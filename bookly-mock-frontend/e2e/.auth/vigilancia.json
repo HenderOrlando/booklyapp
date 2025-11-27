@@ -1,0 +1,57 @@
+{
+  "cookies": [
+    {
+      "name": "accessToken",
+      "value": "mock-token-user_5-1771645320440",
+      "domain": "localhost",
+      "path": "/",
+      "expires": 1771731720.441508,
+      "httpOnly": false,
+      "secure": false,
+      "sameSite": "Strict"
+    },
+    {
+      "name": "refreshToken",
+      "value": "mock-refresh-user_5-1771645320440",
+      "domain": "localhost",
+      "path": "/",
+      "expires": 1772250120.441849,
+      "httpOnly": false,
+      "secure": false,
+      "sameSite": "Strict"
+    },
+    {
+      "name": "NEXT_LOCALE",
+      "value": "es",
+      "domain": "localhost",
+      "path": "/",
+      "expires": 1803181320.442025,
+      "httpOnly": false,
+      "secure": false,
+      "sameSite": "Strict"
+    }
+  ],
+  "origins": [
+    {
+      "origin": "http://localhost:4201",
+      "localStorage": [
+        {
+          "name": "accessToken",
+          "value": "mock-token-user_5-1771645320440"
+        },
+        {
+          "name": "rememberMe",
+          "value": "false"
+        },
+        {
+          "name": "refreshToken",
+          "value": "mock-refresh-user_5-1771645320440"
+        },
+        {
+          "name": "user",
+          "value": "{\"id\":\"user_5\",\"email\":\"vigilante@ufps.edu.co\",\"username\":\"vigilante\",\"firstName\":\"Pedro\",\"lastName\":\"López\",\"fullName\":\"Pedro López\",\"phoneNumber\":\"+57 304 567 8901\",\"phone\":\"+57 304 567 8901\",\"documentType\":\"CC\",\"documentNumber\":\"6677889900\",\"profilePicture\":\"https://api.dicebear.com/7.x/avataaars/svg?seed=pedro\",\"status\":\"ACTIVE\",\"isActive\":true,\"emailVerified\":true,\"isEmailVerified\":true,\"phoneVerified\":true,\"isPhoneVerified\":true,\"twoFactorEnabled\":false,\"roles\":[{\"id\":\"role_5\",\"code\":\"role_5\",\"name\":\"vigilancia\",\"displayName\":\"vigilancia\",\"description\":\"Personal de vigilancia y control de acceso\",\"permissions\":[{\"id\":\"perm_5\",\"code\":\"perm_5\",\"name\":\"perm_5\",\"resource\":\"resources\",\"action\":\"read\",\"description\":\"Ver recursos\",\"isSystem\":true},{\"id\":\"perm_9\",\"code\":\"perm_9\",\"name\":\"perm_9\",\"resource\":\"reservations\",\"action\":\"read\",\"description\":\"Ver reservas\",\"isSystem\":true}],\"isSystem\":true,\"createdAt\":\"2024-01-01T00:00:00.000Z\",\"updatedAt\":\"2024-01-01T00:00:00.000Z\"}],\"permissions\":[{\"id\":\"perm_5\",\"code\":\"perm_5\",\"name\":\"perm_5\",\"resource\":\"resources\",\"action\":\"read\",\"description\":\"Ver recursos\",\"isSystem\":true},{\"id\":\"perm_9\",\"code\":\"perm_9\",\"name\":\"perm_9\",\"resource\":\"reservations\",\"action\":\"read\",\"description\":\"Ver reservas\",\"isSystem\":true}],\"preferences\":{\"language\":\"es\",\"theme\":\"light\",\"notifications\":{\"email\":true,\"push\":true,\"sms\":false},\"timezone\":\"America/Bogota\"},\"lastLoginAt\":\"2026-02-20T15:41:59.121Z\",\"createdAt\":\"2024-04-01T00:00:00.000Z\",\"updatedAt\":\"2026-02-21T03:41:59.121Z\"}"
+        }
+      ]
+    }
+  ]
+}

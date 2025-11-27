@@ -1,0 +1,57 @@
+{
+  "cookies": [
+    {
+      "name": "accessToken",
+      "value": "mock-token-user_4-1771645317614",
+      "domain": "localhost",
+      "path": "/",
+      "expires": 1771731717.615661,
+      "httpOnly": false,
+      "secure": false,
+      "sameSite": "Strict"
+    },
+    {
+      "name": "refreshToken",
+      "value": "mock-refresh-user_4-1771645317614",
+      "domain": "localhost",
+      "path": "/",
+      "expires": 1772250117.615973,
+      "httpOnly": false,
+      "secure": false,
+      "sameSite": "Strict"
+    },
+    {
+      "name": "NEXT_LOCALE",
+      "value": "es",
+      "domain": "localhost",
+      "path": "/",
+      "expires": 1803181317.616093,
+      "httpOnly": false,
+      "secure": false,
+      "sameSite": "Strict"
+    }
+  ],
+  "origins": [
+    {
+      "origin": "http://localhost:4201",
+      "localStorage": [
+        {
+          "name": "accessToken",
+          "value": "mock-token-user_4-1771645317614"
+        },
+        {
+          "name": "rememberMe",
+          "value": "false"
+        },
+        {
+          "name": "refreshToken",
+          "value": "mock-refresh-user_4-1771645317614"
+        },
+        {
+          "name": "user",
+          "value": "{\"id\":\"user_4\",\"email\":\"estudiante@ufps.edu.co\",\"username\":\"estudiante\",\"firstName\":\"Ana\",\"lastName\":\"Martínez\",\"fullName\":\"Ana Martínez\",\"phoneNumber\":\"+57 303 456 7890\",\"phone\":\"+57 303 456 7890\",\"documentType\":\"TI\",\"documentNumber\":\"5566778899\",\"profilePicture\":\"https://api.dicebear.com/7.x/avataaars/svg?seed=ana\",\"status\":\"ACTIVE\",\"isActive\":true,\"emailVerified\":true,\"isEmailVerified\":true,\"phoneVerified\":false,\"isPhoneVerified\":false,\"twoFactorEnabled\":false,\"roles\":[{\"id\":\"role_4\",\"code\":\"role_4\",\"name\":\"estudiante\",\"displayName\":\"estudiante\",\"description\":\"Estudiante de la universidad\",\"permissions\":[{\"id\":\"perm_5\",\"code\":\"perm_5\",\"name\":\"perm_5\",\"resource\":\"resources\",\"action\":\"read\",\"description\":\"Ver recursos\",\"isSystem\":true},{\"id\":\"perm_6\",\"code\":\"perm_6\",\"name\":\"perm_6\",\"resource\":\"resources\",\"action\":\"create\",\"description\":\"Crear recursos\",\"isSystem\":true},{\"id\":\"perm_9\",\"code\":\"perm_9\",\"name\":\"perm_9\",\"resource\":\"reservations\",\"action\":\"read\",\"description\":\"Ver reservas\",\"isSystem\":true},{\"id\":\"perm_10\",\"code\":\"perm_10\",\"name\":\"perm_10\",\"resource\":\"reservations\",\"action\":\"create\",\"description\":\"Crear reservas\",\"isSystem\":true}],\"isSystem\":true,\"createdAt\":\"2024-01-01T00:00:00.000Z\",\"updatedAt\":\"2024-01-01T00:00:00.000Z\"}],\"permissions\":[{\"id\":\"perm_5\",\"code\":\"perm_5\",\"name\":\"perm_5\",\"resource\":\"resources\",\"action\":\"read\",\"description\":\"Ver recursos\",\"isSystem\":true},{\"id\":\"perm_6\",\"code\":\"perm_6\",\"name\":\"perm_6\",\"resource\":\"resources\",\"action\":\"create\",\"description\":\"Crear recursos\",\"isSystem\":true},{\"id\":\"perm_9\",\"code\":\"perm_9\",\"name\":\"perm_9\",\"resource\":\"reservations\",\"action\":\"read\",\"description\":\"Ver reservas\",\"isSystem\":true},{\"id\":\"perm_10\",\"code\":\"perm_10\",\"name\":\"perm_10\",\"resource\":\"reservations\",\"action\":\"create\",\"description\":\"Crear reservas\",\"isSystem\":true}],\"preferences\":{\"language\":\"es\",\"theme\":\"light\",\"notifications\":{\"email\":true,\"push\":true,\"sms\":false},\"timezone\":\"America/Bogota\"},\"lastLoginAt\":\"2026-02-20T03:41:56.449Z\",\"createdAt\":\"2024-03-01T00:00:00.000Z\",\"updatedAt\":\"2026-02-21T03:41:56.449Z\"}"
+        }
+      ]
+    }
+  ]
+}

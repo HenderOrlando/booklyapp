@@ -1,0 +1,57 @@
+{
+  "cookies": [
+    {
+      "name": "accessToken",
+      "value": "mock-token-user_3-1771645314852",
+      "domain": "localhost",
+      "path": "/",
+      "expires": 1771731714.853272,
+      "httpOnly": false,
+      "secure": false,
+      "sameSite": "Strict"
+    },
+    {
+      "name": "refreshToken",
+      "value": "mock-refresh-user_3-1771645314852",
+      "domain": "localhost",
+      "path": "/",
+      "expires": 1772250114.853453,
+      "httpOnly": false,
+      "secure": false,
+      "sameSite": "Strict"
+    },
+    {
+      "name": "NEXT_LOCALE",
+      "value": "es",
+      "domain": "localhost",
+      "path": "/",
+      "expires": 1803181314.853573,
+      "httpOnly": false,
+      "secure": false,
+      "sameSite": "Strict"
+    }
+  ],
+  "origins": [
+    {
+      "origin": "http://localhost:4201",
+      "localStorage": [
+        {
+          "name": "accessToken",
+          "value": "mock-token-user_3-1771645314852"
+        },
+        {
+          "name": "rememberMe",
+          "value": "false"
+        },
+        {
+          "name": "refreshToken",
+          "value": "mock-refresh-user_3-1771645314852"
+        },
+        {
+          "name": "user",
+          "value": "{\"id\":\"user_3\",\"email\":\"profesor@ufps.edu.co\",\"username\":\"profesor\",\"firstName\":\"Carlos\",\"lastName\":\"Ramírez\",\"fullName\":\"Carlos Ramírez\",\"phoneNumber\":\"+57 302 345 6789\",\"phone\":\"+57 302 345 6789\",\"documentType\":\"CC\",\"documentNumber\":\"1122334455\",\"profilePicture\":\"https://api.dicebear.com/7.x/avataaars/svg?seed=carlos\",\"status\":\"ACTIVE\",\"isActive\":true,\"emailVerified\":true,\"isEmailVerified\":true,\"phoneVerified\":false,\"isPhoneVerified\":false,\"twoFactorEnabled\":false,\"roles\":[{\"id\":\"role_3\",\"code\":\"role_3\",\"name\":\"profesor\",\"displayName\":\"profesor\",\"description\":\"Profesor universitario\",\"permissions\":[{\"id\":\"perm_5\",\"code\":\"perm_5\",\"name\":\"perm_5\",\"resource\":\"resources\",\"action\":\"read\",\"description\":\"Ver recursos\",\"isSystem\":true},{\"id\":\"perm_9\",\"code\":\"perm_9\",\"name\":\"perm_9\",\"resource\":\"reservations\",\"action\":\"read\",\"description\":\"Ver reservas\",\"isSystem\":true},{\"id\":\"perm_10\",\"code\":\"perm_10\",\"name\":\"perm_10\",\"resource\":\"reservations\",\"action\":\"create\",\"description\":\"Crear reservas\",\"isSystem\":true},{\"id\":\"perm_11\",\"code\":\"perm_11\",\"name\":\"perm_11\",\"resource\":\"reservations\",\"action\":\"update\",\"description\":\"Actualizar reservas\",\"isSystem\":true},{\"id\":\"perm_12\",\"code\":\"perm_12\",\"name\":\"perm_12\",\"resource\":\"reservations\",\"action\":\"delete\",\"description\":\"Eliminar reservas\",\"isSystem\":true}],\"isSystem\":true,\"createdAt\":\"2024-01-01T00:00:00.000Z\",\"updatedAt\":\"2024-01-01T00:00:00.000Z\"}],\"permissions\":[{\"id\":\"perm_5\",\"code\":\"perm_5\",\"name\":\"perm_5\",\"resource\":\"resources\",\"action\":\"read\",\"description\":\"Ver recursos\",\"isSystem\":true},{\"id\":\"perm_9\",\"code\":\"perm_9\",\"name\":\"perm_9\",\"resource\":\"reservations\",\"action\":\"read\",\"description\":\"Ver reservas\",\"isSystem\":true},{\"id\":\"perm_10\",\"code\":\"perm_10\",\"name\":\"perm_10\",\"resource\":\"reservations\",\"action\":\"create\",\"description\":\"Crear reservas\",\"isSystem\":true},{\"id\":\"perm_11\",\"code\":\"perm_11\",\"name\":\"perm_11\",\"resource\":\"reservations\",\"action\":\"update\",\"description\":\"Actualizar reservas\",\"isSystem\":true},{\"id\":\"perm_12\",\"code\":\"perm_12\",\"name\":\"perm_12\",\"resource\":\"reservations\",\"action\":\"delete\",\"description\":\"Eliminar reservas\",\"isSystem\":true}],\"preferences\":{\"language\":\"es\",\"theme\":\"dark\",\"notifications\":{\"email\":true,\"push\":false,\"sms\":false},\"timezone\":\"America/Bogota\"},\"lastLoginAt\":\"2026-02-21T01:41:53.690Z\",\"createdAt\":\"2024-02-01T00:00:00.000Z\",\"updatedAt\":\"2026-02-21T03:41:53.690Z\"}"
+        }
+      ]
+    }
+  ]
+}
