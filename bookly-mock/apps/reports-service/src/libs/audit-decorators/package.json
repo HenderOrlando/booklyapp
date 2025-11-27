@@ -1,0 +1,19 @@
+{
+  "name": "@reports/audit-decorators",
+  "version": "1.0.0",
+  "description": "Decoradores e interceptores ligeros para auditoría event-driven en Bookly (managed by reports-service)",
+  "type": "commonjs",
+  "main": "src/index.ts",
+  "types": "src/index.ts",
+  "keywords": [
+    "audit",
+    "decorators",
+    "interceptors",
+    "event-driven",
+    "nestjs",
+    "bookly",
+    "reports-service"
+  ],
+  "author": "Bookly Development Team - Reports Service",
+  "license": "MIT"
+}

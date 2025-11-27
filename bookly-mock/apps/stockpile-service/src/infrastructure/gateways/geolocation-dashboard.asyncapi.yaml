@@ -1,0 +1,405 @@
+asyncapi: "2.6.0"
+info:
+  title: Geolocation Dashboard WebSocket API
+  version: "1.0.0"
+  description: |
+    API WebSocket para dashboard de geolocalización en tiempo real del Stockpile Service.
+    Permite tracking de usuarios, actualizaciones de ubicación y alertas de proximidad.
+  contact:
+    name: Bookly Development Team
+    url: https://github.com/bookly-monorepo
+  license:
+    name: MIT
+
+servers:
+  production:
+    url: wss://api.bookly.ufps.edu.co/geolocation
+    protocol: wss
+    description: Servidor de producción
+  development:
+    url: ws://localhost:3004/geolocation
+    protocol: ws
+    description: Servidor de desarrollo local
+
+channels:
+  /:
+    description: Namespace principal del gateway de geolocalización
+
+    publish:
+      summary: Mensajes enviados por el cliente
+      operationId: clientToServer
+      message:
+        oneOf:
+          - $ref: "#/components/messages/UserLocationUpdate"
+          - $ref: "#/components/messages/RequestStats"
+
+    subscribe:
+      summary: Mensajes recibidos por el cliente
+      operationId: serverToClient
+      message:
+        oneOf:
+          - $ref: "#/components/messages/LocationUpdate"
+          - $ref: "#/components/messages/CheckIn"
+          - $ref: "#/components/messages/CheckOut"
+          - $ref: "#/components/messages/ActiveUsers"
+          - $ref: "#/components/messages/ProximityAlert"
+          - $ref: "#/components/messages/DashboardStats"
+
+components:
+  messages:
+    # ============ MENSAJES CLIENTE → SERVIDOR ============
+
+    UserLocationUpdate:
+      name: user-location-update
+      title: Actualización de ubicación del usuario
+      summary: El cliente envía la ubicación actual del usuario
+      contentType: application/json
+      payload:
+        $ref: "#/components/schemas/UserLocationUpdatePayload"
+      examples:
+        - name: Usuario aproximándose
+          summary: Usuario a 50m del recurso
+          payload:
+            userId: "507f1f77bcf86cd799439011"
+            reservationId: "507f1f77bcf86cd799439012"
+            coordinates:
+              latitude: 7.8939
+              longitude: -72.5078
+              accuracy: 10
+            timestamp: "2024-01-15T14:30:00.000Z"
+
+    RequestStats:
+      name: request-stats
+      title: Solicitud de estadísticas
+      summary: El cliente solicita estadísticas del dashboard
+      contentType: application/json
+      payload:
+        type: object
+        properties: {}
+
+    # ============ MENSAJES SERVIDOR → CLIENTE ============
+
+    LocationUpdate:
+      name: location-update
+      title: Broadcast de ubicación actualizada
+      summary: El servidor notifica a todos los clientes sobre una actualización de ubicación
+      contentType: application/json
+      payload:
+        $ref: "#/components/schemas/LocationUpdatePayload"
+      examples:
+        - name: Actualización broadcast
+          payload:
+            userId: "507f1f77bcf86cd799439011"
+            reservationId: "507f1f77bcf86cd799439012"
+            coordinates:
+              latitude: 7.8939
+              longitude: -72.5078
+            timestamp: "2024-01-15T14:30:00.000Z"
+
+    CheckIn:
+      name: check-in
+      title: Notificación de check-in
+      summary: Se notifica cuando un usuario completa un check-in
+      contentType: application/json
+      payload:
+        $ref: "#/components/schemas/CheckInPayload"
+      examples:
+        - name: Check-in completado
+          payload:
+            checkInId: "507f1f77bcf86cd799439013"
+            userId: "507f1f77bcf86cd799439011"
+            reservationId: "507f1f77bcf86cd799439012"
+            resourceId: "507f1f77bcf86cd799439014"
+            checkInTime: "2024-01-15T14:30:00.000Z"
+            coordinates:
+              latitude: 7.8939
+              longitude: -72.5078
+
+    CheckOut:
+      name: check-out
+      title: Notificación de check-out
+      summary: Se notifica cuando un usuario completa un check-out
+      contentType: application/json
+      payload:
+        $ref: "#/components/schemas/CheckOutPayload"
+      examples:
+        - name: Check-out completado
+          payload:
+            checkOutId: "507f1f77bcf86cd799439013"
+            userId: "507f1f77bcf86cd799439011"
+            resourceId: "507f1f77bcf86cd799439014"
+            checkOutTime: "2024-01-15T16:30:00.000Z"
+
+    ActiveUsers:
+      name: active-users
+      title: Lista de usuarios activos
+      summary: Lista todos los usuarios con check-in activo y su ubicación actual
+      contentType: application/json
+      payload:
+        $ref: "#/components/schemas/ActiveUsersPayload"
+      examples:
+        - name: Dos usuarios activos
+          payload:
+            - userId: "507f1f77bcf86cd799439011"
+              reservationId: "507f1f77bcf86cd799439012"
+              resourceId: "507f1f77bcf86cd799439014"
+              checkInTime: "2024-01-15T14:00:00.000Z"
+              currentLocation:
+                latitude: 7.8939
+                longitude: -72.5078
+                lastUpdate: "2024-01-15T14:30:00.000Z"
+              metadata:
+                purpose: "Clase de programación"
+
+    ProximityAlert:
+      name: proximity-alert
+      title: Alerta de proximidad
+      summary: Se envía cuando un usuario se acerca a un recurso reservado
+      contentType: application/json
+      payload:
+        $ref: "#/components/schemas/ProximityAlertPayload"
+      examples:
+        - name: Usuario ha llegado
+          payload:
+            type: "arrived"
+            userId: "507f1f77bcf86cd799439011"
+            resourceId: "507f1f77bcf86cd799439014"
+            distance: 15
+            message: "¡Has llegado! Puedes hacer check-in ahora."
+            canCheckIn: true
+        - name: Usuario cercano
+          payload:
+            type: "approaching"
+            userId: "507f1f77bcf86cd799439011"
+            resourceId: "507f1f77bcf86cd799439014"
+            distance: 85
+            message: "Te acercas - 85m del recurso"
+            canCheckIn: false
+
+    DashboardStats:
+      name: dashboard-stats
+      title: Estadísticas del dashboard
+      summary: Estadísticas en tiempo real del sistema
+      contentType: application/json
+      payload:
+        $ref: "#/components/schemas/DashboardStatsPayload"
+      examples:
+        - name: Estadísticas actuales
+          payload:
+            totalActiveUsers: 25
+            totalConnectedClients: 8
+            avgDistanceToResources: 125
+
+  schemas:
+    # ============ SCHEMAS DE PAYLOAD ============
+
+    UserLocationUpdatePayload:
+      type: object
+      required:
+        - userId
+        - reservationId
+        - coordinates
+        - timestamp
+      properties:
+        userId:
+          type: string
+          description: ID del usuario
+          example: "507f1f77bcf86cd799439011"
+        reservationId:
+          type: string
+          description: ID de la reserva activa
+          example: "507f1f77bcf86cd799439012"
+        coordinates:
+          type: object
+          required:
+            - latitude
+            - longitude
+          properties:
+            latitude:
+              type: number
+              format: double
+              description: Latitud en grados decimales
+              minimum: -90
+              maximum: 90
+              example: 7.8939
+            longitude:
+              type: number
+              format: double
+              description: Longitud en grados decimales
+              minimum: -180
+              maximum: 180
+              example: -72.5078
+            accuracy:
+              type: number
+              format: float
+              description: Precisión en metros (opcional)
+              minimum: 0
+              example: 10
+        timestamp:
+          type: string
+          format: date-time
+          description: Timestamp de la captura de ubicación
+          example: "2024-01-15T14:30:00.000Z"
+
+    LocationUpdatePayload:
+      type: object
+      required:
+        - userId
+        - reservationId
+        - coordinates
+        - timestamp
+      properties:
+        userId:
+          type: string
+        reservationId:
+          type: string
+        coordinates:
+          type: object
+          properties:
+            latitude:
+              type: number
+            longitude:
+              type: number
+        timestamp:
+          type: string
+          format: date-time
+
+    CheckInPayload:
+      type: object
+      required:
+        - checkInId
+        - userId
+        - reservationId
+        - resourceId
+        - checkInTime
+      properties:
+        checkInId:
+          type: string
+        userId:
+          type: string
+        reservationId:
+          type: string
+        resourceId:
+          type: string
+        checkInTime:
+          type: string
+          format: date-time
+        coordinates:
+          type: object
+          properties:
+            latitude:
+              type: number
+            longitude:
+              type: number
+
+    CheckOutPayload:
+      type: object
+      required:
+        - checkOutId
+        - userId
+        - resourceId
+        - checkOutTime
+      properties:
+        checkOutId:
+          type: string
+        userId:
+          type: string
+        resourceId:
+          type: string
+        checkOutTime:
+          type: string
+          format: date-time
+
+    ActiveUsersPayload:
+      type: array
+      items:
+        type: object
+        required:
+          - userId
+          - reservationId
+          - resourceId
+          - checkInTime
+          - currentLocation
+        properties:
+          userId:
+            type: string
+          reservationId:
+            type: string
+          resourceId:
+            type: string
+          checkInTime:
+            type: string
+            format: date-time
+          currentLocation:
+            type: object
+            required:
+              - latitude
+              - longitude
+              - lastUpdate
+            properties:
+              latitude:
+                type: number
+              longitude:
+                type: number
+              lastUpdate:
+                type: string
+                format: date-time
+          metadata:
+            type: object
+            additionalProperties: true
+
+    ProximityAlertPayload:
+      type: object
+      required:
+        - type
+        - userId
+        - resourceId
+        - distance
+        - message
+        - canCheckIn
+      properties:
+        type:
+          type: string
+          enum: [approaching, near, arrived]
+          description: Tipo de alerta según threshold
+        userId:
+          type: string
+        resourceId:
+          type: string
+        distance:
+          type: number
+          description: Distancia en metros
+          minimum: 0
+        message:
+          type: string
+          description: Mensaje personalizado para el usuario
+        canCheckIn:
+          type: boolean
+          description: Indica si el usuario puede hacer check-in
+
+    DashboardStatsPayload:
+      type: object
+      required:
+        - totalActiveUsers
+        - totalConnectedClients
+      properties:
+        totalActiveUsers:
+          type: integer
+          description: Usuarios con check-in activo
+          minimum: 0
+        totalConnectedClients:
+          type: integer
+          description: Clientes WebSocket conectados
+          minimum: 0
+        avgDistanceToResources:
+          type: number
+          description: Distancia promedio a recursos (metros)
+          minimum: 0
+
+tags:
+  - name: geolocation
+    description: Operaciones de geolocalización en tiempo real
+  - name: proximity
+    description: Alertas y notificaciones de proximidad
+  - name: tracking
+    description: Seguimiento de usuarios activos

@@ -1,0 +1,26 @@
+{
+  "name": "@libs/database",
+  "version": "1.0.0",
+  "description": "Librería centralizada para gestión de MongoDB con Mongoose en Bookly",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsc",
+    "clean": "rm -rf dist"
+  },
+  "keywords": [
+    "mongodb",
+    "mongoose",
+    "nestjs",
+    "database",
+    "bookly"
+  ],
+  "author": "Equipo Bookly",
+  "license": "MIT",
+  "peerDependencies": {
+    "@nestjs/common": "^10.0.0",
+    "@nestjs/config": "^3.0.0",
+    "@nestjs/mongoose": "^10.0.0",
+    "mongoose": "^8.0.0"
+  }
+}

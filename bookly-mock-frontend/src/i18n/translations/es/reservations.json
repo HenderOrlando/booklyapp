@@ -1,0 +1,23 @@
+{
+  "title": "Reservas",
+  "management": "Gestiona todas tus reservas de recursos",
+  "view_grid": "Vista Grid",
+  "view_virtual": "Vista Virtual",
+  "create": "Nueva Reserva",
+  "create_action": "Crear Reserva",
+  "list": "Listado de Reservas",
+  "showing_count": "{count, plural, =0 {No se encontraron reservas} one {# reserva encontrada} other {# reservas encontradas}}",
+  "search_placeholder": "Buscar por título o recurso...",
+  "status_all": "Todos los estados",
+  "no_results_title": "No se encontraron reservas",
+  "no_results_desc": "No hay reservas que coincidan con los filtros aplicados.",
+  "empty_desc": "Aún no hay reservas registradas. Crea la primera reserva para comenzar.",
+  "statuses": {
+    "PENDING": "Pendiente",
+    "CONFIRMED": "Confirmada",
+    "IN_PROGRESS": "En Progreso",
+    "COMPLETED": "Completada",
+    "CANCELLED": "Cancelada",
+    "REJECTED": "Rechazada"
+  }
+}

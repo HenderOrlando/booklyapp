@@ -1,0 +1,161 @@
+import { RequirePermissions } from "@libs/common/decorators";
+import { CurrentUser } from "@libs/decorators";
+import { JwtAuthGuard } from "@libs/guards";
+import { PermissionsGuard } from "@libs/guards/permissions.guard";
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  Post,
+  Query,
+  UseGuards,
+} from "@nestjs/common";
+import { CommandBus, QueryBus } from "@nestjs/cqrs";
+import {
+  ApiBearerAuth,
+  ApiOperation,
+  ApiResponse,
+  ApiTags,
+} from "@nestjs/swagger";
+import { CreateAvailabilityExceptionCommand } from "../../application/commands/create-availability-exception.command";
+import { DeleteAvailabilityExceptionCommand } from "../../application/commands/delete-availability-exception.command";
+import { GetAvailabilityExceptionsQuery } from "../../application/queries/get-availability-exceptions.query";
+import {
+  AvailabilityExceptionResponseDto,
+  CreateAvailabilityExceptionDto,
+  QueryAvailabilityExceptionsDto,
+} from "../dtos/availability-exception.dto";
+
+/**
+ * Availability Exceptions Controller
+ * Gestión de excepciones de disponibilidad (días festivos, cierres, etc.)
+ */
+@ApiTags("Availability Exceptions")
+@ApiBearerAuth()
+@Controller("availability/exceptions")
+@UseGuards(JwtAuthGuard, PermissionsGuard)
+export class AvailabilityExceptionsController {
+  constructor(
+    private readonly commandBus: CommandBus,
+    private readonly queryBus: QueryBus
+  ) {}
+
+  @Post()
+  @RequirePermissions("availability:manage")
+  @ApiOperation({
+    summary: "Crear excepción de disponibilidad",
+    description:
+      "Crea una excepción para bloquear o habilitar un recurso en una fecha específica. Útil para días festivos, eventos especiales o cierres temporales.",
+  })
+  @ApiResponse({
+    status: 201,
+    description: "Excepción creada exitosamente",
+    type: AvailabilityExceptionResponseDto,
+  })
+  @ApiResponse({
+    status: 400,
+    description: "Ya existe una excepción para esta fecha y recurso",
+  })
+  @ApiResponse({
+    status: 401,
+    description: "No autenticado",
+  })
+  @ApiResponse({
+    status: 403,
+    description: "Sin permisos para gestionar disponibilidad",
+  })
+  async create(
+    @Body() dto: CreateAvailabilityExceptionDto,
+    @CurrentUser() user: any
+  ): Promise<AvailabilityExceptionResponseDto> {
+    const command = new CreateAvailabilityExceptionCommand(
+      user.id || user.userId,
+      dto
+    );
+    return await this.commandBus.execute(command);
+  }
+
+  @Get()
+  @RequirePermissions("availability:read")
+  @ApiOperation({
+    summary: "Listar excepciones de disponibilidad",
+    description:
+      "Obtiene lista de excepciones filtradas por recurso, fechas, motivo, etc.",
+  })
+  @ApiResponse({
+    status: 200,
+    description: "Lista de excepciones obtenida exitosamente",
+    type: [AvailabilityExceptionResponseDto],
+    schema: {
+      example: [
+        {
+          id: "507f1f77bcf86cd799439011",
+          resourceId: "507f1f77bcf86cd799439012",
+          exceptionDate: "2025-12-25T00:00:00Z",
+          reason: "HOLIDAY",
+          isAvailable: false,
+          notes: "Navidad - Universidad cerrada",
+          createdBy: "507f1f77bcf86cd799439013",
+          createdAt: "2025-11-08T10:00:00Z",
+          updatedAt: "2025-11-08T10:00:00Z",
+        },
+      ],
+    },
+  })
+  @ApiResponse({
+    status: 401,
+    description: "No autenticado",
+  })
+  async findAll(
+    @Query() filters: QueryAvailabilityExceptionsDto
+  ): Promise<AvailabilityExceptionResponseDto[]> {
+    const query = new GetAvailabilityExceptionsQuery(filters);
+    return await this.queryBus.execute(query);
+  }
+
+  @Get("resource/:resourceId")
+  @RequirePermissions("availability:read")
+  @ApiOperation({
+    summary: "Listar excepciones de un recurso",
+    description: "Obtiene todas las excepciones de un recurso específico",
+  })
+  @ApiResponse({
+    status: 200,
+    description: "Lista de excepciones del recurso",
+    type: [AvailabilityExceptionResponseDto],
+  })
+  async findByResource(
+    @Param("resourceId") resourceId: string
+  ): Promise<AvailabilityExceptionResponseDto[]> {
+    const query = new GetAvailabilityExceptionsQuery({ resourceId });
+    return await this.queryBus.execute(query);
+  }
+
+  @Delete(":id")
+  @RequirePermissions("availability:manage")
+  @ApiOperation({
+    summary: "Eliminar excepción de disponibilidad",
+    description: "Elimina una excepción existente",
+  })
+  @ApiResponse({
+    status: 200,
+    description: "Excepción eliminada exitosamente",
+  })
+  @ApiResponse({
+    status: 404,
+    description: "Excepción no encontrada",
+  })
+  @ApiResponse({
+    status: 403,
+    description: "Sin permisos para gestionar disponibilidad",
+  })
+  async delete(@Param("id") id: string): Promise<{ message: string }> {
+    const command = new DeleteAvailabilityExceptionCommand(id);
+    await this.commandBus.execute(command);
+    return {
+      message: "Excepción eliminada exitosamente",
+    };
+  }
+}

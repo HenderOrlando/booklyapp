@@ -1,0 +1,20 @@
+{
+  "title": "Dashboard",
+  "active_reservations": "Active Reservations",
+  "available_resources": "Available Resources",
+  "pending_approvals": "Pending Approvals",
+  "utilization_rate": "Utilization Rate",
+  "recent_reservations": "Recent Reservations",
+  "recent_reservations_desc": "Latest confirmed reservations",
+  "most_used_resources": "Most Used Resources",
+  "most_used_desc": "Top 5 this month",
+  "confirmed": "Confirmed",
+  "no_recent_reservations": "No upcoming reservations",
+  "no_data": "No data available",
+  "reservations_count": "reservations",
+  "total_this_month": "Total this month",
+  "of_total": "Of {{total}} total",
+  "require_attention": "Require attention",
+  "monthly_avg": "Monthly average",
+  "resource": "Resource"
+}

@@ -1,0 +1,215 @@
+version: "3.8"
+
+services:
+  # ===============================================
+  # ZOOKEEPER (Required for Kafka)
+  # ===============================================
+  zookeeper:
+    image: confluentinc/cp-zookeeper:7.5.0
+    container_name: bookly-mock-zookeeper
+    ports:
+      - "2181:2181"
+    environment:
+      ZOOKEEPER_CLIENT_PORT: 2181
+      ZOOKEEPER_TICK_TIME: 2000
+    networks:
+      - bookly-mock-network
+    volumes:
+      - zookeeper-data:/var/lib/zookeeper/data
+      - zookeeper-logs:/var/lib/zookeeper/log
+
+  # ===============================================
+  # KAFKA (Event Bus)
+  # ===============================================
+  kafka:
+    image: confluentinc/cp-kafka:7.5.0
+    container_name: bookly-mock-kafka
+    ports:
+      - "9092:9092"
+      - "9093:9093"
+    environment:
+      KAFKA_BROKER_ID: 1
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://localhost:9092,PLAINTEXT_INTERNAL://kafka:9093
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_INTERNAL:PLAINTEXT
+      KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT_INTERNAL
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_AUTO_CREATE_TOPICS_ENABLE: "true"
+    depends_on:
+      - zookeeper
+    networks:
+      - bookly-mock-network
+    volumes:
+      - kafka-data:/var/lib/kafka/data
+
+  # ===============================================
+  # REDIS (Cache)
+  # ===============================================
+  redis:
+    image: redis:7.2-alpine
+    container_name: bookly-mock-redis
+    ports:
+      - "6379:6379"
+    command: redis-server --appendonly yes
+    networks:
+      - bookly-mock-network
+    volumes:
+      - redis-data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+
+  # ===============================================
+  # MONGODB - AUTH DATABASE
+  # ===============================================
+  mongodb-auth:
+    image: mongo:7.0
+    container_name: bookly-mock-mongodb-auth
+    ports:
+      - "27017:27017"
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: bookly
+      MONGO_INITDB_ROOT_PASSWORD: bookly123
+      MONGO_INITDB_DATABASE: bookly-mock-auth
+    networks:
+      - bookly-mock-network
+    volumes:
+      - mongodb-auth-data:/data/db
+      # - ./apps/auth-service/src/database/init-mongo.js:/docker-entrypoint-initdb.d/init-mongo.js:ro
+    healthcheck:
+      test: echo 'db.runCommand("ping").ok' | mongosh localhost:27017/test --quiet
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # ===============================================
+  # MONGODB - RESOURCES DATABASE
+  # ===============================================
+  mongodb-resources:
+    image: mongo:7.0
+    container_name: bookly-mock-mongodb-resources
+    ports:
+      - "27018:27017"
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: bookly
+      MONGO_INITDB_ROOT_PASSWORD: bookly123
+      MONGO_INITDB_DATABASE: bookly-mock-resources
+    networks:
+      - bookly-mock-network
+    volumes:
+      - mongodb-resources-data:/data/db
+      # - ./apps/resources-service/src/database/init-mongo.js:/docker-entrypoint-initdb.d/init-mongo.js:ro
+    healthcheck:
+      test: echo 'db.runCommand("ping").ok' | mongosh localhost:27017/test --quiet
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # ===============================================
+  # MONGODB - AVAILABILITY DATABASE
+  # ===============================================
+  mongodb-availability:
+    image: mongo:7.0
+    container_name: bookly-mock-mongodb-availability
+    ports:
+      - "27019:27017"
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: bookly
+      MONGO_INITDB_ROOT_PASSWORD: bookly123
+      MONGO_INITDB_DATABASE: bookly-mock-availability
+    networks:
+      - bookly-mock-network
+    volumes:
+      - mongodb-availability-data:/data/db
+      # - ./apps/availability-service/src/database/init-mongo.js:/docker-entrypoint-initdb.d/init-mongo.js:ro
+    healthcheck:
+      test: echo 'db.runCommand("ping").ok' | mongosh localhost:27017/test --quiet
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # ===============================================
+  # MONGODB - STOCKPILE DATABASE
+  # ===============================================
+  mongodb-stockpile:
+    image: mongo:7.0
+    container_name: bookly-mock-mongodb-stockpile
+    ports:
+      - "27020:27017"
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: bookly
+      MONGO_INITDB_ROOT_PASSWORD: bookly123
+      MONGO_INITDB_DATABASE: bookly-mock-stockpile
+    networks:
+      - bookly-mock-network
+    volumes:
+      - mongodb-stockpile-data:/data/db
+      # - ./apps/stockpile-service/src/database/init-mongo.js:/docker-entrypoint-initdb.d/init-mongo.js:ro
+    healthcheck:
+      test: echo 'db.runCommand("ping").ok' | mongosh localhost:27017/test --quiet
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # ===============================================
+  # MONGODB - REPORTS DATABASE
+  # ===============================================
+  mongodb-reports:
+    image: mongo:7.0
+    container_name: bookly-mock-mongodb-reports
+    ports:
+      - "27021:27017"
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: bookly
+      MONGO_INITDB_ROOT_PASSWORD: bookly123
+      MONGO_INITDB_DATABASE: bookly-mock-reports
+    networks:
+      - bookly-mock-network
+    volumes:
+      - mongodb-reports-data:/data/db
+      # - ./apps/reports-service/src/database/init-mongo.js:/docker-entrypoint-initdb.d/init-mongo.js:ro
+    healthcheck:
+      test: echo 'db.runCommand("ping").ok' | mongosh localhost:27017/test --quiet
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # ===============================================
+  # MONGODB - GATEWAY DATABASE (for aggregated data)
+  # ===============================================
+  mongodb-gateway:
+    image: mongo:7.0
+    container_name: bookly-mock-mongodb-gateway
+    ports:
+      - "27022:27017"
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: bookly
+      MONGO_INITDB_ROOT_PASSWORD: bookly123
+      MONGO_INITDB_DATABASE: bookly-mock-gateway
+    networks:
+      - bookly-mock-network
+    volumes:
+      - mongodb-gateway-data:/data/db
+    healthcheck:
+      test: echo 'db.runCommand("ping").ok' | mongosh localhost:27017/test --quiet
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+networks:
+  bookly-mock-network:
+    driver: bridge
+
+volumes:
+  zookeeper-data:
+  zookeeper-logs:
+  kafka-data:
+  redis-data:
+  mongodb-auth-data:
+  mongodb-resources-data:
+  mongodb-availability-data:
+  mongodb-stockpile-data:
+  mongodb-reports-data:
+  mongodb-gateway-data:

@@ -1,0 +1,6 @@
+code,name,description,type,categoryCode,capacity,location,floor,building,attributes,programIds
+LAB-001,Laboratorio de Química 1,Laboratorio equipado para prácticas de química básica,LABORATORY,LAB,30,Edificio de Ciencias,2,Bloque A,"{""equipos"": [""microscopios"", ""centrífugas""], ""software"": [""ChemDraw""]}",PROG-QUIM;PROG-BIO
+AUD-001,Auditorio Principal,Auditorio principal con capacidad para 500 personas,AUDITORIUM,AUD,500,Edificio Principal,1,Bloque Central,"{""proyector"": true, ""sonido"": ""Dolby 7.1"", ""escenario"": true}",
+SAL-101,Sala de Conferencias A,Sala equipada para videoconferencias,ROOM,CONF,25,Edificio Administrativo,1,Bloque B,"{""videoconferencia"": true, ""pizarraDigital"": true}",PROG-ADM
+EQP-001,Proyector Epson EB-2250U,Proyector de alta definición portátil,EQUIPMENT,TECH,0,Almacén de Tecnología,,Bloque A,"{""resolucion"": ""1920x1200"", ""lumens"": 5000}",
+LAB-002,Laboratorio de Física 1,Laboratorio para prácticas de mecánica y termodinámica,LABORATORY,LAB,25,Edificio de Ciencias,3,Bloque A,"{""equipos"": [""osciloscopios"", ""multímetros""]}",PROG-FIS

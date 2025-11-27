@@ -1,0 +1,20 @@
+{
+  "loading": "Cargando...",
+  "save": "Guardar",
+  "cancel": "Cancelar",
+  "delete": "Eliminar",
+  "edit": "Editar",
+  "create": "Crear",
+  "search": "Buscar",
+  "filter": "Filtrar",
+  "clear_filters": "Limpiar Filtros",
+  "export": "Exportar",
+  "import": "Importar",
+  "confirm": "Confirmar",
+  "back": "Volver",
+  "next": "Siguiente",
+  "previous": "Anterior",
+  "close": "Cerrar",
+  "yes": "Sí",
+  "no": "No"
+}

@@ -1,0 +1,17 @@
+{
+  "title": "Solicitudes de Aprobación",
+  "description": "Gestiona las solicitudes de reserva que requieren aprobación",
+  "stats": {
+    "pending": "Pendientes",
+    "approved": "Aprobadas",
+    "rejected": "Rechazadas",
+    "average_time": "Tiempo Promedio"
+  },
+  "search_placeholder": "Buscar por nombre, recurso o propósito...",
+  "filters": "Filtros",
+  "loading": "Cargando solicitudes...",
+  "no_requests": "No se encontraron solicitudes",
+  "share_success_title": "Documento Compartido",
+  "share_success_desc": "El documento se compartió por {medium}",
+  "reject_reason_default": "Rechazado"
+}

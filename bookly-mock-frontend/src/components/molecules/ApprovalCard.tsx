@@ -1,0 +1,226 @@
+import { ApprovalActionButton } from "@/components/atoms/ApprovalActionButton";
+import { ApprovalStatusBadge } from "@/components/atoms/ApprovalStatusBadge";
+import { Badge } from "@/components/atoms/Badge";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/atoms/Card";
+import type { ApprovalRequest } from "@/types/entities/approval";
+import { format } from "date-fns";
+import { es } from "date-fns/locale";
+import {
+  AlertCircle,
+  Calendar,
+  Clock,
+  FileText,
+  MapPin,
+  User,
+  Users,
+} from "lucide-react";
+import * as React from "react";
+
+/**
+ * ApprovalCard - Molecule Component
+ *
+ * Tarjeta que muestra información resumida de una solicitud de aprobación
+ * con opciones para ver detalle, aprobar o rechazar.
+ *
+ * @example
+ * ```tsx
+ * <ApprovalCard
+ *   request={approvalRequest}
+ *   onApprove={handleApprove}
+ *   onReject={handleReject}
+ *   onViewDetails={handleViewDetails}
+ * />
+ * ```
+ */
+
+export interface ApprovalCardProps {
+  /** Solicitud de aprobación */
+  request: ApprovalRequest;
+  /** Handler para aprobar */
+  onApprove?: (id: string) => void;
+  /** Handler para rechazar */
+  onReject?: (id: string) => void;
+  /** Handler para ver detalles */
+  onViewDetails?: (id: string) => void;
+  /** Mostrar acciones de aprobación */
+  showActions?: boolean;
+  /** Estado de carga de acciones */
+  loading?: boolean;
+  /** Clase CSS adicional */
+  className?: string;
+}
+
+export const ApprovalCard = React.memo<ApprovalCardProps>(
+  ({
+    request,
+    onApprove,
+    onReject,
+    onViewDetails,
+    showActions = true,
+    loading = false,
+    className = "",
+  }) => {
+    const startDate = new Date(request.startDate);
+    const endDate = new Date(request.endDate);
+
+    // Calcular si está cerca de expirar
+    const isNearExpiry = React.useMemo(() => {
+      if (!request.expiresAt) return false;
+      const now = new Date();
+      const expiry = new Date(request.expiresAt);
+      const hoursRemaining =
+        (expiry.getTime() - now.getTime()) / (1000 * 60 * 60);
+      return hoursRemaining < 24 && hoursRemaining > 0;
+    }, [request.expiresAt]);
+
+    return (
+      <Card className={`hover:shadow-lg transition-shadow ${className}`}>
+        <CardHeader>
+          <div className="flex items-start justify-between">
+            <div className="flex-1 space-y-1">
+              <div className="flex items-center gap-2">
+                <ApprovalStatusBadge status={request.status} />
+                <Badge variant="outline" className="text-xs">
+                  {request.currentLevel.replace("_", " ")}
+                </Badge>
+                {request.priority === "HIGH" && (
+                  <Badge variant="warning" className="text-xs">
+                    Alta Prioridad
+                  </Badge>
+                )}
+                {request.priority === "URGENT" && (
+                  <Badge variant="error" className="text-xs">
+                    Urgente
+                  </Badge>
+                )}
+              </div>
+              <CardTitle className="text-lg">{request.resourceName}</CardTitle>
+              <CardDescription className="flex items-center gap-1">
+                <MapPin className="h-3.5 w-3.5" />
+                {request.categoryName || request.resourceType}
+              </CardDescription>
+            </div>
+          </div>
+        </CardHeader>
+
+        <CardContent className="space-y-4">
+          {/* Información del solicitante */}
+          <div className="flex items-center gap-2 text-sm">
+            <User className="h-4 w-4 text-gray-500 dark:text-gray-400" />
+            <span className="font-medium">{request.userName}</span>
+            {request.userRole && (
+              <Badge variant="outline" className="text-xs">
+                {request.userRole}
+              </Badge>
+            )}
+          </div>
+
+          {/* Fecha y hora */}
+          <div className="grid grid-cols-2 gap-3 text-sm">
+            <div className="flex items-start gap-2">
+              <Calendar className="h-4 w-4 text-gray-500 dark:text-gray-400 mt-0.5" />
+              <div>
+                <p className="font-medium">
+                  {format(startDate, "d 'de' MMMM, yyyy", { locale: es })}
+                </p>
+                <p className="text-xs text-gray-600 dark:text-gray-400">
+                  {format(startDate, "EEEE", { locale: es })}
+                </p>
+              </div>
+            </div>
+            <div className="flex items-start gap-2">
+              <Clock className="h-4 w-4 text-gray-500 dark:text-gray-400 mt-0.5" />
+              <div>
+                <p className="font-medium">
+                  {format(startDate, "HH:mm")} - {format(endDate, "HH:mm")}
+                </p>
+                <p className="text-xs text-gray-600 dark:text-gray-400">
+                  {Math.round(
+                    (endDate.getTime() - startDate.getTime()) / (1000 * 60)
+                  )}{" "}
+                  minutos
+                </p>
+              </div>
+            </div>
+          </div>
+
+          {/* Propósito */}
+          {request.purpose && (
+            <div className="flex items-start gap-2 text-sm">
+              <FileText className="h-4 w-4 text-gray-500 dark:text-gray-400 mt-0.5 flex-shrink-0" />
+              <p className="text-gray-700 dark:text-gray-300 line-clamp-2">
+                {request.purpose}
+              </p>
+            </div>
+          )}
+
+          {/* Asistentes */}
+          {request.attendees && request.attendees > 1 && (
+            <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
+              <Users className="h-4 w-4" />
+              <span>{request.attendees} asistentes</span>
+            </div>
+          )}
+
+          {/* Alerta de expiración */}
+          {isNearExpiry && (
+            <div className="flex items-center gap-2 rounded-md bg-yellow-50 dark:bg-yellow-900/20 p-2 text-sm text-yellow-800 dark:text-yellow-200">
+              <AlertCircle className="h-4 w-4 flex-shrink-0" />
+              <span>Expira pronto - Requiere atención</span>
+            </div>
+          )}
+
+          {/* Acciones */}
+          {showActions && request.status === "PENDING" && (
+            <div className="flex gap-2 pt-2 border-t border-gray-200 dark:border-gray-700">
+              <button
+                onClick={() => onViewDetails?.(request.id)}
+                className="flex-1 text-sm font-medium text-[var(--color-primary-base)] hover:underline"
+              >
+                Ver Detalle
+              </button>
+              {onApprove && (
+                <ApprovalActionButton
+                  action="approve"
+                  onClick={() => onApprove(request.id)}
+                  loading={loading}
+                  size="sm"
+                />
+              )}
+              {onReject && (
+                <ApprovalActionButton
+                  action="reject"
+                  onClick={() => onReject(request.id)}
+                  loading={loading}
+                  size="sm"
+                />
+              )}
+            </div>
+          )}
+
+          {/* Estado reviewed */}
+          {(request.status === "APPROVED" || request.status === "REJECTED") && (
+            <div className="text-xs text-gray-600 dark:text-gray-400 pt-2 border-t border-gray-200 dark:border-gray-700">
+              {request.status === "APPROVED" ? "Aprobada" : "Rechazada"} por{" "}
+              <span className="font-medium">{request.reviewerName}</span>
+              {request.reviewedAt && (
+                <>
+                  {" "}
+                  el {format(new Date(request.reviewedAt), "d/MM/yyyy HH:mm")}
+                </>
+              )}
+            </div>
+          )}
+        </CardContent>
+      </Card>
+    );
+  }
+);
+
+ApprovalCard.displayName = "ApprovalCard";

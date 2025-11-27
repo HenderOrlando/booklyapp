@@ -1,0 +1,17 @@
+{
+  "title": "Approval Requests",
+  "description": "Manage reservation requests that require approval",
+  "stats": {
+    "pending": "Pending",
+    "approved": "Approved",
+    "rejected": "Rejected",
+    "average_time": "Average Time"
+  },
+  "search_placeholder": "Search by name, resource or purpose...",
+  "filters": "Filters",
+  "loading": "Loading requests...",
+  "no_requests": "No requests found",
+  "share_success_title": "Document Shared",
+  "share_success_desc": "The document was shared via {medium}",
+  "reject_reason_default": "Rejected"
+}

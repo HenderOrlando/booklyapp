@@ -1,0 +1,218 @@
+/**
+ * CalendarDayCell - Atom
+ * Celda individual de día en el calendario
+ */
+
+import type { CalendarDay, CalendarEvent } from "@/types/calendar";
+import * as Tooltip from "@radix-ui/react-tooltip";
+import { format } from "date-fns";
+import { es } from "date-fns/locale";
+
+interface CalendarDayCellProps {
+  day: CalendarDay;
+  onClick?: (date: Date) => void;
+  onDrop?: (date: Date) => void;
+  onEventDrop?: (event: CalendarEvent, newDate: Date) => void;
+  isDragOver?: boolean;
+  isSelected?: boolean;
+}
+
+export function CalendarDayCell({
+  day,
+  onClick,
+  isSelected = false,
+  onDrop,
+  isDragOver = false,
+  onEventDrop,
+}: CalendarDayCellProps) {
+  const handleClick = () => {
+    if (!day.isDisabled && onClick) {
+      onClick(day.date);
+    }
+  };
+
+  const handleContextMenu = (e: React.MouseEvent) => {
+    e.preventDefault(); // Prevenir menú contextual del navegador
+    if (!day.isDisabled && onClick) {
+      onClick(day.date); // Crear reserva rápida con click derecho
+    }
+  };
+
+  const handleDragOver = (e: React.DragEvent) => {
+    e.preventDefault(); // Permitir drop
+    e.dataTransfer.dropEffect = "copy";
+  };
+
+  const handleDrop = (e: React.DragEvent) => {
+    e.preventDefault();
+    if (day.isDisabled) return;
+
+    // Intentar leer datos del evento arrastrado
+    const eventDataStr = e.dataTransfer.getData("application/json");
+
+    if (eventDataStr) {
+      // Es un evento siendo reasignado
+      try {
+        const event = JSON.parse(eventDataStr) as CalendarEvent;
+        if (onEventDrop) {
+          onEventDrop(event, day.date);
+        }
+      } catch (error) {
+        console.error("Error parsing dragged event:", error);
+      }
+    } else if (onDrop) {
+      // Es un recurso siendo arrastrado
+      onDrop(day.date);
+    }
+  };
+
+  const hasEvents = day.events.length > 0;
+  const eventCount = day.events.length;
+
+  const buttonContent = (
+    <button
+      type="button"
+      onClick={handleClick}
+      onContextMenu={handleContextMenu}
+      onDragOver={handleDragOver}
+      onDrop={handleDrop}
+      disabled={day.isDisabled}
+      className={`
+        relative min-h-[80px] p-2 border border-gray-200
+        transition-all duration-200
+        ${
+          !day.isCurrentMonth
+            ? "bg-gray-50 text-gray-400"
+            : "bg-white text-gray-900"
+        }
+        ${day.isToday ? "border-2 border-blue-500 ring-1 ring-blue-500" : ""}
+        ${isSelected ? "bg-blue-50 border-blue-400" : ""}
+        ${isDragOver && !day.isDisabled ? "border-2 border-green-500 bg-green-50" : ""}
+        ${day.isPast && day.isCurrentMonth ? "opacity-60" : ""}
+        ${
+          day.isDisabled
+            ? "cursor-not-allowed opacity-40"
+            : "cursor-pointer hover:bg-blue-50 hover:border-blue-300"
+        }
+        ${day.isWeekend && day.isCurrentMonth ? "bg-gray-50" : ""}
+      `}
+      aria-label={format(day.date, "d 'de' MMMM", { locale: es })}
+      aria-current={day.isToday ? "date" : undefined}
+      aria-disabled={day.isDisabled}
+    >
+      {/* Número del día */}
+      <div className="flex items-center justify-between mb-1">
+        <span
+          className={`
+            text-sm font-medium
+            ${day.isToday ? "text-blue-600 font-bold" : ""}
+          `}
+        >
+          {format(day.date, "d")}
+        </span>
+
+        {/* Indicador de eventos */}
+        {hasEvents && (
+          <span
+            className="
+              inline-flex items-center justify-center
+              w-5 h-5 text-xs font-semibold
+              bg-blue-500 text-white rounded-full
+            "
+            aria-label={`${eventCount} evento${eventCount > 1 ? "s" : ""}`}
+          >
+            {eventCount}
+          </span>
+        )}
+      </div>
+
+      {/* Dots de eventos (máximo 3 visibles) */}
+      {hasEvents && (
+        <div className="flex gap-1 flex-wrap">
+          {day.events.slice(0, 3).map((event, index) => (
+            <div
+              key={event.id}
+              className="w-2 h-2 rounded-full"
+              style={{ backgroundColor: event.color }}
+              title={event.title}
+              aria-hidden="true"
+            />
+          ))}
+          {eventCount > 3 && (
+            <span className="text-xs text-gray-500">+{eventCount - 3}</span>
+          )}
+        </div>
+      )}
+
+      {/* Indicador de hoy */}
+      {day.isToday && (
+        <div
+          className="absolute top-1 right-1 w-2 h-2 bg-blue-500 rounded-full"
+          aria-hidden="true"
+        />
+      )}
+    </button>
+  );
+
+  // Si no hay eventos, retornar solo el botón
+  if (!hasEvents) {
+    return buttonContent;
+  }
+
+  // Si hay eventos, envolver con tooltip
+  return (
+    <Tooltip.Provider delayDuration={200}>
+      <Tooltip.Root>
+        <Tooltip.Trigger asChild>{buttonContent}</Tooltip.Trigger>
+        <Tooltip.Portal>
+          <Tooltip.Content
+            className="z-50 max-w-sm overflow-hidden rounded-md border border-gray-700 bg-gray-900 px-3 py-2 text-sm shadow-md animate-in fade-in-0 zoom-in-95"
+            sideOffset={5}
+          >
+            <div className="space-y-2">
+              <div className="font-semibold text-white border-b border-gray-700 pb-2">
+                {format(day.date, "d 'de' MMMM 'de' yyyy", { locale: es })}
+                <span className="ml-2 text-xs text-gray-400">
+                  ({eventCount} evento{eventCount > 1 ? "s" : ""})
+                </span>
+              </div>
+              <div className="space-y-2 max-h-60 overflow-y-auto">
+                {day.events.map((event) => (
+                  <div
+                    key={event.id}
+                    className="flex items-start gap-2 p-2 rounded bg-gray-800/50"
+                  >
+                    <div
+                      className="w-3 h-3 rounded-full mt-0.5 flex-shrink-0"
+                      style={{ backgroundColor: event.color }}
+                    />
+                    <div className="flex-1 min-w-0">
+                      <div className="font-medium text-white truncate">
+                        {event.title}
+                      </div>
+                      <div className="text-xs text-gray-400">
+                        {format(new Date(event.start), "HH:mm", { locale: es })}{" "}
+                        - {format(new Date(event.end), "HH:mm", { locale: es })}
+                      </div>
+                      {event.resourceName && (
+                        <div className="text-xs text-gray-500 mt-1">
+                          📍 {event.resourceName}
+                        </div>
+                      )}
+                      {event.userName && (
+                        <div className="text-xs text-gray-500">
+                          👤 {event.userName}
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+            <Tooltip.Arrow className="fill-gray-700" />
+          </Tooltip.Content>
+        </Tooltip.Portal>
+      </Tooltip.Root>
+    </Tooltip.Provider>
+  );
+}

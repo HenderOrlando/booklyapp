@@ -1,0 +1,219 @@
+/**
+ * NOTA DE MIGRACIÓN:
+ * Este servicio utiliza OAuth que ha sido migrado a auth-service.
+ * En futuras versiones, este servicio emitirá eventos hacia auth-service
+ * en lugar de usar providers directamente.
+ *
+ * Por ahora, la funcionalidad de calendario está deshabilitada hasta
+ * completar la migración a arquitectura event-driven.
+ */
+
+// TODO: Migrar a eventos hacia auth-service
+// import { GoogleOAuthProvider, MicrosoftOAuthProvider } from "auth-service";
+
+// Enums locales temporales
+enum OAuthProvider {
+  GOOGLE = "google",
+  MICROSOFT = "microsoft",
+}
+
+enum OAuthPurpose {
+  SSO = "sso",
+  CALENDAR = "calendar",
+}
+import { Injectable, Logger, UnauthorizedException } from "@nestjs/common";
+import { ConfigService } from "@nestjs/config";
+
+/**
+ * Interfaz para tokens OAuth
+ */
+export interface OAuthTokens {
+  accessToken: string;
+  refreshToken: string;
+  expiresAt: Date;
+  scope?: string;
+  tokenType?: string;
+}
+
+/**
+ * Interfaz para información de usuario OAuth
+ */
+export interface OAuthUserInfo {
+  id: string;
+  email: string;
+  name?: string;
+  firstName?: string;
+  lastName?: string;
+  photoUrl?: string;
+}
+
+/**
+ * Calendar Integration Service
+ * Usa providers de @libs/oauth para integración con Google Calendar y Outlook
+ * Reemplaza CalendarOAuthService eliminando ~400 líneas de código duplicado
+ */
+@Injectable()
+export class CalendarIntegrationService {
+  private readonly logger = new Logger(CalendarIntegrationService.name);
+  private readonly googleProvider: GoogleOAuthProvider;
+  private readonly microsoftProvider: MicrosoftOAuthProvider;
+  private readonly encryptionKey: string;
+
+  constructor(private readonly configService: ConfigService) {
+    // Configurar Google Calendar Provider
+    this.googleProvider = new GoogleOAuthProvider({
+      clientId: this.configService.get<string>("GOOGLE_CLIENT_ID")!,
+      clientSecret: this.configService.get<string>("GOOGLE_CLIENT_SECRET")!,
+      redirectUri:
+        this.configService.get<string>("GOOGLE_REDIRECT_URI") ||
+        "http://localhost:3003/api/v1/calendar/oauth/google/callback",
+      scopes: [
+        "https://www.googleapis.com/auth/calendar",
+        "https://www.googleapis.com/auth/calendar.events",
+        "https://www.googleapis.com/auth/userinfo.email",
+        "https://www.googleapis.com/auth/userinfo.profile",
+      ],
+      purpose: OAuthPurpose.CALENDAR,
+    });
+
+    // Configurar Microsoft Calendar Provider
+    this.microsoftProvider = new MicrosoftOAuthProvider({
+      clientId: this.configService.get<string>("MICROSOFT_CLIENT_ID")!,
+      clientSecret: this.configService.get<string>("MICROSOFT_CLIENT_SECRET")!,
+      redirectUri:
+        this.configService.get<string>("MICROSOFT_REDIRECT_URI") ||
+        "http://localhost:3003/api/v1/calendar/oauth/microsoft/callback",
+      scopes: ["offline_access", "Calendars.ReadWrite", "User.Read"],
+      purpose: OAuthPurpose.CALENDAR,
+    });
+
+    // Encryption key para tokens
+    this.encryptionKey = this.configService.get<string>("ENCRYPTION_KEY")!;
+
+    this.logger.log("Calendar Integration Service initialized");
+  }
+
+  /**
+   * Obtener provider según tipo
+   */
+  private getProvider(
+    provider: OAuthProvider
+  ): GoogleOAuthProvider | MicrosoftOAuthProvider {
+    switch (provider) {
+      case OAuthProvider.GOOGLE:
+        return this.googleProvider;
+      case OAuthProvider.MICROSOFT:
+      case OAuthProvider.OUTLOOK:
+        return this.microsoftProvider;
+      default:
+        throw new UnauthorizedException(`Provider ${provider} not supported`);
+    }
+  }
+
+  /**
+   * Generar URL de autorización OAuth
+   */
+  async getAuthorizationUrl(
+    provider: OAuthProvider,
+    redirectUri: string
+  ): Promise<{ url: string; state: string }> {
+    this.logger.debug(`Generating auth URL for provider: ${provider}`);
+
+    const oauthProvider = this.getProvider(provider);
+    const result = await oauthProvider.getAuthorizationUrl(redirectUri);
+
+    return {
+      url: result.url,
+      state: result.state,
+    };
+  }
+
+  /**
+   * Intercambiar código de autorización por tokens
+   */
+  async exchangeCodeForTokens(
+    provider: OAuthProvider,
+    code: string,
+    redirectUri: string
+  ): Promise<OAuthTokens> {
+    this.logger.debug(`Exchanging code for tokens: ${provider}`);
+
+    const oauthProvider = this.getProvider(provider);
+    const tokens = await oauthProvider.exchangeCodeForTokens({
+      code,
+      redirectUri,
+    });
+
+    return tokens;
+  }
+
+  /**
+   * Refrescar token de acceso
+   */
+  async refreshAccessToken(
+    provider: OAuthProvider,
+    refreshToken: string
+  ): Promise<OAuthTokens> {
+    this.logger.debug(`Refreshing token for provider: ${provider}`);
+
+    const oauthProvider = this.getProvider(provider);
+    const tokens = await oauthProvider.refreshAccessToken({ refreshToken });
+
+    return tokens;
+  }
+
+  /**
+   * Obtener información del usuario
+   */
+  async getUserInfo(
+    provider: OAuthProvider,
+    accessToken: string
+  ): Promise<OAuthUserInfo> {
+    this.logger.debug(`Getting user info for provider: ${provider}`);
+
+    const oauthProvider = this.getProvider(provider);
+    const userInfo = await oauthProvider.getUserInfo(accessToken);
+
+    return userInfo;
+  }
+
+  /**
+   * Validar token
+   */
+  async validateToken(
+    provider: OAuthProvider,
+    accessToken: string
+  ): Promise<boolean> {
+    const oauthProvider = this.getProvider(provider);
+    return oauthProvider.validateToken(accessToken);
+  }
+
+  /**
+   * Revocar token
+   */
+  async revokeToken(provider: OAuthProvider, token: string): Promise<void> {
+    const oauthProvider = this.getProvider(provider);
+    await oauthProvider.revokeToken(token);
+  }
+
+  /**
+   * Encriptar token
+   */
+  encryptToken(token: string): string {
+    return TokenEncryptionUtil.encrypt(token, this.encryptionKey);
+  }
+
+  /**
+   * Desencriptar token
+   */
+  decryptToken(encryptedToken: string): string {
+    return TokenEncryptionUtil.decrypt(encryptedToken, this.encryptionKey);
+  }
+
+  /**
+   * Hash de token (para comparación segura)
+   */
+  hashToken(token: string): string {
+    return TokenEncryptionUtil.hash(token);
+  }
+}

@@ -1,0 +1,375 @@
+# 📚 Índice de Documentación - Bookly Frontend
+
+> Guía completa de toda la documentación disponible  
+> **Última actualización**: Nov 2025
+
+---
+
+## 🎯 Documentación Principal (Activa)
+
+### Esenciales
+
+1. **[README.md](../README.md)** 📖
+   - Documentación principal del proyecto
+   - Stack tecnológico
+   - Inicio rápido
+   - Scripts disponibles
+   - Estado del proyecto (100% completo)
+
+2. **[ARCHITECTURE.md](./ARCHITECTURE.md)** 🏗️
+   - Principios de diseño (9 aspectos de calidad)
+   - Estructura del proyecto
+   - Atomic Design pattern
+   - Flujo de datos
+   - Patrones de componentes
+
+3. **[BEST_PRACTICES.md](./BEST_PRACTICES.md)** ✅
+   - Componentes React
+   - TypeScript
+   - Hooks
+   - Estado y Data Fetching
+   - Estilos con TailwindCSS
+   - Performance
+   - Accesibilidad
+   - Testing
+   - Git y Commits
+
+4. **[TESTING.md](./TESTING.md)** 🧪
+   - Estrategia de testing
+   - Tests unitarios
+   - Tests de integración
+   - Tests E2E
+   - Coverage
+   - Utilidades y mocks
+
+5. **[PERFORMANCE.md](./PERFORMANCE.md)** ⚡
+   - Core Web Vitals
+   - Code splitting
+   - Memoization
+   - Virtual scrolling
+   - Image optimization
+   - Bundle optimization
+
+6. **[PENDIENTES.md](./PENDIENTES.md)** 📋
+   - 106 TODOs consolidados
+   - Priorización por categoría
+   - Análisis de impacto
+   - Roadmap de implementación
+
+---
+
+## 📑 Documentación de Planificación
+
+### Planes de Implementación por Servicio
+
+7. **[00_PLAN_GENERAL.md](./00_PLAN_GENERAL.md)** 🗺️
+   - Visión general del proyecto
+   - Arquitectura del sistema
+   - Stack tecnológico
+   - Roadmap completo
+
+8. **[01_AUTH_SERVICE.md](./01_AUTH_SERVICE.md)** 🔐
+   - RF-41 a RF-45
+   - Autenticación tradicional y SSO
+   - Gestión de usuarios, roles y permisos
+   - Sistema de auditoría
+   - 2FA
+
+9. **[02_RESOURCES_SERVICE.md](./02_RESOURCES_SERVICE.md)** 🏢
+   - RF-01 a RF-06
+   - CRUD de recursos físicos
+   - Gestión de categorías
+   - Importación/exportación CSV
+   - Sistema de mantenimiento
+
+10. **[03_AVAILABILITY_SERVICE.md](./03_AVAILABILITY_SERVICE.md)** 📅
+    - RF-07 a RF-19
+    - Gestión de reservas
+    - Calendario y visualización
+    - Reservas recurrentes
+    - Lista de espera
+    - Reasignación de recursos
+
+11. **[04_STOCKPILE_SERVICE.md](./04_STOCKPILE_SERVICE.md)** ✅
+    - RF-20 a RF-28
+    - Flujos de aprobación
+    - Check-in/Check-out digital
+    - Generación de documentos PDF
+    - Notificaciones multi-canal
+    - Panel de vigilancia
+
+12. **[05_REPORTS_SERVICE.md](./05_REPORTS_SERVICE.md)** 📊
+    - RF-31 a RF-37
+    - Reportes de uso
+    - Dashboards interactivos
+    - Exportación de datos
+    - Sistema de feedback
+
+13. **[06_API_GATEWAY.md](./06_API_GATEWAY.md)** 🌐
+    - WebSocket tiempo real
+    - Sistema de notificaciones
+    - Event streaming
+    - Health checks
+    - Métricas de sistema
+
+---
+
+## 🗄️ Documentación Archivada
+
+> Documentos de procesos completados - Movidos a `/docs/archive/`
+
+### Implementaciones Completadas
+
+- **IMPLEMENTACION_AUTH_COMPLETA.md** - Autenticación implementada
+- **TYPESCRIPT_FIXES_COMPLETADO.md** - Errores TypeScript resueltos
+- **VERIFICACION_FASE_1_Y_2.md** - Fases iniciales completadas
+- **VERIFICACION_FASE_3.md** - Fase 3 completada
+- **VIRTUAL_SCROLLING_APLICADO_FINAL.md** - Virtual scrolling implementado
+- **VIRTUAL_SCROLLING_IMPLEMENTADO.md** - Primera implementación
+- **README_INTEGRACION.md** - Guía de integración (obsoleta)
+- **README_OLD.md** - README antiguo (reemplazado)
+
+### Procesos de Desarrollo Archivados
+
+- **00_PLAN_GENERAL_ACTUALIZADO.md** - Plan actualizado (fusionado)
+- **ARQUITECTURA_HTTP_CLIENT.md** - HTTP client documentado
+- **AUTH_IMPROVEMENTS.md** - Mejoras de auth implementadas
+- **AUTH_SIN_NEXTAUTH.md** - Decisión de arquitectura
+- **FIX_DATA_MODE_SERVE.md** - Fix implementado
+- **FIX_DATA_MODE_SERVE_FINAL.md** - Fix final
+- **FIX_PERFIL_Y_PROTECCION_RUTAS.md** - Fix implementado
+- **FIX_SESSION_PERSISTENCE.md** - Persistencia arreglada
+- **GUIA_RAPIDA_INTEGRACION.md** - Guía rápida (obsoleta)
+- **INTEGRACION_RESUMEN.md** - Resumen integración
+- **MEJORES_PRACTICAS_CONSULTAS.md** - Integrado en BEST_PRACTICES.md
+- **PERMISOS_CONTEXTUALES_COORDINADOR.md** - Permisos implementados
+- **PLAN_INTEGRACION_BACKEND.md** - Integración completada
+- **PROGRESO_INTEGRACION.md** - Progreso 100%
+- **PROXIMOS_PASOS_INTEGRACION.md** - Ya no aplica
+- **ROLES_Y_PERMISOS_SIDEBAR.md** - Implementado
+- **SERVICIOS_DIRECTOS.md** - Arquitectura decidida
+- **TESTING_AUTH.md** - Tests implementados
+- **TESTING_INTEGRACION_AUTH.md** - Integración testeada
+
+---
+
+## 🔍 Guía de Uso por Tipo de Usuario
+
+### Para Nuevos Desarrolladores
+
+**Orden de lectura recomendado:**
+
+1. **README.md** - Empezar aquí
+2. **ARCHITECTURE.md** - Entender la estructura
+3. **BEST_PRACTICES.md** - Aprender las convenciones
+4. **00_PLAN_GENERAL.md** - Ver el panorama completo
+5. **TESTING.md** - Cómo hacer tests
+
+**Tiempo estimado**: 2-3 horas
+
+---
+
+### Para Product Owners
+
+**Documentos clave:**
+
+1. **README.md** - Estado del proyecto
+2. **00_PLAN_GENERAL.md** - Roadmap y features
+3. **PENDIENTES.md** - Backlog de TODOs
+4. **01-06\_\*\_SERVICE.md** - Detalles por módulo
+
+**Tiempo estimado**: 1-2 horas
+
+---
+
+### Para Tech Leads
+
+**Revisión técnica:**
+
+1. **ARCHITECTURE.md** - Decisiones arquitectónicas
+2. **BEST_PRACTICES.md** - Estándares de código
+3. **PERFORMANCE.md** - Optimizaciones
+4. **TESTING.md** - Estrategia de testing
+5. **PENDIENTES.md** - Deuda técnica
+
+**Tiempo estimado**: 3-4 horas
+
+---
+
+### Para QA/Testers
+
+**Testing focus:**
+
+1. **TESTING.md** - Estrategia completa
+2. **01-06\_\*\_SERVICE.md** - Funcionalidades por servicio
+3. **PENDIENTES.md** - Features pendientes
+4. **BEST_PRACTICES.md** - Comportamientos esperados
+
+**Tiempo estimado**: 2 horas
+
+---
+
+## 📊 Estadísticas de Documentación
+
+### Documentación Activa
+
+| Categoría        | Archivos | Páginas Est. | Estado      |
+| ---------------- | -------- | ------------ | ----------- |
+| Principal        | 6        | ~150         | ✅ Completo |
+| Planificación    | 7        | ~200         | ✅ Completo |
+| **Total Activa** | **13**   | **~350**     | **✅ 100%** |
+
+### Documentación Archivada
+
+| Categoría         | Archivos | Estado           |
+| ----------------- | -------- | ---------------- |
+| Implementaciones  | 8        | ✅ Completado    |
+| Procesos          | 19       | ✅ Completado    |
+| **Total Archivo** | **27**   | **✅ Archivado** |
+
+---
+
+## 🔄 Mantenimiento de Documentación
+
+### Cada Sprint
+
+- [ ] Revisar PENDIENTES.md
+- [ ] Actualizar README.md si hay cambios mayores
+- [ ] Archivar documentos de procesos completados
+
+### Cada Release
+
+- [ ] Actualizar ARCHITECTURE.md si hay cambios estructurales
+- [ ] Revisar BEST_PRACTICES.md
+- [ ] Actualizar estadísticas en README.md
+- [ ] Revisar PERFORMANCE.md con métricas reales
+
+### Cada Quarter
+
+- [ ] Auditoría completa de documentación
+- [ ] Eliminar documentos obsoletos
+- [ ] Consolidar información duplicada
+- [ ] Actualizar todos los índices
+
+---
+
+## 📝 Plantillas de Documentación
+
+### Para Nuevas Features
+
+```markdown
+# Feature: [Nombre]
+
+## Objetivo
+
+[Descripción breve]
+
+## Requerimientos
+
+- [ ] RF-XX: [Descripción]
+- [ ] RNF-XX: [Descripción]
+
+## Implementación
+
+[Detalles técnicos]
+
+## Tests
+
+[Estrategia de testing]
+
+## Referencias
+
+- [Link a documentación relevante]
+```
+
+### Para Fixes/Bugs
+
+```markdown
+# Fix: [Descripción Breve]
+
+## Problema
+
+[Descripción del bug]
+
+## Causa Raíz
+
+[Análisis técnico]
+
+## Solución
+
+[Implementación del fix]
+
+## Prevención
+
+[Cómo evitar en el futuro]
+```
+
+---
+
+## 🎯 Próximos Pasos de Documentación
+
+### Q1 2026
+
+- [ ] Agregar ADRs (Architecture Decision Records)
+- [ ] Crear guías de troubleshooting
+- [ ] Documentar flujos de CI/CD
+- [ ] Agregar diagramas de arquitectura
+
+### Q2 2026
+
+- [ ] Completar Storybook con todos los componentes
+- [ ] Crear videos tutoriales
+- [ ] Documentar patrones de migración
+- [ ] API documentation completa
+
+---
+
+## 🔗 Enlaces Útiles
+
+### Documentación Externa
+
+- [Next.js Docs](https://nextjs.org/docs)
+- [React Query Docs](https://tanstack.com/query/latest)
+- [TailwindCSS Docs](https://tailwindcss.com/docs)
+- [TypeScript Handbook](https://www.typescriptlang.org/docs/)
+
+### Repositorio
+
+- [GitHub](https://github.com/tu-org/bookly-monorepo)
+- [Issues](https://github.com/tu-org/bookly-monorepo/issues)
+- [Pull Requests](https://github.com/tu-org/bookly-monorepo/pulls)
+
+### Backend API
+
+- **Swagger UI**: `http://localhost:3000/api/docs`
+- **Health Check**: `http://localhost:3000/api/v1/health`
+
+---
+
+## ❓ FAQ
+
+### ¿Dónde encuentro la arquitectura del proyecto?
+
+Ver [ARCHITECTURE.md](./ARCHITECTURE.md)
+
+### ¿Cómo hago tests?
+
+Ver [TESTING.md](./TESTING.md)
+
+### ¿Cuáles son las convenciones de código?
+
+Ver [BEST_PRACTICES.md](./BEST_PRACTICES.md)
+
+### ¿Qué TODOs hay pendientes?
+
+Ver [PENDIENTES.md](./PENDIENTES.md)
+
+### ¿Cómo mejoro la performance?
+
+Ver [PERFORMANCE.md](./PERFORMANCE.md)
+
+---
+
+**Mantenido por**: Tech Lead  
+**Última revisión**: Nov 2025  
+**Próxima revisión**: Dic 2025

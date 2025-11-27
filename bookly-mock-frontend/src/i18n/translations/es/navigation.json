@@ -1,0 +1,22 @@
+{
+  "dashboard": "Panel de Control",
+  "profile": "Mi Perfil",
+  "resources": "Recursos",
+  "categories": "Categorías",
+  "maintenance": "Mantenimientos",
+  "programs": "Programas",
+  "reservations": "Reservas",
+  "calendar": "Calendario",
+  "waitlist": "Lista de Espera",
+  "approvals": "Aprobaciones",
+  "vigilance": "Vigilancia",
+  "approval_history": "Historial de Aprobaciones",
+  "check_in": "Check-in / Check-out",
+  "reports": "Reportes",
+  "templates": "Plantillas",
+  "roles": "Roles y Permisos",
+  "audit": "Auditoría",
+  "admin": "Administración",
+  "design_system": "Sistema de Diseño",
+  "users": "Usuarios"
+}

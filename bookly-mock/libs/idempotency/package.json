@@ -1,0 +1,24 @@
+{
+  "name": "@libs/idempotency",
+  "version": "1.0.0",
+  "description": "Idempotency and Distributed Tracing library for Bookly microservices",
+  "main": "src/index.ts",
+  "scripts": {
+    "build": "tsc",
+    "test": "jest"
+  },
+  "keywords": [
+    "idempotency",
+    "distributed-tracing",
+    "correlation-id",
+    "nestjs"
+  ],
+  "author": "Bookly Team",
+  "license": "MIT",
+  "peerDependencies": {
+    "@nestjs/common": "^10.0.0",
+    "@nestjs/core": "^10.0.0",
+    "redis": "^4.0.0",
+    "rxjs": "^7.0.0"
+  }
+}

@@ -1,0 +1,22 @@
+{
+  "dashboard": "Dashboard",
+  "profile": "My Profile",
+  "resources": "Resources",
+  "categories": "Categories",
+  "maintenance": "Maintenance",
+  "programs": "Programs",
+  "reservations": "Reservations",
+  "calendar": "Calendar",
+  "waitlist": "Waitlist",
+  "approvals": "Approvals",
+  "vigilance": "Vigilance",
+  "approval_history": "Approval History",
+  "check_in": "Check-in / Check-out",
+  "reports": "Reports",
+  "templates": "Templates",
+  "roles": "Roles & Permissions",
+  "audit": "Audit",
+  "admin": "Administration",
+  "design_system": "Design System",
+  "users": "Users"
+}

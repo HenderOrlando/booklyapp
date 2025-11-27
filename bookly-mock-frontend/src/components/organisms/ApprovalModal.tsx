@@ -1,0 +1,632 @@
+import { ApprovalStatusBadge } from "@/components/atoms/ApprovalStatusBadge";
+import { Badge } from "@/components/atoms/Badge";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/atoms/Dialog";
+import { ApprovalActions } from "@/components/molecules/ApprovalActions";
+import { ApprovalTimeline } from "@/components/molecules/ApprovalTimeline";
+import { DocumentPreview } from "@/components/molecules/DocumentPreview";
+import type { ApprovalRequest } from "@/types/entities/approval";
+import { format } from "date-fns";
+import { es } from "date-fns/locale";
+import {
+  AlertCircle,
+  Calendar,
+  Clock,
+  Download,
+  FileText,
+  Mail,
+  MapPin,
+  MessageSquare,
+  Share2,
+  User,
+  Users,
+  X,
+} from "lucide-react";
+import * as React from "react";
+
+/**
+ * ApprovalModal - Organism Component
+ *
+ * Modal completo para ver detalle de una solicitud de aprobación
+ * e interactuar con ella. Integra múltiples molecules.
+ *
+ * @example
+ * ```tsx
+ * <ApprovalModal
+ *   request={request}
+ *   isOpen={isOpen}
+ *   onClose={handleClose}
+ *   onApprove={handleApprove}
+ * />
+ * ```
+ */
+
+export interface ApprovalModalProps {
+  /** Solicitud de aprobación */
+  request: ApprovalRequest | null;
+  /** Estado de apertura */
+  isOpen: boolean;
+  /** Handler para cerrar */
+  onClose: () => void;
+  /** Handler para aprobar */
+  onApprove?: (comments?: string) => void;
+  /** Handler para rechazar */
+  onReject?: (reason: string) => void;
+  /** Handler para comentar */
+  onComment?: (comment: string) => void;
+  /** Handler para delegar */
+  onDelegate?: (userId: string, comments: string) => void;
+  /** Handler para descargar */
+  onDownload?: (requestId: string) => void;
+  /** Handler para compartir */
+  onShare?: (requestId: string, medium: "email" | "sms" | "whatsapp") => void;
+  /** Mostrar acciones */
+  showActions?: boolean;
+  /** Clase CSS adicional */
+  className?: string;
+}
+
+export const ApprovalModal = React.memo<ApprovalModalProps>(
+  ({
+    request,
+    isOpen,
+    onClose,
+    onApprove,
+    onReject,
+    onComment,
+    onDelegate,
+    onDownload,
+    onShare,
+    showActions = true,
+    className = "",
+  }) => {
+    const [activeTab, setActiveTab] = React.useState<
+      "details" | "timeline" | "document"
+    >("details");
+    const [showNotificationModal, setShowNotificationModal] =
+      React.useState(false);
+    const [notificationMedium, setNotificationMedium] = React.useState<
+      "email" | "sms" | "whatsapp"
+    >("email");
+    const [isDownloading, setIsDownloading] = React.useState(false);
+    const [isSharing, setIsSharing] = React.useState(false);
+
+    // Reset tab cuando cambia la solicitud
+    React.useEffect(() => {
+      if (isOpen) {
+        setActiveTab("details");
+      }
+    }, [isOpen, request?.id]);
+
+    if (!request) {
+      return null;
+    }
+
+    const startDate = new Date(request.startDate);
+    const endDate = new Date(request.endDate);
+    const requestedDate = new Date(request.requestedAt);
+    const isExpiring = request.expiresAt
+      ? new Date(request.expiresAt).getTime() - Date.now() < 24 * 60 * 60 * 1000
+      : false;
+
+    // Handler para descargar documento
+    const handleDownload = async () => {
+      if (!request || !onDownload) return;
+
+      setIsDownloading(true);
+      try {
+        await onDownload(request.id);
+      } catch (error) {
+        console.error("Error al descargar:", error);
+      } finally {
+        setIsDownloading(false);
+      }
+    };
+
+    // Handler para compartir
+    const handleShare = () => {
+      setShowNotificationModal(true);
+    };
+
+    // Handler para confirmar envío de notificación
+    const handleSendNotification = async () => {
+      if (!request || !onShare) return;
+
+      setIsSharing(true);
+      try {
+        await onShare(request.id, notificationMedium);
+        setShowNotificationModal(false);
+      } catch (error) {
+        console.error("Error al compartir:", error);
+      } finally {
+        setIsSharing(false);
+      }
+    };
+
+    return (
+      <>
+        <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
+          <DialogContent
+            className={`max-w-4xl max-h-[90vh] overflow-hidden ${className}`}
+          >
+            {/* Header con título y estado */}
+            <DialogHeader>
+              <div className="flex items-start justify-between">
+                <div className="flex-1">
+                  <DialogTitle className="text-2xl font-bold">
+                    Solicitud de Aprobación
+                  </DialogTitle>
+                  <DialogDescription className="mt-1">
+                    ID: {request.id}
+                  </DialogDescription>
+                </div>
+                <div className="flex items-center gap-2">
+                  {/* Botones de acción */}
+                  <button
+                    onClick={handleDownload}
+                    disabled={isDownloading}
+                    className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                    title="Descargar documento"
+                  >
+                    <Download className="h-4 w-4 text-gray-600 dark:text-gray-400" />
+                  </button>
+                  <button
+                    onClick={handleShare}
+                    disabled={isSharing}
+                    className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                    title="Compartir documento"
+                  >
+                    <Share2 className="h-4 w-4 text-gray-600 dark:text-gray-400" />
+                  </button>
+
+                  {/* Estados */}
+                  <ApprovalStatusBadge status={request.status} />
+                  {request.priority === "URGENT" && (
+                    <Badge variant="error">Urgente</Badge>
+                  )}
+                  {request.priority === "HIGH" && (
+                    <Badge variant="warning">Alta Prioridad</Badge>
+                  )}
+                </div>
+              </div>
+            </DialogHeader>
+
+            {/* Alerta de expiración */}
+            {isExpiring && request.status === "PENDING" && (
+              <div className="flex items-start gap-2 p-3 rounded-lg bg-yellow-50 dark:bg-yellow-900/20 text-yellow-800 dark:text-yellow-200">
+                <AlertCircle className="h-5 w-5 flex-shrink-0 mt-0.5" />
+                <div className="flex-1">
+                  <p className="font-medium text-sm">Solicitud por expirar</p>
+                  <p className="text-xs mt-1">
+                    Esta solicitud expirará el{" "}
+                    {request.expiresAt &&
+                      format(new Date(request.expiresAt), "PPpp", {
+                        locale: es,
+                      })}
+                  </p>
+                </div>
+              </div>
+            )}
+
+            {/* Tabs */}
+            <div className="flex gap-1 border-b border-gray-200 dark:border-gray-700">
+              <button
+                onClick={() => setActiveTab("details")}
+                className={`px-4 py-2 font-medium text-sm transition-colors ${
+                  activeTab === "details"
+                    ? "text-[var(--color-primary-base)] border-b-2 border-[var(--color-primary-base)]"
+                    : "text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100"
+                }`}
+              >
+                Detalles
+              </button>
+              <button
+                onClick={() => setActiveTab("timeline")}
+                className={`px-4 py-2 font-medium text-sm transition-colors ${
+                  activeTab === "timeline"
+                    ? "text-[var(--color-primary-base)] border-b-2 border-[var(--color-primary-base)]"
+                    : "text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100"
+                }`}
+              >
+                Historial
+              </button>
+              {request.documentUrl && (
+                <button
+                  onClick={() => setActiveTab("document")}
+                  className={`px-4 py-2 font-medium text-sm transition-colors ${
+                    activeTab === "document"
+                      ? "text-[var(--color-primary-base)] border-b-2 border-[var(--color-primary-base)]"
+                      : "text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100"
+                  }`}
+                >
+                  Documento
+                </button>
+              )}
+            </div>
+
+            {/* Contenido scrollable */}
+            <div className="overflow-y-auto max-h-[calc(90vh-300px)] pr-2">
+              {/* Tab: Detalles */}
+              {activeTab === "details" && (
+                <div className="space-y-6 py-4">
+                  {/* Información del solicitante */}
+                  <div>
+                    <h3 className="text-sm font-semibold text-gray-900 dark:text-gray-100 mb-3">
+                      Solicitante
+                    </h3>
+                    <div className="space-y-2">
+                      <div className="flex items-center gap-2 text-sm">
+                        <User className="h-4 w-4 text-gray-500 dark:text-gray-400" />
+                        <span className="font-medium text-gray-900 dark:text-gray-100">
+                          {request.userName}
+                        </span>
+                        {request.userRole && (
+                          <Badge variant="outline" className="text-xs">
+                            {request.userRole}
+                          </Badge>
+                        )}
+                      </div>
+                      <div className="text-sm text-gray-600 dark:text-gray-400">
+                        {request.userEmail}
+                      </div>
+                      <div className="flex items-center gap-2 text-xs text-gray-500 dark:text-gray-400">
+                        <Calendar className="h-3.5 w-3.5" />
+                        Solicitado el{" "}
+                        {format(requestedDate, "PPpp", { locale: es })}
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Información del recurso */}
+                  <div>
+                    <h3 className="text-sm font-semibold text-gray-900 dark:text-gray-100 mb-3">
+                      Recurso
+                    </h3>
+                    <div className="space-y-2">
+                      <div className="flex items-center gap-2 text-sm font-medium text-gray-900 dark:text-gray-100">
+                        <MapPin className="h-4 w-4 text-gray-500 dark:text-gray-400" />
+                        {request.resourceName}
+                      </div>
+                      {request.resourceType && (
+                        <div className="text-sm text-gray-600 dark:text-gray-400">
+                          Tipo: {request.resourceType}
+                        </div>
+                      )}
+                      {request.categoryName && (
+                        <div className="text-sm text-gray-600 dark:text-gray-400">
+                          Categoría: {request.categoryName}
+                        </div>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* Horario */}
+                  <div>
+                    <h3 className="text-sm font-semibold text-gray-900 dark:text-gray-100 mb-3">
+                      Horario de Reserva
+                    </h3>
+                    <div className="space-y-2">
+                      <div className="flex items-center gap-2 text-sm">
+                        <Calendar className="h-4 w-4 text-gray-500 dark:text-gray-400" />
+                        <span className="text-gray-900 dark:text-gray-100">
+                          {format(startDate, "EEEE, d 'de' MMMM 'de' yyyy", {
+                            locale: es,
+                          })}
+                        </span>
+                      </div>
+                      <div className="flex items-center gap-2 text-sm">
+                        <Clock className="h-4 w-4 text-gray-500 dark:text-gray-400" />
+                        <span className="text-gray-900 dark:text-gray-100">
+                          {format(startDate, "HH:mm")} -{" "}
+                          {format(endDate, "HH:mm")}
+                        </span>
+                        <span className="text-xs text-gray-500 dark:text-gray-400">
+                          (
+                          {Math.round(
+                            (endDate.getTime() - startDate.getTime()) /
+                              (1000 * 60)
+                          )}{" "}
+                          minutos)
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Propósito */}
+                  <div>
+                    <h3 className="text-sm font-semibold text-gray-900 dark:text-gray-100 mb-3">
+                      Propósito
+                    </h3>
+                    <p className="text-sm text-gray-700 dark:text-gray-300">
+                      {request.purpose}
+                    </p>
+                  </div>
+
+                  {/* Asistentes */}
+                  <div>
+                    <h3 className="text-sm font-semibold text-gray-900 dark:text-gray-100 mb-3">
+                      Información Adicional
+                    </h3>
+                    <div className="space-y-2">
+                      <div className="flex items-center gap-2 text-sm">
+                        <Users className="h-4 w-4 text-gray-500 dark:text-gray-400" />
+                        <span className="text-gray-900 dark:text-gray-100">
+                          {request.attendees} asistentes esperados
+                        </span>
+                      </div>
+                      {request.requiresEquipment &&
+                        request.requiresEquipment.length > 0 && (
+                          <div className="text-sm">
+                            <span className="font-medium text-gray-900 dark:text-gray-100">
+                              Equipamiento requerido:
+                            </span>
+                            <div className="flex flex-wrap gap-1 mt-1">
+                              {request.requiresEquipment.map((eq, idx) => (
+                                <Badge
+                                  key={idx}
+                                  variant="outline"
+                                  className="text-xs"
+                                >
+                                  {eq}
+                                </Badge>
+                              ))}
+                            </div>
+                          </div>
+                        )}
+                      {request.specialRequirements && (
+                        <div className="text-sm">
+                          <span className="font-medium text-gray-900 dark:text-gray-100">
+                            Requisitos especiales:
+                          </span>
+                          <p className="text-gray-600 dark:text-gray-400 mt-1">
+                            {request.specialRequirements}
+                          </p>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* Nivel de aprobación */}
+                  <div>
+                    <h3 className="text-sm font-semibold text-gray-900 dark:text-gray-100 mb-3">
+                      Flujo de Aprobación
+                    </h3>
+                    <div className="space-y-2">
+                      <div className="flex items-center gap-2 text-sm">
+                        <span className="text-gray-600 dark:text-gray-400">
+                          Nivel actual:
+                        </span>
+                        <Badge variant="default">{request.currentLevel}</Badge>
+                      </div>
+                      <div className="flex items-center gap-2 text-sm">
+                        <span className="text-gray-600 dark:text-gray-400">
+                          Nivel máximo:
+                        </span>
+                        <Badge variant="outline">{request.maxLevel}</Badge>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Información de revisión (si existe) */}
+                  {request.reviewedAt && (
+                    <div>
+                      <h3 className="text-sm font-semibold text-gray-900 dark:text-gray-100 mb-3">
+                        Revisión
+                      </h3>
+                      <div className="space-y-2">
+                        {request.reviewerName && (
+                          <div className="text-sm">
+                            <span className="text-gray-600 dark:text-gray-400">
+                              Revisado por:
+                            </span>{" "}
+                            <span className="font-medium text-gray-900 dark:text-gray-100">
+                              {request.reviewerName}
+                            </span>
+                          </div>
+                        )}
+                        <div className="text-sm text-gray-600 dark:text-gray-400">
+                          Fecha:{" "}
+                          {format(new Date(request.reviewedAt), "PPpp", {
+                            locale: es,
+                          })}
+                        </div>
+                        {request.comments && (
+                          <div className="p-3 bg-gray-50 dark:bg-gray-800 rounded-lg text-sm">
+                            <span className="font-medium text-gray-900 dark:text-gray-100">
+                              Comentarios:
+                            </span>
+                            <p className="text-gray-700 dark:text-gray-300 mt-1">
+                              {request.comments}
+                            </p>
+                          </div>
+                        )}
+                        {request.rejectionReason && (
+                          <div className="p-3 bg-red-50 dark:bg-red-900/20 rounded-lg text-sm">
+                            <span className="font-medium text-red-800 dark:text-red-200">
+                              Razón de rechazo:
+                            </span>
+                            <p className="text-red-700 dark:text-red-300 mt-1">
+                              {request.rejectionReason}
+                            </p>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {/* Tab: Timeline */}
+              {activeTab === "timeline" && (
+                <div className="py-4">
+                  {request.history && request.history.length > 0 ? (
+                    <ApprovalTimeline history={request.history} />
+                  ) : (
+                    <div className="text-center py-12 text-gray-500 dark:text-gray-400">
+                      <FileText className="h-12 w-12 mx-auto mb-3 opacity-50" />
+                      <p>No hay historial disponible</p>
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {/* Tab: Documento */}
+              {activeTab === "document" && request.documentUrl && (
+                <div className="py-4">
+                  <DocumentPreview
+                    pdfUrl={request.documentUrl}
+                    title={`Solicitud ${request.id}`}
+                  />
+                </div>
+              )}
+            </div>
+
+            {/* Footer con acciones */}
+            {showActions && request.status === "PENDING" && (
+              <div className="border-t border-gray-200 dark:border-gray-700 pt-4">
+                <ApprovalActions
+                  onApprove={
+                    onApprove ? (comments) => onApprove(comments) : undefined
+                  }
+                  onReject={onReject ? (reason) => onReject(reason) : undefined}
+                  onComment={
+                    onComment ? (comment) => onComment(comment) : undefined
+                  }
+                  onDelegate={(userId, comments) => {
+                    if (onDelegate) {
+                      onDelegate(userId, comments);
+                    }
+                  }}
+                />
+              </div>
+            )}
+
+            {/* Botón de cerrar */}
+            <button
+              onClick={onClose}
+              className="absolute top-4 right-4 p-1 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
+            >
+              <X className="h-5 w-5 text-gray-500 dark:text-gray-400" />
+            </button>
+          </DialogContent>
+        </Dialog>
+
+        {/* Modal de notificación/compartir */}
+        <Dialog
+          open={showNotificationModal}
+          onOpenChange={setShowNotificationModal}
+        >
+          <DialogContent className="max-w-md">
+            <DialogHeader>
+              <DialogTitle>Compartir Solicitud</DialogTitle>
+              <DialogDescription>
+                Seleccione el medio por el cual desea compartir esta solicitud
+              </DialogDescription>
+            </DialogHeader>
+
+            <div className="space-y-4 py-4">
+              {/* Selector de medio */}
+              <div className="space-y-3">
+                <label className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                  Medio de envío
+                </label>
+                <div className="space-y-2">
+                  <button
+                    onClick={() => setNotificationMedium("email")}
+                    className={`w-full flex items-center gap-3 p-3 rounded-lg border-2 transition-colors ${
+                      notificationMedium === "email"
+                        ? "border-[var(--color-primary-base)] bg-[var(--color-primary-base)]/5"
+                        : "border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600"
+                    }`}
+                  >
+                    <Mail className="h-5 w-5" />
+                    <div className="flex-1 text-left">
+                      <p className="font-medium text-sm">Email</p>
+                      <p className="text-xs text-gray-500 dark:text-gray-400">
+                        Enviar por correo electrónico
+                      </p>
+                    </div>
+                    {notificationMedium === "email" && (
+                      <div className="h-2 w-2 rounded-full bg-[var(--color-primary-base)]" />
+                    )}
+                  </button>
+
+                  <button
+                    onClick={() => setNotificationMedium("sms")}
+                    className={`w-full flex items-center gap-3 p-3 rounded-lg border-2 transition-colors ${
+                      notificationMedium === "sms"
+                        ? "border-[var(--color-primary-base)] bg-[var(--color-primary-base)]/5"
+                        : "border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600"
+                    }`}
+                  >
+                    <MessageSquare className="h-5 w-5" />
+                    <div className="flex-1 text-left">
+                      <p className="font-medium text-sm">SMS</p>
+                      <p className="text-xs text-gray-500 dark:text-gray-400">
+                        Enviar mensaje de texto
+                      </p>
+                    </div>
+                    {notificationMedium === "sms" && (
+                      <div className="h-2 w-2 rounded-full bg-[var(--color-primary-base)]" />
+                    )}
+                  </button>
+
+                  <button
+                    onClick={() => setNotificationMedium("whatsapp")}
+                    className={`w-full flex items-center gap-3 p-3 rounded-lg border-2 transition-colors ${
+                      notificationMedium === "whatsapp"
+                        ? "border-[var(--color-primary-base)] bg-[var(--color-primary-base)]/5"
+                        : "border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600"
+                    }`}
+                  >
+                    <MessageSquare className="h-5 w-5" />
+                    <div className="flex-1 text-left">
+                      <p className="font-medium text-sm">WhatsApp</p>
+                      <p className="text-xs text-gray-500 dark:text-gray-400">
+                        Enviar por WhatsApp
+                      </p>
+                    </div>
+                    {notificationMedium === "whatsapp" && (
+                      <div className="h-2 w-2 rounded-full bg-[var(--color-primary-base)]" />
+                    )}
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <div className="flex justify-end gap-2 pt-4 border-t border-gray-200 dark:border-gray-700">
+              <button
+                onClick={() => setShowNotificationModal(false)}
+                disabled={isSharing}
+                className="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition-colors disabled:opacity-50"
+              >
+                Cancelar
+              </button>
+              <button
+                onClick={handleSendNotification}
+                disabled={isSharing}
+                className="px-4 py-2 text-sm font-medium text-white bg-[var(--color-primary-base)] hover:bg-[var(--color-primary-dark)] rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+              >
+                {isSharing ? (
+                  <>
+                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white" />
+                    Enviando...
+                  </>
+                ) : (
+                  "Enviar"
+                )}
+              </button>
+            </div>
+          </DialogContent>
+        </Dialog>
+      </>
+    );
+  }
+);
+
+ApprovalModal.displayName = "ApprovalModal";

@@ -1,0 +1,319 @@
+### RF-09: Búsqueda Avanzada de Disponibilidad - Ejemplos de Uso
+### Base URL
+@baseUrl = http://localhost:3002/api/v1
+@token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+
+###############################################################################
+# 1. Búsqueda Básica - Solo rango de fechas (requerido)
+###############################################################################
+POST {{baseUrl}}/availabilities/search
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "dateRange": {
+    "start": "2025-01-10T00:00:00Z",
+    "end": "2025-01-15T23:59:59Z"
+  }
+}
+
+###############################################################################
+# 2. Búsqueda con Filtro de Horarios
+###############################################################################
+POST {{baseUrl}}/availabilities/search
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "dateRange": {
+    "start": "2025-01-10T00:00:00Z",
+    "end": "2025-01-15T23:59:59Z"
+  },
+  "timeRange": {
+    "start": "08:00",
+    "end": "18:00"
+  }
+}
+
+###############################################################################
+# 3. Búsqueda por Tipo de Recurso
+###############################################################################
+POST {{baseUrl}}/availabilities/search
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "dateRange": {
+    "start": "2025-01-10T00:00:00Z",
+    "end": "2025-01-15T23:59:59Z"
+  },
+  "resourceTypes": ["CLASSROOM", "LABORATORY"]
+}
+
+###############################################################################
+# 4. Búsqueda con Capacidad Específica
+###############################################################################
+POST {{baseUrl}}/availabilities/search
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "dateRange": {
+    "start": "2025-01-10T00:00:00Z",
+    "end": "2025-01-15T23:59:59Z"
+  },
+  "capacity": {
+    "min": 20,
+    "max": 50
+  }
+}
+
+###############################################################################
+# 5. Búsqueda con Features/Amenidades
+###############################################################################
+POST {{baseUrl}}/availabilities/search
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "dateRange": {
+    "start": "2025-01-10T00:00:00Z",
+    "end": "2025-01-15T23:59:59Z"
+  },
+  "features": ["PROJECTOR", "WHITEBOARD", "AIR_CONDITIONING"]
+}
+
+###############################################################################
+# 6. Búsqueda por Programa Académico
+###############################################################################
+POST {{baseUrl}}/availabilities/search
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "dateRange": {
+    "start": "2025-01-10T00:00:00Z",
+    "end": "2025-01-15T23:59:59Z"
+  },
+  "program": "ING-SISTEMAS"
+}
+
+###############################################################################
+# 7. Búsqueda por Ubicación
+###############################################################################
+POST {{baseUrl}}/availabilities/search
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "dateRange": {
+    "start": "2025-01-10T00:00:00Z",
+    "end": "2025-01-15T23:59:59Z"
+  },
+  "location": "Edificio A"
+}
+
+###############################################################################
+# 8. Búsqueda con Duración Mínima
+###############################################################################
+POST {{baseUrl}}/availabilities/search
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "dateRange": {
+    "start": "2025-01-10T00:00:00Z",
+    "end": "2025-01-15T23:59:59Z"
+  },
+  "minDuration": 120
+}
+
+###############################################################################
+# 9. Búsqueda Completa - Todos los Filtros
+###############################################################################
+POST {{baseUrl}}/availabilities/search
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "dateRange": {
+    "start": "2025-01-10T00:00:00Z",
+    "end": "2025-01-15T23:59:59Z"
+  },
+  "timeRange": {
+    "start": "08:00",
+    "end": "18:00"
+  },
+  "resourceTypes": ["CLASSROOM", "LABORATORY"],
+  "capacity": {
+    "min": 20,
+    "max": 50
+  },
+  "features": ["PROJECTOR", "WHITEBOARD", "AIR_CONDITIONING"],
+  "program": "ING-SISTEMAS",
+  "location": "Edificio A",
+  "minDuration": 120,
+  "status": "AVAILABLE"
+}
+
+###############################################################################
+# 10. Búsqueda de Auditorios con Gran Capacidad
+###############################################################################
+POST {{baseUrl}}/availabilities/search
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "dateRange": {
+    "start": "2025-02-01T00:00:00Z",
+    "end": "2025-02-28T23:59:59Z"
+  },
+  "resourceTypes": ["AUDITORIUM"],
+  "capacity": {
+    "min": 100
+  },
+  "features": ["SOUND_SYSTEM", "PROJECTOR", "STAGE"]
+}
+
+###############################################################################
+# 11. Búsqueda de Laboratorios para Práctica Nocturna
+###############################################################################
+POST {{baseUrl}}/availabilities/search
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "dateRange": {
+    "start": "2025-01-15T00:00:00Z",
+    "end": "2025-01-20T23:59:59Z"
+  },
+  "timeRange": {
+    "start": "18:00",
+    "end": "22:00"
+  },
+  "resourceTypes": ["LABORATORY"],
+  "features": ["COMPUTERS", "INTERNET"],
+  "minDuration": 180
+}
+
+###############################################################################
+# 12. Búsqueda de Salas Pequeñas para Tutorías
+###############################################################################
+POST {{baseUrl}}/availabilities/search
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "dateRange": {
+    "start": "2025-01-10T00:00:00Z",
+    "end": "2025-01-31T23:59:59Z"
+  },
+  "timeRange": {
+    "start": "07:00",
+    "end": "19:00"
+  },
+  "resourceTypes": ["MEETING_ROOM", "TUTORING_ROOM"],
+  "capacity": {
+    "min": 5,
+    "max": 15
+  },
+  "minDuration": 60
+}
+
+###############################################################################
+# RESPUESTA ESPERADA (Estructura)
+###############################################################################
+# HTTP/1.1 200 OK
+# Content-Type: application/json
+# 
+# {
+#   "total": 15,
+#   "totalResources": 5,
+#   "slots": [
+#     {
+#       "resourceId": "resource-123",
+#       "resourceName": "Sala 101",
+#       "resourceType": "CLASSROOM",
+#       "availableFrom": "2025-01-10T08:00:00Z",
+#       "availableUntil": "2025-01-10T12:00:00Z",
+#       "capacity": 30,
+#       "location": "Edificio A - Piso 1",
+#       "features": ["PROJECTOR", "WHITEBOARD", "AIR_CONDITIONING"]
+#     },
+#     {
+#       "resourceId": "resource-456",
+#       "resourceName": "Laboratorio Sistemas",
+#       "resourceType": "LABORATORY",
+#       "availableFrom": "2025-01-10T14:00:00Z",
+#       "availableUntil": "2025-01-10T18:00:00Z",
+#       "capacity": 25,
+#       "location": "Edificio A - Piso 2",
+#       "features": ["PROJECTOR", "COMPUTERS", "AIR_CONDITIONING"]
+#     }
+#   ],
+#   "filters": {
+#     "dateRange": {
+#       "start": "2025-01-10T00:00:00Z",
+#       "end": "2025-01-15T23:59:59Z"
+#     },
+#     "timeRange": { "start": "08:00", "end": "18:00" },
+#     "resourceTypes": ["CLASSROOM", "LABORATORY"],
+#     "capacity": { "min": 20, "max": 50 }
+#   }
+# }
+
+###############################################################################
+# ERRORES COMUNES
+###############################################################################
+
+### Error 400 - Filtros inválidos (fecha mal formateada)
+POST {{baseUrl}}/availabilities/search
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "dateRange": {
+    "start": "2025-01-10",
+    "end": "2025-01-15"
+  }
+}
+
+### Error 400 - Capacidad mínima mayor que máxima
+POST {{baseUrl}}/availabilities/search
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "dateRange": {
+    "start": "2025-01-10T00:00:00Z",
+    "end": "2025-01-15T23:59:59Z"
+  },
+  "capacity": {
+    "min": 50,
+    "max": 20
+  }
+}
+
+### Error 400 - Duración mínima inválida (< 30 min)
+POST {{baseUrl}}/availabilities/search
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "dateRange": {
+    "start": "2025-01-10T00:00:00Z",
+    "end": "2025-01-15T23:59:59Z"
+  },
+  "minDuration": 15
+}
+
+### Error 401 - Sin token de autenticación
+POST {{baseUrl}}/availabilities/search
+Content-Type: application/json
+
+{
+  "dateRange": {
+    "start": "2025-01-10T00:00:00Z",
+    "end": "2025-01-15T23:59:59Z"
+  }
+}

@@ -1,0 +1,76 @@
+import { ResponseUtil } from "@libs/common";
+import { CacheMetricsService } from "@libs/redis";
+import { Controller, Get, Inject } from "@nestjs/common";
+import { ApiOperation, ApiResponse, ApiTags } from "@nestjs/swagger";
+
+/**
+ * Metrics Controller
+ * Expone métricas del servicio (cache hit/miss ratio)
+ */
+@ApiTags("Metrics")
+@Controller("metrics")
+export class MetricsController {
+  constructor(
+    @Inject("CacheMetricsService")
+    private readonly cacheMetrics: CacheMetricsService
+  ) {}
+
+  @Get("cache")
+  @ApiOperation({
+    summary: "Obtener métricas de cache",
+    description: "Retorna estadísticas de hit/miss ratio del cache Redis",
+  })
+  @ApiResponse({
+    status: 200,
+    description: "Métricas obtenidas exitosamente",
+    schema: {
+      example: {
+        success: true,
+        data: {
+          serviceName: "availability-service",
+          hits: 850,
+          misses: 150,
+          hitRate: 85.0,
+          totalRequests: 1000,
+          lastReset: "2025-11-08T10:00:00.000Z",
+        },
+        message: "Cache metrics retrieved successfully",
+      },
+    },
+  })
+  getCacheMetrics() {
+    const metrics = this.cacheMetrics.getMetrics();
+    return ResponseUtil.success(
+      metrics,
+      "Cache metrics retrieved successfully"
+    );
+  }
+
+  @Get("cache/prometheus")
+  @ApiOperation({
+    summary: "Obtener métricas en formato Prometheus",
+    description: "Retorna métricas en formato Prometheus para scraping",
+  })
+  @ApiResponse({
+    status: 200,
+    description: "Métricas en formato Prometheus",
+    content: {
+      "text/plain": {
+        example: `# HELP cache_hits_total Total number of cache hits
+# TYPE cache_hits_total counter
+cache_hits_total{service="availability-service"} 850
+
+# HELP cache_misses_total Total number of cache misses
+# TYPE cache_misses_total counter
+cache_misses_total{service="availability-service"} 150
+
+# HELP cache_hit_rate Cache hit rate percentage
+# TYPE cache_hit_rate gauge
+cache_hit_rate{service="availability-service"} 85.0`,
+      },
+    },
+  })
+  getPrometheusMetrics() {
+    return this.cacheMetrics.getPrometheusMetrics();
+  }
+}

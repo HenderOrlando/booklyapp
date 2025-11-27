@@ -1,0 +1,14 @@
+{
+  "title": "Calendario de Reservas",
+  "description": "Visualiza y gestiona todas las reservas en formato calendario",
+  "new_reservation": "Nueva Reserva",
+  "view_title": "Vista de Calendario",
+  "view_desc": "Visualiza todas las reservas en formato calendario. Cambia entre vista mensual, semanal o diaria. Haz clic en cualquier evento para ver detalles. Usa los filtros para mostrar solo reservas específicas.",
+  "panel": {
+    "show": "Mostrar panel",
+    "hide": "Ocultar panel"
+  },
+  "legend": "Leyenda de Estados",
+  "tip": "💡 Tip: Pasa el cursor sobre una reserva para ver todos los detalles",
+  "reschedule_error": "Error al reasignar la reserva. Por favor intenta de nuevo."
+}

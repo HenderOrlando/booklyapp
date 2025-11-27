@@ -1,0 +1,14 @@
+{
+  "title": "Reservation Calendar",
+  "description": "Visualize and manage all reservations in calendar format",
+  "new_reservation": "New Reservation",
+  "view_title": "Calendar View",
+  "view_desc": "Visualize all reservations in calendar format. Switch between monthly, weekly, or daily view. Click on any event to see details. Use filters to show only specific reservations.",
+  "panel": {
+    "show": "Show panel",
+    "hide": "Hide panel"
+  },
+  "legend": "Status Legend",
+  "tip": "💡 Tip: Hover over a reservation to see all details",
+  "reschedule_error": "Error rescheduling reservation. Please try again."
+}

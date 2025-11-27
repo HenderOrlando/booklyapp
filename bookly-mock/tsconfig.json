@@ -1,0 +1,68 @@
+{
+  "compilerOptions": {
+    "module": "commonjs",
+    "moduleResolution": "node",
+    "declaration": true,
+    "removeComments": true,
+    "emitDecoratorMetadata": true,
+    "experimentalDecorators": true,
+    "allowSyntheticDefaultImports": true,
+    "target": "ES2022",
+    "lib": ["ES2022"],
+    "sourceMap": true,
+    "outDir": "./dist",
+    "baseUrl": "./",
+    "incremental": true,
+    "skipLibCheck": true,
+    "strictNullChecks": true,
+    "noImplicitAny": false,
+    "strictBindCallApply": false,
+    "forceConsistentCasingInFileNames": true,
+    "noFallthroughCasesInSwitch": false,
+    "esModuleInterop": true,
+    "resolveJsonModule": true,
+    "allowJs": false,
+    "paths": {
+      "@libs/common": ["libs/common/src"],
+      "@libs/common/*": ["libs/common/src/*"],
+      "@libs/event-bus": ["libs/event-bus/src"],
+      "@libs/event-bus/*": ["libs/event-bus/src/*"],
+      "@libs/redis": ["libs/redis/src"],
+      "@libs/redis/*": ["libs/redis/src/*"],
+      "@libs/database": ["libs/database/src"],
+      "@libs/database/*": ["libs/database/src/*"],
+      "@libs/decorators": ["libs/decorators/src"],
+      "@libs/decorators/*": ["libs/decorators/src/*"],
+      "@libs/guards": ["libs/guards/src"],
+      "@libs/guards/*": ["libs/guards/src/*"],
+      "@libs/filters": ["libs/filters/src"],
+      "@libs/filters/*": ["libs/filters/src/*"],
+      "@libs/interceptors": ["libs/interceptors/src"],
+      "@libs/interceptors/*": ["libs/interceptors/src/*"],
+      "@libs/kafka": ["libs/kafka/src"],
+      "@libs/kafka/*": ["libs/kafka/src/*"],
+      "@libs/notifications": ["libs/notifications/src"],
+      "@libs/notifications/*": ["libs/notifications/src/*"],
+      "@reports/audit-decorators": [
+        "apps/reports-service/src/libs/audit-decorators/src"
+      ],
+      "@reports/audit-decorators/*": [
+        "apps/reports-service/src/libs/audit-decorators/src/*"
+      ],
+      "@auth/*": ["apps/auth-service/src/*"],
+      "@resources/*": ["apps/resources-service/src/*"],
+      "@availability/*": ["apps/availability-service/src/*"],
+      "@stockpile/*": ["apps/stockpile-service/src/*"],
+      "@reports/*": ["apps/reports-service/src/*"],
+      "@gateway/*": ["apps/api-gateway/src/*"]
+    }
+  },
+  "exclude": [
+    "node_modules",
+    "dist",
+    "test",
+    "**/*spec.ts",
+    "scripts",
+    "**/*.disabled"
+  ]
+}

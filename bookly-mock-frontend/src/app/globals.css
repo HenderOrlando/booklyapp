@@ -1,0 +1,143 @@
+@import "react-day-picker/dist/style.css";
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  /**
+   * Bookly Design System - CSS Variables
+   * Modo Claro (Light Mode)
+   */
+  :root {
+    /* Fondos */
+    --color-bg-app: #f9fafb;
+    --color-bg-surface: #ffffff;
+    --color-bg-muted: #f3f4f6;
+    --color-bg-inverse: #1e293b;
+
+    /* Texto */
+    --color-text-primary: #111827;
+    --color-text-secondary: #6b7280;
+    --color-text-inverse: #ffffff;
+    --color-text-danger: #b91c1c;
+
+    /* Acciones */
+    --color-action-primary: #2563eb;
+    --color-action-primary-hover: #1d4ed8;
+    --color-action-primary-disabled: #d1d5db;
+    --color-action-secondary: #14b8a6;
+    --color-action-secondary-hover: #0d9488;
+    --color-action-ghost-hover: #f3f4f6;
+
+    /* Estados */
+    --color-state-success-bg: #ecfdf5;
+    --color-state-success-text: #15803d;
+    --color-state-success-border: #a7f3d0;
+    --color-state-warning-bg: #fff7ed;
+    --color-state-warning-text: #c2410c;
+    --color-state-warning-border: #fed7aa;
+    --color-state-error-bg: #fef2f2;
+    --color-state-error-text: #b91c1c;
+    --color-state-error-border: #fca5a5;
+
+    /* Bordes */
+    --color-border-subtle: #e5e7eb;
+    --color-border-strong: #d1d5db;
+    --color-border-focus: #2563eb;
+
+    /* Shadcn/ui compatibility */
+    --background: 0 0% 100%;
+    --foreground: 222.2 84% 4.9%;
+    --card: 0 0% 100%;
+    --card-foreground: 222.2 84% 4.9%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 222.2 84% 4.9%;
+    --primary: 221.2 83.2% 53.3%;
+    --primary-foreground: 210 40% 98%;
+    --secondary: 174 62% 38%;
+    --secondary-foreground: 210 40% 98%;
+    --muted: 210 40% 96.1%;
+    --muted-foreground: 215.4 16.3% 46.9%;
+    --accent: 210 40% 96.1%;
+    --accent-foreground: 222.2 47.4% 11.2%;
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 210 40% 98%;
+    --border: 214.3 31.8% 91.4%;
+    --input: 214.3 31.8% 91.4%;
+    --ring: 221.2 83.2% 53.3%;
+    --radius: 0.5rem;
+  }
+
+  /**
+   * Bookly Design System - CSS Variables
+   * Modo Oscuro (Dark Mode)
+   */
+  .dark {
+    /* Fondos */
+    --color-bg-app: #1e293b;
+    --color-bg-surface: #0f172a;
+    --color-bg-muted: #1f2937;
+    --color-bg-inverse: #ffffff;
+
+    /* Texto */
+    --color-text-primary: #f9fafb;
+    --color-text-secondary: #cbd5e1;
+    --color-text-inverse: #111827;
+    --color-text-danger: #f87171;
+
+    /* Acciones */
+    --color-action-primary: #3b82f6;
+    --color-action-primary-hover: #60a5fa;
+    --color-action-primary-disabled: #4b5563;
+    --color-action-secondary: #2dd4bf;
+    --color-action-secondary-hover: #14b8a6;
+    --color-action-ghost-hover: #334155;
+
+    /* Estados */
+    --color-state-success-bg: #064e3b;
+    --color-state-success-text: #a7f3d0;
+    --color-state-success-border: #10b981;
+    --color-state-warning-bg: #7c2d12;
+    --color-state-warning-text: #fed7aa;
+    --color-state-warning-border: #fdba74;
+    --color-state-error-bg: #7f1d1d;
+    --color-state-error-text: #fca5a5;
+    --color-state-error-border: #f87171;
+
+    /* Bordes */
+    --color-border-subtle: #334155;
+    --color-border-strong: #475569;
+    --color-border-focus: #60a5fa;
+
+    /* Shadcn/ui compatibility */
+    --background: 222.2 84% 4.9%;
+    --foreground: 210 40% 98%;
+    --card: 222.2 84% 4.9%;
+    --card-foreground: 210 40% 98%;
+    --popover: 222.2 84% 4.9%;
+    --popover-foreground: 210 40% 98%;
+    --primary: 217.2 91.2% 59.8%;
+    --primary-foreground: 222.2 47.4% 11.2%;
+    --secondary: 174 72% 56%;
+    --secondary-foreground: 210 40% 98%;
+    --muted: 217.2 32.6% 17.5%;
+    --muted-foreground: 215 20.2% 65.1%;
+    --accent: 217.2 32.6% 17.5%;
+    --accent-foreground: 210 40% 98%;
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 210 40% 98%;
+    --border: 217.2 32.6% 17.5%;
+    --input: 217.2 32.6% 17.5%;
+    --ring: 224.3 76.3% 48%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
+}

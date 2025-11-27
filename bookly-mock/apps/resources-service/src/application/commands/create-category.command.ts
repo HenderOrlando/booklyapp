@@ -1,0 +1,19 @@
+import { CategoryType } from "@libs/common/enums";
+
+/**
+ * Create Category Command
+ * Command para crear una nueva categoría
+ */
+export class CreateCategoryCommand {
+  constructor(
+    public readonly code: string,
+    public readonly name: string,
+    public readonly description: string,
+    public readonly type: CategoryType,
+    public readonly color?: string,
+    public readonly icon?: string,
+    public readonly parentId?: string,
+    public readonly metadata?: Record<string, any>,
+    public readonly createdBy?: string
+  ) {}
+}
