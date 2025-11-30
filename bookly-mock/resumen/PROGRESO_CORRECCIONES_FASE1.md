@@ -71,17 +71,28 @@
 - **Esfuerzo**: 2 horas
 - **Estado**: ✅ Completado
 
-**2. import-resources.handler.ts** (CRÍTICO)
+**2. import-resources.handler.ts** (CRÍTICO) ✅
 - **Problema**: 226 líneas con lógica de parseo CSV
-- **Acción**: Crear `ResourceImportService`
-- **Esfuerzo**: 3-4 horas
-- **Estado**: 🔄 Pendiente
+- **Acción**: Creado `ResourceImportService` con métodos:
+  - `importFromCSV()` - Importación completa
+  - `parseCSV()` - Parseo de CSV
+  - `processRow()` - Procesamiento de fila
+  - `validateRequiredFields()` - Validación de campos
+  - `validateResourceType()` - Validación de tipo
+  - `validateMode()` - Validación de modo
+  - `validateAndGetCategory()` - Validación de categoría
+  - `createResource()` - Creación de recurso
+  - `updateResource()` - Actualización de recurso
+  - `validateCSVFormat()` - Validación de formato
+- **Handler refactorizado**: 226 líneas → 32 líneas (86% reducción)
+- **Esfuerzo**: 2 horas
+- **Estado**: ✅ Completado
 
 **3. rollback-import.handler.ts**
 - **Problema**: Acceso directo a repositorio
-- **Acción**: Agregar método en `ResourceService`
+- **Acción**: Requiere ImportJobRepository (pendiente de verificar existencia)
 - **Esfuerzo**: 30 minutos
-- **Estado**: 🔄 Pendiente
+- **Estado**: 🔄 Pendiente (bajo impacto)
 
 ---
 
@@ -160,8 +171,8 @@
 ### Tiempo Invertido
 
 - **Tarea 1.1**: 1 hora ✅
-- **Tarea 1.2**: 2 horas ✅ (parcial)
-- **Total**: 3 horas de 20 semanas estimadas (1.5% del tiempo)
+- **Tarea 1.2**: 4 horas ✅ (2 de 3 handlers completados)
+- **Total**: 5 horas de 20 semanas estimadas (2.5% del tiempo)
 
 ---
 
