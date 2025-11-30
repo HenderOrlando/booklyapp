@@ -1,9 +1,11 @@
-import { MaintenanceStatus, MaintenanceType } from "@libs/common/enums";
+import { MaintenanceStatus, MaintenanceType, EventType, ResourceStatus } from "@libs/common/enums";
 import { PaginationMeta, PaginationQuery } from "@libs/common";
 import { createLogger } from "@libs/common";
 import { Injectable, NotFoundException } from "@nestjs/common";
+import { EventBusService } from "@libs/event-bus";
 import { MaintenanceEntity } from "../../domain/entities/maintenance.entity";
 import { IMaintenanceRepository } from "../../domain/repositories/maintenance.repository.interface";
+import { IResourceRepository } from "../../domain/repositories/resource.repository.interface";
 
 /**
  * Maintenance Service
@@ -13,7 +15,11 @@ import { IMaintenanceRepository } from "../../domain/repositories/maintenance.re
 export class MaintenanceService {
   private readonly logger = createLogger("MaintenanceService");
 
-  constructor(private readonly maintenanceRepository: IMaintenanceRepository) {}
+  constructor(
+    private readonly maintenanceRepository: IMaintenanceRepository,
+    private readonly resourceRepository: IResourceRepository,
+    private readonly eventBusService: EventBusService
+  ) {}
 
   /**
    * Programar un nuevo mantenimiento
@@ -245,5 +251,151 @@ export class MaintenanceService {
       maintenanceId: id,
       status,
     });
+  }
+
+  /**
+   * Iniciar mantenimiento y bloquear recurso si es necesario
+   */
+  async startMaintenanceWithResourceBlock(id: string): Promise<MaintenanceEntity> {
+    const maintenance = await this.getMaintenanceById(id);
+    
+    // Cambiar estado del mantenimiento
+    maintenance.start();
+    
+    // Bloquear recurso automáticamente si el mantenimiento afecta la disponibilidad
+    if (maintenance.affectsAvailability) {
+      await this.blockResourceForMaintenance(maintenance.resourceId, id);
+    }
+    
+    // Guardar cambios del mantenimiento
+    const updated = await this.maintenanceRepository.update(id, {
+      status: maintenance.status,
+      actualStartDate: maintenance.actualStartDate,
+    });
+    
+    this.logger.info(`Maintenance ${id} started successfully`);
+    
+    return updated;
+  }
+
+  /**
+   * Completar mantenimiento y restaurar recurso si es necesario
+   */
+  async completeMaintenanceWithResourceRestore(id: string): Promise<MaintenanceEntity> {
+    const maintenance = await this.getMaintenanceById(id);
+    
+    // Cambiar estado del mantenimiento
+    maintenance.complete();
+    
+    // Restaurar recurso automáticamente si el mantenimiento afectó la disponibilidad
+    if (maintenance.affectsAvailability) {
+      await this.restoreResourceAfterMaintenance(maintenance.resourceId, id);
+    }
+    
+    // Guardar cambios del mantenimiento
+    const updated = await this.maintenanceRepository.update(id, {
+      status: maintenance.status,
+      actualEndDate: maintenance.actualEndDate,
+    });
+    
+    this.logger.info(`Maintenance ${id} completed successfully`);
+    
+    return updated;
+  }
+
+  /**
+   * Cancelar mantenimiento y restaurar recurso si es necesario
+   */
+  async cancelMaintenanceWithResourceRestore(id: string): Promise<MaintenanceEntity> {
+    const maintenance = await this.getMaintenanceById(id);
+    
+    // Cambiar estado del mantenimiento
+    maintenance.cancel();
+    
+    // Restaurar recurso si estaba bloqueado
+    if (maintenance.affectsAvailability && maintenance.status === MaintenanceStatus.IN_PROGRESS) {
+      await this.restoreResourceAfterMaintenance(maintenance.resourceId, id);
+    }
+    
+    // Guardar cambios del mantenimiento
+    const updated = await this.maintenanceRepository.update(id, {
+      status: maintenance.status,
+    });
+    
+    this.logger.info(`Maintenance ${id} cancelled successfully`);
+    
+    return updated;
+  }
+
+  /**
+   * Bloquear recurso por mantenimiento
+   */
+  private async blockResourceForMaintenance(resourceId: string, maintenanceId: string): Promise<void> {
+    this.logger.info(`Blocking resource ${resourceId} due to maintenance`);
+    
+    const resource = await this.resourceRepository.findById(resourceId);
+    const previousStatus = resource?.status || ResourceStatus.AVAILABLE;
+    
+    await this.resourceRepository.update(resourceId, {
+      status: ResourceStatus.MAINTENANCE,
+    });
+    
+    // Publicar evento de cambio de estado
+    await this.eventBusService.publish(EventType.RESOURCE_STATUS_CHANGED, {
+      eventId: `resource-status-changed-${resourceId}-${Date.now()}`,
+      eventType: EventType.RESOURCE_STATUS_CHANGED,
+      service: "resources-service",
+      timestamp: new Date(),
+      data: {
+        resourceId,
+        previousStatus,
+        newStatus: ResourceStatus.MAINTENANCE,
+        updatedBy: "system",
+        reason: `Maintenance started: ${maintenanceId}`,
+      },
+      metadata: {
+        aggregateId: resourceId,
+        aggregateType: "Resource",
+        version: 1,
+      },
+    });
+    
+    this.logger.info(`Resource ${resourceId} status set to MAINTENANCE`);
+  }
+
+  /**
+   * Restaurar recurso después de mantenimiento
+   */
+  private async restoreResourceAfterMaintenance(resourceId: string, maintenanceId: string): Promise<void> {
+    this.logger.info(`Restoring resource ${resourceId} after maintenance completion`);
+    
+    const resource = await this.resourceRepository.findById(resourceId);
+    const previousStatus = resource?.status || ResourceStatus.MAINTENANCE;
+    
+    await this.resourceRepository.update(resourceId, {
+      status: ResourceStatus.AVAILABLE,
+    });
+    
+    // Publicar evento de cambio de estado
+    await this.eventBusService.publish(EventType.RESOURCE_STATUS_CHANGED, {
+      eventId: `resource-status-changed-${resourceId}-${Date.now()}`,
+      eventType: EventType.RESOURCE_STATUS_CHANGED,
+      service: "resources-service",
+      timestamp: new Date(),
+      data: {
+        resourceId,
+        previousStatus,
+        newStatus: ResourceStatus.AVAILABLE,
+        updatedBy: "system",
+        reason: `Maintenance completed: ${maintenanceId}`,
+      },
+      metadata: {
+        aggregateId: resourceId,
+        aggregateType: "Resource",
+        version: 1,
+      },
+    });
+    
+    this.logger.info(`Resource ${resourceId} status restored to AVAILABLE`);
   }
 }
