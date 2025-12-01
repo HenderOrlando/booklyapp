@@ -1,7 +1,7 @@
 import { CommandHandler, ICommandHandler } from "@nestjs/cqrs";
-import { RemovePermissionsCommand } from "../../commands/roles/remove-permissions.command";
-import { RoleResponseDto } from "../../dtos/role/role-response.dto";
-import { RoleService } from "../../services/role.service";
+import { RemovePermissionsCommand } from '@auth/application/commands/roles/remove-permissions.command";
+import { RoleResponseDto } from '@auth/application/dtos/role/role-response.dto";
+import { RoleService } from '@auth/application/services/role.service";
 
 /**
  * Handler para remover permisos de un rol

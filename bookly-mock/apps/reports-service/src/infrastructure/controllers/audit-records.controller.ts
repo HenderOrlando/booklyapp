@@ -24,7 +24,7 @@ import { createReadStream } from "fs";
 import { writeFile } from "fs/promises";
 import { Model } from "mongoose";
 import { join } from "path";
-import { AuditRecord } from "../../modules/audit/schemas/audit-record.schema";
+import { AuditRecord } from "@reports/modules/audit/schemas/audit-record.schema";
 
 /**
  * Controller para consultar registros de auditoría

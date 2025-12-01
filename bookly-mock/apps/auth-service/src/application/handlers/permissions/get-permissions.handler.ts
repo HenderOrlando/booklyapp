@@ -1,7 +1,7 @@
 import { IQueryHandler, QueryHandler } from "@nestjs/cqrs";
-import { PermissionResponseDto } from "../../dtos/permission/permission-response.dto";
-import { GetPermissionsQuery } from "../../queries/permissions/get-permissions.query";
-import { PermissionService } from "../../services/permission.service";
+import { PermissionResponseDto } from '@auth/application/dtos/permission/permission-response.dto";
+import { GetPermissionsQuery } from '@auth/application/queries/permissions/get-permissions.query";
+import { PermissionService } from '@auth/application/services/permission.service";
 
 /**
  * Handler para obtener permisos con filtros

@@ -41,10 +41,14 @@ async function fixImports(serviceName: string, alias: string): Promise<FixStats>
 
     // Patrones para reemplazar rutas relativas por alias
     const patterns = [
+      // Cuatro niveles arriba (../../../../)
+      { from: /from ['"]\.\.\/\.\.\/\.\.\/\.\.\/(domain|application|infrastructure)\//g, to: `from '${alias}/$1/` },
       // Tres niveles arriba (../../../)
       { from: /from ['"]\.\.\/\.\.\/\.\.\/(domain|application|infrastructure)\//g, to: `from '${alias}/$1/` },
       // Dos niveles arriba (../../)
       { from: /from ['"]\.\.\/\.\.\/(domain|application|infrastructure)\//g, to: `from '${alias}/$1/` },
+      // Casos especiales: handlers en subdirectorios que van a application/
+      { from: /from ['"]\.\.\/\.\.\/(commands|queries|dtos|services)\//g, to: `from '${alias}/application/$1/` },
       // Imports de @nestjs y otras librerías externas no se tocan
     ];
 
