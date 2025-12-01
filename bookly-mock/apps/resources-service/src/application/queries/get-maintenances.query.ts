@@ -1,6 +1,6 @@
 import { MaintenanceType } from "@libs/common/enums";
 import { PaginationQuery } from "@libs/common";
-import { MaintenanceStatus } from "../../domain/entities/maintenance.entity";
+import { MaintenanceStatus } from '@resources/domain/entities/maintenance.entity";
 
 /**
  * Get Maintenances Query

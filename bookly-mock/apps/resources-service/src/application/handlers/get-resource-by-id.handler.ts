@@ -1,5 +1,5 @@
 import { IQueryHandler, QueryHandler } from "@nestjs/cqrs";
-import { ResourceEntity } from "../../domain/entities/resource.entity";
+import { ResourceEntity } from '@resources/domain/entities/resource.entity";
 import { GetResourceByIdQuery } from "../queries/get-resource-by-id.query";
 import { ResourceService } from "../services/resource.service";
 

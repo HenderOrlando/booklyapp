@@ -17,7 +17,7 @@ import {
   CreateTenantNotificationConfigDto,
   TenantNotificationConfigResponseDto,
   UpdateTenantNotificationConfigDto,
-} from "../../application/dto/tenant-notification-config.dto";
+} from '@stockpile/application/dto/tenant-notification-config.dto";
 
 /**
  * Tenant Notification Configuration Controller

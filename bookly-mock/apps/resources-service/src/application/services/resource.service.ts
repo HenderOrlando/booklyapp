@@ -11,8 +11,8 @@ import {
   Injectable,
   NotFoundException,
 } from "@nestjs/common";
-import { ResourceEntity } from "../../domain/entities/resource.entity";
-import { IResourceRepository } from "../../domain/repositories/resource.repository.interface";
+import { ResourceEntity } from '@resources/domain/entities/resource.entity";
+import { IResourceRepository } from '@resources/domain/repositories/resource.repository.interface";
 import { AvailabilityRulesUpdatedEvent } from "../events/availability-rules-updated.event";
 import { ResourceCategoryChangedEvent } from "../events/resource-category-changed.event";
 import { ResourceStatusChangedEvent } from "../events/resource-status-changed.event";

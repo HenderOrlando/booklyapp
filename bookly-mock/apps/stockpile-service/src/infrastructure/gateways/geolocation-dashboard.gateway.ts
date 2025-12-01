@@ -9,8 +9,8 @@ import {
   WebSocketServer,
 } from "@nestjs/websockets";
 import { Server, Socket } from "socket.io";
-import { CheckInOutService } from "../../application/services/check-in-out.service";
-import { GeolocationService } from "../../application/services/geolocation.service";
+import { CheckInOutService } from '@stockpile/application/services/check-in-out.service";
+import { GeolocationService } from '@stockpile/application/services/geolocation.service";
 
 const logger = createLogger("GeolocationDashboardGateway");
 

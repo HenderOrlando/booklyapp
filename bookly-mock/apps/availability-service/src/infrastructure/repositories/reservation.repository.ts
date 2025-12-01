@@ -3,8 +3,8 @@ import { PaginationMeta, PaginationQuery } from "@libs/common";
 import { Injectable } from "@nestjs/common";
 import { InjectModel } from "@nestjs/mongoose";
 import { Model, Types } from "mongoose";
-import { ReservationEntity } from "../../domain/entities/reservation.entity";
-import { IReservationRepository } from "../../domain/repositories/reservation.repository.interface";
+import { ReservationEntity } from '@availability/domain/entities/reservation.entity";
+import { IReservationRepository } from '@availability/domain/repositories/reservation.repository.interface";
 import {
   Reservation,
   ReservationDocument,

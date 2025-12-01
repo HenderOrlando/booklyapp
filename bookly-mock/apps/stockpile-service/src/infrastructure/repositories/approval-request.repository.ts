@@ -3,8 +3,8 @@ import { PaginationMeta, PaginationQuery } from "@libs/common";
 import { Injectable } from "@nestjs/common";
 import { InjectModel } from "@nestjs/mongoose";
 import { Model, Types } from "mongoose";
-import { ApprovalRequestEntity } from "../../domain/entities";
-import { IApprovalRequestRepository } from "../../domain/repositories";
+import { ApprovalRequestEntity } from '@stockpile/domain/entities";
+import { IApprovalRequestRepository } from '@stockpile/domain/repositories";
 import { ApprovalRequest } from "../schemas";
 
 /**

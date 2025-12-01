@@ -18,9 +18,9 @@ import {
   LogFilterDto,
   WebSocketEvent,
   WebSocketSubscribeDto,
-} from "../../application/dto/websocket.dto";
-import { EventsService } from "../../application/services/events.service";
-import { NotificationService } from "../../application/services/notification.service";
+} from '@gateway/application/dto/websocket.dto";
+import { EventsService } from '@gateway/application/services/events.service";
+import { NotificationService } from '@gateway/application/services/notification.service";
 
 const logger = createLogger("WebSocketGateway");
 

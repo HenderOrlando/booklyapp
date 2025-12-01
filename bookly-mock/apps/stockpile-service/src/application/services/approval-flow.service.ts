@@ -4,8 +4,8 @@ import { Inject, Injectable, NotFoundException } from "@nestjs/common";
 import {
   ApprovalFlowEntity,
   ApprovalStep,
-} from "../../domain/entities/approval-flow.entity";
-import { IApprovalFlowRepository } from "../../domain/repositories";
+} from '@stockpile/domain/entities/approval-flow.entity";
+import { IApprovalFlowRepository } from '@stockpile/domain/repositories";
 
 const logger = createLogger("ApprovalFlowService");
 

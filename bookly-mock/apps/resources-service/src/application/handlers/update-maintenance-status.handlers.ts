@@ -1,6 +1,6 @@
 import { createLogger } from "@libs/common";
 import { CommandHandler, ICommandHandler } from "@nestjs/cqrs";
-import { MaintenanceEntity } from "../../domain/entities/maintenance.entity";
+import { MaintenanceEntity } from '@resources/domain/entities/maintenance.entity";
 import {
   CancelMaintenanceCommand,
   CompleteMaintenanceCommand,

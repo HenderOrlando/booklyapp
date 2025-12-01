@@ -2,12 +2,12 @@ import { ApprovalRequestStatus } from "@libs/common/enums";
 import { PaginationMeta, PaginationQuery } from "@libs/common";
 import { createLogger } from "@libs/common";
 import { Inject, Injectable, NotFoundException } from "@nestjs/common";
-import { ApprovalRequestEntity } from "../../domain/entities";
+import { ApprovalRequestEntity } from '@stockpile/domain/entities";
 import {
   IApprovalFlowRepository,
   IApprovalRequestRepository,
-} from "../../domain/repositories";
-import { EnrichedApprovalRequestDto } from "../../infrastructure/dtos";
+} from '@stockpile/domain/repositories";
+import { EnrichedApprovalRequestDto } from '@stockpile/infrastructure/dtos";
 import { DataEnrichmentService } from "./data-enrichment.service";
 
 const logger = createLogger("ApprovalRequestService");

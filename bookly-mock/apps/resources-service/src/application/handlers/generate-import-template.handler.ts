@@ -1,7 +1,7 @@
 import { ResourceType } from "@libs/common/enums";
 import { createLogger } from "@libs/common";
 import { IQueryHandler, QueryHandler } from "@nestjs/cqrs";
-import { CategoryRepository } from "../../infrastructure/repositories/category.repository";
+import { CategoryRepository } from '@resources/infrastructure/repositories/category.repository";
 import { GenerateImportTemplateQuery } from "../queries/generate-import-template.query";
 
 /**

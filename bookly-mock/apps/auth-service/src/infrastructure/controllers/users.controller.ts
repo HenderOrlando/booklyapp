@@ -23,8 +23,8 @@ import {
   ApiTags,
 } from "@nestjs/swagger";
 import { Audit, AuditAction } from "@reports/audit-decorators";
-import { GetUserByIdQuery } from "../../application/queries/get-user-by-id.query";
-import { GetUsersQuery } from "../../application/queries/get-users.query";
+import { GetUserByIdQuery } from '@auth/application/queries/get-user-by-id.query";
+import { GetUsersQuery } from '@auth/application/queries/get-users.query";
 import { UpdateUserDto } from "../dto/update-user.dto";
 
 /**

@@ -7,7 +7,7 @@ import {
 } from "@nestjs/common";
 import { InjectModel } from "@nestjs/mongoose";
 import { Model } from "mongoose";
-import { Role } from "../../infrastructure/schemas/role.schema";
+import { Role } from '@auth/infrastructure/schemas/role.schema";
 import { CreateRoleDto } from "../dtos/role/create-role.dto";
 import { RoleResponseDto } from "../dtos/role/role-response.dto";
 import { UpdateRoleDto } from "../dtos/role/update-role.dto";

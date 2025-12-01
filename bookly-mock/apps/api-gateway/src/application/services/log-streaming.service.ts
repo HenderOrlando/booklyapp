@@ -1,7 +1,7 @@
 import { createLogger } from "@libs/common";
 import { Injectable } from "@nestjs/common";
 import { LogLevel } from "../../../../../libs/common/src";
-import { BooklyWebSocketGateway } from "../../infrastructure/websocket/websocket.gateway";
+import { BooklyWebSocketGateway } from '@gateway/infrastructure/websocket/websocket.gateway";
 import { LogFilterDto, WebSocketEvent } from "../dto/websocket.dto";
 
 const logger = createLogger("LogStreamingService");

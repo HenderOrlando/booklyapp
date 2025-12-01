@@ -1,6 +1,6 @@
 import { PaginationMeta } from "@libs/common";
 import { IQueryHandler, QueryHandler } from "@nestjs/cqrs";
-import { ResourceEntity } from "../../domain/entities/resource.entity";
+import { ResourceEntity } from '@resources/domain/entities/resource.entity";
 import { GetResourcesQuery } from "../queries/get-resources.query";
 import { ResourceService } from "../services/resource.service";
 

@@ -24,7 +24,7 @@ import {
   DLQStatsResponseDto,
   GetDLQEventsQueryDto,
   ResolveDLQEventDto,
-} from "../../application/dto/dlq.dto";
+} from '@gateway/application/dto/dlq.dto";
 
 @ApiTags("Dead Letter Queue")
 @Controller("dlq")

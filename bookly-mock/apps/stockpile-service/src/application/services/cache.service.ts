@@ -1,7 +1,7 @@
 import { createLogger } from "@libs/common";
 import { RedisService } from "@libs/redis";
 import { Injectable } from "@nestjs/common";
-import { UserData } from "../../infrastructure/clients/auth-service.client";
+import { UserData } from '@stockpile/infrastructure/clients/auth-service.client";
 
 /**
  * Resource Data for caching

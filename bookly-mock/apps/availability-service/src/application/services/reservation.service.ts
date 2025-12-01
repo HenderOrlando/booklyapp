@@ -2,8 +2,8 @@ import { ReservationStatus } from "@libs/common/enums";
 import { PaginationMeta, PaginationQuery } from "@libs/common";
 import { createLogger } from "@libs/common";
 import { Inject, Injectable, NotFoundException } from "@nestjs/common";
-import { ReservationEntity } from "../../domain/entities/reservation.entity";
-import { IReservationRepository } from "../../domain/repositories/reservation.repository.interface";
+import { ReservationEntity } from '@availability/domain/entities/reservation.entity";
+import { IReservationRepository } from '@availability/domain/repositories/reservation.repository.interface";
 
 const logger = createLogger("ReservationService");
 

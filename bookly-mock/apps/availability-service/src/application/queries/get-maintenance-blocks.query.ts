@@ -1,4 +1,4 @@
-import { QueryMaintenanceBlocksDto } from "../../infrastructure/dtos/maintenance-block.dto";
+import { QueryMaintenanceBlocksDto } from '@availability/infrastructure/dtos/maintenance-block.dto";
 
 /**
  * Query para obtener bloqueos de mantenimiento

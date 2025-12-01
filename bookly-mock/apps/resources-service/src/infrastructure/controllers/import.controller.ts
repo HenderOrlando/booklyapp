@@ -26,13 +26,13 @@ import {
   RollbackImportCommand,
   StartAsyncImportCommand,
   ValidateImportCommand,
-} from "../../application/commands";
+} from '@resources/application/commands";
 import {
   GenerateImportTemplateQuery,
   GetImportJobQuery,
   GetUserImportJobsQuery,
-} from "../../application/queries";
-import { ImportJobEntity } from "../../domain/entities/import-job.entity";
+} from '@resources/application/queries";
+import { ImportJobEntity } from '@resources/domain/entities/import-job.entity";
 import {
   GenerateTemplateDto,
   ImportJobDto,

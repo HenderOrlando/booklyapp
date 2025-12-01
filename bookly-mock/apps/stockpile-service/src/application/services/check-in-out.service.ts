@@ -3,8 +3,8 @@ import { Injectable } from "@nestjs/common";
 import { InjectModel } from "@nestjs/mongoose";
 import * as crypto from "crypto";
 import { Model, Types } from "mongoose";
-import { CheckInOutEntity } from "../../domain/entities/check-in-out.entity";
-import { CheckInOut } from "../../infrastructure/schemas/check-in-out.schema";
+import { CheckInOutEntity } from '@stockpile/domain/entities/check-in-out.entity";
+import { CheckInOut } from '@stockpile/infrastructure/schemas/check-in-out.schema";
 
 @Injectable()
 export class CheckInOutService {

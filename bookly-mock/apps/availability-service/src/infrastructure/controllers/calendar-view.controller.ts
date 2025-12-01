@@ -10,7 +10,7 @@ import {
   ApiResponse,
   ApiTags,
 } from "@nestjs/swagger";
-import { GetCalendarViewQuery } from "../../application/queries/get-calendar-view.query";
+import { GetCalendarViewQuery } from '@availability/application/queries/get-calendar-view.query";
 import {
   CalendarViewDto,
   CalendarViewResponseDto,

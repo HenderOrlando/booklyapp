@@ -2,8 +2,8 @@ import { PaginationMeta, PaginationQuery } from "@libs/common";
 import { Injectable } from "@nestjs/common";
 import { InjectModel } from "@nestjs/mongoose";
 import { Model, Types } from "mongoose";
-import { WaitingListEntity } from "../../domain/entities/waiting-list.entity";
-import { IWaitingListRepository } from "../../domain/repositories/waiting-list.repository.interface";
+import { WaitingListEntity } from '@availability/domain/entities/waiting-list.entity";
+import { IWaitingListRepository } from '@availability/domain/repositories/waiting-list.repository.interface";
 import {
   WaitingList,
   WaitingListDocument,

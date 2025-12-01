@@ -1,5 +1,5 @@
 import { CommandHandler, ICommandHandler } from "@nestjs/cqrs";
-import { MaintenanceEntity } from "../../domain/entities/maintenance.entity";
+import { MaintenanceEntity } from '@resources/domain/entities/maintenance.entity";
 import { ScheduleMaintenanceCommand } from "../commands/schedule-maintenance.command";
 import { MaintenanceService } from "../services/maintenance.service";
 

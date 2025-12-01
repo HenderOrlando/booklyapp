@@ -3,8 +3,8 @@ import { Inject, Injectable } from "@nestjs/common";
 import {
   ApprovalAuditLogActionType,
   ApprovalAuditLogEntity,
-} from "../../domain/entities/approval-audit-log.entity";
-import { IApprovalAuditLogRepository } from "../../domain/repositories/approval-audit-log.repository.interface";
+} from '@stockpile/domain/entities/approval-audit-log.entity";
+import { IApprovalAuditLogRepository } from '@stockpile/domain/repositories/approval-audit-log.repository.interface";
 
 /**
  * Approval Audit Service

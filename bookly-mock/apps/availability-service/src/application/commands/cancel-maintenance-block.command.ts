@@ -1,4 +1,4 @@
-import { CancelMaintenanceDto } from "../../infrastructure/dtos/maintenance-block.dto";
+import { CancelMaintenanceDto } from '@availability/infrastructure/dtos/maintenance-block.dto";
 
 /**
  * Command para cancelar mantenimiento

@@ -1,5 +1,5 @@
 import { Injectable } from "@nestjs/common";
-import { SimilarityWeightsDto } from "../../infrastructure/dtos/reassignment.dto";
+import { SimilarityWeightsDto } from '@availability/infrastructure/dtos/reassignment.dto";
 
 /**
  * Interfaz para recurso en scoring

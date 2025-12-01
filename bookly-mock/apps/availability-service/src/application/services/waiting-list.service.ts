@@ -1,8 +1,8 @@
 import { PaginationMeta, PaginationQuery } from "@libs/common";
 import { createLogger } from "@libs/common";
 import { Inject, Injectable, NotFoundException } from "@nestjs/common";
-import { WaitingListEntity } from "../../domain/entities/waiting-list.entity";
-import { IWaitingListRepository } from "../../domain/repositories/waiting-list.repository.interface";
+import { WaitingListEntity } from '@availability/domain/entities/waiting-list.entity";
+import { IWaitingListRepository } from '@availability/domain/repositories/waiting-list.repository.interface";
 
 const logger = createLogger("WaitingListService");
 

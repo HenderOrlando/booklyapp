@@ -1,4 +1,4 @@
-import { RespondReassignmentDto } from "../../infrastructure/dtos/reassignment.dto";
+import { RespondReassignmentDto } from '@availability/infrastructure/dtos/reassignment.dto";
 
 /**
  * Command para responder a una reasignación

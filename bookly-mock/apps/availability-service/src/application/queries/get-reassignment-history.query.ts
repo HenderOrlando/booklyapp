@@ -1,4 +1,4 @@
-import { GetReassignmentHistoryDto } from "../../infrastructure/dtos/reassignment.dto";
+import { GetReassignmentHistoryDto } from '@availability/infrastructure/dtos/reassignment.dto";
 
 /**
  * Query para obtener historial de reasignaciones

@@ -2,7 +2,7 @@ import { createLogger } from "@libs/common";
 import { Injectable } from "@nestjs/common";
 import { InjectModel } from "@nestjs/mongoose";
 import { Model } from "mongoose";
-import { TenantNotificationConfigEntity } from "../../domain/entities/tenant-notification-config.entity";
+import { TenantNotificationConfigEntity } from '@stockpile/domain/entities/tenant-notification-config.entity";
 import { TenantNotificationConfig } from "../schemas/tenant-notification-config.schema";
 
 const logger = createLogger("TenantNotificationConfigRepository");

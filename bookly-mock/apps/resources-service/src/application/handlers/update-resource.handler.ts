@@ -1,5 +1,5 @@
 import { CommandHandler, ICommandHandler } from "@nestjs/cqrs";
-import { ResourceEntity } from "../../domain/entities/resource.entity";
+import { ResourceEntity } from '@resources/domain/entities/resource.entity";
 import { UpdateResourceCommand } from "../commands/update-resource.command";
 import { ResourceService } from "../services/resource.service";
 

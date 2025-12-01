@@ -7,7 +7,7 @@ import {
   ApiResponse,
   ApiTags,
 } from "@nestjs/swagger";
-import { GetDemandReportsQuery } from "../../application/queries";
+import { GetDemandReportsQuery } from '@reports/application/queries";
 import { QueryDemandReportsDto } from "../dtos";
 
 @ApiTags("Demand Reports")

@@ -16,9 +16,9 @@ import {
 import { EventBus } from "@nestjs/cqrs";
 import { JwtService } from "@nestjs/jwt";
 import * as bcrypt from "bcrypt";
-import { UserEntity } from "../../domain/entities/user.entity";
-import { TwoFactorVerificationFailedEvent } from "../../domain/events/two-factor-verification-failed.event";
-import { IUserRepository } from "../../domain/repositories/user.repository.interface";
+import { UserEntity } from '@auth/domain/entities/user.entity";
+import { TwoFactorVerificationFailedEvent } from '@auth/domain/events/two-factor-verification-failed.event";
+import { IUserRepository } from '@auth/domain/repositories/user.repository.interface";
 
 export interface AuthTokens {
   accessToken: string;

@@ -2,8 +2,8 @@ import { createLogger } from "@libs/common";
 import { Injectable } from "@nestjs/common";
 import { InjectModel } from "@nestjs/mongoose";
 import { Model } from "mongoose";
-import { UserEvaluationEntity } from "../../domain/entities/user-evaluation.entity";
-import { IUserEvaluationRepository } from "../../domain/repositories/user-evaluation.repository.interface";
+import { UserEvaluationEntity } from '@reports/domain/entities/user-evaluation.entity";
+import { IUserEvaluationRepository } from '@reports/domain/repositories/user-evaluation.repository.interface";
 import { UserEvaluation } from "../schemas/user-evaluation.schema";
 
 const logger = createLogger("UserEvaluationRepository");

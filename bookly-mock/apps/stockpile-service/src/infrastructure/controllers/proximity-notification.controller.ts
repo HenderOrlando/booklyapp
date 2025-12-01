@@ -18,7 +18,7 @@ import {
 import {
   ProximityNotificationService,
   ProximityThreshold,
-} from "../../application/services/proximity-notification.service";
+} from '@stockpile/application/services/proximity-notification.service";
 
 /**
  * DTO para verificar proximidad

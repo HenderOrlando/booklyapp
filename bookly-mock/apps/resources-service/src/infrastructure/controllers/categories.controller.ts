@@ -4,8 +4,8 @@ import { JwtAuthGuard } from "@libs/guards";
 import { Body, Controller, Get, Post, Query, UseGuards } from "@nestjs/common";
 import { CommandBus, QueryBus } from "@nestjs/cqrs";
 import { ApiBearerAuth, ApiOperation, ApiTags } from "@nestjs/swagger";
-import { CreateCategoryCommand } from "../../application/commands";
-import { GetCategoriesQuery } from "../../application/queries";
+import { CreateCategoryCommand } from '@resources/application/commands";
+import { GetCategoriesQuery } from '@resources/application/queries";
 import { CreateCategoryDto } from "../dto";
 
 /**

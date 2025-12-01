@@ -1,6 +1,6 @@
 import { PaginationMeta } from "@libs/common";
 import { IQueryHandler, QueryHandler } from "@nestjs/cqrs";
-import { CategoryEntity } from "../../domain/entities/category.entity";
+import { CategoryEntity } from '@resources/domain/entities/category.entity";
 import { GetCategoriesQuery } from "../queries/get-categories.query";
 import { CategoryService } from "../services/category.service";
 

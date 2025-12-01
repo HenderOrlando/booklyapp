@@ -9,7 +9,7 @@ import {
 } from "@nestjs/common";
 import { ApiOperation, ApiTags } from "@nestjs/swagger";
 import { Audit, AuditAction } from "@reports/audit-decorators";
-import { ProxyService } from "../../application/services/proxy.service";
+import { ProxyService } from '@gateway/application/services/proxy.service";
 
 /**
  * Proxy Controller

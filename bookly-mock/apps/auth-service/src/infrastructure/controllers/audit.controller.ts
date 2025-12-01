@@ -19,8 +19,8 @@ import { Response } from "express";
 import {
   AuditLogsResponseDto,
   CleanupStatsDto,
-} from "../../application/dtos/audit/audit-log-response.dto";
-import { AuditService } from "../../application/services/audit.service";
+} from '@auth/application/dtos/audit/audit-log-response.dto";
+import { AuditService } from '@auth/application/services/audit.service";
 import { RequireAction } from "../decorators/require-action.decorator";
 import { RequirePermissions } from "../decorators/require-permissions.decorator";
 import { ActionGuard } from "../guards/action.guard";

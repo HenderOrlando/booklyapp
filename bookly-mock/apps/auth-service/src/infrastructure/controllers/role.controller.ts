@@ -20,19 +20,19 @@ import {
   ApiResponse,
   ApiTags,
 } from "@nestjs/swagger";
-import { AssignPermissionsCommand } from "../../application/commands/roles/assign-permissions.command";
-import { CreateRoleCommand } from "../../application/commands/roles/create-role.command";
-import { DeleteRoleCommand } from "../../application/commands/roles/delete-role.command";
-import { RemovePermissionsCommand } from "../../application/commands/roles/remove-permissions.command";
-import { UpdateRoleCommand } from "../../application/commands/roles/update-role.command";
-import { AssignPermissionsDto } from "../../application/dtos/role/assign-permissions.dto";
-import { CreateRoleDto } from "../../application/dtos/role/create-role.dto";
-import { RoleResponseDto } from "../../application/dtos/role/role-response.dto";
-import { UpdateRoleDto } from "../../application/dtos/role/update-role.dto";
-import { GetActiveRolesQuery } from "../../application/queries/roles/get-active-roles.query";
-import { GetRoleByIdQuery } from "../../application/queries/roles/get-role-by-id.query";
-import { GetRolesQuery } from "../../application/queries/roles/get-roles.query";
-import { GetSystemRolesQuery } from "../../application/queries/roles/get-system-roles.query";
+import { AssignPermissionsCommand } from '@auth/application/commands/roles/assign-permissions.command";
+import { CreateRoleCommand } from '@auth/application/commands/roles/create-role.command";
+import { DeleteRoleCommand } from '@auth/application/commands/roles/delete-role.command";
+import { RemovePermissionsCommand } from '@auth/application/commands/roles/remove-permissions.command";
+import { UpdateRoleCommand } from '@auth/application/commands/roles/update-role.command";
+import { AssignPermissionsDto } from '@auth/application/dtos/role/assign-permissions.dto";
+import { CreateRoleDto } from '@auth/application/dtos/role/create-role.dto";
+import { RoleResponseDto } from '@auth/application/dtos/role/role-response.dto";
+import { UpdateRoleDto } from '@auth/application/dtos/role/update-role.dto";
+import { GetActiveRolesQuery } from '@auth/application/queries/roles/get-active-roles.query";
+import { GetRoleByIdQuery } from '@auth/application/queries/roles/get-role-by-id.query";
+import { GetRolesQuery } from '@auth/application/queries/roles/get-roles.query";
+import { GetSystemRolesQuery } from '@auth/application/queries/roles/get-system-roles.query";
 import { CurrentUser, UserPayload } from "../decorators/current-user.decorator";
 import { RequireAction } from "../decorators/require-action.decorator";
 import { RequirePermissions } from "../decorators/require-permissions.decorator";

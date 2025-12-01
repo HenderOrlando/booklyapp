@@ -1,7 +1,7 @@
 import { Injectable } from "@nestjs/common";
 import { IQueryHandler, QueryHandler } from "@nestjs/cqrs";
-import { MaintenanceBlockRepository } from "../../infrastructure/repositories/maintenance-block.repository";
-import { MaintenanceBlock } from "../../infrastructure/schemas/maintenance-block.schema";
+import { MaintenanceBlockRepository } from '@availability/infrastructure/repositories/maintenance-block.repository";
+import { MaintenanceBlock } from '@availability/infrastructure/schemas/maintenance-block.schema";
 import { GetMaintenanceBlocksQuery } from "../queries/get-maintenance-blocks.query";
 
 /**

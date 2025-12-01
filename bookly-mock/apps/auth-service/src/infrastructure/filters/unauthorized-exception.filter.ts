@@ -8,7 +8,7 @@ import {
   UnauthorizedException,
 } from "@nestjs/common";
 import { Response } from "express";
-import { AuditService } from "../../application/services/audit.service";
+import { AuditService } from '@auth/application/services/audit.service";
 
 /**
  * Exception Filter para capturar y auditar intentos de acceso no autorizado

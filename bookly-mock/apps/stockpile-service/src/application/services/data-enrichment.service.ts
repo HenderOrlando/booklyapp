@@ -1,12 +1,12 @@
 import { createLogger } from "@libs/common";
 import { RedisService } from "@libs/redis";
 import { Injectable } from "@nestjs/common";
-import { ApprovalRequestEntity } from "../../domain/entities";
+import { ApprovalRequestEntity } from '@stockpile/domain/entities";
 import {
   EnrichedApprovalRequestDto,
   RequesterInfoDto,
   ResourceInfoDto,
-} from "../../infrastructure/dtos/enriched-approval.dto";
+} from '@stockpile/infrastructure/dtos/enriched-approval.dto";
 
 const logger = createLogger("DataEnrichmentService");
 

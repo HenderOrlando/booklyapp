@@ -9,7 +9,7 @@ import { v4 as uuidv4 } from "uuid";
 import {
   AuditLog,
   AuditLogDocument,
-} from "../../infrastructure/schemas/audit-log.schema";
+} from '@auth/infrastructure/schemas/audit-log.schema";
 import { CreateAuditLogDto } from "../dtos/audit/create-audit-log.dto";
 
 /**
