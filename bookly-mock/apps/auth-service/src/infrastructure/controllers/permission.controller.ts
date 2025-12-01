@@ -20,18 +20,18 @@ import {
   ApiResponse,
   ApiTags,
 } from "@nestjs/swagger";
-import { BulkCreatePermissionsCommand } from '@auth/application/commands/permissions/bulk-create-permissions.command";
-import { CreatePermissionCommand } from '@auth/application/commands/permissions/create-permission.command";
-import { DeletePermissionCommand } from '@auth/application/commands/permissions/delete-permission.command";
-import { UpdatePermissionCommand } from '@auth/application/commands/permissions/update-permission.command";
-import { BulkCreatePermissionsDto } from '@auth/application/dtos/permission/bulk-create-permissions.dto";
-import { CreatePermissionDto } from '@auth/application/dtos/permission/create-permission.dto";
-import { PermissionResponseDto } from '@auth/application/dtos/permission/permission-response.dto";
-import { UpdatePermissionDto } from '@auth/application/dtos/permission/update-permission.dto";
-import { GetActivePermissionsQuery } from '@auth/application/queries/permissions/get-active-permissions.query";
-import { GetPermissionByIdQuery } from '@auth/application/queries/permissions/get-permission-by-id.query";
-import { GetPermissionsByModuleQuery } from '@auth/application/queries/permissions/get-permissions-by-module.query";
-import { GetPermissionsQuery } from '@auth/application/queries/permissions/get-permissions.query";
+import { BulkCreatePermissionsCommand } from "@auth/application/commands/permissions/bulk-create-permissions.command";
+import { CreatePermissionCommand } from "@auth/application/commands/permissions/create-permission.command";
+import { DeletePermissionCommand } from "@auth/application/commands/permissions/delete-permission.command";
+import { UpdatePermissionCommand } from "@auth/application/commands/permissions/update-permission.command";
+import { BulkCreatePermissionsDto } from "@auth/application/dtos/permission/bulk-create-permissions.dto";
+import { CreatePermissionDto } from "@auth/application/dtos/permission/create-permission.dto";
+import { PermissionResponseDto } from "@auth/application/dtos/permission/permission-response.dto";
+import { UpdatePermissionDto } from "@auth/application/dtos/permission/update-permission.dto";
+import { GetActivePermissionsQuery } from "@auth/application/queries/permissions/get-active-permissions.query";
+import { GetPermissionByIdQuery } from "@auth/application/queries/permissions/get-permission-by-id.query";
+import { GetPermissionsByModuleQuery } from "@auth/application/queries/permissions/get-permissions-by-module.query";
+import { GetPermissionsQuery } from "@auth/application/queries/permissions/get-permissions.query";
 import { CurrentUser, UserPayload } from "../decorators/current-user.decorator";
 import { RequireAction } from "../decorators/require-action.decorator";
 import { RequirePermissions } from "../decorators/require-permissions.decorator";
@@ -119,6 +119,18 @@ export class PermissionController {
     required: false,
     description: "Buscar en name, description o code",
   })
+  @ApiQuery({
+    name: "page",
+    required: false,
+    type: Number,
+    description: "Número de página (default: 1)",
+  })
+  @ApiQuery({
+    name: "limit",
+    required: false,
+    type: Number,
+    description: "Items por página (default: 20)",
+  })
   @ApiResponse({
     status: 200,
     description: "Lista de permisos",
@@ -128,7 +140,9 @@ export class PermissionController {
     @Query("resource") resource?: string,
     @Query("action") action?: string,
     @Query("isActive") isActive?: string,
-    @Query("search") search?: string
+    @Query("search") search?: string,
+    @Query("page") page?: number,
+    @Query("limit") limit?: number
   ) {
     const query = new GetPermissionsQuery({
       resource,
@@ -143,9 +157,19 @@ export class PermissionController {
       PermissionResponseDto[]
     >(query);
 
-    return ResponseUtil.success(
-      permissions,
-      `${permissions.length} permiso(s) encontrado(s)`
+    // Aplicar paginación en memoria
+    const currentPage = page || 1;
+    const pageSize = limit || 20;
+    const startIndex = (currentPage - 1) * pageSize;
+    const endIndex = startIndex + pageSize;
+    const paginatedPermissions = permissions.slice(startIndex, endIndex);
+
+    return ResponseUtil.paginated(
+      paginatedPermissions,
+      permissions.length,
+      currentPage,
+      pageSize,
+      'Permissions retrieved successfully'
     );
   }
 
