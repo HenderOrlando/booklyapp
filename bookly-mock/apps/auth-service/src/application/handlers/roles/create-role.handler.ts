@@ -1,7 +1,7 @@
 import { CommandHandler, ICommandHandler } from "@nestjs/cqrs";
-import { CreateRoleCommand } from "../../commands/roles/create-role.command";
-import { RoleResponseDto } from "../../dtos/role/role-response.dto";
-import { RoleService } from "../../services/role.service";
+import { CreateRoleCommand } from '@auth/application/commands/roles/create-role.command";
+import { RoleResponseDto } from '@auth/application/dtos/role/role-response.dto";
+import { RoleService } from '@auth/application/services/role.service";
 
 /**
  * Handler para el command CreateRole

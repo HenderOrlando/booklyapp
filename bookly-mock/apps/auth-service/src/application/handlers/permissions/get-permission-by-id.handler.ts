@@ -1,7 +1,7 @@
 import { IQueryHandler, QueryHandler } from "@nestjs/cqrs";
-import { PermissionResponseDto } from "../../dtos/permission/permission-response.dto";
-import { GetPermissionByIdQuery } from "../../queries/permissions/get-permission-by-id.query";
-import { PermissionService } from "../../services/permission.service";
+import { PermissionResponseDto } from '@auth/application/dtos/permission/permission-response.dto";
+import { GetPermissionByIdQuery } from '@auth/application/queries/permissions/get-permission-by-id.query";
+import { PermissionService } from '@auth/application/services/permission.service";
 
 /**
  * Handler para obtener un permiso por ID

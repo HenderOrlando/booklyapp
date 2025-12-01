@@ -1,6 +1,6 @@
 import { Injectable, Logger } from "@nestjs/common";
 import { ConfigService } from "@nestjs/config";
-import { GoogleOAuthProvider, OAuthPurpose } from "../../modules/oauth";
+import { GoogleOAuthProvider, OAuthPurpose } from "@auth/modules/oauth";
 
 /**
  * Google OAuth Service para auth-service

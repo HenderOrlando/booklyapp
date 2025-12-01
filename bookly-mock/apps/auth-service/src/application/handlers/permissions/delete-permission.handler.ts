@@ -1,6 +1,6 @@
 import { CommandHandler, ICommandHandler } from "@nestjs/cqrs";
-import { DeletePermissionCommand } from "../../commands/permissions/delete-permission.command";
-import { PermissionService } from "../../services/permission.service";
+import { DeletePermissionCommand } from '@auth/application/commands/permissions/delete-permission.command";
+import { PermissionService } from '@auth/application/services/permission.service";
 
 /**
  * Handler para eliminar un permiso

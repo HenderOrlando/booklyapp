@@ -23,9 +23,10 @@ Refactorizar todas las importaciones relativas (`../../`) a aliases (`@service/`
 | Métrica | Valor |
 |---------|-------|
 | **Archivos procesados** | 659 |
-| **Archivos modificados** | 169 |
-| **Imports corregidos** | 316 |
-| **Tasa de modificación** | 25.6% |
+| **Archivos modificados** | 190 |
+| **Imports corregidos** | 369 |
+| **Tasa de modificación** | 28.8% |
+| **Imports restantes** | 3 (solo en tests) |
 
 ---
 
@@ -33,9 +34,9 @@ Refactorizar todas las importaciones relativas (`../../`) a aliases (`@service/`
 
 ### auth-service (@auth)
 - **Archivos procesados**: 189
-- **Archivos modificados**: 58
-- **Imports corregidos**: 110
-- **Estado**: ✅ Completado
+- **Archivos modificados**: 76
+- **Imports corregidos**: 161
+- **Estado**: ✅ Completado (3 imports en tests ignorados)
 
 ### resources-service (@resources)
 - **Archivos procesados**: 104
@@ -63,8 +64,8 @@ Refactorizar todas las importaciones relativas (`../../`) a aliases (`@service/`
 
 ### api-gateway (@gateway)
 - **Archivos procesados**: 29
-- **Archivos modificados**: 7
-- **Imports corregidos**: 12
+- **Archivos modificados**: 8
+- **Imports corregidos**: 13
 - **Estado**: ✅ Completado
 
 ---
@@ -117,15 +118,15 @@ import { ResourceService } from '@resources/application/services/resource.servic
 - Handlers: Todos los handlers CQRS
 - Repositories: Todos los repositorios
 
-### reports-service (29 archivos)
-- Controllers: demand-reports.controller.ts, dashboard.controller.ts
+### reports-service (30 archivos)
+- Controllers: demand-reports.controller.ts, dashboard.controller.ts, audit-records.controller.ts
 - Services: export-processor.service.ts, dashboard.service.ts
 - Handlers: generate-usage-report.handler.ts
 - Repositories: Todos los repositorios
 
-### api-gateway (7 archivos)
+### api-gateway (8 archivos)
 - Controllers: proxy.controller.ts, events.controller.ts, notifications.controller.ts
-- Services: log-streaming.service.ts
+- Services: log-streaming.service.ts (corregido manualmente)
 - WebSocket: websocket.gateway.ts
 
 ---

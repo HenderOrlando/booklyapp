@@ -1,7 +1,7 @@
 import { IQueryHandler, QueryHandler } from "@nestjs/cqrs";
-import { PermissionResponseDto } from "../../dtos/permission/permission-response.dto";
-import { GetActivePermissionsQuery } from "../../queries/permissions/get-active-permissions.query";
-import { PermissionService } from "../../services/permission.service";
+import { PermissionResponseDto } from '@auth/application/dtos/permission/permission-response.dto";
+import { GetActivePermissionsQuery } from '@auth/application/queries/permissions/get-active-permissions.query";
+import { PermissionService } from '@auth/application/services/permission.service";
 
 /**
  * Handler para obtener solo permisos activos
