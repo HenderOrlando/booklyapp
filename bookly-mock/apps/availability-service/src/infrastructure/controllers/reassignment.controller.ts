@@ -1,4 +1,5 @@
 import { RequirePermissions } from "@libs/common/decorators";
+import { ResponseUtil } from "@libs/common";
 import { CurrentUser } from "@libs/decorators";
 import { JwtAuthGuard } from "@libs/guards";
 import { PermissionsGuard } from "@libs/guards/permissions.guard";
@@ -46,9 +47,10 @@ export class ReassignmentController {
   async requestReassignment(
     @Body() dto: RequestReassignmentDto,
     @CurrentUser("sub") userId: string
-  ): Promise<ReassignmentResponseDto> {
+  ): Promise<any> {
     const command = new RequestReassignmentCommand(dto, userId);
-    return await this.commandBus.execute(command);
+    const result = await this.commandBus.execute(command);
+    return ResponseUtil.success(result, 'Reassignment alternatives found successfully');
   }
 
   /**
@@ -68,9 +70,10 @@ export class ReassignmentController {
   async respondToReassignment(
     @Body() dto: RespondReassignmentDto,
     @CurrentUser("sub") userId: string
-  ): Promise<void> {
+  ): Promise<any> {
     const command = new RespondReassignmentCommand(dto, userId);
-    return await this.commandBus.execute(command);
+    const result = await this.commandBus.execute(command);
+    return ResponseUtil.success(result, 'Reassignment response registered successfully');
   }
 
   /**
@@ -90,9 +93,10 @@ export class ReassignmentController {
   })
   async getHistory(
     @Query() filters: GetReassignmentHistoryDto
-  ): Promise<ReassignmentHistoryResponseDto[]> {
+  ): Promise<any> {
     const query = new GetReassignmentHistoryQuery(filters);
-    return await this.queryBus.execute(query);
+    const history = await this.queryBus.execute(query);
+    return ResponseUtil.success(history, 'Reassignment history retrieved successfully');
   }
 
   /**
@@ -111,8 +115,9 @@ export class ReassignmentController {
   })
   async getMyHistory(
     @CurrentUser("sub") userId: string
-  ): Promise<ReassignmentHistoryResponseDto[]> {
+  ): Promise<any> {
     const query = new GetReassignmentHistoryQuery({ userId });
-    return await this.queryBus.execute(query);
+    const history = await this.queryBus.execute(query);
+    return ResponseUtil.success(history, 'Personal reassignment history retrieved successfully');
   }
 }

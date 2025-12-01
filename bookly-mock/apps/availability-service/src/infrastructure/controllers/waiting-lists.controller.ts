@@ -1,3 +1,4 @@
+import { ResponseUtil } from "@libs/common";
 import { CurrentUser } from "@libs/decorators";
 import { JwtAuthGuard } from "@libs/guards";
 import {
@@ -60,7 +61,8 @@ export class WaitingListsController {
       user.sub
     );
 
-    return await this.commandBus.execute(command);
+    const waitingListEntry = await this.commandBus.execute(command);
+    return ResponseUtil.success(waitingListEntry, 'Added to waiting list successfully');
   }
 
   @Get("resource/:resourceId")
@@ -79,7 +81,20 @@ export class WaitingListsController {
       limit: limit || 10,
     });
 
-    return await this.queryBus.execute(query);
+    const result = await this.queryBus.execute(query);
+    
+    // Si el resultado ya tiene estructura de paginación
+    if (result.data && result.meta) {
+      return ResponseUtil.paginated(
+        result.data,
+        result.meta.total,
+        page || 1,
+        limit || 10,
+        'Waiting list retrieved successfully'
+      );
+    }
+    
+    return ResponseUtil.success(result, 'Waiting list retrieved successfully');
   }
 
   @Delete(":id")
@@ -97,10 +112,11 @@ export class WaitingListsController {
     @CurrentUser() user: any
   ): Promise<any> {
     // Implementar CancelWaitingListCommand si es necesario
-    return {
+    const result = {
       message: "Cancel waiting list functionality to be implemented",
       id,
       userId: user.sub,
     };
+    return ResponseUtil.success(result, 'Waiting list entry cancelled successfully');
   }
 }

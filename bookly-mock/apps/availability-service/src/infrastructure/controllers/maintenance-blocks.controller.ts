@@ -1,4 +1,5 @@
 import { RequirePermissions } from "@libs/common/decorators";
+import { ResponseUtil } from "@libs/common";
 import { CurrentUser } from "@libs/decorators";
 import { JwtAuthGuard } from "@libs/guards";
 import { PermissionsGuard } from "@libs/guards/permissions.guard";
@@ -72,12 +73,13 @@ export class MaintenanceBlocksController {
   async create(
     @Body() dto: CreateMaintenanceBlockDto,
     @CurrentUser() user: any
-  ): Promise<MaintenanceBlockResponseDto> {
+  ): Promise<any> {
     const command = new CreateMaintenanceBlockCommand(
       user.id || user.userId,
       dto
     );
-    return await this.commandBus.execute(command);
+    const result = await this.commandBus.execute(command);
+    return ResponseUtil.success(result, 'Maintenance block created successfully');
   }
 
   @Get()
@@ -118,9 +120,10 @@ export class MaintenanceBlocksController {
   })
   async findAll(
     @Query() filters: QueryMaintenanceBlocksDto
-  ): Promise<MaintenanceBlockResponseDto[]> {
+  ): Promise<any> {
     const query = new GetMaintenanceBlocksQuery(filters);
-    return await this.queryBus.execute(query);
+    const result = await this.queryBus.execute(query);
+    return ResponseUtil.success(result, 'Maintenance blocks retrieved successfully');
   }
 
   @Get("resource/:resourceId")
@@ -136,9 +139,10 @@ export class MaintenanceBlocksController {
   })
   async findByResource(
     @Param("resourceId") resourceId: string
-  ): Promise<MaintenanceBlockResponseDto[]> {
+  ): Promise<any> {
     const query = new GetMaintenanceBlocksQuery({ resourceId });
-    return await this.queryBus.execute(query);
+    const result = await this.queryBus.execute(query);
+    return ResponseUtil.success(result, 'Resource maintenance blocks retrieved successfully');
   }
 
   @Get("active")
@@ -152,11 +156,12 @@ export class MaintenanceBlocksController {
     description: "Lista de mantenimientos activos",
     type: [MaintenanceBlockResponseDto],
   })
-  async findActive(): Promise<MaintenanceBlockResponseDto[]> {
+  async findActive(): Promise<any> {
     const query = new GetMaintenanceBlocksQuery({
       status: "IN_PROGRESS" as any,
     });
-    return await this.queryBus.execute(query);
+    const result = await this.queryBus.execute(query);
+    return ResponseUtil.success(result, 'Active maintenance blocks retrieved successfully');
   }
 
   @Patch(":id/complete")
@@ -182,13 +187,14 @@ export class MaintenanceBlocksController {
     @Param("id") id: string,
     @Body() dto: CompleteMaintenanceDto,
     @CurrentUser() user: any
-  ): Promise<MaintenanceBlockResponseDto> {
+  ): Promise<any> {
     const command = new CompleteMaintenanceBlockCommand(
       id,
       user.id || user.userId,
       dto
     );
-    return await this.commandBus.execute(command);
+    const result = await this.commandBus.execute(command);
+    return ResponseUtil.success(result, 'Maintenance block completed successfully');
   }
 
   @Patch(":id/cancel")
@@ -214,12 +220,13 @@ export class MaintenanceBlocksController {
     @Param("id") id: string,
     @Body() dto: CancelMaintenanceDto,
     @CurrentUser() user: any
-  ): Promise<MaintenanceBlockResponseDto> {
+  ): Promise<any> {
     const command = new CancelMaintenanceBlockCommand(
       id,
       user.id || user.userId,
       dto
     );
-    return await this.commandBus.execute(command);
+    const result = await this.commandBus.execute(command);
+    return ResponseUtil.success(result, 'Maintenance block cancelled successfully');
   }
 }

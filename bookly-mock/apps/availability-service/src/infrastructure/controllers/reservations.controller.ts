@@ -1,4 +1,5 @@
 import { RequirePermissions } from "@libs/common/decorators";
+import { ResponseUtil } from "@libs/common";
 import { CurrentUser } from "@libs/decorators";
 import { JwtAuthGuard, PermissionsGuard } from "@libs/guards";
 import {
@@ -103,7 +104,8 @@ export class ReservationsController {
       user.sub
     );
 
-    return await this.commandBus.execute(command);
+    const reservation = await this.commandBus.execute(command);
+    return ResponseUtil.success(reservation, 'Reservation created successfully');
   }
 
   @Get()
@@ -127,7 +129,20 @@ export class ReservationsController {
       }
     );
 
-    return await this.queryBus.execute(queryObj);
+    const result = await this.queryBus.execute(queryObj);
+    
+    // Si el resultado ya tiene estructura de paginación
+    if (result.data && result.meta) {
+      return ResponseUtil.paginated(
+        result.data,
+        result.meta.total,
+        query.page || 1,
+        query.limit || 10,
+        'Reservations retrieved successfully'
+      );
+    }
+    
+    return ResponseUtil.success(result, 'Reservations retrieved successfully');
   }
 
   @Get(":id")
@@ -142,7 +157,8 @@ export class ReservationsController {
   })
   async findOne(@Param("id") id: string): Promise<any> {
     const query = new GetReservationByIdQuery(id);
-    return await this.queryBus.execute(query);
+    const reservation = await this.queryBus.execute(query);
+    return ResponseUtil.success(reservation, 'Reservation retrieved successfully');
   }
 
   @Patch(":id")
@@ -170,7 +186,8 @@ export class ReservationsController {
       user.sub
     );
 
-    return await this.commandBus.execute(command);
+    const reservation = await this.commandBus.execute(command);
+    return ResponseUtil.success(reservation, 'Reservation updated successfully');
   }
 
   @Post(":id/cancel")
@@ -194,7 +211,8 @@ export class ReservationsController {
       dto.cancellationReason
     );
 
-    return await this.commandBus.execute(command);
+    const result = await this.commandBus.execute(command);
+    return ResponseUtil.success(result, 'Reservation cancelled successfully');
   }
 
   @Post(":id/check-in")
@@ -212,7 +230,8 @@ export class ReservationsController {
     @CurrentUser() user: any
   ): Promise<any> {
     const command = new CheckInReservationCommand(id, user.sub);
-    return await this.commandBus.execute(command);
+    const result = await this.commandBus.execute(command);
+    return ResponseUtil.success(result, 'Check-in completed successfully');
   }
 
   @Post(":id/check-out")
@@ -230,7 +249,8 @@ export class ReservationsController {
     @CurrentUser() user: any
   ): Promise<any> {
     const command = new CheckOutReservationCommand(id, user.sub);
-    return await this.commandBus.execute(command);
+    const result = await this.commandBus.execute(command);
+    return ResponseUtil.success(result, 'Check-out completed successfully');
   }
 
   @Delete(":id")

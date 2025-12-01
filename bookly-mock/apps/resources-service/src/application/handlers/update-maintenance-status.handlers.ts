@@ -1,5 +1,6 @@
 import { createLogger } from "@libs/common";
 import { CommandHandler, ICommandHandler } from "@nestjs/cqrs";
+import { MaintenanceEntity } from "../../domain/entities/maintenance.entity";
 import {
   CancelMaintenanceCommand,
   CompleteMaintenanceCommand,
@@ -19,7 +20,7 @@ export class StartMaintenanceHandler
 
   constructor(private readonly maintenanceService: MaintenanceService) {}
 
-  async execute(command: StartMaintenanceCommand) {
+  async execute(command: StartMaintenanceCommand): Promise<MaintenanceEntity> {
     this.logger.info(`Starting maintenance ${command.maintenanceId}`);
     
     const maintenance = await this.maintenanceService.startMaintenanceWithResourceBlock(
@@ -42,7 +43,7 @@ export class CompleteMaintenanceHandler
 
   constructor(private readonly maintenanceService: MaintenanceService) {}
 
-  async execute(command: CompleteMaintenanceCommand) {
+  async execute(command: CompleteMaintenanceCommand): Promise<MaintenanceEntity> {
     this.logger.info(`Completing maintenance ${command.maintenanceId}`);
     
     const maintenance = await this.maintenanceService.completeMaintenanceWithResourceRestore(
@@ -76,7 +77,7 @@ export class CancelMaintenanceHandler
 
   constructor(private readonly maintenanceService: MaintenanceService) {}
 
-  async execute(command: CancelMaintenanceCommand) {
+  async execute(command: CancelMaintenanceCommand): Promise<MaintenanceEntity> {
     this.logger.info(`Cancelling maintenance ${command.maintenanceId}`);
     
     const maintenance = await this.maintenanceService.cancelMaintenanceWithResourceRestore(
