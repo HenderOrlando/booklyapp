@@ -3,8 +3,8 @@ import { EventPayload } from "@libs/common";
 import { createLogger } from "@libs/common";
 import { EventBusService } from "@libs/event-bus";
 import { Injectable, OnModuleInit } from "@nestjs/common";
-import { AuditAlertService } from "../../application/services/audit-alert.service";
-import { AuditAnalyticsService } from "../../application/services/audit-analytics.service";
+import { AuditAlertService } from '@reports/application/services/audit-alert.service";
+import { AuditAnalyticsService } from '@reports/application/services/audit-analytics.service";
 
 /**
  * Consumer de eventos de auditoría desde Kafka

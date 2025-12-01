@@ -20,18 +20,18 @@ import {
   ApiResponse,
   ApiTags,
 } from "@nestjs/swagger";
-import { BulkCreatePermissionsCommand } from "../../application/commands/permissions/bulk-create-permissions.command";
-import { CreatePermissionCommand } from "../../application/commands/permissions/create-permission.command";
-import { DeletePermissionCommand } from "../../application/commands/permissions/delete-permission.command";
-import { UpdatePermissionCommand } from "../../application/commands/permissions/update-permission.command";
-import { BulkCreatePermissionsDto } from "../../application/dtos/permission/bulk-create-permissions.dto";
-import { CreatePermissionDto } from "../../application/dtos/permission/create-permission.dto";
-import { PermissionResponseDto } from "../../application/dtos/permission/permission-response.dto";
-import { UpdatePermissionDto } from "../../application/dtos/permission/update-permission.dto";
-import { GetActivePermissionsQuery } from "../../application/queries/permissions/get-active-permissions.query";
-import { GetPermissionByIdQuery } from "../../application/queries/permissions/get-permission-by-id.query";
-import { GetPermissionsByModuleQuery } from "../../application/queries/permissions/get-permissions-by-module.query";
-import { GetPermissionsQuery } from "../../application/queries/permissions/get-permissions.query";
+import { BulkCreatePermissionsCommand } from '@auth/application/commands/permissions/bulk-create-permissions.command";
+import { CreatePermissionCommand } from '@auth/application/commands/permissions/create-permission.command";
+import { DeletePermissionCommand } from '@auth/application/commands/permissions/delete-permission.command";
+import { UpdatePermissionCommand } from '@auth/application/commands/permissions/update-permission.command";
+import { BulkCreatePermissionsDto } from '@auth/application/dtos/permission/bulk-create-permissions.dto";
+import { CreatePermissionDto } from '@auth/application/dtos/permission/create-permission.dto";
+import { PermissionResponseDto } from '@auth/application/dtos/permission/permission-response.dto";
+import { UpdatePermissionDto } from '@auth/application/dtos/permission/update-permission.dto";
+import { GetActivePermissionsQuery } from '@auth/application/queries/permissions/get-active-permissions.query";
+import { GetPermissionByIdQuery } from '@auth/application/queries/permissions/get-permission-by-id.query";
+import { GetPermissionsByModuleQuery } from '@auth/application/queries/permissions/get-permissions-by-module.query";
+import { GetPermissionsQuery } from '@auth/application/queries/permissions/get-permissions.query";
 import { CurrentUser, UserPayload } from "../decorators/current-user.decorator";
 import { RequireAction } from "../decorators/require-action.decorator";
 import { RequirePermissions } from "../decorators/require-permissions.decorator";

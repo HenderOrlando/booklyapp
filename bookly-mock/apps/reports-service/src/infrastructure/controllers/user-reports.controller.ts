@@ -7,7 +7,7 @@ import {
   ApiTags,
 } from "@nestjs/swagger";
 import { JwtAuthGuard } from "@libs/guards";
-import { GetUserReportsQuery } from "../../application/queries";
+import { GetUserReportsQuery } from '@reports/application/queries";
 import { QueryUserReportsDto } from "../dtos";
 
 @ApiTags("User Reports")

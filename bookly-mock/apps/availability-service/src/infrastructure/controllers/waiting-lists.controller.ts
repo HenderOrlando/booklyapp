@@ -18,8 +18,8 @@ import {
   ApiResponse,
   ApiTags,
 } from "@nestjs/swagger";
-import { AddToWaitingListCommand } from "../../application/commands";
-import { GetWaitingListQuery } from "../../application/queries";
+import { AddToWaitingListCommand } from '@availability/application/commands";
+import { GetWaitingListQuery } from '@availability/application/queries";
 import { AddToWaitingListDto } from "../dtos";
 
 /**

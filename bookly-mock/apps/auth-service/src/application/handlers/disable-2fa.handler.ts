@@ -1,7 +1,7 @@
 import { Inject } from "@nestjs/common";
 import { CommandHandler, EventBus, ICommandHandler } from "@nestjs/cqrs";
-import { TwoFactorDisabledEvent } from "../../domain/events/two-factor-disabled.event";
-import { IUserRepository } from "../../domain/repositories/user.repository.interface";
+import { TwoFactorDisabledEvent } from '@auth/domain/events/two-factor-disabled.event";
+import { IUserRepository } from '@auth/domain/repositories/user.repository.interface";
 import { Disable2FACommand } from "../commands/disable-2fa.command";
 import { TwoFactorService } from "../services/two-factor.service";
 

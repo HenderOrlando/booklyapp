@@ -10,9 +10,9 @@ import { Injectable } from "@nestjs/common";
 import { InjectModel } from "@nestjs/mongoose";
 import { Cron, CronExpression } from "@nestjs/schedule";
 import { Model } from "mongoose";
-import { ReminderConfigurationEntity } from "../../domain/entities/reminder-configuration.entity";
-import { AuthServiceClient } from "../../infrastructure/clients/auth-service.client";
-import { ReminderConfiguration } from "../../infrastructure/schemas/reminder-configuration.schema";
+import { ReminderConfigurationEntity } from '@stockpile/domain/entities/reminder-configuration.entity";
+import { AuthServiceClient } from '@stockpile/infrastructure/clients/auth-service.client";
+import { ReminderConfiguration } from '@stockpile/infrastructure/schemas/reminder-configuration.schema";
 import { ApprovalRequestService } from "./approval-request.service";
 import { CheckInOutService } from "./check-in-out.service";
 

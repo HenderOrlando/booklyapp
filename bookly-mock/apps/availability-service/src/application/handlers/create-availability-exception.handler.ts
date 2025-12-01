@@ -1,7 +1,7 @@
 import { BadRequestException, Injectable } from "@nestjs/common";
 import { CommandHandler, ICommandHandler } from "@nestjs/cqrs";
-import { AvailabilityExceptionRepository } from "../../infrastructure/repositories/availability-exception.repository";
-import { AvailabilityException } from "../../infrastructure/schemas/availability-exception.schema";
+import { AvailabilityExceptionRepository } from '@availability/infrastructure/repositories/availability-exception.repository";
+import { AvailabilityException } from '@availability/infrastructure/schemas/availability-exception.schema";
 import { CreateAvailabilityExceptionCommand } from "../commands/create-availability-exception.command";
 
 /**

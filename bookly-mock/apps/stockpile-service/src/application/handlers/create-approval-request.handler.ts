@@ -1,6 +1,6 @@
 import { createLogger } from "@libs/common";
 import { CommandHandler, ICommandHandler } from "@nestjs/cqrs";
-import { ApprovalRequestEntity } from "../../domain/entities";
+import { ApprovalRequestEntity } from '@stockpile/domain/entities";
 import { CreateApprovalRequestCommand } from "../commands";
 import { ApprovalRequestService } from "../services";
 

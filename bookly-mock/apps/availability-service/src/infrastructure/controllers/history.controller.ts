@@ -22,8 +22,8 @@ import {
 } from "@nestjs/swagger";
 import { IAuditQueryResult } from "@reports/audit-decorators";
 import { Response } from "express";
-import { GetReservationHistoryQuery } from "../../application/queries/get-reservation-history.query";
-import { GetUserActivityQuery } from "../../application/queries/get-user-activity.query";
+import { GetReservationHistoryQuery } from '@availability/application/queries/get-reservation-history.query";
+import { GetUserActivityQuery } from '@availability/application/queries/get-user-activity.query";
 import { ExportHistoryDto, HistoryQueryDto } from "../dtos/history-query.dto";
 import { ReservationHistoryRepository } from "../repositories/reservation-history.repository";
 

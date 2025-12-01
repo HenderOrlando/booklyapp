@@ -5,9 +5,9 @@ import {
 } from "@nestjs/common";
 import { InjectModel } from "@nestjs/mongoose";
 import { Model } from "mongoose";
-import { Permission } from "../../infrastructure/schemas/permission.schema";
-import { Role } from "../../infrastructure/schemas/role.schema";
-import { User } from "../../infrastructure/schemas/user.schema";
+import { Permission } from '@auth/infrastructure/schemas/permission.schema";
+import { Role } from '@auth/infrastructure/schemas/role.schema";
+import { User } from '@auth/infrastructure/schemas/user.schema";
 import { CreatePermissionDto } from "../dtos/permission/create-permission.dto";
 import { PermissionResponseDto } from "../dtos/permission/permission-response.dto";
 import { UpdatePermissionDto } from "../dtos/permission/update-permission.dto";

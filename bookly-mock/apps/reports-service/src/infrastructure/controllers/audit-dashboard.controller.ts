@@ -7,8 +7,8 @@ import {
   ApiResponse,
   ApiTags,
 } from "@nestjs/swagger";
-import { AuditAlertService } from "../../application/services/audit-alert.service";
-import { AuditAnalyticsService } from "../../application/services/audit-analytics.service";
+import { AuditAlertService } from '@reports/application/services/audit-alert.service";
+import { AuditAnalyticsService } from '@reports/application/services/audit-analytics.service";
 
 /**
  * Controller para dashboard de auditoría en tiempo real

@@ -4,8 +4,8 @@ import { createLogger } from "@libs/common";
 import { Injectable } from "@nestjs/common";
 import { InjectModel } from "@nestjs/mongoose";
 import { Model } from "mongoose";
-import { MaintenanceEntity } from "../../domain/entities/maintenance.entity";
-import { IMaintenanceRepository } from "../../domain/repositories/maintenance.repository.interface";
+import { MaintenanceEntity } from '@resources/domain/entities/maintenance.entity";
+import { IMaintenanceRepository } from '@resources/domain/repositories/maintenance.repository.interface";
 import {
   Maintenance,
   MaintenanceDocument,

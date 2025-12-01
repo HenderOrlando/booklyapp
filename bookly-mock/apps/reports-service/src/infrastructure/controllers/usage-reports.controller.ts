@@ -10,7 +10,7 @@ import {
 import {
   GenerateUsageReportQuery,
   GetUsageReportsQuery,
-} from "../../application/queries";
+} from '@reports/application/queries";
 import { GenerateUsageReportDto, QueryUsageReportsDto } from "../dtos";
 
 @ApiTags("Usage Reports")

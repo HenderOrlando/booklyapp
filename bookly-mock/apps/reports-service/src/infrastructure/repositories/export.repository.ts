@@ -3,8 +3,8 @@ import { createLogger } from "@libs/common";
 import { Injectable } from "@nestjs/common";
 import { InjectModel } from "@nestjs/mongoose";
 import { Model } from "mongoose";
-import { ExportEntity } from "../../domain/entities";
-import { IExportRepository } from "../../domain/repositories/export.repository.interface";
+import { ExportEntity } from '@reports/domain/entities";
+import { IExportRepository } from '@reports/domain/repositories/export.repository.interface";
 import { Export } from "../schemas/export.schema";
 
 const logger = createLogger("ExportRepository");

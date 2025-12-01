@@ -1,6 +1,6 @@
 import { createLogger } from "@libs/common";
 import { IQueryHandler, QueryHandler } from "@nestjs/cqrs";
-import { ApprovalFlowEntity } from "../../domain/entities";
+import { ApprovalFlowEntity } from '@stockpile/domain/entities";
 import { GetApprovalFlowByIdQuery } from "../queries";
 import { ApprovalFlowService } from "../services";
 

@@ -16,9 +16,9 @@ import {
   ApiResponse,
   ApiTags,
 } from "@nestjs/swagger";
-import { CheckInCommand } from "../../application/commands/check-in.command";
-import { CheckOutCommand } from "../../application/commands/check-out.command";
-import { CheckInOutService } from "../../application/services/check-in-out.service";
+import { CheckInCommand } from '@stockpile/application/commands/check-in.command";
+import { CheckOutCommand } from '@stockpile/application/commands/check-out.command";
+import { CheckInOutService } from '@stockpile/application/services/check-in-out.service";
 import {
   CheckInOutResponseDto,
   CheckInRequestDto,

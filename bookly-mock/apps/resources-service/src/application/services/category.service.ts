@@ -6,8 +6,8 @@ import {
   Injectable,
   NotFoundException,
 } from "@nestjs/common";
-import { CategoryEntity } from "../../domain/entities/category.entity";
-import { ICategoryRepository } from "../../domain/repositories/category.repository.interface";
+import { CategoryEntity } from '@resources/domain/entities/category.entity";
+import { ICategoryRepository } from '@resources/domain/repositories/category.repository.interface";
 
 /**
  * Category Service

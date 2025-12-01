@@ -35,12 +35,12 @@ import {
   ImportResourcesCommand,
   RestoreResourceCommand,
   UpdateResourceCommand,
-} from "../../application/commands";
+} from '@resources/application/commands";
 import {
   GetResourceByIdQuery,
   GetResourcesQuery,
   SearchResourcesAdvancedQuery,
-} from "../../application/queries";
+} from '@resources/application/queries";
 import {
   CreateResourceDto,
   ImportResourcesDto,

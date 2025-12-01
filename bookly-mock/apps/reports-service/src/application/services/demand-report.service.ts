@@ -1,8 +1,8 @@
 import { PaginationMeta, PaginationQuery } from "@libs/common";
 import { createLogger } from "@libs/common";
 import { Inject, Injectable, NotFoundException } from "@nestjs/common";
-import { DemandReportEntity } from "../../domain/entities";
-import { IDemandReportRepository } from "../../domain/repositories";
+import { DemandReportEntity } from '@reports/domain/entities";
+import { IDemandReportRepository } from '@reports/domain/repositories";
 
 /**
  * Demand Report Service

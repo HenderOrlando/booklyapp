@@ -5,8 +5,8 @@ import {
 } from "@libs/common/enums";
 import { createLogger } from "@libs/common";
 import { Inject, Injectable } from "@nestjs/common";
-import { DashboardMetricEntity } from "../../domain/entities";
-import { IDashboardMetricRepository } from "../../domain/repositories/dashboard-metric.repository.interface";
+import { DashboardMetricEntity } from '@reports/domain/entities";
+import { IDashboardMetricRepository } from '@reports/domain/repositories/dashboard-metric.repository.interface";
 import { MetricsAggregationService } from "./metrics-aggregation.service";
 import { TrendAnalysisService } from "./trend-analysis.service";
 

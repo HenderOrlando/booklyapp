@@ -2,8 +2,8 @@ import { createLogger } from "@libs/common";
 import { EventBusService } from "@libs/event-bus";
 import { Inject, Injectable, NotFoundException } from "@nestjs/common";
 import { v4 as uuidv4 } from "uuid";
-import { UserEvaluationEntity } from "../../domain/entities/user-evaluation.entity";
-import { IUserEvaluationRepository } from "../../domain/repositories/user-evaluation.repository.interface";
+import { UserEvaluationEntity } from '@reports/domain/entities/user-evaluation.entity";
+import { IUserEvaluationRepository } from '@reports/domain/repositories/user-evaluation.repository.interface";
 
 const logger = createLogger("UserEvaluationService");
 

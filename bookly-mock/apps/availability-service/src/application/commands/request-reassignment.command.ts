@@ -1,4 +1,4 @@
-import { RequestReassignmentDto } from "../../infrastructure/dtos/reassignment.dto";
+import { RequestReassignmentDto } from '@availability/infrastructure/dtos/reassignment.dto";
 
 /**
  * Command para solicitar reasignación de recurso

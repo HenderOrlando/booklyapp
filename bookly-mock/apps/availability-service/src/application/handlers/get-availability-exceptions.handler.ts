@@ -1,7 +1,7 @@
 import { Injectable } from "@nestjs/common";
 import { IQueryHandler, QueryHandler } from "@nestjs/cqrs";
-import { AvailabilityExceptionRepository } from "../../infrastructure/repositories/availability-exception.repository";
-import { AvailabilityException } from "../../infrastructure/schemas/availability-exception.schema";
+import { AvailabilityExceptionRepository } from '@availability/infrastructure/repositories/availability-exception.repository";
+import { AvailabilityException } from '@availability/infrastructure/schemas/availability-exception.schema";
 import { GetAvailabilityExceptionsQuery } from "../queries/get-availability-exceptions.query";
 
 /**

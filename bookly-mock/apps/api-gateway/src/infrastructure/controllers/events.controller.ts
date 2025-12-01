@@ -23,8 +23,8 @@ import {
   EventMetricsResponseDto,
   EventReplayFilterDto,
   GetEventsQueryDto,
-} from "../../application/dto/events.dto";
-import { EventsService } from "../../application/services/events.service";
+} from '@gateway/application/dto/events.dto";
+import { EventsService } from '@gateway/application/services/events.service";
 
 @ApiTags("Events")
 @Controller("events")

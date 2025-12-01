@@ -1,4 +1,4 @@
-import { ApprovalStep } from "../../domain/entities/approval-flow.entity";
+import { ApprovalStep } from '@stockpile/domain/entities/approval-flow.entity";
 
 /**
  * Update Approval Flow Command

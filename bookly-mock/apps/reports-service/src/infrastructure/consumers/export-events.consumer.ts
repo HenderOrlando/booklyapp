@@ -1,7 +1,7 @@
 import { createLogger } from "@libs/common";
 import { EventBusService } from "@libs/event-bus";
 import { Injectable, OnModuleInit } from "@nestjs/common";
-import { ExportProcessorService } from "../../application/services/export-processor.service";
+import { ExportProcessorService } from '@reports/application/services/export-processor.service";
 
 const logger = createLogger("ExportEventsConsumer");
 

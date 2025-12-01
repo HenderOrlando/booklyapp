@@ -1,7 +1,7 @@
 import { MaintenanceType } from "@libs/common/enums";
 import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
 import { Document } from "mongoose";
-import { MaintenanceStatus } from "../../domain/entities/maintenance.entity";
+import { MaintenanceStatus } from '@resources/domain/entities/maintenance.entity";
 
 export type MaintenanceDocument = Maintenance & Document;
 

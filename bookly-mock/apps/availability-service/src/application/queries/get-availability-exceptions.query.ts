@@ -1,4 +1,4 @@
-import { QueryAvailabilityExceptionsDto } from "../../infrastructure/dtos/availability-exception.dto";
+import { QueryAvailabilityExceptionsDto } from '@availability/infrastructure/dtos/availability-exception.dto";
 
 /**
  * Query para obtener excepciones de disponibilidad

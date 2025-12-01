@@ -3,7 +3,7 @@ import { JwtPayload } from "@libs/common";
 import { Injectable, UnauthorizedException } from "@nestjs/common";
 import { PassportStrategy } from "@nestjs/passport";
 import { ExtractJwt, Strategy } from "passport-jwt";
-import { UserService } from "../../application/services/user.service";
+import { UserService } from '@auth/application/services/user.service";
 
 /**
  * JWT Strategy

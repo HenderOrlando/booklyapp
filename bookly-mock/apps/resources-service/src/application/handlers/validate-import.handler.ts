@@ -1,8 +1,8 @@
 import { ImportResourceMode, ResourceType } from "@libs/common/enums";
 import { createLogger } from "@libs/common";
 import { CommandHandler, ICommandHandler } from "@nestjs/cqrs";
-import { ValidationResultDto } from "../../infrastructure/dto/import-advanced.dto";
-import { CategoryRepository } from "../../infrastructure/repositories/category.repository";
+import { ValidationResultDto } from '@resources/infrastructure/dto/import-advanced.dto";
+import { CategoryRepository } from '@resources/infrastructure/repositories/category.repository";
 import { ValidateImportCommand } from "../commands/validate-import.command";
 
 /**

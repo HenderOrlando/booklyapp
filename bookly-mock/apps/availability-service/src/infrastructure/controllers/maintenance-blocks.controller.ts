@@ -20,10 +20,10 @@ import {
   ApiResponse,
   ApiTags,
 } from "@nestjs/swagger";
-import { CancelMaintenanceBlockCommand } from "../../application/commands/cancel-maintenance-block.command";
-import { CompleteMaintenanceBlockCommand } from "../../application/commands/complete-maintenance-block.command";
-import { CreateMaintenanceBlockCommand } from "../../application/commands/create-maintenance-block.command";
-import { GetMaintenanceBlocksQuery } from "../../application/queries/get-maintenance-blocks.query";
+import { CancelMaintenanceBlockCommand } from '@availability/application/commands/cancel-maintenance-block.command";
+import { CompleteMaintenanceBlockCommand } from '@availability/application/commands/complete-maintenance-block.command";
+import { CreateMaintenanceBlockCommand } from '@availability/application/commands/create-maintenance-block.command";
+import { GetMaintenanceBlocksQuery } from '@availability/application/queries/get-maintenance-blocks.query";
 import {
   CancelMaintenanceDto,
   CompleteMaintenanceDto,

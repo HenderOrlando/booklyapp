@@ -4,7 +4,7 @@ import { Model } from "mongoose";
 import {
   IResourceMetadata,
   IResourceMetadataRepository,
-} from "../../domain/interfaces/resource-metadata.interface";
+} from '@availability/domain/interfaces/resource-metadata.interface";
 import {
   ResourceMetadata,
   ResourceMetadataDocument,

@@ -3,8 +3,8 @@ import { createLogger } from "@libs/common";
 import { EventBusService } from "@libs/event-bus";
 import { Inject, Injectable, NotFoundException } from "@nestjs/common";
 import { v4 as uuidv4 } from "uuid";
-import { UserFeedbackEntity } from "../../domain/entities/user-feedback.entity";
-import { IFeedbackRepository } from "../../domain/repositories/feedback.repository.interface";
+import { UserFeedbackEntity } from '@reports/domain/entities/user-feedback.entity";
+import { IFeedbackRepository } from '@reports/domain/repositories/feedback.repository.interface";
 
 const logger = createLogger("FeedbackService");
 

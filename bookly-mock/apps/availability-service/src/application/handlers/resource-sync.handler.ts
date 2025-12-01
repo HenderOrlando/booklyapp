@@ -3,7 +3,7 @@ import { EventPayload } from "@libs/common";
 import { createLogger } from "@libs/common";
 import { EventBusService } from "@libs/event-bus";
 import { Inject, Injectable, OnModuleInit } from "@nestjs/common";
-import { IResourceMetadataRepository } from "../../domain/interfaces/resource-metadata.interface";
+import { IResourceMetadataRepository } from '@availability/domain/interfaces/resource-metadata.interface";
 
 const logger = createLogger("ResourceSyncHandler");
 

@@ -20,9 +20,9 @@ import {
   ApiResponse,
   ApiTags,
 } from "@nestjs/swagger";
-import { CreateAvailabilityExceptionCommand } from "../../application/commands/create-availability-exception.command";
-import { DeleteAvailabilityExceptionCommand } from "../../application/commands/delete-availability-exception.command";
-import { GetAvailabilityExceptionsQuery } from "../../application/queries/get-availability-exceptions.query";
+import { CreateAvailabilityExceptionCommand } from '@availability/application/commands/create-availability-exception.command";
+import { DeleteAvailabilityExceptionCommand } from '@availability/application/commands/delete-availability-exception.command";
+import { GetAvailabilityExceptionsQuery } from '@availability/application/queries/get-availability-exceptions.query";
 import {
   AvailabilityExceptionResponseDto,
   CreateAvailabilityExceptionDto,

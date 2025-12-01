@@ -27,7 +27,7 @@ import {
   DeleteFeedbackCommand,
   RespondToFeedbackCommand,
   UpdateFeedbackStatusCommand,
-} from "../../application/commands/feedback.commands";
+} from '@reports/application/commands/feedback.commands";
 import {
   GetAllFeedbackQuery,
   GetFeedbackByIdQuery,
@@ -36,7 +36,7 @@ import {
   GetFeedbackResourceStatisticsQuery,
   GetResourceFeedbackQuery,
   GetUserFeedbackQuery,
-} from "../../application/queries/feedback.queries";
+} from '@reports/application/queries/feedback.queries";
 import {
   CreateFeedbackDto,
   FeedbackQueryDto,

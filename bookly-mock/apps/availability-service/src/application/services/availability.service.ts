@@ -7,10 +7,10 @@ import { SortByField, SortOrder, WeekDay } from "@libs/common/enums";
 import { createLogger } from "@libs/common";
 import { RedisService } from "@libs/redis";
 import { Inject, Injectable, NotFoundException } from "@nestjs/common";
-import { AvailabilityEntity } from "../../domain/entities/availability.entity";
-import { IResourceMetadataRepository } from "../../domain/interfaces/resource-metadata.interface";
-import { IAvailabilityRepository } from "../../domain/repositories/availability.repository.interface";
-import { IReservationRepository } from "../../domain/repositories/reservation.repository.interface";
+import { AvailabilityEntity } from '@availability/domain/entities/availability.entity";
+import { IResourceMetadataRepository } from '@availability/domain/interfaces/resource-metadata.interface";
+import { IAvailabilityRepository } from '@availability/domain/repositories/availability.repository.interface";
+import { IReservationRepository } from '@availability/domain/repositories/reservation.repository.interface";
 
 const logger = createLogger("AvailabilityService");
 

@@ -3,8 +3,8 @@ import { createLogger } from "@libs/common";
 import { Injectable } from "@nestjs/common";
 import { InjectModel } from "@nestjs/mongoose";
 import { Model } from "mongoose";
-import { DashboardMetricEntity } from "../../domain/entities";
-import { IDashboardMetricRepository } from "../../domain/repositories/dashboard-metric.repository.interface";
+import { DashboardMetricEntity } from '@reports/domain/entities";
+import { IDashboardMetricRepository } from '@reports/domain/repositories/dashboard-metric.repository.interface";
 import { DashboardMetric } from "../schemas/dashboard-metric.schema";
 
 const logger = createLogger("DashboardMetricRepository");

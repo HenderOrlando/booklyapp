@@ -1,6 +1,6 @@
 import { PaginationMeta } from "@libs/common";
 import { IQueryHandler, QueryHandler } from "@nestjs/cqrs";
-import { EnrichedApprovalRequestDto } from "../../infrastructure/dtos";
+import { EnrichedApprovalRequestDto } from '@stockpile/infrastructure/dtos";
 import { GetActiveTodayApprovalsQuery } from "../queries/get-active-today-approvals.query";
 import { ApprovalRequestService } from "../services";
 

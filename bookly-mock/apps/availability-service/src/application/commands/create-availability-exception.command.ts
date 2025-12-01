@@ -1,4 +1,4 @@
-import { CreateAvailabilityExceptionDto } from "../../infrastructure/dtos/availability-exception.dto";
+import { CreateAvailabilityExceptionDto } from '@availability/infrastructure/dtos/availability-exception.dto";
 
 /**
  * Command para crear excepción de disponibilidad

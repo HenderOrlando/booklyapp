@@ -1,4 +1,4 @@
-import { CompleteMaintenanceDto } from "../../infrastructure/dtos/maintenance-block.dto";
+import { CompleteMaintenanceDto } from '@availability/infrastructure/dtos/maintenance-block.dto";
 
 /**
  * Command para completar mantenimiento
