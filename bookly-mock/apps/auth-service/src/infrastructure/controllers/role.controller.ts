@@ -20,19 +20,19 @@ import {
   ApiResponse,
   ApiTags,
 } from "@nestjs/swagger";
-import { AssignPermissionsCommand } from '@auth/application/commands/roles/assign-permissions.command";
-import { CreateRoleCommand } from '@auth/application/commands/roles/create-role.command";
-import { DeleteRoleCommand } from '@auth/application/commands/roles/delete-role.command";
-import { RemovePermissionsCommand } from '@auth/application/commands/roles/remove-permissions.command";
-import { UpdateRoleCommand } from '@auth/application/commands/roles/update-role.command";
-import { AssignPermissionsDto } from '@auth/application/dtos/role/assign-permissions.dto";
-import { CreateRoleDto } from '@auth/application/dtos/role/create-role.dto";
-import { RoleResponseDto } from '@auth/application/dtos/role/role-response.dto";
-import { UpdateRoleDto } from '@auth/application/dtos/role/update-role.dto";
-import { GetActiveRolesQuery } from '@auth/application/queries/roles/get-active-roles.query";
-import { GetRoleByIdQuery } from '@auth/application/queries/roles/get-role-by-id.query";
-import { GetRolesQuery } from '@auth/application/queries/roles/get-roles.query";
-import { GetSystemRolesQuery } from '@auth/application/queries/roles/get-system-roles.query";
+import { AssignPermissionsCommand } from "@auth/application/commands/roles/assign-permissions.command";
+import { CreateRoleCommand } from "@auth/application/commands/roles/create-role.command";
+import { DeleteRoleCommand } from "@auth/application/commands/roles/delete-role.command";
+import { RemovePermissionsCommand } from "@auth/application/commands/roles/remove-permissions.command";
+import { UpdateRoleCommand } from "@auth/application/commands/roles/update-role.command";
+import { AssignPermissionsDto } from "@auth/application/dtos/role/assign-permissions.dto";
+import { CreateRoleDto } from "@auth/application/dtos/role/create-role.dto";
+import { RoleResponseDto } from "@auth/application/dtos/role/role-response.dto";
+import { UpdateRoleDto } from "@auth/application/dtos/role/update-role.dto";
+import { GetActiveRolesQuery } from "@auth/application/queries/roles/get-active-roles.query";
+import { GetRoleByIdQuery } from "@auth/application/queries/roles/get-role-by-id.query";
+import { GetRolesQuery } from "@auth/application/queries/roles/get-roles.query";
+import { GetSystemRolesQuery } from "@auth/application/queries/roles/get-system-roles.query";
 import { CurrentUser, UserPayload } from "../decorators/current-user.decorator";
 import { RequireAction } from "../decorators/require-action.decorator";
 import { RequirePermissions } from "../decorators/require-permissions.decorator";
@@ -118,6 +118,18 @@ export class RoleController {
     required: false,
     description: "Buscar en displayName o description",
   })
+  @ApiQuery({
+    name: "page",
+    required: false,
+    type: Number,
+    description: "Número de página (default: 1)",
+  })
+  @ApiQuery({
+    name: "limit",
+    required: false,
+    type: Number,
+    description: "Items por página (default: 20)",
+  })
   @ApiResponse({
     status: 200,
     description: "Lista de roles",
@@ -127,7 +139,9 @@ export class RoleController {
     @Query("name") name?: string,
     @Query("isActive") isActive?: string,
     @Query("isDefault") isDefault?: string,
-    @Query("search") search?: string
+    @Query("search") search?: string,
+    @Query("page") page?: number,
+    @Query("limit") limit?: number
   ) {
     const query = new GetRolesQuery({
       name: name as any,
@@ -142,7 +156,20 @@ export class RoleController {
       query
     );
 
-    return ResponseUtil.success(roles, `${roles.length} rol(es) encontrado(s)`);
+    // Aplicar paginación en memoria
+    const currentPage = page || 1;
+    const pageSize = limit || 20;
+    const startIndex = (currentPage - 1) * pageSize;
+    const endIndex = startIndex + pageSize;
+    const paginatedRoles = roles.slice(startIndex, endIndex);
+
+    return ResponseUtil.paginated(
+      paginatedRoles,
+      roles.length,
+      currentPage,
+      pageSize,
+      'Roles retrieved successfully'
+    );
   }
 
   /**

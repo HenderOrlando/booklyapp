@@ -15,7 +15,7 @@
 | 1.3 | Rutas relativas en imports | ✅ Completado | 01/12/2024 |
 | 2.1 | Controllers sin ResponseUtil | ✅ Completado | 01/12/2024 |
 | 2.2 | Manejo de errores | ✅ Completado | 01/12/2024 |
-| 2.5 | Paginación sin estándar | 🔄 Pendiente | - |
+| 2.5 | Paginación sin estándar | 🔄 En Progreso | 01/12/2024 |
 
 ---
 
