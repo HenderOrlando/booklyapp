@@ -1,4 +1,5 @@
 import { UserRole } from "@libs/common/enums";
+import { ResponseUtil } from "@libs/common";
 import { CurrentUser } from "@libs/decorators";
 import { Roles } from "@libs/decorators";
 import { JwtAuthGuard } from "@libs/guards";
@@ -85,7 +86,8 @@ export class ApprovalRequestsController {
       user.sub
     );
 
-    return await this.commandBus.execute(command);
+    const result = await this.commandBus.execute(command);
+    return ResponseUtil.success(result, 'Approval request created successfully');
   }
 
   @Get()
@@ -108,7 +110,19 @@ export class ApprovalRequestsController {
       }
     );
 
-    return await this.queryBus.execute(queryCommand);
+    const result = await this.queryBus.execute(queryCommand);
+    
+    if (result.data && result.meta) {
+      return ResponseUtil.paginated(
+        result.data,
+        result.meta.total,
+        query.page || 1,
+        query.limit || 10,
+        'Approval requests retrieved successfully'
+      );
+    }
+    
+    return ResponseUtil.success(result, 'Approval requests retrieved successfully');
   }
 
   @Get("statistics")
@@ -128,7 +142,8 @@ export class ApprovalRequestsController {
       approvalFlowId,
     });
 
-    return await this.queryBus.execute(query);
+    const result = await this.queryBus.execute(query);
+    return ResponseUtil.success(result, 'Approval statistics retrieved successfully');
   }
 
   @Get("active-today")
@@ -155,7 +170,7 @@ export class ApprovalRequestsController {
   })
   async getActiveToday(
     @Query() dto: GetActiveTodayApprovalsDto
-  ): Promise<PaginatedActiveApprovalsResponseDto> {
+  ): Promise<any> {
     const query = new GetActiveTodayApprovalsQuery(
       dto.date,
       dto.page,
@@ -169,11 +184,14 @@ export class ApprovalRequestsController {
 
     const result = await this.queryBus.execute(query);
 
-    // Transformar la respuesta al formato esperado
-    return {
-      data: result.requests,
-      meta: result.meta,
-    };
+    // Transformar la respuesta al formato esperado con ResponseUtil
+    return ResponseUtil.paginated(
+      result.requests,
+      result.meta.total,
+      dto.page || 1,
+      dto.limit || 10,
+      'Active approvals for today retrieved successfully'
+    );
   }
 
   @Get(":id")
@@ -188,7 +206,8 @@ export class ApprovalRequestsController {
   })
   async findOne(@Param("id") id: string): Promise<any> {
     const query = new GetApprovalRequestByIdQuery(id);
-    return await this.queryBus.execute(query);
+    const result = await this.queryBus.execute(query);
+    return ResponseUtil.success(result, 'Approval request retrieved successfully');
   }
 
   @Post(":id/approve")
@@ -218,7 +237,8 @@ export class ApprovalRequestsController {
       dto.comment
     );
 
-    return await this.commandBus.execute(command);
+    const result = await this.commandBus.execute(command);
+    return ResponseUtil.success(result, 'Step approved successfully');
   }
 
   @Post(":id/reject")
@@ -248,7 +268,8 @@ export class ApprovalRequestsController {
       dto.comment
     );
 
-    return await this.commandBus.execute(command);
+    const result = await this.commandBus.execute(command);
+    return ResponseUtil.success(result, 'Step rejected successfully');
   }
 
   @Post(":id/cancel")
@@ -273,7 +294,8 @@ export class ApprovalRequestsController {
   ): Promise<any> {
     const command = new CancelApprovalRequestCommand(id, user.sub, dto.reason);
 
-    return await this.commandBus.execute(command);
+    const result = await this.commandBus.execute(command);
+    return ResponseUtil.success(result, 'Approval request cancelled successfully');
   }
 
   @Delete(":id")
@@ -293,6 +315,7 @@ export class ApprovalRequestsController {
   })
   async remove(@Param("id") id: string): Promise<any> {
     // Implementar DeleteApprovalRequestCommand si es necesario
-    return { message: "Delete functionality to be implemented" };
+    const result = { message: "Delete functionality to be implemented", id };
+    return ResponseUtil.success(result, 'Approval request deleted successfully');
   }
 }

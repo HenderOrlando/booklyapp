@@ -1,10 +1,9 @@
-import { ImportResourceMode, ResourceType, ImportJobStatus } from "@libs/common/enums";
+import { ImportResourceMode, ResourceType } from "@libs/common/enums";
 import { createLogger } from "@libs/common";
-import { Injectable, NotFoundException, ForbiddenException } from "@nestjs/common";
+import { Injectable } from "@nestjs/common";
 import { ResourceEntity } from "../../domain/entities/resource.entity";
 import { ICategoryRepository } from "../../domain/repositories/category.repository.interface";
 import { IResourceRepository } from "../../domain/repositories/resource.repository.interface";
-import { IImportJobRepository } from "../../domain/repositories/import-job.repository.interface";
 
 /**
  * DTO para resultado de importación
@@ -334,7 +333,6 @@ export class ResourceImportService {
       attributes: attributes || {},
       programIds,
       updatedAt: new Date(),
-      audit: { updatedBy: userId },
     };
 
     const updated = await this.resourceRepository.update(resourceId, updates);

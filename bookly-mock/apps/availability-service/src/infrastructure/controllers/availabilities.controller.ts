@@ -1,3 +1,4 @@
+import { ResponseUtil } from "@libs/common";
 import { CurrentUser } from "@libs/decorators";
 import { JwtAuthGuard } from "@libs/guards";
 import {
@@ -71,7 +72,8 @@ export class AvailabilitiesController {
       user.sub
     );
 
-    return await this.commandBus.execute(command);
+    const availability = await this.commandBus.execute(command);
+    return ResponseUtil.success(availability, 'Availability created successfully');
   }
 
   @Get("resource/:resourceId")
@@ -90,7 +92,20 @@ export class AvailabilitiesController {
       limit: limit || 10,
     });
 
-    return await this.queryBus.execute(query);
+    const result = await this.queryBus.execute(query);
+    
+    // Si el resultado ya tiene estructura de paginación
+    if (result.data && result.meta) {
+      return ResponseUtil.paginated(
+        result.data,
+        result.meta.total,
+        page || 1,
+        limit || 10,
+        'Availabilities retrieved successfully'
+      );
+    }
+    
+    return ResponseUtil.success(result, 'Availabilities retrieved successfully');
   }
 
   @Post("check")
@@ -106,7 +121,8 @@ export class AvailabilitiesController {
       dto.endDate
     );
 
-    return await this.queryBus.execute(query);
+    const result = await this.queryBus.execute(query);
+    return ResponseUtil.success(result, 'Availability checked successfully');
   }
 
   @Post("search")
@@ -130,9 +146,10 @@ export class AvailabilitiesController {
   })
   async searchAvailability(
     @Body() dto: SearchAvailabilityDto
-  ): Promise<SearchAvailabilityResponseDto> {
+  ): Promise<any> {
     const query = new SearchAvailabilityQuery(dto);
-    return await this.queryBus.execute(query);
+    const result = await this.queryBus.execute(query);
+    return ResponseUtil.success(result, 'Available slots found successfully');
   }
 
   @Delete(":id")
@@ -147,6 +164,7 @@ export class AvailabilitiesController {
   })
   async remove(@Param("id") id: string): Promise<any> {
     // Implementar DeleteAvailabilityCommand si es necesario
-    return { message: "Delete functionality to be implemented" };
+    const result = { message: "Delete functionality to be implemented", id };
+    return ResponseUtil.success(result, 'Availability deleted successfully');
   }
 }

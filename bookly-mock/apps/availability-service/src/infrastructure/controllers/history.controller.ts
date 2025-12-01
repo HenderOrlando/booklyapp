@@ -1,4 +1,5 @@
 import { RequirePermissions } from "@libs/common/decorators";
+import { ResponseUtil } from "@libs/common";
 import { CurrentUser } from "@libs/decorators";
 import { JwtAuthGuard } from "@libs/guards";
 import { PermissionsGuard } from "@libs/guards/permissions.guard";
@@ -84,7 +85,7 @@ export class HistoryController {
   async getReservationHistory(
     @Param("id") reservationId: string,
     @Query() queryDto: HistoryQueryDto
-  ): Promise<IAuditQueryResult> {
+  ): Promise<any> {
     const query = new GetReservationHistoryQuery(reservationId, {
       action: queryDto.action,
       startDate: queryDto.startDate ? new Date(queryDto.startDate) : undefined,
@@ -93,7 +94,8 @@ export class HistoryController {
       limit: queryDto.limit,
     });
 
-    return await this.queryBus.execute(query);
+    const result = await this.queryBus.execute(query);
+    return ResponseUtil.success(result, 'Reservation history retrieved successfully');
   }
 
   @Get("user/:userId")
@@ -116,7 +118,7 @@ export class HistoryController {
     @Param("userId") userId: string,
     @Query() queryDto: HistoryQueryDto,
     @CurrentUser() currentUser: any
-  ): Promise<IAuditQueryResult> {
+  ): Promise<any> {
     // Solo admins pueden ver actividad de otros usuarios
     // Los usuarios normales solo ven su propia actividad
     const targetUserId =
@@ -132,7 +134,8 @@ export class HistoryController {
       limit: queryDto.limit,
     });
 
-    return await this.queryBus.execute(query);
+    const result = await this.queryBus.execute(query);
+    return ResponseUtil.success(result, 'User activity retrieved successfully');
   }
 
   @Get("search")
@@ -144,8 +147,8 @@ export class HistoryController {
   })
   async searchHistory(
     @Query() queryDto: HistoryQueryDto
-  ): Promise<IAuditQueryResult> {
-    return await this.historyRepository.findWithFilters({
+  ): Promise<any> {
+    const result = await this.historyRepository.findWithFilters({
       entityId: queryDto.reservationId,
       userId: queryDto.userId,
       action: queryDto.action,
@@ -154,6 +157,7 @@ export class HistoryController {
       page: queryDto.page,
       limit: queryDto.limit,
     });
+    return ResponseUtil.success(result, 'History search completed successfully');
   }
 
   @Post("export")
@@ -241,7 +245,7 @@ export class HistoryController {
   async getMyActivity(
     @CurrentUser() user: any,
     @Query() queryDto: HistoryQueryDto
-  ): Promise<IAuditQueryResult> {
+  ): Promise<any> {
     const query = new GetUserActivityQuery(user.id || user.userId, {
       action: queryDto.action,
       startDate: queryDto.startDate ? new Date(queryDto.startDate) : undefined,
@@ -250,6 +254,7 @@ export class HistoryController {
       limit: queryDto.limit,
     });
 
-    return await this.queryBus.execute(query);
+    const result = await this.queryBus.execute(query);
+    return ResponseUtil.success(result, 'Personal activity retrieved successfully');
   }
 }

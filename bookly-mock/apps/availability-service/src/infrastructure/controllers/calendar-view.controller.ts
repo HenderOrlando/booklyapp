@@ -1,3 +1,4 @@
+import { ResponseUtil } from "@libs/common";
 import { CurrentUser } from "@libs/decorators";
 import { JwtAuthGuard } from "@libs/guards";
 import { PermissionsGuard } from "@libs/guards/permissions.guard";
@@ -100,9 +101,10 @@ export class CalendarViewController {
   async getCalendarView(
     @Query() dto: CalendarViewDto,
     @CurrentUser() user: any
-  ): Promise<CalendarViewResponseDto> {
+  ): Promise<any> {
     const query = new GetCalendarViewQuery(user.id || user.userId, dto);
-    return await this.queryBus.execute(query);
+    const result = await this.queryBus.execute(query);
+    return ResponseUtil.success(result, 'Calendar view generated successfully');
   }
 
   @Get("month")
@@ -120,7 +122,7 @@ export class CalendarViewController {
     @Query("month") month: number,
     @Query("resourceId") resourceId: string,
     @CurrentUser() user: any
-  ): Promise<CalendarViewResponseDto> {
+  ): Promise<any> {
     const dto: CalendarViewDto = {
       view: "month" as any,
       year: Number(year),
@@ -129,7 +131,8 @@ export class CalendarViewController {
     };
 
     const query = new GetCalendarViewQuery(user.id || user.userId, dto);
-    return await this.queryBus.execute(query);
+    const result = await this.queryBus.execute(query);
+    return ResponseUtil.success(result, 'Monthly calendar view generated successfully');
   }
 
   @Get("week")
@@ -147,7 +150,7 @@ export class CalendarViewController {
     @Query("week") week: number,
     @Query("resourceId") resourceId: string,
     @CurrentUser() user: any
-  ): Promise<CalendarViewResponseDto> {
+  ): Promise<any> {
     const dto: CalendarViewDto = {
       view: "week" as any,
       year: Number(year),
@@ -156,7 +159,8 @@ export class CalendarViewController {
     };
 
     const query = new GetCalendarViewQuery(user.id || user.userId, dto);
-    return await this.queryBus.execute(query);
+    const result = await this.queryBus.execute(query);
+    return ResponseUtil.success(result, 'Weekly calendar view generated successfully');
   }
 
   @Get("day")
@@ -173,7 +177,7 @@ export class CalendarViewController {
     @Query("date") date: string,
     @Query("resourceId") resourceId: string,
     @CurrentUser() user: any
-  ): Promise<CalendarViewResponseDto> {
+  ): Promise<any> {
     const dto: CalendarViewDto = {
       view: "day" as any,
       year: new Date(date).getFullYear(),
@@ -182,6 +186,7 @@ export class CalendarViewController {
     };
 
     const query = new GetCalendarViewQuery(user.id || user.userId, dto);
-    return await this.queryBus.execute(query);
+    const result = await this.queryBus.execute(query);
+    return ResponseUtil.success(result, 'Daily calendar view generated successfully');
   }
 }

@@ -1,4 +1,5 @@
 import { RequirePermissions } from "@libs/common/decorators";
+import { ResponseUtil } from "@libs/common";
 import { CurrentUser } from "@libs/decorators";
 import { JwtAuthGuard } from "@libs/guards";
 import { PermissionsGuard } from "@libs/guards/permissions.guard";
@@ -69,12 +70,13 @@ export class AvailabilityExceptionsController {
   async create(
     @Body() dto: CreateAvailabilityExceptionDto,
     @CurrentUser() user: any
-  ): Promise<AvailabilityExceptionResponseDto> {
+  ): Promise<any> {
     const command = new CreateAvailabilityExceptionCommand(
       user.id || user.userId,
       dto
     );
-    return await this.commandBus.execute(command);
+    const result = await this.commandBus.execute(command);
+    return ResponseUtil.success(result, 'Availability exception created successfully');
   }
 
   @Get()
@@ -110,9 +112,10 @@ export class AvailabilityExceptionsController {
   })
   async findAll(
     @Query() filters: QueryAvailabilityExceptionsDto
-  ): Promise<AvailabilityExceptionResponseDto[]> {
+  ): Promise<any> {
     const query = new GetAvailabilityExceptionsQuery(filters);
-    return await this.queryBus.execute(query);
+    const result = await this.queryBus.execute(query);
+    return ResponseUtil.success(result, 'Availability exceptions retrieved successfully');
   }
 
   @Get("resource/:resourceId")
@@ -128,9 +131,10 @@ export class AvailabilityExceptionsController {
   })
   async findByResource(
     @Param("resourceId") resourceId: string
-  ): Promise<AvailabilityExceptionResponseDto[]> {
+  ): Promise<any> {
     const query = new GetAvailabilityExceptionsQuery({ resourceId });
-    return await this.queryBus.execute(query);
+    const result = await this.queryBus.execute(query);
+    return ResponseUtil.success(result, 'Resource availability exceptions retrieved successfully');
   }
 
   @Delete(":id")
@@ -151,11 +155,9 @@ export class AvailabilityExceptionsController {
     status: 403,
     description: "Sin permisos para gestionar disponibilidad",
   })
-  async delete(@Param("id") id: string): Promise<{ message: string }> {
+  async delete(@Param("id") id: string): Promise<any> {
     const command = new DeleteAvailabilityExceptionCommand(id);
     await this.commandBus.execute(command);
-    return {
-      message: "Excepción eliminada exitosamente",
-    };
+    return ResponseUtil.success({ id }, 'Availability exception deleted successfully');
   }
 }
