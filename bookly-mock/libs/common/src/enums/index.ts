@@ -126,7 +126,12 @@ export enum EventType {
   USER_LOGGED_IN = "user.logged_in",
   USER_LOGGED_OUT = "user.logged_out",
   PASSWORD_CHANGED = "password.changed",
+  PASSWORD_RESET_REQUESTED = "password.reset.requested",
   ROLE_ASSIGNED = "role.assigned",
+  PERMISSION_GRANTED = "permission.granted",
+  TWO_FACTOR_ENABLED = "two_factor.enabled",
+  TWO_FACTOR_DISABLED = "two_factor.disabled",
+  TWO_FACTOR_VERIFICATION_FAILED = "two_factor.verification.failed",
 
   // Resource events
   RESOURCE_CREATED = "resource.created",
@@ -135,8 +140,13 @@ export enum EventType {
   RESOURCE_RESTORED = "resource.restored",
   RESOURCE_CATEGORY_CHANGED = "resource.category.changed",
   RESOURCE_STATUS_CHANGED = "resource.status.changed",
+  RESOURCE_AVAILABILITY_CHANGED = "resource.availability.changed",
   RESOURCE_MAINTENANCE_SCHEDULED = "resource.maintenance.scheduled",
   RESOURCE_MAINTENANCE_COMPLETED = "resource.maintenance.completed",
+  MAINTENANCE_SCHEDULED = "maintenance.scheduled",
+  MAINTENANCE_COMPLETED = "maintenance.completed",
+  CATEGORY_CREATED = "category.created",
+  CATEGORY_UPDATED = "category.updated",
 
   // Reservation events
   RESERVATION_CREATED = "reservation.created",
@@ -145,6 +155,10 @@ export enum EventType {
   RESERVATION_APPROVED = "reservation.approved",
   RESERVATION_REJECTED = "reservation.rejected",
   RESERVATION_COMPLETED = "reservation.completed",
+  RESERVATION_CONFIRMED = "reservation.confirmed",
+  WAITING_LIST_ADDED = "waiting_list.added",
+  WAITING_LIST_NOTIFIED = "waiting_list.notified",
+  SCHEDULE_CONFLICT_DETECTED = "schedule.conflict.detected",
 
   // Stockpile events
   CHECK_IN = "check-in",
@@ -170,6 +184,10 @@ export enum EventType {
   APPROVAL_REQUEST_CREATED = "approval_request.created",
   APPROVAL_REQUEST_APPROVED = "approval_request.approved",
   APPROVAL_REQUEST_REJECTED = "approval_request.rejected",
+  APPROVAL_REQUESTED = "approval.requested",
+  APPROVAL_GRANTED = "approval.granted",
+  APPROVAL_REJECTED = "approval.rejected",
+  DOCUMENT_GENERATED = "document.generated",
 
   // Notification events
   NOTIFICATION_SENT = "notification.sent",
@@ -179,6 +197,11 @@ export enum EventType {
   AUDIT_LOG_CREATED = "audit.log.created",
   AUDIT_UNAUTHORIZED_ATTEMPT = "audit.unauthorized_attempt",
   AUDIT_GROUP = "reports-service-audit-group",
+
+  // Reports events
+  REPORT_GENERATED = "report.generated",
+  FEEDBACK_SUBMITTED = "feedback.submitted",
+  DASHBOARD_UPDATED = "dashboard.updated",
 
   // User events
   USER_CREATED = "user.created",
