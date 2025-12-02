@@ -17,6 +17,7 @@ import { PermissionService } from "./application/services/permission.service";
 import { RoleService } from "./application/services/role.service";
 import { TwoFactorService } from "./application/services/two-factor.service";
 import { UserService } from "./application/services/user.service";
+import { AuthCacheService } from "./infrastructure/cache";
 import { AuditController } from "./infrastructure/controllers/audit.controller";
 import { AuthController } from "./infrastructure/controllers/auth.controller";
 import { HealthController } from "./infrastructure/controllers/health.controller";
@@ -157,6 +158,7 @@ import { OAuthModule, OAuthProvider, OAuthPurpose } from "./modules/oauth";
     AuditService,
     TwoFactorService,
     GoogleOAuthService,
+    AuthCacheService,
 
     // Guards
     PermissionsGuard,

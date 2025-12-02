@@ -28,6 +28,8 @@ import {
   MaintenancesController,
   ResourcesController,
 } from "./infrastructure/controllers";
+import { ResourcesCacheService } from "./infrastructure/cache";
+import * as InfraEventHandlers from "./infrastructure/event-handlers";
 import {
   CategoryRepository,
   ImportJobRepository,
@@ -165,6 +167,12 @@ const IMPORT_JOB_REPOSITORY = "IImportJobRepository";
     ResourceService,
     CategoryService,
     MaintenanceService,
+    ResourcesCacheService,
+
+    // Infrastructure Event Handlers
+    InfraEventHandlers.ReservationCreatedHandler,
+    InfraEventHandlers.ReservationCancelledHandler,
+    InfraEventHandlers.CheckOutCompletedHandler,
 
     // Repository Implementations
     {
@@ -225,10 +233,10 @@ const IMPORT_JOB_REPOSITORY = "IImportJobRepository";
     },
     {
       provide: MaintenanceService,
-      useFactory: (maintenanceRepository: MaintenanceRepository) => {
-        return new MaintenanceService(maintenanceRepository);
+      useFactory: (maintenanceRepository: MaintenanceRepository, resourceRepository: ResourceRepository, eventBusService: EventBusService) => {
+        return new MaintenanceService(maintenanceRepository, resourceRepository, eventBusService);
       },
-      inject: [MAINTENANCE_REPOSITORY],
+      inject: [MAINTENANCE_REPOSITORY, RESOURCE_REPOSITORY, EventBusService],
     },
   ],
 })
