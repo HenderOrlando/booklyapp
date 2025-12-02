@@ -85,6 +85,12 @@ import { MaintenanceStatusCron } from "./infrastructure/cron/maintenance-status.
 // Strategy
 import { JwtStrategy } from "./infrastructure/strategies/jwt.strategy";
 
+// Cache
+import { AvailabilityCacheService } from "./infrastructure/cache";
+
+// Infrastructure Event Handlers
+import * as InfraEventHandlers from "./infrastructure/event-handlers";
+
 /**
  * Availability Module
  * Módulo principal del servicio de disponibilidad y reservas
@@ -193,6 +199,7 @@ import { JwtStrategy } from "./infrastructure/strategies/jwt.strategy";
     MaintenanceNotificationService,
     ResourcesEventService,
     CalendarExportService,
+    AvailabilityCacheService,
 
     // Repositories
     {
@@ -223,10 +230,18 @@ import { JwtStrategy } from "./infrastructure/strategies/jwt.strategy";
     // Handlers (CQRS)
     ...AllHandlers,
 
-    // Event Handlers (EDA)
+    // Event Handlers (EDA - Application)
     AvailabilityRulesUpdatedHandler,
     ResourceStatusChangedHandler,
     ResourceSyncHandler,
+
+    // Event Handlers (EDA - Infrastructure)
+    InfraEventHandlers.ResourceDeletedHandler,
+    InfraEventHandlers.ResourceAvailabilityChangedHandler,
+    InfraEventHandlers.MaintenanceScheduledHandler,
+    InfraEventHandlers.ApprovalGrantedHandler,
+    InfraEventHandlers.ApprovalRejectedHandler,
+    InfraEventHandlers.RoleAssignedHandler,
   ],
 })
 export class AvailabilityModule {}

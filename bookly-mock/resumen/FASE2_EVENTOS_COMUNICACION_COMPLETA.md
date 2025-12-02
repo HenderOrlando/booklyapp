@@ -177,13 +177,13 @@ La Fase 2 implementa la arquitectura Event-Driven (EDA) completa para el sistema
 
 ```
 ┌─────────────────────────────────────────────────────┐
-│                    Redis Cluster                     │
-│  ┌──────────────┬──────────────┬──────────────┐    │
-│  │ auth:*       │ res:*        │ avail:*      │    │
-│  │ - sessions   │ - resources  │ - availability│   │
-│  │ - tokens     │ - categories │ - reservations│   │
-│  │ - permissions│ - status     │ - schedules   │   │
-│  └──────────────┴──────────────┴──────────────┘    │
+│                    Redis Cluster                    │
+│  ┌──────────────┬──────────────┬───────────────┐    │
+│  │ auth:*       │ res:*        │ avail:*       │    │
+│  │ - sessions   │ - resources  │ - availability│    │
+│  │ - tokens     │ - categories │ - reservations│    │
+│  │ - permissions│ - status     │ - schedules   │    │
+│  └──────────────┴──────────────┴───────────────┘    │
 └─────────────────────────────────────────────────────┘
          ▲              ▲              ▲
          │              │              │
