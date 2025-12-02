@@ -1,3 +1,4 @@
+import { ResponseUtil } from "@libs/common";
 import { JwtAuthGuard } from "@libs/guards";
 import { Body, Controller, Get, Post, Query, UseGuards } from "@nestjs/common";
 import { QueryBus } from "@nestjs/cqrs";
@@ -10,7 +11,7 @@ import {
 import {
   GenerateUsageReportQuery,
   GetUsageReportsQuery,
-} from '@reports/application/queries";
+} from "@reports/application/queries";
 import { GenerateUsageReportDto, QueryUsageReportsDto } from "../dtos";
 
 @ApiTags("Usage Reports")
@@ -30,7 +31,7 @@ export class UsageReportsController {
     const query = new GetUsageReportsQuery(
       {
         page: dto.page || 1,
-        limit: dto.limit || 10,
+        limit: dto.limit || 20,
       },
       {
         resourceId: dto.resourceId,
@@ -40,7 +41,28 @@ export class UsageReportsController {
       }
     );
 
-    return await this.queryBus.execute(query);
+    const result = await this.queryBus.execute(query);
+    
+    // Si el handler retorna estructura paginada
+    if (result.data && result.meta) {
+      return ResponseUtil.paginated(
+        result.data,
+        result.meta.total,
+        dto.page || 1,
+        dto.limit || 20,
+        'Usage reports retrieved successfully'
+      );
+    }
+    
+    // Fallback si retorna array directo
+    const items = Array.isArray(result) ? result : [];
+    return ResponseUtil.paginated(
+      items,
+      items.length,
+      1,
+      items.length,
+      'Usage reports retrieved successfully'
+    );
   }
 
   @Post("generate")

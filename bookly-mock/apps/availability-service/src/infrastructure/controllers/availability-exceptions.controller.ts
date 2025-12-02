@@ -17,12 +17,13 @@ import { CommandBus, QueryBus } from "@nestjs/cqrs";
 import {
   ApiBearerAuth,
   ApiOperation,
+  ApiQuery,
   ApiResponse,
   ApiTags,
 } from "@nestjs/swagger";
-import { CreateAvailabilityExceptionCommand } from '@availability/application/commands/create-availability-exception.command";
-import { DeleteAvailabilityExceptionCommand } from '@availability/application/commands/delete-availability-exception.command";
-import { GetAvailabilityExceptionsQuery } from '@availability/application/queries/get-availability-exceptions.query";
+import { CreateAvailabilityExceptionCommand } from "@availability/application/commands/create-availability-exception.command";
+import { DeleteAvailabilityExceptionCommand } from "@availability/application/commands/delete-availability-exception.command";
+import { GetAvailabilityExceptionsQuery } from "@availability/application/queries/get-availability-exceptions.query";
 import {
   AvailabilityExceptionResponseDto,
   CreateAvailabilityExceptionDto,
@@ -110,12 +111,41 @@ export class AvailabilityExceptionsController {
     status: 401,
     description: "No autenticado",
   })
+  @ApiQuery({
+    name: "page",
+    required: false,
+    type: Number,
+    description: "Número de página (default: 1)",
+  })
+  @ApiQuery({
+    name: "limit",
+    required: false,
+    type: Number,
+    description: "Items por página (default: 20)",
+  })
   async findAll(
-    @Query() filters: QueryAvailabilityExceptionsDto
+    @Query() filters: QueryAvailabilityExceptionsDto,
+    @Query("page") page?: number,
+    @Query("limit") limit?: number
   ): Promise<any> {
     const query = new GetAvailabilityExceptionsQuery(filters);
     const result = await this.queryBus.execute(query);
-    return ResponseUtil.success(result, 'Availability exceptions retrieved successfully');
+    
+    // Aplicar paginación en memoria
+    const items = Array.isArray(result) ? result : [];
+    const currentPage = page || 1;
+    const pageSize = limit || 20;
+    const startIndex = (currentPage - 1) * pageSize;
+    const endIndex = startIndex + pageSize;
+    const paginatedItems = items.slice(startIndex, endIndex);
+    
+    return ResponseUtil.paginated(
+      paginatedItems,
+      items.length,
+      currentPage,
+      pageSize,
+      'Availability exceptions retrieved successfully'
+    );
   }
 
   @Get("resource/:resourceId")

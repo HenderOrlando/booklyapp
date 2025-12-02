@@ -3,6 +3,7 @@ import {
   TenantNotificationConfigRepository,
   TenantNotificationConfigService,
 } from "@libs/notifications";
+import { ResponseUtil } from "@libs/common";
 import {
   Body,
   Controller,
@@ -11,13 +12,14 @@ import {
   Param,
   Post,
   Put,
+  Query,
 } from "@nestjs/common";
-import { ApiOperation, ApiResponse, ApiTags } from "@nestjs/swagger";
+import { ApiOperation, ApiQuery, ApiResponse, ApiTags } from "@nestjs/swagger";
 import {
   CreateTenantNotificationConfigDto,
   TenantNotificationConfigResponseDto,
   UpdateTenantNotificationConfigDto,
-} from '@stockpile/application/dto/tenant-notification-config.dto";
+} from "@stockpile/application/dto/tenant-notification-config.dto";
 
 /**
  * Tenant Notification Configuration Controller
@@ -91,14 +93,44 @@ export class TenantNotificationConfigController {
    */
   @Get()
   @ApiOperation({ summary: "Listar todas las configuraciones de tenants" })
+  @ApiQuery({
+    name: "page",
+    required: false,
+    type: Number,
+    description: "Número de página (default: 1)",
+  })
+  @ApiQuery({
+    name: "limit",
+    required: false,
+    type: Number,
+    description: "Items por página (default: 20)",
+  })
   @ApiResponse({
     status: 200,
     description: "Lista de configuraciones",
     type: [TenantNotificationConfigResponseDto],
   })
-  async findAll(): Promise<TenantNotificationConfigResponseDto[]> {
+  async findAll(
+    @Query("page") page?: number,
+    @Query("limit") limit?: number
+  ): Promise<any> {
     const entities = await this.repository.findAll(false);
-    return entities.map((entity) => this.toResponseDto(entity));
+    const items = entities.map((entity) => this.toResponseDto(entity));
+    
+    // Aplicar paginación en memoria
+    const currentPage = page || 1;
+    const pageSize = limit || 20;
+    const startIndex = (currentPage - 1) * pageSize;
+    const endIndex = startIndex + pageSize;
+    const paginatedItems = items.slice(startIndex, endIndex);
+    
+    return ResponseUtil.paginated(
+      paginatedItems,
+      items.length,
+      currentPage,
+      pageSize,
+      'Tenant notification configs retrieved successfully'
+    );
   }
 
   /**
