@@ -5,6 +5,9 @@ import {
   DocumentGenerationService,
   DocumentGenerationResult,
   DocumentType,
+  ApprovalDocumentData,
+  RejectionDocumentData,
+  ConfirmationDocumentData,
 } from "../services/document-generation.service";
 
 const logger = createLogger("GenerateDocumentHandler");
@@ -32,17 +35,17 @@ export class GenerateDocumentHandler
     switch (command.documentType) {
       case DocumentType.APPROVAL_LETTER:
         return await this.documentGenerationService.generateApprovalLetter(
-          command.data
+          command.data as ApprovalDocumentData
         );
 
       case DocumentType.REJECTION_LETTER:
         return await this.documentGenerationService.generateRejectionLetter(
-          command.data
+          command.data as RejectionDocumentData
         );
 
       case DocumentType.CONFIRMATION:
         return await this.documentGenerationService.generateConfirmation(
-          command.data
+          command.data as ConfirmationDocumentData
         );
 
       default:

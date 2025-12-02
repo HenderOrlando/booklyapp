@@ -99,6 +99,8 @@ export class DocumentGenerationService {
   ) {
     this.templates = new Map();
     this.initializeTemplates();
+    
+    logger.info("DocumentGenerationService initialized");
   }
 
   /**
