@@ -2,6 +2,7 @@ import { Injectable, Logger, OnModuleInit } from '@nestjs/common';
 import { EventBusService } from '@libs/event-bus';
 import { EventType } from '@libs/common/enums';
 import { EventPayload } from '@libs/common';
+import { ResourcesCacheService } from '../cache';
 
 /**
  * Handler para evento CHECK_OUT_COMPLETED
@@ -12,7 +13,10 @@ import { EventPayload } from '@libs/common';
 export class CheckOutCompletedHandler implements OnModuleInit {
   private readonly logger = new Logger(CheckOutCompletedHandler.name);
 
-  constructor(private readonly eventBus: EventBusService) {}
+  constructor(
+    private readonly eventBus: EventBusService,
+    private readonly cacheService: ResourcesCacheService,
+  ) {}
 
   async onModuleInit() {
     await this.eventBus.subscribe(
@@ -43,6 +47,13 @@ export class CheckOutCompletedHandler implements OnModuleInit {
       // 4. Actualizar historial de uso
 
       if (resourceCondition === 'damaged' || resourceCondition === 'needs_maintenance') {
+        // Invalidar cache del recurso y su estado
+        await this.cacheService.invalidateResource(resourceId);
+        await this.cacheService.invalidateResourceStatus(resourceId);
+
+        this.logger.log(
+          `Resource ${resourceId} condition after check-out: ${resourceCondition}. Cache invalidated.`,
+        );
         this.logger.warn(
           `Resource ${resourceId} needs attention. Condition: ${resourceCondition}. Notes: ${notes}`,
         );

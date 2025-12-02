@@ -2,6 +2,7 @@ import { Injectable, Logger, OnModuleInit } from '@nestjs/common';
 import { EventBusService } from '@libs/event-bus';
 import { EventType } from '@libs/common/enums';
 import { EventPayload } from '@libs/common';
+import { AvailabilityCacheService } from '../cache';
 
 /**
  * Handler para evento APPROVAL_GRANTED
@@ -12,7 +13,10 @@ import { EventPayload } from '@libs/common';
 export class ApprovalGrantedHandler implements OnModuleInit {
   private readonly logger = new Logger(ApprovalGrantedHandler.name);
 
-  constructor(private readonly eventBus: EventBusService) {}
+  constructor(
+    private readonly eventBus: EventBusService,
+    private readonly cacheService: AvailabilityCacheService,
+  ) {}
 
   async onModuleInit() {
     await this.eventBus.subscribe(
@@ -42,6 +46,13 @@ export class ApprovalGrantedHandler implements OnModuleInit {
       // 3. Registrar quién aprobó y comentarios
       // 4. Publicar evento RESERVATION_CONFIRMED
       // 5. Notificar al usuario solicitante
+
+      // Invalidar cache de la reserva
+      await this.cacheService.invalidateReservation(reservationId);
+
+      this.logger.log(
+        `Reservation ${reservationId} confirmed after approval. Cache invalidated.`,
+      );
 
       this.logger.log(
         `Reservation ${reservationId} approved by ${approvedBy}. Comments: ${comments || 'None'}`,

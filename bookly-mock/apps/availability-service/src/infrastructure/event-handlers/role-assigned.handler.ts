@@ -2,6 +2,7 @@ import { Injectable, Logger, OnModuleInit } from '@nestjs/common';
 import { EventBusService } from '@libs/event-bus';
 import { EventType } from '@libs/common/enums';
 import { EventPayload } from '@libs/common';
+import { AvailabilityCacheService } from '../cache';
 
 /**
  * Handler para evento ROLE_ASSIGNED
@@ -12,7 +13,10 @@ import { EventPayload } from '@libs/common';
 export class RoleAssignedHandler implements OnModuleInit {
   private readonly logger = new Logger(RoleAssignedHandler.name);
 
-  constructor(private readonly eventBus: EventBusService) {}
+  constructor(
+    private readonly eventBus: EventBusService,
+    private readonly cacheService: AvailabilityCacheService,
+  ) {}
 
   async onModuleInit() {
     await this.eventBus.subscribe(
@@ -45,8 +49,11 @@ export class RoleAssignedHandler implements OnModuleInit {
       // 3. Actualizar tipos de recursos que puede reservar
       // 4. Actualizar si requiere aprobación o no
 
+      // Invalidar cache de permisos del usuario
+      await this.cacheService.invalidateUserPermissions(userId);
+
       this.logger.log(
-        `User ${userId} permissions updated due to role assignment: ${roleName}`,
+        `User ${userId} reservation permissions updated due to role: ${roleName}. Cache invalidated.`,
       );
     } catch (error) {
       this.logger.error(

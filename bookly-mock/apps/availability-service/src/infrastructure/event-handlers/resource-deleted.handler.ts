@@ -2,6 +2,7 @@ import { Injectable, Logger, OnModuleInit } from '@nestjs/common';
 import { EventBusService } from '@libs/event-bus';
 import { EventType } from '@libs/common/enums';
 import { EventPayload } from '@libs/common';
+import { AvailabilityCacheService } from '../cache';
 
 /**
  * Handler para evento RESOURCE_DELETED
@@ -12,7 +13,10 @@ import { EventPayload } from '@libs/common';
 export class ResourceDeletedHandler implements OnModuleInit {
   private readonly logger = new Logger(ResourceDeletedHandler.name);
 
-  constructor(private readonly eventBus: EventBusService) {}
+  constructor(
+    private readonly eventBus: EventBusService,
+    private readonly cacheService: AvailabilityCacheService,
+  ) {}
 
   async onModuleInit() {
     await this.eventBus.subscribe(
@@ -36,6 +40,13 @@ export class ResourceDeletedHandler implements OnModuleInit {
     );
 
     try {
+      // Invalidar todo el cache del recurso
+      await this.cacheService.invalidateAllResourceCache(resourceId);
+
+      this.logger.log(
+        `Cancelled all future reservations for deleted resource ${resourceId}. Cache invalidated.`,
+      );
+
       // TODO: Implementar lógica de negocio
       // 1. Buscar todas las reservas futuras del recurso
       // 2. Cancelar cada reserva

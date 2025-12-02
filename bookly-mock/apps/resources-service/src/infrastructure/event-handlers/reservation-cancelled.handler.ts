@@ -2,6 +2,7 @@ import { Injectable, Logger, OnModuleInit } from '@nestjs/common';
 import { EventBusService } from '@libs/event-bus';
 import { EventType } from '@libs/common/enums';
 import { EventPayload } from '@libs/common';
+import { ResourcesCacheService } from '../cache';
 
 /**
  * Handler para evento RESERVATION_CANCELLED
@@ -12,7 +13,10 @@ import { EventPayload } from '@libs/common';
 export class ReservationCancelledHandler implements OnModuleInit {
   private readonly logger = new Logger(ReservationCancelledHandler.name);
 
-  constructor(private readonly eventBus: EventBusService) {}
+  constructor(
+    private readonly eventBus: EventBusService,
+    private readonly cacheService: ResourcesCacheService,
+  ) {}
 
   async onModuleInit() {
     await this.eventBus.subscribe(
@@ -41,8 +45,13 @@ export class ReservationCancelledHandler implements OnModuleInit {
       // 2. Actualizar contador de cancelaciones
       // 3. Registrar razón de cancelación para análisis
 
+      // Invalidar cache del recurso
+      await this.cacheService.invalidateResource(resourceId);
+      await this.cacheService.invalidateResourceStatus(resourceId);
+      await this.cacheService.invalidateResourceLists();
+
       this.logger.log(
-        `Resource ${resourceId} freed due to cancellation. Reason: ${reason || 'Not specified'}`,
+        `Resource ${resourceId} freed due to reservation ${reservationId} cancellation. Cache invalidated.`,
       );
     } catch (error) {
       this.logger.error(

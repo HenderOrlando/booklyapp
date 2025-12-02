@@ -2,6 +2,7 @@ import { Injectable, Logger, OnModuleInit } from '@nestjs/common';
 import { EventBusService } from '@libs/event-bus';
 import { EventType } from '@libs/common/enums';
 import { EventPayload } from '@libs/common';
+import { RedisService } from '@libs/redis';
 
 /**
  * Handler para evento PERMISSION_GRANTED
@@ -12,7 +13,10 @@ import { EventPayload } from '@libs/common';
 export class PermissionGrantedHandler implements OnModuleInit {
   private readonly logger = new Logger(PermissionGrantedHandler.name);
 
-  constructor(private readonly eventBus: EventBusService) {}
+  constructor(
+    private readonly eventBus: EventBusService,
+    private readonly redis: RedisService,
+  ) {}
 
   async onModuleInit() {
     await this.eventBus.subscribe(
@@ -45,8 +49,13 @@ export class PermissionGrantedHandler implements OnModuleInit {
       //    - override_approvals: Puede anular aprobaciones
       // 3. Actualizar flujos de aprobación afectados
 
+      // Invalidar cache de permisos
+      if (targetType === 'user') {
+        await this.redis.del(`auth:perms:${targetId}`);
+      }
+
       this.logger.log(
-        `Permission ${permissionName} granted to ${targetType} ${targetId} by ${grantedBy}`,
+        `Permission ${permissionName} granted to ${targetType} ${targetId} by ${grantedBy}. Cache invalidated.`,
       );
     } catch (error) {
       this.logger.error(

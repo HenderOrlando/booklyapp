@@ -2,6 +2,7 @@ import { Injectable, Logger, OnModuleInit } from '@nestjs/common';
 import { EventBusService } from '@libs/event-bus';
 import { EventType } from '@libs/common/enums';
 import { EventPayload } from '@libs/common';
+import { AvailabilityCacheService } from '../cache';
 
 /**
  * Handler para evento RESOURCE_AVAILABILITY_CHANGED
@@ -12,7 +13,10 @@ import { EventPayload } from '@libs/common';
 export class ResourceAvailabilityChangedHandler implements OnModuleInit {
   private readonly logger = new Logger(ResourceAvailabilityChangedHandler.name);
 
-  constructor(private readonly eventBus: EventBusService) {}
+  constructor(
+    private readonly eventBus: EventBusService,
+    private readonly cacheService: AvailabilityCacheService,
+  ) {}
 
   async onModuleInit() {
     await this.eventBus.subscribe(
@@ -49,6 +53,13 @@ export class ResourceAvailabilityChangedHandler implements OnModuleInit {
         // TODO: Verificar y notificar conflictos
       }
 
+      // Invalidar cache de disponibilidad del recurso
+      await this.cacheService.invalidateResourceAvailability(resourceId);
+      await this.cacheService.invalidateAllResourceCache(resourceId);
+
+      this.logger.log(
+        `Updated availability for resource ${resourceId}. Cache invalidated.`,
+      );
       this.logger.log(
         `Resource ${resourceId} availability updated: ${previousAvailability} -> ${newAvailability}`,
       );

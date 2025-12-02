@@ -2,6 +2,7 @@ import { Injectable, Logger, OnModuleInit } from '@nestjs/common';
 import { EventBusService } from '@libs/event-bus';
 import { EventType } from '@libs/common/enums';
 import { EventPayload } from '@libs/common';
+import { AvailabilityCacheService } from '../cache';
 
 /**
  * Handler para evento APPROVAL_REJECTED
@@ -12,7 +13,10 @@ import { EventPayload } from '@libs/common';
 export class ApprovalRejectedHandler implements OnModuleInit {
   private readonly logger = new Logger(ApprovalRejectedHandler.name);
 
-  constructor(private readonly eventBus: EventBusService) {}
+  constructor(
+    private readonly eventBus: EventBusService,
+    private readonly cacheService: AvailabilityCacheService,
+  ) {}
 
   async onModuleInit() {
     await this.eventBus.subscribe(
@@ -47,6 +51,15 @@ export class ApprovalRejectedHandler implements OnModuleInit {
 
       this.logger.warn(
         `Reservation ${reservationId} rejected by ${rejectedBy}. Reason: ${reason}`,
+      );
+
+      // Invalidar cache de la reserva y disponibilidad del recurso
+      await this.cacheService.invalidateReservation(reservationId);
+      await this.cacheService.invalidateResourceAvailability(resourceId);
+      await this.cacheService.invalidateWaitingList(resourceId);
+
+      this.logger.log(
+        `Reservation ${reservationId} rejected. Slot freed for resource ${resourceId}. Cache invalidated.`,
       );
 
       // TODO: Publicar RESERVATION_REJECTED

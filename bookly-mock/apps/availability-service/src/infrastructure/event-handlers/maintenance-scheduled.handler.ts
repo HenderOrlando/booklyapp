@@ -2,6 +2,7 @@ import { Injectable, Logger, OnModuleInit } from '@nestjs/common';
 import { EventBusService } from '@libs/event-bus';
 import { EventType } from '@libs/common/enums';
 import { EventPayload } from '@libs/common';
+import { AvailabilityCacheService } from '../cache';
 
 /**
  * Handler para evento MAINTENANCE_SCHEDULED
@@ -12,7 +13,10 @@ import { EventPayload } from '@libs/common';
 export class MaintenanceScheduledHandler implements OnModuleInit {
   private readonly logger = new Logger(MaintenanceScheduledHandler.name);
 
-  constructor(private readonly eventBus: EventBusService) {}
+  constructor(
+    private readonly eventBus: EventBusService,
+    private readonly cacheService: AvailabilityCacheService,
+  ) {}
 
   async onModuleInit() {
     await this.eventBus.subscribe(
@@ -51,8 +55,12 @@ export class MaintenanceScheduledHandler implements OnModuleInit {
         // TODO: Verificar y manejar conflictos con reservas
       }
 
+      // Invalidar cache de disponibilidad y horarios
+      await this.cacheService.invalidateResourceAvailability(resourceId);
+      await this.cacheService.invalidateAllResourceCache(resourceId);
+
       this.logger.log(
-        `Resource ${resourceId} blocked for maintenance (${maintenanceId})`,
+        `Resource ${resourceId} blocked for maintenance from ${scheduledStartDate} to ${scheduledEndDate}. Cache invalidated.`,
       );
     } catch (error) {
       this.logger.error(
