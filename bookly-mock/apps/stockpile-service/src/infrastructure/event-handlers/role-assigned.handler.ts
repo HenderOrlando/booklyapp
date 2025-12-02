@@ -2,6 +2,7 @@ import { Injectable, Logger, OnModuleInit } from '@nestjs/common';
 import { EventBusService } from '@libs/event-bus';
 import { EventType } from '@libs/common/enums';
 import { EventPayload } from '@libs/common';
+import { RedisService } from '@libs/redis';
 
 /**
  * Handler para evento ROLE_ASSIGNED
@@ -12,7 +13,10 @@ import { EventPayload } from '@libs/common';
 export class RoleAssignedHandler implements OnModuleInit {
   private readonly logger = new Logger(RoleAssignedHandler.name);
 
-  constructor(private readonly eventBus: EventBusService) {}
+  constructor(
+    private readonly eventBus: EventBusService,
+    private readonly redis: RedisService,
+  ) {}
 
   async onModuleInit() {
     await this.eventBus.subscribe(
@@ -45,8 +49,12 @@ export class RoleAssignedHandler implements OnModuleInit {
       // 3. Actualizar lista de aprobadores disponibles
       // 4. Reasignar solicitudes pendientes si es necesario
 
+      // Invalidar cache de permisos del usuario (usando RedisService directamente)
+      await this.redis.del(`auth:perms:${userId}`);
+      await this.redis.del(`auth:roles:${userId}`);
+
       this.logger.log(
-        `User ${userId} approval permissions updated due to role: ${roleName}`,
+        `User ${userId} approval permissions updated due to role: ${roleName}. Cache invalidated.`,
       );
     } catch (error) {
       this.logger.error(

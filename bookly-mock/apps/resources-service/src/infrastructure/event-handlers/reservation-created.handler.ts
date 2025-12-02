@@ -2,6 +2,7 @@ import { Injectable, Logger, OnModuleInit } from '@nestjs/common';
 import { EventBusService } from '@libs/event-bus';
 import { EventType } from '@libs/common/enums';
 import { EventPayload } from '@libs/common';
+import { ResourcesCacheService } from '../cache';
 
 /**
  * Handler para evento RESERVATION_CREATED
@@ -12,7 +13,10 @@ import { EventPayload } from '@libs/common';
 export class ReservationCreatedHandler implements OnModuleInit {
   private readonly logger = new Logger(ReservationCreatedHandler.name);
 
-  constructor(private readonly eventBus: EventBusService) {}
+  constructor(
+    private readonly eventBus: EventBusService,
+    private readonly cacheService: ResourcesCacheService,
+  ) {}
 
   async onModuleInit() {
     await this.eventBus.subscribe(
@@ -41,8 +45,13 @@ export class ReservationCreatedHandler implements OnModuleInit {
       // 2. Registrar historial de reservas del recurso
       // 3. Actualizar métricas de demanda
 
+      // Invalidar cache del recurso y su estado
+      await this.cacheService.invalidateResource(resourceId);
+      await this.cacheService.invalidateResourceStatus(resourceId);
+      await this.cacheService.invalidateResourceLists();
+
       this.logger.log(
-        `Resource ${resourceId} reserved from ${startTime} to ${endTime} by user ${userId}`,
+        `Resource ${resourceId} reserved from ${startTime} to ${endTime} by user ${userId}. Cache invalidated.`,
       );
     } catch (error) {
       this.logger.error(
