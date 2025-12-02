@@ -64,3 +64,5 @@ docker-data/
 
 # Misc
 .eslintcache
+
+package-lock.json
