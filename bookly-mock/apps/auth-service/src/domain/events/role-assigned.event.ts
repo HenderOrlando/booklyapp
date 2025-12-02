@@ -1,14 +1,35 @@
+import { EventType } from '@libs/common/enums';
+import { EventPayload } from '@libs/common';
+
 /**
- * Role Assigned Event
- * Evento publicado cuando se asigna un rol a un usuario
+ * Event payload when a role is assigned to a user
+ */
+export interface RoleAssignedPayload {
+  userId: string;
+  email: string;
+  roleId: string;
+  roleName: string;
+  assignedBy: string;
+}
+
+/**
+ * Event Factory for Role Assigned
  */
 export class RoleAssignedEvent {
-  constructor(
-    public readonly userId: string,
-    public readonly email: string,
-    public readonly roleId: string,
-    public readonly roleName: string,
-    public readonly assignedBy: string,
-    public readonly timestamp: Date = new Date()
-  ) {}
+  static create(
+    payload: RoleAssignedPayload
+  ): EventPayload<RoleAssignedPayload> {
+    return {
+      eventId: `evt-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+      eventType: EventType.ROLE_ASSIGNED,
+      service: 'auth-service',
+      data: payload,
+      timestamp: new Date(),
+      metadata: {
+        version: '1.0',
+        aggregateType: 'User',
+        aggregateId: payload.userId,
+      },
+    };
+  }
 }

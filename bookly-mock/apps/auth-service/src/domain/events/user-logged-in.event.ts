@@ -1,13 +1,34 @@
+import { EventType } from '@libs/common/enums';
+import { EventPayload } from '@libs/common';
+
 /**
- * User Logged In Event
- * Evento publicado cuando un usuario inicia sesión exitosamente
+ * Event payload when a user logs in
+ */
+export interface UserLoggedInPayload {
+  userId: string;
+  email: string;
+  ip?: string;
+  userAgent?: string;
+}
+
+/**
+ * Event Factory for User Logged In
  */
 export class UserLoggedInEvent {
-  constructor(
-    public readonly userId: string,
-    public readonly email: string,
-    public readonly ip?: string,
-    public readonly userAgent?: string,
-    public readonly timestamp: Date = new Date()
-  ) {}
+  static create(
+    payload: UserLoggedInPayload
+  ): EventPayload<UserLoggedInPayload> {
+    return {
+      eventId: `evt-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+      eventType: EventType.USER_LOGGED_IN,
+      service: 'auth-service',
+      data: payload,
+      timestamp: new Date(),
+      metadata: {
+        version: '1.0',
+        aggregateType: 'User',
+        aggregateId: payload.userId,
+      },
+    };
+  }
 }

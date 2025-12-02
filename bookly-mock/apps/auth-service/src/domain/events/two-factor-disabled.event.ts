@@ -1,11 +1,32 @@
+import { EventType } from '@libs/common/enums';
+import { EventPayload } from '@libs/common';
+
 /**
- * Two Factor Disabled Event
- * Evento publicado cuando un usuario deshabilita 2FA
+ * Event payload when a user disables two-factor authentication
+ */
+export interface TwoFactorDisabledPayload {
+  userId: string;
+  email: string;
+}
+
+/**
+ * Event Factory for Two Factor Disabled
  */
 export class TwoFactorDisabledEvent {
-  constructor(
-    public readonly userId: string,
-    public readonly email: string,
-    public readonly timestamp: Date = new Date()
-  ) {}
+  static create(
+    payload: TwoFactorDisabledPayload
+  ): EventPayload<TwoFactorDisabledPayload> {
+    return {
+      eventId: `evt-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+      eventType: EventType.TWO_FACTOR_DISABLED,
+      service: 'auth-service',
+      data: payload,
+      timestamp: new Date(),
+      metadata: {
+        version: '1.0',
+        aggregateType: 'User',
+        aggregateId: payload.userId,
+      },
+    };
+  }
 }
