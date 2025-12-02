@@ -28,17 +28,26 @@ Implementar todos los eventos faltantes en cada microservicio siguiendo el patr�
 | ROLE_ASSIGNED | role-assigned.event.ts | ✅ |
 | PERMISSION_GRANTED | permission-granted.event.ts | ✅ |
 
-**Patrón usado**: Clase simple con constructor
+**Patrón usado**: Factory pattern con EventPayload (estandarizado)
 
 ```typescript
 export class UserRegisteredEvent {
-  constructor(
-    public readonly userId: string,
-    public readonly email: string,
-    public readonly name: string,
-    public readonly roles: string[],
-    public readonly timestamp: Date = new Date()
-  ) {}
+  static create(
+    payload: UserRegisteredPayload
+  ): EventPayload<UserRegisteredPayload> {
+    return {
+      eventId: `evt-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+      eventType: EventType.USER_REGISTERED,
+      service: 'auth-service',
+      data: payload,
+      timestamp: new Date(),
+      metadata: {
+        version: '1.0',
+        aggregateType: 'User',
+        aggregateId: payload.userId,
+      },
+    };
+  }
 }
 ```
 
@@ -208,10 +217,10 @@ export class ResourceCreatedEvent {
 - ✅ Facilita imports: `import { ResourceCreatedEvent } from '@app/domain/events'`
 
 ### 4. Consistencia de Patrones
-- ✅ auth-service: Constructor pattern (más simple)
-- ✅ Otros servicios: Factory pattern con `.create()` (más flexible)
-- ✅ Todos usan interfaces para payloads
-- ✅ Todos incluyen metadata completa
+- ✅ **TODOS los servicios**: Factory pattern con `.create()` (estandarizado)
+- ✅ Todos usan interfaces para payloads (`*Payload`)
+- ✅ Todos retornan `EventPayload<T>`
+- ✅ Todos incluyen metadata completa con `aggregateType` y `aggregateId`
 
 ---
 
@@ -328,7 +337,70 @@ Todos los eventos incluyen:
 
 ---
 
-**Tiempo invertido**: ~2 horas  
+**Tiempo invertido**: ~2.5 horas  
 **Archivos creados**: 37  
-**Líneas de código**: ~1,200  
+**Archivos refactorizados**: 10 (auth-service events estandarizados)  
+**Líneas de código**: ~1,400  
 **Estado**: ✅ COMPLETADO CON ÉXITO
+
+---
+
+## 🔄 Estandarización de Patrones
+
+### Refactorización de auth-service
+Todos los eventos de `auth-service` fueron refactorizados de constructor pattern a factory pattern para mantener consistencia con el resto de los servicios:
+
+**Eventos refactorizados:**
+1. ✅ UserRegisteredEvent
+2. ✅ UserLoggedInEvent
+3. ✅ UserLoggedOutEvent
+4. ✅ PasswordChangedEvent
+5. ✅ PasswordResetRequestedEvent
+6. ✅ RoleAssignedEvent
+7. ✅ PermissionGrantedEvent
+8. ✅ TwoFactorEnabledEvent
+9. ✅ TwoFactorDisabledEvent
+10. ✅ TwoFactorVerificationFailedEvent
+
+**Patrón unificado:**
+```typescript
+// Antes (constructor pattern)
+export class UserRegisteredEvent {
+  constructor(
+    public readonly userId: string,
+    public readonly email: string,
+    ...
+  ) {}
+}
+
+// Después (factory pattern)
+export interface UserRegisteredPayload {
+  userId: string;
+  email: string;
+  ...
+}
+
+export class UserRegisteredEvent {
+  static create(payload: UserRegisteredPayload): EventPayload<UserRegisteredPayload> {
+    return {
+      eventId: `evt-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+      eventType: EventType.USER_REGISTERED,
+      service: 'auth-service',
+      data: payload,
+      timestamp: new Date(),
+      metadata: {
+        version: '1.0',
+        aggregateType: 'User',
+        aggregateId: payload.userId,
+      },
+    };
+  }
+}
+```
+
+**Beneficios de la estandarización:**
+- ✅ Consistencia total en todos los microservicios
+- ✅ Mejor soporte para Event Sourcing
+- ✅ Metadata completa en todos los eventos
+- ✅ Tipado fuerte con interfaces de payload
+- ✅ Facilita testing y mocking

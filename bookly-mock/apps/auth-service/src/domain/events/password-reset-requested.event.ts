@@ -1,13 +1,34 @@
+import { EventType } from '@libs/common/enums';
+import { EventPayload } from '@libs/common';
+
 /**
- * Password Reset Requested Event
- * Evento publicado cuando un usuario solicita restablecer su contraseña
+ * Event payload when a user requests a password reset
+ */
+export interface PasswordResetRequestedPayload {
+  userId: string;
+  email: string;
+  resetToken: string;
+  expiresAt: Date;
+}
+
+/**
+ * Event Factory for Password Reset Requested
  */
 export class PasswordResetRequestedEvent {
-  constructor(
-    public readonly userId: string,
-    public readonly email: string,
-    public readonly resetToken: string,
-    public readonly expiresAt: Date,
-    public readonly timestamp: Date = new Date()
-  ) {}
+  static create(
+    payload: PasswordResetRequestedPayload
+  ): EventPayload<PasswordResetRequestedPayload> {
+    return {
+      eventId: `evt-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+      eventType: EventType.PASSWORD_RESET_REQUESTED,
+      service: 'auth-service',
+      data: payload,
+      timestamp: new Date(),
+      metadata: {
+        version: '1.0',
+        aggregateType: 'User',
+        aggregateId: payload.userId,
+      },
+    };
+  }
 }
