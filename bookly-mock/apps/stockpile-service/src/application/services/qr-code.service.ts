@@ -144,6 +144,30 @@ export class QRCodeService {
   }
 
   /**
+   * Generar código QR simple (helper para documentos)
+   */
+  async generateQRCode(data: string): Promise<string> {
+    try {
+      const qrCodeImage = await QRCode.toDataURL(data, {
+        errorCorrectionLevel: "H",
+        type: "image/png",
+        width: 300,
+        margin: 2,
+        color: {
+          dark: "#000000",
+          light: "#FFFFFF",
+        },
+      });
+
+      logger.info("Simple QR code generated");
+      return qrCodeImage;
+    } catch (error) {
+      logger.error("Error generating simple QR code", error as Error);
+      throw error;
+    }
+  }
+
+  /**
    * Invalidar token después de uso
    */
   async invalidateToken(token: string): Promise<void> {
