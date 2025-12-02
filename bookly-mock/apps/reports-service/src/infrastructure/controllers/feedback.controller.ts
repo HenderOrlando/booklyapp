@@ -1,3 +1,4 @@
+import { ResponseUtil } from "@libs/common";
 import { FeedbackStatus } from "@libs/common/enums";
 import { Permissions } from "@libs/decorators/permissions.decorator";
 import { JwtAuthGuard } from "@libs/guards";
@@ -27,7 +28,7 @@ import {
   DeleteFeedbackCommand,
   RespondToFeedbackCommand,
   UpdateFeedbackStatusCommand,
-} from '@reports/application/commands/feedback.commands";
+} from "@reports/application/commands/feedback.commands";
 import {
   GetAllFeedbackQuery,
   GetFeedbackByIdQuery,
@@ -36,7 +37,7 @@ import {
   GetFeedbackResourceStatisticsQuery,
   GetResourceFeedbackQuery,
   GetUserFeedbackQuery,
-} from '@reports/application/queries/feedback.queries";
+} from "@reports/application/queries/feedback.queries";
 import {
   CreateFeedbackDto,
   FeedbackQueryDto,
@@ -195,8 +196,28 @@ export class FeedbackController {
   @ApiResponse({ status: 403, description: "Solo accesible por staff" })
   async getAllFeedback(@Query() queryDto: FeedbackQueryDto) {
     const query = new GetAllFeedbackQuery(queryDto.page, queryDto.limit);
-
-    return await this.queryBus.execute(query);
+    const result = await this.queryBus.execute(query);
+    
+    // Si el handler retorna estructura paginada
+    if (result.data && result.meta) {
+      return ResponseUtil.paginated(
+        result.data,
+        result.meta.total,
+        queryDto.page || 1,
+        queryDto.limit || 20,
+        'Feedback retrieved successfully'
+      );
+    }
+    
+    // Fallback si retorna array directo
+    const items = Array.isArray(result) ? result : [];
+    return ResponseUtil.paginated(
+      items,
+      items.length,
+      1,
+      items.length,
+      'Feedback retrieved successfully'
+    );
   }
 
   /**

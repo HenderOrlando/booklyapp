@@ -1,3 +1,4 @@
+import { ResponseUtil } from "@libs/common";
 import { JwtAuthGuard } from "@libs/guards";
 import { Controller, Get, Query, UseGuards } from "@nestjs/common";
 import { QueryBus } from "@nestjs/cqrs";
@@ -7,7 +8,7 @@ import {
   ApiResponse,
   ApiTags,
 } from "@nestjs/swagger";
-import { GetDemandReportsQuery } from '@reports/application/queries";
+import { GetDemandReportsQuery } from "@reports/application/queries";
 import { QueryDemandReportsDto } from "../dtos";
 
 @ApiTags("Demand Reports")
@@ -27,7 +28,7 @@ export class DemandReportsController {
     const query = new GetDemandReportsQuery(
       {
         page: dto.page || 1,
-        limit: dto.limit || 10,
+        limit: dto.limit || 20,
       },
       {
         resourceType: dto.resourceType,
@@ -37,6 +38,27 @@ export class DemandReportsController {
       }
     );
 
-    return await this.queryBus.execute(query);
+    const result = await this.queryBus.execute(query);
+    
+    // Si el handler retorna estructura paginada
+    if (result.data && result.meta) {
+      return ResponseUtil.paginated(
+        result.data,
+        result.meta.total,
+        dto.page || 1,
+        dto.limit || 20,
+        'Demand reports retrieved successfully'
+      );
+    }
+    
+    // Fallback si retorna array directo
+    const items = Array.isArray(result) ? result : [];
+    return ResponseUtil.paginated(
+      items,
+      items.length,
+      1,
+      items.length,
+      'Demand reports retrieved successfully'
+    );
   }
 }

@@ -17,13 +17,14 @@ import { CommandBus, QueryBus } from "@nestjs/cqrs";
 import {
   ApiBearerAuth,
   ApiOperation,
+  ApiQuery,
   ApiResponse,
   ApiTags,
 } from "@nestjs/swagger";
-import { CancelMaintenanceBlockCommand } from '@availability/application/commands/cancel-maintenance-block.command";
-import { CompleteMaintenanceBlockCommand } from '@availability/application/commands/complete-maintenance-block.command";
-import { CreateMaintenanceBlockCommand } from '@availability/application/commands/create-maintenance-block.command";
-import { GetMaintenanceBlocksQuery } from '@availability/application/queries/get-maintenance-blocks.query";
+import { CancelMaintenanceBlockCommand } from "@availability/application/commands/cancel-maintenance-block.command";
+import { CompleteMaintenanceBlockCommand } from "@availability/application/commands/complete-maintenance-block.command";
+import { CreateMaintenanceBlockCommand } from "@availability/application/commands/create-maintenance-block.command";
+import { GetMaintenanceBlocksQuery } from "@availability/application/queries/get-maintenance-blocks.query";
 import {
   CancelMaintenanceDto,
   CompleteMaintenanceDto,
@@ -118,12 +119,41 @@ export class MaintenanceBlocksController {
     status: 401,
     description: "No autenticado",
   })
+  @ApiQuery({
+    name: "page",
+    required: false,
+    type: Number,
+    description: "Número de página (default: 1)",
+  })
+  @ApiQuery({
+    name: "limit",
+    required: false,
+    type: Number,
+    description: "Items por página (default: 20)",
+  })
   async findAll(
-    @Query() filters: QueryMaintenanceBlocksDto
+    @Query() filters: QueryMaintenanceBlocksDto,
+    @Query("page") page?: number,
+    @Query("limit") limit?: number
   ): Promise<any> {
     const query = new GetMaintenanceBlocksQuery(filters);
     const result = await this.queryBus.execute(query);
-    return ResponseUtil.success(result, 'Maintenance blocks retrieved successfully');
+    
+    // Aplicar paginación en memoria
+    const items = Array.isArray(result) ? result : [];
+    const currentPage = page || 1;
+    const pageSize = limit || 20;
+    const startIndex = (currentPage - 1) * pageSize;
+    const endIndex = startIndex + pageSize;
+    const paginatedItems = items.slice(startIndex, endIndex);
+    
+    return ResponseUtil.paginated(
+      paginatedItems,
+      items.length,
+      currentPage,
+      pageSize,
+      'Maintenance blocks retrieved successfully'
+    );
   }
 
   @Get("resource/:resourceId")

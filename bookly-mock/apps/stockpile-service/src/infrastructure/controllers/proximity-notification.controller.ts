@@ -1,3 +1,4 @@
+import { ResponseUtil } from "@libs/common";
 import {
   Body,
   Controller,
@@ -6,19 +7,21 @@ import {
   HttpStatus,
   Param,
   Post,
+  Query,
 } from "@nestjs/common";
 import {
   ApiBearerAuth,
   ApiBody,
   ApiOperation,
   ApiParam,
+  ApiQuery,
   ApiResponse,
   ApiTags,
 } from "@nestjs/swagger";
 import {
   ProximityNotificationService,
   ProximityThreshold,
-} from '@stockpile/application/services/proximity-notification.service";
+} from "@stockpile/application/services/proximity-notification.service";
 
 /**
  * DTO para verificar proximidad
@@ -188,16 +191,42 @@ export class ProximityNotificationController {
       },
     },
   })
-  async getAllActiveProximities() {
+  @ApiQuery({
+    name: "page",
+    required: false,
+    type: Number,
+    description: "Número de página (default: 1)",
+  })
+  @ApiQuery({
+    name: "limit",
+    required: false,
+    type: Number,
+    description: "Items por página (default: 20)",
+  })
+  async getAllActiveProximities(
+    @Query("page") page?: number,
+    @Query("limit") limit?: number
+  ) {
     const proximities = this.proximityService.getAllActiveProximities();
+    const items = proximities.map((p) => ({
+      ...p,
+      lastThreshold: ProximityThreshold[p.lastThreshold],
+    }));
 
-    return {
-      total: proximities.length,
-      proximities: proximities.map((p) => ({
-        ...p,
-        lastThreshold: ProximityThreshold[p.lastThreshold],
-      })),
-    };
+    // Aplicar paginación en memoria
+    const currentPage = page || 1;
+    const pageSize = limit || 20;
+    const startIndex = (currentPage - 1) * pageSize;
+    const endIndex = startIndex + pageSize;
+    const paginatedItems = items.slice(startIndex, endIndex);
+
+    return ResponseUtil.paginated(
+      paginatedItems,
+      items.length,
+      currentPage,
+      pageSize,
+      'Active proximities retrieved successfully'
+    );
   }
 
   /**
