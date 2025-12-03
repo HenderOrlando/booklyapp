@@ -4,8 +4,8 @@ import { Inject, Injectable, NotFoundException } from "@nestjs/common";
 import {
   ApprovalFlowEntity,
   ApprovalStep,
-} from '@stockpile/domain/entities/approval-flow.entity";
-import { IApprovalFlowRepository } from '@stockpile/domain/repositories";
+} from "@stockpile/domain/entities/approval-flow.entity";
+import { IApprovalFlowRepository } from "@stockpile/domain/repositories";
 
 const logger = createLogger("ApprovalFlowService");
 
@@ -292,5 +292,37 @@ export class ApprovalFlowService {
     logger.info("Approval flow deleted successfully", { flowId });
 
     return deleted;
+  }
+
+  /**
+   * Obtiene todos los flujos activos
+   * Método requerido por FlowMatchingService
+   */
+  async getActiveFlows(): Promise<ApprovalFlowEntity[]> {
+    logger.info("Getting all active approval flows");
+
+    const result = await this.approvalFlowRepository.findMany(
+      { page: 1, limit: 1000 }, // Obtener todos los flujos activos
+      { isActive: true }
+    );
+
+    return result.flows;
+  }
+
+  /**
+   * Obtiene un flujo por ID (alias para compatibilidad)
+   * Método requerido por FlowMatchingService
+   */
+  async getFlowById(flowId: string): Promise<ApprovalFlowEntity | null> {
+    logger.info("Getting flow by ID", { flowId });
+
+    try {
+      return await this.getApprovalFlowById(flowId);
+    } catch (error) {
+      if (error instanceof NotFoundException) {
+        return null;
+      }
+      throw error;
+    }
   }
 }

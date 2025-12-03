@@ -79,6 +79,9 @@ import { CacheInvalidationService } from "./infrastructure/services/cache-invali
 import { AllEventHandlers } from "./infrastructure/event-handlers";
 import { NotificationEventHandler } from "./infrastructure/handlers/notification-event.handler";
 
+// Event Bus Integration
+import { EventBusIntegrationModule } from "./infrastructure/event-bus";
+
 /**
  * Stockpile Module
  * Módulo principal del servicio de aprobaciones y flujos de trabajo
@@ -162,6 +165,9 @@ import { NotificationEventHandler } from "./infrastructure/handlers/notification
 
     // Audit Decorators (event-driven audit)
     AuditDecoratorsModule,
+
+    // Event Bus Integration (suscripciones a eventos)
+    EventBusIntegrationModule,
   ],
   controllers: [
     ApprovalRequestsController,

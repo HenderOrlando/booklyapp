@@ -23,6 +23,7 @@ export class ApprovalFlowEntity {
     public readonly steps: ApprovalStep[],
     public readonly isActive: boolean,
     public readonly autoApproveConditions?: Record<string, any>,
+    public readonly metadata?: Record<string, any>,
     public readonly createdAt?: Date,
     public readonly updatedAt?: Date,
     public readonly audit?: {
@@ -94,6 +95,7 @@ export class ApprovalFlowEntity {
       this.steps,
       false,
       this.autoApproveConditions,
+      this.metadata,
       this.createdAt,
       new Date(),
       {
@@ -115,6 +117,7 @@ export class ApprovalFlowEntity {
       this.steps,
       true,
       this.autoApproveConditions,
+      this.metadata,
       this.createdAt,
       new Date(),
       {
@@ -136,6 +139,7 @@ export class ApprovalFlowEntity {
       steps: this.steps,
       isActive: this.isActive,
       autoApproveConditions: this.autoApproveConditions,
+      metadata: this.metadata,
       createdAt: this.createdAt,
       updatedAt: this.updatedAt,
       audit: this.audit,
@@ -154,6 +158,7 @@ export class ApprovalFlowEntity {
       obj.steps,
       obj.isActive !== undefined ? obj.isActive : true,
       obj.autoApproveConditions,
+      obj.metadata,
       obj.createdAt,
       obj.updatedAt,
       obj.audit

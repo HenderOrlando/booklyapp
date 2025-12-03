@@ -23,11 +23,11 @@ import {
   CreateApprovalFlowCommand,
   DeactivateApprovalFlowCommand,
   UpdateApprovalFlowCommand,
-} from '@stockpile/application/commands";
+} from '@stockpile/application/commands';
 import {
   GetApprovalFlowByIdQuery,
   GetApprovalFlowsQuery,
-} from '@stockpile/application/queries";
+} from '@stockpile/application/queries';
 import {
   CreateApprovalFlowDto,
   QueryApprovalFlowsDto,

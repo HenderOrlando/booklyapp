@@ -1,5 +1,5 @@
-import { EventType } from '@libs/common/enums';
-import { EventPayload } from '@libs/common';
+import { EventType } from "@libs/common/enums";
+import { EventPayload } from "@libs/common";
 
 export interface CheckInCompletedPayload {
   checkInId: string;

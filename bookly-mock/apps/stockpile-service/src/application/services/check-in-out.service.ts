@@ -3,8 +3,8 @@ import { Injectable } from "@nestjs/common";
 import { InjectModel } from "@nestjs/mongoose";
 import * as crypto from "crypto";
 import { Model, Types } from "mongoose";
-import { CheckInOutEntity } from '@stockpile/domain/entities/check-in-out.entity";
-import { CheckInOut } from '@stockpile/infrastructure/schemas/check-in-out.schema";
+import { CheckInOutEntity } from '@stockpile/domain/entities/check-in-out.entity';
+import { CheckInOut } from '@stockpile/infrastructure/schemas/check-in-out.schema';
 
 @Injectable()
 export class CheckInOutService {
@@ -153,6 +153,79 @@ export class CheckInOutService {
       })
       .sort({ checkInTime: -1 })
       .lean();
+
+    return docs.map((doc) => CheckInOutEntity.fromObject(doc));
+  }
+
+  /**
+   * Obtener check-ins activos con filtros opcionales
+   */
+  async getActiveCheckIns(filters?: {
+    resourceId?: string;
+    userId?: string;
+  }): Promise<CheckInOutEntity[]> {
+    const query: any = { status: CheckInOutStatus.CHECKED_IN };
+    
+    if (filters?.resourceId) {
+      query.resourceId = new Types.ObjectId(filters.resourceId);
+    }
+    
+    if (filters?.userId) {
+      query.userId = new Types.ObjectId(filters.userId);
+    }
+
+    const docs = await this.model
+      .find(query)
+      .sort({ checkInTime: -1 })
+      .lean();
+
+    return docs.map((doc) => CheckInOutEntity.fromObject(doc));
+  }
+
+  /**
+   * Obtener historial de check-ins con filtros
+   */
+  async getCheckInHistory(filters: {
+    resourceId?: string;
+    userId?: string;
+    startDate?: Date;
+    endDate?: Date;
+    status?: CheckInOutStatus;
+    limit?: number;
+  }): Promise<CheckInOutEntity[]> {
+    const query: any = {};
+    
+    if (filters.resourceId) {
+      query.resourceId = new Types.ObjectId(filters.resourceId);
+    }
+    
+    if (filters.userId) {
+      query.userId = new Types.ObjectId(filters.userId);
+    }
+    
+    if (filters.status) {
+      query.status = filters.status;
+    }
+    
+    if (filters.startDate || filters.endDate) {
+      query.checkInTime = {};
+      if (filters.startDate) {
+        query.checkInTime.$gte = filters.startDate;
+      }
+      if (filters.endDate) {
+        query.checkInTime.$lte = filters.endDate;
+      }
+    }
+
+    let queryBuilder = this.model
+      .find(query)
+      .sort({ checkInTime: -1 });
+    
+    if (filters.limit) {
+      queryBuilder = queryBuilder.limit(filters.limit);
+    }
+
+    const docs = await queryBuilder.lean();
 
     return docs.map((doc) => CheckInOutEntity.fromObject(doc));
   }

@@ -2,8 +2,8 @@ import { PaginationMeta, PaginationQuery } from "@libs/common";
 import { Injectable } from "@nestjs/common";
 import { InjectModel } from "@nestjs/mongoose";
 import { Model, Types } from "mongoose";
-import { ApprovalFlowEntity } from '@stockpile/domain/entities/approval-flow.entity";
-import { IApprovalFlowRepository } from '@stockpile/domain/repositories";
+import { ApprovalFlowEntity } from "@stockpile/domain/entities/approval-flow.entity";
+import { IApprovalFlowRepository } from "@stockpile/domain/repositories";
 import { ApprovalFlow } from "../schemas";
 
 /**

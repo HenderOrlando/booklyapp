@@ -10,9 +10,9 @@ import { Injectable } from "@nestjs/common";
 import { InjectModel } from "@nestjs/mongoose";
 import { Cron, CronExpression } from "@nestjs/schedule";
 import { Model } from "mongoose";
-import { ReminderConfigurationEntity } from '@stockpile/domain/entities/reminder-configuration.entity";
-import { AuthServiceClient } from '@stockpile/infrastructure/clients/auth-service.client";
-import { ReminderConfiguration } from '@stockpile/infrastructure/schemas/reminder-configuration.schema";
+import { ReminderConfigurationEntity } from "@stockpile/domain/entities/reminder-configuration.entity";
+import { AuthServiceClient } from "@stockpile/infrastructure/clients/auth-service.client";
+import { ReminderConfiguration } from "@stockpile/infrastructure/schemas/reminder-configuration.schema";
 import { ApprovalRequestService } from "./approval-request.service";
 import { CheckInOutService } from "./check-in-out.service";
 
@@ -376,5 +376,60 @@ export class ReminderService {
         });
       }
     }
+  }
+
+  /**
+   * Programa recordatorios para una reserva
+   * Método requerido por NotificationEventHandler (RF-28)
+   */
+  async scheduleReminders(params: {
+    reservationId: string;
+    userId: string;
+    resourceId: string;
+    startDate: Date;
+    endDate: Date;
+  }): Promise<void> {
+    logger.info('Scheduling reminders for reservation', {
+      reservationId: params.reservationId,
+    });
+
+    // TODO: Implementar lógica de programación de recordatorios
+    // Esto podría usar un job scheduler como Bull o Agenda
+    // Por ahora solo registramos el evento
+
+    // Recordatorio 24h antes
+    const reminder24h = new Date(params.startDate);
+    reminder24h.setHours(reminder24h.getHours() - 24);
+
+    // Recordatorio 1h antes
+    const reminder1h = new Date(params.startDate);
+    reminder1h.setHours(reminder1h.getHours() - 1);
+
+    logger.debug('Reminders scheduled', {
+      reservationId: params.reservationId,
+      reminder24h: reminder24h.toISOString(),
+      reminder1h: reminder1h.toISOString(),
+    });
+
+    // Aquí se programarían los jobs reales con un scheduler
+    // await this.jobScheduler.schedule('reminder-24h', reminder24h, { reservationId, userId });
+    // await this.jobScheduler.schedule('reminder-1h', reminder1h, { reservationId, userId });
+  }
+
+  /**
+   * Cancela todos los recordatorios de una reserva
+   * Método requerido por NotificationEventHandler (RF-28)
+   */
+  async cancelReminders(reservationId: string): Promise<void> {
+    logger.info('Cancelling reminders for reservation', { reservationId });
+
+    // TODO: Implementar lógica de cancelación de recordatorios programados
+    // Esto requiere integración con el job scheduler
+    // Por ahora solo registramos el evento
+
+    logger.debug('Reminders cancelled', { reservationId });
+
+    // Aquí se cancelarían los jobs programados
+    // await this.jobScheduler.cancel({ reservationId });
   }
 }
