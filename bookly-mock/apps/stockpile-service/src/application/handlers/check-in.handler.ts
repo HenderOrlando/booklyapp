@@ -75,30 +75,36 @@ export class CheckInHandler implements ICommandHandler<CheckInCommand> {
 
     // Crear check-in
     const entity = new CheckInOutEntity(
-      undefined as any,
-      command.reservationId,
-      reservation.resourceId,
-      command.userId,
-      CheckInOutStatus.CHECKED_IN,
-      new Date(),
-      command.userId,
-      command.type,
-      command.notes,
-      undefined,
-      undefined,
-      undefined,
-      undefined,
-      reservation.endTime, // expectedReturnTime desde la reserva
-      undefined,
-      undefined,
+      undefined as any, // id
+      command.reservationId, // reservationId
+      reservation.resourceId, // resourceId
+      command.userId, // userId
+      CheckInOutStatus.CHECKED_IN, // status
+      new Date(), // checkInTime
+      command.userId, // checkInBy
+      command.type, // checkInType
+      command.notes, // checkInNotes
+      undefined, // checkOutTime
+      undefined, // checkOutBy
+      undefined, // checkOutType
+      undefined, // checkOutNotes
+      reservation.endTime, // expectedReturnTime
+      undefined, // actualReturnTime
+      reservation.endTime, // expectedCheckOutTime
+      undefined, // resourceCondition
       {
+        // metadata
         ...command.metadata,
-        userName: user?.name,
-        userEmail: user?.email,
-        resourceName: reservation.resourceId,
-        coordinates: command.coordinates,
+        qrCode: command.qrToken,
+        location: command.coordinates ? `${command.coordinates.latitude},${command.coordinates.longitude}` : undefined,
         qrValidated: !!command.qrToken,
-      }
+      },
+      reservation.startTime, // reservationStartTime
+      reservation.endTime, // reservationEndTime
+      undefined, // resourceType
+      undefined, // resourceName - TODO: obtener del resource-service
+      user?.name, // userName
+      user?.email // userEmail
     );
 
     const created = await this.checkInOutService.create(entity);
