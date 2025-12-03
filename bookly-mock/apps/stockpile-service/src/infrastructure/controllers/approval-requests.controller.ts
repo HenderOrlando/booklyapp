@@ -28,13 +28,13 @@ import {
   CancelApprovalRequestCommand,
   CreateApprovalRequestCommand,
   RejectStepCommand,
-} from '@stockpile/application/commands";
+} from '@stockpile/application/commands';
 import {
   GetActiveTodayApprovalsQuery,
   GetApprovalRequestByIdQuery,
   GetApprovalRequestsQuery,
   GetApprovalStatisticsQuery,
-} from '@stockpile/application/queries";
+} from '@stockpile/application/queries';
 import {
   ApproveStepDto,
   CancelApprovalRequestDto,

@@ -1,5 +1,8 @@
 import { CheckInOutStatus, CheckInOutType } from "@libs/common/enums";
 
+// Re-exportar enums para uso externo
+export { CheckInOutStatus, CheckInOutType };
+
 /**
  * Check-in/Check-out Entity
  * Entidad de dominio para registro de entrada/salida
@@ -21,6 +24,7 @@ export class CheckInOutEntity {
     public readonly checkOutNotes?: string,
     public readonly expectedReturnTime?: Date,
     public readonly actualReturnTime?: Date,
+    public readonly expectedCheckOutTime?: Date,
     public readonly resourceCondition?: {
       beforeCheckIn?: string;
       afterCheckOut?: string;
@@ -134,6 +138,7 @@ export class CheckInOutEntity {
       undefined,
       this.expectedReturnTime,
       undefined,
+      this.expectedCheckOutTime,
       this.resourceCondition,
       { ...this.metadata, ...metadata },
       this.reservationStartTime,
@@ -186,6 +191,7 @@ export class CheckInOutEntity {
       notes,
       this.expectedReturnTime,
       now,
+      this.expectedCheckOutTime,
       {
         ...this.resourceCondition,
         afterCheckOut: resourceCondition,
@@ -224,6 +230,7 @@ export class CheckInOutEntity {
       this.checkOutNotes,
       this.expectedReturnTime,
       this.actualReturnTime,
+      this.expectedCheckOutTime,
       this.resourceCondition,
       this.metadata,
       this.reservationStartTime,
@@ -257,6 +264,7 @@ export class CheckInOutEntity {
       checkOutNotes: this.checkOutNotes,
       expectedReturnTime: this.expectedReturnTime,
       actualReturnTime: this.actualReturnTime,
+      expectedCheckOutTime: this.expectedCheckOutTime,
       resourceCondition: this.resourceCondition,
       metadata: this.metadata,
       qrCode: this.metadata?.qrCode, // Extraído de metadata para fácil acceso
@@ -293,6 +301,7 @@ export class CheckInOutEntity {
       obj.checkOutNotes,
       obj.expectedReturnTime ? new Date(obj.expectedReturnTime) : undefined,
       obj.actualReturnTime ? new Date(obj.actualReturnTime) : undefined,
+      obj.expectedCheckOutTime ? new Date(obj.expectedCheckOutTime) : undefined,
       obj.resourceCondition,
       obj.metadata,
       obj.reservationStartTime ? new Date(obj.reservationStartTime) : undefined,

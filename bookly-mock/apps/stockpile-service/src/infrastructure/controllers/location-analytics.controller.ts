@@ -15,7 +15,7 @@ import {
   ApiResponse,
   ApiTags,
 } from "@nestjs/swagger";
-import { LocationAnalyticsService } from '@stockpile/application/services/location-analytics.service";
+import { LocationAnalyticsService } from '@stockpile/application/services/location-analytics.service';
 
 /**
  * Location Analytics Controller

@@ -1,6 +1,6 @@
 import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
 import { Document, Types } from "mongoose";
-import { ApprovalAuditLogActionType } from '@stockpile/domain/entities/approval-audit-log.entity";
+import { ApprovalAuditLogActionType } from "@stockpile/domain/entities/approval-audit-log.entity";
 
 /**
  * Change Item Schema

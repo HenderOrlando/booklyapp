@@ -1,8 +1,8 @@
-import { Injectable, Logger, OnModuleInit } from '@nestjs/common';
-import { EventBusService } from '@libs/event-bus';
-import { EventType } from '@libs/common/enums';
-import { EventPayload } from '@libs/common';
-import { RedisService } from '@libs/redis';
+import { Injectable, Logger, OnModuleInit } from "@nestjs/common";
+import { EventBusService } from "@libs/event-bus";
+import { EventType } from "@libs/common/enums";
+import { EventPayload } from "@libs/common";
+import { RedisService } from "@libs/redis";
 
 /**
  * Handler para evento ROLE_ASSIGNED

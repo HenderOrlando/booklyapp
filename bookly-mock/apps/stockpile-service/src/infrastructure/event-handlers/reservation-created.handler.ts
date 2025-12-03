@@ -1,7 +1,7 @@
-import { Injectable, Logger, OnModuleInit } from '@nestjs/common';
-import { EventBusService } from '@libs/event-bus';
-import { EventType } from '@libs/common/enums';
-import { EventPayload } from '@libs/common';
+import { Injectable, Logger, OnModuleInit } from "@nestjs/common";
+import { EventBusService } from "@libs/event-bus";
+import { EventType } from "@libs/common/enums";
+import { EventPayload } from "@libs/common";
 
 /**
  * Handler para evento RESERVATION_CREATED

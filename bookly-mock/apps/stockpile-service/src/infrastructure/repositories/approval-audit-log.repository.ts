@@ -4,8 +4,8 @@ import { Model, Types } from "mongoose";
 import {
   ApprovalAuditLogActionType,
   ApprovalAuditLogEntity,
-} from '@stockpile/domain/entities/approval-audit-log.entity";
-import { IApprovalAuditLogRepository } from '@stockpile/domain/repositories/approval-audit-log.repository.interface";
+} from "@stockpile/domain/entities/approval-audit-log.entity";
+import { IApprovalAuditLogRepository } from "@stockpile/domain/repositories/approval-audit-log.repository.interface";
 import { ApprovalAuditLog } from "../schemas/approval-audit-log.schema";
 
 /**
