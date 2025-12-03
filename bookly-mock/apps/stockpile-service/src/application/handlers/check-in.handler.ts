@@ -1,9 +1,9 @@
 import { CheckInOutStatus, EventType } from "@libs/common/enums";
 import { EventBusService } from "@libs/event-bus";
 import { CommandHandler, ICommandHandler } from "@nestjs/cqrs";
-import { CheckInOutEntity } from '@stockpile/domain/entities/check-in-out.entity";
-import { AuthServiceClient } from '@stockpile/infrastructure/clients/auth-service.client";
-import { AvailabilityServiceClient } from '@stockpile/infrastructure/clients/availability-service.client";
+import { CheckInOutEntity } from '@stockpile/domain/entities/check-in-out.entity';
+import { AuthServiceClient } from '@stockpile/infrastructure/clients/auth-service.client';
+import { AvailabilityServiceClient } from '@stockpile/infrastructure/clients/availability-service.client';
 import { CheckInCommand } from "../commands/check-in.command";
 import { CheckInOutService } from "../services/check-in-out.service";
 import { GeolocationService } from "../services/geolocation.service";

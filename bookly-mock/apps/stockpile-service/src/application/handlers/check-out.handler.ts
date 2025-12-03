@@ -1,7 +1,7 @@
 import { EventType } from "@libs/common/enums";
 import { EventBusService } from "@libs/event-bus";
 import { CommandHandler, ICommandHandler } from "@nestjs/cqrs";
-import { CheckInOutEntity } from '@stockpile/domain/entities/check-in-out.entity";
+import { CheckInOutEntity } from '@stockpile/domain/entities/check-in-out.entity';
 import { CheckOutCommand } from "../commands/check-out.command";
 import { CheckInOutService } from "../services/check-in-out.service";
 import { DigitalSignatureService } from "../services/digital-signature.service";

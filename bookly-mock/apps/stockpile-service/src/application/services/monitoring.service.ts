@@ -96,15 +96,18 @@ export class MonitoringService {
   /**
    * Obtiene todos los check-ins activos (sin check-out)
    * Para mostrar en el dashboard de vigilancia
+   * Los filtros se aplican en la consulta de BD para optimizar rendimiento
    */
   async getActiveCheckIns(filters?: MonitoringFilters): Promise<EnrichedCheckInOut[]> {
     this.logger.debug('Getting active check-ins', { filters });
 
     try {
-      // Obtener check-ins activos del servicio
+      // Obtener check-ins activos del servicio con filtros aplicados en BD
       const activeCheckIns = await this.checkInOutService.getActiveCheckIns({
         resourceId: filters?.resourceId,
         userId: filters?.userId,
+        startDate: filters?.startDate,
+        endDate: filters?.endDate,
       });
 
       // Enriquecer datos
@@ -112,17 +115,8 @@ export class MonitoringService {
         activeCheckIns.map(checkIn => this.enrichCheckInData(checkIn, filters?.includeIncidents))
       );
 
-      // Filtrar por fecha si se especifica
-      let filtered = enrichedCheckIns;
-      if (filters?.startDate) {
-        filtered = filtered.filter(c => c.checkInTime && c.checkInTime >= filters.startDate!);
-      }
-      if (filters?.endDate) {
-        filtered = filtered.filter(c => c.checkInTime && c.checkInTime <= filters.endDate!);
-      }
-
-      this.logger.log(`Found ${filtered.length} active check-ins`);
-      return filtered;
+      this.logger.log(`Found ${enrichedCheckIns.length} active check-ins`);
+      return enrichedCheckIns;
     } catch (error) {
       this.logger.error(`Error getting active check-ins: ${error.message}`, error.stack);
       throw error;
