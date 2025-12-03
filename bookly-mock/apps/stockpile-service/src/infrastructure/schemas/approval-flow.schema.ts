@@ -45,6 +45,9 @@ export class ApprovalFlow extends Document {
   @Prop({ type: Object })
   autoApproveConditions?: Record<string, any>;
 
+  @Prop({ type: Object })
+  metadata?: Record<string, any>;
+
   // Audit fields
   @Prop({ type: Types.ObjectId, required: true })
   createdBy: Types.ObjectId;

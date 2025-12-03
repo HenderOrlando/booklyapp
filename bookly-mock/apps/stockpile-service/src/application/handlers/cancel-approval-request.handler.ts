@@ -1,7 +1,7 @@
 import { createLogger } from "@libs/common";
 import { CommandHandler, ICommandHandler } from "@nestjs/cqrs";
-import { ApprovalRequestEntity } from '@stockpile/domain/entities";
-import { CacheInvalidationService } from '@stockpile/infrastructure/services/cache-invalidation.service";
+import { ApprovalRequestEntity } from '@stockpile/domain/entities';
+import { CacheInvalidationService } from '@stockpile/infrastructure/services/cache-invalidation.service';
 import { CancelApprovalRequestCommand } from "../commands";
 import { ApprovalRequestService } from "../services";
 

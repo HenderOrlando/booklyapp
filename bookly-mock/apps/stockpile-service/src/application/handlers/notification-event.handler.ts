@@ -1,5 +1,6 @@
 import { Injectable, Logger } from "@nestjs/common";
 import { EventsHandler, IEventHandler } from "@nestjs/cqrs";
+import { NotificationChannel } from "@libs/common/enums";
 import { ReminderService } from "@stockpile/application/services/reminder.service";
 import { EnhancedNotificationService } from "@stockpile/application/services/enhanced-notification.service";
 
@@ -89,20 +90,19 @@ export class NotificationEventHandler {
       const enrichedData = await this.enrichReservationData(data);
 
       // Enviar notificación de confirmación
-      await this.notificationService.sendNotification({
-        userId: data.userId,
-        channels: ['EMAIL', 'PUSH', 'IN_APP'],
-        template: 'reservation_confirmed',
-        data: {
+      await this.notificationService.sendReservationConfirmedNotification(
+        {
           userName: enrichedData.userName,
           resourceName: enrichedData.resourceName,
-          date: this.formatDate(new Date(data.startDate)),
-          startTime: this.formatTime(new Date(data.startDate)),
-          endTime: this.formatTime(new Date(data.endDate)),
-          reservationId: data.reservationId,
+          reservationDate: new Date(data.startDate),
+          reservationStartTime: this.formatTime(new Date(data.startDate)),
+          reservationEndTime: this.formatTime(new Date(data.endDate)),
         },
-        priority: 'NORMAL',
-      });
+        {
+          channels: [NotificationChannel.EMAIL, NotificationChannel.PUSH],
+          priority: 'normal',
+        }
+      );
 
       // Programar recordatorios
       await this.reminderService.scheduleReminders({
@@ -147,19 +147,21 @@ export class NotificationEventHandler {
         .map(change => `• ${change.field}: ${change.oldValue} → ${change.newValue}`)
         .join('\n');
 
+      // TODO: Implementar método sendReservationUpdatedNotification en EnhancedNotificationService
       // Enviar notificación de cambios
-      await this.notificationService.sendNotification({
-        userId: data.userId,
-        channels: ['EMAIL', 'SMS', 'PUSH'],
-        template: 'reservation_updated',
-        data: {
-          userName: enrichedData.userName,
-          reservationId: data.reservationId,
-          changes: changesText,
-          changesArray: significantChanges,
-        },
-        priority: 'HIGH',
-      });
+      // await this.notificationService.sendNotification({
+      //   userId: data.userId,
+      //   channels: ['EMAIL', 'SMS', 'PUSH'],
+      //   template: 'reservation_updated',
+      //   data: {
+      //     userName: enrichedData.userName,
+      //     reservationId: data.reservationId,
+      //     changes: changesText,
+      //     changesArray: significantChanges,
+      //   },
+      //   priority: 'HIGH',
+      // });
+      this.logger.warn('Notification skipped: sendReservationUpdatedNotification not implemented');
 
       // Si cambió la fecha/hora, reprogramar recordatorios
       if (data.changes.startDate || data.changes.endDate) {
@@ -198,20 +200,22 @@ export class NotificationEventHandler {
       // Cancelar todos los recordatorios programados
       await this.reminderService.cancelReminders(data.reservationId);
 
+      // TODO: Implementar método sendReservationCancelledNotification en EnhancedNotificationService
       // Enviar notificación de cancelación
-      await this.notificationService.sendNotification({
-        userId: data.userId,
-        channels: ['EMAIL', 'IN_APP'],
-        template: 'reservation_cancelled',
-        data: {
-          userName: enrichedData.userName,
-          resourceName: enrichedData.resourceName,
-          reservationId: data.reservationId,
-          reason: data.reason || 'No especificado',
-          cancelledBy: enrichedData.cancelledByName || 'Sistema',
-        },
-        priority: 'NORMAL',
-      });
+      // await this.notificationService.sendNotification({
+      //   userId: data.userId,
+      //   channels: ['EMAIL', 'IN_APP'],
+      //   template: 'reservation_cancelled',
+      //   data: {
+      //     userName: enrichedData.userName,
+      //     resourceName: enrichedData.resourceName,
+      //     reservationId: data.reservationId,
+      //     reason: data.reason || 'No especificado',
+      //     cancelledBy: enrichedData.cancelledByName || 'Sistema',
+      //   },
+      //   priority: 'NORMAL',
+      // });
+      this.logger.warn('Notification skipped: sendReservationCancelledNotification not implemented');
 
       this.logger.log(`Reservation cancelled notification sent: ${data.reservationId}`);
     } catch (error) {
@@ -235,28 +239,22 @@ export class NotificationEventHandler {
       const enrichedData = await this.enrichReservationData(data);
 
       // Enviar notificación de aprobación con documento PDF
-      await this.notificationService.sendNotification({
-        userId: data.userId,
-        channels: ['EMAIL', 'WHATSAPP'],
-        template: 'reservation_approved',
-        data: {
+      await this.notificationService.sendApprovalApprovedNotification(
+        {
           userName: enrichedData.userName,
           resourceName: enrichedData.resourceName,
           approverName: enrichedData.approverName,
-          approverRole: data.approverRole,
-          reservationId: data.reservationId,
-          approvalId: data.approvalId,
+          approvalRequestId: data.approvalId,
+          reservationDate: enrichedData.startDate ? new Date(enrichedData.startDate) : new Date(),
           documentUrl: enrichedData.documentUrl,
-          qrCodeUrl: enrichedData.qrCodeUrl,
+          qrCode: enrichedData.qrCodeUrl,
         },
-        priority: 'HIGH',
-        attachments: data.documentId ? [
-          {
-            filename: `aprobacion_${data.reservationId}.pdf`,
-            path: enrichedData.documentUrl,
-          },
-        ] : undefined,
-      });
+        {
+          channels: [NotificationChannel.EMAIL, NotificationChannel.WHATSAPP],
+          priority: 'high',
+          includeDocument: !!data.documentId,
+        }
+      );
 
       // Programar recordatorios si aún no existen
       if (enrichedData.startDate && enrichedData.endDate) {
@@ -294,21 +292,19 @@ export class NotificationEventHandler {
       await this.reminderService.cancelReminders(data.reservationId);
 
       // Enviar notificación de rechazo
-      await this.notificationService.sendNotification({
-        userId: data.userId,
-        channels: ['EMAIL', 'IN_APP'],
-        template: 'reservation_rejected',
-        data: {
+      await this.notificationService.sendApprovalRejectedNotification(
+        {
           userName: enrichedData.userName,
           resourceName: enrichedData.resourceName,
-          rejectorName: enrichedData.rejectorName,
-          rejectorRole: data.rejectorRole,
-          reservationId: data.reservationId,
-          reason: data.reason,
-          suggestions: data.suggestions || 'Contacta con el administrador para más información',
+          rejectedBy: enrichedData.rejectorName,
+          rejectionReason: data.reason,
+          reservationDate: enrichedData.startDate ? new Date(enrichedData.startDate) : new Date(),
         },
-        priority: 'HIGH',
-      });
+        {
+          channels: [NotificationChannel.EMAIL],
+          priority: 'high',
+        }
+      );
 
       this.logger.log(`Reservation rejected notification sent: ${data.reservationId}`);
     } catch (error) {

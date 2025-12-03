@@ -1,7 +1,7 @@
 import { PaginationMeta } from "@libs/common";
 import { createLogger } from "@libs/common";
 import { IQueryHandler, QueryHandler } from "@nestjs/cqrs";
-import { ApprovalFlowEntity } from '@stockpile/domain/entities";
+import { ApprovalFlowEntity } from '@stockpile/domain/entities';
 import { GetApprovalFlowsQuery } from "../queries";
 import { ApprovalFlowService } from "../services";
 

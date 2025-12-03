@@ -69,8 +69,9 @@ export class ApprovalFlowService {
       params.steps,
       true, // Activo por defecto
       params.autoApproveConditions,
-      new Date(),
-      new Date(),
+      undefined, // metadata
+      new Date(), // createdAt
+      new Date(), // updatedAt
       {
         createdBy: params.createdBy || "system",
       }

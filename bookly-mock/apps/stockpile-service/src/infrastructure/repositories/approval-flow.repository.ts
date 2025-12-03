@@ -215,6 +215,7 @@ export class ApprovalFlowRepository implements IApprovalFlowRepository {
       doc.steps,
       doc.isActive,
       doc.autoApproveConditions,
+      doc.metadata,
       (doc as any).createdAt,
       (doc as any).updatedAt,
       {

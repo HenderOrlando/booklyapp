@@ -159,10 +159,14 @@ export class CheckInOutService {
 
   /**
    * Obtener check-ins activos con filtros opcionales
+   * Los filtros se aplican directamente en la consulta de base de datos
+   * para optimizar rendimiento y soportar paginación
    */
   async getActiveCheckIns(filters?: {
     resourceId?: string;
     userId?: string;
+    startDate?: Date;
+    endDate?: Date;
   }): Promise<CheckInOutEntity[]> {
     const query: any = { status: CheckInOutStatus.CHECKED_IN };
     
@@ -172,6 +176,17 @@ export class CheckInOutService {
     
     if (filters?.userId) {
       query.userId = new Types.ObjectId(filters.userId);
+    }
+
+    // Aplicar filtros de fecha directamente en la consulta de BD
+    if (filters?.startDate || filters?.endDate) {
+      query.checkInTime = {};
+      if (filters.startDate) {
+        query.checkInTime.$gte = filters.startDate;
+      }
+      if (filters.endDate) {
+        query.checkInTime.$lte = filters.endDate;
+      }
     }
 
     const docs = await this.model
