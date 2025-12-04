@@ -3,7 +3,7 @@ import { createLogger } from "@libs/common";
 import { Injectable } from "@nestjs/common";
 import { InjectModel } from "@nestjs/mongoose";
 import { Model } from "mongoose";
-import { UsageReport } from '@reports/infrastructure/schemas/usage-report.schema";
+import { UsageReport } from '@reports/infrastructure/schemas/usage-report.schema';
 
 const logger = createLogger("TrendAnalysisService");
 

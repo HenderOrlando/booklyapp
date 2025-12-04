@@ -2,7 +2,7 @@ import { createLogger } from "@libs/common";
 import { IQueryHandler, QueryHandler } from "@nestjs/cqrs";
 import { InjectModel } from "@nestjs/mongoose";
 import { Model } from "mongoose";
-import { ResourceCache } from '@reports/infrastructure/schemas/resource-cache.schema";
+import { ResourceCache } from '@reports/infrastructure/schemas/resource-cache.schema';
 import { GenerateUsageReportQuery } from "../queries";
 import { UsageReportService } from "../services";
 

@@ -1,5 +1,5 @@
 import { CommandHandler, ICommandHandler } from "@nestjs/cqrs";
-import { UserEntity } from '@auth/domain/entities/user.entity";
+import { UserEntity } from '@auth/domain/entities/user.entity';
 import { RegisterUserCommand } from "../commands/register-user.command";
 import { AuthService } from "../services/auth.service";
 

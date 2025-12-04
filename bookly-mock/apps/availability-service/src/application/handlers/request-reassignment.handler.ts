@@ -1,6 +1,6 @@
 import { Injectable } from "@nestjs/common";
 import { CommandHandler, ICommandHandler } from "@nestjs/cqrs";
-import { ReassignmentResponseDto } from '@availability/infrastructure/dtos/reassignment.dto";
+import { ReassignmentResponseDto } from '@availability/infrastructure/dtos/reassignment.dto';
 import { RequestReassignmentCommand } from "../commands/request-reassignment.command";
 import { ReassignmentService } from "../services/reassignment.service";
 

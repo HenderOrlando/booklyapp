@@ -8,7 +8,7 @@ import {
 import * as crypto from "crypto";
 import * as QRCode from "qrcode";
 import * as speakeasy from "speakeasy";
-import { IUserRepository } from '@auth/domain/repositories/user.repository.interface";
+import { IUserRepository } from '@auth/domain/repositories/user.repository.interface';
 
 export interface TwoFactorSetup {
   secret: string;

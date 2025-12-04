@@ -1,7 +1,7 @@
 import { CommandHandler, ICommandHandler } from "@nestjs/cqrs";
-import { UpdatePermissionCommand } from '@auth/application/commands/permissions/update-permission.command";
-import { PermissionResponseDto } from '@auth/application/dtos/permission/permission-response.dto";
-import { PermissionService } from '@auth/application/services/permission.service";
+import { UpdatePermissionCommand } from '@auth/application/commands/permissions/update-permission.command';
+import { PermissionResponseDto } from '@auth/application/dtos/permission/permission-response.dto';
+import { PermissionService } from '@auth/application/services/permission.service';
 
 /**
  * Handler para actualizar un permiso

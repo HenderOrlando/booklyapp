@@ -1,6 +1,6 @@
 import { PaginationMeta } from "@libs/common";
 import { IQueryHandler, QueryHandler } from "@nestjs/cqrs";
-import { UserEntity } from '@auth/domain/entities/user.entity";
+import { UserEntity } from '@auth/domain/entities/user.entity';
 import { GetUsersQuery } from "../queries/get-users.query";
 import { UserService } from "../services/user.service";
 

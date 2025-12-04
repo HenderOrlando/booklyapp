@@ -1,7 +1,7 @@
 import { CommandHandler, ICommandHandler } from "@nestjs/cqrs";
-import { UpdateRoleCommand } from '@auth/application/commands/roles/update-role.command";
-import { RoleResponseDto } from '@auth/application/dtos/role/role-response.dto";
-import { RoleService } from '@auth/application/services/role.service";
+import { UpdateRoleCommand } from '@auth/application/commands/roles/update-role.command';
+import { RoleResponseDto } from '@auth/application/dtos/role/role-response.dto';
+import { RoleService } from '@auth/application/services/role.service';
 
 /**
  * Handler para el command UpdateRole

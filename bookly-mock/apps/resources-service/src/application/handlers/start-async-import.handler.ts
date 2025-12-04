@@ -1,8 +1,8 @@
 import { ImportJobStatus } from "@libs/common/enums";
 import { createLogger } from "@libs/common";
 import { CommandHandler, ICommandHandler } from "@nestjs/cqrs";
-import { ImportJobEntity } from '@resources/domain/entities/import-job.entity";
-import { ImportJobRepository } from '@resources/infrastructure/repositories/import-job.repository";
+import { ImportJobEntity } from '@resources/domain/entities/import-job.entity';
+import { ImportJobRepository } from '@resources/infrastructure/repositories/import-job.repository';
 import { StartAsyncImportCommand } from "../commands/start-async-import.command";
 import { ImportResourcesHandler } from "./import-resources.handler";
 

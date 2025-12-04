@@ -3,9 +3,9 @@ import { PaginationMeta, PaginationQuery } from "@libs/common";
 import { createLogger } from "@libs/common";
 import { Injectable, NotFoundException } from "@nestjs/common";
 import { EventBusService } from "@libs/event-bus";
-import { MaintenanceEntity } from '@resources/domain/entities/maintenance.entity";
-import { IMaintenanceRepository } from '@resources/domain/repositories/maintenance.repository.interface";
-import { IResourceRepository } from '@resources/domain/repositories/resource.repository.interface";
+import { MaintenanceEntity } from '@resources/domain/entities/maintenance.entity';
+import { IMaintenanceRepository } from '@resources/domain/repositories/maintenance.repository.interface';
+import { IResourceRepository } from '@resources/domain/repositories/resource.repository.interface';
 
 /**
  * Maintenance Service

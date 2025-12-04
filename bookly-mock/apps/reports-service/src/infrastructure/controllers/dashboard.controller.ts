@@ -17,7 +17,7 @@ import {
   GetOccupancyMetricsQuery,
   GetResourceComparisonQuery,
   GetTrendAnalysisQuery,
-} from '@reports/application/queries/dashboard.queries";
+} from '@reports/application/queries/dashboard.queries';
 
 /**
  * Dashboard Controller

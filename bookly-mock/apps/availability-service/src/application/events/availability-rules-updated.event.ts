@@ -1,6 +1,6 @@
 import { EventType } from "@libs/common/enums";
 import { EventPayload } from "@libs/common";
-import { AvailabilityRulesDto } from '@availability/infrastructure/dtos/availability-rules.dto";
+import { AvailabilityRulesDto } from '@availability/infrastructure/dtos/availability-rules.dto';
 
 /**
  * Event payload when availability rules are updated in resources-service

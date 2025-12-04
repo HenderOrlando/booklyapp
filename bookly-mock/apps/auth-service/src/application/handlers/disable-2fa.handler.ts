@@ -1,7 +1,7 @@
 import { Inject } from "@nestjs/common";
 import { CommandHandler, EventBus, ICommandHandler } from "@nestjs/cqrs";
-import { TwoFactorDisabledEvent } from '@auth/domain/events/two-factor-disabled.event";
-import { IUserRepository } from '@auth/domain/repositories/user.repository.interface";
+import { TwoFactorDisabledEvent } from '@auth/domain/events/two-factor-disabled.event';
+import { IUserRepository } from '@auth/domain/repositories/user.repository.interface';
 import { Disable2FACommand } from "../commands/disable-2fa.command";
 import { TwoFactorService } from "../services/two-factor.service";
 
@@ -27,7 +27,9 @@ export class Disable2FAHandler implements ICommandHandler<Disable2FACommand> {
 
     if (user) {
       // Publicar evento de 2FA deshabilitado
-      this.eventBus.publish(new TwoFactorDisabledEvent(user.id, user.email));
+      this.eventBus.publish(
+        TwoFactorDisabledEvent.create({ userId: user.id, email: user.email })
+      );
     }
 
     return result;

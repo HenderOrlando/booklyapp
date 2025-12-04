@@ -1,5 +1,5 @@
 import { CommandHandler, ICommandHandler } from "@nestjs/cqrs";
-import { CategoryEntity } from '@resources/domain/entities/category.entity";
+import { CategoryEntity } from '@resources/domain/entities/category.entity';
 import { CreateCategoryCommand } from "../commands/create-category.command";
 import { CategoryService } from "../services/category.service";
 

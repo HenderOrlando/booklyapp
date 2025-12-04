@@ -1,7 +1,7 @@
 import { Injectable } from "@nestjs/common";
 import { IQueryHandler, QueryHandler } from "@nestjs/cqrs";
 import { IAuditQueryResult } from "@reports/audit-decorators";
-import { ReservationHistoryRepository } from '@availability/infrastructure/repositories/reservation-history.repository";
+import { ReservationHistoryRepository } from '@availability/infrastructure/repositories/reservation-history.repository';
 import { GetUserActivityQuery } from "../queries/get-user-activity.query";
 
 /**

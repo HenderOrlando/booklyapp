@@ -6,7 +6,7 @@ import { Model } from "mongoose";
 import {
   AuditEvent,
   AuditEventDocument,
-} from '@reports/infrastructure/schemas/audit-event.schema";
+} from '@reports/infrastructure/schemas/audit-event.schema';
 
 export interface AuditStatistics {
   totalEvents: number;

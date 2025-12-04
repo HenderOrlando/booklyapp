@@ -16,9 +16,9 @@ import {
 import { EventBus } from "@nestjs/cqrs";
 import { JwtService } from "@nestjs/jwt";
 import * as bcrypt from "bcrypt";
-import { UserEntity } from '@auth/domain/entities/user.entity";
-import { TwoFactorVerificationFailedEvent } from '@auth/domain/events/two-factor-verification-failed.event";
-import { IUserRepository } from '@auth/domain/repositories/user.repository.interface";
+import { UserEntity } from '@auth/domain/entities/user.entity';
+import { TwoFactorVerificationFailedEvent } from '@auth/domain/events/two-factor-verification-failed.event';
+import { IUserRepository } from '@auth/domain/repositories/user.repository.interface';
 
 export interface AuthTokens {
   accessToken: string;
@@ -219,11 +219,11 @@ export class AuthService {
 
         // Publicar evento de verificación fallida
         this.eventBus.publish(
-          new TwoFactorVerificationFailedEvent(
-            user.id,
-            user.email,
-            "invalid_backup_code"
-          )
+          TwoFactorVerificationFailedEvent.create({
+            userId: user.id,
+            email: user.email,
+            reason: "invalid_backup_code"
+          })
         );
 
         throw new UnauthorizedException("Invalid backup code");

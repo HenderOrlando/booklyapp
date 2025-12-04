@@ -3,8 +3,8 @@ import { createLogger } from "@libs/common";
 import { Injectable } from "@nestjs/common";
 import { InjectModel } from "@nestjs/mongoose";
 import { Model } from "mongoose";
-import { UserFeedbackEntity } from '@reports/domain/entities/user-feedback.entity";
-import { IFeedbackRepository } from '@reports/domain/repositories/feedback.repository.interface";
+import { UserFeedbackEntity } from '@reports/domain/entities/user-feedback.entity';
+import { IFeedbackRepository } from '@reports/domain/repositories/feedback.repository.interface';
 import { UserFeedback } from "../schemas/user-feedback.schema";
 
 const logger = createLogger("FeedbackRepository");

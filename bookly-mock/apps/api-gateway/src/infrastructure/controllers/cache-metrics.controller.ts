@@ -1,7 +1,7 @@
 import { ResponseUtil } from "@libs/common";
 import { Controller, Get, Param } from "@nestjs/common";
 import { ApiOperation, ApiParam, ApiResponse, ApiTags } from "@nestjs/swagger";
-import { CacheMetricsAggregatorService } from '@gateway/application/services/cache-metrics-aggregator.service";
+import { CacheMetricsAggregatorService } from '@gateway/application/services/cache-metrics-aggregator.service';
 
 /**
  * Cache Metrics Controller

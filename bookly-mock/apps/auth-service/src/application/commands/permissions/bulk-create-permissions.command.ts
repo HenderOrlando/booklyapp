@@ -1,4 +1,4 @@
-import { CreatePermissionDto } from '@auth/application/dtos/permission/create-permission.dto";
+import { CreatePermissionDto } from '@auth/application/dtos/permission/create-permission.dto';
 
 /**
  * Command para crear múltiples permisos

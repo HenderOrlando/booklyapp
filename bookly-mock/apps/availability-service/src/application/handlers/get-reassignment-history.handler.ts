@@ -1,7 +1,7 @@
 import { Injectable } from "@nestjs/common";
 import { IQueryHandler, QueryHandler } from "@nestjs/cqrs";
-import { ReassignmentHistoryRepository } from '@availability/infrastructure/repositories/reassignment-history.repository";
-import { ReassignmentHistory } from '@availability/infrastructure/schemas/reassignment-history.schema";
+import { ReassignmentHistoryRepository } from '@availability/infrastructure/repositories/reassignment-history.repository';
+import { ReassignmentHistory } from '@availability/infrastructure/schemas/reassignment-history.schema';
 import { GetReassignmentHistoryQuery } from "../queries/get-reassignment-history.query";
 
 /**

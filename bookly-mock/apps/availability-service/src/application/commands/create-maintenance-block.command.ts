@@ -1,4 +1,4 @@
-import { CreateMaintenanceBlockDto } from '@availability/infrastructure/dtos/maintenance-block.dto";
+import { CreateMaintenanceBlockDto } from '@availability/infrastructure/dtos/maintenance-block.dto';
 
 /**
  * Command para crear bloqueo por mantenimiento

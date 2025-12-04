@@ -4,8 +4,8 @@ import { createLogger } from "@libs/common";
 import { Injectable } from "@nestjs/common";
 import { InjectModel } from "@nestjs/mongoose";
 import { Model } from "mongoose";
-import { RoleEntity } from '@auth/domain/entities/role.entity";
-import { IRoleRepository } from '@auth/domain/repositories/role.repository.interface";
+import { RoleEntity } from '@auth/domain/entities/role.entity';
+import { IRoleRepository } from '@auth/domain/repositories/role.repository.interface';
 import { Role, RoleDocument } from "../schemas/role.schema";
 
 /**

@@ -25,7 +25,7 @@ import {
   CreateEvaluationCommand,
   DeleteEvaluationCommand,
   UpdateEvaluationCommand,
-} from '@reports/application/commands/evaluation.commands";
+} from '@reports/application/commands/evaluation.commands';
 import {
   GetEvaluationByIdQuery,
   GetEvaluationsByPeriodQuery,
@@ -35,7 +35,7 @@ import {
   GetPriorityUsersQuery,
   GetUserEvaluationsQuery,
   GetUserEvaluationStatisticsQuery,
-} from '@reports/application/queries/evaluation.queries";
+} from '@reports/application/queries/evaluation.queries';
 import {
   CreateEvaluationDto,
   EvaluationPeriodQueryDto,

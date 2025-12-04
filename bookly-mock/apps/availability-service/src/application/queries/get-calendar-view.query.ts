@@ -1,4 +1,4 @@
-import { CalendarViewDto } from '@availability/infrastructure/dtos/calendar-view.dto";
+import { CalendarViewDto } from '@availability/infrastructure/dtos/calendar-view.dto';
 
 /**
  * Query para obtener vista de calendario

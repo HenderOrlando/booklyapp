@@ -1,14 +1,14 @@
 import { Inject, Injectable, Logger, NotFoundException } from "@nestjs/common";
 import { EventBus } from "@nestjs/cqrs";
 import { Types } from "mongoose";
-import { IReservationRepository } from '@availability/domain/repositories/reservation.repository.interface";
+import { IReservationRepository } from '@availability/domain/repositories/reservation.repository.interface';
 import {
   ReassignmentResponseDto,
   RequestReassignmentDto,
   ResourceAlternativeDto,
   SimilarityWeightsDto,
-} from '@availability/infrastructure/dtos/reassignment.dto";
-import { ReassignmentHistoryRepository } from '@availability/infrastructure/repositories/reassignment-history.repository";
+} from '@availability/infrastructure/dtos/reassignment.dto';
+import { ReassignmentHistoryRepository } from '@availability/infrastructure/repositories/reassignment-history.repository';
 import {
   ResourceForScoring,
   ResourceSimilarityService,

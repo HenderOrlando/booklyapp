@@ -34,7 +34,7 @@ import {
   ModifyRecurringInstanceCommand,
   UpdateRecurringSeriesCommand,
   UpdateReservationCommand,
-} from '@availability/application/commands";
+} from '@availability/application/commands';
 import {
   GetRecurringAnalyticsQuery,
   GetRecurringSeriesQuery,
@@ -42,8 +42,8 @@ import {
   GetReservationsQuery,
   GetUserRecurringReservationsQuery,
   PreviewRecurringSeriesQuery,
-} from '@availability/application/queries";
-import { CalendarExportService } from '@availability/application/services/calendar-export.service";
+} from '@availability/application/queries';
+import { CalendarExportService } from '@availability/application/services/calendar-export.service';
 import {
   CancelInstanceDto,
   CancelRecurringSeriesDto,

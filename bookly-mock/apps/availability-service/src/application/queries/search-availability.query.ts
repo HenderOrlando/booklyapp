@@ -1,4 +1,4 @@
-import { SearchAvailabilityDto } from '@availability/infrastructure/dtos/search-availability.dto";
+import { SearchAvailabilityDto } from '@availability/infrastructure/dtos/search-availability.dto';
 
 /**
  * Query to search available slots with advanced filters

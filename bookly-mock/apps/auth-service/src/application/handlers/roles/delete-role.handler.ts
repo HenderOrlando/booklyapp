@@ -1,6 +1,6 @@
 import { CommandHandler, ICommandHandler } from "@nestjs/cqrs";
-import { DeleteRoleCommand } from '@auth/application/commands/roles/delete-role.command";
-import { RoleService } from '@auth/application/services/role.service";
+import { DeleteRoleCommand } from '@auth/application/commands/roles/delete-role.command';
+import { RoleService } from '@auth/application/services/role.service';
 
 /**
  * Handler para el command DeleteRole

@@ -2,7 +2,7 @@ import { ImportJobStatus } from "@libs/common/enums";
 import { Injectable } from "@nestjs/common";
 import { InjectModel } from "@nestjs/mongoose";
 import { Model } from "mongoose";
-import { ImportJobEntity } from '@resources/domain/entities/import-job.entity";
+import { ImportJobEntity } from '@resources/domain/entities/import-job.entity';
 import { ImportJob, ImportJobDocument } from "../schemas/import-job.schema";
 
 /**

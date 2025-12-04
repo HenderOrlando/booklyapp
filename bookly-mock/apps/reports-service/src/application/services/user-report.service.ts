@@ -1,8 +1,8 @@
 import { PaginationMeta, PaginationQuery } from "@libs/common";
 import { createLogger } from "@libs/common";
 import { Inject, Injectable, NotFoundException } from "@nestjs/common";
-import { UserReportEntity } from '@reports/domain/entities";
-import { IUserReportRepository } from '@reports/domain/repositories";
+import { UserReportEntity } from '@reports/domain/entities';
+import { IUserReportRepository } from '@reports/domain/repositories';
 
 /**
  * User Report Service

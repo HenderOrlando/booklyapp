@@ -6,9 +6,9 @@ import { PermissionsGuard } from "@libs/guards/permissions.guard";
 import { Body, Controller, Get, Post, Query, UseGuards } from "@nestjs/common";
 import { CommandBus, QueryBus } from "@nestjs/cqrs";
 import { ApiOperation, ApiResponse, ApiTags } from "@nestjs/swagger";
-import { RequestReassignmentCommand } from '@availability/application/commands/request-reassignment.command";
-import { RespondReassignmentCommand } from '@availability/application/commands/respond-reassignment.command";
-import { GetReassignmentHistoryQuery } from '@availability/application/queries/get-reassignment-history.query";
+import { RequestReassignmentCommand } from '@availability/application/commands/request-reassignment.command';
+import { RespondReassignmentCommand } from '@availability/application/commands/respond-reassignment.command';
+import { GetReassignmentHistoryQuery } from '@availability/application/queries/get-reassignment-history.query';
 import {
   GetReassignmentHistoryDto,
   ReassignmentHistoryResponseDto,

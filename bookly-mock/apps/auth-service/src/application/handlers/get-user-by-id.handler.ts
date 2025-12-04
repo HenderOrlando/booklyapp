@@ -1,5 +1,5 @@
 import { IQueryHandler, QueryHandler } from "@nestjs/cqrs";
-import { UserEntity } from '@auth/domain/entities/user.entity";
+import { UserEntity } from '@auth/domain/entities/user.entity';
 import { GetUserByIdQuery } from "../queries/get-user-by-id.query";
 import { UserService } from "../services/user.service";
 

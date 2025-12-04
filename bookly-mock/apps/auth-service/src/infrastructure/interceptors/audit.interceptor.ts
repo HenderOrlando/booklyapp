@@ -8,7 +8,7 @@ import {
 import { Reflector } from "@nestjs/core";
 import { Observable, throwError } from "rxjs";
 import { catchError, tap } from "rxjs/operators";
-import { AuditService } from '@auth/application/services/audit.service";
+import { AuditService } from '@auth/application/services/audit.service';
 import {
   AUDIT_ACTION_KEY,
   AuditMetadata,

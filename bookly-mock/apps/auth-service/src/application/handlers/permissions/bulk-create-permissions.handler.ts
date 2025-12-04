@@ -1,7 +1,7 @@
 import { CommandHandler, ICommandHandler } from "@nestjs/cqrs";
-import { BulkCreatePermissionsCommand } from '@auth/application/commands/permissions/bulk-create-permissions.command";
-import { PermissionResponseDto } from '@auth/application/dtos/permission/permission-response.dto";
-import { PermissionService } from '@auth/application/services/permission.service";
+import { BulkCreatePermissionsCommand } from '@auth/application/commands/permissions/bulk-create-permissions.command';
+import { PermissionResponseDto } from '@auth/application/dtos/permission/permission-response.dto';
+import { PermissionService } from '@auth/application/services/permission.service';
 
 /**
  * Handler para crear múltiples permisos

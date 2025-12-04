@@ -2,8 +2,8 @@ import { UserRole } from "@libs/common/enums";
 import { PaginationMeta, PaginationQuery } from "@libs/common";
 import { createLogger } from "@libs/common";
 import { Inject, Injectable, NotFoundException } from "@nestjs/common";
-import { UserEntity } from '@auth/domain/entities/user.entity";
-import { IUserRepository } from '@auth/domain/repositories/user.repository.interface";
+import { UserEntity } from '@auth/domain/entities/user.entity';
+import { IUserRepository } from '@auth/domain/repositories/user.repository.interface';
 
 /**
  * User Service
