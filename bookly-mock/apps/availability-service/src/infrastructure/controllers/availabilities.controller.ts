@@ -18,12 +18,12 @@ import {
   ApiResponse,
   ApiTags,
 } from "@nestjs/swagger";
-import { CreateAvailabilityCommand } from '@availability/application/commands";
+import { CreateAvailabilityCommand } from '@availability/application/commands';
 import {
   CheckAvailabilityQuery,
   GetAvailabilitiesQuery,
   SearchAvailabilityQuery,
-} from '@availability/application/queries";
+} from '@availability/application/queries';
 import {
   CheckAvailabilityDto,
   CreateAvailabilityDto,

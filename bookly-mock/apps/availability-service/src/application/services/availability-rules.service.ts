@@ -4,8 +4,8 @@ import { Injectable } from "@nestjs/common";
 import {
   AvailabilityRulesDto,
   ValidationResultDto,
-} from '@availability/infrastructure/dtos/availability-rules.dto";
-import { CreateReservationDto } from '@availability/infrastructure/dtos/create-reservation.dto";
+} from '@availability/infrastructure/dtos/availability-rules.dto';
+import { CreateReservationDto } from '@availability/infrastructure/dtos/create-reservation.dto';
 
 /**
  * Service for managing and validating availability rules

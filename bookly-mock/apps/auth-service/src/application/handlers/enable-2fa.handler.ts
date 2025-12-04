@@ -1,7 +1,7 @@
 import { Inject } from "@nestjs/common";
 import { CommandHandler, EventBus, ICommandHandler } from "@nestjs/cqrs";
-import { TwoFactorEnabledEvent } from '@auth/domain/events/two-factor-enabled.event";
-import { IUserRepository } from '@auth/domain/repositories/user.repository.interface";
+import { TwoFactorEnabledEvent } from '@auth/domain/events/two-factor-enabled.event';
+import { IUserRepository } from '@auth/domain/repositories/user.repository.interface';
 import { Enable2FACommand } from "../commands/enable-2fa.command";
 import { TwoFactorService } from "../services/two-factor.service";
 
@@ -31,7 +31,9 @@ export class Enable2FAHandler implements ICommandHandler<Enable2FACommand> {
 
     if (user) {
       // Publicar evento de 2FA habilitado
-      this.eventBus.publish(new TwoFactorEnabledEvent(user.id, user.email));
+      this.eventBus.publish(
+        TwoFactorEnabledEvent.create({ userId: user.id, email: user.email })
+      );
     }
 
     return result;

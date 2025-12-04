@@ -1,13 +1,13 @@
 import { CalendarViewType, SlotStatus } from "@libs/common/enums";
 import { Inject, Injectable } from "@nestjs/common";
-import { IAvailabilityRepository } from '@availability/domain/repositories/availability.repository.interface";
-import { IReservationRepository } from '@availability/domain/repositories/reservation.repository.interface";
+import { IAvailabilityRepository } from '@availability/domain/repositories/availability.repository.interface';
+import { IReservationRepository } from '@availability/domain/repositories/reservation.repository.interface';
 import {
   CalendarLegendDto,
   CalendarSlotDto,
   CalendarViewDto,
   CalendarViewResponseDto,
-} from '@availability/infrastructure/dtos/calendar-view.dto";
+} from '@availability/infrastructure/dtos/calendar-view.dto';
 import { SlotColorService } from "./slot-color.service";
 
 /**

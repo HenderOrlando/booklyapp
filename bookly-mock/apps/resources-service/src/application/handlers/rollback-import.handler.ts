@@ -1,9 +1,9 @@
 import { ImportJobStatus } from "@libs/common/enums";
 import { createLogger } from "@libs/common";
 import { CommandHandler, ICommandHandler } from "@nestjs/cqrs";
-import { RollbackResultDto } from '@resources/infrastructure/dto/import-advanced.dto";
-import { ImportJobRepository } from '@resources/infrastructure/repositories/import-job.repository";
-import { ResourceRepository } from '@resources/infrastructure/repositories/resource.repository";
+import { RollbackResultDto } from '@resources/infrastructure/dto/import-advanced.dto';
+import { ImportJobRepository } from '@resources/infrastructure/repositories/import-job.repository';
+import { ResourceRepository } from '@resources/infrastructure/repositories/resource.repository';
 import { RollbackImportCommand } from "../commands/rollback-import.command";
 
 /**

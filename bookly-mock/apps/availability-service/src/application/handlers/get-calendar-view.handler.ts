@@ -1,6 +1,6 @@
 import { Injectable } from "@nestjs/common";
 import { IQueryHandler, QueryHandler } from "@nestjs/cqrs";
-import { CalendarViewResponseDto } from '@availability/infrastructure/dtos/calendar-view.dto";
+import { CalendarViewResponseDto } from '@availability/infrastructure/dtos/calendar-view.dto';
 import { GetCalendarViewQuery } from "../queries/get-calendar-view.query";
 import { CalendarViewService } from "../services/calendar-view.service";
 

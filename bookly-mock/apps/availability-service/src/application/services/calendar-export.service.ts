@@ -2,7 +2,7 @@ import { CalendarEvent, ICalGenerator } from "@libs/common";
 import { Injectable, Logger, NotFoundException } from "@nestjs/common";
 import { InjectModel } from "@nestjs/mongoose";
 import { Model } from "mongoose";
-import { Reservation } from '@availability/infrastructure/schemas";
+import { Reservation } from '@availability/infrastructure/schemas';
 
 /**
  * Calendar Export Service

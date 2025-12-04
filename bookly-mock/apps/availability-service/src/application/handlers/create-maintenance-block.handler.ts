@@ -1,7 +1,7 @@
 import { BadRequestException, Injectable } from "@nestjs/common";
 import { CommandHandler, ICommandHandler } from "@nestjs/cqrs";
-import { MaintenanceBlockRepository } from '@availability/infrastructure/repositories/maintenance-block.repository";
-import { MaintenanceBlock } from '@availability/infrastructure/schemas/maintenance-block.schema";
+import { MaintenanceBlockRepository } from '@availability/infrastructure/repositories/maintenance-block.repository';
+import { MaintenanceBlock } from '@availability/infrastructure/schemas/maintenance-block.schema';
 import { CreateMaintenanceBlockCommand } from "../commands/create-maintenance-block.command";
 
 /**

@@ -19,8 +19,8 @@ import {
   CompleteMaintenanceCommand,
   ScheduleMaintenanceCommand,
   StartMaintenanceCommand,
-} from '@resources/application/commands";
-import { GetMaintenancesQuery } from '@resources/application/queries";
+} from '@resources/application/commands';
+import { GetMaintenancesQuery } from '@resources/application/queries';
 import { ScheduleMaintenanceDto } from "../dto";
 
 /**

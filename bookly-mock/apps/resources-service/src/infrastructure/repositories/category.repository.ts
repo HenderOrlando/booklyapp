@@ -4,8 +4,8 @@ import { createLogger } from "@libs/common";
 import { Injectable } from "@nestjs/common";
 import { InjectModel } from "@nestjs/mongoose";
 import { Model } from "mongoose";
-import { CategoryEntity } from '@resources/domain/entities/category.entity";
-import { ICategoryRepository } from '@resources/domain/repositories/category.repository.interface";
+import { CategoryEntity } from '@resources/domain/entities/category.entity';
+import { ICategoryRepository } from '@resources/domain/repositories/category.repository.interface';
 import { Category, CategoryDocument } from "../schemas/category.schema";
 
 /**

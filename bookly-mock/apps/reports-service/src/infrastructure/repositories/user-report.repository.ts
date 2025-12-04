@@ -2,8 +2,8 @@ import { PaginationMeta, PaginationQuery } from "@libs/common";
 import { Injectable } from "@nestjs/common";
 import { InjectModel } from "@nestjs/mongoose";
 import { Model, Types } from "mongoose";
-import { UserReportEntity } from '@reports/domain/entities";
-import { IUserReportRepository } from '@reports/domain/repositories";
+import { UserReportEntity } from '@reports/domain/entities';
+import { IUserReportRepository } from '@reports/domain/repositories';
 import { UserReport } from "../schemas";
 
 @Injectable()

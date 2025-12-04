@@ -1,7 +1,7 @@
 import { CommandHandler, ICommandHandler } from "@nestjs/cqrs";
-import { CreatePermissionCommand } from '@auth/application/commands/permissions/create-permission.command";
-import { PermissionResponseDto } from '@auth/application/dtos/permission/permission-response.dto";
-import { PermissionService } from '@auth/application/services/permission.service";
+import { CreatePermissionCommand } from '@auth/application/commands/permissions/create-permission.command';
+import { PermissionResponseDto } from '@auth/application/dtos/permission/permission-response.dto';
+import { PermissionService } from '@auth/application/services/permission.service';
 
 /**
  * Handler para crear un permiso

@@ -3,8 +3,8 @@ import { PaginationMeta, PaginationQuery } from "@libs/common";
 import { Injectable } from "@nestjs/common";
 import { InjectModel } from "@nestjs/mongoose";
 import { Model, Types } from "mongoose";
-import { AvailabilityEntity } from '@availability/domain/entities/availability.entity";
-import { IAvailabilityRepository } from '@availability/domain/repositories/availability.repository.interface";
+import { AvailabilityEntity } from '@availability/domain/entities/availability.entity';
+import { IAvailabilityRepository } from '@availability/domain/repositories/availability.repository.interface';
 import {
   Availability,
   AvailabilityDocument,

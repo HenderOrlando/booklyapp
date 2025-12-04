@@ -1,7 +1,7 @@
 import { CommandHandler, ICommandHandler } from "@nestjs/cqrs";
-import { AssignPermissionsCommand } from '@auth/application/commands/roles/assign-permissions.command";
-import { RoleResponseDto } from '@auth/application/dtos/role/role-response.dto";
-import { RoleService } from '@auth/application/services/role.service";
+import { AssignPermissionsCommand } from '@auth/application/commands/roles/assign-permissions.command';
+import { RoleResponseDto } from '@auth/application/dtos/role/role-response.dto';
+import { RoleService } from '@auth/application/services/role.service';
 
 /**
  * Handler para asignar permisos a un rol

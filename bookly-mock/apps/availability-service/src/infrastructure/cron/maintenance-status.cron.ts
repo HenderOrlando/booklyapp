@@ -2,7 +2,7 @@ import { MaintenanceStatus } from "@libs/common/enums";
 import { Injectable, Logger } from "@nestjs/common";
 import { Cron, CronExpression } from "@nestjs/schedule";
 import { Types } from "mongoose";
-import { MaintenanceNotificationService } from '@availability/application/services/maintenance-notification.service";
+import { MaintenanceNotificationService } from '@availability/application/services/maintenance-notification.service';
 import { MaintenanceBlockRepository } from "../repositories/maintenance-block.repository";
 import { MaintenanceBlock } from "../schemas/maintenance-block.schema";
 

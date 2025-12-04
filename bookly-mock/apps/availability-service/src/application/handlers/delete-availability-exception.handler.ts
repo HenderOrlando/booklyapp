@@ -1,6 +1,6 @@
 import { Injectable, NotFoundException } from "@nestjs/common";
 import { CommandHandler, ICommandHandler } from "@nestjs/cqrs";
-import { AvailabilityExceptionRepository } from '@availability/infrastructure/repositories/availability-exception.repository";
+import { AvailabilityExceptionRepository } from '@availability/infrastructure/repositories/availability-exception.repository';
 import { DeleteAvailabilityExceptionCommand } from "../commands/delete-availability-exception.command";
 
 /**

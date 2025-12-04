@@ -19,9 +19,9 @@ import {
 import {
   LogFilterDto,
   NotificationDto,
-} from '@gateway/application/dto/websocket.dto";
-import { LogStreamingService } from '@gateway/application/services/log-streaming.service";
-import { NotificationService } from '@gateway/application/services/notification.service";
+} from '@gateway/application/dto/websocket.dto';
+import { LogStreamingService } from '@gateway/application/services/log-streaming.service';
+import { NotificationService } from '@gateway/application/services/notification.service';
 
 @ApiTags("Notifications & Logs")
 @Controller("notifications")

@@ -1,5 +1,5 @@
 import { IQueryHandler, QueryHandler } from "@nestjs/cqrs";
-import { SearchAvailabilityResponseDto } from '@availability/infrastructure/dtos/search-availability.dto";
+import { SearchAvailabilityResponseDto } from '@availability/infrastructure/dtos/search-availability.dto';
 import { SearchAvailabilityQuery } from "../queries/search-availability.query";
 import { AvailabilityService } from "../services/availability.service";
 

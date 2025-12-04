@@ -1,6 +1,6 @@
 import { PaginationMeta } from "@libs/common";
 import { IQueryHandler, QueryHandler } from "@nestjs/cqrs";
-import { MaintenanceEntity } from '@resources/domain/entities/maintenance.entity";
+import { MaintenanceEntity } from '@resources/domain/entities/maintenance.entity';
 import { GetMaintenancesQuery } from "../queries/get-maintenances.query";
 import { MaintenanceService } from "../services/maintenance.service";
 

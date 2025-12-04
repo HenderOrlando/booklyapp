@@ -1,9 +1,9 @@
 import { ImportResourceMode, ResourceType } from "@libs/common/enums";
 import { createLogger } from "@libs/common";
 import { Injectable } from "@nestjs/common";
-import { ResourceEntity } from '@resources/domain/entities/resource.entity";
-import { ICategoryRepository } from '@resources/domain/repositories/category.repository.interface";
-import { IResourceRepository } from '@resources/domain/repositories/resource.repository.interface";
+import { ResourceEntity } from '@resources/domain/entities/resource.entity';
+import { ICategoryRepository } from '@resources/domain/repositories/category.repository.interface';
+import { IResourceRepository } from '@resources/domain/repositories/resource.repository.interface';
 
 /**
  * DTO para resultado de importación
