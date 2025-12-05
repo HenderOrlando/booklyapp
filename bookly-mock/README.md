@@ -20,6 +20,13 @@ Toda la documentación está organizada y disponible en el índice maestro:
 - **[🔗 Guías de Integración](./docs/INDEX.md#guías-de-integración)** - OAuth, calendarios, eventos
 - **[📜 Documentación Histórica](./docs/INDEX.md#documentación-histórica)** - Migraciones, refactorings
 
+### Guías Rápidas
+
+- **[🐛 Debugging](./docs/DEBUG_README.md)** - Configuración de debug en VS Code
+- **[🔄 Idempotencia](./docs/IDEMPOTENCY_README.md)** - Guía de uso de idempotencia y distributed tracing
+- **[▶️ Ejecutar Servicios](./docs/RUNNING_SERVICES.md)** - Comandos para iniciar microservicios
+- **[🤝 Contribuir](./docs/CONTRIBUTING.md)** - Guía de contribución al proyecto
+
 ## 🏗️ Architecture
 
 ### Microservices
@@ -170,22 +177,24 @@ npm test -- apps/auth-service
 
 ```
 bookly-mock/
-├── apps/                          # Microservices
+├── apps/                         # Microservices
 │   ├── api-gateway/              # Central gateway
 │   ├── auth-service/             # Authentication & Authorization
 │   ├── resources-service/        # Resource management
 │   ├── availability-service/     # Reservations & Availability
 │   ├── stockpile-service/        # Approvals & Workflows
 │   └── reports-service/          # Analytics & Reports
-├── libs/                          # Shared libraries
+├── libs/                         # Shared libraries
 │   ├── common/                   # Common utilities
 │   ├── database/                 # MongoDB connection
-│   ├── kafka/                    # Event bus
+│   ├── event-bus/                # Event bus (RabbitMQ/Kafka)
 │   ├── redis/                    # Cache layer
-│   ├── dto/                      # Shared DTOs
+│   ├── idempotency/              # Idempotency & distributed tracing
 │   ├── guards/                   # Auth guards
 │   ├── decorators/               # Custom decorators
 │   └── filters/                  # Exception filters
+├── docs/                         # Comprehensive documentation
+├── scripts/                      # Utility scripts
 ├── docker-compose.yml            # Infrastructure
 ├── package.json                  # Dependencies
 └── README.md                     # This file

@@ -49,7 +49,21 @@
     "validate:seeds": "npm run validate:seed:ids && npm run validate:seed:relations && npm run validate:seed:audit",
     "validate:seed:ids": "ts-node -r tsconfig-paths/register scripts/validate-seed-ids.ts",
     "validate:seed:relations": "ts-node -r tsconfig-paths/register scripts/validate-seed-relations.ts",
-    "validate:seed:audit": "ts-node -r tsconfig-paths/register scripts/validate-seed-audit.ts"
+    "validate:seed:audit": "ts-node -r tsconfig-paths/register scripts/validate-seed-audit.ts",
+    "script:fix-imports-syntax": "node scripts/fix-imports-syntax.js",
+    "script:fix-imports-paths": "bash scripts/fix-imports-paths.sh",
+    "script:fix-imports": "ts-node scripts/fix-imports.ts",
+    "script:fix-tsconfig": "bash scripts/fix-tsconfig-rootdir.sh",
+    "script:start-all": "bash scripts/start-all-services.sh",
+    "script:start-prod": "bash scripts/start-all-prod.sh",
+    "script:test-websocket": "ts-node scripts/test-websocket-client.ts",
+    "script:seed-events": "ts-node scripts/seed-events-for-replay.ts",
+    "script:test-pagination": "ts-node -r tsconfig-paths/register scripts/check-pagination.ts",
+    "script:verify-dlq": "bash scripts/verify-dlq-fix.sh",
+    "script:verify-eventbus": "bash scripts/verify-event-bus-integration.sh",
+    "script:test-eventbus": "bash scripts/test-event-bus.sh",
+    "script:test-event-replay": "bash scripts/test-event-replay.sh",
+    "script:start-brokers": "bash scripts/start-event-brokers.sh"
   },
   "dependencies": {
     "@azure/msal-node": "^3.8.1",

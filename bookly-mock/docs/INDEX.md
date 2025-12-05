@@ -3,9 +3,11 @@
 ## 📚 Navegación Rápida
 
 - [Microservicios](#microservicios)
-- [Documentación Técnica](#documentación-técnica)
-- [Guías de Integración](#guías-de-integración)
-- [Configuración y Deploy](#configuración-y-deploy)
+- [Desarrollo](#desarrollo)
+- [Arquitectura](#arquitectura)
+- [API](#api)
+- [Implementación](#implementación)
+- [Testing](#testing)
 - [Documentación Histórica](#documentación-histórica)
 
 ---
@@ -95,224 +97,168 @@
 
 ---
 
-## 📖 Documentación Técnica
+## 💻 Desarrollo
 
-### Arquitectura y Configuración
+Guías para desarrollo, debugging y ejecución de servicios.
 
-#### [API_SWAGGER_DOCUMENTATION.md](./API_SWAGGER_DOCUMENTATION.md)
-
-Documentación completa de Swagger para todas las APIs
-
-#### [ESM_CONFIGURATION.md](./ESM_CONFIGURATION.md)
-
-Configuración de módulos ES (ESM) en el proyecto
-
-#### [ESM_VERIFICATION_REPORT.md](./ESM_VERIFICATION_REPORT.md)
-
-Reporte de verificación de módulos ESM
-
-#### [RUNTIME_PATH_ALIASES.md](./RUNTIME_PATH_ALIASES.md)
-
-Configuración de path aliases en runtime
-
-### Implementación y Testing
-
-#### [ESTADO_PROYECTO.md](./ESTADO_PROYECTO.md)
-
-Estado actual del proyecto y roadmap
-
-#### [TESTING_STATUS.md](./TESTING_STATUS.md)
-
-Estado de testing y cobertura
-
-#### [ERROR_RESOLUTION_REPORT.md](./ERROR_RESOLUTION_REPORT.md)
-
-Reporte de resolución de errores
-
-### Debugging y Desarrollo
-
-#### [DEBUG_QUICK_START.md](./DEBUG_QUICK_START.md) ⚡
-
-**Guía rápida de inicio** para debugging de microservicios  
-Configuraciones VS Code listas para usar en 3 pasos
-
-#### [DEBUG_SETUP.md](./DEBUG_SETUP.md) 🔧
-
-**Documentación completa de debugging**  
-Configuraciones, troubleshooting y mejores prácticas
-
-### Observabilidad
-
-#### [AUDIT_DASHBOARD_SPEC.md](./AUDIT_DASHBOARD_SPEC.md)
-
-Especificación del dashboard de auditoría
-
-#### [CACHE_METRICS_IMPLEMENTATION.md](./CACHE_METRICS_IMPLEMENTATION.md)
-
-Implementación de métricas de cache
-
-#### [WEBSOCKET_REALTIME.md](./WEBSOCKET_REALTIME.md)
-
-Implementación de WebSockets y comunicación en tiempo real
+- **[DEBUG_README.md](./development/DEBUG_README.md)** - Resumen de configuración de debugging
+- **[DEBUG_QUICK_START.md](./development/DEBUG_QUICK_START.md)** ⚡ - Inicio rápido de debugging en VS Code
+- **[DEBUG_SETUP.md](./development/DEBUG_SETUP.md)** 🔧 - Guía completa de debugging
+- **[RUNNING_SERVICES.md](./development/RUNNING_SERVICES.md)** - Comandos para ejecutar servicios
+- **[CONTRIBUTING.md](./development/CONTRIBUTING.md)** - Guía de contribución
+- **[MIGRATION_GUIDE_REORGANIZATION.md](./development/MIGRATION_GUIDE_REORGANIZATION.md)** 🔄 - Guía de migración tras reorganización
 
 ---
 
-## 🔗 Guías de Integración
+## 🏗️ Arquitectura
 
-### [INTEGRATION_GUIDE.md](./INTEGRATION_GUIDE.md)
+Documentación de arquitectura, configuración y estado del proyecto.
 
-Guía completa de integración entre microservicios
-
-### OAuth y Autenticación
-
-#### [OAUTH_MIGRATION_GUIDE.md](./OAUTH_MIGRATION_GUIDE.md)
-
-Guía de migración OAuth
-
-#### [OAUTH_MIGRATION_COMPLETE.md](./OAUTH_MIGRATION_COMPLETE.md)
-
-Migración OAuth completada
-
-#### [OAUTH_COMPILATION_REPORT.md](./OAUTH_COMPILATION_REPORT.md)
-
-Reporte de compilación OAuth
-
-#### [OAUTH_CLEANUP_REPORT.md](./OAUTH_CLEANUP_REPORT.md)
-
-Limpieza y optimización OAuth
-
-### Calendar Integration
-
-#### [MIGRACION_CALENDAR_OAUTH_EVENT_DRIVEN_PENDDING.md](./MIGRACION_CALENDAR_OAUTH_EVENT_DRIVEN_PENDDING.md)
-
-Migración pendiente de Calendar OAuth con Event-Driven
+- **[ESTADO_PROYECTO.md](./architecture/ESTADO_PROYECTO.md)** - Estado actual y roadmap
+- **[ORGANIZATION_SUMMARY.md](./architecture/ORGANIZATION_SUMMARY.md)** - Resumen organizativo
+- **[ESM_CONFIGURATION.md](./architecture/ESM_CONFIGURATION.md)** - Configuración de módulos ES
+- **[ESM_VERIFICATION_REPORT.md](./architecture/ESM_VERIFICATION_REPORT.md)** - Verificación de ESM
+- **[MONGODB_CONFIGURATION.md](./architecture/MONGODB_CONFIGURATION.md)** - Configuración de MongoDB
+- **[EVENTBUS_RABBITMQ_CONFIG.md](./architecture/EVENTBUS_RABBITMQ_CONFIG.md)** - Configuración de RabbitMQ
 
 ---
 
-## ⚙️ Configuración y Deploy
+## 📡 API
 
-### [STOCKPILE_SERVICE_IMPLEMENTATION_PLAN.md](./STOCKPILE_SERVICE_IMPLEMENTATION_PLAN.md)
+Documentación de APIs, estándares de respuesta y Swagger.
 
-Plan de implementación del Stockpile Service
+- **[API_DOCUMENTATION_STATUS.md](./api/API_DOCUMENTATION_STATUS.md)** - Estado de documentación de APIs
+- **[API_RESPONSE_STANDARD.md](./api/API_RESPONSE_STANDARD.md)** - Estándar de respuestas API
+- **[API_SWAGGER_DOCUMENTATION.md](./api/API_SWAGGER_DOCUMENTATION.md)** - Documentación Swagger
+- **[RESPONSE_STANDARD_SUMMARY.md](./api/RESPONSE_STANDARD_SUMMARY.md)** - Resumen del estándar
+- **[RESPONSE_UTIL_USAGE_EXAMPLES.md](./api/RESPONSE_UTIL_USAGE_EXAMPLES.md)** - Ejemplos de uso
 
-### Verificación de Plantillas
+---
 
-#### [VERIFICACION_PLANTILLAS_API_GATEWAY.md](./VERIFICACION_PLANTILLAS_API_GATEWAY.md)
+## 🔨 Implementación
 
-Verificación de plantillas del API Gateway
+Guías de implementación de características y patrones.
 
-#### [VERIFICACION_PLANTILLAS_AUTH_SERVICE.md](./VERIFICACION_PLANTILLAS_AUTH_SERVICE.md)
+### Idempotencia y Distributed Tracing
 
-Verificación de plantillas del Auth Service
+- **[IDEMPOTENCY_README.md](./implementation/IDEMPOTENCY_README.md)** 📖 - Guía principal
+- **[IDEMPOTENCY_AND_DISTRIBUTED_TRACING.md](./implementation/IDEMPOTENCY_AND_DISTRIBUTED_TRACING.md)** - Teoría y conceptos
+- **[IDEMPOTENCY_IMPLEMENTATION_STATUS.md](./implementation/IDEMPOTENCY_IMPLEMENTATION_STATUS.md)** - Estado de implementación
+- **[IDEMPOTENCY_IMPLEMENTATION_PLAN.md](./implementation/IDEMPOTENCY_IMPLEMENTATION_PLAN.md)** - Plan de implementación
+- **[IDEMPOTENCY_COMPONENTS_COMPLETE.md](./implementation/IDEMPOTENCY_COMPONENTS_COMPLETE.md)** - Componentes completos
 
-#### [VERIFICACION_PLANTILLAS_AVAILABILITY_SERVICE.md](./VERIFICACION_PLANTILLAS_AVAILABILITY_SERVICE.md)
+### Observabilidad y Logging
 
-Verificación de plantillas del Availability Service
+- **[LOGGER_ENHANCEMENTS.md](./implementation/LOGGER_ENHANCEMENTS.md)** - Mejoras del logger
+- **[LOGGER_STANDARDIZATION.md](./implementation/LOGGER_STANDARDIZATION.md)** - Estandarización de logging
+- **[CHANGELOG_LOGGER.md](./implementation/CHANGELOG_LOGGER.md)** - Historial de cambios
+- **[CACHE_METRICS_IMPLEMENTATION.md](./implementation/CACHE_METRICS_IMPLEMENTATION.md)** - Métricas de cache
 
-#### [VERIFICACION_PLANTILLAS_RESOURCES_SERVICE.md](./VERIFICACION_PLANTILLAS_RESOURCES_SERVICE.md)
+### WebSocket y Real-time
 
-Verificación de plantillas del Resources Service
+- **[WEBSOCKET_REALTIME.md](./implementation/WEBSOCKET_REALTIME.md)** - Comunicación en tiempo real
 
-#### [VERIFICACION_PLANTILLAS_STOCKPILE_SERVICE.md](./VERIFICACION_PLANTILLAS_STOCKPILE_SERVICE.md)
+### Integraciones
 
-Verificación de plantillas del Stockpile Service
+- **[INTEGRATION_GUIDE.md](./implementation/INTEGRATION_GUIDE.md)** - Guía de integración
+- **[STOCKPILE_SERVICE_IMPLEMENTATION_PLAN.md](./implementation/STOCKPILE_SERVICE_IMPLEMENTATION_PLAN.md)** - Plan Stockpile Service
+- **[MIGRACION_CALENDAR_OAUTH_EVENT_DRIVEN_PENDDING.md](./implementation/MIGRACION_CALENDAR_OAUTH_EVENT_DRIVEN_PENDDING.md)** - Migración Calendar OAuth
 
-#### [VERIFICACION_PLANTILLAS_REPORTS_SERVICE.md](./VERIFICACION_PLANTILLAS_REPORTS_SERVICE.md)
+---
 
-Verificación de plantillas del Reports Service
+## 🧪 Testing
+
+Documentación de testing, auditoría y dashboards.
+
+- **[TESTING_STATUS.md](./testing/TESTING_STATUS.md)** - Estado de testing y cobertura
+- **[AUDIT_DASHBOARD_SPEC.md](./testing/AUDIT_DASHBOARD_SPEC.md)** - Especificación del dashboard de auditoría
 
 ---
 
 ## 📜 Documentación Histórica
 
-### [migrations/](./migrations/)
+Documentación de migraciones, refactorings y reportes históricos archivados.
 
-Documentos de migraciones y refactorings históricos:
+### [archive/](./archive/)
 
-- AUDITORIA_MIGRACION_FINAL.md
-- MIGRACION_AUDIT_COMPLETADA.md
-- MIGRACION_SERVICIOS_RESTANTES.md
-- PLAN_MIGRACION_AUDIT_DECORATORS.md
-- FASE2_AUDIT_COMPLETED.md
-- FASE3_OAUTH_COMPLETED.md
-- OPCIONES_2_Y_3_COMPLETADAS.md
-- CALENDAR_EXPORT_IMPLEMENTADO.md
-- COMMONJS_CONFIGURADO.md
-- PROJECT_STATUS_FINAL.md
-- DOCUMENTACION_REFACTOR_INDEX.md
+Documentos archivados:
 
-### [refactoring/](./refactoring/)
+- **Migraciones**: Reportes de migraciones completadas
+- **Refactorings**: Documentación de refactorings mayores
+- **Fixes**: Reportes de resolución de errores
+- **Verificaciones**: Reportes de verificación de plantillas
+- **Resúmenes**: Documentación de progreso por fase
 
-Documentos de refactorings mayores:
-
-- REFACTOR_FINAL_COMPLETO.md
-- REFACTOR_COMPLETADO.md
-- REFACTOR_EVENT_DRIVEN.md
-- CHANGELOG_REFACTOR_EVENT_DRIVEN.md
-- PLAN_REFACTOR_FINAL.md
-- LIMPIEZA_SERVICIOS_COMENTADOS.md
-
-### [guides/](./guides/)
-
-Guías de uso y mejores prácticas:
-
-- GUIA_USO_AUDIT_DECORATORS.md
+Consulta [archive/README.md](./archive/README.md) para más detalles.
 
 ---
 
-## 📋 Templates
+## 📋 Plantillas y Ejemplos
 
 ### [templates/](./templates/)
 
-Plantillas para documentación estandarizada:
+Plantillas estandarizadas para documentación:
 
-- REQUIREMENT_TEMPLATE.md
-- ENDPOINTS_TEMPLATE.md
-- SEEDS_TEMPLATE.md
+- **REQUIREMENT_TEMPLATE.md** - Template para requerimientos
+- **ENDPOINTS_TEMPLATE.md** - Template para endpoints
+- **SEEDS_TEMPLATE.md** - Template para seeds
+
+### [examples/](./examples/)
+
+Ejemplos de código y configuración.
+
+### [seeds/](./seeds/)
+
+Scripts y documentación de seeding de datos.
 
 ---
 
-## 🔧 Mantenimiento de la Documentación
+## 🔧 Estructura de Documentación
 
-### Estructura Organizativa
-
-```
+```text
 docs/
-├── INDEX.md                    # Este archivo (índice maestro)
-├── migrations/                 # Documentación histórica de migraciones
-├── refactoring/               # Documentación de refactorings
-├── guides/                    # Guías de uso
-├── templates/                 # Plantillas de documentación
-└── examples/                  # Ejemplos de código
+├── INDEX.md                      # Este archivo (índice maestro)
+├── development/                  # Guías de desarrollo y debugging
+├── architecture/                 # Arquitectura y configuración
+├── api/                          # Documentación de APIs
+├── implementation/               # Guías de implementación
+├── testing/                      # Testing y auditoría
+├── archive/                      # Documentación histórica
+│   ├── migrations/              # Migraciones históricas
+│   ├── refactoring/             # Refactorings históricos
+│   └── resumen/                 # Resúmenes de progreso
+├── templates/                    # Plantillas de documentación
+├── examples/                     # Ejemplos de código
+├── seeds/                        # Scripts de seeding
+└── guides/                       # Guías de uso
+
+apps/{service}/docs/              # Documentación específica por microservicio
 ```
 
-### Guía de Contribución
+---
+
+## 📖 Guía de Contribución
 
 Al agregar nueva documentación:
 
 1. **Documentación de microservicio**: Agregar en `apps/{service}/docs/` y actualizar su `INDEX.md`
-2. **Documentación técnica general**: Agregar en `docs/` y actualizar este índice
-3. **Documentación histórica**: Mover a `docs/migrations/` o `docs/refactoring/`
-4. **Guías y tutoriales**: Agregar en `docs/guides/`
-
-### Limpieza de Documentación
-
-- Mover documentos obsoletos a carpetas `archive/` dentro de cada microservicio
-- Consolidar documentos duplicados
-- Mantener enlaces actualizados
-- Revisar y actualizar fechas regularmente
+2. **Desarrollo**: Documentos de debugging y desarrollo → `docs/development/`
+3. **Arquitectura**: Configuración y diseño → `docs/architecture/`
+4. **APIs**: Estándares y documentación → `docs/api/`
+5. **Implementación**: Guías de features → `docs/implementation/`
+6. **Testing**: Cobertura y auditoría → `docs/testing/`
+7. **Histórico**: Documentos obsoletos → `docs/archive/`
 
 ---
 
-## 🌐 Enlaces Externos
+## 🌐 Enlaces Útiles
 
-- **Repositorio Principal**: [bookly-monorepo](../../)
-- **Proyecto Real (Backend)**: [bookly-backend](../../../bookly-backend/)
-- **Documentación Oficial**: [README.md](../README.md)
-- **Guía de Contribución**: [CONTRIBUTING.md](../CONTRIBUTING.md)
+- **[README Principal](../README.md)** - Documentación principal del proyecto
+- **[Scripts](../scripts/README.md)** - Documentación de scripts utilitarios
+- **Swagger UIs**: Disponibles en cada microservicio (puertos 3000-3005)
 
 ---
 
-**Última actualización**: Noviembre 2024  
+**Última actualización**: Diciembre 2024  
 **Proyecto**: Bookly Mock - Sistema de Reservas Institucionales  
 **Mantenido por**: Equipo Bookly

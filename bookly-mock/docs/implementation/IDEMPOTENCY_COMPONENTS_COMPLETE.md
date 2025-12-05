@@ -446,7 +446,7 @@ export class AuthModule {}
 
 ## 🎓 Recursos
 
-- **[Guía de Inicio](../README_IDEMPOTENCY.md)** - Quick start guide
+- **[Guía de Inicio](./IDEMPOTENCY_README.md)** - Quick start guide
 - **[Estado Completo](./IDEMPOTENCY_IMPLEMENTATION_STATUS.md)** - Documentación exhaustiva
 - **[Plan Original](./IDEMPOTENCY_IMPLEMENTATION_PLAN.md)** - Roadmap completo
 - **[Teoría y Patrones](./IDEMPOTENCY_AND_DISTRIBUTED_TRACING.md)** - Conceptos fundamentales
