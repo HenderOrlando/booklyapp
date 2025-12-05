@@ -4,7 +4,114 @@ Scripts utilitarios para desarrollo, testing y mantenimiento de Bookly Mock.
 
 ## 📋 Scripts Disponibles
 
-### 🎨 test-logger-colors.ts
+### 🔧 Scripts de Utilidad
+
+#### fix-imports-syntax.js
+
+Corrige problemas de sintaxis en imports (comillas inconsistentes).
+
+**Ejecutar:**
+```bash
+node scripts/fix-imports-syntax.js
+```
+
+**Función:**
+- Corrige comillas inconsistentes en imports
+- Procesa archivos en `apps/` y `libs/`
+- Reporta archivos corregidos
+
+---
+
+#### fix-imports.ts
+
+Refactoriza imports relativos a alias de TypeScript.
+
+**Ejecutar:**
+```bash
+ts-node scripts/fix-imports.ts
+```
+
+**Función:**
+- Convierte rutas relativas (../../) a alias (@auth, @resources, etc.)
+- Procesa todos los microservicios
+- Muestra estadísticas de archivos modificados
+
+---
+
+#### fix-imports-paths.sh
+
+Corrige paths de @libs/* removiendo /src/ y archivos específicos.
+
+**Ejecutar:**
+```bash
+bash scripts/fix-imports-paths.sh
+```
+
+**Función:**
+- Corrige imports de @libs/common, @libs/decorators, @libs/guards, etc.
+- Remueve referencias a /src/ en paths
+- Normaliza imports de librerías compartidas
+
+---
+
+#### fix-tsconfig-rootdir.sh
+
+Corrige configuraciones de rootDir en tsconfig.json de microservicios.
+
+**Ejecutar:**
+```bash
+bash scripts/fix-tsconfig-rootdir.sh
+```
+
+---
+
+#### test-pattern.js
+
+Utilidad para testing de patrones.
+
+**Ejecutar:**
+```bash
+node scripts/test-pattern.js
+```
+
+---
+
+### 🚀 Scripts de Inicio
+
+#### start-all-services.sh
+
+Inicia todos los microservicios simultáneamente.
+
+**Ejecutar:**
+```bash
+bash scripts/start-all-services.sh
+```
+
+**Función:**
+- Inicia los 6 microservicios en modo watch
+- Útil para desarrollo local
+
+---
+
+#### start-all-prod.sh
+
+Inicia todos los microservicios en modo producción.
+
+**Ejecutar:**
+```bash
+bash scripts/start-all-prod.sh
+```
+
+**Función:**
+- Build optimizado de todos los servicios
+- Modo producción sin watch
+- Configuración para deployment
+
+---
+
+### 🧪 Testing & Validación
+
+#### test-logger-colors.ts
 
 Script de demostración del Logger mejorado con colores e iconos.
 
@@ -43,7 +150,7 @@ ts-node scripts/test-logger-colors.ts
 
 ---
 
-### 🌱 seed-events-for-replay.ts
+#### seed-events-for-replay.ts
 
 Pobla el Event Store con eventos de prueba para testing de Event Replay.
 
@@ -73,7 +180,7 @@ ts-node scripts/seed-events-for-replay.ts
 
 ---
 
-### 🔌 test-websocket-client.ts
+#### test-websocket-client.ts
 
 Cliente de prueba para WebSocket con subscripciones a múltiples canales.
 

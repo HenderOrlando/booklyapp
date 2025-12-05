@@ -125,7 +125,7 @@ Actualizado **[README.md](../README.md)** con:
 | **Archivos movidos a docs/refactoring/** | 6                                          |
 | **Archivos movidos a docs/guides/**      | 1                                          |
 | **Índices creados**                      | 7 (6 microservicios + 1 maestro)           |
-| **Archivos en raíz (apropiados)**        | 3 (README, CONTRIBUTING, RUNNING_SERVICES) |
+| **Archivos en raíz (esenciales)**        | 3 (README, package.json, docker-compose)   |
 
 ### Documentación por Microservicio
 
@@ -173,8 +173,8 @@ Actualizado **[README.md](../README.md)** con:
 ```
 bookly-mock/
 ├── README.md                          # ✅ Actualizado con enlaces a documentación
-├── CONTRIBUTING.md                    # ✅ Guía de contribución
-├── RUNNING_SERVICES.md                # ✅ Status de servicios
+├── package.json                       # ✅ Scripts actualizados
+├── docker-compose.yml                 # Infraestructura
 │
 ├── apps/                              # Microservicios
 │   ├── api-gateway/docs/
@@ -190,13 +190,21 @@ bookly-mock/
 │   └── reports-service/docs/
 │       └── INDEX.md                   # ✅ Índice con 16 documentos
 │
+├── scripts/                           # ✅ Scripts utilitarios (17 archivos)
+│   └── README.md                      # Documentación de scripts
+│
 └── docs/                              # Documentación general
-    ├── INDEX.md                       # ✅ Índice maestro
-    ├── migrations/                    # ✅ 11 documentos históricos
-    ├── refactoring/                   # ✅ 6 documentos de refactoring
-    ├── guides/                        # ✅ 1 guía de uso
-    ├── templates/                     # Plantillas existentes
-    └── examples/                      # Ejemplos existentes
+    ├── INDEX.md                       # ✅ Índice maestro actualizado
+    ├── development/                   # 🔧 Debugging y ejecución
+    ├── architecture/                  # 🏗️ Arquitectura y configuración
+    ├── api/                          # 📡 APIs y estándares
+    ├── implementation/               # 🔨 Implementaciones
+    ├── testing/                      # 🧪 Testing y auditoría
+    ├── archive/                      # 📦 Históricos (~77 archivos)
+    ├── templates/                    # Plantillas
+    ├── examples/                     # Ejemplos
+    ├── seeds/                        # Seeding
+    └── guides/                       # Guías de uso
 ```
 
 ---
