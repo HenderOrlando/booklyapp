@@ -204,7 +204,7 @@ services:
   api-gateway:
     build:
       context: .
-      dockerfile: Dockerfile.gateway
+      dockerfile: ../ci-cd/bookly-mock/dockerfiles/Dockerfile.gateway
     container_name: bookly-mock-api-gateway
     ports:
       - "3000:3000"
@@ -246,7 +246,7 @@ services:
   auth-service:
     build:
       context: .
-      dockerfile: Dockerfile.auth
+      dockerfile: ../ci-cd/bookly-mock/dockerfiles/Dockerfile.auth
     container_name: bookly-mock-auth-service
     ports:
       - "3001:3001"
@@ -280,7 +280,7 @@ services:
   resources-service:
     build:
       context: .
-      dockerfile: Dockerfile.resources
+      dockerfile: ../ci-cd/bookly-mock/dockerfiles/Dockerfile.resources
     container_name: bookly-mock-resources-service
     ports:
       - "3002:3002"
@@ -311,7 +311,7 @@ services:
   availability-service:
     build:
       context: .
-      dockerfile: Dockerfile.availability
+      dockerfile: ../ci-cd/bookly-mock/dockerfiles/Dockerfile.availability
     container_name: bookly-mock-availability-service
     ports:
       - "3003:3003"
@@ -342,7 +342,7 @@ services:
   stockpile-service:
     build:
       context: .
-      dockerfile: Dockerfile.stockpile
+      dockerfile: ../ci-cd/bookly-mock/dockerfiles/Dockerfile.stockpile
     container_name: bookly-mock-stockpile-service
     ports:
       - "3004:3004"
@@ -373,7 +373,7 @@ services:
   reports-service:
     build:
       context: .
-      dockerfile: Dockerfile.reports
+      dockerfile: ../ci-cd/bookly-mock/dockerfiles/Dockerfile.reports
     container_name: bookly-mock-reports-service
     ports:
       - "3005:3005"
