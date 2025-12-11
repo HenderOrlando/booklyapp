@@ -15,7 +15,7 @@ import {
 } from "@nestjs/common";
 import { EventBus } from "@nestjs/cqrs";
 import { JwtService } from "@nestjs/jwt";
-import * as bcrypt from "bcrypt";
+import * as bcrypt from "bcryptjs";
 import { UserEntity } from '@auth/domain/entities/user.entity';
 import { TwoFactorVerificationFailedEvent } from '@auth/domain/events/two-factor-verification-failed.event';
 import { IUserRepository } from '@auth/domain/repositories/user.repository.interface';
