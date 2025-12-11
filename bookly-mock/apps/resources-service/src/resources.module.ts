@@ -9,6 +9,7 @@ import { MongooseModule } from "@nestjs/mongoose";
 import { PassportModule } from "@nestjs/passport";
 import { AuditDecoratorsModule } from "@reports/audit-decorators";
 import { JwtStrategy } from "./infrastructure/strategies/jwt.strategy";
+import { ResourceImportService } from "./application/services/resource-import.service";
 
 // Application Layer
 import * as EventHandlers from "./application/event-handlers";
@@ -155,6 +156,18 @@ const IMPORT_JOB_REPOSITORY = "IImportJobRepository";
 
     // CQRS Handlers
     ...AllHandlers,
+    
+    // Resource Import Service (with factory for interface injection)
+    {
+      provide: ResourceImportService,
+      useFactory: (
+        resourceRepository: ResourceRepository,
+        categoryRepository: CategoryRepository
+      ) => {
+        return new ResourceImportService(resourceRepository, categoryRepository);
+      },
+      inject: [RESOURCE_REPOSITORY, CATEGORY_REPOSITORY],
+    },
 
     // Event Handlers (EDA)
     EventHandlers.QueryResourceByIdHandler,
