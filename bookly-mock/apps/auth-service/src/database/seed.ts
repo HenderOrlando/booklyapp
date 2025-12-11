@@ -2,7 +2,7 @@ import { createLogger } from "@libs/common";
 import { UserRole } from "@libs/common/enums";
 import { NestFactory } from "@nestjs/core";
 import { getModelToken } from "@nestjs/mongoose";
-import * as bcrypt from "bcrypt";
+import * as bcrypt from "bcryptjs";
 import { Model } from "mongoose";
 import { AuthModule } from "../auth.module";
 import { Permission } from "../infrastructure/schemas/permission.schema";

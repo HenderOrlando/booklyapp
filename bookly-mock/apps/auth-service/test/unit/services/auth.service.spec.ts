@@ -4,12 +4,12 @@ import { UnauthorizedException } from "@nestjs/common";
 import { EventBus } from "@nestjs/cqrs";
 import { JwtService } from "@nestjs/jwt";
 import { Test, TestingModule } from "@nestjs/testing";
-import * as bcrypt from "bcrypt";
+import * as bcrypt from "bcryptjs";
 import { AuthService } from "../../../src/application/services/auth.service";
 import { UserEntity } from "../../../src/domain/entities/user.entity";
 import { IUserRepository } from "../../../src/domain/repositories/user.repository.interface";
 
-jest.mock("bcrypt");
+jest.mock("bcryptjs");
 
 describe("AuthService", () => {
   let service: AuthService;
