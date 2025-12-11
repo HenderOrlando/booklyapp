@@ -41,6 +41,8 @@
     "docker:down:microservices": "docker-compose -f docker-compose.microservices.yml down",
     "docker:logs": "docker-compose logs -f",
     "docker:logs:microservices": "docker-compose -f docker-compose.microservices.yml logs -f",
+    "deploy:full": "powershell -ExecutionPolicy Bypass -File ../ci-cd/bookly-mock/scripts/docker/deploy.ps1 -Mode full",
+    "deploy:partial": "powershell -ExecutionPolicy Bypass -File ../ci-cd/bookly-mock/scripts/docker/deploy.ps1 -Mode partial",
     "test:logger": "ts-node scripts/test-logger-colors.ts",
     "test:logger:colors": "ts-node scripts/test-logger-colors.ts",
     "seed:all": "npm run seed:auth && npm run seed:resources && npm run seed:availability && npm run seed:stockpile && npm run seed:reports",
