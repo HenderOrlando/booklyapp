@@ -2,24 +2,62 @@
 # Bookly Docker Deployment Script
 # ===================================
 # Options:
-#   -Mode full    : Deploy infrastructure + microservices + frontend (default)
-#   -Mode partial : Deploy only microservices + frontend (uses .env files)
+#   -Action start   : Start deployment (default)
+#   -Action stop    : Stop deployment
+#   -Action restart : Restart deployment
+#   -Mode full      : Deploy infrastructure + microservices + frontend (default)
+#   -Mode partial   : Deploy only microservices + frontend (uses .env files)
 # ===================================
 
 param(
     [Parameter(Mandatory=$false)]
+    [ValidateSet("start", "stop", "restart")]
+    [string]$Action = "start",
+    
+    [Parameter(Mandatory=$false)]
     [ValidateSet("full", "partial")]
-    [string]$Mode = "full"
+    [string]$Mode = ""
 )
 
 # Configuration
 $BOOKLY_MOCK_PATH = "..\..\..\..\bookly-mock"
 $DOCKER_COMPOSE_FULL = "docker-compose.yml"
 $DOCKER_COMPOSE_PARTIAL = "docker-compose.microservices.yml"
+$DEPLOY_MODE_FILE = ".deploy-mode"
+
+# Function to get saved mode
+function Get-SavedMode {
+    $modeFilePath = Join-Path $BOOKLY_MOCK_PATH $DEPLOY_MODE_FILE
+    if (Test-Path $modeFilePath) {
+        return Get-Content $modeFilePath -Raw
+    }
+    return $null
+}
+
+# Function to save mode
+function Save-Mode {
+    param([string]$ModeToSave)
+    $modeFilePath = Join-Path $BOOKLY_MOCK_PATH $DEPLOY_MODE_FILE
+    $ModeToSave | Out-File -FilePath $modeFilePath -NoNewline
+}
+
+# Determine mode to use
+$savedMode = Get-SavedMode
+if ($Mode -eq "") {
+    if ($Action -eq "start") {
+        $Mode = "full"
+    } elseif ($savedMode) {
+        $Mode = $savedMode.Trim()
+    } else {
+        Write-Host "ERROR: No previous deployment found. Please run with -Mode (full|partial) first." -ForegroundColor Red
+        exit 1
+    }
+}
 
 Write-Host "=====================================" -ForegroundColor Cyan
 Write-Host "  Bookly Docker Deployment Script" -ForegroundColor Cyan
 Write-Host "=====================================" -ForegroundColor Cyan
+Write-Host "Action: $Action" -ForegroundColor Magenta
 Write-Host "Mode: $Mode" -ForegroundColor Magenta
 Write-Host ""
 
@@ -36,7 +74,64 @@ Write-Host ""
 # Change to bookly-mock directory
 Push-Location $BOOKLY_MOCK_PATH
 
+# Determine which docker-compose file to use
+$dockerComposeFile = if ($Mode -eq "full") { $DOCKER_COMPOSE_FULL } else { $DOCKER_COMPOSE_PARTIAL }
+
 try {
+    # ===============================================
+    # STOP ACTION
+    # ===============================================
+    if ($Action -eq "stop") {
+        Write-Host "=====================================" -ForegroundColor Cyan
+        Write-Host "  STOPPING DEPLOYMENT ($Mode)" -ForegroundColor Cyan
+        Write-Host "=====================================" -ForegroundColor Cyan
+        Write-Host ""
+        
+        if ($Mode -eq "full") {
+            docker-compose -f $dockerComposeFile down -v
+        } else {
+            docker-compose -f $dockerComposeFile down
+        }
+        
+        Write-Host ""
+        Write-Host "Deployment stopped successfully!" -ForegroundColor Green
+        exit 0
+    }
+    
+    # ===============================================
+    # RESTART ACTION
+    # ===============================================
+    if ($Action -eq "restart") {
+        Write-Host "=====================================" -ForegroundColor Cyan
+        Write-Host "  RESTARTING DEPLOYMENT ($Mode)" -ForegroundColor Cyan
+        Write-Host "=====================================" -ForegroundColor Cyan
+        Write-Host ""
+        
+        Write-Host "Stopping containers..." -ForegroundColor Yellow
+        docker-compose -f $dockerComposeFile down
+        Write-Host ""
+        
+        Write-Host "Starting containers..." -ForegroundColor Yellow
+        docker-compose -f $dockerComposeFile up -d
+        Write-Host ""
+        
+        Write-Host "=====================================" -ForegroundColor Cyan
+        Write-Host "  Deployment Status" -ForegroundColor Cyan
+        Write-Host "=====================================" -ForegroundColor Cyan
+        docker-compose -f $dockerComposeFile ps
+        Write-Host ""
+        
+        Write-Host "Deployment restarted successfully!" -ForegroundColor Green
+        exit 0
+    }
+
+    # ===============================================
+    # START ACTION (default)
+    # ===============================================
+    
+    # Save the mode for future stop/restart commands
+    Save-Mode $Mode
+    
     if ($Mode -eq "full") {
         # ===============================================
         # FULL DEPLOYMENT: Infrastructure + Microservices + Frontend
