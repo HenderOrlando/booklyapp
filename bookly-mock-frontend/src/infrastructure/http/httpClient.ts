@@ -19,9 +19,10 @@ import axios, { AxiosError, AxiosInstance, AxiosRequestConfig } from "axios";
 
 /**
  * Cliente Axios configurado para Serve Mode
+ * NOTA: baseURL se deja vacío porque buildUrl() construye URLs completas
+ * según la configuración (API Gateway vs servicios directos)
  */
 const axiosInstance: AxiosInstance = axios.create({
-  baseURL: config.useDirectServices ? "" : config.apiGatewayUrl,
   timeout: 30000,
   headers: {
     "Content-Type": "application/json",
@@ -208,7 +209,7 @@ class HttpClient {
       });
     }
 
-    // En mock mode, retornar endpoint con prefijo
+    // En mock mode, retornar endpoint con prefijo (MockService lo maneja)
     if (this.shouldUseMock()) {
       console.log("📦 Mock Mode - URL:", fullEndpoint);
       return fullEndpoint;
@@ -216,13 +217,20 @@ class HttpClient {
 
     // En serve mode con API Gateway (por defecto)
     if (!config.useDirectServices) {
-      console.log("🌐 API Gateway Mode - URL:", fullEndpoint);
-      return fullEndpoint;
+      const url = `${config.apiGatewayUrl}${fullEndpoint}`;
+      console.log("🌐 API Gateway Mode - URL:", url);
+      return url;
     }
 
     // En serve mode con servicios directos
     // Detectar servicio desde el endpoint
-    if (fullEndpoint.includes("/auth/") || fullEndpoint.includes("auth")) {
+    if (
+      fullEndpoint.includes("/auth/") ||
+      fullEndpoint.includes("/users/") ||
+      fullEndpoint.includes("/users") ||
+      fullEndpoint.includes("/roles") ||
+      fullEndpoint.includes("/permissions")
+    ) {
       const url = `${getServiceUrl("auth")}${fullEndpoint}`;
       console.log("🔑 Auth Service - URL:", url);
       return url;
@@ -271,8 +279,9 @@ class HttpClient {
     }
 
     // Por defecto usar API Gateway
-    console.log("🌐 Default (API Gateway) - URL:", fullEndpoint);
-    return fullEndpoint;
+    const defaultUrl = `${config.apiGatewayUrl}${fullEndpoint}`;
+    console.log("🌐 Default (API Gateway) - URL:", defaultUrl);
+    return defaultUrl;
   }
 
   /**
