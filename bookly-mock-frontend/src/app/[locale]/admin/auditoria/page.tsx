@@ -50,7 +50,7 @@ interface AuditLog {
 }
 
 export default function AuditoriaPage() {
-  const t = useTranslations("audit");
+  const t = useTranslations("admin.audit");
   const [logs, setLogs] = React.useState<AuditLog[]>([]);
   const [loading, setLoading] = React.useState(true);
   const [useVirtualScrolling, setUseVirtualScrolling] = React.useState(true);
