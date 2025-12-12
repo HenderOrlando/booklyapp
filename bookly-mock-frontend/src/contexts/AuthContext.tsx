@@ -147,7 +147,6 @@ export function AuthProvider({ children }: AuthProviderProps) {
         message: error?.message,
         status: error?.response?.status,
         data: error?.response?.data,
-        error,
       });
 
       // Solo limpiar sesión si es un error de autenticación válido
