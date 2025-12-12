@@ -7,6 +7,7 @@
 "use client";
 
 import { useWebSocket } from "@/hooks/useWebSocket";
+import { config } from "@/lib/config";
 import React, { createContext, useContext } from "react";
 
 interface WebSocketContextValue {
@@ -26,7 +27,7 @@ interface WebSocketProviderProps {
 
 export function WebSocketProvider({
   children,
-  url = process.env.NEXT_PUBLIC_WS_URL || "ws://localhost:3001",
+  url = config.wsUrl,
   enabled = true,
 }: WebSocketProviderProps) {
   const websocket = useWebSocket({

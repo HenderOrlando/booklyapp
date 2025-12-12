@@ -1,7 +1,7 @@
 "use client";
 
 import { httpClient } from "@/infrastructure/http";
-import { DataMode } from "@/lib/config";
+import { config, DataMode } from "@/lib/config";
 import { useEffect, useState } from "react";
 
 /**
@@ -22,12 +22,11 @@ export function useDataMode() {
   const [isDevelopment, setIsDevelopment] = useState(false);
 
   useEffect(() => {
-    // Detectar modo desde configuración (solo en cliente)
-    const dataMode = process.env.NEXT_PUBLIC_DATA_MODE || "mock";
-    setMode(dataMode as DataMode);
+    // Detectar modo desde configuración centralizada
+    setMode(config.dataMode);
 
-    // Detectar entorno
-    setIsDevelopment(process.env.NODE_ENV === "development");
+    // Detectar entorno desde configuración centralizada
+    setIsDevelopment(config.isDevelopment);
   }, []);
 
   const isMock = mode === "mock";

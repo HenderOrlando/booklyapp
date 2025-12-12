@@ -14,6 +14,7 @@
  */
 
 import { MockService } from "@/infrastructure/mock/mockService";
+import { config } from "@/lib/config";
 import type { ApiResponse } from "@/types/api/response";
 
 /**
@@ -489,7 +490,7 @@ export function initializeInterceptors(options?: {
   const {
     includeRetry = true,
     includeAnalytics = false,
-    includeTiming = process.env.NODE_ENV === "development",
+    includeTiming = config.isDevelopment,
   } = options || {};
 
   // Limpiar interceptors anteriores
