@@ -14,6 +14,7 @@ export function useAuth() {
   const user = session?.user as User | undefined;
 
   const login = async (email: string, password: string) => {
+    console.log("Login attempt:", { email, password });
     const result = await signIn("credentials", {
       email,
       password,

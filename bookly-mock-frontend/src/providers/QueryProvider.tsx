@@ -8,6 +8,7 @@
 
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
+import { config } from "@/lib/config";
 import { useState } from "react";
 
 /**
@@ -76,7 +77,7 @@ export function QueryProvider({ children }: { children: React.ReactNode }) {
     <QueryClientProvider client={queryClient}>
       {children}
       {/* DevTools solo en desarrollo */}
-      {process.env.NODE_ENV === "development" && (
+      {config.isDevelopment && (
         <ReactQueryDevtools initialIsOpen={false} />
       )}
     </QueryClientProvider>

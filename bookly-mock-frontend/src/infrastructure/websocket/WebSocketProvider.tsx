@@ -8,6 +8,7 @@ import {
   useState,
 } from "react";
 import { io, Socket } from "socket.io-client";
+import { config } from "@/lib/config";
 
 interface WebSocketContextType {
   socket: Socket | null;
@@ -29,7 +30,7 @@ export function WebSocketProvider({ children }: WebSocketProviderProps) {
   useEffect(() => {
     // Por ahora solo inicializar sin conectar
     // La conexión se hará después del login
-    const socketInstance = io(process.env.NEXT_PUBLIC_WS_URL || "", {
+    const socketInstance = io(config.wsUrl || "", {
       path: "/api/v1/ws",
       autoConnect: false, // No conectar automáticamente
     });

@@ -5,6 +5,7 @@
 
 import { configureStore } from "@reduxjs/toolkit";
 import { setupListeners } from "@reduxjs/toolkit/query";
+import { config } from "@/lib/config";
 import authReducer from "./slices/authSlice";
 import uiReducer from "./slices/uiSlice";
 
@@ -23,7 +24,7 @@ export const store = configureStore({
         ignoredActions: ["persist/PERSIST"],
       },
     }),
-  devTools: process.env.NODE_ENV !== "production",
+  devTools: !config.isProduction,
 });
 
 // Setup listeners para refetchOnFocus/refetchOnReconnect
