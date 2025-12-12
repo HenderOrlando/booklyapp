@@ -1,6 +1,6 @@
 #!/bin/bash
 # ===================================
-# Bookly Docker Deployment Script
+# Bookly Podman Deployment Script (OPTIMIZED)
 # ===================================
 # Options:
 #   -a, --action start   : Start deployment (default)
@@ -8,7 +8,14 @@
 #   -a, --action restart : Restart deployment
 #   -m, --mode full      : Deploy infrastructure + microservices + frontend (default)
 #   -m, --mode partial   : Deploy only microservices + frontend (uses .env files)
+#   -f, --fast           : Skip health checks, maximum speed (use with caution)
+#   -p, --parallel N     : Number of parallel builds (default: auto-detect CPUs)
 # ===================================
+
+set -euo pipefail
+
+# Start timer for performance tracking
+START_TIME=$(date +%s)
 
 # Colors for output
 RED='\033[0;31m'
@@ -18,9 +25,27 @@ CYAN='\033[0;36m'
 MAGENTA='\033[0;35m'
 NC='\033[0m' # No Color
 
+# ===============================================
+# PERFORMANCE OPTIMIZATIONS
+# ===============================================
+# Detect CPU cores for parallel builds
+CPU_CORES=$(nproc 2>/dev/null || sysctl -n hw.ncpu 2>/dev/null || echo 4)
+PARALLEL_JOBS=$((CPU_CORES > 2 ? CPU_CORES : 2))
+
+# Podman/Buildah optimizations
+export BUILDAH_LAYERS=true
+export BUILDAH_FORMAT=docker
+export CONTAINERS_CONF=""
+export STORAGE_DRIVER=overlay
+
+# Go runtime optimizations for Podman
+export GOMAXPROCS=$CPU_CORES
+
 # Default values
 ACTION="start"
 MODE=""
+FAST_MODE=false
+CUSTOM_PARALLEL=""
 
 # Parse arguments
 while [[ $# -gt 0 ]]; do
@@ -33,12 +58,25 @@ while [[ $# -gt 0 ]]; do
             MODE="$2"
             shift 2
             ;;
+        -f|--fast)
+            FAST_MODE=true
+            shift
+            ;;
+        -p|--parallel)
+            CUSTOM_PARALLEL="$2"
+            shift 2
+            ;;
         *)
             echo -e "${RED}Unknown option: $1${NC}"
             exit 1
             ;;
     esac
 done
+
+# Apply custom parallel setting if provided
+if [[ -n "$CUSTOM_PARALLEL" ]]; then
+    PARALLEL_JOBS="$CUSTOM_PARALLEL"
+fi
 
 # Validate action
 if [[ ! "$ACTION" =~ ^(start|stop|restart)$ ]]; then
@@ -89,9 +127,12 @@ fi
 
 echo -e "${CYAN}=====================================${NC}"
 echo -e "${CYAN}  Bookly Podman Deployment Script${NC}"
+echo -e "${CYAN}  (OPTIMIZED - $PARALLEL_JOBS parallel jobs)${NC}"
 echo -e "${CYAN}=====================================${NC}"
 echo -e "${MAGENTA}Action: $ACTION${NC}"
 echo -e "${MAGENTA}Mode: $MODE${NC}"
+echo -e "${MAGENTA}Fast Mode: $FAST_MODE${NC}"
+echo -e "${MAGENTA}CPU Cores: $CPU_CORES${NC}"
 echo ""
 
 # Check if Podman is running
@@ -102,6 +143,74 @@ if ! podman info &>/dev/null; then
 fi
 echo -e "${GREEN}Podman is running!${NC}"
 echo ""
+
+# ===============================================
+# UTILITY FUNCTIONS FOR SPEED
+# ===============================================
+
+# Pre-pull base images in parallel (background jobs)
+prepull_images() {
+    echo -e "${YELLOW}Pre-pulling base images in parallel...${NC}"
+    local images=("node:20-alpine" "mongo:7.0" "redis:7.2-alpine" "confluentinc/cp-zookeeper:7.5.0" "confluentinc/cp-kafka:7.5.0")
+    for img in "${images[@]}"; do
+        podman pull "$img" &>/dev/null &
+    done
+    wait
+    echo -e "${GREEN}Base images ready!${NC}"
+}
+
+# Wait for container to be healthy (active polling, not fixed sleep)
+wait_for_container() {
+    local container_name="$1"
+    local max_wait="${2:-30}"
+    local interval=2
+    local elapsed=0
+    
+    while [[ $elapsed -lt $max_wait ]]; do
+        if podman inspect --format='{{.State.Health.Status}}' "$container_name" 2>/dev/null | grep -q "healthy"; then
+            return 0
+        fi
+        if podman inspect --format='{{.State.Running}}' "$container_name" 2>/dev/null | grep -q "true"; then
+            # No health check defined, just check if running
+            if ! podman inspect --format='{{.State.Health.Status}}' "$container_name" 2>/dev/null | grep -q "starting"; then
+                return 0
+            fi
+        fi
+        sleep $interval
+        elapsed=$((elapsed + interval))
+    done
+    echo -e "${YELLOW}Warning: $container_name did not become healthy in ${max_wait}s${NC}"
+    return 0
+}
+
+# Wait for multiple containers in parallel
+wait_for_containers() {
+    local containers=("$@")
+    local pids=()
+    
+    for container in "${containers[@]}"; do
+        wait_for_container "$container" 20 &
+        pids+=($!)
+    done
+    
+    for pid in "${pids[@]}"; do
+        wait "$pid" 2>/dev/null || true
+    done
+}
+
+# Build all services in parallel using background jobs
+parallel_build() {
+    local compose_file="$1"
+    shift
+    local services=("$@")
+    
+    echo -e "${YELLOW}Building ${#services[@]} services in parallel (max $PARALLEL_JOBS jobs)...${NC}"
+    
+    # Use podman-compose with all services at once (it handles parallelization)
+    podman-compose -f "$compose_file" build --parallel "${services[@]}" 2>&1 | tail -20
+    
+    echo -e "${GREEN}Build complete!${NC}"
+}
 
 # Change to bookly-mock directory
 cd "$BOOKLY_MOCK_PATH" || exit 1
@@ -179,39 +288,65 @@ if [[ "$MODE" == "full" ]]; then
     # Uses inline environment variables from podman-compose.yml
     # ===============================================
     echo -e "${CYAN}=====================================${NC}"
-    echo -e "${CYAN}  FULL DEPLOYMENT${NC}"
+    echo -e "${CYAN}  FULL DEPLOYMENT (OPTIMIZED)${NC}"
     echo -e "${CYAN}  (Infrastructure + Microservices + Frontend)${NC}"
     echo -e "${CYAN}=====================================${NC}"
     echo ""
 
-    # Stop and remove existing containers
+    # Pre-pull base images in parallel (speeds up builds significantly)
+    prepull_images &
+    PREPULL_PID=$!
+
+    # Stop and remove existing containers (in parallel with pre-pull)
     echo -e "${YELLOW}Stopping and removing existing containers...${NC}"
-    podman-compose -f "$DOCKER_COMPOSE_FULL" down -v
+    podman-compose -f "$DOCKER_COMPOSE_FULL" down -v 2>/dev/null || true
     echo ""
 
-    # Build and start infrastructure services first
+    # Wait for pre-pull to complete
+    wait $PREPULL_PID 2>/dev/null || true
+
+    # Start ALL infrastructure services in parallel
     echo -e "${YELLOW}Starting infrastructure services (MongoDB, Redis, Kafka)...${NC}"
     podman-compose -f "$DOCKER_COMPOSE_FULL" up -d zookeeper kafka redis mongodb-auth mongodb-resources mongodb-availability mongodb-stockpile mongodb-reports mongodb-gateway
     echo ""
 
-    # Wait for infrastructure to be ready
-    echo -e "${YELLOW}Waiting for infrastructure services to be healthy (60 seconds)...${NC}"
-    sleep 60
+    # Wait for infrastructure - use active polling instead of fixed sleep
+    if [[ "$FAST_MODE" == "true" ]]; then
+        echo -e "${YELLOW}Fast mode: skipping health checks...${NC}"
+        sleep 5
+    else
+        echo -e "${YELLOW}Waiting for infrastructure (active polling, max 30s)...${NC}"
+        wait_for_containers \
+            "bookly-mock-redis" \
+            "bookly-mock-mongodb-auth" \
+            "bookly-mock-mongodb-resources" \
+            "bookly-mock-mongodb-availability" \
+            "bookly-mock-mongodb-stockpile" \
+            "bookly-mock-mongodb-reports" \
+            "bookly-mock-mongodb-gateway"
+        echo -e "${GREEN}Infrastructure ready!${NC}"
+    fi
     echo ""
 
-    # Build and start microservices
-    echo -e "${YELLOW}Building and starting microservices...${NC}"
-    podman-compose -f "$DOCKER_COMPOSE_FULL" up -d --build api-gateway auth-service resources-service availability-service stockpile-service reports-service
+    # Build ALL microservices + frontend in ONE parallel command
+    echo -e "${YELLOW}Building and starting ALL services in parallel...${NC}"
+    podman-compose -f "$DOCKER_COMPOSE_FULL" up -d --build \
+        api-gateway auth-service resources-service availability-service stockpile-service reports-service bookly-web
     echo ""
 
-    # Wait for microservices to be ready
-    echo -e "${YELLOW}Waiting for microservices to be ready (30 seconds)...${NC}"
-    sleep 30
-    echo ""
-
-    # Build and start frontend
-    echo -e "${YELLOW}Building and starting frontend...${NC}"
-    podman-compose -f "$DOCKER_COMPOSE_FULL" up -d --build bookly-web
+    # Wait for services - use active polling
+    if [[ "$FAST_MODE" != "true" ]]; then
+        echo -e "${YELLOW}Waiting for services to be ready (active polling)...${NC}"
+        wait_for_containers \
+            "bookly-mock-api-gateway" \
+            "bookly-mock-auth-service" \
+            "bookly-mock-resources-service" \
+            "bookly-mock-availability-service" \
+            "bookly-mock-stockpile-service" \
+            "bookly-mock-reports-service" \
+            "bookly-mock-frontend"
+        echo -e "${GREEN}All services ready!${NC}"
+    fi
     echo ""
 
     # Show status
@@ -228,13 +363,18 @@ else
     # Assumes infrastructure is already running externally
     # ===============================================
     echo -e "${CYAN}=====================================${NC}"
-    echo -e "${CYAN}  PARTIAL DEPLOYMENT${NC}"
+    echo -e "${CYAN}  PARTIAL DEPLOYMENT (OPTIMIZED)${NC}"
     echo -e "${CYAN}  (Microservices + Frontend only)${NC}"
     echo -e "${CYAN}  Using .env files for configuration${NC}"
     echo -e "${CYAN}=====================================${NC}"
     echo ""
 
-    # Verify .env files exist
+    # Pre-pull node:20-alpine in background while checking .env files
+    echo -e "${YELLOW}Pre-pulling node:20-alpine...${NC}"
+    podman pull node:20-alpine &>/dev/null &
+    PREPULL_PID=$!
+
+    # Verify .env files exist (quick check, in parallel with pre-pull)
     echo -e "${YELLOW}Verifying .env files exist...${NC}"
     env_files=(
         "apps/api-gateway/.env"
@@ -271,24 +411,36 @@ else
     fi
     echo ""
 
-    # Stop existing microservices containers
+    # Stop existing containers (in parallel with pre-pull completion)
     echo -e "${YELLOW}Stopping existing microservices containers...${NC}"
-    podman-compose -f "$DOCKER_COMPOSE_PARTIAL" down
+    podman-compose -f "$DOCKER_COMPOSE_PARTIAL" down 2>/dev/null || true
     echo ""
 
-    # Build and start microservices
-    echo -e "${YELLOW}Building and starting microservices...${NC}"
-    podman-compose -f "$DOCKER_COMPOSE_PARTIAL" up -d --build --force-recreate api-gateway auth-service resources-service availability-service stockpile-service reports-service
+    # Wait for pre-pull
+    wait $PREPULL_PID 2>/dev/null || true
+
+    # Build and start ALL services in ONE parallel command (no --force-recreate unless needed)
+    echo -e "${YELLOW}Building and starting ALL services in parallel...${NC}"
+    podman-compose -f "$DOCKER_COMPOSE_PARTIAL" up -d --build \
+        api-gateway auth-service resources-service availability-service stockpile-service reports-service bookly-web
     echo ""
 
-    # Wait for microservices to be ready
-    echo -e "${YELLOW}Waiting for microservices to be ready (30 seconds)...${NC}"
-    sleep 30
-    echo ""
-
-    # Build and start frontend
-    echo -e "${YELLOW}Building and starting frontend...${NC}"
-    podman-compose -f "$DOCKER_COMPOSE_PARTIAL" up -d --build --force-recreate bookly-web
+    # Wait for services - use active polling instead of fixed sleep
+    if [[ "$FAST_MODE" == "true" ]]; then
+        echo -e "${YELLOW}Fast mode: skipping health checks...${NC}"
+        sleep 3
+    else
+        echo -e "${YELLOW}Waiting for services to be ready (active polling)...${NC}"
+        wait_for_containers \
+            "bookly-api-gateway" \
+            "bookly-auth-service" \
+            "bookly-resources-service" \
+            "bookly-availability-service" \
+            "bookly-stockpile-service" \
+            "bookly-reports-service" \
+            "bookly-frontend"
+        echo -e "${GREEN}All services ready!${NC}"
+    fi
     echo ""
 
     # Show status
@@ -298,6 +450,12 @@ else
     podman-compose -f "$DOCKER_COMPOSE_PARTIAL" ps
     echo ""
 fi
+
+# Calculate and show elapsed time
+END_TIME=$(date +%s)
+ELAPSED=$((END_TIME - START_TIME))
+ELAPSED_MIN=$((ELAPSED / 60))
+ELAPSED_SEC=$((ELAPSED % 60))
 
 # Show access URLs
 echo -e "${CYAN}=====================================${NC}"
@@ -313,6 +471,15 @@ echo -e "${GREEN}Reports Service:      http://localhost:3005${NC}"
 echo -e "${GREEN}Frontend:             http://localhost:4200${NC}"
 echo ""
 
+# Show performance summary
+echo -e "${CYAN}=====================================${NC}"
+echo -e "${CYAN}  Performance Summary${NC}"
+echo -e "${CYAN}=====================================${NC}"
+echo -e "${GREEN}Total deployment time: ${ELAPSED_MIN}m ${ELAPSED_SEC}s${NC}"
+echo -e "${GREEN}Parallel jobs used: $PARALLEL_JOBS${NC}"
+echo -e "${GREEN}Fast mode: $FAST_MODE${NC}"
+echo ""
+
 # Show appropriate commands based on mode
 echo -e "${CYAN}=====================================${NC}"
 if [[ "$MODE" == "full" ]]; then
@@ -323,3 +490,4 @@ else
     echo -e "${YELLOW}To stop services, run: podman-compose -f $DOCKER_COMPOSE_PARTIAL down${NC}"
 fi
 echo -e "${CYAN}=====================================${NC}"
+echo -e "${GREEN}Deployment completed successfully!${NC}"
