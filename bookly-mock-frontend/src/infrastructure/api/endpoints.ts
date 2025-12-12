@@ -222,6 +222,15 @@ export const REPORTS_ENDPOINTS = {
 } as const;
 
 /**
+ * Endpoints de Auditoría (Auth Service - Puerto 3001)
+ */
+export const AUDIT_ENDPOINTS = {
+  LOGS: `${API_VERSION}/audit/logs`,
+  LOG_BY_ID: (id: string) => `${API_VERSION}/audit/logs/${id}`,
+  EXPORT: `${API_VERSION}/audit/export`,
+} as const;
+
+/**
  * Endpoints de Sistema y Health Checks
  */
 export const SYSTEM_ENDPOINTS = {
@@ -263,8 +272,8 @@ export function buildUrl(
  * Útil para debugging y logging
  */
 export function getServiceFromEndpoint(endpoint: string): string {
-  // Auth Service
-  if (endpoint.includes("/auth") || endpoint.includes("/users")) return "AUTH";
+  // Auth Service (incluye auditoría)
+  if (endpoint.includes("/auth") || endpoint.includes("/users") || endpoint.includes("/audit")) return "AUTH";
 
   // Resources Service
   if (

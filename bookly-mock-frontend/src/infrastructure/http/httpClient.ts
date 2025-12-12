@@ -229,7 +229,8 @@ class HttpClient {
       fullEndpoint.includes("/users/") ||
       fullEndpoint.includes("/users") ||
       fullEndpoint.includes("/roles") ||
-      fullEndpoint.includes("/permissions")
+      fullEndpoint.includes("/permissions") ||
+      fullEndpoint.includes("/audit")
     ) {
       const url = `${getServiceUrl("auth")}${fullEndpoint}`;
       console.log("🔑 Auth Service - URL:", url);
