@@ -74,6 +74,14 @@ export class MockService {
       return this.mockGetCurrentUser() as any;
     }
 
+    if (endpoint.includes("/users/me") && method === "GET") {
+      return this.mockGetCurrentUser() as any;
+    }
+
+    if (endpoint.includes("/users/me") && method === "PUT") {
+      return this.mockUpdateProfile(data) as any;
+    }
+
     if (endpoint.includes("/auth/profile") && method === "PUT") {
       return this.mockUpdateProfile(data) as any;
     }

@@ -14,7 +14,7 @@ export const AUTH_ENDPOINTS = {
   LOGIN: `${API_VERSION}/auth/login`,
   REGISTER: `${API_VERSION}/auth/register`,
   LOGOUT: `${API_VERSION}/auth/logout`,
-  PROFILE: `${API_VERSION}/auth/profile`,
+  PROFILE: `${API_VERSION}/users/me`,
   REFRESH_TOKEN: `${API_VERSION}/auth/refresh`,
   VERIFY_EMAIL: `${API_VERSION}/auth/verify-email`,
   FORGOT_PASSWORD: `${API_VERSION}/auth/forgot-password`,
