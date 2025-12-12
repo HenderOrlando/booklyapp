@@ -56,26 +56,26 @@ if ($Mode -eq "") {
 }
 
 Write-Host "=====================================" -ForegroundColor Cyan
-Write-Host "  Bookly Docker Deployment Script" -ForegroundColor Cyan
+Write-Host "  Bookly Podman Deployment Script" -ForegroundColor Cyan
 Write-Host "=====================================" -ForegroundColor Cyan
 Write-Host "Action: $Action" -ForegroundColor Magenta
 Write-Host "Mode: $Mode" -ForegroundColor Magenta
 Write-Host ""
 
-# Check if Docker is running
-Write-Host "Checking Docker status..." -ForegroundColor Yellow
-docker info 2>&1 | Out-Null
+# Check if Podman is running
+Write-Host "Checking Podman status..." -ForegroundColor Yellow
+podman info 2>&1 | Out-Null
 if ($LASTEXITCODE -ne 0) {
-    Write-Host "ERROR: Docker is not running. Please start Docker Desktop." -ForegroundColor Red
+    Write-Host "ERROR: Podman is not running. Please start Podman Desktop." -ForegroundColor Red
     exit 1
 }
-Write-Host "Docker is running!" -ForegroundColor Green
+Write-Host "Podman is running!" -ForegroundColor Green
 Write-Host ""
 
 # Change to bookly-mock directory
 Push-Location $BOOKLY_MOCK_PATH
 
-# Determine which docker-compose file to use
+# Determine which podman-compose file to use
 $dockerComposeFile = if ($Mode -eq "full") { $DOCKER_COMPOSE_FULL } else { $DOCKER_COMPOSE_PARTIAL }
 
 try {
@@ -89,9 +89,9 @@ try {
         Write-Host ""
         
         if ($Mode -eq "full") {
-            docker compose -f $dockerComposeFile down -v
+            podman compose -f $dockerComposeFile down -v
         } else {
-            docker compose -f $dockerComposeFile down
+            podman compose -f $dockerComposeFile down
         }
         
         Write-Host ""
@@ -109,17 +109,17 @@ try {
         Write-Host ""
         
         Write-Host "Stopping containers..." -ForegroundColor Yellow
-        docker compose -f $dockerComposeFile down
+        podman compose -f $dockerComposeFile down
         Write-Host ""
         
         Write-Host "Starting containers..." -ForegroundColor Yellow
-        docker compose -f $dockerComposeFile up -d
+        podman compose -f $dockerComposeFile up -d
         Write-Host ""
         
         Write-Host "=====================================" -ForegroundColor Cyan
         Write-Host "  Deployment Status" -ForegroundColor Cyan
         Write-Host "=====================================" -ForegroundColor Cyan
-        docker compose -f $dockerComposeFile ps
+        podman compose -f $dockerComposeFile ps
         Write-Host ""
         
         Write-Host "Deployment restarted successfully!" -ForegroundColor Green
@@ -136,7 +136,7 @@ try {
     if ($Mode -eq "full") {
         # ===============================================
         # FULL DEPLOYMENT: Infrastructure + Microservices + Frontend
-        # Uses inline environment variables from docker-compose.yml
+        # Uses inline environment variables from podman-compose.yml
         # ===============================================
         Write-Host "=====================================" -ForegroundColor Cyan
         Write-Host "  FULL DEPLOYMENT" -ForegroundColor Cyan
@@ -146,12 +146,12 @@ try {
 
         # Stop and remove existing containers
         Write-Host "Stopping and removing existing containers..." -ForegroundColor Yellow
-        docker compose -f $DOCKER_COMPOSE_FULL down -v
+        podman compose -f $DOCKER_COMPOSE_FULL down -v
         Write-Host ""
 
         # Build and start infrastructure services first
         Write-Host "Starting infrastructure services (MongoDB, Redis, Kafka)..." -ForegroundColor Yellow
-        docker compose -f $DOCKER_COMPOSE_FULL up -d zookeeper kafka redis mongodb-auth mongodb-resources mongodb-availability mongodb-stockpile mongodb-reports mongodb-gateway
+        podman compose -f $DOCKER_COMPOSE_FULL up -d zookeeper kafka redis mongodb-auth mongodb-resources mongodb-availability mongodb-stockpile mongodb-reports mongodb-gateway
         Write-Host ""
 
         # Wait for infrastructure to be ready
@@ -161,7 +161,7 @@ try {
 
         # Build and start microservices
         Write-Host "Building and starting microservices..." -ForegroundColor Yellow
-        docker compose -f $DOCKER_COMPOSE_FULL up -d --build api-gateway auth-service resources-service availability-service stockpile-service reports-service
+        podman compose -f $DOCKER_COMPOSE_FULL up -d --build api-gateway auth-service resources-service availability-service stockpile-service reports-service
         Write-Host ""
 
         # Wait for microservices to be ready
@@ -171,14 +171,14 @@ try {
 
         # Build and start frontend
         Write-Host "Building and starting frontend..." -ForegroundColor Yellow
-        docker compose -f $DOCKER_COMPOSE_FULL up -d --build bookly-web
+        podman compose -f $DOCKER_COMPOSE_FULL up -d --build bookly-web
         Write-Host ""
 
         # Show status
         Write-Host "=====================================" -ForegroundColor Cyan
         Write-Host "  Deployment Status" -ForegroundColor Cyan
         Write-Host "=====================================" -ForegroundColor Cyan
-        docker compose -f $DOCKER_COMPOSE_FULL ps
+        podman compose -f $DOCKER_COMPOSE_FULL ps
         Write-Host ""
 
     } else {
@@ -233,12 +233,12 @@ try {
 
         # Stop existing microservices containers
         Write-Host "Stopping existing microservices containers..." -ForegroundColor Yellow
-        docker compose -f $DOCKER_COMPOSE_PARTIAL down
+        podman compose -f $DOCKER_COMPOSE_PARTIAL down
         Write-Host ""
 
         # Build and start microservices
         Write-Host "Building and starting microservices..." -ForegroundColor Yellow
-        docker compose -f $DOCKER_COMPOSE_PARTIAL up -d --build --force-recreate api-gateway auth-service resources-service availability-service stockpile-service reports-service
+        podman compose -f $DOCKER_COMPOSE_PARTIAL up -d --build --force-recreate api-gateway auth-service resources-service availability-service stockpile-service reports-service
         Write-Host ""
 
         # Wait for microservices to be ready
@@ -248,14 +248,14 @@ try {
 
         # Build and start frontend
         Write-Host "Building and starting frontend..." -ForegroundColor Yellow
-        docker compose -f $DOCKER_COMPOSE_PARTIAL up -d --build --force-recreate bookly-web
+        podman compose -f $DOCKER_COMPOSE_PARTIAL up -d --build --force-recreate bookly-web
         Write-Host ""
 
         # Show status
         Write-Host "=====================================" -ForegroundColor Cyan
         Write-Host "  Deployment Status" -ForegroundColor Cyan
         Write-Host "=====================================" -ForegroundColor Cyan
-        docker compose -f $DOCKER_COMPOSE_PARTIAL ps
+        podman compose -f $DOCKER_COMPOSE_PARTIAL ps
         Write-Host ""
     }
 
@@ -276,11 +276,11 @@ try {
     # Show appropriate commands based on mode
     Write-Host "=====================================" -ForegroundColor Cyan
     if ($Mode -eq "full") {
-        Write-Host "To view logs, run: docker compose logs -f" -ForegroundColor Yellow
-        Write-Host "To stop all services, run: docker compose down" -ForegroundColor Yellow
+        Write-Host "To view logs, run: podman compose logs -f" -ForegroundColor Yellow
+        Write-Host "To stop all services, run: podman compose down" -ForegroundColor Yellow
     } else {
-        Write-Host "To view logs, run: docker compose -f $DOCKER_COMPOSE_PARTIAL logs -f" -ForegroundColor Yellow
-        Write-Host "To stop services, run: docker compose -f $DOCKER_COMPOSE_PARTIAL down" -ForegroundColor Yellow
+        Write-Host "To view logs, run: podman compose -f $DOCKER_COMPOSE_PARTIAL logs -f" -ForegroundColor Yellow
+        Write-Host "To stop services, run: podman compose -f $DOCKER_COMPOSE_PARTIAL down" -ForegroundColor Yellow
     }
     Write-Host "=====================================" -ForegroundColor Cyan
 
