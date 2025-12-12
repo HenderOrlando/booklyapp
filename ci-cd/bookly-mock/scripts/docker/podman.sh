@@ -129,9 +129,9 @@ if [[ "$ACTION" == "stop" ]]; then
     echo ""
     
     if [[ "$MODE" == "full" ]]; then
-        podman compose -f "$docker_compose_file" down -v
+        podman-compose -f "$docker_compose_file" down -v
     else
-        podman compose -f "$docker_compose_file" down
+        podman-compose -f "$docker_compose_file" down
     fi
     
     echo ""
@@ -149,17 +149,17 @@ if [[ "$ACTION" == "restart" ]]; then
     echo ""
     
     echo -e "${YELLOW}Stopping containers...${NC}"
-    podman compose -f "$docker_compose_file" down
+    podman-compose -f "$docker_compose_file" down
     echo ""
     
     echo -e "${YELLOW}Starting containers...${NC}"
-    podman compose -f "$docker_compose_file" up -d
+    podman-compose -f "$docker_compose_file" up -d
     echo ""
     
     echo -e "${CYAN}=====================================${NC}"
     echo -e "${CYAN}  Deployment Status${NC}"
     echo -e "${CYAN}=====================================${NC}"
-    podman compose -f "$docker_compose_file" ps
+    podman-compose -f "$docker_compose_file" ps
     echo ""
     
     echo -e "${GREEN}Deployment restarted successfully!${NC}"
@@ -186,12 +186,12 @@ if [[ "$MODE" == "full" ]]; then
 
     # Stop and remove existing containers
     echo -e "${YELLOW}Stopping and removing existing containers...${NC}"
-    podman compose -f "$DOCKER_COMPOSE_FULL" down -v
+    podman-compose -f "$DOCKER_COMPOSE_FULL" down -v
     echo ""
 
     # Build and start infrastructure services first
     echo -e "${YELLOW}Starting infrastructure services (MongoDB, Redis, Kafka)...${NC}"
-    podman compose -f "$DOCKER_COMPOSE_FULL" up -d zookeeper kafka redis mongodb-auth mongodb-resources mongodb-availability mongodb-stockpile mongodb-reports mongodb-gateway
+    podman-compose -f "$DOCKER_COMPOSE_FULL" up -d zookeeper kafka redis mongodb-auth mongodb-resources mongodb-availability mongodb-stockpile mongodb-reports mongodb-gateway
     echo ""
 
     # Wait for infrastructure to be ready
@@ -201,7 +201,7 @@ if [[ "$MODE" == "full" ]]; then
 
     # Build and start microservices
     echo -e "${YELLOW}Building and starting microservices...${NC}"
-    podman compose -f "$DOCKER_COMPOSE_FULL" up -d --build api-gateway auth-service resources-service availability-service stockpile-service reports-service
+    podman-compose -f "$DOCKER_COMPOSE_FULL" up -d --build api-gateway auth-service resources-service availability-service stockpile-service reports-service
     echo ""
 
     # Wait for microservices to be ready
@@ -211,14 +211,14 @@ if [[ "$MODE" == "full" ]]; then
 
     # Build and start frontend
     echo -e "${YELLOW}Building and starting frontend...${NC}"
-    podman compose -f "$DOCKER_COMPOSE_FULL" up -d --build bookly-web
+    podman-compose -f "$DOCKER_COMPOSE_FULL" up -d --build bookly-web
     echo ""
 
     # Show status
     echo -e "${CYAN}=====================================${NC}"
     echo -e "${CYAN}  Deployment Status${NC}"
     echo -e "${CYAN}=====================================${NC}"
-    podman compose -f "$DOCKER_COMPOSE_FULL" ps
+    podman-compose -f "$DOCKER_COMPOSE_FULL" ps
     echo ""
 
 else
@@ -273,12 +273,12 @@ else
 
     # Stop existing microservices containers
     echo -e "${YELLOW}Stopping existing microservices containers...${NC}"
-    podman compose -f "$DOCKER_COMPOSE_PARTIAL" down
+    podman-compose -f "$DOCKER_COMPOSE_PARTIAL" down
     echo ""
 
     # Build and start microservices
     echo -e "${YELLOW}Building and starting microservices...${NC}"
-    podman compose -f "$DOCKER_COMPOSE_PARTIAL" up -d --build --force-recreate api-gateway auth-service resources-service availability-service stockpile-service reports-service
+    podman-compose -f "$DOCKER_COMPOSE_PARTIAL" up -d --build --force-recreate api-gateway auth-service resources-service availability-service stockpile-service reports-service
     echo ""
 
     # Wait for microservices to be ready
@@ -288,14 +288,14 @@ else
 
     # Build and start frontend
     echo -e "${YELLOW}Building and starting frontend...${NC}"
-    podman compose -f "$DOCKER_COMPOSE_PARTIAL" up -d --build --force-recreate bookly-web
+    podman-compose -f "$DOCKER_COMPOSE_PARTIAL" up -d --build --force-recreate bookly-web
     echo ""
 
     # Show status
     echo -e "${CYAN}=====================================${NC}"
     echo -e "${CYAN}  Deployment Status${NC}"
     echo -e "${CYAN}=====================================${NC}"
-    podman compose -f "$DOCKER_COMPOSE_PARTIAL" ps
+    podman-compose -f "$DOCKER_COMPOSE_PARTIAL" ps
     echo ""
 fi
 
@@ -316,10 +316,10 @@ echo ""
 # Show appropriate commands based on mode
 echo -e "${CYAN}=====================================${NC}"
 if [[ "$MODE" == "full" ]]; then
-    echo -e "${YELLOW}To view logs, run: podman compose logs -f${NC}"
-    echo -e "${YELLOW}To stop all services, run: podman compose down${NC}"
+    echo -e "${YELLOW}To view logs, run: podman-compose logs -f${NC}"
+    echo -e "${YELLOW}To stop all services, run: podman-compose down${NC}"
 else
-    echo -e "${YELLOW}To view logs, run: podman compose -f $DOCKER_COMPOSE_PARTIAL logs -f${NC}"
-    echo -e "${YELLOW}To stop services, run: podman compose -f $DOCKER_COMPOSE_PARTIAL down${NC}"
+    echo -e "${YELLOW}To view logs, run: podman-compose -f $DOCKER_COMPOSE_PARTIAL logs -f${NC}"
+    echo -e "${YELLOW}To stop services, run: podman-compose -f $DOCKER_COMPOSE_PARTIAL down${NC}"
 fi
 echo -e "${CYAN}=====================================${NC}"
