@@ -8,7 +8,7 @@ import {
   useState,
 } from "react";
 import { io, Socket } from "socket.io-client";
-import { config } from "@/lib/config";
+import { config, isMockMode } from "@/lib/config";
 
 interface WebSocketContextType {
   socket: Socket | null;
@@ -28,11 +28,16 @@ export function WebSocketProvider({ children }: WebSocketProviderProps) {
   const [isConnected, setIsConnected] = useState(false);
 
   useEffect(() => {
-    // Por ahora solo inicializar sin conectar
-    // La conexión se hará después del login
+    // No inicializar WebSocket en modo mock
+    if (isMockMode() || !config.features.enableWebSocket) {
+      console.log("[WebSocket] Deshabilitado en modo mock o por configuración");
+      return;
+    }
+
+    // Inicializar sin conectar - la conexión se hará después del login
     const socketInstance = io(config.wsUrl || "", {
       path: "/api/v1/ws",
-      autoConnect: false, // No conectar automáticamente
+      autoConnect: false,
     });
 
     socketInstance.on("connect", () => {

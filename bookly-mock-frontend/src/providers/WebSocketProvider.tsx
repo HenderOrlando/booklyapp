@@ -7,8 +7,8 @@
 "use client";
 
 import { useWebSocket } from "@/hooks/useWebSocket";
-import { config } from "@/lib/config";
-import React, { createContext, useContext } from "react";
+import { config, isMockMode } from "@/lib/config";
+import React, { createContext, useContext, useMemo } from "react";
 
 interface WebSocketContextValue {
   isConnected: boolean;
@@ -18,6 +18,13 @@ interface WebSocketContextValue {
 }
 
 const WebSocketContext = createContext<WebSocketContextValue | null>(null);
+
+const DISABLED_CONTEXT: WebSocketContextValue = {
+  isConnected: false,
+  connectionState: "DISABLED",
+  send: () => {},
+  subscribe: () => () => {},
+};
 
 interface WebSocketProviderProps {
   children: React.ReactNode;
@@ -30,13 +37,17 @@ export function WebSocketProvider({
   url = config.wsUrl,
   enabled = true,
 }: WebSocketProviderProps) {
+  // Desactivar WebSocket en modo mock o si está explícitamente deshabilitado
+  const shouldEnable = enabled && !isMockMode() && config.features.enableWebSocket;
+
   const websocket = useWebSocket({
     url,
     token:
       typeof window !== "undefined"
         ? localStorage.getItem("token") || undefined
         : undefined,
-    autoConnect: enabled,
+    autoConnect: shouldEnable,
+    reconnect: shouldEnable, // No reconectar si está deshabilitado
     onConnected: () => {
       console.log("[WebSocketProvider] Conectado al servidor");
     },
@@ -48,24 +59,16 @@ export function WebSocketProvider({
     },
   });
 
-  // Si WebSocket está deshabilitado, proveer mock
-  if (!enabled) {
-    return (
-      <WebSocketContext.Provider
-        value={{
-          isConnected: false,
-          connectionState: "DISABLED",
-          send: () => {},
-          subscribe: () => () => {},
-        }}
-      >
-        {children}
-      </WebSocketContext.Provider>
-    );
-  }
+  // Usar contexto deshabilitado si WebSocket no está activo
+  const contextValue = useMemo(() => {
+    if (!shouldEnable) {
+      return DISABLED_CONTEXT;
+    }
+    return websocket;
+  }, [shouldEnable, websocket]);
 
   return (
-    <WebSocketContext.Provider value={websocket}>
+    <WebSocketContext.Provider value={contextValue}>
       {children}
     </WebSocketContext.Provider>
   );
