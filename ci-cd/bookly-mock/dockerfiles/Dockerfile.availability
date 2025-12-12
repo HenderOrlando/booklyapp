@@ -19,7 +19,7 @@ COPY apps ./apps
 COPY libs ./libs
 
 # Build
-RUN npm run build availability-service
+RUN npx nest build availability-service
 
 # Health check
 HEALTHCHECK --interval=30s --timeout=10s --start-period=40s --retries=3 \

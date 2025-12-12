@@ -19,8 +19,9 @@ param(
     [string]$Mode = ""
 )
 
-# Configuration
-$BOOKLY_MOCK_PATH = "..\..\..\..\bookly-mock"
+# Configuration - Use $PSScriptRoot to calculate paths relative to script location
+$SCRIPT_DIR = $PSScriptRoot
+$BOOKLY_MOCK_PATH = (Resolve-Path (Join-Path $SCRIPT_DIR "..\..\..\..\bookly-mock")).Path
 $DOCKER_COMPOSE_FULL = "docker-compose.yml"
 $DOCKER_COMPOSE_PARTIAL = "docker-compose.microservices.yml"
 $DEPLOY_MODE_FILE = ".deploy-mode"
@@ -88,9 +89,9 @@ try {
         Write-Host ""
         
         if ($Mode -eq "full") {
-            docker-compose -f $dockerComposeFile down -v
+            docker compose -f $dockerComposeFile down -v
         } else {
-            docker-compose -f $dockerComposeFile down
+            docker compose -f $dockerComposeFile down
         }
         
         Write-Host ""
@@ -108,17 +109,17 @@ try {
         Write-Host ""
         
         Write-Host "Stopping containers..." -ForegroundColor Yellow
-        docker-compose -f $dockerComposeFile down
+        docker compose -f $dockerComposeFile down
         Write-Host ""
         
         Write-Host "Starting containers..." -ForegroundColor Yellow
-        docker-compose -f $dockerComposeFile up -d
+        docker compose -f $dockerComposeFile up -d
         Write-Host ""
         
         Write-Host "=====================================" -ForegroundColor Cyan
         Write-Host "  Deployment Status" -ForegroundColor Cyan
         Write-Host "=====================================" -ForegroundColor Cyan
-        docker-compose -f $dockerComposeFile ps
+        docker compose -f $dockerComposeFile ps
         Write-Host ""
         
         Write-Host "Deployment restarted successfully!" -ForegroundColor Green
@@ -145,12 +146,12 @@ try {
 
         # Stop and remove existing containers
         Write-Host "Stopping and removing existing containers..." -ForegroundColor Yellow
-        docker-compose -f $DOCKER_COMPOSE_FULL down -v
+        docker compose -f $DOCKER_COMPOSE_FULL down -v
         Write-Host ""
 
         # Build and start infrastructure services first
         Write-Host "Starting infrastructure services (MongoDB, Redis, Kafka)..." -ForegroundColor Yellow
-        docker-compose -f $DOCKER_COMPOSE_FULL up -d zookeeper kafka redis mongodb-auth mongodb-resources mongodb-availability mongodb-stockpile mongodb-reports mongodb-gateway
+        docker compose -f $DOCKER_COMPOSE_FULL up -d zookeeper kafka redis mongodb-auth mongodb-resources mongodb-availability mongodb-stockpile mongodb-reports mongodb-gateway
         Write-Host ""
 
         # Wait for infrastructure to be ready
@@ -160,7 +161,7 @@ try {
 
         # Build and start microservices
         Write-Host "Building and starting microservices..." -ForegroundColor Yellow
-        docker-compose -f $DOCKER_COMPOSE_FULL up -d --build api-gateway auth-service resources-service availability-service stockpile-service reports-service
+        docker compose -f $DOCKER_COMPOSE_FULL up -d --build api-gateway auth-service resources-service availability-service stockpile-service reports-service
         Write-Host ""
 
         # Wait for microservices to be ready
@@ -170,14 +171,14 @@ try {
 
         # Build and start frontend
         Write-Host "Building and starting frontend..." -ForegroundColor Yellow
-        docker-compose -f $DOCKER_COMPOSE_FULL up -d --build bookly-web
+        docker compose -f $DOCKER_COMPOSE_FULL up -d --build bookly-web
         Write-Host ""
 
         # Show status
         Write-Host "=====================================" -ForegroundColor Cyan
         Write-Host "  Deployment Status" -ForegroundColor Cyan
         Write-Host "=====================================" -ForegroundColor Cyan
-        docker-compose -f $DOCKER_COMPOSE_FULL ps
+        docker compose -f $DOCKER_COMPOSE_FULL ps
         Write-Host ""
 
     } else {
@@ -232,12 +233,12 @@ try {
 
         # Stop existing microservices containers
         Write-Host "Stopping existing microservices containers..." -ForegroundColor Yellow
-        docker-compose -f $DOCKER_COMPOSE_PARTIAL down
+        docker compose -f $DOCKER_COMPOSE_PARTIAL down
         Write-Host ""
 
         # Build and start microservices
         Write-Host "Building and starting microservices..." -ForegroundColor Yellow
-        docker-compose -f $DOCKER_COMPOSE_PARTIAL up -d --build api-gateway auth-service resources-service availability-service stockpile-service reports-service
+        docker compose -f $DOCKER_COMPOSE_PARTIAL up -d --build --force-recreate api-gateway auth-service resources-service availability-service stockpile-service reports-service
         Write-Host ""
 
         # Wait for microservices to be ready
@@ -247,14 +248,14 @@ try {
 
         # Build and start frontend
         Write-Host "Building and starting frontend..." -ForegroundColor Yellow
-        docker-compose -f $DOCKER_COMPOSE_PARTIAL up -d --build bookly-web
+        docker compose -f $DOCKER_COMPOSE_PARTIAL up -d --build --force-recreate bookly-web
         Write-Host ""
 
         # Show status
         Write-Host "=====================================" -ForegroundColor Cyan
         Write-Host "  Deployment Status" -ForegroundColor Cyan
         Write-Host "=====================================" -ForegroundColor Cyan
-        docker-compose -f $DOCKER_COMPOSE_PARTIAL ps
+        docker compose -f $DOCKER_COMPOSE_PARTIAL ps
         Write-Host ""
     }
 
@@ -275,11 +276,11 @@ try {
     # Show appropriate commands based on mode
     Write-Host "=====================================" -ForegroundColor Cyan
     if ($Mode -eq "full") {
-        Write-Host "To view logs, run: docker-compose logs -f" -ForegroundColor Yellow
-        Write-Host "To stop all services, run: docker-compose down" -ForegroundColor Yellow
+        Write-Host "To view logs, run: docker compose logs -f" -ForegroundColor Yellow
+        Write-Host "To stop all services, run: docker compose down" -ForegroundColor Yellow
     } else {
-        Write-Host "To view logs, run: docker-compose -f $DOCKER_COMPOSE_PARTIAL logs -f" -ForegroundColor Yellow
-        Write-Host "To stop services, run: docker-compose -f $DOCKER_COMPOSE_PARTIAL down" -ForegroundColor Yellow
+        Write-Host "To view logs, run: docker compose -f $DOCKER_COMPOSE_PARTIAL logs -f" -ForegroundColor Yellow
+        Write-Host "To stop services, run: docker compose -f $DOCKER_COMPOSE_PARTIAL down" -ForegroundColor Yellow
     }
     Write-Host "=====================================" -ForegroundColor Cyan
 

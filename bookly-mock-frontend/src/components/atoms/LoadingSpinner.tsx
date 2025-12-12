@@ -17,6 +17,10 @@ import * as React from "react";
 export interface LoadingSpinnerProps {
   size?: "sm" | "md" | "lg" | "xl";
   className?: string;
+  /** Texto a mostrar junto al spinner */
+  text?: string;
+  /** Si true, centra el spinner en toda la pantalla */
+  fullScreen?: boolean;
 }
 
 const sizeClasses = {
@@ -27,17 +31,26 @@ const sizeClasses = {
 };
 
 export const LoadingSpinner = React.memo<LoadingSpinnerProps>(
-  ({ size = "md", className = "" }) => {
+  ({ size = "md", className = "", text, fullScreen = false }) => {
+    const containerClasses = fullScreen
+      ? "flex flex-col items-center justify-center h-96"
+      : `flex flex-col items-center justify-center ${className}`;
+
     return (
-      <Loader2
-        className={`
-          ${sizeClasses[size]}
-          animate-spin
-          text-primary-600 dark:text-primary-400
-          ${className}
-        `}
-        aria-label="Cargando..."
-      />
+      <div className={containerClasses}>
+        <Loader2
+          className={`
+            ${sizeClasses[size]}
+            animate-spin
+            text-primary-600 dark:text-primary-400
+            mb-2
+          `}
+          aria-label="Cargando..."
+        />
+        {text && (
+          <p className="text-sm text-gray-500 dark:text-gray-400">{text}</p>
+        )}
+      </div>
     );
   }
 );
