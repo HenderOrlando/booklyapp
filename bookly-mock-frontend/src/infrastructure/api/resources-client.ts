@@ -275,9 +275,7 @@ export class ResourcesClient {
     startDate: string,
     endDate: string
   ): Promise<ApiResponse<{ available: boolean; conflicts?: any[] }>> {
-    return httpClient.get<
-      ApiResponse<{ available: boolean; conflicts?: any[] }>
-    >(
+    return httpClient.get<{ available: boolean; conflicts?: any[] }>(
       buildUrl(RESOURCES_ENDPOINTS.AVAILABILITY_BY_ID(resourceId), {
         startDate,
         endDate,

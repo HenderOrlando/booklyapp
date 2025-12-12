@@ -356,10 +356,12 @@ export function getMockLoginResponse(
   }
 
   return {
+    requiresTwoFactor: false,
     user: credential.user,
-    accessToken: `mock-token-${credential.user.id}-${Date.now()}`,
-    refreshToken: `mock-refresh-${credential.user.id}-${Date.now()}`,
-    expiresIn: 86400, // 24 horas
+    tokens: {
+      accessToken: `mock-token-${credential.user.id}-${Date.now()}`,
+      refreshToken: `mock-refresh-${credential.user.id}-${Date.now()}`,
+    },
   };
 }
 
