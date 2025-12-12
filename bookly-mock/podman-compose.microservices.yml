@@ -8,13 +8,13 @@ services:
     build:
       context: .
       dockerfile: ../ci-cd/bookly-mock/dockerfiles/Dockerfile.gateway
-    container_name: bookly-mock-api-gateway
+    container_name: bookly-api-gateway
     ports:
       - "${PORT_0}:3000"
     env_file:
       - ./apps/api-gateway/.env
     networks:
-      - bookly-mock-network
+      - bookly-network
     restart: unless-stopped
 
   # ===============================================
@@ -24,13 +24,13 @@ services:
     build:
       context: .
       dockerfile: ../ci-cd/bookly-mock/dockerfiles/Dockerfile.auth
-    container_name: bookly-mock-auth-service
+    container_name: bookly-auth-service
     ports:
       - "${PORT_1}:3001"
     env_file:
       - ./apps/auth-service/.env
     networks:
-      - bookly-mock-network
+      - bookly-network
     restart: unless-stopped
 
   # ===============================================
@@ -40,13 +40,13 @@ services:
     build:
       context: .
       dockerfile: ../ci-cd/bookly-mock/dockerfiles/Dockerfile.resources
-    container_name: bookly-mock-resources-service
+    container_name: bookly-resources-service
     ports:
       - "${PORT_2}:3002"
     env_file:
       - ./apps/resources-service/.env
     networks:
-      - bookly-mock-network
+      - bookly-network
     restart: unless-stopped
 
   # ===============================================
@@ -56,13 +56,13 @@ services:
     build:
       context: .
       dockerfile: ../ci-cd/bookly-mock/dockerfiles/Dockerfile.availability
-    container_name: bookly-mock-availability-service
+    container_name: bookly-availability-service
     ports:
       - "${PORT_3}:3003"
     env_file:
       - ./apps/availability-service/.env
     networks:
-      - bookly-mock-network
+      - bookly-network
     restart: unless-stopped
 
   # ===============================================
@@ -72,13 +72,13 @@ services:
     build:
       context: .
       dockerfile: ../ci-cd/bookly-mock/dockerfiles/Dockerfile.stockpile
-    container_name: bookly-mock-stockpile-service
+    container_name: bookly-stockpile-service
     ports:
       - "${PORT_4}:3004"
     env_file:
       - ./apps/stockpile-service/.env
     networks:
-      - bookly-mock-network
+      - bookly-network
     restart: unless-stopped
 
   # ===============================================
@@ -88,13 +88,13 @@ services:
     build:
       context: .
       dockerfile: ../ci-cd/bookly-mock/dockerfiles/Dockerfile.reports
-    container_name: bookly-mock-reports-service
+    container_name: bookly-reports-service
     ports:
       - "${PORT_5}:3005"
     env_file:
       - ./apps/reports-service/.env
     networks:
-      - bookly-mock-network
+      - bookly-network
     restart: unless-stopped
 
   # ===============================================
@@ -104,15 +104,15 @@ services:
     build:
       context: ../bookly-mock-frontend
       dockerfile: ../ci-cd/bookly-mock/dockerfiles/Dockerfile.web
-    container_name: bookly-mock-frontend
+    container_name: bookly-frontend
     ports:
       - "${PORT_6}:4200"
     env_file:
-      - ../bookly-mock-frontend/.env
+      - ../bookly-mock-frontend/.env.podman
     networks:
-      - bookly-mock-network
+      - bookly-network
     restart: unless-stopped
 
 networks:
-  bookly-mock-network:
+  bookly-network:
     driver: bridge
