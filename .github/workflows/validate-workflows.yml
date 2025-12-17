@@ -38,8 +38,10 @@ jobs:
             trailing-spaces: error
           EOF
 
-          yamllint -c .yamllint.yml .github/workflows/*.yml || true
+          # Lint workflow files (warnings allowed, errors fail)
+          yamllint -c .yamllint.yml .github/workflows/*.yml
 
-      - name: Validate workflows
+      - name: Validation summary
+        if: success()
         run: |
           echo "✅ All workflow files have valid YAML syntax"
