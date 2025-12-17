@@ -40,8 +40,8 @@ Los workflows usan **GitHub Container Registry (GHCR)** automáticamente, no nec
 
 En el servidor donde se desplegarán los servicios:
 
-1. Instalar Docker
-2. Crear red Docker: `docker network create bookly-network`
+1. Instalar Podman
+2. Crear red Podman: `podman network create bookly-network`
 3. Crear directorio para env files: `sudo mkdir -p /opt/bookly`
 4. Crear archivos `.env` para cada servicio:
    - `/opt/bookly/.env.api-gateway`
@@ -96,7 +96,7 @@ El workflow realiza los siguientes pasos:
 Después del build exitoso, se ejecuta el deploy automáticamente:
 
 1. **Conexión SSH**: Se conecta al servidor usando las credenciales configuradas
-2. **Login a GHCR**: Autentica Docker en el servidor con GHCR
+2. **Login a GHCR**: Autentica Podman en el servidor con GHCR
 3. **Pull de imagen**: Descarga la imagen recién creada desde GHCR
 4. **Stop container**: Detiene el contenedor existente (si existe)
 5. **Remove container**: Elimina el contenedor antiguo
@@ -106,7 +106,7 @@ Después del build exitoso, se ejecuta el deploy automáticamente:
    - Red `bookly-network`
    - Variables de entorno desde `/opt/bookly/.env.{servicio}`
    - Restart policy: `unless-stopped`
-7. **Cleanup**: Limpia imágenes antiguas no utilizadas
+7. **Cleanup**: Limpia imágenes antiguas no utilizadas usando Podman
 
 ## 🏷️ Tags Generados Automáticamente
 

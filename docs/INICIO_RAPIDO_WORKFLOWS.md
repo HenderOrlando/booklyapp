@@ -19,10 +19,10 @@ Esta guía te ayudará a empezar a usar los workflows de GitHub Actions en menos
 
 #### 1.1 Preparar Servidor de Despliegue
 
-1. Asegúrate de tener Docker instalado en tu servidor
-2. Crea la red Docker:
+1. Asegúrate de tener Podman instalado en tu servidor
+2. Crea la red Podman:
    ```bash
-   docker network create bookly-network
+   podman network create bookly-network
    ```
 3. Crea directorio para env files:
    ```bash
@@ -108,10 +108,10 @@ Esta guía te ayudará a empezar a usar los workflows de GitHub Actions en menos
    ssh usuario@servidor
    
    # Verificar que el contenedor está corriendo
-   docker ps | grep bookly-api-gateway
+   podman ps | grep bookly-api-gateway
    
    # Ver logs del servicio
-   docker logs bookly-api-gateway
+   podman logs bookly-api-gateway
    ```
 
 ---
