@@ -11,8 +11,13 @@ on:
       - '.github/workflows/frontend.yml'
   workflow_dispatch:
 
+permissions:
+  contents: read
+
 jobs:
   build:
+    permissions:
+      contents: read
     uses: ./.github/workflows/build-and-push-image.yml
     with:
       service-name: bookly-web
@@ -24,6 +29,7 @@ jobs:
       DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
 
   deploy:
+    permissions: {}
     needs: build
     runs-on: ubuntu-latest
     steps:
