@@ -4,7 +4,7 @@ Esta guía te ayudará a empezar a usar los workflows de GitHub Actions en menos
 
 ## ⚡ TL;DR (Lo Mínimo Necesario)
 
-1. **Configurar Secrets** → `Settings` → `Secrets` → Agregar `DOCKER_USERNAME` y `DOCKER_PASSWORD`
+1. **Configurar Secrets SSH** → `Settings` → `Secrets` → Agregar `DEPLOY_HOST`, `DEPLOY_USER`, `DEPLOY_SSH_KEY`
 2. **Hacer un cambio** → Edita cualquier archivo en un servicio
 3. **Push a GitHub** → `git push origin main`
 4. **Ver el resultado** → Tab `Actions` en GitHub
@@ -15,35 +15,47 @@ Esta guía te ayudará a empezar a usar los workflows de GitHub Actions en menos
 
 ## 📋 Pasos Detallados
 
-### Paso 1: Configurar Docker Hub Secrets (2 minutos)
+### Paso 1: Configurar SSH Secrets (2 minutos)
 
-#### 1.1 Crear Token en Docker Hub
+#### 1.1 Preparar Servidor de Despliegue
 
-1. Ve a https://hub.docker.com/
-2. Inicia sesión
-3. Ve a: **Account Settings** → **Security** → **Access Tokens**
-4. Click en **New Access Token**
-5. Nombre: `GitHub Actions - Bookly`
-6. Permisos: **Read, Write, Delete**
-7. Click **Generate**
-8. **¡COPIA EL TOKEN!** (no podrás verlo de nuevo)
+1. Asegúrate de tener Docker instalado en tu servidor
+2. Crea la red Docker:
+   ```bash
+   docker network create bookly-network
+   ```
+3. Crea directorio para env files:
+   ```bash
+   sudo mkdir -p /opt/bookly
+   ```
+4. Crea archivos `.env` para cada servicio en `/opt/bookly/`
 
-#### 1.2 Agregar Secrets en GitHub
+#### 1.2 Agregar Secrets SSH en GitHub
 
 1. Ve a tu repositorio: https://github.com/HenderOrlando/booklyapp
 2. Click en **Settings** (tab superior)
 3. En el menú lateral: **Secrets and variables** → **Actions**
 4. Click en **New repository secret**
-5. Agrega el primer secret:
-   - Name: `DOCKER_USERNAME`
-   - Secret: Tu usuario de Docker Hub
+5. Agrega los siguientes secrets:
+   - Name: `DEPLOY_HOST`
+   - Secret: IP o dominio de tu servidor (ej: `192.168.1.100` o `server.example.com`)
    - Click **Add secret**
-6. Agrega el segundo secret:
-   - Name: `DOCKER_PASSWORD`
-   - Secret: El token que copiaste de Docker Hub
+6. Agrega el usuario SSH:
+   - Name: `DEPLOY_USER`
+   - Secret: Usuario SSH (ej: `ubuntu`, `root`, etc.)
+   - Click **Add secret**
+7. Agrega la clave SSH privada:
+   - Name: `DEPLOY_SSH_KEY`
+   - Secret: Contenido completo de tu clave privada SSH (ej: `~/.ssh/id_rsa`)
+   - Click **Add secret**
+8. (Opcional) Si usas un puerto SSH diferente:
+   - Name: `DEPLOY_PORT`
+   - Secret: Número de puerto (ej: `2222`)
    - Click **Add secret**
 
-✅ **Secrets configurados correctamente**
+✅ **Secrets SSH configurados correctamente**
+
+**Nota**: Las imágenes se publican automáticamente en **GitHub Container Registry (GHCR)** usando `GITHUB_TOKEN`, no necesitas configurar Docker Hub.
 
 ### Paso 2: Probar un Workflow (1 minuto)
 
@@ -85,15 +97,21 @@ Esta guía te ayudará a empezar a usar los workflows de GitHub Actions en menos
    - ⏳ = Paso en ejecución
    - ❌ = Paso fallido (click para ver logs)
 
-2. **En Docker Hub:**
-   - Ve a: https://hub.docker.com/
-   - Busca: `tu-usuario/bookly-api-gateway`
+2. **En GitHub Container Registry (GHCR):**
+   - Ve a: `https://github.com/TU-USUARIO?tab=packages`
+   - Busca: `bookly-api-gateway`
    - Verás la imagen con múltiples tags
 
-3. **Verificar localmente:**
+3. **En el servidor de despliegue:**
    ```bash
-   docker pull <tu-usuario>/bookly-api-gateway:latest
-   docker run -p 3000:3000 <tu-usuario>/bookly-api-gateway:latest
+   # Conectarse al servidor
+   ssh usuario@servidor
+   
+   # Verificar que el contenedor está corriendo
+   docker ps | grep bookly-api-gateway
+   
+   # Ver logs del servicio
+   docker logs bookly-api-gateway
    ```
 
 ---
@@ -112,9 +130,9 @@ Esta guía te ayudará a empezar a usar los workflows de GitHub Actions en menos
 
 ---
 
-## 🔧 Personalizar Deploy (Opcional)
+## 🔧 Deploy Automático via SSH
 
-Por defecto, los workflows solo hacen **build** y **push** a Docker Hub.
+Los workflows ahora despliegan automáticamente cada servicio en tu servidor vía SSH:
 
 Para agregar deploy automático, edita la sección `deploy` en cada workflow:
 
