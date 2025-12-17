@@ -1,0 +1,184 @@
+name: Build and Push to GHCR
+
+on:
+  workflow_dispatch:
+    inputs:
+      service:
+        description: 'Servicio a construir (o "all" para todos)'
+        required: true
+        default: 'all'
+        type: choice
+        options:
+          - all
+          - base
+          - auth
+          - availability
+          - gateway
+          - reports
+          - resources
+          - stockpile
+          - web
+      tag:
+        description: 'Tag de la imagen (default: latest)'
+        required: false
+        default: 'latest'
+        type: string
+  push:
+    branches:
+      - main
+      - develop
+    paths:
+      - 'bookly-mock/**'
+      - 'ci-cd/bookly-mock/dockerfiles/**'
+      - 'bookly-mock-frontend/**'
+
+env:
+  REGISTRY: ghcr.io
+  IMAGE_PREFIX: ${{ github.repository_owner }}/bookly
+
+jobs:
+  prepare:
+    name: Preparar matriz de servicios
+    runs-on: ubuntu-latest
+    outputs:
+      services: ${{ steps.set-matrix.outputs.services }}
+      tag: ${{ steps.set-tag.outputs.tag }}
+    steps:
+      - name: Determinar servicios a construir
+        id: set-matrix
+        run: |
+          SERVICE="${{ github.event.inputs.service || 'all' }}"
+          if [ "$SERVICE" = "all" ]; then
+            echo 'services=["base","auth","availability","gateway","reports","resources","stockpile","web"]' >> $GITHUB_OUTPUT
+          else
+            echo "services=[\"$SERVICE\"]" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Determinar tag
+        id: set-tag
+        run: |
+          if [ "${{ github.event_name }}" = "push" ]; then
+            BRANCH="${{ github.ref_name }}"
+            SHA_SHORT=$(echo "${{ github.sha }}" | cut -c1-7)
+            if [ "$BRANCH" = "main" ]; then
+              echo "tag=latest" >> $GITHUB_OUTPUT
+            else
+              echo "tag=${BRANCH}-${SHA_SHORT}" >> $GITHUB_OUTPUT
+            fi
+          else
+            TAG="${{ github.event.inputs.tag || 'latest' }}"
+            echo "tag=$TAG" >> $GITHUB_OUTPUT
+          fi
+
+  build-and-push:
+    name: Build ${{ matrix.service }}
+    runs-on: ubuntu-latest
+    needs: prepare
+    strategy:
+      fail-fast: false
+      matrix:
+        service: ${{ fromJson(needs.prepare.outputs.services) }}
+    permissions:
+      contents: read
+      packages: write
+
+    steps:
+      - name: Checkout código
+        uses: actions/checkout@v4
+
+      - name: Configurar Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Login a GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Extraer metadata de Docker
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.REGISTRY }}/${{ env.IMAGE_PREFIX }}-${{ matrix.service }}
+          tags: |
+            type=raw,value=${{ needs.prepare.outputs.tag }}
+            type=sha,prefix=,format=short
+
+      - name: Determinar Dockerfile y contexto
+        id: dockerfile
+        run: |
+          SERVICE="${{ matrix.service }}"
+          
+          case $SERVICE in
+            web)
+              echo "dockerfile=ci-cd/bookly-mock/dockerfiles/Dockerfile.web" >> $GITHUB_OUTPUT
+              echo "context=bookly-mock-frontend" >> $GITHUB_OUTPUT
+              ;;
+            *)
+              echo "dockerfile=ci-cd/bookly-mock/dockerfiles/Dockerfile.$SERVICE" >> $GITHUB_OUTPUT
+              echo "context=bookly-mock" >> $GITHUB_OUTPUT
+              ;;
+          esac
+
+      - name: Build y Push imagen
+        uses: docker/build-push-action@v5
+        with:
+          context: ${{ steps.dockerfile.outputs.context }}
+          file: ${{ steps.dockerfile.outputs.dockerfile }}
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+          build-args: |
+            BUILD_DATE=${{ github.event.repository.updated_at }}
+            VCS_REF=${{ github.sha }}
+            VERSION=${{ needs.prepare.outputs.tag }}
+
+      - name: Generar resumen
+        run: |
+          echo "### 📦 Imagen construida: ${{ matrix.service }}" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "| Propiedad | Valor |" >> $GITHUB_STEP_SUMMARY
+          echo "|-----------|-------|" >> $GITHUB_STEP_SUMMARY
+          echo "| **Registry** | \`${{ env.REGISTRY }}\` |" >> $GITHUB_STEP_SUMMARY
+          echo "| **Imagen** | \`${{ env.IMAGE_PREFIX }}-${{ matrix.service }}\` |" >> $GITHUB_STEP_SUMMARY
+          echo "| **Tag** | \`${{ needs.prepare.outputs.tag }}\` |" >> $GITHUB_STEP_SUMMARY
+
+  notify-deploy:
+    name: Notificar para despliegue
+    runs-on: ubuntu-latest
+    needs: [prepare, build-and-push]
+    if: success() && github.ref == 'refs/heads/main'
+    steps:
+      - name: Dispatch evento de despliegue
+        uses: peter-evans/repository-dispatch@v2
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          event-type: image-updated
+          client-payload: '{"tag": "${{ needs.prepare.outputs.tag }}", "services": ${{ needs.prepare.outputs.services }}, "sha": "${{ github.sha }}"}'
+
+  summary:
+    name: Resumen final
+    runs-on: ubuntu-latest
+    needs: [prepare, build-and-push]
+    if: always()
+    steps:
+      - name: Generar resumen completo
+        run: |
+          echo "## 🐳 Build and Push a GHCR - Resumen" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "| Parámetro | Valor |" >> $GITHUB_STEP_SUMMARY
+          echo "|-----------|-------|" >> $GITHUB_STEP_SUMMARY
+          echo "| **Registry** | \`${{ env.REGISTRY }}\` |" >> $GITHUB_STEP_SUMMARY
+          echo "| **Tag** | \`${{ needs.prepare.outputs.tag }}\` |" >> $GITHUB_STEP_SUMMARY
+          echo "| **Servicios** | ${{ needs.prepare.outputs.services }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| **Commit** | \`${{ github.sha }}\` |" >> $GITHUB_STEP_SUMMARY
+          echo "| **Actor** | ${{ github.actor }} |" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### 📋 Imágenes publicadas:" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          for service in $(echo '${{ needs.prepare.outputs.services }}' | jq -r '.[]'); do
+            echo "- \`${{ env.REGISTRY }}/${{ env.IMAGE_PREFIX }}-${service}:${{ needs.prepare.outputs.tag }}\`" >> $GITHUB_STEP_SUMMARY
+          done
