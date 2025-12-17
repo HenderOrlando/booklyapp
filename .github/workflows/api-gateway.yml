@@ -1,0 +1,36 @@
+name: API Gateway - Build and Deploy
+
+on:
+  push:
+    branches:
+      - main
+      - develop
+    paths:
+      - 'bookly-mock/apps/api-gateway/**'
+      - 'bookly-mock/libs/**'
+      - 'ci-cd/bookly-mock/dockerfiles/Dockerfile.gateway'
+      - '.github/workflows/api-gateway.yml'
+  workflow_dispatch:
+
+jobs:
+  build:
+    uses: ./.github/workflows/build-and-push-image.yml
+    with:
+      service-name: api-gateway
+      dockerfile-path: ci-cd/bookly-mock/dockerfiles/Dockerfile.gateway
+      context-path: bookly-mock
+      image-name: bookly-api-gateway
+    secrets:
+      DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
+      DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
+  
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Deploy API Gateway
+        run: |
+          echo "Deploying API Gateway service"
+          echo "Image: ${{ secrets.DOCKER_USERNAME }}/bookly-api-gateway:${{ github.ref_name }}-${{ github.sha }}"
+          # Add your deployment logic here (e.g., kubectl, helm, docker-compose, etc.)
+          # Example: kubectl set image deployment/api-gateway api-gateway=${{ secrets.DOCKER_USERNAME }}/bookly-api-gateway:${{ github.ref_name }}-${{ github.sha }}

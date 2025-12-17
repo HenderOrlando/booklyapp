@@ -1,0 +1,35 @@
+name: Auth Service - Build and Deploy
+
+on:
+  push:
+    branches:
+      - main
+      - develop
+    paths:
+      - 'bookly-mock/apps/auth-service/**'
+      - 'bookly-mock/libs/**'
+      - 'ci-cd/bookly-mock/dockerfiles/Dockerfile.auth'
+      - '.github/workflows/auth-service.yml'
+  workflow_dispatch:
+
+jobs:
+  build:
+    uses: ./.github/workflows/build-and-push-image.yml
+    with:
+      service-name: auth-service
+      dockerfile-path: ci-cd/bookly-mock/dockerfiles/Dockerfile.auth
+      context-path: bookly-mock
+      image-name: bookly-auth-service
+    secrets:
+      DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
+      DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
+  
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Deploy Auth Service
+        run: |
+          echo "Deploying Auth Service"
+          echo "Image: ${{ secrets.DOCKER_USERNAME }}/bookly-auth-service:${{ github.ref_name }}-${{ github.sha }}"
+          # Add your deployment logic here (e.g., kubectl, helm, docker-compose, etc.)
