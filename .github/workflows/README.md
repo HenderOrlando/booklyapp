@@ -6,7 +6,7 @@ Este directorio contiene los workflows de GitHub Actions que reemplazan el archi
 
 ### Workflows Disponibles
 
-1. **build-and-push-image.yml** - Workflow reutilizable para construir y publicar imágenes Docker
+1. **build-and-push-image.yml** - Workflow reutilizable para construir y publicar imágenes Docker en GHCR
 2. **api-gateway.yml** - Build y deploy del API Gateway
 3. **auth-service.yml** - Build y deploy del servicio de autenticación
 4. **resources-service.yml** - Build y deploy del servicio de recursos
@@ -22,18 +22,35 @@ Este directorio contiene los workflows de GitHub Actions que reemplazan el archi
 Para que los workflows funcionen correctamente, necesitas configurar los siguientes secrets en tu repositorio de GitHub:
 
 1. Ve a **Settings** > **Secrets and variables** > **Actions**
-2. Agrega los siguientes secrets:
-   - `DOCKER_USERNAME`: Tu nombre de usuario de Docker Hub
-   - `DOCKER_PASSWORD`: Tu token de acceso de Docker Hub (recomendado) o contraseña
+2. Agrega los siguientes secrets para SSH deployment:
+   - `DEPLOY_HOST`: IP o dominio del servidor de despliegue
+   - `DEPLOY_USER`: Usuario SSH para conectarse al servidor
+   - `DEPLOY_SSH_KEY`: Clave privada SSH para autenticación
+   - `DEPLOY_PORT`: (Opcional) Puerto SSH, por defecto 22
 
-### 2. Crear Token de Docker Hub (Recomendado)
+### 2. Configurar Permisos de GHCR
 
-1. Inicia sesión en [Docker Hub](https://hub.docker.com/)
-2. Ve a **Account Settings** > **Security** > **Access Tokens**
-3. Click en **New Access Token**
-4. Dale un nombre descriptivo (ej: "GitHub Actions - Bookly")
-5. Selecciona permisos: **Read, Write, Delete**
-6. Copia el token generado y úsalo como `DOCKER_PASSWORD`
+Los workflows usan **GitHub Container Registry (GHCR)** automáticamente, no necesitas configurar credenciales adicionales:
+
+1. Las imágenes se publican en: `ghcr.io/{tu-usuario}/{imagen}:{tag}`
+2. Se usa `GITHUB_TOKEN` automático para autenticación
+3. Permisos `packages: write` ya están configurados en los workflows
+
+### 3. Preparar Servidor de Despliegue
+
+En el servidor donde se desplegarán los servicios:
+
+1. Instalar Docker
+2. Crear red Docker: `docker network create bookly-network`
+3. Crear directorio para env files: `sudo mkdir -p /opt/bookly`
+4. Crear archivos `.env` para cada servicio:
+   - `/opt/bookly/.env.api-gateway`
+   - `/opt/bookly/.env.auth-service`
+   - `/opt/bookly/.env.resources-service`
+   - `/opt/bookly/.env.availability-service`
+   - `/opt/bookly/.env.stockpile-service`
+   - `/opt/bookly/.env.reports-service`
+   - `/opt/bookly/.env.frontend`
 
 ## 🎯 Funcionamiento
 
@@ -59,42 +76,48 @@ Todos los workflows también se pueden ejecutar manualmente:
 
 ## 📦 Proceso de Build y Deploy
 
-### Fase 1: Build y Push
+### Fase 1: Build y Push a GHCR
 
 El workflow realiza los siguientes pasos:
 
 1. **Checkout del código**: Descarga el código del repositorio
 2. **Setup Docker Buildx**: Configura Docker para builds multi-plataforma
-3. **Login a Docker Hub**: Autentica con Docker Hub usando los secrets
+3. **Login a GHCR**: Autentica con GitHub Container Registry usando `GITHUB_TOKEN`
 4. **Extracción de metadata**: Genera tags automáticos basados en:
    - Rama actual
    - SHA del commit
-   - Version semántica (si existe)
-5. **Build y Push**: Construye la imagen Docker y la sube a Docker Hub
+   - Versión semántica (si existe)
+5. **Build y Push**: Construye la imagen Docker y la sube a GHCR
    - Usa caché de GitHub Actions para acelerar builds
    - Genera múltiples tags automáticamente
 
-### Fase 2: Deploy
+### Fase 2: Deploy via SSH
 
-Después del build exitoso, se ejecuta el deploy:
+Después del build exitoso, se ejecuta el deploy automáticamente:
 
-- **Actualmente**: Muestra información del despliegue (placeholder)
-- **Próximos pasos**: Integrar con tu plataforma de despliegue:
-  - Kubernetes (kubectl, helm)
-  - Docker Swarm
-  - Cloud providers (AWS ECS, GCP Cloud Run, Azure Container Instances)
-  - Servidores remotos vía SSH
+1. **Conexión SSH**: Se conecta al servidor usando las credenciales configuradas
+2. **Login a GHCR**: Autentica Docker en el servidor con GHCR
+3. **Pull de imagen**: Descarga la imagen recién creada desde GHCR
+4. **Stop container**: Detiene el contenedor existente (si existe)
+5. **Remove container**: Elimina el contenedor antiguo
+6. **Run container**: Ejecuta el nuevo contenedor con:
+   - Nombre del servicio
+   - Puerto mapeado
+   - Red `bookly-network`
+   - Variables de entorno desde `/opt/bookly/.env.{servicio}`
+   - Restart policy: `unless-stopped`
+7. **Cleanup**: Limpia imágenes antiguas no utilizadas
 
 ## 🏷️ Tags Generados Automáticamente
 
-Para cada imagen, se generan los siguientes tags:
+Para cada imagen en GHCR, se generan los siguientes tags:
 
 | Tag | Descripción | Ejemplo |
 |-----|-------------|---------|
-| `latest` | Última versión de la rama principal | `bookly-api-gateway:latest` |
-| `{branch}` | Nombre de la rama | `bookly-api-gateway:main` |
-| `{branch}-{sha}` | Rama + SHA del commit | `bookly-api-gateway:main-abc1234` |
-| `{version}` | Versión semántica (si existe) | `bookly-api-gateway:1.0.0` |
+| `latest` | Última versión de la rama principal | `ghcr.io/usuario/bookly-api-gateway:latest` |
+| `{branch}` | Nombre de la rama | `ghcr.io/usuario/bookly-api-gateway:main` |
+| `{branch}-{sha}` | Rama + SHA del commit | `ghcr.io/usuario/bookly-api-gateway:main-abc1234` |
+| `{version}` | Versión semántica (si existe) | `ghcr.io/usuario/bookly-api-gateway:1.0.0` |
 
 ## 🔄 Migración desde podman-compose.microservices.yml
 
