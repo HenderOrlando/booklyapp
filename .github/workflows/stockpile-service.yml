@@ -49,21 +49,21 @@ jobs:
           envs: GITHUB_TOKEN,GITHUB_ACTOR,GITHUB_OWNER,REF_NAME,SHA
           script: |
             # Login to GitHub Container Registry
-            echo "$GITHUB_TOKEN" | docker login ghcr.io -u "$GITHUB_ACTOR" --password-stdin
+            echo "$GITHUB_TOKEN" | podman login ghcr.io -u "$GITHUB_ACTOR" --password-stdin
 
             # Pull the latest image
             # Set image variables
             REGISTRY="ghcr.io/$GITHUB_OWNER"
             TAG="$REF_NAME-$SHA"
             IMAGE="$REGISTRY/bookly-stockpile-service:$TAG"
-            docker pull "$IMAGE"
+            podman pull "$IMAGE"
 
             # Stop and remove existing container
-            docker stop bookly-stockpile-service || true
-            docker rm bookly-stockpile-service || true
+            podman stop bookly-stockpile-service || true
+            podman rm bookly-stockpile-service || true
 
             # Run the new container
-            docker run -d \
+            podman run -d \
               --name bookly-stockpile-service \
               --restart unless-stopped \
               -p 3004:3004 \
@@ -72,4 +72,4 @@ jobs:
               "$IMAGE"
 
             # Clean up old images
-            docker image prune -f
+            podman image prune -f
