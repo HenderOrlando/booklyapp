@@ -48,21 +48,21 @@ jobs:
           envs: GITHUB_TOKEN,GITHUB_ACTOR,GITHUB_OWNER,REF_NAME,SHA
           script: |
             # Login to GitHub Container Registry
-            echo "$GITHUB_TOKEN" | docker login ghcr.io -u "$GITHUB_ACTOR" --password-stdin
+            echo "$GITHUB_TOKEN" | podman login ghcr.io -u "$GITHUB_ACTOR" --password-stdin
 
             # Pull the latest image
             # Set image variables
             REGISTRY="ghcr.io/$GITHUB_OWNER"
             TAG="$REF_NAME-$SHA"
             IMAGE="$REGISTRY/bookly-frontend:$TAG"
-            docker pull "$IMAGE"
+            podman pull "$IMAGE"
 
             # Stop and remove existing container
-            docker stop bookly-frontend || true
-            docker rm bookly-frontend || true
+            podman stop bookly-frontend || true
+            podman rm bookly-frontend || true
 
             # Run the new container
-            docker run -d \
+            podman run -d \
               --name bookly-frontend \
               --restart unless-stopped \
               -p 4200:4200 \
@@ -71,4 +71,4 @@ jobs:
               "$IMAGE"
 
             # Clean up old images
-            docker image prune -f
+            podman image prune -f
