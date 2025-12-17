@@ -274,5 +274,4 @@ git push origin main
 ---
 
 **Fecha**: Diciembre 17, 2024
-**Autor**: GitHub Copilot
-**Version**: 1.0.0
+**Versión**: 1.0.0
