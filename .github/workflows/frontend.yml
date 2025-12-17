@@ -13,28 +13,55 @@ on:
 
 permissions:
   contents: read
+  packages: write
 
 jobs:
   build:
     permissions:
       contents: read
+      packages: write
     uses: ./.github/workflows/build-and-push-image.yml
     with:
       service-name: bookly-web
       dockerfile-path: ci-cd/bookly-mock/dockerfiles/Dockerfile.web
       context-path: bookly-mock-frontend
       image-name: bookly-frontend
-    secrets:
-      DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
-      DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
 
   deploy:
-    permissions: {}
     needs: build
     runs-on: ubuntu-latest
+    permissions: {}
     steps:
-      - name: Deploy Frontend
-        run: |
-          echo "Deploying Frontend"
-          echo "Image: ${{ secrets.DOCKER_USERNAME }}/bookly-frontend:${{ github.ref_name }}-${{ github.sha }}"
-          # Add your deployment logic here (e.g., kubectl, helm, docker-compose, etc.)
+      - name: Deploy Frontend via SSH
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.DEPLOY_HOST }}
+          username: ${{ secrets.DEPLOY_USER }}
+          key: ${{ secrets.DEPLOY_SSH_KEY }}
+          port: ${{ secrets.DEPLOY_PORT || 22 }}
+          script: |
+            # Login to GitHub Container Registry
+            echo ${{ secrets.GITHUB_TOKEN }} | docker login ghcr.io -u ${{ github.actor }} --password-stdin
+
+            # Pull the latest image
+            # Set image variables
+            REGISTRY="ghcr.io/${{ github.repository_owner }}"
+            TAG="${{ github.ref_name }}-${{ github.sha }}"
+            IMAGE="$REGISTRY/bookly-frontend:$TAG"
+            docker pull "$IMAGE"
+
+            # Stop and remove existing container
+            docker stop bookly-frontend || true
+            docker rm bookly-frontend || true
+
+            # Run the new container
+            docker run -d \
+              --name bookly-frontend \
+              --restart unless-stopped \
+              -p 4200:4200 \
+              --network bookly-network \
+              --env-file /opt/bookly/.env.frontend \
+              "$IMAGE"
+
+            # Clean up old images
+            docker image prune -f

@@ -14,29 +14,55 @@ on:
 
 permissions:
   contents: read
+  packages: write
 
 jobs:
   build:
     permissions:
       contents: read
+      packages: write
     uses: ./.github/workflows/build-and-push-image.yml
     with:
       service-name: api-gateway
       dockerfile-path: ci-cd/bookly-mock/dockerfiles/Dockerfile.gateway
       context-path: bookly-mock
       image-name: bookly-api-gateway
-    secrets:
-      DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
-      DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
 
   deploy:
     needs: build
     runs-on: ubuntu-latest
     permissions: {}
     steps:
-      - name: Deploy API Gateway
-        run: |
-          echo "Deploying API Gateway service"
-          echo "Image: ${{ secrets.DOCKER_USERNAME }}/bookly-api-gateway:${{ github.ref_name }}-${{ github.sha }}"
-          # Add your deployment logic here (e.g., kubectl, helm, docker-compose, etc.)
-          # Example: kubectl set image deployment/api-gateway api-gateway=${{ secrets.DOCKER_USERNAME }}/bookly-api-gateway:${{ github.ref_name }}-${{ github.sha }}
+      - name: Deploy API Gateway via SSH
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.DEPLOY_HOST }}
+          username: ${{ secrets.DEPLOY_USER }}
+          key: ${{ secrets.DEPLOY_SSH_KEY }}
+          port: ${{ secrets.DEPLOY_PORT || 22 }}
+          script: |
+            # Login to GitHub Container Registry
+            echo ${{ secrets.GITHUB_TOKEN }} | docker login ghcr.io -u ${{ github.actor }} --password-stdin
+
+            # Pull the latest image
+            # Set image variables
+            REGISTRY="ghcr.io/${{ github.repository_owner }}"
+            TAG="${{ github.ref_name }}-${{ github.sha }}"
+            IMAGE="$REGISTRY/bookly-api-gateway:$TAG"
+            docker pull "$IMAGE"
+
+            # Stop and remove existing container
+            docker stop bookly-api-gateway || true
+            docker rm bookly-api-gateway || true
+
+            # Run the new container
+            docker run -d \
+              --name bookly-api-gateway \
+              --restart unless-stopped \
+              -p 3000:3000 \
+              --network bookly-network \
+              --env-file /opt/bookly/.env.api-gateway \
+              "$IMAGE"
+
+            # Clean up old images
+            docker image prune -f
