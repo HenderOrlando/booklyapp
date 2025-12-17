@@ -1,0 +1,34 @@
+name: Frontend (Bookly Web) - Build and Deploy
+
+on:
+  push:
+    branches:
+      - main
+      - develop
+    paths:
+      - 'bookly-mock-frontend/**'
+      - 'ci-cd/bookly-mock/dockerfiles/Dockerfile.web'
+      - '.github/workflows/frontend.yml'
+  workflow_dispatch:
+
+jobs:
+  build:
+    uses: ./.github/workflows/build-and-push-image.yml
+    with:
+      service-name: bookly-web
+      dockerfile-path: ci-cd/bookly-mock/dockerfiles/Dockerfile.web
+      context-path: bookly-mock-frontend
+      image-name: bookly-frontend
+    secrets:
+      DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
+      DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
+  
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Deploy Frontend
+        run: |
+          echo "Deploying Frontend"
+          echo "Image: ${{ secrets.DOCKER_USERNAME }}/bookly-frontend:${{ github.ref_name }}-${{ github.sha }}"
+          # Add your deployment logic here (e.g., kubectl, helm, docker-compose, etc.)

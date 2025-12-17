@@ -1,0 +1,35 @@
+name: Stockpile Service - Build and Deploy
+
+on:
+  push:
+    branches:
+      - main
+      - develop
+    paths:
+      - 'bookly-mock/apps/stockpile-service/**'
+      - 'bookly-mock/libs/**'
+      - 'ci-cd/bookly-mock/dockerfiles/Dockerfile.stockpile'
+      - '.github/workflows/stockpile-service.yml'
+  workflow_dispatch:
+
+jobs:
+  build:
+    uses: ./.github/workflows/build-and-push-image.yml
+    with:
+      service-name: stockpile-service
+      dockerfile-path: ci-cd/bookly-mock/dockerfiles/Dockerfile.stockpile
+      context-path: bookly-mock
+      image-name: bookly-stockpile-service
+    secrets:
+      DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
+      DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
+  
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Deploy Stockpile Service
+        run: |
+          echo "Deploying Stockpile Service"
+          echo "Image: ${{ secrets.DOCKER_USERNAME }}/bookly-stockpile-service:${{ github.ref_name }}-${{ github.sha }}"
+          # Add your deployment logic here (e.g., kubectl, helm, docker-compose, etc.)

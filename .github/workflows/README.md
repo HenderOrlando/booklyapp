@@ -1,0 +1,232 @@
+# 🚀 GitHub Actions Workflows - Despliegue Automatizado
+
+Este directorio contiene los workflows de GitHub Actions que reemplazan el archivo `podman-compose.microservices.yml`, permitiendo un despliegue automático de cada microservicio cuando su imagen Docker es actualizada.
+
+## 📋 Contenido
+
+### Workflows Disponibles
+
+1. **build-and-push-image.yml** - Workflow reutilizable para construir y publicar imágenes Docker
+2. **api-gateway.yml** - Build y deploy del API Gateway
+3. **auth-service.yml** - Build y deploy del servicio de autenticación
+4. **resources-service.yml** - Build y deploy del servicio de recursos
+5. **availability-service.yml** - Build y deploy del servicio de disponibilidad
+6. **stockpile-service.yml** - Build y deploy del servicio de inventario
+7. **reports-service.yml** - Build y deploy del servicio de reportes
+8. **frontend.yml** - Build y deploy del frontend (Bookly Web)
+
+## 🔧 Configuración Inicial
+
+### 1. Configurar Secrets en GitHub
+
+Para que los workflows funcionen correctamente, necesitas configurar los siguientes secrets en tu repositorio de GitHub:
+
+1. Ve a **Settings** > **Secrets and variables** > **Actions**
+2. Agrega los siguientes secrets:
+   - `DOCKER_USERNAME`: Tu nombre de usuario de Docker Hub
+   - `DOCKER_PASSWORD`: Tu token de acceso de Docker Hub (recomendado) o contraseña
+
+### 2. Crear Token de Docker Hub (Recomendado)
+
+1. Inicia sesión en [Docker Hub](https://hub.docker.com/)
+2. Ve a **Account Settings** > **Security** > **Access Tokens**
+3. Click en **New Access Token**
+4. Dale un nombre descriptivo (ej: "GitHub Actions - Bookly")
+5. Selecciona permisos: **Read, Write, Delete**
+6. Copia el token generado y úsalo como `DOCKER_PASSWORD`
+
+## 🎯 Funcionamiento
+
+### Triggers Automáticos
+
+Cada servicio tiene su propio workflow que se activa automáticamente cuando:
+
+1. **Push a ramas principales** (`main` o `develop`)
+2. **Cambios en archivos específicos**:
+   - Código del servicio específico (`bookly-mock/apps/{servicio}/**`)
+   - Librerías compartidas (`bookly-mock/libs/**`)
+   - Dockerfile del servicio (`ci-cd/bookly-mock/dockerfiles/Dockerfile.{servicio}`)
+   - El propio workflow (`.github/workflows/{servicio}.yml`)
+
+### Triggers Manuales
+
+Todos los workflows también se pueden ejecutar manualmente:
+
+1. Ve a **Actions** en tu repositorio de GitHub
+2. Selecciona el workflow que deseas ejecutar
+3. Click en **Run workflow**
+4. Selecciona la rama y click en **Run workflow**
+
+## 📦 Proceso de Build y Deploy
+
+### Fase 1: Build y Push
+
+El workflow realiza los siguientes pasos:
+
+1. **Checkout del código**: Descarga el código del repositorio
+2. **Setup Docker Buildx**: Configura Docker para builds multi-plataforma
+3. **Login a Docker Hub**: Autentica con Docker Hub usando los secrets
+4. **Extracción de metadata**: Genera tags automáticos basados en:
+   - Rama actual
+   - SHA del commit
+   - Version semántica (si existe)
+5. **Build y Push**: Construye la imagen Docker y la sube a Docker Hub
+   - Usa caché de GitHub Actions para acelerar builds
+   - Genera múltiples tags automáticamente
+
+### Fase 2: Deploy
+
+Después del build exitoso, se ejecuta el deploy:
+
+- **Actualmente**: Muestra información del despliegue (placeholder)
+- **Próximos pasos**: Integrar con tu plataforma de despliegue:
+  - Kubernetes (kubectl, helm)
+  - Docker Swarm
+  - Cloud providers (AWS ECS, GCP Cloud Run, Azure Container Instances)
+  - Servidores remotos vía SSH
+
+## 🏷️ Tags Generados Automáticamente
+
+Para cada imagen, se generan los siguientes tags:
+
+| Tag | Descripción | Ejemplo |
+|-----|-------------|---------|
+| `latest` | Última versión de la rama principal | `bookly-api-gateway:latest` |
+| `{branch}` | Nombre de la rama | `bookly-api-gateway:main` |
+| `{branch}-{sha}` | Rama + SHA del commit | `bookly-api-gateway:main-abc1234` |
+| `{version}` | Versión semántica (si existe) | `bookly-api-gateway:1.0.0` |
+
+## 🔄 Migración desde podman-compose.microservices.yml
+
+### Antes (podman-compose.microservices.yml)
+
+```yaml
+services:
+  api-gateway:
+    build:
+      context: .
+      dockerfile: ../ci-cd/bookly-mock/dockerfiles/Dockerfile.gateway
+    # ...
+```
+
+### Después (GitHub Actions)
+
+El despliegue ahora es completamente automático:
+
+1. **Push de código** → Workflow se activa automáticamente
+2. **Build de imagen** → Imagen se construye y publica en Docker Hub
+3. **Deploy** → Servicio se despliega automáticamente
+
+### Ventajas
+
+✅ **Automatización completa**: No necesitas ejecutar comandos manualmente
+✅ **CI/CD integrado**: Build y deploy en un solo flujo
+✅ **Trazabilidad**: Historial completo de todos los despliegues
+✅ **Control de versiones**: Tags automáticos por commit
+✅ **Independencia**: Cada servicio se despliega independientemente
+✅ **Rollback fácil**: Usa cualquier tag anterior para volver a una versión previa
+
+## 🚀 Personalizar el Deploy
+
+Para integrar con tu plataforma de despliegue, edita la sección `deploy` en cada workflow:
+
+### Ejemplo: Kubernetes
+
+```yaml
+deploy:
+  needs: build
+  runs-on: ubuntu-latest
+  steps:
+    - name: Configure kubectl
+      uses: azure/setup-kubectl@v3
+      with:
+        version: 'v1.28.0'
+    
+    - name: Deploy to Kubernetes
+      run: |
+        kubectl set image deployment/api-gateway \
+          api-gateway=${{ secrets.DOCKER_USERNAME }}/bookly-api-gateway:${{ github.ref_name }}-${{ github.sha }} \
+          --namespace=bookly
+```
+
+### Ejemplo: Docker Compose en servidor remoto
+
+```yaml
+deploy:
+  needs: build
+  runs-on: ubuntu-latest
+  steps:
+    - name: Deploy via SSH
+      uses: appleboy/ssh-action@master
+      with:
+        host: ${{ secrets.DEPLOY_HOST }}
+        username: ${{ secrets.DEPLOY_USER }}
+        key: ${{ secrets.DEPLOY_SSH_KEY }}
+        script: |
+          cd /opt/bookly
+          docker-compose pull api-gateway
+          docker-compose up -d api-gateway
+```
+
+## 🔍 Monitoreo de Workflows
+
+### Ver el estado de los workflows
+
+1. Ve a la pestaña **Actions** en GitHub
+2. Verás el historial de todos los workflows ejecutados
+3. Click en cualquier workflow para ver detalles
+4. Revisa logs de cada paso
+
+### Notificaciones
+
+GitHub enviará notificaciones cuando:
+- ✅ Un workflow se complete exitosamente
+- ❌ Un workflow falle
+- ⚠️ Se requiera aprobación manual (si configuras ambientes protegidos)
+
+## 📝 Mejores Prácticas
+
+1. **Protege ramas principales**: Requiere pull requests y revisiones antes de merge
+2. **Usa ambientes**: Configura ambientes de staging y producción en GitHub
+3. **Aprobaciones manuales**: Requiere aprobación manual para deploy a producción
+4. **Secrets seguros**: Nunca commits secrets en el código
+5. **Tests antes de deploy**: Agrega tests en el workflow antes del deploy
+6. **Rollback plan**: Mantén tags anteriores para rollback rápido
+
+## 🐛 Troubleshooting
+
+### Error: "docker login failed"
+
+**Problema**: Las credenciales de Docker Hub son incorrectas o no están configuradas.
+
+**Solución**:
+1. Verifica que los secrets `DOCKER_USERNAME` y `DOCKER_PASSWORD` estén configurados
+2. Asegúrate de usar un Access Token en lugar de la contraseña
+3. Verifica que el token tenga permisos de escritura
+
+### Error: "Dockerfile not found"
+
+**Problema**: La ruta al Dockerfile es incorrecta.
+
+**Solución**:
+1. Verifica que el Dockerfile existe en la ruta especificada
+2. Revisa que la ruta sea relativa al contexto de build
+
+### Workflow no se activa
+
+**Problema**: El workflow no se ejecuta después de hacer push.
+
+**Solución**:
+1. Verifica que los archivos modificados coincidan con los paths configurados
+2. Asegúrate de hacer push a las ramas correctas (`main` o `develop`)
+3. Revisa la sintaxis del archivo YAML
+
+## 🔗 Referencias
+
+- [GitHub Actions Documentation](https://docs.github.com/en/actions)
+- [Docker Build Push Action](https://github.com/docker/build-push-action)
+- [Docker Login Action](https://github.com/docker/login-action)
+
+---
+
+**Última actualización**: Diciembre 17, 2024

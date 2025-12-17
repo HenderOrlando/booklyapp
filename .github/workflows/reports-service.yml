@@ -1,0 +1,35 @@
+name: Reports Service - Build and Deploy
+
+on:
+  push:
+    branches:
+      - main
+      - develop
+    paths:
+      - 'bookly-mock/apps/reports-service/**'
+      - 'bookly-mock/libs/**'
+      - 'ci-cd/bookly-mock/dockerfiles/Dockerfile.reports'
+      - '.github/workflows/reports-service.yml'
+  workflow_dispatch:
+
+jobs:
+  build:
+    uses: ./.github/workflows/build-and-push-image.yml
+    with:
+      service-name: reports-service
+      dockerfile-path: ci-cd/bookly-mock/dockerfiles/Dockerfile.reports
+      context-path: bookly-mock
+      image-name: bookly-reports-service
+    secrets:
+      DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
+      DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
+  
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Deploy Reports Service
+        run: |
+          echo "Deploying Reports Service"
+          echo "Image: ${{ secrets.DOCKER_USERNAME }}/bookly-reports-service:${{ github.ref_name }}-${{ github.sha }}"
+          # Add your deployment logic here (e.g., kubectl, helm, docker-compose, etc.)
