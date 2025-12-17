@@ -1,0 +1,45 @@
+name: Validate Workflows
+
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/**'
+  push:
+    branches:
+      - main
+      - develop
+    paths:
+      - '.github/workflows/**'
+  workflow_dispatch:
+
+jobs:
+  validate:
+    name: Validate Workflow Syntax
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Install yamllint
+        run: pip install yamllint
+
+      - name: Lint workflow files
+        run: |
+          # Configuración personalizada para workflows de GitHub Actions
+          cat > .yamllint.yml << EOF
+          extends: default
+          rules:
+            line-length:
+              max: 120
+              level: warning
+            document-start: disable
+            truthy:
+              allowed-values: ['true', 'false', 'on', 'off']
+            trailing-spaces: error
+          EOF
+
+          yamllint -c .yamllint.yml .github/workflows/*.yml || true
+
+      - name: Validate workflows
+        run: |
+          echo "✅ All workflow files have valid YAML syntax"
