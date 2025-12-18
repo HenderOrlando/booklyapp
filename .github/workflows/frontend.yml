@@ -1,0 +1,74 @@
+name: Frontend (Bookly Web) - Build and Deploy
+
+on:
+  push:
+    branches:
+      - main
+      - develop
+    paths:
+      - 'bookly-mock-frontend/**'
+      - 'ci-cd/bookly-mock/dockerfiles/Dockerfile.web'
+      - '.github/workflows/frontend.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  packages: write
+
+jobs:
+  build:
+    permissions:
+      contents: read
+      packages: write
+    uses: ./.github/workflows/build-and-push-image.yml
+    with:
+      service-name: bookly-web
+      dockerfile-path: ci-cd/bookly-mock/dockerfiles/Dockerfile.web
+      context-path: bookly-mock-frontend
+      image-name: bookly-frontend
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    permissions: {}
+    steps:
+      - name: Deploy Frontend via SSH
+        uses: appleboy/ssh-action@v1.0.3
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_ACTOR: ${{ github.actor }}
+          GITHUB_OWNER: ${{ github.repository_owner }}
+          REF_NAME: ${{ github.ref_name }}
+          SHA: ${{ github.sha }}
+        with:
+          host: ${{ secrets.DEPLOY_HOST }}
+          username: ${{ secrets.DEPLOY_USER }}
+          key: ${{ secrets.DEPLOY_SSH_KEY }}
+          port: ${{ secrets.DEPLOY_PORT || 22 }}
+          envs: GITHUB_TOKEN,GITHUB_ACTOR,GITHUB_OWNER,REF_NAME,SHA
+          script: |
+            # Login to GitHub Container Registry
+            echo "$GITHUB_TOKEN" | podman login ghcr.io -u "$GITHUB_ACTOR" --password-stdin
+
+            # Pull the latest image
+            # Set image variables
+            REGISTRY="ghcr.io/$GITHUB_OWNER"
+            TAG="$REF_NAME-$SHA"
+            IMAGE="$REGISTRY/bookly-frontend:$TAG"
+            podman pull "$IMAGE"
+
+            # Stop and remove existing container
+            podman stop bookly-frontend || true
+            podman rm bookly-frontend || true
+
+            # Run the new container
+            podman run -d \
+              --name bookly-frontend \
+              --restart unless-stopped \
+              -p ${PORT_6}:4200 \
+              --network bookly-network \
+              --env-file /opt/bookly/.env.frontend \
+              "$IMAGE"
+
+            # Clean up old images
+            podman image prune -f
