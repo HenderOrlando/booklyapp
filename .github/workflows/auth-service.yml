@@ -66,7 +66,7 @@ jobs:
             podman run -d \
               --name bookly-auth-service \
               --restart unless-stopped \
-              -p 3001:3001 \
+              -p ${PORT_1}:3001 \
               --network bookly-network \
               --env-file /opt/bookly/.env.auth-service \
               "$IMAGE"
