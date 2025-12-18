@@ -43,7 +43,15 @@ En el servidor donde se desplegarán los servicios:
 1. Instalar Podman
 2. Crear red Podman: `podman network create bookly-network`
 3. Crear directorio para env files: `sudo mkdir -p /opt/bookly`
-4. Crear archivos `.env` para cada servicio:
+4. Configurar variables de entorno para puertos dinámicos:
+   - `PORT_0` - Puerto para api-gateway (ej: 3000)
+   - `PORT_1` - Puerto para auth-service (ej: 3001)
+   - `PORT_2` - Puerto para resources-service (ej: 3002)
+   - `PORT_3` - Puerto para availability-service (ej: 3003)
+   - `PORT_4` - Puerto para stockpile-service (ej: 3004)
+   - `PORT_5` - Puerto para reports-service (ej: 3005)
+   - `PORT_6` - Puerto para frontend/bookly-web (ej: 4200)
+5. Crear archivos `.env` para cada servicio:
    - `/opt/bookly/.env.api-gateway`
    - `/opt/bookly/.env.auth-service`
    - `/opt/bookly/.env.resources-service`

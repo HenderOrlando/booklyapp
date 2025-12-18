@@ -28,7 +28,18 @@ Esta guía te ayudará a empezar a usar los workflows de GitHub Actions en menos
    ```bash
    sudo mkdir -p /opt/bookly
    ```
-4. Crea archivos `.env` para cada servicio en `/opt/bookly/`
+4. Configura variables de entorno para puertos dinámicos en el servidor:
+   ```bash
+   export PORT_0=3000  # api-gateway
+   export PORT_1=3001  # auth-service
+   export PORT_2=3002  # resources-service
+   export PORT_3=3003  # availability-service
+   export PORT_4=3004  # stockpile-service
+   export PORT_5=3005  # reports-service
+   export PORT_6=4200  # frontend/bookly-web
+   ```
+   Nota: Agrega estas variables a tu archivo de perfil del shell (`.bashrc`, `.zshrc`, etc.) para que persistan.
+5. Crea archivos `.env` para cada servicio en `/opt/bookly/`
 
 #### 1.2 Agregar Secrets SSH en GitHub
 
