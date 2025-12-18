@@ -64,9 +64,10 @@ helm/*.tgz
 sonar-project.properties
 
 # 8. 🤖 Archivos de CI/CD y GitHub Actions
-.github/workflows/
-.github/*.yml
-.github/*.yaml
+# Permitir workflows de GitHub Actions
+# .github/workflows/
+# .github/*.yml
+# .github/*.yaml
 
 # 9. 🎨 Archivos del Frontend (Next.js, Storybook, Vite)
 .next/
