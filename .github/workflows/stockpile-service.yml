@@ -66,7 +66,7 @@ jobs:
             podman run -d \
               --name bookly-stockpile-service \
               --restart unless-stopped \
-              -p 3004:3004 \
+              -p ${PORT_4}:3004 \
               --network bookly-network \
               --env-file /opt/bookly/.env.stockpile-service \
               "$IMAGE"

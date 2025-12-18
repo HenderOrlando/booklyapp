@@ -65,7 +65,7 @@ jobs:
             podman run -d \
               --name bookly-frontend \
               --restart unless-stopped \
-              -p 4200:4200 \
+              -p ${PORT_6}:4200 \
               --network bookly-network \
               --env-file /opt/bookly/.env.frontend \
               "$IMAGE"

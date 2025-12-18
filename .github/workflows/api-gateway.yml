@@ -66,7 +66,7 @@ jobs:
             podman run -d \
               --name bookly-api-gateway \
               --restart unless-stopped \
-              -p 3000:3000 \
+              -p ${PORT_0}:3000 \
               --network bookly-network \
               --env-file /opt/bookly/.env.api-gateway \
               "$IMAGE"
