@@ -40,7 +40,8 @@ jobs:
             document-start: disable
             truthy:
               allowed-values: ['true', 'false', 'on', 'off']
-            trailing-spaces: error
+            trailing-spaces:
+              level: error
           EOF
 
           # Lint workflow files (warnings allowed, errors fail)
