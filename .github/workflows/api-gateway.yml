@@ -63,6 +63,10 @@ jobs:
             podman stop bookly-api-gateway || true
             podman rm bookly-api-gateway || true
 
+            # Ensure environment file exists
+            mkdir -p /opt/bookly
+            touch /opt/bookly/.env.api-gateway
+
             # Run the new container
             podman run -d \
               --name bookly-api-gateway \
