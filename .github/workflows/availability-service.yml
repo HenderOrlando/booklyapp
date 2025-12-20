@@ -54,7 +54,8 @@ jobs:
             # Pull the latest image
             # Set image variables
             REGISTRY="ghcr.io/${GITHUB_OWNER,,}"
-            TAG="$REF_NAME-$SHA"
+            SHORT_SHA="${SHA:0:7}"
+            TAG="$REF_NAME-$SHORT_SHA"
             IMAGE="$REGISTRY/bookly-availability-service:$TAG"
             podman pull "$IMAGE"
 
