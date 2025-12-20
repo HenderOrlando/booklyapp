@@ -63,6 +63,10 @@ jobs:
             podman stop bookly-availability-service || true
             podman rm bookly-availability-service || true
 
+            # Ensure environment file exists
+            mkdir -p /opt/bookly
+            touch /opt/bookly/.env.availability-service
+
             # Run the new container
             podman run -d \
               --name bookly-availability-service \

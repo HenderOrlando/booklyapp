@@ -62,6 +62,10 @@ jobs:
             podman stop bookly-frontend || true
             podman rm bookly-frontend || true
 
+            # Ensure environment file exists
+            mkdir -p /opt/bookly
+            touch /opt/bookly/.env.frontend
+
             # Run the new container
             podman run -d \
               --name bookly-frontend \
