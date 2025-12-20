@@ -63,6 +63,10 @@ jobs:
             podman stop bookly-reports-service || true
             podman rm bookly-reports-service || true
 
+            # Ensure environment file exists
+            mkdir -p /opt/bookly
+            touch /opt/bookly/.env.reports-service
+
             # Run the new container
             podman run -d \
               --name bookly-reports-service \
