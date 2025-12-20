@@ -8,6 +8,7 @@ services:
     build:
       context: .
       dockerfile: ../ci-cd/bookly-mock/dockerfiles/Dockerfile.gateway
+    image: bookly-api-gateway:latest
     container_name: bookly-api-gateway
     ports:
       - "${PORT_0}:3000"
@@ -24,6 +25,7 @@ services:
     build:
       context: .
       dockerfile: ../ci-cd/bookly-mock/dockerfiles/Dockerfile.auth
+    image: bookly-auth-service:latest
     container_name: bookly-auth-service
     ports:
       - "${PORT_1}:3001"
@@ -40,6 +42,7 @@ services:
     build:
       context: .
       dockerfile: ../ci-cd/bookly-mock/dockerfiles/Dockerfile.resources
+    image: bookly-resources-service:latest
     container_name: bookly-resources-service
     ports:
       - "${PORT_2}:3002"
@@ -56,6 +59,7 @@ services:
     build:
       context: .
       dockerfile: ../ci-cd/bookly-mock/dockerfiles/Dockerfile.availability
+    image: bookly-availability-service:latest
     container_name: bookly-availability-service
     ports:
       - "${PORT_3}:3003"
@@ -72,6 +76,7 @@ services:
     build:
       context: .
       dockerfile: ../ci-cd/bookly-mock/dockerfiles/Dockerfile.stockpile
+    image: bookly-stockpile-service:latest
     container_name: bookly-stockpile-service
     ports:
       - "${PORT_4}:3004"
@@ -88,6 +93,7 @@ services:
     build:
       context: .
       dockerfile: ../ci-cd/bookly-mock/dockerfiles/Dockerfile.reports
+    image: bookly-reports-service:latest
     container_name: bookly-reports-service
     ports:
       - "${PORT_5}:3005"
@@ -104,6 +110,7 @@ services:
     build:
       context: ../bookly-mock-frontend
       dockerfile: ../ci-cd/bookly-mock/dockerfiles/Dockerfile.web
+    image: bookly-frontend:latest
     container_name: bookly-frontend
     ports:
       - "${PORT_6}:4200"

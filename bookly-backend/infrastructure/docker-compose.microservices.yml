@@ -10,6 +10,7 @@ services:
       target: production
       args:
         - NODE_ENV=production
+    image: bookly-api-gateway:latest
     container_name: bookly-api-gateway
     hostname: api-gateway
     restart: unless-stopped
@@ -81,6 +82,7 @@ services:
       context: ..
       dockerfile: infrastructure/docker/Dockerfile.auth-service
       target: production
+    image: bookly-auth-service:latest
     container_name: bookly-auth-service
     hostname: auth-service
     restart: unless-stopped
@@ -141,6 +143,7 @@ services:
       context: ..
       dockerfile: infrastructure/docker/Dockerfile.resources-service
       target: production
+    image: bookly-resources-service:latest
     container_name: bookly-resources-service
     hostname: resources-service
     restart: unless-stopped
@@ -199,6 +202,7 @@ services:
       context: ..
       dockerfile: infrastructure/docker/Dockerfile.availability-service
       target: production
+    image: bookly-availability-service:latest
     container_name: bookly-availability-service
     hostname: availability-service
     restart: unless-stopped
@@ -260,6 +264,7 @@ services:
       context: ..
       dockerfile: infrastructure/docker/Dockerfile.stockpile-service
       target: production
+    image: bookly-stockpile-service:latest
     container_name: bookly-stockpile-service
     hostname: stockpile-service
     restart: unless-stopped
@@ -328,6 +333,7 @@ services:
       context: ..
       dockerfile: infrastructure/docker/Dockerfile.reports-service
       target: production
+    image: bookly-reports-service:latest
     container_name: bookly-reports-service
     hostname: reports-service
     restart: unless-stopped
