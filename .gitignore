@@ -68,6 +68,7 @@ sonar-project.properties
 # .github/workflows/
 # .github/*.yml
 # .github/*.yaml
+.yamllint.yml
 
 # 9. 🎨 Archivos del Frontend (Next.js, Storybook, Vite)
 .next/
