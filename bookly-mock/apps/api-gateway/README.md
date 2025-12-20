@@ -3,7 +3,6 @@
 **Puerto**: 3000  
 **Versión**: 1.0.0  
 **Arquitectura**: Híbrida (HTTP + Kafka EDA)
-
 ---
 
 ## 🎯 Descripción
