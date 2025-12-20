@@ -63,6 +63,10 @@ jobs:
             podman stop bookly-resources-service || true
             podman rm bookly-resources-service || true
 
+            # Ensure environment file exists
+            mkdir -p /opt/bookly
+            touch /opt/bookly/.env.resources-service
+
             # Run the new container
             podman run -d \
               --name bookly-resources-service \
