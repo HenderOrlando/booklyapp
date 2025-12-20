@@ -53,7 +53,7 @@ jobs:
 
             # Pull the latest image
             # Set image variables
-            REGISTRY="ghcr.io/$GITHUB_OWNER"
+            REGISTRY="ghcr.io/${GITHUB_OWNER,,}"
             TAG="$REF_NAME-$SHA"
             IMAGE="$REGISTRY/bookly-stockpile-service:$TAG"
             podman pull "$IMAGE"

@@ -45,11 +45,17 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
+      - name: Set lowercase owner name
+        id: owner
+        run: echo "name=${OWNER,,}" >> $GITHUB_OUTPUT
+        env:
+          OWNER: ${{ github.repository_owner }}
+
       - name: Extract metadata for Docker
         id: meta
         uses: docker/metadata-action@v5
         with:
-          images: ghcr.io/${{ github.repository_owner }}/${{ inputs.image-name }}
+          images: ghcr.io/${{ steps.owner.outputs.name }}/${{ inputs.image-name }}
           tags: |
             type=ref,event=branch
             type=ref,event=pr
