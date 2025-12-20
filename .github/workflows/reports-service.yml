@@ -1,0 +1,75 @@
+name: Reports Service - Build and Deploy
+
+on:
+  push:
+    branches:
+      - main
+      - develop
+    paths:
+      - 'bookly-mock/apps/reports-service/**'
+      - 'bookly-mock/libs/**'
+      - 'ci-cd/bookly-mock/dockerfiles/Dockerfile.reports'
+      - '.github/workflows/reports-service.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  packages: write
+
+jobs:
+  build:
+    permissions:
+      contents: read
+      packages: write
+    uses: ./.github/workflows/build-and-push-image.yml
+    with:
+      service-name: reports-service
+      dockerfile-path: ci-cd/bookly-mock/dockerfiles/Dockerfile.reports
+      context-path: bookly-mock
+      image-name: bookly-reports-service
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    permissions: {}
+    steps:
+      - name: Deploy Reports Service via SSH
+        uses: appleboy/ssh-action@v1.1.0
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_ACTOR: ${{ github.actor }}
+          GITHUB_OWNER: ${{ github.repository_owner }}
+          REF_NAME: ${{ github.ref_name }}
+          SHA: ${{ github.sha }}
+        with:
+          host: ${{ secrets.DEPLOY_HOST }}
+          username: ${{ secrets.DEPLOY_USER }}
+          key: ${{ secrets.DEPLOY_SSH_KEY }}
+          port: ${{ secrets.DEPLOY_PORT }}
+          envs: GITHUB_TOKEN,GITHUB_ACTOR,GITHUB_OWNER,REF_NAME,SHA
+          script: |
+            # Login to GitHub Container Registry
+            echo "$GITHUB_TOKEN" | podman login ghcr.io -u "$GITHUB_ACTOR" --password-stdin
+
+            # Pull the latest image
+            # Set image variables
+            REGISTRY="ghcr.io/$GITHUB_OWNER"
+            TAG="$REF_NAME-$SHA"
+            IMAGE="$REGISTRY/bookly-reports-service:$TAG"
+            podman pull "$IMAGE"
+
+            # Stop and remove existing container
+            podman stop bookly-reports-service || true
+            podman rm bookly-reports-service || true
+
+            # Run the new container
+            podman run -d \
+              --name bookly-reports-service \
+              --restart unless-stopped \
+              -p ${PORT_5}:3005 \
+              --network bookly-network \
+              --env-file /opt/bookly/.env.reports-service \
+              "$IMAGE"
+
+            # Clean up old images
+            podman image prune -f

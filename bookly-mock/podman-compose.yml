@@ -205,6 +205,7 @@ services:
     build:
       context: .
       dockerfile: ../ci-cd/bookly-mock/dockerfiles/Dockerfile.gateway
+    image: bookly-mock-api-gateway:latest
     container_name: bookly-mock-api-gateway
     ports:
       - "${PORT_10}:3000"
@@ -247,6 +248,7 @@ services:
     build:
       context: .
       dockerfile: ../ci-cd/bookly-mock/dockerfiles/Dockerfile.auth
+    image: bookly-mock-auth-service:latest
     container_name: bookly-mock-auth-service
     ports:
       - "${PORT_11}:3001"
@@ -281,6 +283,7 @@ services:
     build:
       context: .
       dockerfile: ../ci-cd/bookly-mock/dockerfiles/Dockerfile.resources
+    image: bookly-mock-resources-service:latest
     container_name: bookly-mock-resources-service
     ports:
       - "${PORT_12}:3002"
@@ -312,6 +315,7 @@ services:
     build:
       context: .
       dockerfile: ../ci-cd/bookly-mock/dockerfiles/Dockerfile.availability
+    image: bookly-mock-availability-service:latest
     container_name: bookly-mock-availability-service
     ports:
       - "${PORT_13}:3003"
@@ -343,6 +347,7 @@ services:
     build:
       context: .
       dockerfile: ../ci-cd/bookly-mock/dockerfiles/Dockerfile.stockpile
+    image: bookly-mock-stockpile-service:latest
     container_name: bookly-mock-stockpile-service
     ports:
       - "${PORT_14}:3004"
@@ -374,6 +379,7 @@ services:
     build:
       context: .
       dockerfile: ../ci-cd/bookly-mock/dockerfiles/Dockerfile.reports
+    image: bookly-mock-reports-service:latest
     container_name: bookly-mock-reports-service
     ports:
       - "${PORT_15}:3005"
@@ -428,6 +434,7 @@ services:
         EXPOSE 4200
         ENV PORT 4200
         CMD ["node", "server.js"]
+    image: bookly-mock-frontend:latest
     container_name: bookly-mock-frontend
     ports:
       - "${PORT_16}:4200"
