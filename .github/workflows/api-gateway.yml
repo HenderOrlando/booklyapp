@@ -63,9 +63,12 @@ jobs:
             podman stop bookly-api-gateway || true
             podman rm bookly-api-gateway || true
 
-            # Ensure environment file exists
-            sudo mkdir -p /opt/bookly
-            sudo touch /opt/bookly/.env.api-gateway
+            # Prepare environment file options
+            ENV_FILE_PATH="/opt/bookly/.env.api-gateway"
+            ENV_FILE_OPTION=""
+            if [ -f "$ENV_FILE_PATH" ]; then
+              ENV_FILE_OPTION="--env-file $ENV_FILE_PATH"
+            fi
 
             # Run the new container
             podman run -d \
@@ -73,7 +76,7 @@ jobs:
               --restart unless-stopped \
               -p ${PORT_0}:3000 \
               --network bookly-network \
-              --env-file /opt/bookly/.env.api-gateway \
+              $ENV_FILE_OPTION \
               "$IMAGE"
 
             # Clean up old images

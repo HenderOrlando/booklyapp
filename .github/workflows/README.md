@@ -42,7 +42,7 @@ En el servidor donde se desplegarán los servicios:
 
 1. Instalar Podman
 2. Crear red Podman: `podman network create bookly-network`
-3. Crear directorio para env files: `sudo mkdir -p /opt/bookly`
+3. **[Opcional]** Crear directorio para env files: `mkdir -p /opt/bookly` (solo si necesitas variables de entorno)
 4. Configurar variables de entorno para puertos dinámicos:
    - `PORT_0` - Puerto para api-gateway (ej: 3000)
    - `PORT_1` - Puerto para auth-service (ej: 3001)
@@ -51,7 +51,7 @@ En el servidor donde se desplegarán los servicios:
    - `PORT_4` - Puerto para stockpile-service (ej: 3004)
    - `PORT_5` - Puerto para reports-service (ej: 3005)
    - `PORT_6` - Puerto para frontend/bookly-web (ej: 4200)
-5. Crear archivos `.env` para cada servicio:
+5. **[Opcional]** Crear archivos `.env` para cada servicio (solo si necesitas variables de entorno específicas):
    - `/opt/bookly/.env.api-gateway`
    - `/opt/bookly/.env.auth-service`
    - `/opt/bookly/.env.resources-service`
@@ -59,6 +59,8 @@ En el servidor donde se desplegarán los servicios:
    - `/opt/bookly/.env.stockpile-service`
    - `/opt/bookly/.env.reports-service`
    - `/opt/bookly/.env.frontend`
+
+> **Nota**: Los archivos de entorno son opcionales. Si no existen, los contenedores se ejecutarán sin variables de entorno adicionales. Esto permite que el despliegue funcione inmediatamente sin configuración previa.
 
 ## 🎯 Funcionamiento
 
@@ -112,7 +114,7 @@ Después del build exitoso, se ejecuta el deploy automáticamente:
    - Nombre del servicio
    - Puerto mapeado
    - Red `bookly-network`
-   - Variables de entorno desde `/opt/bookly/.env.{servicio}`
+   - Variables de entorno desde `/opt/bookly/.env.{servicio}` (si el archivo existe)
    - Restart policy: `unless-stopped`
 7. **Cleanup**: Limpia imágenes antiguas no utilizadas usando Podman
 
@@ -226,6 +228,23 @@ GitHub enviará notificaciones cuando:
 
 ## 🐛 Troubleshooting
 
+### Error: "sudo: a terminal is required to read the password"
+
+**Problema**: El usuario SSH no tiene permisos sudo sin contraseña.
+
+**Solución**: Este error ha sido resuelto en la última versión de los workflows. Los archivos de entorno ahora son opcionales y no requieren sudo. Si aún experimentas este error:
+1. Actualiza los workflows a la última versión
+2. O configura sudo sin contraseña para el usuario de deploy: `echo "deploy-user ALL=(ALL) NOPASSWD: ALL" | sudo tee /etc/sudoers.d/deploy-user`
+
+### Error: "parsing file: no such file or directory" al cargar .env
+
+**Problema**: El archivo de variables de entorno no existe en el servidor.
+
+**Solución**: Este error ha sido resuelto en la última versión de los workflows. Los archivos `.env` ahora son opcionales. Si necesitas variables de entorno:
+1. Crea el directorio: `mkdir -p /opt/bookly`
+2. Crea el archivo de entorno: `touch /opt/bookly/.env.{servicio}`
+3. Agrega las variables necesarias al archivo
+
 ### Error: "docker login failed"
 
 **Problema**: Las credenciales de Docker Hub son incorrectas o no están configuradas.
@@ -260,4 +279,4 @@ GitHub enviará notificaciones cuando:
 
 ---
 
-**Última actualización**: Diciembre 17, 2024
+**Última actualización**: Diciembre 22, 2024
