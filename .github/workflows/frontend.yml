@@ -50,6 +50,9 @@ jobs:
             # Login to GitHub Container Registry
             echo "$GITHUB_TOKEN" | podman login ghcr.io -u "$GITHUB_ACTOR" --password-stdin
 
+            # Create podman network if it doesn't exist
+            podman network exists bookly-network || podman network create bookly-network
+
             # Pull the latest image
             # Set image variables
             REGISTRY="ghcr.io/${GITHUB_OWNER,,}"
