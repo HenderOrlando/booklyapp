@@ -62,9 +62,12 @@ jobs:
             podman stop bookly-frontend || true
             podman rm bookly-frontend || true
 
-            # Ensure environment file exists
-            sudo mkdir -p /opt/bookly
-            sudo touch /opt/bookly/.env.frontend
+            # Prepare environment file options
+            ENV_FILE_PATH="/opt/bookly/.env.frontend"
+            ENV_FILE_OPTION=""
+            if [ -f "$ENV_FILE_PATH" ]; then
+              ENV_FILE_OPTION="--env-file $ENV_FILE_PATH"
+            fi
 
             # Run the new container
             podman run -d \
@@ -72,7 +75,7 @@ jobs:
               --restart unless-stopped \
               -p ${PORT_6}:4200 \
               --network bookly-network \
-              --env-file /opt/bookly/.env.frontend \
+              $ENV_FILE_OPTION \
               "$IMAGE"
 
             # Clean up old images
