@@ -69,6 +69,7 @@ export default function CreateResourcePage() {
       maxAdvanceBookingDays: 30,
       minBookingDurationMinutes: 60,
       maxBookingDurationMinutes: 240,
+      bufferTimeBetweenReservationsMinutes: 15,
       allowRecurring: true,
     },
   });
@@ -454,7 +455,7 @@ export default function CreateResourcePage() {
                           setHasProjector(e.target.checked);
                           handleAttributeChange(
                             "hasProjector",
-                            e.target.checked
+                            e.target.checked,
                           );
                         }}
                         className="rounded w-4 h-4"
@@ -470,7 +471,7 @@ export default function CreateResourcePage() {
                           setHasAirConditioning(e.target.checked);
                           handleAttributeChange(
                             "hasAirConditioning",
-                            e.target.checked
+                            e.target.checked,
                           );
                         }}
                         className="rounded w-4 h-4"
@@ -488,7 +489,7 @@ export default function CreateResourcePage() {
                           setHasWhiteboard(e.target.checked);
                           handleAttributeChange(
                             "hasWhiteboard",
-                            e.target.checked
+                            e.target.checked,
                           );
                         }}
                         className="rounded w-4 h-4"
@@ -506,7 +507,7 @@ export default function CreateResourcePage() {
                           setHasComputers(e.target.checked);
                           handleAttributeChange(
                             "hasComputers",
-                            e.target.checked
+                            e.target.checked,
                           );
                         }}
                         className="rounded w-4 h-4"
@@ -611,7 +612,7 @@ export default function CreateResourcePage() {
                       <div className="flex flex-wrap gap-2">
                         {selectedPrograms.map((programId) => {
                           const program = programs.find(
-                            (p) => p.id === programId
+                            (p) => p.id === programId,
                           );
                           return program ? (
                             <span
@@ -656,7 +657,7 @@ export default function CreateResourcePage() {
                         onChange={(e) =>
                           handleAvailabilityRuleChange(
                             "requiresApproval",
-                            e.target.checked
+                            e.target.checked,
                           )
                         }
                         className="rounded w-4 h-4"
@@ -682,7 +683,7 @@ export default function CreateResourcePage() {
                         onChange={(e) =>
                           handleAvailabilityRuleChange(
                             "allowRecurring",
-                            e.target.checked
+                            e.target.checked,
                           )
                         }
                         className="rounded w-4 h-4"
@@ -713,7 +714,7 @@ export default function CreateResourcePage() {
                         onChange={(e) =>
                           handleAvailabilityRuleChange(
                             "maxAdvanceBookingDays",
-                            parseInt(e.target.value)
+                            parseInt(e.target.value),
                           )
                         }
                       />
@@ -734,7 +735,7 @@ export default function CreateResourcePage() {
                         onChange={(e) =>
                           handleAvailabilityRuleChange(
                             "minBookingDurationMinutes",
-                            parseInt(e.target.value)
+                            parseInt(e.target.value),
                           )
                         }
                       />
@@ -756,7 +757,7 @@ export default function CreateResourcePage() {
                       onChange={(e) =>
                         handleAvailabilityRuleChange(
                           "maxBookingDurationMinutes",
-                          parseInt(e.target.value)
+                          parseInt(e.target.value),
                         )
                       }
                     />
