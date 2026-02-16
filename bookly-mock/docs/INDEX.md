@@ -1,6 +1,6 @@
 # Bookly Mock - Índice Maestro de Documentación
 
-## 📚 Navegación Rápida
+## Navegación Rápida
 
 - [Microservicios](#microservicios)
 - [Desarrollo](#desarrollo)
@@ -8,11 +8,12 @@
 - [API](#api)
 - [Implementación](#implementación)
 - [Testing](#testing)
+- [Rules Review](#rules-review)
 - [Documentación Histórica](#documentación-histórica)
 
 ---
 
-## 🚀 Microservicios
+## Microservicios
 
 ### [API Gateway](../apps/api-gateway/docs/INDEX.md)
 
@@ -94,10 +95,12 @@
 - RF-35: Evaluación de usuarios
 - RF-36: Dashboards interactivos
 - RF-37: Demanda insatisfecha
+- RF-38: Conflictos de reserva
+- RF-39: Cumplimiento de reserva
 
 ---
 
-## 💻 Desarrollo
+## Desarrollo
 
 Guías para desarrollo, debugging y ejecución de servicios.
 
@@ -110,7 +113,7 @@ Guías para desarrollo, debugging y ejecución de servicios.
 
 ---
 
-## 🏗️ Arquitectura
+## Arquitectura
 
 Documentación de arquitectura, configuración y estado del proyecto.
 
@@ -123,7 +126,7 @@ Documentación de arquitectura, configuración y estado del proyecto.
 
 ---
 
-## 📡 API
+## API
 
 Documentación de APIs, estándares de respuesta y Swagger.
 
@@ -135,7 +138,7 @@ Documentación de APIs, estándares de respuesta y Swagger.
 
 ---
 
-## 🔨 Implementación
+## Implementación
 
 Guías de implementación de características y patrones.
 
@@ -143,9 +146,6 @@ Guías de implementación de características y patrones.
 
 - **[IDEMPOTENCY_README.md](./implementation/IDEMPOTENCY_README.md)** 📖 - Guía principal
 - **[IDEMPOTENCY_AND_DISTRIBUTED_TRACING.md](./implementation/IDEMPOTENCY_AND_DISTRIBUTED_TRACING.md)** - Teoría y conceptos
-- **[IDEMPOTENCY_IMPLEMENTATION_STATUS.md](./implementation/IDEMPOTENCY_IMPLEMENTATION_STATUS.md)** - Estado de implementación
-- **[IDEMPOTENCY_IMPLEMENTATION_PLAN.md](./implementation/IDEMPOTENCY_IMPLEMENTATION_PLAN.md)** - Plan de implementación
-- **[IDEMPOTENCY_COMPONENTS_COMPLETE.md](./implementation/IDEMPOTENCY_COMPONENTS_COMPLETE.md)** - Componentes completos
 
 ### Observabilidad y Logging
 
@@ -160,13 +160,11 @@ Guías de implementación de características y patrones.
 
 ### Integraciones
 
-- **[INTEGRATION_GUIDE.md](./implementation/INTEGRATION_GUIDE.md)** - Guía de integración
-- **[STOCKPILE_SERVICE_IMPLEMENTATION_PLAN.md](./implementation/STOCKPILE_SERVICE_IMPLEMENTATION_PLAN.md)** - Plan Stockpile Service
-- **[MIGRACION_CALENDAR_OAUTH_EVENT_DRIVEN_PENDDING.md](./implementation/MIGRACION_CALENDAR_OAUTH_EVENT_DRIVEN_PENDDING.md)** - Migración Calendar OAuth
+- **[INTEGRATION_GUIDE.md](./implementation/INTEGRATION_GUIDE.md)** - Guía de integración entre microservicios
 
 ---
 
-## 🧪 Testing
+## Testing
 
 Documentación de testing, auditoría y dashboards.
 
@@ -175,7 +173,19 @@ Documentación de testing, auditoría y dashboards.
 
 ---
 
-## 📜 Documentación Histórica
+## Rules Review
+
+Auditorías formales de cumplimiento de Requerimientos Funcionales.
+
+### [Run 2026-02-16-bookly-mock-01](./rules-review/runs/2026-02-16-bookly-mock-01/README.md)
+
+- **44 RFs** auditados con score individual
+- **PLAN-RF-RESOLUTION.md** - Plan de resolución para llevar todos los RFs a score ≥ 4
+- **RULE-{SERVICE}-RF{XX}.md** - Evidencia por RF
+
+---
+
+## Documentación Histórica
 
 Documentación de migraciones, refactorings y reportes históricos archivados.
 
@@ -193,7 +203,7 @@ Consulta [archive/README.md](./archive/README.md) para más detalles.
 
 ---
 
-## 📋 Plantillas y Ejemplos
+## Plantillas y Ejemplos
 
 ### [templates/](./templates/)
 
@@ -213,31 +223,44 @@ Scripts y documentación de seeding de datos.
 
 ---
 
-## 🔧 Estructura de Documentación
+## Estructura de Documentación
 
 ```text
 docs/
 ├── INDEX.md                      # Este archivo (índice maestro)
+├── api/                          # Estándares de respuesta y Swagger
+├── architecture/                 # Configuración y diseño del sistema
 ├── development/                  # Guías de desarrollo y debugging
-├── architecture/                 # Arquitectura y configuración
-├── api/                          # Documentación de APIs
-├── implementation/               # Guías de implementación
-├── testing/                      # Testing y auditoría
-├── archive/                      # Documentación histórica
-│   ├── migrations/              # Migraciones históricas
-│   ├── refactoring/             # Refactorings históricos
-│   └── resumen/                 # Resúmenes de progreso
-├── templates/                    # Plantillas de documentación
-├── examples/                     # Ejemplos de código
-├── seeds/                        # Scripts de seeding
-└── guides/                       # Guías de uso
+├── examples/                     # Ejemplos (CSV de importación, etc.)
+├── guides/                       # Guías de uso (audit decorators, etc.)
+├── implementation/               # Guías de implementación activas
+├── rules-review/                 # Auditorías de RFs por run
+│   └── runs/{RUN_ID}/           # Resultados por ejecución
+├── seeds/                        # Integridad referencial y seeds
+├── templates/                    # Plantillas estandarizadas
+├── testing/                      # Testing y cobertura
+└── archive/                      # Documentación histórica
+    ├── implementation/           # Planes completados
+    ├── migrations/               # Migraciones completadas
+    ├── refactoring/              # Refactorings completados
+    └── resumen/                  # Progreso por fase
 
-apps/{service}/docs/              # Documentación específica por microservicio
+apps/{service}/
+├── docs/
+│   ├── INDEX.md                 # Índice del servicio
+│   ├── ARCHITECTURE.md          # Arquitectura
+│   ├── DATABASE.md              # Esquemas y modelos
+│   ├── ENDPOINTS.md             # Endpoints REST
+│   ├── EVENT_BUS.md             # Eventos publicados/consumidos
+│   ├── SEEDS.md                 # Datos iniciales
+│   ├── requirements/            # Documentación por RF
+│   └── archive/                 # Docs completados del servicio
+└── test/unit/services/           # Tests unitarios BDD
 ```
 
 ---
 
-## 📖 Guía de Contribución
+## Guía de Contribución
 
 Al agregar nueva documentación:
 
@@ -251,7 +274,7 @@ Al agregar nueva documentación:
 
 ---
 
-## 🌐 Enlaces Útiles
+## Enlaces Útiles
 
 - **[README Principal](../README.md)** - Documentación principal del proyecto
 - **[Scripts](../scripts/README.md)** - Documentación de scripts utilitarios
@@ -259,6 +282,6 @@ Al agregar nueva documentación:
 
 ---
 
-**Última actualización**: Diciembre 2024  
+**Última actualización**: Febrero 2026  
 **Proyecto**: Bookly Mock - Sistema de Reservas Institucionales  
 **Mantenido por**: Equipo Bookly
