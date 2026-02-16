@@ -62,6 +62,30 @@ services:
       retries: 5
 
   # ===============================================
+  # RABBITMQ (Event Bus)
+  # ===============================================
+  rabbitmq:
+    image: rabbitmq:3.12-management
+    container_name: bookly-mock-rabbitmq
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    environment:
+      RABBITMQ_DEFAULT_USER: bookly
+      RABBITMQ_DEFAULT_PASS: bookly123
+      RABBITMQ_DEFAULT_VHOST: bookly
+    networks:
+      - bookly-mock-network
+    volumes:
+      - rabbitmq-data:/var/lib/rabbitmq
+    healthcheck:
+      test: rabbitmq-diagnostics -q ping
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+
+  # ===============================================
   # MONGODB - AUTH DATABASE
   # ===============================================
   mongodb-auth:
@@ -224,7 +248,8 @@ services:
       # Reports Service
       REPORTS_SERVICE_URL: http://reports-service:3005
       # MongoDB Gateway
-      MONGO_URI: mongodb://bookly:bookly123@mongodb-gateway:27017/bookly-mock-gateway?authSource=admin
+      DATABASE_URI: ${GATEWAY_DB_URI:-mongodb://bookly:bookly123@mongodb-gateway:27017/bookly-mock-gateway?authSource=admin}
+      DATABASE_NAME: ${GATEWAY_DB_NAME:-bookly-mock-gateway}
       # Redis
       REDIS_HOST: redis
       REDIS_PORT: 6379
@@ -256,7 +281,8 @@ services:
       NODE_ENV: production
       PORT: 3001
       # MongoDB Auth
-      MONGO_URI: mongodb://bookly:bookly123@mongodb-auth:27017/bookly-mock-auth?authSource=admin
+      DATABASE_URI: ${AUTH_DB_URI:-mongodb://bookly:bookly123@mongodb-auth:27017/bookly-mock-auth?authSource=admin}
+      DATABASE_NAME: ${AUTH_DB_NAME:-bookly-mock-auth}
       # Redis
       REDIS_HOST: redis
       REDIS_PORT: 6379
@@ -291,7 +317,8 @@ services:
       NODE_ENV: production
       PORT: 3002
       # MongoDB Resources
-      MONGO_URI: mongodb://bookly:bookly123@mongodb-resources:27017/bookly-mock-resources?authSource=admin
+      DATABASE_URI: ${RESOURCES_DB_URI:-mongodb://bookly:bookly123@mongodb-resources:27017/bookly-mock-resources?authSource=admin}
+      DATABASE_NAME: ${RESOURCES_DB_NAME:-bookly-mock-resources}
       # Redis
       REDIS_HOST: redis
       REDIS_PORT: 6379
@@ -323,7 +350,8 @@ services:
       NODE_ENV: production
       PORT: 3003
       # MongoDB Availability
-      MONGO_URI: mongodb://bookly:bookly123@mongodb-availability:27017/bookly-mock-availability?authSource=admin
+      DATABASE_URI: ${AVAILABILITY_DB_URI:-mongodb://bookly:bookly123@mongodb-availability:27017/bookly-mock-availability?authSource=admin}
+      DATABASE_NAME: ${AVAILABILITY_DB_NAME:-bookly-mock-availability}
       # Redis
       REDIS_HOST: redis
       REDIS_PORT: 6379
@@ -355,7 +383,8 @@ services:
       NODE_ENV: production
       PORT: 3004
       # MongoDB Stockpile
-      MONGO_URI: mongodb://bookly:bookly123@mongodb-stockpile:27017/bookly-mock-stockpile?authSource=admin
+      DATABASE_URI: ${STOCKPILE_DB_URI:-mongodb://bookly:bookly123@mongodb-stockpile:27017/bookly-mock-stockpile?authSource=admin}
+      DATABASE_NAME: ${STOCKPILE_DB_NAME:-bookly-mock-stockpile}
       # Redis
       REDIS_HOST: redis
       REDIS_PORT: 6379
@@ -387,7 +416,8 @@ services:
       NODE_ENV: production
       PORT: 3005
       # MongoDB Reports
-      MONGO_URI: mongodb://bookly:bookly123@mongodb-reports:27017/bookly-mock-reports?authSource=admin
+      DATABASE_URI: ${REPORTS_DB_URI:-mongodb://bookly:bookly123@mongodb-reports:27017/bookly-mock-reports?authSource=admin}
+      DATABASE_NAME: ${REPORTS_DB_NAME:-bookly-mock-reports}
       # Redis
       REDIS_HOST: redis
       REDIS_PORT: 6379
@@ -457,6 +487,7 @@ volumes:
   zookeeper-logs:
   kafka-data:
   redis-data:
+  rabbitmq-data:
   mongodb-auth-data:
   mongodb-resources-data:
   mongodb-availability-data:

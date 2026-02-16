@@ -13,6 +13,8 @@ import { AuditModule } from "./modules/audit/audit.module";
 
 // Schemas
 import {
+  ConflictReport,
+  ConflictReportSchema,
   DashboardMetric,
   DashboardMetricSchema,
   DemandReport,
@@ -34,6 +36,10 @@ import {
   AuditEvent,
   AuditEventSchema,
 } from "./infrastructure/schemas/audit-event.schema";
+import {
+  ComplianceReport,
+  ComplianceReportSchema,
+} from "./infrastructure/schemas/compliance-report.schema";
 import { Export, ExportSchema } from "./infrastructure/schemas/export.schema";
 import {
   ResourceCache,
@@ -42,6 +48,9 @@ import {
 
 // Services
 import {
+  AuditAlertService,
+  AuditAnalyticsService,
+  ConflictReportService,
   CsvGeneratorService,
   DashboardService,
   DemandReportService,
@@ -56,11 +65,12 @@ import {
   UserEvaluationService,
   UserReportService,
 } from "./application/services";
-import { AuditAlertService } from "./application/services/audit-alert.service";
-import { AuditAnalyticsService } from "./application/services/audit-analytics.service";
+import { ComplianceReportService } from "./application/services/compliance-report.service";
 
 // Repositories
 import {
+  ComplianceReportRepository,
+  ConflictReportRepository,
   DashboardMetricRepository,
   DemandReportRepository,
   ExportRepository,
@@ -138,6 +148,8 @@ import { JwtStrategy } from "./infrastructure/strategies/jwt.strategy";
     // MongoDB - Conexión global con librería estandarizada
     DatabaseModule,
     MongooseModule.forFeature([
+      { name: ComplianceReport.name, schema: ComplianceReportSchema },
+      { name: ConflictReport.name, schema: ConflictReportSchema },
       { name: UsageReport.name, schema: UsageReportSchema },
       { name: DemandReport.name, schema: DemandReportSchema },
       { name: UserReport.name, schema: UserReportSchema },
@@ -195,6 +207,8 @@ import { JwtStrategy } from "./infrastructure/strategies/jwt.strategy";
     DemandReportService,
     UserReportService,
     UserEvaluationService,
+    ComplianceReportService,
+    ConflictReportService, // Temporarily commented to test ComplianceReportService
     AuditAnalyticsService,
     AuditAlertService,
     DashboardService,
@@ -225,6 +239,14 @@ import { JwtStrategy } from "./infrastructure/strategies/jwt.strategy";
     {
       provide: "IUserReportRepository",
       useClass: UserReportRepository,
+    },
+    {
+      provide: "IComplianceReportRepository",
+      useClass: ComplianceReportRepository,
+    },
+    {
+      provide: "IConflictReportRepository",
+      useClass: ConflictReportRepository,
     },
     {
       provide: "IDashboardMetricRepository",

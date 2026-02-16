@@ -1,3 +1,5 @@
+export * from "./compliance-report.repository";
+export * from "./conflict-report.repository";
 export * from "./dashboard-metric.repository";
 export * from "./demand-report.repository";
 export * from "./export.repository";

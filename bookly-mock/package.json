@@ -30,6 +30,7 @@
     "start:reports": "nest start reports-service --watch",
     "start:reports:debug": "nest start reports-service --debug --watch",
     "start:all": "concurrently \"npm:start:gateway\" \"npm:start:auth\" \"npm:start:resources\" \"npm:start:availability\" \"npm:start:stockpile\" \"npm:start:reports\"",
+    "start:all:debug": "concurrently \"npm:start:gateway:debug\" \"npm:start:auth:debug\" \"npm:start:resources:debug\" \"npm:start:availability:debug\" \"npm:start:stockpile\" \"npm:start:reports:debug\"",
     "lint": "eslint \"{apps,libs}/**/*.ts\" --fix",
     "test": "jest",
     "test:watch": "jest --watch",
