@@ -34,6 +34,7 @@ export interface AvailabilityRules {
   maxAdvanceBookingDays: number;
   minBookingDurationMinutes: number;
   maxBookingDurationMinutes: number;
+  bufferTimeBetweenReservationsMinutes: number;
   allowRecurring: boolean;
 }
 
