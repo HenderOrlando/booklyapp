@@ -3,6 +3,8 @@ export * from "./evaluation.handlers";
 export * from "./export.handlers";
 export * from "./feedback.handlers";
 export * from "./generate-usage-report.handler";
+export * from "./get-compliance-reports.handler";
+export * from "./get-conflict-reports.handler";
 export * from "./get-demand-reports.handler";
 export * from "./get-usage-reports.handler";
 export * from "./get-user-reports.handler";
@@ -46,6 +48,8 @@ import {
   UpdateFeedbackStatusHandler,
 } from "./feedback.handlers";
 import { GenerateUsageReportHandler } from "./generate-usage-report.handler";
+import { GetComplianceReportsHandler } from "./get-compliance-reports.handler";
+import { GetConflictReportsHandler } from "./get-conflict-reports.handler";
 import { GetDemandReportsHandler } from "./get-demand-reports.handler";
 import { GetUsageReportsHandler } from "./get-usage-reports.handler";
 import { GetUserReportsHandler } from "./get-user-reports.handler";
@@ -87,6 +91,8 @@ export const AllHandlers = [
   GetFeedbackGeneralStatisticsHandler,
   // Report Handlers
   GenerateUsageReportHandler,
+  GetComplianceReportsHandler,
+  GetConflictReportsHandler,
   GetDemandReportsHandler,
   GetUsageReportsHandler,
   GetUserReportsHandler,
