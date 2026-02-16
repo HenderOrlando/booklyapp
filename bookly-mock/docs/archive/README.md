@@ -7,24 +7,16 @@ Esta carpeta contiene documentación histórica que ya no es activamente relevan
 ```text
 archive/
 ├── README.md                           # Este archivo
+├── implementation/                     # Planes de implementación completados
 ├── migrations/                         # Reportes de migraciones completadas
 ├── refactoring/                        # Documentación de refactorings mayores
 ├── resumen/                            # Resúmenes de progreso por fase
+├── seeds/                              # Planes de integridad referencial completados
+├── REORGANIZATION_SUMMARY.md           # Resumen de reorganización dic 2024
 ├── ERROR_RESOLUTION_REPORT.md          # Resolución de errores históricos
-├── FIXES_MICROSERVICES_DEBUG.md        # Fixes de debug en microservicios
-├── FIX_DLQ_MONGODB_AUTH.md            # Fix de DLQ y MongoDB
-├── FIX_TYPESCRIPT_MONOREPO_IMPORTS.md # Fix de imports en monorepo
-├── LIMPIEZA_MARKDOWN_NOV6.md          # Limpieza de documentación
-├── REAL_FIXES_APPLIED.md              # Registro de fixes aplicados
-├── RESUMEN_FIX_DLQ_MONGODB.md         # Resumen de fix DLQ
-├── RUNTIME_PATH_ALIASES.md            # Configuración de path aliases
-├── MIGRATION_COMPLETED_SUMMARY.md     # Resumen de migraciones completadas
-├── MIGRATION_GUIDE_RESPONSE_STANDARD.md # Guía de migración de estándar de respuesta
-├── OAUTH_CLEANUP_REPORT.md            # Limpieza OAuth
-├── OAUTH_COMPILATION_REPORT.md        # Reporte de compilación OAuth
-├── OAUTH_MIGRATION_COMPLETE.md        # Migración OAuth completa
-├── OAUTH_MIGRATION_GUIDE.md           # Guía de migración OAuth
-├── VERIFICACION_PLANTILLAS_*.md       # Verificaciones de plantillas por servicio
+├── FIX_*.md                            # Fixes de debug y errores
+├── OAUTH_*.md                          # Migraciones OAuth
+├── VERIFICACION_PLANTILLAS_*.md        # Verificaciones de plantillas por servicio
 └── ...
 ```
 
@@ -69,7 +61,7 @@ Documentación de progreso por fase del proyecto:
 - **04-REQUERIMIENTOS-FUNCIONALES.md** - Requerimientos funcionales
 - **05-TESTING-Y-CALIDAD.md** - Testing y calidad
 - **06-DOCUMENTACION-Y-SWAGGER.md** - Documentación y Swagger
-- **PROGRESO_*.md** - Documentos de progreso por tarea
+- **PROGRESO\_\*.md** - Documentos de progreso por tarea
 
 ### Fixes y Reportes
 
@@ -129,5 +121,5 @@ La información en estos documentos puede estar **desactualizada**. Para informa
 
 ---
 
-**Archivado**: Diciembre 2024  
+**Última limpieza**: Febrero 2026  
 **Razón**: Reorganización de documentación para mejor navegabilidad

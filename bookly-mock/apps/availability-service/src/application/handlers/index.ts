@@ -9,6 +9,7 @@ import { CheckOutReservationHandler } from "./check-out-reservation.handler";
 import { CompleteMaintenanceBlockHandler } from "./complete-maintenance-block.handler";
 import { CreateAvailabilityExceptionHandler } from "./create-availability-exception.handler";
 import { CreateAvailabilityHandler } from "./create-availability.handler";
+import { CreateBatchReservationHandler } from "./create-batch-reservation.handler";
 import { CreateMaintenanceBlockHandler } from "./create-maintenance-block.handler";
 import { CreateRecurringReservationHandler } from "./create-recurring-reservation.handler";
 import { CreateReservationHandler } from "./create-reservation.handler";
@@ -26,6 +27,7 @@ import { GetUserRecurringReservationsHandler } from "./get-user-recurring-reserv
 import { ModifyRecurringInstanceHandler } from "./modify-recurring-instance.handler";
 import { PreviewRecurringSeriesHandler } from "./preview-recurring-series.handler";
 import { RequestReassignmentHandler } from "./request-reassignment.handler";
+import { RequestTeacherApprovalHandler } from "./request-teacher-approval.handler";
 import { RespondReassignmentHandler } from "./respond-reassignment.handler";
 import { SearchAvailabilityHandler } from "./search-availability.handler";
 import { UpdateRecurringSeriesHandler } from "./update-recurring-series.handler";
@@ -52,6 +54,8 @@ export const AllHandlers = [
   CancelMaintenanceBlockHandler,
   RequestReassignmentHandler,
   RespondReassignmentHandler,
+  CreateBatchReservationHandler,
+  RequestTeacherApprovalHandler,
 
   // Query Handlers
   GetReservationsHandler,
@@ -80,6 +84,7 @@ export * from "./check-out-reservation.handler";
 export * from "./complete-maintenance-block.handler";
 export * from "./create-availability-exception.handler";
 export * from "./create-availability.handler";
+export * from "./create-batch-reservation.handler";
 export * from "./create-maintenance-block.handler";
 export * from "./create-recurring-reservation.handler";
 export * from "./create-reservation.handler";
@@ -97,6 +102,7 @@ export * from "./get-user-recurring-reservations.handler";
 export * from "./modify-recurring-instance.handler";
 export * from "./preview-recurring-series.handler";
 export * from "./request-reassignment.handler";
+export * from "./request-teacher-approval.handler";
 export * from "./respond-reassignment.handler";
 export * from "./search-availability.handler";
 export * from "./update-recurring-series.handler";
