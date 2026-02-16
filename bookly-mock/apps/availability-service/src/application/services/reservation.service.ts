@@ -1,9 +1,8 @@
+import { ReservationEntity } from "@availability/domain/entities/reservation.entity";
+import { IReservationRepository } from "@availability/domain/repositories/reservation.repository.interface";
+import { createLogger, PaginationMeta, PaginationQuery } from "@libs/common";
 import { ReservationStatus } from "@libs/common/enums";
-import { PaginationMeta, PaginationQuery } from "@libs/common";
-import { createLogger } from "@libs/common";
 import { Inject, Injectable, NotFoundException } from "@nestjs/common";
-import { ReservationEntity } from '@availability/domain/entities/reservation.entity';
-import { IReservationRepository } from '@availability/domain/repositories/reservation.repository.interface';
 
 const logger = createLogger("ReservationService");
 
@@ -22,7 +21,7 @@ export class ReservationService {
     @Inject("RedisService")
     private readonly redisService?: any,
     @Inject("CacheMetricsService")
-    private readonly cacheMetrics?: any
+    private readonly cacheMetrics?: any,
   ) {}
 
   /**
@@ -56,14 +55,38 @@ export class ReservationService {
       userId: data.userId,
     });
 
-    // Verificar conflictos
+    // Verificar conflictos (incluye buffer de preparación RF-17)
+    const preparationTimeMinutes = await this.getPreparationTimeMinutes(
+      data.resourceId,
+    );
+    const bufferedStartDate = new Date(
+      data.startDate.getTime() - preparationTimeMinutes * 60000,
+    );
+    const bufferedEndDate = new Date(
+      data.endDate.getTime() + preparationTimeMinutes * 60000,
+    );
+
     const conflicts = await this.reservationRepository.findConflicts(
       data.resourceId,
-      data.startDate,
-      data.endDate
+      bufferedStartDate,
+      bufferedEndDate,
     );
 
     if (conflicts.length > 0) {
+      const isBufferConflict = conflicts.every((c: any) => {
+        const cEnd = new Date(c.endDate);
+        const cStart = new Date(c.startDate);
+        return (
+          (cEnd <= data.startDate && cEnd > bufferedStartDate) ||
+          (cStart >= data.endDate && cStart < bufferedEndDate)
+        );
+      });
+
+      if (isBufferConflict && preparationTimeMinutes > 0) {
+        throw new Error(
+          `Resource requires ${preparationTimeMinutes} minutes of preparation time between reservations`,
+        );
+      }
       throw new Error("Resource is not available for the requested period");
     }
 
@@ -92,7 +115,7 @@ export class ReservationService {
       new Date(),
       {
         createdBy: data.createdBy || data.userId,
-      }
+      },
     );
 
     // Guardar
@@ -117,7 +140,7 @@ export class ReservationService {
       status?: ReservationStatus;
       startDate?: Date;
       endDate?: Date;
-    }
+    },
   ): Promise<{ reservations: ReservationEntity[]; meta: PaginationMeta }> {
     logger.info("Finding reservations", { filters, query });
 
@@ -135,7 +158,7 @@ export class ReservationService {
       try {
         const cached = await this.redisService.getCachedWithPrefix(
           "cache",
-          `${this.CACHE_PREFIX}:${id}`
+          `${this.CACHE_PREFIX}:${id}`,
         );
         if (cached) {
           this.cacheMetrics.recordHit();
@@ -161,7 +184,7 @@ export class ReservationService {
           "cache",
           `${this.CACHE_PREFIX}:${id}`,
           reservation,
-          this.CACHE_TTL
+          this.CACHE_TTL,
         );
       } catch (error) {
         logger.warn("Cache write error", error as Error);
@@ -187,7 +210,7 @@ export class ReservationService {
       }[];
       notes?: string;
       updatedBy?: string;
-    }
+    },
   ): Promise<ReservationEntity> {
     logger.info("Updating reservation", { id });
 
@@ -196,7 +219,7 @@ export class ReservationService {
       try {
         await this.redisService.deleteCachedWithPrefix(
           "cache",
-          `${this.CACHE_PREFIX}:${id}`
+          `${this.CACHE_PREFIX}:${id}`,
         );
       } catch (error) {
         logger.warn("Cache invalidation error", error as Error);
@@ -207,7 +230,7 @@ export class ReservationService {
 
     if (!reservation.canBeModified()) {
       throw new Error(
-        `Cannot modify reservation with status: ${reservation.status}`
+        `Cannot modify reservation with status: ${reservation.status}`,
       );
     }
 
@@ -217,7 +240,7 @@ export class ReservationService {
         reservation.resourceId,
         data.startDate || reservation.startDate,
         data.endDate || reservation.endDate,
-        id
+        id,
       );
 
       if (conflicts.length > 0) {
@@ -246,7 +269,7 @@ export class ReservationService {
   async cancelReservation(
     id: string,
     cancelledBy: string,
-    reason?: string
+    reason?: string,
   ): Promise<ReservationEntity> {
     logger.info("Cancelling reservation", { id, cancelledBy });
 
@@ -311,5 +334,26 @@ export class ReservationService {
     logger.info("Check-out successful", { id });
 
     return checkedOutReservation;
+  }
+
+  /**
+   * Obtener tiempo de preparación en minutos para un recurso (RF-17)
+   * El valor se obtiene de la metadata del recurso o se usa un default de 0
+   */
+  private async getPreparationTimeMinutes(resourceId: string): Promise<number> {
+    try {
+      if (this.redisService) {
+        const cached = await this.redisService.get(
+          `${this.CACHE_PREFIX}:prep:${resourceId}`,
+        );
+        if (cached !== null && cached !== undefined) {
+          return Number(cached);
+        }
+      }
+      // Default: sin buffer de preparación
+      return 0;
+    } catch {
+      return 0;
+    }
   }
 }

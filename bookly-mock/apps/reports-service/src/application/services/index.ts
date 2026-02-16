@@ -1,5 +1,7 @@
 export * from "./audit-alert.service";
 export * from "./audit-analytics.service";
+export * from "./compliance-report.service";
+export * from "./conflict-report.service";
 export * from "./dashboard.service";
 export * from "./demand-report.service";
 export * from "./export-processor.service";
