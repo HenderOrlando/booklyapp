@@ -1,5 +1,6 @@
 "use client";
 
+import { Alert, AlertDescription, AlertTitle } from "@/components/atoms/Alert";
 import { Badge } from "@/components/atoms/Badge";
 import { Button } from "@/components/atoms/Button";
 import {
@@ -9,7 +10,6 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/atoms/Card";
-import { Alert, AlertDescription, AlertTitle } from "@/components/atoms/Alert";
 import { AppHeader } from "@/components/organisms/AppHeader";
 import { AppSidebar } from "@/components/organisms/AppSidebar";
 import { MainLayout } from "@/components/templates/MainLayout";
@@ -17,13 +17,12 @@ import { httpClient } from "@/infrastructure/http";
 import { cn } from "@/lib/utils";
 import {
   ArrowRightLeft,
-  MapPin,
-  Users,
-  Clock,
   CheckCircle2,
-  XCircle,
-  AlertTriangle,
+  Clock,
+  MapPin,
   Star,
+  Users,
+  XCircle,
 } from "lucide-react";
 import * as React from "react";
 
@@ -115,8 +114,9 @@ const mockReassignmentHistory: ReassignmentHistoryEntry[] = [
 export default function ReasignacionPage() {
   const [suggestions, setSuggestions] =
     React.useState<ReassignmentSuggestion[]>(mockSuggestions);
-  const [history, setHistory] =
-    React.useState<ReassignmentHistoryEntry[]>(mockReassignmentHistory);
+  const [history, setHistory] = React.useState<ReassignmentHistoryEntry[]>(
+    mockReassignmentHistory,
+  );
   const [loading, setLoading] = React.useState(false);
 
   React.useEffect(() => {
@@ -132,7 +132,7 @@ export default function ReasignacionPage() {
               date: r.requestedDate || r.createdAt,
               decision: r.response || "accepted",
               decidedAt: r.respondedAt || r.updatedAt,
-            }))
+            })),
           );
         }
       } catch {
@@ -144,7 +144,7 @@ export default function ReasignacionPage() {
 
   const handleRespond = async (
     suggestionId: string,
-    response: "accepted" | "rejected"
+    response: "accepted" | "rejected",
   ) => {
     setLoading(true);
     try {
@@ -152,8 +152,8 @@ export default function ReasignacionPage() {
       await new Promise((r) => setTimeout(r, 800));
       setSuggestions((prev) =>
         prev.map((s) =>
-          s.id === suggestionId ? { ...s, status: response } : s
-        )
+          s.id === suggestionId ? { ...s, status: response } : s,
+        ),
       );
     } finally {
       setLoading(false);
@@ -222,7 +222,7 @@ export default function ReasignacionPage() {
                           <span className="flex items-center gap-1">
                             <Clock className="h-3.5 w-3.5" />
                             {new Date(
-                              suggestion.originalDate
+                              suggestion.originalDate,
                             ).toLocaleDateString("es-ES", {
                               day: "2-digit",
                               month: "short",
@@ -241,7 +241,7 @@ export default function ReasignacionPage() {
                       <div className="flex flex-col items-center gap-3 shrink-0">
                         <div className="text-center">
                           <div className="flex items-center gap-1">
-                            <Star className="h-4 w-4 text-yellow-400 fill-yellow-400" />
+                            <Star className="h-4 w-4 text-state-warning-500 fill-state-warning-500" />
                             <span className="text-lg font-bold text-[var(--color-text-primary)]">
                               {Math.round(suggestion.similarityScore * 100)}%
                             </span>
@@ -320,7 +320,7 @@ export default function ReasignacionPage() {
                           "h-2 w-2 rounded-full",
                           entry.decision === "accepted"
                             ? "bg-state-success-500"
-                            : "bg-state-error-500"
+                            : "bg-state-error-500",
                         )}
                       />
                       <div>

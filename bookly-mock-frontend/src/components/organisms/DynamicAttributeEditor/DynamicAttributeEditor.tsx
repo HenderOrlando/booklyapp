@@ -3,7 +3,7 @@
 import { Button } from "@/components/atoms/Button/Button";
 import { Input } from "@/components/atoms/Input/Input";
 import { cn } from "@/lib/utils";
-import { Plus, Trash2, GripVertical } from "lucide-react";
+import { GripVertical, Plus, Trash2 } from "lucide-react";
 import * as React from "react";
 
 /**
@@ -38,8 +38,13 @@ export function DynamicAttributeEditor({
     Object.entries(attributes).map(([key, value]) => ({
       key,
       value,
-      type: typeof value === "boolean" ? "boolean" : typeof value === "number" ? "number" : "text",
-    }))
+      type:
+        typeof value === "boolean"
+          ? "boolean"
+          : typeof value === "number"
+            ? "number"
+            : "text",
+    })),
   );
 
   const syncToParent = (updated: AttributeEntry[]) => {
@@ -53,7 +58,10 @@ export function DynamicAttributeEditor({
   };
 
   const addEntry = () => {
-    const updated = [...entries, { key: "", value: "", type: "text" as AttributeType }];
+    const updated = [
+      ...entries,
+      { key: "", value: "", type: "text" as AttributeType },
+    ];
     setEntries(updated);
   };
 
@@ -63,15 +71,25 @@ export function DynamicAttributeEditor({
     syncToParent(updated);
   };
 
-  const updateEntry = (index: number, field: keyof AttributeEntry, val: any) => {
+  const updateEntry = (
+    index: number,
+    field: keyof AttributeEntry,
+    val: any,
+  ) => {
     const updated = entries.map((entry, i) => {
       if (i !== index) return entry;
       const newEntry = { ...entry, [field]: val };
       if (field === "type") {
         switch (val) {
-          case "boolean": newEntry.value = false; break;
-          case "number": newEntry.value = 0; break;
-          default: newEntry.value = ""; break;
+          case "boolean":
+            newEntry.value = false;
+            break;
+          case "number":
+            newEntry.value = 0;
+            break;
+          default:
+            newEntry.value = "";
+            break;
         }
       }
       return newEntry;
@@ -86,7 +104,12 @@ export function DynamicAttributeEditor({
         <h4 className="text-sm font-semibold text-[var(--color-text-primary)]">
           Atributos del recurso
         </h4>
-        <Button variant="outline" size="sm" onClick={addEntry} className="gap-1">
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={addEntry}
+          className="gap-1"
+        >
           <Plus className="h-3.5 w-3.5" />
           Agregar
         </Button>
@@ -130,13 +153,15 @@ export function DynamicAttributeEditor({
                   onClick={() => updateEntry(index, "value", !entry.value)}
                   className={cn(
                     "relative inline-flex h-6 w-11 shrink-0 rounded-full border-2 border-transparent transition-colors",
-                    entry.value ? "bg-brand-primary-500" : "bg-gray-200"
+                    entry.value
+                      ? "bg-brand-primary-500"
+                      : "bg-[var(--color-bg-muted)]",
                   )}
                 >
                   <span
                     className={cn(
                       "inline-block h-5 w-5 transform rounded-full bg-white shadow transition-transform",
-                      entry.value ? "translate-x-5" : "translate-x-0"
+                      entry.value ? "translate-x-5" : "translate-x-0",
                     )}
                   />
                 </button>
@@ -149,7 +174,9 @@ export function DynamicAttributeEditor({
                     updateEntry(
                       index,
                       "value",
-                      entry.type === "number" ? parseFloat(e.target.value) || 0 : e.target.value
+                      entry.type === "number"
+                        ? parseFloat(e.target.value) || 0
+                        : e.target.value,
                     )
                   }
                   className="flex-1"

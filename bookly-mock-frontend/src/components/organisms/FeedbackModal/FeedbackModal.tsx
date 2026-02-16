@@ -55,7 +55,7 @@ export function FeedbackModal({
 
   const toggleCategory = (cat: string) => {
     setCategories((prev) =>
-      prev.includes(cat) ? prev.filter((c) => c !== cat) : [...prev, cat]
+      prev.includes(cat) ? prev.filter((c) => c !== cat) : [...prev, cat],
     );
   };
 
@@ -87,7 +87,10 @@ export function FeedbackModal({
           {submitted ? (
             <div className="text-center py-6">
               <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-state-success-100">
-                <Star className="h-6 w-6 text-state-success-600" fill="currentColor" />
+                <Star
+                  className="h-6 w-6 text-state-success-600"
+                  fill="currentColor"
+                />
               </div>
               <Dialog.Title className="text-lg font-semibold">
                 ¡Gracias por tu feedback!
@@ -125,8 +128,8 @@ export function FeedbackModal({
                         className={cn(
                           "h-8 w-8 transition-colors",
                           (hoverRating || rating) >= star
-                            ? "text-yellow-400 fill-yellow-400"
-                            : "text-gray-300"
+                            ? "text-state-warning-500 fill-state-warning-500"
+                            : "text-[var(--color-text-tertiary)]",
                         )}
                       />
                     </button>
@@ -148,7 +151,7 @@ export function FeedbackModal({
                           "rounded-full px-3 py-1 text-xs font-medium transition-colors",
                           categories.includes(cat)
                             ? "bg-brand-primary-500 text-white"
-                            : "bg-[var(--color-bg-muted)] text-[var(--color-text-secondary)] hover:bg-[var(--color-bg-muted)]/80"
+                            : "bg-[var(--color-bg-muted)] text-[var(--color-text-secondary)] hover:bg-[var(--color-bg-muted)]/80",
                         )}
                       >
                         {cat}
@@ -176,7 +179,10 @@ export function FeedbackModal({
                 <Button variant="outline" onClick={handleClose}>
                   Omitir
                 </Button>
-                <Button onClick={handleSubmit} disabled={rating === 0 || loading}>
+                <Button
+                  onClick={handleSubmit}
+                  disabled={rating === 0 || loading}
+                >
                   {loading ? "Enviando..." : "Enviar feedback"}
                 </Button>
               </div>

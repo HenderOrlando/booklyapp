@@ -26,10 +26,19 @@ const TRANSLATION_KEYS: Record<string, string> = {
   "/admin/roles": "navigation.roles",
   "/admin/usuarios": "navigation.users",
   "/admin/auditoria": "navigation.audit",
+  "/admin/integraciones": "navigation.integrations",
+  "/admin/flujos-aprobacion": "navigation.approval_flows",
+  "/admin/horarios": "navigation.schedules",
+  "/admin/canales-notificacion": "navigation.notification_channels",
+  "/admin/evaluaciones": "navigation.evaluations",
+  "/reservas/reasignacion": "navigation.reassignment",
   "/design-system": "navigation.design_system",
   "/reportes/recursos": "reports_section.resources",
   "/reportes/usuarios": "reports_section.users",
   "/reportes/avanzado": "reports_section.advanced",
+  "/reportes/demanda-insatisfecha": "reports_section.unsatisfied_demand",
+  "/reportes/cumplimiento": "reports_section.compliance",
+  "/reportes/conflictos": "reports_section.conflicts",
 };
 
 /**
@@ -357,7 +366,39 @@ const navigationItems: NavItem[] = [
         href: "/reportes/avanzado",
         label: "Análisis Avanzado",
       },
+      {
+        href: "/reportes/demanda-insatisfecha",
+        label: "Demanda Insatisfecha",
+      },
+      {
+        href: "/reportes/cumplimiento",
+        label: "Cumplimiento",
+      },
+      {
+        href: "/reportes/conflictos",
+        label: "Conflictos",
+      },
     ],
+  },
+  {
+    href: "/reservas/reasignacion",
+    label: "Reasignación",
+    icon: (
+      <svg
+        className="w-5 h-5"
+        fill="none"
+        stroke="currentColor"
+        viewBox="0 0 24 24"
+      >
+        <path
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          strokeWidth={2}
+          d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"
+        />
+      </svg>
+    ),
+    roles: ["admin", "coordinador"],
   },
   {
     href: "/admin/templates",
@@ -418,6 +459,106 @@ const navigationItems: NavItem[] = [
       </svg>
     ),
     roles: ["admin"], // Solo admin puede gestionar usuarios
+  },
+  {
+    href: "/admin/integraciones",
+    label: "Integraciones",
+    icon: (
+      <svg
+        className="w-5 h-5"
+        fill="none"
+        stroke="currentColor"
+        viewBox="0 0 24 24"
+      >
+        <path
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          strokeWidth={2}
+          d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"
+        />
+      </svg>
+    ),
+    roles: ["admin"],
+  },
+  {
+    href: "/admin/flujos-aprobacion",
+    label: "Flujos de Aprobación",
+    icon: (
+      <svg
+        className="w-5 h-5"
+        fill="none"
+        stroke="currentColor"
+        viewBox="0 0 24 24"
+      >
+        <path
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          strokeWidth={2}
+          d="M9 5l7 7-7 7"
+        />
+      </svg>
+    ),
+    roles: ["admin"],
+  },
+  {
+    href: "/admin/horarios",
+    label: "Horarios",
+    icon: (
+      <svg
+        className="w-5 h-5"
+        fill="none"
+        stroke="currentColor"
+        viewBox="0 0 24 24"
+      >
+        <path
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          strokeWidth={2}
+          d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
+        />
+      </svg>
+    ),
+    roles: ["admin", "coordinador"],
+  },
+  {
+    href: "/admin/canales-notificacion",
+    label: "Canales de Notificación",
+    icon: (
+      <svg
+        className="w-5 h-5"
+        fill="none"
+        stroke="currentColor"
+        viewBox="0 0 24 24"
+      >
+        <path
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          strokeWidth={2}
+          d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"
+        />
+      </svg>
+    ),
+    roles: ["admin"],
+  },
+  {
+    href: "/admin/evaluaciones",
+    label: "Evaluaciones",
+    icon: (
+      <svg
+        className="w-5 h-5"
+        fill="none"
+        stroke="currentColor"
+        viewBox="0 0 24 24"
+      >
+        <path
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          strokeWidth={2}
+          d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z"
+        />
+      </svg>
+    ),
+    roles: ["admin", "coordinador"],
   },
   {
     href: "/admin/auditoria",
@@ -491,7 +632,7 @@ export function AppSidebar({
 
     console.log(
       "[AppSidebar] Roles originales:",
-      user.roles.map((r) => (typeof r === "string" ? r : r.name))
+      user.roles.map((r) => (typeof r === "string" ? r : r.name)),
     );
     console.log("[AppSidebar] Roles normalizados:", normalizedRoles);
 
@@ -504,7 +645,7 @@ export function AppSidebar({
       .filter(
         (item) =>
           item.children &&
-          item.children.some((child) => pathname.startsWith(child.href))
+          item.children.some((child) => pathname.startsWith(child.href)),
       )
       .map((item) => item.href);
 
@@ -517,7 +658,7 @@ export function AppSidebar({
     setExpandedItems((prev) =>
       prev.includes(href)
         ? prev.filter((item) => item !== href)
-        : [...prev, href]
+        : [...prev, href],
     );
   };
 
@@ -532,14 +673,14 @@ export function AppSidebar({
       // Si el item tiene roles pero el usuario no tiene roles asignados, no mostrarlo
       if (!userRoles || userRoles.length === 0) {
         console.log(
-          `[AppSidebar] Ocultando "${item.href}" - usuario sin roles`
+          `[AppSidebar] Ocultando "${item.href}" - usuario sin roles`,
         );
         return false;
       }
 
       // Verificar si alguno de los roles del usuario coincide con los roles permitidos del item
       const hasAccess = item.roles.some((requiredRole) =>
-        userRoles.includes(requiredRole)
+        userRoles.includes(requiredRole),
       );
 
       if (!hasAccess) {
@@ -547,7 +688,7 @@ export function AppSidebar({
           `[AppSidebar] Ocultando "${item.href}" - requiere roles:`,
           item.roles,
           "usuario tiene:",
-          userRoles
+          userRoles,
         );
       }
 

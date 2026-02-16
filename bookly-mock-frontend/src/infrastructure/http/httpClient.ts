@@ -60,7 +60,7 @@ axiosInstance.interceptors.request.use(
   },
   (error) => {
     return Promise.reject(error);
-  }
+  },
 );
 
 /**
@@ -96,7 +96,7 @@ axiosInstance.interceptors.response.use(
         // Intentar refresh del token
         const response = await axios.post(
           `${config.apiGatewayUrl}/api/v1/auth/refresh`,
-          { refreshToken }
+          { refreshToken },
         );
 
         if (response.data.success && response.data.data) {
@@ -152,7 +152,7 @@ axiosInstance.interceptors.response.use(
     }
 
     return Promise.reject(error);
-  }
+  },
 );
 
 /**
@@ -170,7 +170,7 @@ class HttpClient {
   private logMode(): void {
     if (config.isDevelopment && typeof window !== "undefined") {
       console.log(
-        `🌐 HTTP Client inicializado en modo: ${config.dataMode.toUpperCase()}`
+        `🌐 HTTP Client inicializado en modo: ${config.dataMode.toUpperCase()}`,
       );
       if (config.useDirectServices) {
         console.log("🔧 Usando servicios directos (bypass API Gateway)");
@@ -229,8 +229,7 @@ class HttpClient {
       fullEndpoint.includes("/users/") ||
       fullEndpoint.includes("/users") ||
       fullEndpoint.includes("/roles") ||
-      fullEndpoint.includes("/permissions") ||
-      fullEndpoint.includes("/audit")
+      fullEndpoint.includes("/permissions")
     ) {
       const url = `${getServiceUrl("auth")}${fullEndpoint}`;
       console.log("🔑 Auth Service - URL:", url);
@@ -252,7 +251,11 @@ class HttpClient {
     if (
       fullEndpoint.includes("/reservations") ||
       fullEndpoint.includes("/availabilities") ||
-      fullEndpoint.includes("availability")
+      fullEndpoint.includes("availability") ||
+      fullEndpoint.includes("/history") ||
+      fullEndpoint.includes("/reassignments") ||
+      fullEndpoint.includes("/waitlist") ||
+      fullEndpoint.includes("/check-in")
     ) {
       const url = `${getServiceUrl("availability")}${fullEndpoint}`;
       console.log("📅 Availability Service - URL:", url);
@@ -261,7 +264,11 @@ class HttpClient {
     if (
       fullEndpoint.includes("/stockpile/") ||
       fullEndpoint.includes("stockpile") ||
-      fullEndpoint.includes("/approvals")
+      fullEndpoint.includes("/approvals") ||
+      fullEndpoint.includes("/approval-flows") ||
+      fullEndpoint.includes("/approval-requests") ||
+      fullEndpoint.includes("/documents") ||
+      fullEndpoint.includes("/check-in-out")
     ) {
       const url = `${getServiceUrl("stockpile")}${fullEndpoint}`;
       console.log("✅ Stockpile Service - URL:", url);
@@ -272,7 +279,12 @@ class HttpClient {
       fullEndpoint.includes("dashboard/") ||
       fullEndpoint.includes("usage-reports") ||
       fullEndpoint.includes("demand-reports") ||
-      fullEndpoint.includes("user-reports")
+      fullEndpoint.includes("user-reports") ||
+      fullEndpoint.includes("conflict-reports") ||
+      fullEndpoint.includes("/feedback") ||
+      fullEndpoint.includes("/notifications") ||
+      fullEndpoint.includes("/audit") ||
+      fullEndpoint.includes("/evaluations")
     ) {
       const url = `${getServiceUrl("reports")}${fullEndpoint}`;
       console.log("📊 Reports Service - URL:", url);
@@ -290,7 +302,7 @@ class HttpClient {
    */
   async get<T = any>(
     endpoint: string,
-    config?: AxiosRequestConfig
+    config?: AxiosRequestConfig,
   ): Promise<ApiResponse<T>> {
     const url = this.buildUrl(endpoint);
 
@@ -312,7 +324,7 @@ class HttpClient {
   async post<T = any>(
     endpoint: string,
     data?: any,
-    config?: AxiosRequestConfig
+    config?: AxiosRequestConfig,
   ): Promise<ApiResponse<T>> {
     const url = this.buildUrl(endpoint);
 
@@ -324,7 +336,7 @@ class HttpClient {
       const response = await axiosInstance.post<ApiResponse<T>>(
         url,
         data,
-        config
+        config,
       );
       return response.data;
     } catch (error) {
@@ -338,7 +350,7 @@ class HttpClient {
   async put<T = any>(
     endpoint: string,
     data?: any,
-    config?: AxiosRequestConfig
+    config?: AxiosRequestConfig,
   ): Promise<ApiResponse<T>> {
     const url = this.buildUrl(endpoint);
 
@@ -350,7 +362,7 @@ class HttpClient {
       const response = await axiosInstance.put<ApiResponse<T>>(
         url,
         data,
-        config
+        config,
       );
       return response.data;
     } catch (error) {
@@ -364,7 +376,7 @@ class HttpClient {
   async patch<T = any>(
     endpoint: string,
     data?: any,
-    config?: AxiosRequestConfig
+    config?: AxiosRequestConfig,
   ): Promise<ApiResponse<T>> {
     const url = this.buildUrl(endpoint);
 
@@ -376,7 +388,7 @@ class HttpClient {
       const response = await axiosInstance.patch<ApiResponse<T>>(
         url,
         data,
-        config
+        config,
       );
       return response.data;
     } catch (error) {
@@ -389,7 +401,7 @@ class HttpClient {
    */
   async delete<T = any>(
     endpoint: string,
-    config?: AxiosRequestConfig
+    config?: AxiosRequestConfig,
   ): Promise<ApiResponse<T>> {
     const url = this.buildUrl(endpoint);
 
@@ -416,12 +428,12 @@ class HttpClient {
         // El servidor respondió con un error
         return new Error(
           axiosError.response.data?.message ||
-            "Error en la petición al servidor"
+            "Error en la petición al servidor",
         );
       } else if (axiosError.request) {
         // La petición se hizo pero no hubo respuesta
         return new Error(
-          "No se pudo conectar con el servidor. Verifica tu conexión."
+          "No se pudo conectar con el servidor. Verifica tu conexión.",
         );
       }
     }

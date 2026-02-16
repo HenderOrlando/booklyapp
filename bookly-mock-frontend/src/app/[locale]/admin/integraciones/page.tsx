@@ -1,5 +1,6 @@
 "use client";
 
+import { Alert, AlertDescription, AlertTitle } from "@/components/atoms/Alert";
 import { Badge } from "@/components/atoms/Badge";
 import { Button } from "@/components/atoms/Button";
 import {
@@ -9,23 +10,11 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/atoms/Card";
-import { Alert, AlertDescription, AlertTitle } from "@/components/atoms/Alert";
 import { AppHeader } from "@/components/organisms/AppHeader";
 import { AppSidebar } from "@/components/organisms/AppSidebar";
 import { MainLayout } from "@/components/templates/MainLayout";
-import { httpClient } from "@/infrastructure/http";
 import { cn } from "@/lib/utils";
-import {
-  Calendar,
-  Mail,
-  Link2,
-  CheckCircle2,
-  XCircle,
-  RefreshCw,
-  ExternalLink,
-  Shield,
-  Unlink,
-} from "lucide-react";
+import { Calendar, Link2, Mail, RefreshCw, Shield, Unlink } from "lucide-react";
 import * as React from "react";
 
 /**
@@ -79,11 +68,7 @@ const mockIntegrations: IntegrationConfig[] = [
     connected: true,
     accountEmail: "admin@ufps.edu.co",
     lastSyncAt: "2026-02-16T10:30:00Z",
-    scopes: [
-      "openid",
-      "email",
-      "profile",
-    ],
+    scopes: ["openid", "email", "profile"],
     status: "active",
   },
   {
@@ -94,9 +79,7 @@ const mockIntegrations: IntegrationConfig[] = [
     provider: "google",
     type: "email",
     connected: false,
-    scopes: [
-      "https://www.googleapis.com/auth/gmail.send",
-    ],
+    scopes: ["https://www.googleapis.com/auth/gmail.send"],
     status: "inactive",
   },
 ];
@@ -108,7 +91,8 @@ const typeIcons = {
 };
 
 export default function IntegracionesPage() {
-  const [integrations, setIntegrations] = React.useState<IntegrationConfig[]>(mockIntegrations);
+  const [integrations, setIntegrations] =
+    React.useState<IntegrationConfig[]>(mockIntegrations);
   const [connecting, setConnecting] = React.useState<string | null>(null);
   const [syncing, setSyncing] = React.useState<string | null>(null);
 
@@ -131,8 +115,8 @@ export default function IntegracionesPage() {
                 accountEmail: "usuario@ufps.edu.co",
                 lastSyncAt: new Date().toISOString(),
               }
-            : int
-        )
+            : int,
+        ),
       );
     } catch (err) {
       console.error("Error connecting integration:", err);
@@ -157,8 +141,8 @@ export default function IntegracionesPage() {
                 accountEmail: undefined,
                 lastSyncAt: undefined,
               }
-            : int
-        )
+            : int,
+        ),
       );
     } catch (err) {
       console.error("Error disconnecting:", err);
@@ -177,8 +161,8 @@ export default function IntegracionesPage() {
         prev.map((int) =>
           int.id === integrationId
             ? { ...int, lastSyncAt: new Date().toISOString() }
-            : int
-        )
+            : int,
+        ),
       );
     } catch (err) {
       console.error("Error syncing:", err);
@@ -232,7 +216,7 @@ export default function IntegracionesPage() {
                           "rounded-lg p-2.5",
                           integration.connected
                             ? "bg-state-success-100"
-                            : "bg-gray-100 dark:bg-gray-800"
+                            : "bg-[var(--color-bg-muted)]",
                         )}
                       >
                         <Icon
@@ -240,7 +224,7 @@ export default function IntegracionesPage() {
                             "h-5 w-5",
                             integration.connected
                               ? "text-state-success-600"
-                              : "text-gray-400"
+                              : "text-[var(--color-text-tertiary)]",
                           )}
                         />
                       </div>
@@ -254,15 +238,15 @@ export default function IntegracionesPage() {
                               integration.status === "active"
                                 ? "success"
                                 : integration.status === "error"
-                                ? "error"
-                                : "default"
+                                  ? "error"
+                                  : "default"
                             }
                           >
                             {integration.status === "active"
                               ? "Conectado"
                               : integration.status === "error"
-                              ? "Error"
-                              : "Desconectado"}
+                                ? "Error"
+                                : "Desconectado"}
                           </Badge>
                         </div>
                       </div>
@@ -297,7 +281,7 @@ export default function IntegracionesPage() {
                                 month: "short",
                                 hour: "2-digit",
                                 minute: "2-digit",
-                              }
+                              },
                             )}
                           </span>
                         </div>
@@ -349,7 +333,7 @@ export default function IntegracionesPage() {
                             <RefreshCw
                               className={cn(
                                 "h-3.5 w-3.5",
-                                isSyncing && "animate-spin"
+                                isSyncing && "animate-spin",
                               )}
                             />
                             {isSyncing ? "Sincronizando..." : "Sincronizar"}
@@ -374,9 +358,7 @@ export default function IntegracionesPage() {
                         onClick={() => handleConnect(integration.id)}
                       >
                         <Link2 className="h-3.5 w-3.5" />
-                        {isConnecting
-                          ? "Conectando..."
-                          : `Conectar con Google`}
+                        {isConnecting ? "Conectando..." : `Conectar con Google`}
                       </Button>
                     )}
                   </div>
@@ -390,7 +372,9 @@ export default function IntegracionesPage() {
         {integrations.find((i) => i.id === "int-gcal" && i.connected) && (
           <Card>
             <CardHeader>
-              <CardTitle>Configuración de Sincronización de Calendario</CardTitle>
+              <CardTitle>
+                Configuración de Sincronización de Calendario
+              </CardTitle>
               <CardDescription>
                 Configura cómo se sincronizan las reservas con Google Calendar
               </CardDescription>
@@ -407,11 +391,7 @@ export default function IntegracionesPage() {
                       Calendar
                     </p>
                   </div>
-                  <input
-                    type="checkbox"
-                    defaultChecked
-                    className="rounded"
-                  />
+                  <input type="checkbox" defaultChecked className="rounded" />
                 </label>
 
                 <label className="flex items-center justify-between rounded-lg border p-4">
@@ -424,11 +404,7 @@ export default function IntegracionesPage() {
                       correspondiente
                     </p>
                   </div>
-                  <input
-                    type="checkbox"
-                    defaultChecked
-                    className="rounded"
-                  />
+                  <input type="checkbox" defaultChecked className="rounded" />
                 </label>
 
                 <label className="flex items-center justify-between rounded-lg border p-4">
@@ -440,11 +416,7 @@ export default function IntegracionesPage() {
                       Agrega la ubicación del recurso como ubicación del evento
                     </p>
                   </div>
-                  <input
-                    type="checkbox"
-                    defaultChecked
-                    className="rounded"
-                  />
+                  <input type="checkbox" defaultChecked className="rounded" />
                 </label>
 
                 <label className="flex items-center justify-between rounded-lg border p-4">
