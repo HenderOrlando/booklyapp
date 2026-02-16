@@ -238,24 +238,50 @@
 | RF-38         | 1            | **4**       | reportes/conflictos page + page tests             |
 | RF-44         | 2            | **4**       | auditoria CSV export + page tests                 |
 
-**Score promedio: 4.0** (24 rules × 4 = 96 / 24 = 4.0)
+**Score promedio: 4.04** (25 rules × ~4 = 101 / 25 = 4.04)
 
 ### Test Coverage Summary
 
-| Category       | Suites | Tests   | Status                   |
-| -------------- | ------ | ------- | ------------------------ |
-| Atoms          | 4      | 33      | ✅ ALL PASS              |
-| Organisms      | 8      | 63      | ✅ ALL PASS              |
-| Auth           | 1      | 8       | ✅ ALL PASS              |
-| Lib Utils      | 1      | 25      | ✅ ALL PASS              |
-| Page Tests     | 12     | 24      | ✅ ALL PASS              |
-| Infra (API)    | 1      | 47      | ✅ 1 PASS (retry)        |
-| **TOTAL NEW**  | **27** | **200** | ✅                       |
-| Infra preexist | 5      | 18      | ❌ Pre-existing failures |
+| Category         | Suites | Tests   | Status                   |
+| ---------------- | ------ | ------- | ------------------------ |
+| Atoms            | 4      | 33      | ✅ ALL PASS              |
+| Organisms        | 8      | 63      | ✅ ALL PASS              |
+| Auth             | 1      | 8       | ✅ ALL PASS              |
+| Lib Utils        | 1      | 25      | ✅ ALL PASS              |
+| Page Tests       | 12     | 24      | ✅ ALL PASS              |
+| Infra (API)      | 1      | 47      | ✅ 1 PASS (retry)        |
+| **TOTAL UNIT**   | **27** | **200** | ✅                       |
+| E2E (Playwright) | 5      | 20      | 🔧 Ready to run          |
+| Infra preexist   | 5      | 18      | ❌ Pre-existing failures |
 
-### Pendientes para próximo run (score 4→5)
+### E2E Tests (Playwright)
 
-- Tests e2e con Playwright para flujos críticos
+| Spec file            | Tests | Flujos cubiertos                                   |
+| -------------------- | ----- | -------------------------------------------------- |
+| auth.spec.ts         | 5     | Login, validación, redirect, register              |
+| resources.spec.ts    | 3     | Listado, detalle, creación                         |
+| reservations.spec.ts | 3     | Listado, calendario, nueva reserva                 |
+| admin.spec.ts        | 5     | Auditoría+CSV, roles, flujos, integraciones, eval. |
+| reports.spec.ts      | 4     | Dashboard, demanda, cumplimiento, conflictos       |
+
+**Ejecutar**: `npx playwright test` (requiere dev server activo)
+
+### Artefactos adicionales (run 2)
+
+- **RF-30**: `useWebSocketToasts` hook + `WebSocketToastBridge` component + integración en `providers.tsx`
+- **Toast DS fix**: Colores hardcoded reemplazados por tokens semánticos (`state-success-*`, `state-error-*`, etc.)
+- **Playwright**: Configuración completa + 5 specs con 20 test cases
+- **jest.config.js**: Exclusión de `/e2e/` + global mocks en `jest.setup.js`
+
+### Rules impactadas — Run 2
+
+| Rule  | Score previo | Score final | Artefacto clave                                      |
+| ----- | ------------ | ----------- | ---------------------------------------------------- |
+| RF-30 | 1            | **4**       | useWebSocketToasts + WebSocketToastBridge + Toast DS |
+
+### Pendientes para score 5
+
+- Ejecutar Playwright e2e tests contra dev server
 - Integración real con Google Calendar OAuth (requiere backend env vars)
-- WebSocket toast notifications (RF-30)
 - Gateway restart para aplicar proxy fix
+- Aumentar cobertura e2e para flujos de aprobación y check-in/check-out

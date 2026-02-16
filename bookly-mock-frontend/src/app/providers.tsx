@@ -1,6 +1,7 @@
 "use client";
 
 import { ToastContainer } from "@/components/organisms/ToastContainer";
+import { WebSocketToastBridge } from "@/components/organisms/WebSocketToastBridge/WebSocketToastBridge";
 import { AuthProvider } from "@/contexts/AuthContext";
 import { WebSocketProvider } from "@/infrastructure/websocket/WebSocketProvider";
 import { QueryProvider } from "@/providers/QueryProvider";
@@ -24,6 +25,7 @@ export function Providers({ children }: ProvidersProps) {
         >
           <AuthProvider>
             <WebSocketProvider>
+              <WebSocketToastBridge />
               {children}
               <ToastContainer />
             </WebSocketProvider>

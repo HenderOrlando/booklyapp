@@ -31,35 +31,35 @@ export interface ToastProps {
 const toastConfig = {
   success: {
     icon: CheckCircle,
-    bgColor: "bg-green-50 dark:bg-green-900/20",
-    borderColor: "border-green-200 dark:border-green-800",
-    iconColor: "text-green-600 dark:text-green-400",
-    titleColor: "text-green-900 dark:text-green-100",
-    messageColor: "text-green-700 dark:text-green-300",
+    bgColor: "bg-state-success-50",
+    borderColor: "border-state-success-200",
+    iconColor: "text-state-success-600",
+    titleColor: "text-[var(--color-text-primary)]",
+    messageColor: "text-state-success-700",
   },
   error: {
     icon: AlertCircle,
-    bgColor: "bg-red-50 dark:bg-red-900/20",
-    borderColor: "border-red-200 dark:border-red-800",
-    iconColor: "text-red-600 dark:text-red-400",
-    titleColor: "text-red-900 dark:text-red-100",
-    messageColor: "text-red-700 dark:text-red-300",
+    bgColor: "bg-state-error-50",
+    borderColor: "border-state-error-200",
+    iconColor: "text-state-error-600",
+    titleColor: "text-[var(--color-text-primary)]",
+    messageColor: "text-state-error-700",
   },
   warning: {
     icon: AlertTriangle,
-    bgColor: "bg-yellow-50 dark:bg-yellow-900/20",
-    borderColor: "border-yellow-200 dark:border-yellow-800",
-    iconColor: "text-yellow-600 dark:text-yellow-400",
-    titleColor: "text-yellow-900 dark:text-yellow-100",
-    messageColor: "text-yellow-700 dark:text-yellow-300",
+    bgColor: "bg-state-warning-50",
+    borderColor: "border-state-warning-200",
+    iconColor: "text-state-warning-600",
+    titleColor: "text-[var(--color-text-primary)]",
+    messageColor: "text-state-warning-700",
   },
   info: {
     icon: Info,
-    bgColor: "bg-blue-50 dark:bg-blue-900/20",
-    borderColor: "border-blue-200 dark:border-blue-800",
-    iconColor: "text-blue-600 dark:text-blue-400",
-    titleColor: "text-blue-900 dark:text-blue-100",
-    messageColor: "text-blue-700 dark:text-blue-300",
+    bgColor: "bg-brand-primary-50",
+    borderColor: "border-brand-primary-200",
+    iconColor: "text-brand-primary-600",
+    titleColor: "text-[var(--color-text-primary)]",
+    messageColor: "text-brand-primary-700",
   },
 };
 
@@ -108,7 +108,7 @@ export const Toast = React.memo<ToastProps>(
         </button>
       </div>
     );
-  }
+  },
 );
 
 Toast.displayName = "Toast";
