@@ -408,7 +408,41 @@ export default function AuditoriaPage() {
                 </Button>
                 <Button
                   variant="outline"
-                  onClick={() => alert("Exportar CSV pendiente")}
+                  onClick={() => {
+                    const headers = [
+                      "Timestamp",
+                      "Usuario",
+                      "Acción",
+                      "Entidad",
+                      "Entity ID",
+                      "Detalles",
+                      "Estado",
+                      "IP",
+                    ];
+                    const rows = filteredLogs.map((log) => [
+                      new Date(log.timestamp).toISOString(),
+                      log.user,
+                      log.action,
+                      log.entity,
+                      log.entityId || "",
+                      `"${log.details.replace(/"/g, '""')}"`,
+                      log.status,
+                      log.ipAddress,
+                    ]);
+                    const csv = [
+                      headers.join(","),
+                      ...rows.map((r) => r.join(",")),
+                    ].join("\n");
+                    const blob = new Blob([csv], {
+                      type: "text/csv;charset=utf-8;",
+                    });
+                    const url = URL.createObjectURL(blob);
+                    const link = document.createElement("a");
+                    link.href = url;
+                    link.download = `audit_logs_${new Date().toISOString().slice(0, 10)}.csv`;
+                    link.click();
+                    URL.revokeObjectURL(url);
+                  }}
                 >
                   {t("export_csv")}
                 </Button>
@@ -430,12 +464,12 @@ export default function AuditoriaPage() {
                           <div>
                             <div className="text-sm font-medium text-white">
                               {new Date(log.timestamp).toLocaleDateString(
-                                "es-ES"
+                                "es-ES",
                               )}
                             </div>
                             <div className="text-xs text-gray-400">
                               {new Date(log.timestamp).toLocaleTimeString(
-                                "es-ES"
+                                "es-ES",
                               )}
                             </div>
                           </div>

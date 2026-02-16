@@ -1,13 +1,13 @@
 import {
   cn,
+  formatBytes,
   formatDate,
   formatDateTime,
-  getInitials,
-  truncate,
-  parseApiError,
-  formatBytes,
   generateId,
+  getInitials,
   isValidEmail,
+  parseApiError,
+  truncate,
 } from "../utils";
 
 describe("cn", () => {
@@ -27,9 +27,9 @@ describe("cn", () => {
 
 describe("formatDate", () => {
   it("formats date in Spanish locale", () => {
-    const result = formatDate("2026-02-16T00:00:00Z", "es-ES");
+    const result = formatDate("2026-02-16T12:00:00Z", "es-ES");
     expect(result).toContain("2026");
-    expect(result).toContain("16");
+    expect(result).toContain("febrero");
   });
 });
 
