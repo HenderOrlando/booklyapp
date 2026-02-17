@@ -18,7 +18,7 @@ export class PermissionsGuard implements CanActivate {
   canActivate(context: ExecutionContext): boolean {
     const requiredPermissions = this.reflector.getAllAndOverride<string[]>(
       "permissions",
-      [context.getHandler(), context.getClass()]
+      [context.getHandler(), context.getClass()],
     );
 
     if (!requiredPermissions || requiredPermissions.length === 0) {
@@ -28,18 +28,27 @@ export class PermissionsGuard implements CanActivate {
     const request = context.switchToHttp().getRequest();
     const user = request.user;
 
-    if (!user || !user.permissions) {
+    if (!user) {
+      throw new ForbiddenException("User does not have required permissions");
+    }
+
+    // GENERAL_ADMIN tiene acceso total — bypass de permisos
+    if (user.roles?.includes("GENERAL_ADMIN")) {
+      return true;
+    }
+
+    if (!user.permissions) {
       throw new ForbiddenException("User does not have required permissions");
     }
 
     const hasPermission = PermissionUtil.hasAllPermissions(
       user.permissions,
-      requiredPermissions
+      requiredPermissions,
     );
 
     if (!hasPermission) {
       throw new ForbiddenException(
-        `User does not have required permissions: ${requiredPermissions.join(", ")}`
+        `User does not have required permissions: ${requiredPermissions.join(", ")}`,
       );
     }
 
