@@ -1,3 +1,4 @@
+import "@testing-library/jest-dom";
 import { render, screen } from "@testing-library/react";
 import { Badge } from "../Badge";
 
@@ -10,37 +11,43 @@ describe("Badge", () => {
   it("renders default variant", () => {
     render(<Badge>Default</Badge>);
     const badge = screen.getByText("Default");
-    expect(badge.className).toContain("color-bg-secondary");
+    expect(badge.className).toContain("bg-[var(--color-bg-secondary)]");
   });
 
   it("renders success variant with state tokens", () => {
     render(<Badge variant="success">Confirmed</Badge>);
     const badge = screen.getByText("Confirmed");
-    expect(badge.className).toContain("color-state-success");
+    expect(badge.className).toContain(
+      "border-[var(--color-state-success-border)]",
+    );
   });
 
   it("renders warning variant with state tokens", () => {
     render(<Badge variant="warning">Pending</Badge>);
     const badge = screen.getByText("Pending");
-    expect(badge.className).toContain("color-state-warning");
+    expect(badge.className).toContain(
+      "border-[var(--color-state-warning-border)]",
+    );
   });
 
   it("renders error variant with state tokens", () => {
     render(<Badge variant="error">Rejected</Badge>);
     const badge = screen.getByText("Rejected");
-    expect(badge.className).toContain("color-state-error");
+    expect(badge.className).toContain(
+      "border-[var(--color-state-error-border)]",
+    );
   });
 
   it("renders primary variant with brand colors", () => {
     render(<Badge variant="primary">Primary</Badge>);
     const badge = screen.getByText("Primary");
-    expect(badge.className).toContain("bg-brand-primary");
+    expect(badge.className).toContain("bg-[var(--color-action-primary)]");
   });
 
   it("renders secondary variant with brand colors", () => {
     render(<Badge variant="secondary">Secondary</Badge>);
     const badge = screen.getByText("Secondary");
-    expect(badge.className).toContain("bg-brand-secondary");
+    expect(badge.className).toContain("bg-[var(--color-action-secondary)]");
   });
 
   it("renders outline variant with border", () => {

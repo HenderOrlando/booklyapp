@@ -5,6 +5,7 @@ import { i18nConfig } from "./config";
 // Lista de namespaces que se cargarán dinámicamente
 const namespaces = [
   "common",
+  "errors",
   "navigation",
   "reports_section",
   "dashboard",
@@ -36,7 +37,7 @@ export default getRequestConfig(async ({ locale }) => {
     } catch (error) {
       console.warn(
         `Warning: Could not load translation file for namespace "${namespace}" in locale "${locale}"`,
-        error
+        error,
       );
     }
   }

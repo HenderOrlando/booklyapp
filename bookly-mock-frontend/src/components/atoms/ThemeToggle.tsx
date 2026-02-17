@@ -35,15 +35,17 @@ export function ThemeToggle() {
   return (
     <button
       onClick={toggleTheme}
-      className="relative inline-flex items-center h-7 w-14 rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+      className="relative inline-flex h-7 w-14 items-center rounded-full border border-[var(--color-border-subtle)] transition-colors focus:outline-none focus:ring-2 focus:ring-[var(--color-border-focus)] focus:ring-offset-2"
       style={{
-        backgroundColor: isDark ? "#1e293b" : "#cbd5e1",
+        backgroundColor: isDark
+          ? "var(--color-bg-primary)"
+          : "var(--color-border-strong)",
       }}
       aria-label={`Cambiar a tema ${isDark ? "claro" : "oscuro"}`}
     >
       {/* Slider */}
       <span
-        className={`inline-block h-5 w-5 transform rounded-full bg-white shadow-lg transition-transform ${
+        className={`inline-block h-5 w-5 transform rounded-full bg-[var(--color-bg-surface)] shadow-lg transition-transform ${
           isDark ? "translate-x-7" : "translate-x-1"
         }`}
       />
@@ -52,7 +54,7 @@ export function ThemeToggle() {
       <span className="absolute left-1.5 flex items-center">
         {/* Sol (light) */}
         <svg
-          className={`w-3 h-3 ${isDark ? "text-[var(--color-text-secondary)]" : "text-yellow-500"}`}
+          className={`h-3 w-3 ${isDark ? "text-[var(--color-text-secondary)]" : "text-[var(--color-text-link)]"}`}
           fill="currentColor"
           viewBox="0 0 20 20"
         >
@@ -67,7 +69,7 @@ export function ThemeToggle() {
       <span className="absolute right-1.5 flex items-center">
         {/* Luna (dark) */}
         <svg
-          className={`w-3 h-3 ${isDark ? "text-yellow-300" : "text-[var(--color-text-secondary)]"}`}
+          className={`h-3 w-3 ${isDark ? "text-[var(--color-text-link)]" : "text-[var(--color-text-secondary)]"}`}
           fill="currentColor"
           viewBox="0 0 20 20"
         >

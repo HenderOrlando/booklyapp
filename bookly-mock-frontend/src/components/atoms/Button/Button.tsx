@@ -25,13 +25,13 @@ const buttonVariants = cva(
       variant: {
         // Botón primario - Bookly Design System
         default:
-          "bg-brand-primary-500 text-[var(--color-text-inverse)] hover:bg-brand-primary-600 active:bg-brand-primary-700 disabled:bg-[var(--color-action-primary-disabled)] dark:bg-brand-primary-600 dark:hover:bg-brand-primary-500",
+          "bg-[var(--color-action-primary)] text-[var(--color-text-inverse)] hover:bg-[var(--color-action-primary-hover)] active:brightness-95 disabled:bg-[var(--color-action-primary-disabled)]",
         // Botón secundario - Bookly Design System
         secondary:
-          "bg-brand-secondary-500 text-[var(--color-text-inverse)] hover:bg-brand-secondary-600 active:bg-brand-secondary-700 dark:bg-brand-secondary-600 dark:hover:bg-brand-secondary-500",
+          "bg-[var(--color-action-secondary)] text-[var(--color-text-inverse)] hover:bg-[var(--color-action-secondary-hover)] active:brightness-95",
         // Botón destructivo - Estados de error
         destructive:
-          "bg-state-error-500 text-[var(--color-text-inverse)] hover:bg-state-error-700 active:bg-state-error-900",
+          "bg-[var(--color-state-error-text)] text-[var(--color-text-inverse)] hover:brightness-95 active:brightness-90",
         // Botón outline
         outline:
           "border border-[var(--color-border-strong)] bg-transparent text-[var(--color-text-primary)] hover:bg-[var(--color-bg-muted)]",
@@ -39,7 +39,7 @@ const buttonVariants = cva(
         ghost:
           "bg-transparent text-[var(--color-text-primary)] hover:bg-[var(--color-action-ghost-hover)]",
         // Botón link
-        link: "text-brand-primary-500 underline-offset-4 hover:underline",
+        link: "text-[var(--color-text-link)] underline-offset-4 hover:underline",
       },
       size: {
         default: "h-10 px-4 py-2",
@@ -52,7 +52,7 @@ const buttonVariants = cva(
       variant: "default",
       size: "default",
     },
-  }
+  },
 );
 
 export interface ButtonProps
@@ -71,7 +71,7 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
         {...props}
       />
     );
-  }
+  },
 );
 Button.displayName = "Button";
 

@@ -4,7 +4,11 @@ import { Alert, AlertDescription } from "@/components/atoms/Alert";
 import { Input } from "@/components/atoms/Input";
 import { AuthLayout } from "@/components/templates/AuthLayout";
 import { useAuth } from "@/contexts/AuthContext";
-import { useLocale, useTranslations } from "next-intl";
+import {
+  type ErrorTranslator,
+  resolveErrorMessage,
+} from "@/infrastructure/http/errorMessageResolver";
+import { useTranslations } from "next-intl";
 import * as React from "react";
 import { ButtonWithLoading } from "../../../components";
 
@@ -17,7 +21,7 @@ import { ButtonWithLoading } from "../../../components";
 
 export default function LoginPage() {
   const t = useTranslations("auth");
-  const locale = useLocale();
+  const tErrors = useTranslations("errors");
   const { login, isLoading } = useAuth();
   const [email, setEmail] = React.useState("");
   const [password, setPassword] = React.useState("");
@@ -33,7 +37,10 @@ export default function LoginPage() {
       // AuthContext redirige automáticamente al dashboard
     } catch (error: any) {
       console.error("Login error:", error);
-      setError(error?.message || t("default_error"));
+      setError(
+        resolveErrorMessage(error, tErrors as unknown as ErrorTranslator) ||
+          t("default_error"),
+      );
     }
   };
 
@@ -81,7 +88,7 @@ export default function LoginPage() {
               checked={rememberMe}
               onChange={(e) => setRememberMe(e.target.checked)}
               disabled={isLoading}
-              className="rounded border-[var(--color-border-subtle)] text-brand-primary-500 focus:ring-brand-primary-500 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="rounded border-[var(--color-border-subtle)] text-[var(--color-action-primary)] focus:ring-[var(--color-border-focus)] disabled:cursor-not-allowed disabled:opacity-50"
             />
             <span className="ml-2 text-[var(--color-text-secondary)]">
               {t("remember")}
@@ -89,7 +96,7 @@ export default function LoginPage() {
           </label>
           <a
             href="/forgot-password"
-            className="text-brand-primary-500 hover:underline"
+            className="text-[var(--color-text-link)] hover:underline"
           >
             {t("forgot_password")}
           </a>
@@ -107,7 +114,7 @@ export default function LoginPage() {
           {t("no_account")}{" "}
           <a
             href="/register"
-            className="text-brand-primary-500 hover:underline"
+            className="text-[var(--color-text-link)] hover:underline"
           >
             {t("register_link")}
           </a>

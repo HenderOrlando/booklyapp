@@ -2,7 +2,12 @@
 
 import { useToast } from "@/hooks/useToast";
 import { AuthClient } from "@/infrastructure/api/auth-client";
+import {
+  type ErrorTranslator,
+  resolveErrorMessage,
+} from "@/infrastructure/http/errorMessageResolver";
 import { User } from "@/types/entities/auth";
+import { useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
 import React, {
   createContext,
@@ -19,7 +24,7 @@ interface AuthContextType {
   login: (
     email: string,
     password: string,
-    rememberMe?: boolean
+    rememberMe?: boolean,
   ) => Promise<void>;
   logout: () => Promise<void>;
   refreshUser: () => Promise<void>;
@@ -41,6 +46,8 @@ export function AuthProvider({ children }: AuthProviderProps) {
   const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const router = useRouter();
+  const tAuth = useTranslations("auth");
+  const tErrors = useTranslations("errors");
   const { showError, showWarning, showSuccess, showInfo } = useToast();
 
   // Referencias para timers
@@ -116,7 +123,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
         }
       } else {
         console.log(
-          "⚠️ checkAuth - Respuesta sin éxito, intentando refresh..."
+          "⚠️ checkAuth - Respuesta sin éxito, intentando refresh...",
         );
         // Token inválido, intentar refresh
         const refreshSuccess = await attemptTokenRefresh();
@@ -127,7 +134,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
           setUser(null);
         } else {
           console.log(
-            "✅ checkAuth - Refresh exitoso, reintentando getProfile..."
+            "✅ checkAuth - Refresh exitoso, reintentando getProfile...",
           );
           // Intentar obtener perfil nuevamente con el nuevo token
           const retryResponse = await AuthClient.getProfile();
@@ -161,7 +168,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
 
       if (isAuthError) {
         console.log(
-          "🔄 checkAuth - Error de autenticación detectado, intentando refresh..."
+          "🔄 checkAuth - Error de autenticación detectado, intentando refresh...",
         );
         const refreshSuccess = await attemptTokenRefresh();
         if (refreshSuccess) {
@@ -177,7 +184,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
           } catch (retryError) {
             console.error(
               "❌ checkAuth - Error en retry después de refresh:",
-              retryError
+              retryError,
             );
           }
         }
@@ -190,13 +197,13 @@ export function AuthProvider({ children }: AuthProviderProps) {
       } else if (isNetworkError) {
         // Error de red: mantener el token, usuario Y reintentar
         console.warn(
-          "⚠️ checkAuth - Error de red/backend, manteniendo sesión completa. Reintentando en 3 segundos..."
+          "⚠️ checkAuth - Error de red/backend, manteniendo sesión completa. Reintentando en 3 segundos...",
         );
         // No limpiar tokens ni usuario - mantener UI funcional
         // Si hay un usuario válido previo, usarlo
         if (lastValidUserRef.current && !user) {
           console.log(
-            "💾 checkAuth - Restaurando último usuario válido desde cache"
+            "💾 checkAuth - Restaurando último usuario válido desde cache",
           );
           setUser(lastValidUserRef.current);
         }
@@ -208,13 +215,13 @@ export function AuthProvider({ children }: AuthProviderProps) {
           }
           checkAuthRetryRef.current = setTimeout(() => {
             console.log(
-              `🔄 Reintentando checkAuth (intento ${retryCountRef.current}/3)...`
+              `🔄 Reintentando checkAuth (intento ${retryCountRef.current}/3)...`,
             );
             checkAuth();
           }, 3000);
         } else {
           console.warn(
-            "⚠️ checkAuth - Máximo de reintentos alcanzado. Usuario debe recargar manualmente."
+            "⚠️ checkAuth - Máximo de reintentos alcanzado. Usuario debe recargar manualmente.",
           );
           retryCountRef.current = 0;
         }
@@ -223,12 +230,12 @@ export function AuthProvider({ children }: AuthProviderProps) {
         // Otro tipo de error: ser conservador y mantener sesión completa
         console.warn(
           "⚠️ checkAuth - Error desconocido, manteniendo sesión completa. Error:",
-          error?.message
+          error?.message,
         );
         // Si hay un usuario válido previo, usarlo
         if (lastValidUserRef.current && !user) {
           console.log(
-            "💾 checkAuth - Restaurando último usuario válido desde cache"
+            "💾 checkAuth - Restaurando último usuario válido desde cache",
           );
           setUser(lastValidUserRef.current);
         }
@@ -275,7 +282,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
   const login = async (
     email: string,
     password: string,
-    rememberMe: boolean = false
+    rememberMe: boolean = false,
   ) => {
     try {
       setIsLoading(true);
@@ -296,8 +303,8 @@ export function AuthProvider({ children }: AuthProviderProps) {
 
         // Mostrar notificación de éxito
         showSuccess(
-          "Inicio de sesión exitoso",
-          `Bienvenido ${user.firstName || user.email}`
+          tAuth("login_success"),
+          `Bienvenido ${user.firstName || user.email}`,
         );
 
         // Redirigir al dashboard
@@ -307,9 +314,13 @@ export function AuthProvider({ children }: AuthProviderProps) {
       }
     } catch (error: any) {
       console.error("Error en login:", error);
+      const resolvedMessage = resolveErrorMessage(
+        error,
+        tErrors as unknown as ErrorTranslator,
+      );
       showError(
-        "Error de autenticación",
-        error.message || "No se pudo iniciar sesión. Verifica tus credenciales."
+        tErrors("auth.default"),
+        resolvedMessage || tAuth("default_error"),
       );
       throw error;
     } finally {
@@ -386,9 +397,13 @@ export function AuthProvider({ children }: AuthProviderProps) {
       console.error("Error refrescando token:", error);
       // Si falla el refresh, cerrar sesión
       await logout(false);
+      const resolvedMessage = resolveErrorMessage(
+        error,
+        tErrors as unknown as ErrorTranslator,
+      );
       showError(
-        "Sesión expirada",
-        "Tu sesión ha expirado. Por favor, inicia sesión nuevamente."
+        tErrors("auth.default"),
+        resolvedMessage || tErrors("http.unauthorized"),
       );
       return false;
     }
@@ -426,7 +441,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
     warningTimeoutRef.current = setTimeout(() => {
       showWarning(
         "Sesión por expirar",
-        "Tu sesión se cerrará en 5 minutos por inactividad. Mueve el mouse para mantenerla activa."
+        "Tu sesión se cerrará en 5 minutos por inactividad. Mueve el mouse para mantenerla activa.",
       );
     }, SESSION_TIMEOUT - SESSION_WARNING_TIME);
 
@@ -435,7 +450,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
       await logout(false);
       showError(
         "Sesión cerrada por inactividad",
-        "Tu sesión se cerró automáticamente después de 30 minutos de inactividad."
+        "Tu sesión se cerró automáticamente después de 30 minutos de inactividad.",
       );
     }, SESSION_TIMEOUT);
   };

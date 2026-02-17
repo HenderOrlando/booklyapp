@@ -1,3 +1,4 @@
+import "@testing-library/jest-dom";
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { Input } from "../Input";
@@ -18,7 +19,10 @@ describe("Input", () => {
 
   it("renders with correct type", () => {
     render(<Input type="email" placeholder="Email" />);
-    expect(screen.getByPlaceholderText("Email")).toHaveAttribute("type", "email");
+    expect(screen.getByPlaceholderText("Email")).toHaveAttribute(
+      "type",
+      "email",
+    );
   });
 
   it("is disabled when disabled prop is true", () => {
@@ -34,7 +38,9 @@ describe("Input", () => {
   it("applies error border style when error exists", () => {
     render(<Input error="Error" placeholder="Name" />);
     const input = screen.getByPlaceholderText("Name");
-    expect(input.className).toContain("border-destructive");
+    expect(input.className).toContain(
+      "border-[var(--color-state-error-border)]",
+    );
   });
 
   it("does not show error when error is undefined", () => {
@@ -44,7 +50,9 @@ describe("Input", () => {
 
   it("applies custom className", () => {
     render(<Input className="custom-input" placeholder="Custom" />);
-    expect(screen.getByPlaceholderText("Custom").className).toContain("custom-input");
+    expect(screen.getByPlaceholderText("Custom").className).toContain(
+      "custom-input",
+    );
   });
 
   it("has focus-visible ring for accessibility", () => {

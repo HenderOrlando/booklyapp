@@ -53,6 +53,7 @@ import {
 } from "@/components/atoms/Tabs";
 import { DataTable } from "@/components/molecules/DataTable";
 import { DatePicker } from "@/components/molecules/DatePicker";
+import { ThemeColorEditorPanel } from "@/components/organisms/ThemeColorEditorPanel";
 import { MainLayout } from "@/components/templates/MainLayout";
 import * as React from "react";
 
@@ -75,7 +76,7 @@ export default function DesignSystemPage() {
       <Button
         variant="ghost"
         size="sm"
-        className="text-white hover:bg-brand-primary-600"
+        className="text-[var(--color-text-inverse)] hover:bg-[var(--color-action-ghost-hover)]"
       >
         Cerrar Sesión
       </Button>
@@ -86,37 +87,37 @@ export default function DesignSystemPage() {
     <nav className="space-y-2">
       <a
         href="/design-system"
-        className="block px-4 py-2 rounded-md bg-brand-primary-600 text-white"
+        className="block rounded-md bg-[var(--color-action-primary)] px-4 py-2 text-[var(--color-text-inverse)]"
       >
         Design System
       </a>
       <a
         href="/"
-        className="block px-4 py-2 rounded-md hover:bg-slate-700 text-[var(--color-text-secondary)]"
+        className="block rounded-md px-4 py-2 text-[var(--color-text-secondary)] hover:bg-[var(--color-action-ghost-hover)]"
       >
         Dashboard
       </a>
       <a
         href="/recursos"
-        className="block px-4 py-2 rounded-md hover:bg-slate-700 text-[var(--color-text-secondary)]"
+        className="block rounded-md px-4 py-2 text-[var(--color-text-secondary)] hover:bg-[var(--color-action-ghost-hover)]"
       >
         Recursos
       </a>
       <a
         href="/reservas"
-        className="block px-4 py-2 rounded-md hover:bg-slate-700 text-[var(--color-text-secondary)]"
+        className="block rounded-md px-4 py-2 text-[var(--color-text-secondary)] hover:bg-[var(--color-action-ghost-hover)]"
       >
         Reservas
       </a>
       <a
         href="/aprobaciones"
-        className="block px-4 py-2 rounded-md hover:bg-slate-700 text-[var(--color-text-secondary)]"
+        className="block rounded-md px-4 py-2 text-[var(--color-text-secondary)] hover:bg-[var(--color-action-ghost-hover)]"
       >
         Aprobaciones
       </a>
       <a
         href="/reportes"
-        className="block px-4 py-2 rounded-md hover:bg-slate-700 text-[var(--color-text-secondary)]"
+        className="block rounded-md px-4 py-2 text-[var(--color-text-secondary)] hover:bg-[var(--color-action-ghost-hover)]"
       >
         Reportes
       </a>
@@ -136,6 +137,8 @@ export default function DesignSystemPage() {
             system
           </p>
         </div>
+
+        <ThemeColorEditorPanel />
 
         {/* Alerts */}
         <Card>
@@ -384,10 +387,10 @@ export default function DesignSystemPage() {
               <div>
                 <h4 className="font-semibold mb-2">Colores de Marca</h4>
                 <div className="flex gap-2">
-                  <div className="flex-1 h-20 bg-brand-primary-500 rounded-md flex items-center justify-center text-white">
+                  <div className="flex h-20 flex-1 items-center justify-center rounded-md bg-[var(--color-action-primary)] text-[var(--color-text-inverse)]">
                     Primary
                   </div>
-                  <div className="flex-1 h-20 bg-brand-secondary-500 rounded-md flex items-center justify-center text-white">
+                  <div className="flex h-20 flex-1 items-center justify-center rounded-md bg-[var(--color-action-secondary)] text-[var(--color-text-inverse)]">
                     Secondary
                   </div>
                 </div>
@@ -397,13 +400,13 @@ export default function DesignSystemPage() {
               <div>
                 <h4 className="font-semibold mb-2">Estados</h4>
                 <div className="flex gap-2">
-                  <div className="flex-1 h-20 bg-state-success-500 rounded-md flex items-center justify-center text-white">
+                  <div className="flex h-20 flex-1 items-center justify-center rounded-md border border-[var(--color-state-success-border)] bg-[var(--color-state-success-bg)] text-[var(--color-state-success-text)]">
                     Success
                   </div>
-                  <div className="flex-1 h-20 bg-state-warning-500 rounded-md flex items-center justify-center text-white">
+                  <div className="flex h-20 flex-1 items-center justify-center rounded-md border border-[var(--color-state-warning-border)] bg-[var(--color-state-warning-bg)] text-[var(--color-state-warning-text)]">
                     Warning
                   </div>
-                  <div className="flex-1 h-20 bg-state-error-500 rounded-md flex items-center justify-center text-white">
+                  <div className="flex h-20 flex-1 items-center justify-center rounded-md border border-[var(--color-state-error-border)] bg-[var(--color-state-error-bg)] text-[var(--color-state-error-text)]">
                     Error
                   </div>
                 </div>
@@ -504,7 +507,7 @@ export default function DesignSystemPage() {
                   <DropdownMenuItem>Configuración</DropdownMenuItem>
                   <DropdownMenuItem>Mis Reservas</DropdownMenuItem>
                   <DropdownMenuSeparator />
-                  <DropdownMenuItem className="text-state-error-700">
+                  <DropdownMenuItem className="text-[var(--color-state-error-text)]">
                     Cerrar Sesión
                   </DropdownMenuItem>
                 </DropdownMenuContent>
@@ -519,7 +522,7 @@ export default function DesignSystemPage() {
                   <DropdownMenuItem>Editar</DropdownMenuItem>
                   <DropdownMenuItem>Duplicar</DropdownMenuItem>
                   <DropdownMenuSeparator />
-                  <DropdownMenuItem className="text-state-error-700">
+                  <DropdownMenuItem className="text-[var(--color-state-error-text)]">
                     Eliminar
                   </DropdownMenuItem>
                 </DropdownMenuContent>
@@ -961,7 +964,7 @@ export default function DesignSystemPage() {
         </Card>
 
         {/* Resumen Final */}
-        <Card className="border-brand-primary-200 bg-brand-primary-50 dark:bg-brand-primary-900/20">
+        <Card className="border-[var(--color-border-focus)] bg-[var(--color-state-info-bg)]">
           <CardHeader>
             <CardTitle className="text-2xl">
               🎉 Sistema de Diseño Completo
@@ -972,24 +975,24 @@ export default function DesignSystemPage() {
           </CardHeader>
           <CardContent>
             <div className="grid gap-4 md:grid-cols-3">
-              <div className="text-center p-4 bg-[var(--color-bg-primary)] dark:bg-slate-800 rounded-lg">
-                <div className="text-3xl font-bold text-brand-primary-500">
+              <div className="rounded-lg bg-[var(--color-bg-primary)] p-4 text-center">
+                <div className="text-3xl font-bold text-[var(--color-action-primary)]">
                   24
                 </div>
                 <div className="text-sm text-[var(--color-text-secondary)]">
                   Componentes
                 </div>
               </div>
-              <div className="text-center p-4 bg-[var(--color-bg-primary)] dark:bg-slate-800 rounded-lg">
-                <div className="text-3xl font-bold text-brand-primary-500">
+              <div className="rounded-lg bg-[var(--color-bg-primary)] p-4 text-center">
+                <div className="text-3xl font-bold text-[var(--color-action-primary)]">
                   5
                 </div>
                 <div className="text-sm text-[var(--color-text-secondary)]">
                   Layouts
                 </div>
               </div>
-              <div className="text-center p-4 bg-[var(--color-bg-primary)] dark:bg-slate-800 rounded-lg">
-                <div className="text-3xl font-bold text-brand-primary-500">
+              <div className="rounded-lg bg-[var(--color-bg-primary)] p-4 text-center">
+                <div className="text-3xl font-bold text-[var(--color-action-primary)]">
                   40+
                 </div>
                 <div className="text-sm text-[var(--color-text-secondary)]">

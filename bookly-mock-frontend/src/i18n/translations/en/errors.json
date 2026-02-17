@@ -1,0 +1,43 @@
+{
+  "auth": {
+    "default": "Authentication error",
+    "AUTH-0001": "Invalid credentials.",
+    "AUTH-0002": "Invalid or expired token.",
+    "AUTH-0003": "You do not have permission to perform this action."
+  },
+  "resources": {
+    "default": "Resources module error",
+    "RSRC-0301": "The requested resource does not exist or was deleted."
+  },
+  "availability": {
+    "default": "Availability module error"
+  },
+  "stockpile": {
+    "default": "Approval module error"
+  },
+  "reports": {
+    "default": "Reports module error"
+  },
+  "gateway": {
+    "default": "API Gateway communication error"
+  },
+  "http": {
+    "bad_request": "Invalid request",
+    "unauthorized": "Unauthorized. Please sign in again.",
+    "forbidden": "You do not have permission for this action.",
+    "not_found": "Resource not found.",
+    "conflict": "Data conflict.",
+    "unprocessable": "The submitted data could not be processed.",
+    "rate_limited": "Too many requests. Try again in a few seconds.",
+    "server_error": "Internal server error.",
+    "bad_gateway": "The upstream service is not available.",
+    "unavailable": "Service temporarily unavailable.",
+    "unknown": "Unknown HTTP error."
+  },
+  "network": {
+    "connection": "Could not connect to the server"
+  },
+  "generic": {
+    "unknown": "An unexpected error occurred."
+  }
+}

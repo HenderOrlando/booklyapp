@@ -1,3 +1,4 @@
+import "@testing-library/jest-dom";
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { Button } from "../Button";
@@ -5,7 +6,9 @@ import { Button } from "../Button";
 describe("Button", () => {
   it("renders with correct text", () => {
     render(<Button>Click me</Button>);
-    expect(screen.getByRole("button", { name: /click me/i })).toBeInTheDocument();
+    expect(
+      screen.getByRole("button", { name: /click me/i }),
+    ).toBeInTheDocument();
   });
 
   it("calls onClick when clicked", async () => {
@@ -24,7 +27,11 @@ describe("Button", () => {
   it("does not fire onClick when disabled", async () => {
     const user = userEvent.setup();
     const onClick = jest.fn();
-    render(<Button disabled onClick={onClick}>Click me</Button>);
+    render(
+      <Button disabled onClick={onClick}>
+        Click me
+      </Button>,
+    );
     await user.click(screen.getByRole("button"));
     expect(onClick).not.toHaveBeenCalled();
   });
@@ -32,19 +39,19 @@ describe("Button", () => {
   it("renders default variant with primary styles", () => {
     render(<Button variant="default">Primary</Button>);
     const btn = screen.getByRole("button");
-    expect(btn.className).toContain("bg-brand-primary");
+    expect(btn.className).toContain("bg-[var(--color-action-primary)]");
   });
 
   it("renders secondary variant", () => {
     render(<Button variant="secondary">Secondary</Button>);
     const btn = screen.getByRole("button");
-    expect(btn.className).toContain("bg-brand-secondary");
+    expect(btn.className).toContain("bg-[var(--color-action-secondary)]");
   });
 
   it("renders destructive variant", () => {
     render(<Button variant="destructive">Delete</Button>);
     const btn = screen.getByRole("button");
-    expect(btn.className).toContain("bg-state-error");
+    expect(btn.className).toContain("bg-[var(--color-state-error-text)]");
   });
 
   it("renders ghost variant", () => {
@@ -80,7 +87,7 @@ describe("Button", () => {
     render(
       <Button asChild>
         <a href="/test">Link Button</a>
-      </Button>
+      </Button>,
     );
     const link = screen.getByRole("link", { name: /link button/i });
     expect(link).toBeInTheDocument();
