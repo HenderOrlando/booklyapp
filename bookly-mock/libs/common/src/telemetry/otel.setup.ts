@@ -9,19 +9,18 @@
  *   OTEL_EXPORTER_OTLP_ENDPOINT - OTLP collector URL (default: http://localhost:4318)
  */
 
+import { OTLPMetricExporter } from "@opentelemetry/exporter-metrics-otlp-http";
+import { OTLPTraceExporter } from "@opentelemetry/exporter-trace-otlp-http";
+import { ExpressInstrumentation } from "@opentelemetry/instrumentation-express";
+import { HttpInstrumentation } from "@opentelemetry/instrumentation-http";
+import { MongooseInstrumentation } from "@opentelemetry/instrumentation-mongoose";
+import { resourceFromAttributes } from "@opentelemetry/resources";
+import { PeriodicExportingMetricReader } from "@opentelemetry/sdk-metrics";
 import { NodeSDK } from "@opentelemetry/sdk-node";
-import { Resource } from "@opentelemetry/resources";
 import {
   ATTR_SERVICE_NAME,
   ATTR_SERVICE_VERSION,
-  ATTR_DEPLOYMENT_ENVIRONMENT_NAME,
 } from "@opentelemetry/semantic-conventions";
-import { OTLPTraceExporter } from "@opentelemetry/exporter-trace-otlp-http";
-import { OTLPMetricExporter } from "@opentelemetry/exporter-metrics-otlp-http";
-import { PeriodicExportingMetricReader } from "@opentelemetry/sdk-metrics";
-import { HttpInstrumentation } from "@opentelemetry/instrumentation-http";
-import { ExpressInstrumentation } from "@opentelemetry/instrumentation-express";
-import { MongooseInstrumentation } from "@opentelemetry/instrumentation-mongoose";
 
 export interface OtelSetupOptions {
   serviceName: string;
@@ -43,8 +42,7 @@ export function initOtel(options: OtelSetupOptions): NodeSDK | null {
     return null;
   }
 
-  const serviceName =
-    process.env.OTEL_SERVICE_NAME || options.serviceName;
+  const serviceName = process.env.OTEL_SERVICE_NAME || options.serviceName;
   const endpoint =
     process.env.OTEL_EXPORTER_OTLP_ENDPOINT ||
     options.otlpEndpoint ||
@@ -52,10 +50,10 @@ export function initOtel(options: OtelSetupOptions): NodeSDK | null {
   const environment =
     process.env.NODE_ENV || options.environment || "development";
 
-  const resource = new Resource({
+  const resource = resourceFromAttributes({
     [ATTR_SERVICE_NAME]: serviceName,
     [ATTR_SERVICE_VERSION]: options.serviceVersion || "1.0.0",
-    [ATTR_DEPLOYMENT_ENVIRONMENT_NAME]: environment,
+    ["deployment.environment.name"]: environment,
   });
 
   const traceExporter = new OTLPTraceExporter({

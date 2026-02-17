@@ -3,6 +3,7 @@ import { DatabaseModule, ReferenceDataModule } from "@libs/database";
 import { EventBusModule } from "@libs/event-bus";
 import { IdempotencyModule } from "@libs/idempotency";
 import { NotificationsModule } from "@libs/notifications";
+import { RedisModule } from "@libs/redis";
 import { AuthClientModule } from "@libs/security";
 import { Module } from "@nestjs/common";
 import { ConfigModule, ConfigService } from "@nestjs/config";
@@ -146,6 +147,16 @@ import { JwtStrategy } from "./infrastructure/strategies/jwt.strategy";
               },
         enableEventStore: configService.get("ENABLE_EVENT_STORE") === "true",
         topicPrefix: "bookly",
+      }),
+      inject: [ConfigService],
+    }),
+    // Redis (required by IdempotencyModule)
+    RedisModule.forRootAsync({
+      useFactory: (configService: ConfigService) => ({
+        host: configService.get("REDIS_HOST", "localhost"),
+        port: configService.get("REDIS_PORT", 6379),
+        password: configService.get("REDIS_PASSWORD"),
+        db: configService.get("REDIS_DB", 0),
       }),
       inject: [ConfigService],
     }),
