@@ -33,8 +33,8 @@ import {
   CreateResourceDto,
   ResourceType,
 } from "@/types/entities/resource";
-import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
+import { useRouter } from "next/navigation";
 import * as React from "react";
 
 /**
@@ -255,7 +255,7 @@ export default function CreateResourcePage() {
                 <CardContent className="space-y-4">
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
-                      <label className="block text-sm font-medium text-white mb-2">
+                      <label className="block text-sm font-medium text-[var(--color-text-primary)] mb-2">
                         Código <span className="text-state-error-500">*</span>
                       </label>
                       <Input
@@ -269,7 +269,7 @@ export default function CreateResourcePage() {
                     </div>
 
                     <div>
-                      <label className="block text-sm font-medium text-white mb-2">
+                      <label className="block text-sm font-medium text-[var(--color-text-primary)] mb-2">
                         Nombre <span className="text-state-error-500">*</span>
                       </label>
                       <Input
@@ -284,8 +284,9 @@ export default function CreateResourcePage() {
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-white mb-2">
-                      Descripción <span className="text-state-error-500">*</span>
+                    <label className="block text-sm font-medium text-[var(--color-text-primary)] mb-2">
+                      Descripción{" "}
+                      <span className="text-state-error-500">*</span>
                     </label>
                     <Input
                       placeholder="Describe el recurso..."
@@ -299,7 +300,7 @@ export default function CreateResourcePage() {
 
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
-                      <label className="block text-sm font-medium text-white mb-2">
+                      <label className="block text-sm font-medium text-[var(--color-text-primary)] mb-2">
                         Tipo <span className="text-state-error-500">*</span>
                       </label>
                       <Select
@@ -341,8 +342,9 @@ export default function CreateResourcePage() {
                     </div>
 
                     <div>
-                      <label className="block text-sm font-medium text-white mb-2">
-                        Categoría <span className="text-state-error-500">*</span>
+                      <label className="block text-sm font-medium text-[var(--color-text-primary)] mb-2">
+                        Categoría{" "}
+                        <span className="text-state-error-500">*</span>
                       </label>
                       <Select
                         value={formData.categoryId}
@@ -365,7 +367,7 @@ export default function CreateResourcePage() {
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-white mb-2">
+                    <label className="block text-sm font-medium text-[var(--color-text-primary)] mb-2">
                       Capacidad <span className="text-state-error-500">*</span>
                     </label>
                     <Input
@@ -394,7 +396,7 @@ export default function CreateResourcePage() {
                 </CardHeader>
                 <CardContent className="space-y-4">
                   <div>
-                    <label className="block text-sm font-medium text-white mb-2">
+                    <label className="block text-sm font-medium text-[var(--color-text-primary)] mb-2">
                       Ubicación <span className="text-state-error-500">*</span>
                     </label>
                     <Input
@@ -409,7 +411,7 @@ export default function CreateResourcePage() {
 
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
-                      <label className="block text-sm font-medium text-white mb-2">
+                      <label className="block text-sm font-medium text-[var(--color-text-primary)] mb-2">
                         Edificio
                       </label>
                       <Input
@@ -422,7 +424,7 @@ export default function CreateResourcePage() {
                     </div>
 
                     <div>
-                      <label className="block text-sm font-medium text-white mb-2">
+                      <label className="block text-sm font-medium text-[var(--color-text-primary)] mb-2">
                         Piso
                       </label>
                       <Input
@@ -462,7 +464,7 @@ export default function CreateResourcePage() {
                         }}
                         className="rounded w-4 h-4"
                       />
-                      <span className="text-white text-sm">Proyector</span>
+                      <span className="text-foreground text-sm">Proyector</span>
                     </label>
 
                     <label className="flex items-center gap-3 p-3 bg-[var(--color-bg-primary)] rounded-lg cursor-pointer hover:bg-[var(--color-bg-secondary)]">
@@ -478,7 +480,7 @@ export default function CreateResourcePage() {
                         }}
                         className="rounded w-4 h-4"
                       />
-                      <span className="text-white text-sm">
+                      <span className="text-foreground text-sm">
                         Aire Acondicionado
                       </span>
                     </label>
@@ -496,7 +498,7 @@ export default function CreateResourcePage() {
                         }}
                         className="rounded w-4 h-4"
                       />
-                      <span className="text-white text-sm">
+                      <span className="text-foreground text-sm">
                         Tablero/Pizarra
                       </span>
                     </label>
@@ -514,7 +516,9 @@ export default function CreateResourcePage() {
                         }}
                         className="rounded w-4 h-4"
                       />
-                      <span className="text-white text-sm">Computadores</span>
+                      <span className="text-foreground text-sm">
+                        Computadores
+                      </span>
                     </label>
                   </div>
                 </CardContent>
@@ -537,7 +541,7 @@ export default function CreateResourcePage() {
                       <div className="text-sm text-[var(--color-text-tertiary)]">
                         Programas seleccionados
                       </div>
-                      <div className="text-2xl font-bold text-white">
+                      <div className="text-2xl font-bold text-foreground">
                         {selectedPrograms.length} / {programs.length}
                       </div>
                     </div>
@@ -581,7 +585,7 @@ export default function CreateResourcePage() {
                           />
                           <div className="flex-1 min-w-0">
                             <div className="flex items-center gap-2">
-                              <span className="text-white font-medium">
+                              <span className="text-foreground font-medium">
                                 {program.name}
                               </span>
                               <span className="text-xs text-[var(--color-text-tertiary)] font-mono">
@@ -665,7 +669,7 @@ export default function CreateResourcePage() {
                         className="rounded w-4 h-4"
                       />
                       <div className="flex-1">
-                        <div className="text-white text-sm font-medium">
+                        <div className="text-foreground text-sm font-medium">
                           Requiere Aprobación
                         </div>
                         <div className="text-xs text-[var(--color-text-tertiary)]">
@@ -691,7 +695,7 @@ export default function CreateResourcePage() {
                         className="rounded w-4 h-4"
                       />
                       <div className="flex-1">
-                        <div className="text-white text-sm font-medium">
+                        <div className="text-foreground text-sm font-medium">
                           Permitir Reservas Recurrentes
                         </div>
                         <div className="text-xs text-[var(--color-text-tertiary)]">
@@ -703,7 +707,7 @@ export default function CreateResourcePage() {
 
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
-                      <label className="block text-sm font-medium text-white mb-2">
+                      <label className="block text-sm font-medium text-[var(--color-text-primary)] mb-2">
                         Días Máximos de Anticipación
                       </label>
                       <Input
@@ -723,7 +727,7 @@ export default function CreateResourcePage() {
                     </div>
 
                     <div>
-                      <label className="block text-sm font-medium text-white mb-2">
+                      <label className="block text-sm font-medium text-[var(--color-text-primary)] mb-2">
                         Duración Mínima (minutos)
                       </label>
                       <Input
@@ -745,7 +749,7 @@ export default function CreateResourcePage() {
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-white mb-2">
+                    <label className="block text-sm font-medium text-[var(--color-text-primary)] mb-2">
                       Duración Máxima (minutos)
                     </label>
                     <Input

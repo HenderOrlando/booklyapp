@@ -35,8 +35,8 @@ import {
   ResourceType,
   UpdateResourceDto,
 } from "@/types/entities/resource";
-import { useParams, useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
+import { useParams, useRouter } from "next/navigation";
 import * as React from "react";
 
 /**
@@ -177,28 +177,28 @@ export default function EditResourcePage() {
       // 1. Actualizar recurso
       const response = await httpClient.patch(
         `resources/${resourceId}`,
-        formData
+        formData,
       );
 
       if (response.success) {
         // 2. Actualizar asociaciones de programas
         // Obtener asociaciones actuales
         const currentProgramsRes = await httpClient.get(
-          `program-resources?programId=all`
+          `program-resources?programId=all`,
         );
         const currentAssociations = currentProgramsRes.data?.items || [];
         const currentProgramIds = new Set<string>(
           currentAssociations
             .filter((a: any) => a.resourceId === resourceId)
-            .map((a: any) => a.programId as string)
+            .map((a: any) => a.programId as string),
         );
 
         // Programas a agregar y quitar
         const toAdd = Array.from(selectedProgramIds).filter(
-          (id) => !currentProgramIds.has(id)
+          (id) => !currentProgramIds.has(id),
         );
         const toRemove = Array.from(currentProgramIds).filter(
-          (id) => !selectedProgramIds.has(id)
+          (id) => !selectedProgramIds.has(id),
         );
 
         // Agregar nuevos programas
@@ -213,7 +213,7 @@ export default function EditResourcePage() {
         // Quitar programas
         for (const programId of toRemove) {
           await httpClient.delete(
-            `program-resources?programId=${programId}&resourceId=${resourceId}`
+            `program-resources?programId=${programId}&resourceId=${resourceId}`,
           );
         }
 
@@ -309,7 +309,7 @@ export default function EditResourcePage() {
                 <CardContent className="space-y-4">
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
-                      <label className="block text-sm font-medium text-white mb-2">
+                      <label className="block text-sm font-medium text-[var(--color-text-primary)] mb-2">
                         Código
                       </label>
                       <Input
@@ -321,7 +321,7 @@ export default function EditResourcePage() {
                     </div>
 
                     <div>
-                      <label className="block text-sm font-medium text-white mb-2">
+                      <label className="block text-sm font-medium text-[var(--color-text-primary)] mb-2">
                         Nombre
                       </label>
                       <Input
@@ -334,7 +334,7 @@ export default function EditResourcePage() {
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-white mb-2">
+                    <label className="block text-sm font-medium text-[var(--color-text-primary)] mb-2">
                       Descripción
                     </label>
                     <Input
@@ -347,7 +347,7 @@ export default function EditResourcePage() {
 
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
-                      <label className="block text-sm font-medium text-white mb-2">
+                      <label className="block text-sm font-medium text-[var(--color-text-primary)] mb-2">
                         Tipo
                       </label>
                       <Select
@@ -389,7 +389,7 @@ export default function EditResourcePage() {
                     </div>
 
                     <div>
-                      <label className="block text-sm font-medium text-white mb-2">
+                      <label className="block text-sm font-medium text-[var(--color-text-primary)] mb-2">
                         Categoría
                       </label>
                       <Select
@@ -413,7 +413,7 @@ export default function EditResourcePage() {
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-white mb-2">
+                    <label className="block text-sm font-medium text-[var(--color-text-primary)] mb-2">
                       Capacidad
                     </label>
                     <Input
@@ -437,7 +437,7 @@ export default function EditResourcePage() {
                 </CardHeader>
                 <CardContent className="space-y-4">
                   <div>
-                    <label className="block text-sm font-medium text-white mb-2">
+                    <label className="block text-sm font-medium text-[var(--color-text-primary)] mb-2">
                       Ubicación
                     </label>
                     <Input
@@ -450,7 +450,7 @@ export default function EditResourcePage() {
 
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
-                      <label className="block text-sm font-medium text-white mb-2">
+                      <label className="block text-sm font-medium text-[var(--color-text-primary)] mb-2">
                         Edificio
                       </label>
                       <Input
@@ -462,7 +462,7 @@ export default function EditResourcePage() {
                     </div>
 
                     <div>
-                      <label className="block text-sm font-medium text-white mb-2">
+                      <label className="block text-sm font-medium text-[var(--color-text-primary)] mb-2">
                         Piso
                       </label>
                       <Input
@@ -503,7 +503,7 @@ export default function EditResourcePage() {
                           }
                           className="rounded w-4 h-4"
                         />
-                        <span className="text-white text-sm">
+                        <span className="text-foreground text-sm">
                           {attr === "hasProjector" && "Proyector"}
                           {attr === "hasAirConditioning" &&
                             "Aire Acondicionado"}
@@ -534,13 +534,13 @@ export default function EditResourcePage() {
                         onChange={(e) =>
                           handleAvailabilityRuleChange(
                             "requiresApproval",
-                            e.target.checked
+                            e.target.checked,
                           )
                         }
                         className="rounded w-4 h-4"
                       />
                       <div className="flex-1">
-                        <div className="text-white text-sm font-medium">
+                        <div className="text-foreground text-sm font-medium">
                           Requiere Aprobación
                         </div>
                       </div>
@@ -557,13 +557,13 @@ export default function EditResourcePage() {
                         onChange={(e) =>
                           handleAvailabilityRuleChange(
                             "allowRecurring",
-                            e.target.checked
+                            e.target.checked,
                           )
                         }
                         className="rounded w-4 h-4"
                       />
                       <div className="flex-1">
-                        <div className="text-white text-sm font-medium">
+                        <div className="text-foreground text-sm font-medium">
                           Permitir Reservas Recurrentes
                         </div>
                       </div>
@@ -572,7 +572,7 @@ export default function EditResourcePage() {
 
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                     <div>
-                      <label className="block text-sm font-medium text-white mb-2">
+                      <label className="block text-sm font-medium text-[var(--color-text-primary)] mb-2">
                         Días Anticipación
                       </label>
                       <Input
@@ -585,14 +585,14 @@ export default function EditResourcePage() {
                         onChange={(e) =>
                           handleAvailabilityRuleChange(
                             "maxAdvanceBookingDays",
-                            parseInt(e.target.value)
+                            parseInt(e.target.value),
                           )
                         }
                       />
                     </div>
 
                     <div>
-                      <label className="block text-sm font-medium text-white mb-2">
+                      <label className="block text-sm font-medium text-[var(--color-text-primary)] mb-2">
                         Duración Mín. (min)
                       </label>
                       <Input
@@ -606,14 +606,14 @@ export default function EditResourcePage() {
                         onChange={(e) =>
                           handleAvailabilityRuleChange(
                             "minBookingDurationMinutes",
-                            parseInt(e.target.value)
+                            parseInt(e.target.value),
                           )
                         }
                       />
                     </div>
 
                     <div>
-                      <label className="block text-sm font-medium text-white mb-2">
+                      <label className="block text-sm font-medium text-[var(--color-text-primary)] mb-2">
                         Duración Máx. (min)
                       </label>
                       <Input
@@ -627,7 +627,7 @@ export default function EditResourcePage() {
                         onChange={(e) =>
                           handleAvailabilityRuleChange(
                             "maxBookingDurationMinutes",
-                            parseInt(e.target.value)
+                            parseInt(e.target.value),
                           )
                         }
                       />
@@ -665,7 +665,7 @@ export default function EditResourcePage() {
                               p.code
                                 .toLowerCase()
                                 .includes(programFilter.toLowerCase())
-                            : true
+                            : true,
                         )
                         .map((program) => (
                           <label
@@ -680,7 +680,7 @@ export default function EditResourcePage() {
                                 className="w-5 h-5 rounded border-[var(--color-border-strong)] bg-[var(--color-bg-tertiary)] text-brand-primary-500 focus:ring-brand-primary-500 focus:ring-offset-gray-900"
                               />
                               <div>
-                                <p className="font-medium text-white">
+                                <p className="font-medium text-foreground">
                                   {program.name}
                                 </p>
                                 <p className="text-sm text-[var(--color-text-tertiary)]">

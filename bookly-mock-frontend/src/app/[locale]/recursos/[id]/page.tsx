@@ -83,7 +83,7 @@ export default function RecursoDetailPage() {
             .map((a: any) => a.programId);
 
           const associatedProgs = (programsRes.data?.items || []).filter(
-            (p: AcademicProgram) => programIds.includes(p.id)
+            (p: AcademicProgram) => programIds.includes(p.id),
           );
           setResourcePrograms(associatedProgs);
         }
@@ -145,10 +145,10 @@ export default function RecursoDetailPage() {
     try {
       const currentIds = new Set(resourcePrograms.map((p) => p.id));
       const toAdd = Array.from(selectedProgramIds).filter(
-        (id) => !currentIds.has(id)
+        (id) => !currentIds.has(id),
       );
       const toRemove = Array.from(currentIds).filter(
-        (id) => !selectedProgramIds.has(id)
+        (id) => !selectedProgramIds.has(id),
       );
 
       // Agregar nuevos programas
@@ -163,13 +163,13 @@ export default function RecursoDetailPage() {
       // Quitar programas
       for (const programId of toRemove) {
         await httpClient.delete(
-          `program-resources?programId=${programId}&resourceId=${resourceId}`
+          `program-resources?programId=${programId}&resourceId=${resourceId}`,
         );
       }
 
       // Actualizar lista de programas del recurso
       const newResourcePrograms = allPrograms.filter((p) =>
-        selectedProgramIds.has(p.id)
+        selectedProgramIds.has(p.id),
       );
       setResourcePrograms(newResourcePrograms);
       setProgramFilter("");
@@ -222,7 +222,7 @@ export default function RecursoDetailPage() {
               if (selectedDate && resource) {
                 const dateStr = selectedDate.toISOString().split("T")[0];
                 router.push(
-                  `/calendario?date=${dateStr}&resourceId=${resource.id}`
+                  `/calendario?date=${dateStr}&resourceId=${resource.id}`,
                 );
               }
             }}
@@ -272,10 +272,14 @@ export default function RecursoDetailPage() {
       >
         <div className="space-y-2">
           <div className="bg-[var(--color-bg-primary)] p-4 rounded-lg">
-            <p className="font-medium text-white">{resource.name}</p>
-            <p className="text-sm text-[var(--color-text-tertiary)]">{resource.code}</p>
+            <p className="font-medium text-foreground">{resource.name}</p>
+            <p className="text-sm text-[var(--color-text-tertiary)]">
+              {resource.code}
+            </p>
           </div>
-          <p className="text-sm text-[var(--color-text-tertiary)]">{t("delete_warning")}</p>
+          <p className="text-sm text-[var(--color-text-tertiary)]">
+            {t("delete_warning")}
+          </p>
         </div>
       </ConfirmDialog>
 
@@ -346,7 +350,7 @@ export default function RecursoDetailPage() {
                       </p>
                       <p className="text-sm text-[var(--color-text-primary)]">
                         {new Date(resource.createdAt).toLocaleDateString(
-                          locale
+                          locale,
                         )}
                       </p>
                     </div>
@@ -610,7 +614,7 @@ export default function RecursoDetailPage() {
                         </p>
                         <p className="text-sm text-[var(--color-text-primary)]">
                           {new Date(resource.updatedAt).toLocaleDateString(
-                            locale
+                            locale,
                           )}
                         </p>
                       </div>
@@ -633,7 +637,7 @@ export default function RecursoDetailPage() {
                             </p>
                             <p className="text-lg font-semibold text-[var(--color-text-primary)]">
                               {new Date(
-                                resource.maintenanceSchedule.lastMaintenanceDate
+                                resource.maintenanceSchedule.lastMaintenanceDate,
                               ).toLocaleDateString(locale)}
                             </p>
                           </div>
@@ -646,7 +650,7 @@ export default function RecursoDetailPage() {
                             </p>
                             <p className="text-lg font-semibold text-[var(--color-text-primary)]">
                               {new Date(
-                                resource.maintenanceSchedule.nextMaintenanceDate
+                                resource.maintenanceSchedule.nextMaintenanceDate,
                               ).toLocaleDateString(locale)}
                             </p>
                           </div>
@@ -681,7 +685,7 @@ export default function RecursoDetailPage() {
             content: (
               <div className="space-y-4">
                 <div className="flex items-center justify-between mb-4">
-                  <h3 className="text-xl font-semibold text-white">
+                  <h3 className="text-xl font-semibold text-foreground">
                     {t("programs_title_prefix")} ({resourcePrograms.length})
                   </h3>
                 </div>
@@ -697,7 +701,7 @@ export default function RecursoDetailPage() {
                         className="flex items-center justify-between p-4 bg-[var(--color-bg-primary)]/50 rounded-lg"
                       >
                         <div className="flex-1">
-                          <p className="font-medium text-white">
+                          <p className="font-medium text-foreground">
                             {program.name}
                           </p>
                           <p className="text-sm text-[var(--color-text-tertiary)]">

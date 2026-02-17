@@ -38,8 +38,10 @@ export function ResourcesTable({
       header: t("code"),
       cell: (resource: Resource) => (
         <div>
-          <p className="font-medium text-white">{resource.code}</p>
-          <p className="text-xs text-[var(--color-text-tertiary)]">{resource.name}</p>
+          <p className="font-medium text-foreground">{resource.code}</p>
+          <p className="text-xs text-[var(--color-text-tertiary)]">
+            {resource.name}
+          </p>
         </div>
       ),
     },
@@ -60,7 +62,9 @@ export function ResourcesTable({
       key: "location",
       header: t("location"),
       cell: (resource: Resource) => (
-        <div className="text-sm text-[var(--color-text-secondary)]">{resource.location}</div>
+        <div className="text-sm text-[var(--color-text-secondary)]">
+          {resource.location}
+        </div>
       ),
     },
     {
@@ -100,7 +104,7 @@ export function ResourcesTable({
       <div className="flex items-start justify-between mb-3">
         <div className="flex-1">
           <div className="flex items-center gap-3 mb-2">
-            <h3 className="text-lg font-semibold text-white">
+            <h3 className="text-lg font-semibold text-foreground">
               {resource.name}
             </h3>
             <Badge variant="outline">{resource.type}</Badge>
@@ -114,14 +118,18 @@ export function ResourcesTable({
 
       <div className="grid grid-cols-2 gap-4 mb-3 text-sm">
         <div>
-          <span className="text-[var(--color-text-tertiary)]">{t("capacity")}:</span>
-          <span className="text-white ml-2">
+          <span className="text-[var(--color-text-tertiary)]">
+            {t("capacity")}:
+          </span>
+          <span className="text-foreground ml-2">
             {resource.capacity} {t("people")}
           </span>
         </div>
         <div>
-          <span className="text-[var(--color-text-tertiary)]">{t("location")}:</span>
-          <span className="text-white ml-2">{resource.location}</span>
+          <span className="text-[var(--color-text-tertiary)]">
+            {t("location")}:
+          </span>
+          <span className="text-foreground ml-2">{resource.location}</span>
         </div>
       </div>
 

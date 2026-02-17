@@ -21,19 +21,19 @@ export function ResourceStatsCards({ resources }: ResourceStatsCardsProps) {
   const stats = React.useMemo(() => {
     const totalResources = resources.length;
     const availableResources = resources.filter(
-      (r) => r.status === ResourceStatus.AVAILABLE
+      (r) => r.status === ResourceStatus.AVAILABLE,
     ).length;
     const inMaintenanceResources = resources.filter(
-      (r) => r.status === ResourceStatus.MAINTENANCE
+      (r) => r.status === ResourceStatus.MAINTENANCE,
     ).length;
     const reservedResources = resources.filter(
-      (r) => r.status === ResourceStatus.RESERVED
+      (r) => r.status === ResourceStatus.RESERVED,
     ).length;
 
     // Capacidad total
     const totalCapacity = resources.reduce(
       (sum, r) => sum + (r.capacity || 0),
-      0
+      0,
     );
 
     // Tipos de recursos
@@ -59,7 +59,7 @@ export function ResourceStatsCards({ resources }: ResourceStatsCardsProps) {
               <p className="text-sm font-medium text-[var(--color-text-tertiary)]">
                 {t("total_resources") || "Total Recursos"}
               </p>
-              <h3 className="text-3xl font-bold text-white mt-2">
+              <h3 className="text-3xl font-bold text-foreground mt-2">
                 {stats.total}
               </h3>
               <p className="text-xs text-[var(--color-text-tertiary)] mt-1">
@@ -81,7 +81,7 @@ export function ResourceStatsCards({ resources }: ResourceStatsCardsProps) {
               <p className="text-sm font-medium text-[var(--color-text-tertiary)]">
                 {t("available") || "Disponibles"}
               </p>
-              <h3 className="text-3xl font-bold text-white mt-2">
+              <h3 className="text-3xl font-bold text-foreground mt-2">
                 {stats.available}
               </h3>
               <p className="text-xs text-[var(--color-text-tertiary)] mt-1">
@@ -106,7 +106,7 @@ export function ResourceStatsCards({ resources }: ResourceStatsCardsProps) {
               <p className="text-sm font-medium text-[var(--color-text-tertiary)]">
                 {t("in_maintenance") || "En Mantenimiento"}
               </p>
-              <h3 className="text-3xl font-bold text-white mt-2">
+              <h3 className="text-3xl font-bold text-foreground mt-2">
                 {stats.inMaintenance}
               </h3>
               <p className="text-xs text-[var(--color-text-tertiary)] mt-1">
@@ -131,7 +131,7 @@ export function ResourceStatsCards({ resources }: ResourceStatsCardsProps) {
               <p className="text-sm font-medium text-[var(--color-text-tertiary)]">
                 {t("total_capacity") || "Capacidad Total"}
               </p>
-              <h3 className="text-3xl font-bold text-white mt-2">
+              <h3 className="text-3xl font-bold text-foreground mt-2">
                 {stats.totalCapacity}
               </h3>
               <p className="text-xs text-[var(--color-text-tertiary)] mt-1">
