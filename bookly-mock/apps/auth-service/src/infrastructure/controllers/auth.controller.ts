@@ -9,6 +9,8 @@ import { RegenerateBackupCodesCommand } from "@auth/application/commands/regener
 import { RegisterUserCommand } from "@auth/application/commands/register-user.command";
 import { ResetPasswordCommand } from "@auth/application/commands/reset-password.command";
 import { Setup2FACommand } from "@auth/application/commands/setup-2fa.command";
+import { EvaluatePermissionsQuery } from "@auth/application/queries/evaluate-permissions.query";
+import { IntrospectTokenQuery } from "@auth/application/queries/introspect-token.query";
 import { ValidateTokenQuery } from "@auth/application/queries/validate-token.query";
 import { AppConfigurationService } from "@auth/application/services/app-configuration.service";
 import { ResponseUtil } from "@libs/common";
@@ -34,7 +36,9 @@ import {
 } from "@nestjs/swagger";
 import { Audit, AuditAction } from "@reports/audit-decorators";
 import { ChangePasswordDto } from "../dto/change-password.dto";
+import { EvaluatePermissionsDto } from "../dto/evaluate-permissions.dto";
 import { ForgotPasswordDto } from "../dto/forgot-password.dto";
+import { IntrospectTokenDto } from "../dto/introspect-token.dto";
 import { LoginDto } from "../dto/login.dto";
 import { RefreshTokenDto } from "../dto/refresh-token.dto";
 import { RegisterDto } from "../dto/register.dto";
@@ -411,6 +415,89 @@ export class AuthController {
     const payload = await this.queryBus.execute(query);
 
     return ResponseUtil.success(payload, "Token válido");
+  }
+
+  // ==================== Internal Contract (inter-service) ====================
+
+  /**
+   * Introspect token — resolves full user identity from DB (not just JWT claims).
+   * Used by other microservices to validate tokens and get authoritative user data.
+   */
+  @Post("introspect")
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({
+    summary: "Introspect JWT token",
+    description:
+      "Validates a JWT token and returns the full user identity resolved from the database. " +
+      "Used by other microservices for authoritative identity resolution.",
+  })
+  @ApiResponse({
+    status: 200,
+    description: "Token introspection result",
+    schema: {
+      example: {
+        success: true,
+        data: {
+          active: true,
+          sub: "507f1f77bcf86cd799439011",
+          email: "admin@ufps.edu.co",
+          firstName: "Admin",
+          lastName: "User",
+          roles: ["GENERAL_ADMIN"],
+          permissions: ["*:*"],
+          isActive: true,
+          is2FAEnabled: false,
+        },
+        message: "Token introspected successfully",
+      },
+    },
+  })
+  async introspectToken(@Body() dto: IntrospectTokenDto) {
+    const query = new IntrospectTokenQuery(dto.token);
+    const result = await this.queryBus.execute(query);
+    return ResponseUtil.success(result, "Token introspected successfully");
+  }
+
+  /**
+   * Evaluate permissions — checks if a user has a specific permission.
+   * Used by other microservices for fine-grained RBAC checks against auth-service as SoT.
+   */
+  @Post("evaluate-permissions")
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({
+    summary: "Evaluate user permissions",
+    description:
+      "Checks if a user has permission to perform a specific action on a resource. " +
+      "Resolves from DB (authoritative), supports wildcards (*:*).",
+  })
+  @ApiResponse({
+    status: 200,
+    description: "Permission evaluation result",
+    schema: {
+      example: {
+        success: true,
+        data: {
+          allowed: true,
+          userId: "507f1f77bcf86cd799439011",
+          resource: "reservation",
+          action: "create",
+          matchedRoles: ["GENERAL_ADMIN"],
+          matchedPermissions: ["*:*"],
+          policyVersion: "1.0.0",
+        },
+        message: "Permission evaluated",
+      },
+    },
+  })
+  async evaluatePermissions(@Body() dto: EvaluatePermissionsDto) {
+    const query = new EvaluatePermissionsQuery(
+      dto.userId,
+      dto.resource,
+      dto.action,
+      dto.context,
+    );
+    const result = await this.queryBus.execute(query);
+    return ResponseUtil.success(result, "Permission evaluated");
   }
 
   // ==================== Two-Factor Authentication ====================

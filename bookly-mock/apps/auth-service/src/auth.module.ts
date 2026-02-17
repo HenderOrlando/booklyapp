@@ -1,6 +1,7 @@
 import { JWT_EXPIRATION, JWT_SECRET } from "@libs/common/constants";
 import { DatabaseModule, ReferenceDataModule } from "@libs/database";
 import { EventBusModule } from "@libs/event-bus";
+import { IdempotencyModule } from "@libs/idempotency";
 import { RedisModule } from "@libs/redis";
 import { Module } from "@nestjs/common";
 import { ConfigModule, ConfigService } from "@nestjs/config";
@@ -143,6 +144,9 @@ import { OAuthModule, OAuthProvider, OAuthPurpose } from "./modules/oauth";
         },
       ],
     }),
+
+    // Idempotency + Correlation
+    IdempotencyModule.forRoot({ keyPrefix: "auth" }),
 
     // Audit Decorators (event-driven audit)
     AuditDecoratorsModule,

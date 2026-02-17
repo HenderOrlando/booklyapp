@@ -47,6 +47,47 @@ export class AppConfiguration {
   @Prop({ default: false })
   maintenanceMode: boolean;
 
+  @Prop({ type: String, default: "local", enum: ["local", "s3", "gcs"] })
+  storageProvider: string;
+
+  @Prop({
+    type: {
+      bucket: String,
+      region: String,
+      accessKeyId: String,
+      secretAccessKey: String,
+      endpoint: String,
+    },
+    _id: false,
+    default: {},
+  })
+  storageS3Config?: {
+    bucket?: string;
+    region?: string;
+    accessKeyId?: string;
+    secretAccessKey?: string;
+    endpoint?: string;
+  };
+
+  @Prop({
+    type: {
+      bucket: String,
+      projectId: String,
+      keyFilePath: String,
+      clientEmail: String,
+      privateKey: String,
+    },
+    _id: false,
+    default: {},
+  })
+  storageGcsConfig?: {
+    bucket?: string;
+    projectId?: string;
+    keyFilePath?: string;
+    clientEmail?: string;
+    privateKey?: string;
+  };
+
   @Prop({ type: String })
   updatedBy?: string;
 }

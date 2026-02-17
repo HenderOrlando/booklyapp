@@ -1,25 +1,23 @@
+import {
+  UpdateAppConfigCommand,
+  UpdateStorageConfigCommand,
+} from "@auth/application/commands/app-config.commands";
+import {
+  GetAppConfigQuery,
+  GetPublicAppConfigQuery,
+  GetStorageConfigQuery,
+} from "@auth/application/queries/app-config.queries";
 import { ResponseUtil } from "@libs/common";
 import { CurrentUser, Roles } from "@libs/decorators";
 import { JwtAuthGuard, RolesGuard } from "@libs/guards";
-import {
-  Body,
-  Controller,
-  Get,
-  Put,
-  UseGuards,
-} from "@nestjs/common";
-import { InjectModel } from "@nestjs/mongoose";
+import { Body, Controller, Get, Put, UseGuards } from "@nestjs/common";
+import { CommandBus, QueryBus } from "@nestjs/cqrs";
 import {
   ApiBearerAuth,
   ApiOperation,
   ApiResponse,
   ApiTags,
 } from "@nestjs/swagger";
-import { Model } from "mongoose";
-import {
-  AppConfiguration,
-  AppConfigurationDocument,
-} from "../schemas/app-configuration.schema";
 
 /**
  * AppConfiguration Controller
@@ -31,8 +29,8 @@ import {
 @Controller("app-config")
 export class AppConfigurationController {
   constructor(
-    @InjectModel(AppConfiguration.name)
-    private readonly configModel: Model<AppConfigurationDocument>,
+    private readonly commandBus: CommandBus,
+    private readonly queryBus: QueryBus,
   ) {}
 
   /**
@@ -47,22 +45,8 @@ export class AppConfigurationController {
   })
   @ApiResponse({ status: 200, description: "Configuración pública obtenida" })
   async getPublicConfig() {
-    const config = await this.getOrCreateConfig();
-    return ResponseUtil.success(
-      {
-        registrationEnabled: config.registrationEnabled,
-        corporateAuthEnabled: config.corporateAuthEnabled,
-        themeMode: config.themeMode,
-        primaryColor: config.primaryColor,
-        secondaryColor: config.secondaryColor,
-        defaultLocale: config.defaultLocale,
-        supportedLocales: config.supportedLocales,
-        appName: config.appName,
-        appLogoUrl: config.appLogoUrl,
-        maintenanceMode: config.maintenanceMode,
-      },
-      "Public configuration retrieved",
-    );
+    const config = await this.queryBus.execute(new GetPublicAppConfigQuery());
+    return ResponseUtil.success(config, "Public configuration retrieved");
   }
 
   /**
@@ -79,7 +63,7 @@ export class AppConfigurationController {
   @ApiResponse({ status: 200, description: "Configuración obtenida" })
   @ApiResponse({ status: 403, description: "No tiene permisos" })
   async getConfig() {
-    const config = await this.getOrCreateConfig();
+    const config = await this.queryBus.execute(new GetAppConfigQuery(false));
     return ResponseUtil.success(config, "Configuration retrieved");
   }
 
@@ -114,46 +98,72 @@ export class AppConfigurationController {
     },
     @CurrentUser("sub") userId: string,
   ) {
-    const config = await this.getOrCreateConfig();
-    const updateData: Record<string, any> = { updatedBy: userId };
-
-    if (dto.registrationEnabled !== undefined)
-      updateData.registrationEnabled = dto.registrationEnabled;
-    if (dto.corporateAuthEnabled !== undefined)
-      updateData.corporateAuthEnabled = dto.corporateAuthEnabled;
-    if (dto.allowedDomains !== undefined)
-      updateData.allowedDomains = dto.allowedDomains;
-    if (dto.autoRegisterOnSSO !== undefined)
-      updateData.autoRegisterOnSSO = dto.autoRegisterOnSSO;
-    if (dto.themeMode !== undefined) updateData.themeMode = dto.themeMode;
-    if (dto.primaryColor !== undefined)
-      updateData.primaryColor = dto.primaryColor;
-    if (dto.secondaryColor !== undefined)
-      updateData.secondaryColor = dto.secondaryColor;
-    if (dto.defaultLocale !== undefined)
-      updateData.defaultLocale = dto.defaultLocale;
-    if (dto.supportedLocales !== undefined)
-      updateData.supportedLocales = dto.supportedLocales;
-    if (dto.appName !== undefined) updateData.appName = dto.appName;
-    if (dto.appLogoUrl !== undefined) updateData.appLogoUrl = dto.appLogoUrl;
-    if (dto.maintenanceMode !== undefined)
-      updateData.maintenanceMode = dto.maintenanceMode;
-
-    const updated = await this.configModel
-      .findByIdAndUpdate(config._id, { $set: updateData }, { new: true })
-      .exec();
-
+    const command = new UpdateAppConfigCommand(userId, dto);
+    const updated = await this.commandBus.execute(command);
     return ResponseUtil.success(updated, "Configuration updated successfully");
   }
 
   /**
-   * Obtener o crear configuración por defecto (singleton)
+   * Obtener configuración de storage (GENERAL_ADMIN)
    */
-  private async getOrCreateConfig(): Promise<AppConfigurationDocument> {
-    let config = await this.configModel.findOne().exec();
-    if (!config) {
-      config = await new this.configModel({}).save();
-    }
-    return config;
+  @Get("storage")
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles("GENERAL_ADMIN")
+  @ApiBearerAuth()
+  @ApiOperation({
+    summary: "Obtener configuración de storage",
+    description: "Retorna provider y config de storage (secrets masked)",
+  })
+  @ApiResponse({ status: 200, description: "Storage config obtenida" })
+  async getStorageConfig() {
+    const config = await this.queryBus.execute(new GetStorageConfigQuery());
+    return ResponseUtil.success(config, "Storage configuration retrieved");
+  }
+
+  /**
+   * Actualizar configuración de storage (GENERAL_ADMIN)
+   * Secrets are never logged. Fallback to local if config is incomplete.
+   */
+  @Put("storage")
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles("GENERAL_ADMIN")
+  @ApiBearerAuth()
+  @ApiOperation({
+    summary: "Actualizar configuración de storage",
+    description: "Configura provider de storage (local/s3/gcs). Solo admin.",
+  })
+  @ApiResponse({ status: 200, description: "Storage config actualizada" })
+  async updateStorageConfig(
+    @Body()
+    dto: {
+      storageProvider: "local" | "s3" | "gcs";
+      storageS3Config?: {
+        bucket?: string;
+        region?: string;
+        accessKeyId?: string;
+        secretAccessKey?: string;
+        endpoint?: string;
+      };
+      storageGcsConfig?: {
+        bucket?: string;
+        projectId?: string;
+        keyFilePath?: string;
+        clientEmail?: string;
+        privateKey?: string;
+      };
+    },
+    @CurrentUser("sub") userId: string,
+  ) {
+    const command = new UpdateStorageConfigCommand(
+      userId,
+      dto.storageProvider,
+      dto.storageS3Config,
+      dto.storageGcsConfig,
+    );
+    const updated = await this.commandBus.execute(command);
+    return ResponseUtil.success(
+      updated,
+      "Storage configuration updated successfully",
+    );
   }
 }

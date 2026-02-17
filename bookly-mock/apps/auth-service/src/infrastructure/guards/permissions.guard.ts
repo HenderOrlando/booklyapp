@@ -36,7 +36,7 @@ export class PermissionsGuard implements CanActivate {
     // Obtener usuario del request (ya autenticado por JwtAuthGuard)
     const { user } = context.switchToHttp().getRequest();
 
-    if (!user || !user.id) {
+    if (!user) {
       return false;
     }
 
@@ -45,10 +45,14 @@ export class PermissionsGuard implements CanActivate {
       return true;
     }
 
+    const userId = user.id || user.sub;
+    if (!userId) {
+      return false;
+    }
+
     // Obtener permisos del usuario desde sus roles
-    const userPermissions = await this.permissionService.getUserPermissions(
-      user.id,
-    );
+    const userPermissions =
+      await this.permissionService.getUserPermissions(userId);
 
     // Verificar que el usuario tenga TODOS los permisos requeridos
     return requiredPermissions.every((permission) =>

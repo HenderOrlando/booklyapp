@@ -38,6 +38,13 @@ import { GetPermissionsByModuleHandler } from "./permissions/get-permissions-by-
 import { GetPermissionsHandler } from "./permissions/get-permissions.handler";
 import { UpdatePermissionHandler } from "./permissions/update-permission.handler";
 
+// AppConfig Handlers
+import { AppConfigHandlers } from "./app-config.handlers";
+
+// Internal Contract Handlers (WS1.1)
+import { EvaluatePermissionsHandler } from "./evaluate-permissions.handler";
+import { IntrospectTokenHandler } from "./introspect-token.handler";
+
 export const CommandHandlers = [
   // Users & Auth
   RegisterUserHandler,
@@ -74,6 +81,9 @@ export const QueryHandlers = [
   GetUserByIdHandler,
   GetUsersHandler,
   ValidateTokenHandler,
+  // Internal Contract (inter-service)
+  IntrospectTokenHandler,
+  EvaluatePermissionsHandler,
   // Roles
   GetRolesHandler,
   GetRoleByIdHandler,
@@ -86,4 +96,8 @@ export const QueryHandlers = [
   GetActivePermissionsHandler,
 ];
 
-export const AllHandlers = [...CommandHandlers, ...QueryHandlers];
+export const AllHandlers = [
+  ...CommandHandlers,
+  ...QueryHandlers,
+  ...AppConfigHandlers,
+];
