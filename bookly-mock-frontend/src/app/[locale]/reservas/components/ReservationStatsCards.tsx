@@ -81,17 +81,17 @@ export function ReservationStatsCards({
         <CardContent className="p-6">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm font-medium text-gray-400">
+              <p className="text-sm font-medium text-[var(--color-text-tertiary)]">
                 {t("total") || "Total Reservas"}
               </p>
               <h3 className="text-3xl font-bold text-white mt-2">
                 {stats.total}
               </h3>
-              <p className="text-xs text-gray-500 mt-1">
+              <p className="text-xs text-[var(--color-text-tertiary)] mt-1">
                 {stats.active} {t("active") || "activas"}
               </p>
             </div>
-            <div className="w-12 h-12 bg-blue-500/20 rounded-full flex items-center justify-center">
+            <div className="w-12 h-12 bg-brand-primary-500/20 rounded-full flex items-center justify-center">
               <span className="text-2xl">📅</span>
             </div>
           </div>
@@ -103,13 +103,13 @@ export function ReservationStatsCards({
         <CardContent className="p-6">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm font-medium text-gray-400">
+              <p className="text-sm font-medium text-[var(--color-text-tertiary)]">
                 {t("today") || "Hoy"}
               </p>
               <h3 className="text-3xl font-bold text-white mt-2">
                 {stats.today}
               </h3>
-              <p className="text-xs text-gray-500 mt-1">
+              <p className="text-xs text-[var(--color-text-tertiary)] mt-1">
                 {stats.upcoming} {t("upcoming") || "próximas"}
               </p>
             </div>
@@ -125,17 +125,17 @@ export function ReservationStatsCards({
         <CardContent className="p-6">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm font-medium text-gray-400">
+              <p className="text-sm font-medium text-[var(--color-text-tertiary)]">
                 {t("confirmed") || "Confirmadas"}
               </p>
               <h3 className="text-3xl font-bold text-white mt-2">
                 {stats.confirmed}
               </h3>
-              <p className="text-xs text-gray-500 mt-1">
+              <p className="text-xs text-[var(--color-text-tertiary)] mt-1">
                 {stats.pending} {t("pending") || "pendientes"}
               </p>
             </div>
-            <div className="w-12 h-12 bg-green-500/20 rounded-full flex items-center justify-center">
+            <div className="w-12 h-12 bg-state-success-500/20 rounded-full flex items-center justify-center">
               <span className="text-2xl">✅</span>
             </div>
           </div>
@@ -147,13 +147,13 @@ export function ReservationStatsCards({
         <CardContent className="p-6">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm font-medium text-gray-400">
+              <p className="text-sm font-medium text-[var(--color-text-tertiary)]">
                 {t("completed") || "Completadas"}
               </p>
               <h3 className="text-3xl font-bold text-white mt-2">
                 {stats.completed}
               </h3>
-              <p className="text-xs text-gray-500 mt-1">
+              <p className="text-xs text-[var(--color-text-tertiary)] mt-1">
                 {stats.cancelled} {t("cancelled") || "canceladas"}
               </p>
             </div>

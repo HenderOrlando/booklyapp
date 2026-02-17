@@ -29,6 +29,7 @@ import {
   ArrowDown,
   Zap,
 } from "lucide-react";
+import { useTranslations } from "next-intl";
 import * as React from "react";
 
 /**
@@ -193,6 +194,7 @@ const resourceTypeLabels: Record<string, string> = {
 };
 
 export default function FlujosAprobacionPage() {
+  const t = useTranslations("admin");
   const [flows, setFlows] = React.useState<ApprovalFlow[]>([]);
   const [loading, setLoading] = React.useState(true);
   const [expandedFlow, setExpandedFlow] = React.useState<string | null>(null);

@@ -102,7 +102,7 @@ export function ReservationFiltersSection({
           onChange={(e) =>
             onStatusFilterChange(e.target.value as ReservationStatus | "all")
           }
-          className="px-4 py-2 bg-gray-800 border border-gray-700 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-brand-primary-500 min-w-[180px]"
+          className="px-4 py-2 bg-[var(--color-bg-primary)] border border-gray-700 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-brand-primary-500 min-w-[180px]"
         >
           {statusOptions.map((option) => (
             <option key={option.value} value={option.value}>

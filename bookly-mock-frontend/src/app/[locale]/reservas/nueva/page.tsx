@@ -6,6 +6,7 @@ import { ReservationModal } from "@/components/organisms/ReservationModal";
 import { useCreateReservation } from "@/hooks/mutations";
 import { mockResourcesForReservations } from "@/infrastructure/mock/data/reservations-service.mock";
 import type { CreateReservationDto } from "@/types/entities/reservation";
+import { useTranslations } from "next-intl";
 import { useRouter, useSearchParams } from "next/navigation";
 
 /**
@@ -16,6 +17,7 @@ import { useRouter, useSearchParams } from "next/navigation";
  */
 
 export default function NuevaReservaPage() {
+  const t = useTranslations("reservations");
   const router = useRouter();
   const searchParams = useSearchParams();
 

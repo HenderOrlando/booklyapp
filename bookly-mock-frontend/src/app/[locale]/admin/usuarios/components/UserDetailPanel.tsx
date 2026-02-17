@@ -114,7 +114,7 @@ export function UserDetailPanel({
               </h3>
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="text-sm font-medium text-gray-400">
+                  <label className="text-sm font-medium text-[var(--color-text-tertiary)]">
                     {t("full_name")}
                   </label>
                   <div className="text-white mt-1">
@@ -122,13 +122,13 @@ export function UserDetailPanel({
                   </div>
                 </div>
                 <div>
-                  <label className="text-sm font-medium text-gray-400">
+                  <label className="text-sm font-medium text-[var(--color-text-tertiary)]">
                     {t("username")}
                   </label>
                   <div className="text-white mt-1">{user.username}</div>
                 </div>
                 <div>
-                  <label className="text-sm font-medium text-gray-400">
+                  <label className="text-sm font-medium text-[var(--color-text-tertiary)]">
                     {t("email")}
                   </label>
                   <div className="flex items-center gap-2 mt-1">
@@ -141,7 +141,7 @@ export function UserDetailPanel({
                   </div>
                 </div>
                 <div>
-                  <label className="text-sm font-medium text-gray-400">
+                  <label className="text-sm font-medium text-[var(--color-text-tertiary)]">
                     {t("phone_number")}
                   </label>
                   <div className="flex items-center gap-2 mt-1">
@@ -161,7 +161,7 @@ export function UserDetailPanel({
               {(user.documentType || user.documentNumber) && (
                 <div className="grid grid-cols-2 gap-4 mt-4">
                   <div>
-                    <label className="text-sm font-medium text-gray-400">
+                    <label className="text-sm font-medium text-[var(--color-text-tertiary)]">
                       {t("document_type")}
                     </label>
                     <div className="text-white mt-1">
@@ -169,7 +169,7 @@ export function UserDetailPanel({
                     </div>
                   </div>
                   <div>
-                    <label className="text-sm font-medium text-gray-400">
+                    <label className="text-sm font-medium text-[var(--color-text-tertiary)]">
                       {t("document_number")}
                     </label>
                     <div className="text-white mt-1">
@@ -183,7 +183,7 @@ export function UserDetailPanel({
             {/* Estado y seguridad */}
             <div className="grid grid-cols-3 gap-4">
               <div>
-                <label className="text-sm font-medium text-gray-400">
+                <label className="text-sm font-medium text-[var(--color-text-tertiary)]">
                   {t("account_status")}
                 </label>
                 <div className="mt-1">
@@ -191,7 +191,7 @@ export function UserDetailPanel({
                 </div>
               </div>
               <div>
-                <label className="text-sm font-medium text-gray-400">
+                <label className="text-sm font-medium text-[var(--color-text-tertiary)]">
                   {t("two_factor")}
                 </label>
                 <div className="mt-1">
@@ -203,7 +203,7 @@ export function UserDetailPanel({
                 </div>
               </div>
               <div>
-                <label className="text-sm font-medium text-gray-400">
+                <label className="text-sm font-medium text-[var(--color-text-tertiary)]">
                   {t("last_login")}
                 </label>
                 <div className="text-white mt-1">
@@ -220,7 +220,7 @@ export function UserDetailPanel({
                 {t("assigned_roles")} ({user.roles.length})
               </h3>
               {user.roles.length === 0 ? (
-                <div className="text-center py-8 text-gray-400">
+                <div className="text-center py-8 text-[var(--color-text-tertiary)]">
                   {t("no_roles_assigned")}
                 </div>
               ) : (
@@ -241,11 +241,11 @@ export function UserDetailPanel({
                         )}
                       </div>
                       {role.description && (
-                        <p className="text-xs text-gray-400">
+                        <p className="text-xs text-[var(--color-text-tertiary)]">
                           {role.description}
                         </p>
                       )}
-                      <div className="text-xs text-gray-500 mt-2">
+                      <div className="text-xs text-[var(--color-text-tertiary)] mt-2">
                         {role.permissions.length} {t("permissions")}
                       </div>
                     </div>
@@ -270,7 +270,7 @@ export function UserDetailPanel({
                 />
               </div>
               {effectivePermissions.length === 0 ? (
-                <div className="text-center py-8 text-gray-400">
+                <div className="text-center py-8 text-[var(--color-text-tertiary)]">
                   {t("no_permissions")}
                 </div>
               ) : (
@@ -278,7 +278,7 @@ export function UserDetailPanel({
                   {filteredPermissions.map((perm: Permission) => (
                     <div
                       key={perm.id}
-                      className="p-3 bg-gray-800 rounded-lg border border-gray-700"
+                      className="p-3 bg-[var(--color-bg-primary)] rounded-lg border border-gray-700"
                     >
                       <div className="flex items-start gap-2">
                         <div className="flex-shrink-0 w-8 h-8 bg-brand-primary-500 rounded-lg flex items-center justify-center">
@@ -291,7 +291,7 @@ export function UserDetailPanel({
                             {perm.description ||
                               `${perm.resource}:${perm.action}`}
                           </div>
-                          <div className="text-gray-400 text-xs mt-1">
+                          <div className="text-[var(--color-text-tertiary)] text-xs mt-1">
                             {perm.resource}:{perm.action}
                           </div>
                         </div>
@@ -305,7 +305,7 @@ export function UserDetailPanel({
             {/* Fechas */}
             <div className="grid grid-cols-2 gap-4 pt-4 border-t border-gray-700">
               <div>
-                <label className="text-sm font-medium text-gray-400">
+                <label className="text-sm font-medium text-[var(--color-text-tertiary)]">
                   {t("created_at")}
                 </label>
                 <div className="text-white mt-1">
@@ -313,7 +313,7 @@ export function UserDetailPanel({
                 </div>
               </div>
               <div>
-                <label className="text-sm font-medium text-gray-400">
+                <label className="text-sm font-medium text-[var(--color-text-tertiary)]">
                   {t("updated_at")}
                 </label>
                 <div className="text-white mt-1">

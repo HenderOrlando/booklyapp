@@ -36,6 +36,7 @@ import {
   UpdateResourceDto,
 } from "@/types/entities/resource";
 import { useParams, useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 import * as React from "react";
 
 /**
@@ -45,6 +46,7 @@ import * as React from "react";
  */
 
 export default function EditResourcePage() {
+  const t = useTranslations("resources");
   const params = useParams();
   const router = useRouter();
   const resourceId = params.id as string;
@@ -491,7 +493,7 @@ export default function EditResourcePage() {
                     ].map((attr) => (
                       <label
                         key={attr}
-                        className="flex items-center gap-3 p-3 bg-gray-800 rounded-lg cursor-pointer hover:bg-gray-750"
+                        className="flex items-center gap-3 p-3 bg-[var(--color-bg-primary)] rounded-lg cursor-pointer hover:bg-[var(--color-bg-secondary)]"
                       >
                         <input
                           type="checkbox"
@@ -523,7 +525,7 @@ export default function EditResourcePage() {
                 </CardHeader>
                 <CardContent className="space-y-4">
                   <div>
-                    <label className="flex items-center gap-3 p-3 bg-gray-800 rounded-lg cursor-pointer hover:bg-gray-750">
+                    <label className="flex items-center gap-3 p-3 bg-[var(--color-bg-primary)] rounded-lg cursor-pointer hover:bg-[var(--color-bg-secondary)]">
                       <input
                         type="checkbox"
                         checked={
@@ -546,7 +548,7 @@ export default function EditResourcePage() {
                   </div>
 
                   <div>
-                    <label className="flex items-center gap-3 p-3 bg-gray-800 rounded-lg cursor-pointer hover:bg-gray-750">
+                    <label className="flex items-center gap-3 p-3 bg-[var(--color-bg-primary)] rounded-lg cursor-pointer hover:bg-[var(--color-bg-secondary)]">
                       <input
                         type="checkbox"
                         checked={
@@ -668,20 +670,20 @@ export default function EditResourcePage() {
                         .map((program) => (
                           <label
                             key={program.id}
-                            className="flex items-center justify-between p-4 bg-gray-800/50 rounded-lg cursor-pointer hover:bg-gray-800"
+                            className="flex items-center justify-between p-4 bg-[var(--color-bg-primary)]/50 rounded-lg cursor-pointer hover:bg-[var(--color-bg-primary)]"
                           >
                             <div className="flex items-center gap-3">
                               <input
                                 type="checkbox"
                                 checked={selectedProgramIds.has(program.id)}
                                 onChange={() => handleToggleProgram(program.id)}
-                                className="w-5 h-5 rounded border-gray-600 bg-gray-700 text-brand-primary-500 focus:ring-brand-primary-500 focus:ring-offset-gray-900"
+                                className="w-5 h-5 rounded border-gray-600 bg-[var(--color-bg-tertiary)] text-brand-primary-500 focus:ring-brand-primary-500 focus:ring-offset-gray-900"
                               />
                               <div>
                                 <p className="font-medium text-white">
                                   {program.name}
                                 </p>
-                                <p className="text-sm text-gray-400">
+                                <p className="text-sm text-[var(--color-text-tertiary)]">
                                   {program.code} - {program.faculty}
                                 </p>
                               </div>
@@ -694,7 +696,7 @@ export default function EditResourcePage() {
                     </div>
 
                     <div className="flex items-center justify-between pt-4 border-t border-gray-700">
-                      <p className="text-sm text-gray-400">
+                      <p className="text-sm text-[var(--color-text-tertiary)]">
                         {selectedProgramIds.size} programa(s) seleccionado(s)
                       </p>
                     </div>

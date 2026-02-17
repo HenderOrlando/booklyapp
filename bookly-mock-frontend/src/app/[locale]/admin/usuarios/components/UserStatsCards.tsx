@@ -42,14 +42,14 @@ export function UserStatsCards({ users, roles }: UserStatsCardsProps) {
         <CardContent className="p-6">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm font-medium text-gray-400">
+              <p className="text-sm font-medium text-[var(--color-text-tertiary)]">
                 {t("total_users")}
               </p>
               <h3 className="text-3xl font-bold text-white mt-2">
                 {users.length}
               </h3>
             </div>
-            <div className="w-12 h-12 bg-blue-500/20 rounded-full flex items-center justify-center">
+            <div className="w-12 h-12 bg-brand-primary-500/20 rounded-full flex items-center justify-center">
               <span className="text-2xl">👥</span>
             </div>
           </div>
@@ -61,18 +61,18 @@ export function UserStatsCards({ users, roles }: UserStatsCardsProps) {
         <CardContent className="p-6">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm font-medium text-gray-400">
+              <p className="text-sm font-medium text-[var(--color-text-tertiary)]">
                 {t("active_users")}
               </p>
               <h3 className="text-3xl font-bold text-white mt-2">
                 {activeUsers.length}
               </h3>
-              <p className="text-xs text-gray-500 mt-1">
+              <p className="text-xs text-[var(--color-text-tertiary)] mt-1">
                 {((activeUsers.length / users.length) * 100).toFixed(0)}%{" "}
                 {t("of_total")}
               </p>
             </div>
-            <div className="w-12 h-12 bg-green-500/20 rounded-full flex items-center justify-center">
+            <div className="w-12 h-12 bg-state-success-500/20 rounded-full flex items-center justify-center">
               <span className="text-2xl">✅</span>
             </div>
           </div>
@@ -84,13 +84,13 @@ export function UserStatsCards({ users, roles }: UserStatsCardsProps) {
         <CardContent className="p-6">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm font-medium text-gray-400">
+              <p className="text-sm font-medium text-[var(--color-text-tertiary)]">
                 {t("inactive_users")}
               </p>
               <h3 className="text-3xl font-bold text-white mt-2">
                 {inactiveUsers.length}
               </h3>
-              <p className="text-xs text-gray-500 mt-1">
+              <p className="text-xs text-[var(--color-text-tertiary)] mt-1">
                 {users.length > 0
                   ? ((inactiveUsers.length / users.length) * 100).toFixed(0)
                   : 0}
@@ -109,14 +109,14 @@ export function UserStatsCards({ users, roles }: UserStatsCardsProps) {
         <CardContent className="p-6">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm font-medium text-gray-400">
+              <p className="text-sm font-medium text-[var(--color-text-tertiary)]">
                 {t("total_roles")}
               </p>
               <h3 className="text-3xl font-bold text-white mt-2">
                 {roles.length}
               </h3>
               {mostCommonRole && (
-                <p className="text-xs text-gray-500 mt-1">
+                <p className="text-xs text-[var(--color-text-tertiary)] mt-1">
                   {t("most_common")}: {mostCommonRole[0]} ({mostCommonRole[1]})
                 </p>
               )}

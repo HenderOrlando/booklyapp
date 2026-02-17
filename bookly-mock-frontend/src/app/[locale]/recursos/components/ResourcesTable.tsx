@@ -39,7 +39,7 @@ export function ResourcesTable({
       cell: (resource: Resource) => (
         <div>
           <p className="font-medium text-white">{resource.code}</p>
-          <p className="text-xs text-gray-400">{resource.name}</p>
+          <p className="text-xs text-[var(--color-text-tertiary)]">{resource.name}</p>
         </div>
       ),
     },
@@ -60,7 +60,7 @@ export function ResourcesTable({
       key: "location",
       header: t("location"),
       cell: (resource: Resource) => (
-        <div className="text-sm text-gray-300">{resource.location}</div>
+        <div className="text-sm text-[var(--color-text-secondary)]">{resource.location}</div>
       ),
     },
     {
@@ -96,7 +96,7 @@ export function ResourcesTable({
 
   // Renderizado de item para lista virtualizada
   const renderResourceItem = (resource: Resource) => (
-    <div className="bg-gray-800 rounded-lg p-4 border border-gray-700 hover:border-gray-600 transition-colors">
+    <div className="bg-[var(--color-bg-primary)] rounded-lg p-4 border border-gray-700 hover:border-gray-600 transition-colors">
       <div className="flex items-start justify-between mb-3">
         <div className="flex-1">
           <div className="flex items-center gap-3 mb-2">
@@ -106,7 +106,7 @@ export function ResourcesTable({
             <Badge variant="outline">{resource.type}</Badge>
             <StatusBadge type="resource" status={resource.status} />
           </div>
-          <p className="text-sm text-gray-400">
+          <p className="text-sm text-[var(--color-text-tertiary)]">
             {t("code")}: {resource.code}
           </p>
         </div>
@@ -114,19 +114,19 @@ export function ResourcesTable({
 
       <div className="grid grid-cols-2 gap-4 mb-3 text-sm">
         <div>
-          <span className="text-gray-400">{t("capacity")}:</span>
+          <span className="text-[var(--color-text-tertiary)]">{t("capacity")}:</span>
           <span className="text-white ml-2">
             {resource.capacity} {t("people")}
           </span>
         </div>
         <div>
-          <span className="text-gray-400">{t("location")}:</span>
+          <span className="text-[var(--color-text-tertiary)]">{t("location")}:</span>
           <span className="text-white ml-2">{resource.location}</span>
         </div>
       </div>
 
       {resource.description && (
-        <p className="text-sm text-gray-400 mb-3 line-clamp-2">
+        <p className="text-sm text-[var(--color-text-tertiary)] mb-3 line-clamp-2">
           {resource.description}
         </p>
       )}

@@ -18,5 +18,11 @@
   "audit": "Auditoría",
   "admin": "Administración",
   "design_system": "Sistema de Diseño",
-  "users": "Usuarios"
+  "users": "Usuarios",
+  "integrations": "Integraciones",
+  "approval_flows": "Flujos de Aprobación",
+  "schedules": "Horarios",
+  "notification_channels": "Canales de Notificación",
+  "evaluations": "Evaluaciones",
+  "reassignment": "Reasignación"
 }

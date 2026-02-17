@@ -1,0 +1,20 @@
+{
+  "title": "Categories",
+  "description": "Resource category management",
+  "create": "Create category",
+  "edit": "Edit category",
+  "delete": "Delete category",
+  "name": "Name",
+  "code": "Code",
+  "description_field": "Description",
+  "color": "Color",
+  "icon": "Icon",
+  "resources_count": "Associated resources",
+  "status": "Status",
+  "active": "Active",
+  "inactive": "Inactive",
+  "no_categories": "No categories registered",
+  "confirm_delete": "Are you sure you want to delete this category?",
+  "save": "Save",
+  "cancel": "Cancel"
+}

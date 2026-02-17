@@ -52,7 +52,7 @@ export function UsersTable({
             <div className="text-white font-medium">
               {user.firstName} {user.lastName}
             </div>
-            <div className="text-xs text-gray-400">{user.username}</div>
+            <div className="text-xs text-[var(--color-text-tertiary)]">{user.username}</div>
           </div>
         </div>
       ),

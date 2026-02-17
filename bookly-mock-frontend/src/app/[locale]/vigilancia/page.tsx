@@ -11,6 +11,7 @@ import type {
 } from "@/types/entities/checkInOut";
 import { useQuery } from "@tanstack/react-query";
 import { RefreshCw, Shield } from "lucide-react";
+import { useTranslations } from "next-intl";
 import * as React from "react";
 
 /**
@@ -146,6 +147,7 @@ const getMockVigilanceData = (): {
 });
 
 export default function VigilanciaPage() {
+  const t = useTranslations("vigilance");
   const [autoRefresh, setAutoRefresh] = React.useState(true);
 
   // Query con auto-refresh cada 30 segundos
@@ -179,14 +181,14 @@ export default function VigilanciaPage() {
         <div className="flex items-start justify-between">
           <div>
             <div className="flex items-center gap-3">
-              <div className="p-2 bg-blue-100 dark:bg-blue-900/20 rounded-lg">
-                <Shield className="h-6 w-6 text-blue-600 dark:text-blue-400" />
+              <div className="p-2 bg-brand-primary-100 dark:bg-brand-primary-900/20 rounded-lg">
+                <Shield className="h-6 w-6 text-brand-primary-600 dark:text-brand-primary-400" />
               </div>
               <div>
-                <h1 className="text-3xl font-bold text-gray-900 dark:text-gray-100">
+                <h1 className="text-3xl font-bold text-[var(--color-text-primary)] dark:text-[var(--color-text-primary)]">
                   Panel de Vigilancia
                 </h1>
-                <p className="mt-1 text-gray-600 dark:text-gray-400">
+                <p className="mt-1 text-[var(--color-text-secondary)] dark:text-[var(--color-text-tertiary)]">
                   Monitor en tiempo real de reservas y accesos
                 </p>
               </div>
@@ -195,12 +197,12 @@ export default function VigilanciaPage() {
 
           <div className="flex items-center gap-3">
             {/* Toggle auto-refresh */}
-            <label className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
+            <label className="flex items-center gap-2 text-sm text-[var(--color-text-secondary)] dark:text-[var(--color-text-tertiary)]">
               <input
                 type="checkbox"
                 checked={autoRefresh}
                 onChange={(e) => setAutoRefresh(e.target.checked)}
-                className="rounded border-gray-300 text-[var(--color-primary-base)] focus:ring-[var(--color-primary-base)]"
+                className="rounded border-[var(--color-border-primary)] text-[var(--color-primary-base)] focus:ring-[var(--color-primary-base)]"
               />
               Auto-actualizar (30s)
             </label>
@@ -222,35 +224,35 @@ export default function VigilanciaPage() {
         {/* Estadísticas rápidas */}
         {data?.stats && (
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-4">
-              <p className="text-sm text-gray-600 dark:text-gray-400">
+            <div className="bg-[var(--color-bg-primary)] dark:bg-[var(--color-bg-secondary)] rounded-lg border border-[var(--color-border-primary)] dark:border-[var(--color-border-primary)] p-4">
+              <p className="text-sm text-[var(--color-text-secondary)] dark:text-[var(--color-text-tertiary)]">
                 Activos Ahora
               </p>
-              <p className="text-2xl font-bold text-gray-900 dark:text-gray-100">
+              <p className="text-2xl font-bold text-[var(--color-text-primary)] dark:text-[var(--color-text-primary)]">
                 {data.active.length}
               </p>
             </div>
-            <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-4">
-              <p className="text-sm text-gray-600 dark:text-gray-400">
+            <div className="bg-[var(--color-bg-primary)] dark:bg-[var(--color-bg-secondary)] rounded-lg border border-[var(--color-border-primary)] dark:border-[var(--color-border-primary)] p-4">
+              <p className="text-sm text-[var(--color-text-secondary)] dark:text-[var(--color-text-tertiary)]">
                 Check-ins Hoy
               </p>
-              <p className="text-2xl font-bold text-gray-900 dark:text-gray-100">
+              <p className="text-2xl font-bold text-[var(--color-text-primary)] dark:text-[var(--color-text-primary)]">
                 {data.stats.totalCheckIns}
               </p>
             </div>
-            <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-4">
-              <p className="text-sm text-gray-600 dark:text-gray-400">
+            <div className="bg-[var(--color-bg-primary)] dark:bg-[var(--color-bg-secondary)] rounded-lg border border-[var(--color-border-primary)] dark:border-[var(--color-border-primary)] p-4">
+              <p className="text-sm text-[var(--color-text-secondary)] dark:text-[var(--color-text-tertiary)]">
                 Retrasos
               </p>
               <p className="text-2xl font-bold text-orange-600 dark:text-orange-400">
                 {data.stats.lateCheckIns}
               </p>
             </div>
-            <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-4">
-              <p className="text-sm text-gray-600 dark:text-gray-400">
+            <div className="bg-[var(--color-bg-primary)] dark:bg-[var(--color-bg-secondary)] rounded-lg border border-[var(--color-border-primary)] dark:border-[var(--color-border-primary)] p-4">
+              <p className="text-sm text-[var(--color-text-secondary)] dark:text-[var(--color-text-tertiary)]">
                 Ausencias
               </p>
-              <p className="text-2xl font-bold text-red-600 dark:text-red-400">
+              <p className="text-2xl font-bold text-state-error-600 dark:text-state-error-400">
                 {data.overdue.length}
               </p>
             </div>
@@ -270,7 +272,7 @@ export default function VigilanciaPage() {
         )}
 
         {/* Última actualización */}
-        <div className="text-center text-xs text-gray-500 dark:text-gray-400">
+        <div className="text-center text-xs text-[var(--color-text-tertiary)] dark:text-[var(--color-text-tertiary)]">
           Última actualización:{" "}
           {new Date().toLocaleTimeString("es-ES", {
             hour: "2-digit",

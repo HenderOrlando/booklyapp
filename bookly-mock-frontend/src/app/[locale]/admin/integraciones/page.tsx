@@ -15,6 +15,7 @@ import { AppSidebar } from "@/components/organisms/AppSidebar";
 import { MainLayout } from "@/components/templates/MainLayout";
 import { cn } from "@/lib/utils";
 import { Calendar, Link2, Mail, RefreshCw, Shield, Unlink } from "lucide-react";
+import { useTranslations } from "next-intl";
 import * as React from "react";
 
 /**
@@ -91,6 +92,7 @@ const typeIcons = {
 };
 
 export default function IntegracionesPage() {
+  const t = useTranslations("admin");
   const [integrations, setIntegrations] =
     React.useState<IntegrationConfig[]>(mockIntegrations);
   const [connecting, setConnecting] = React.useState<string | null>(null);

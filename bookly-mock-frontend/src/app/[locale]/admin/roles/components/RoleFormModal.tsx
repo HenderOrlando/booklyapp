@@ -140,7 +140,7 @@ export function RoleFormModal({
                 className={`pb-2 px-1 border-b-2 transition-colors ${
                   activeTab === "permissions"
                     ? "border-brand-primary-500 text-brand-primary-500"
-                    : "border-transparent text-gray-400 hover:text-white"
+                    : "border-transparent text-[var(--color-text-tertiary)] hover:text-white"
                 }`}
               >
                 {t("tab_permissions")} ({selectedPermissions.length})
@@ -151,7 +151,7 @@ export function RoleFormModal({
                 className={`pb-2 px-1 border-b-2 transition-colors ${
                   activeTab === "users"
                     ? "border-brand-primary-500 text-brand-primary-500"
-                    : "border-transparent text-gray-400 hover:text-white"
+                    : "border-transparent text-[var(--color-text-tertiary)] hover:text-white"
                 }`}
               >
                 {t("tab_users")} ({selectedUsers.length})
@@ -182,7 +182,7 @@ export function RoleFormModal({
                     className={`flex items-center gap-3 p-3 rounded-lg cursor-pointer border transition-all ${
                       selectedPermissions.includes(perm.id)
                         ? "bg-brand-primary-500/10 border-brand-primary-500 hover:bg-brand-primary-500/20"
-                        : "bg-gray-800 border-gray-700 hover:bg-gray-750 hover:border-gray-600"
+                        : "bg-[var(--color-bg-primary)] border-gray-700 hover:bg-[var(--color-bg-secondary)] hover:border-gray-600"
                     } ${isLoading ? "opacity-50 cursor-not-allowed" : ""}`}
                   >
                     <input
@@ -202,7 +202,7 @@ export function RoleFormModal({
                         <div className="text-white text-sm font-medium">
                           {perm.description}
                         </div>
-                        <div className="text-gray-400 text-xs mt-1">
+                        <div className="text-[var(--color-text-tertiary)] text-xs mt-1">
                           {perm.resource}:{perm.action}
                         </div>
                       </div>
@@ -236,7 +236,7 @@ export function RoleFormModal({
                     className={`flex items-center gap-3 p-3 rounded-lg cursor-pointer border transition-all ${
                       selectedUsers.includes(user.id)
                         ? "bg-brand-primary-500/10 border-brand-primary-500"
-                        : "bg-gray-800 border-gray-700 hover:bg-gray-750"
+                        : "bg-[var(--color-bg-primary)] border-gray-700 hover:bg-[var(--color-bg-secondary)]"
                     } ${isLoading ? "opacity-50 cursor-not-allowed" : ""}`}
                   >
                     <input
@@ -256,7 +256,7 @@ export function RoleFormModal({
                       <div className="text-white text-sm font-medium">
                         {user.firstName} {user.lastName}
                       </div>
-                      <div className="text-xs text-gray-400 truncate">
+                      <div className="text-xs text-[var(--color-text-tertiary)] truncate">
                         {user.email}
                       </div>
                       {user.roles.length > 0 && (

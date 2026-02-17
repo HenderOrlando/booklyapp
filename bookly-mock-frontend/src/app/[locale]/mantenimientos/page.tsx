@@ -33,6 +33,7 @@ import { httpClient } from "@/infrastructure/http";
 import { Maintenance, Resource } from "@/types/entities/resource";
 import { useQuery } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 import * as React from "react";
 
 /**
@@ -42,6 +43,7 @@ import * as React from "react";
  */
 
 export default function MantenimientosPage() {
+  const t = useTranslations("maintenance");
   const router = useRouter();
 
   // React Query para cargar mantenimientos
@@ -184,10 +186,10 @@ export default function MantenimientosPage() {
         return resource ? (
           <div>
             <p className="font-medium text-white">{resource.name}</p>
-            <p className="text-sm text-gray-400">{resource.code}</p>
+            <p className="text-sm text-[var(--color-text-tertiary)]">{resource.code}</p>
           </div>
         ) : (
-          <p className="text-gray-400">-</p>
+          <p className="text-[var(--color-text-tertiary)]">-</p>
         );
       },
     },
@@ -422,11 +424,11 @@ export default function MantenimientosPage() {
           variant="destructive"
         >
           {maintenanceToDelete && (
-            <div className="bg-gray-800 p-4 rounded-lg">
+            <div className="bg-[var(--color-bg-primary)] p-4 rounded-lg">
               <p className="font-medium text-white">
                 {maintenanceToDelete.description}
               </p>
-              <p className="text-sm text-gray-400">
+              <p className="text-sm text-[var(--color-text-tertiary)]">
                 {new Date(maintenanceToDelete.scheduledDate).toLocaleString()}
               </p>
             </div>

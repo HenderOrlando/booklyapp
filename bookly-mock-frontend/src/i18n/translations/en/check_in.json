@@ -1,0 +1,22 @@
+{
+  "title": "Check-in / Check-out",
+  "description": "Entry and exit registration for active reservations",
+  "scan_code": "Scan code",
+  "manual_entry": "Manual entry",
+  "reservation_code": "Reservation code",
+  "check_in": "Check in",
+  "check_out": "Check out",
+  "status": "Status",
+  "checked_in": "Checked in",
+  "checked_out": "Completed",
+  "pending": "Pending",
+  "no_active": "No active reservations for check-in",
+  "success_in": "Check-in registered successfully",
+  "success_out": "Check-out registered successfully",
+  "error_invalid": "Invalid reservation code",
+  "error_expired": "Reservation has expired",
+  "resource": "Resource",
+  "user": "User",
+  "scheduled_time": "Scheduled time",
+  "actual_time": "Actual time"
+}

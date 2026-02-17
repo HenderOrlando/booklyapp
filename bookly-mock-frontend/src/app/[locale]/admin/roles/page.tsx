@@ -120,7 +120,7 @@ export default function RolesAdminPage() {
       cell: (role: Role) => (
         <div>
           <div className="font-medium text-white">{role.name}</div>
-          <div className="text-sm text-gray-400">{role.description}</div>
+          <div className="text-sm text-[var(--color-text-tertiary)]">{role.description}</div>
         </div>
       ),
     },
@@ -197,7 +197,7 @@ export default function RolesAdminPage() {
       cell: (perm: Permission) => (
         <div>
           <div className="font-medium text-white">{perm.description}</div>
-          <div className="text-sm text-gray-400">
+          <div className="text-sm text-[var(--color-text-tertiary)]">
             {perm.resource} : {perm.action}
           </div>
         </div>
@@ -213,7 +213,7 @@ export default function RolesAdminPage() {
         return (
           <div className="flex flex-wrap gap-1">
             {rolesWithPermission.length === 0 ? (
-              <span className="text-gray-400 text-sm">{t("no_roles")}</span>
+              <span className="text-[var(--color-text-tertiary)] text-sm">{t("no_roles")}</span>
             ) : (
               rolesWithPermission.map((role: Role) => (
                 <Badge key={role.id} variant="primary">
@@ -484,7 +484,7 @@ export default function RolesAdminPage() {
                   {t("clear")}
                 </Button>
               )}
-              <span className="text-sm text-gray-400 whitespace-nowrap">
+              <span className="text-sm text-[var(--color-text-tertiary)] whitespace-nowrap">
                 {t("showing_count", {
                   count: filteredRoles.length,
                   total: roles.length,
@@ -520,7 +520,7 @@ export default function RolesAdminPage() {
                   {t("clear")}
                 </Button>
               )}
-              <span className="text-sm text-gray-400 whitespace-nowrap">
+              <span className="text-sm text-[var(--color-text-tertiary)] whitespace-nowrap">
                 {t("showing_perm_count", {
                   count: filteredPermissions.length,
                   total: allPermissions.length,

@@ -7,6 +7,7 @@ import { AuthLayout } from "@/components/templates/AuthLayout";
 import { httpClient } from "@/infrastructure/http";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
+import { useTranslations } from "next-intl";
 import * as React from "react";
 
 /**
@@ -25,6 +26,7 @@ interface ResetPasswordResponse {
 }
 
 export default function ResetPasswordPage() {
+  const t = useTranslations("auth");
   const router = useRouter();
   const searchParams = useSearchParams();
   const token = searchParams.get("token");

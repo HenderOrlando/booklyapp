@@ -307,9 +307,9 @@ export default function DashboardPage() {
             <CardContent>
               <div className="space-y-4">
                 {isLoading ? (
-                  <p className="text-gray-400">{tCommon("loading")}</p>
+                  <p className="text-[var(--color-text-tertiary)]">{tCommon("loading")}</p>
                 ) : upcomingReservations.length === 0 ? (
-                  <p className="text-gray-400">{t("no_recent_reservations")}</p>
+                  <p className="text-[var(--color-text-tertiary)]">{t("no_recent_reservations")}</p>
                 ) : (
                   upcomingReservations
                     .slice(0, 3)
@@ -353,9 +353,9 @@ export default function DashboardPage() {
             <CardContent>
               <div className="space-y-4">
                 {isLoading ? (
-                  <p className="text-gray-400">{tCommon("loading")}</p>
+                  <p className="text-[var(--color-text-tertiary)]">{tCommon("loading")}</p>
                 ) : (metrics?.mostUsedResources || []).length === 0 ? (
-                  <p className="text-gray-400">{t("no_data")}</p>
+                  <p className="text-[var(--color-text-tertiary)]">{t("no_data")}</p>
                 ) : (
                   (metrics?.mostUsedResources || [])
                     .slice(0, 5)
@@ -370,7 +370,7 @@ export default function DashboardPage() {
                             {t("reservations_count")}
                           </span>
                         </div>
-                        <div className="w-full bg-gray-200 rounded-full h-2 dark:bg-gray-700">
+                        <div className="w-full bg-[var(--color-bg-muted)] rounded-full h-2 dark:bg-[var(--color-bg-tertiary)]">
                           <div
                             className="bg-brand-primary-500 h-2 rounded-full"
                             style={{

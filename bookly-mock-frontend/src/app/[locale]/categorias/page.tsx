@@ -34,6 +34,7 @@ import { httpClient } from "@/infrastructure/http";
 import { Category } from "@/types/entities/resource";
 import { useQuery } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 import * as React from "react";
 
 /**
@@ -48,6 +49,7 @@ import * as React from "react";
  */
 
 export default function CategoriasPage() {
+  const t = useTranslations("categories");
   const router = useRouter();
 
   // React Query para cargar categorías
@@ -192,7 +194,7 @@ export default function CategoriasPage() {
           <ColorSwatch color={category.color} size="md" />
           <div>
             <p className="font-medium text-white">{category.name}</p>
-            <p className="text-sm text-gray-400">{category.description}</p>
+            <p className="text-sm text-[var(--color-text-tertiary)]">{category.description}</p>
           </div>
         </div>
       ),
@@ -210,7 +212,7 @@ export default function CategoriasPage() {
           >
             {category.name}
           </Badge>
-          <span className="text-xs text-gray-400 font-mono">
+          <span className="text-xs text-[var(--color-text-tertiary)] font-mono">
             {category.color}
           </span>
         </div>
@@ -292,7 +294,7 @@ export default function CategoriasPage() {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           <Card>
             <CardHeader>
-              <CardTitle className="text-sm font-medium text-gray-400">
+              <CardTitle className="text-sm font-medium text-[var(--color-text-tertiary)]">
                 Total Categorías
               </CardTitle>
             </CardHeader>
@@ -305,12 +307,12 @@ export default function CategoriasPage() {
 
           <Card>
             <CardHeader>
-              <CardTitle className="text-sm font-medium text-gray-400">
+              <CardTitle className="text-sm font-medium text-[var(--color-text-tertiary)]">
                 Activas
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <p className="text-3xl font-bold text-green-500">
+              <p className="text-3xl font-bold text-state-success-500">
                 {categories.filter((c: Category) => c.isActive).length}
               </p>
             </CardContent>
@@ -318,12 +320,12 @@ export default function CategoriasPage() {
 
           <Card>
             <CardHeader>
-              <CardTitle className="text-sm font-medium text-gray-400">
+              <CardTitle className="text-sm font-medium text-[var(--color-text-tertiary)]">
                 Inactivas
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <p className="text-3xl font-bold text-gray-400">
+              <p className="text-3xl font-bold text-[var(--color-text-tertiary)]">
                 {categories.filter((c: Category) => !c.isActive).length}
               </p>
             </CardContent>
@@ -478,7 +480,7 @@ export default function CategoriasPage() {
         >
           {categoryToDelete && (
             <div className="space-y-2">
-              <div className="bg-gray-800 p-4 rounded-lg flex items-center gap-3">
+              <div className="bg-[var(--color-bg-primary)] p-4 rounded-lg flex items-center gap-3">
                 <div
                   className="w-12 h-12 rounded-lg flex-shrink-0"
                   style={{ backgroundColor: categoryToDelete.color }}
@@ -487,12 +489,12 @@ export default function CategoriasPage() {
                   <p className="font-medium text-white">
                     {categoryToDelete.name}
                   </p>
-                  <p className="text-sm text-gray-400">
+                  <p className="text-sm text-[var(--color-text-tertiary)]">
                     {categoryToDelete.description}
                   </p>
                 </div>
               </div>
-              <p className="text-sm text-gray-400">
+              <p className="text-sm text-[var(--color-text-tertiary)]">
                 Esta acción no se puede deshacer. La categoría será eliminada
                 permanentemente.
               </p>

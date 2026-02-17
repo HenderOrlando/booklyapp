@@ -22,6 +22,7 @@ import type { CreateReservationDto } from "@/types/entities/reservation";
 import { useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import { useTranslations } from "next-intl";
 
 /**
  * Página de Detalle de Reserva
@@ -35,6 +36,7 @@ export default function ReservaDetallePage({
 }: {
   params: { id: string };
 }) {
+  const t = useTranslations("reservations");
   const router = useRouter();
   const queryClient = useQueryClient();
 

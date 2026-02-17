@@ -30,17 +30,17 @@ export default function HomePage() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mt-8">
           <div className="p-6 border rounded-lg">
             <h2 className="text-xl font-semibold mb-2">Recursos</h2>
-            <p className="text-sm text-gray-600">Gestión de recursos físicos</p>
+            <p className="text-sm text-[var(--color-text-secondary)]">Gestión de recursos físicos</p>
           </div>
           <div className="p-6 border rounded-lg">
             <h2 className="text-xl font-semibold mb-2">Reservas</h2>
-            <p className="text-sm text-gray-600">
+            <p className="text-sm text-[var(--color-text-secondary)]">
               Sistema de disponibilidad y reservas
             </p>
           </div>
           <div className="p-6 border rounded-lg">
             <h2 className="text-xl font-semibold mb-2">Aprobaciones</h2>
-            <p className="text-sm text-gray-600">
+            <p className="text-sm text-[var(--color-text-secondary)]">
               Flujos de aprobación configurables
             </p>
           </div>

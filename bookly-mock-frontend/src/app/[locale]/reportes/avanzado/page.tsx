@@ -12,8 +12,10 @@ import { MainLayout } from "@/components/templates/MainLayout";
 import { useChartExport } from "@/hooks/useChartExport";
 import { useReportFilters } from "@/hooks/useReportFilters";
 import { useSavedFilters } from "@/hooks/useSavedFilters";
+import { useTranslations } from "next-intl";
 
 export default function ReportesAvanzadoPage() {
+  const t = useTranslations("reports");
   const { filters, setFilters } = useReportFilters();
   const { savedFilters, saveFilter, deleteFilter, toggleFavorite, loadFilter } =
     useSavedFilters();
@@ -56,7 +58,7 @@ export default function ReportesAvanzadoPage() {
     await exportChartAsPDF(
       ["trend-chart", "scatter-chart", "area-chart"],
       "reporte-avanzado",
-      "Reporte Avanzado de Análisis"
+      "Reporte Avanzado de Análisis",
     );
   };
 
@@ -70,10 +72,10 @@ export default function ReportesAvanzadoPage() {
         {/* Header */}
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-3xl font-bold text-gray-900 dark:text-gray-100">
+            <h1 className="text-3xl font-bold text-[var(--color-text-primary)] dark:text-[var(--color-text-primary)]">
               Análisis Avanzado
             </h1>
-            <p className="text-gray-600 dark:text-gray-400 mt-1">
+            <p className="text-[var(--color-text-secondary)] dark:text-[var(--color-text-tertiary)] mt-1">
               Gráficos adicionales, comparaciones y filtros guardables
             </p>
           </div>

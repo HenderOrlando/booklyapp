@@ -271,11 +271,11 @@ export default function RecursoDetailPage() {
         variant="destructive"
       >
         <div className="space-y-2">
-          <div className="bg-gray-800 p-4 rounded-lg">
+          <div className="bg-[var(--color-bg-primary)] p-4 rounded-lg">
             <p className="font-medium text-white">{resource.name}</p>
-            <p className="text-sm text-gray-400">{resource.code}</p>
+            <p className="text-sm text-[var(--color-text-tertiary)]">{resource.code}</p>
           </div>
-          <p className="text-sm text-gray-400">{t("delete_warning")}</p>
+          <p className="text-sm text-[var(--color-text-tertiary)]">{t("delete_warning")}</p>
         </div>
       </ConfirmDialog>
 
@@ -478,8 +478,8 @@ export default function RecursoDetailPage() {
                           key={attr.key}
                           className={`flex items-center gap-3 p-4 rounded-lg border ${
                             hasAttribute
-                              ? "border-green-500/50 bg-green-500/10"
-                              : "border-[var(--color-border-subtle)] bg-gray-800/50"
+                              ? "border-green-500/50 bg-state-success-500/10"
+                              : "border-[var(--color-border-subtle)] bg-[var(--color-bg-primary)]/50"
                           }`}
                         >
                           <span className="text-2xl">{attr.icon}</span>
@@ -686,7 +686,7 @@ export default function RecursoDetailPage() {
                   </h3>
                 </div>
                 {resourcePrograms.length === 0 ? (
-                  <p className="text-center text-gray-400 py-8">
+                  <p className="text-center text-[var(--color-text-tertiary)] py-8">
                     {t("no_programs")}
                   </p>
                 ) : (
@@ -694,13 +694,13 @@ export default function RecursoDetailPage() {
                     {resourcePrograms.map((program) => (
                       <div
                         key={program.id}
-                        className="flex items-center justify-between p-4 bg-gray-800/50 rounded-lg"
+                        className="flex items-center justify-between p-4 bg-[var(--color-bg-primary)]/50 rounded-lg"
                       >
                         <div className="flex-1">
                           <p className="font-medium text-white">
                             {program.name}
                           </p>
-                          <p className="text-sm text-gray-400">
+                          <p className="text-sm text-[var(--color-text-tertiary)]">
                             {program.code} - {program.faculty}
                           </p>
                         </div>

@@ -4,15 +4,31 @@ import { AppHeader } from "@/components/organisms/AppHeader";
 import { AppSidebar } from "@/components/organisms/AppSidebar/AppSidebar";
 import { TemplateEditor } from "@/components/organisms/TemplateEditor";
 import { MainLayout } from "@/components/templates/MainLayout";
+import { httpClient } from "@/infrastructure/http/httpClient";
 import { mockTemplates } from "@/infrastructure/mock/mockData";
 import type { Template } from "@/types/entities/template";
+import { useQuery } from "@tanstack/react-query";
 import { Copy, Edit, Plus, Trash2 } from "lucide-react";
 import { useTranslations } from "next-intl";
 import * as React from "react";
 
 export default function TemplatesPage() {
   const t = useTranslations("admin.templates");
+  const { data: serverTemplates } = useQuery({
+    queryKey: ["templates"],
+    queryFn: async () => {
+      const response = await httpClient.get("documents/templates");
+      return response.data?.items || response.data || [];
+    },
+    staleTime: 1000 * 60 * 10,
+  });
   const [templates, setTemplates] = React.useState<Template[]>(mockTemplates);
+
+  React.useEffect(() => {
+    if (serverTemplates && serverTemplates.length > 0) {
+      setTemplates(serverTemplates);
+    }
+  }, [serverTemplates]);
   const [isEditing, setIsEditing] = React.useState(false);
   const [selectedTemplate, setSelectedTemplate] = React.useState<
     Template | undefined
@@ -33,8 +49,8 @@ export default function TemplatesPage() {
       // Actualizar
       setTemplates(
         templates.map((t) =>
-          t.id === selectedTemplate.id ? { ...t, ...template } : t
-        )
+          t.id === selectedTemplate.id ? { ...t, ...template } : t,
+        ),
       );
     } else {
       // Crear nuevo
@@ -77,10 +93,10 @@ export default function TemplatesPage() {
         {/* Header */}
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-3xl font-bold text-gray-900 dark:text-gray-100">
+            <h1 className="text-3xl font-bold text-[var(--color-text-primary)] dark:text-[var(--color-text-primary)]">
               {t("title")}
             </h1>
-            <p className="text-gray-600 dark:text-gray-400 mt-1">
+            <p className="text-[var(--color-text-secondary)] dark:text-[var(--color-text-tertiary)] mt-1">
               {t("subtitle")}
             </p>
           </div>
@@ -111,33 +127,33 @@ export default function TemplatesPage() {
             {templates.map((template) => (
               <div
                 key={template.id}
-                className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-6"
+                className="bg-[var(--color-bg-primary)] dark:bg-[var(--color-bg-secondary)] border border-[var(--color-border-primary)] dark:border-[var(--color-border-primary)] rounded-lg p-6"
               >
                 <div className="flex items-start justify-between">
                   <div className="flex-1">
                     <div className="flex items-center gap-3 mb-2">
-                      <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100">
+                      <h3 className="text-lg font-semibold text-[var(--color-text-primary)] dark:text-[var(--color-text-primary)]">
                         {template.name}
                       </h3>
                       {template.isDefault && (
-                        <span className="px-2 py-1 text-xs font-medium bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 rounded">
+                        <span className="px-2 py-1 text-xs font-medium bg-brand-primary-100 dark:bg-brand-primary-900/30 text-brand-primary-700 dark:text-brand-primary-300 rounded">
                           {t("default")}
                         </span>
                       )}
                       <span
                         className={`px-2 py-1 text-xs font-medium rounded ${
                           template.isActive
-                            ? "bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300"
-                            : "bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300"
+                            ? "bg-state-success-100 dark:bg-state-success-900/30 text-state-success-700 dark:text-state-success-300"
+                            : "bg-[var(--color-bg-tertiary)] dark:bg-[var(--color-bg-tertiary)] text-[var(--color-text-secondary)] dark:text-[var(--color-text-secondary)]"
                         }`}
                       >
                         {template.isActive ? t("active") : t("inactive")}
                       </span>
                     </div>
-                    <p className="text-sm text-gray-600 dark:text-gray-400 mb-3">
+                    <p className="text-sm text-[var(--color-text-secondary)] dark:text-[var(--color-text-tertiary)] mb-3">
                       {template.subject}
                     </p>
-                    <div className="flex items-center gap-4 text-xs text-gray-500">
+                    <div className="flex items-center gap-4 text-xs text-[var(--color-text-tertiary)]">
                       <span>
                         {t("type")}: {template.type}
                       </span>
@@ -149,14 +165,14 @@ export default function TemplatesPage() {
                   <div className="flex items-center gap-2">
                     <button
                       onClick={() => handleEdit(template)}
-                      className="p-2 text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-lg"
+                      className="p-2 text-brand-primary-600 dark:text-brand-primary-400 hover:bg-brand-primary-50 dark:hover:bg-brand-primary-900/20 rounded-lg"
                       title={t("edit")}
                     >
                       <Edit className="h-4 w-4" />
                     </button>
                     <button
                       onClick={() => handleDuplicate(template)}
-                      className="p-2 text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-700 rounded-lg"
+                      className="p-2 text-[var(--color-text-secondary)] dark:text-[var(--color-text-tertiary)] hover:bg-[var(--color-bg-secondary)] dark:hover:bg-[var(--color-bg-tertiary)] rounded-lg"
                       title={t("duplicate")}
                     >
                       <Copy className="h-4 w-4" />
@@ -164,7 +180,7 @@ export default function TemplatesPage() {
                     {!template.isDefault && (
                       <button
                         onClick={() => handleDelete(template.id)}
-                        className="p-2 text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg"
+                        className="p-2 text-state-error-600 dark:text-state-error-400 hover:bg-state-error-50 dark:hover:bg-state-error-900/20 rounded-lg"
                         title={t("delete")}
                       >
                         <Trash2 className="h-4 w-4" />

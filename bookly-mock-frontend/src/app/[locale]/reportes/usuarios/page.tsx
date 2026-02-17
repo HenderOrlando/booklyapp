@@ -5,15 +5,19 @@ import { AppSidebar } from "@/components/organisms/AppSidebar/AppSidebar";
 import { ExportPanel } from "@/components/organisms/ExportPanel";
 import { UserActivityTable } from "@/components/organisms/UserActivityTable";
 import { MainLayout } from "@/components/templates/MainLayout";
+import { useReportByUser } from "@/hooks/useReportData";
 import { useReportExport } from "@/hooks/useReportExport";
 import { mockUserReports } from "@/infrastructure/mock/data";
+import { useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
-import * as React from "react";
 
 export default function ReportesUsuariosPage() {
+  const t = useTranslations("reports");
   const router = useRouter();
   const { exportReport } = useReportExport();
-  const [userData] = React.useState(mockUserReports);
+  const { data: serverData } = useReportByUser();
+  const userData =
+    serverData && serverData.length > 0 ? serverData : mockUserReports;
 
   const handleUserClick = (userId: string) => {
     router.push(`/reportes/usuarios/${userId}`);
@@ -28,10 +32,10 @@ export default function ReportesUsuariosPage() {
       <div className="space-y-6">
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-3xl font-bold text-gray-900 dark:text-gray-100">
+            <h1 className="text-3xl font-bold text-[var(--color-text-primary)] dark:text-[var(--color-text-primary)]">
               Reportes por Usuario
             </h1>
-            <p className="text-gray-600 dark:text-gray-400 mt-1">
+            <p className="text-[var(--color-text-secondary)] dark:text-[var(--color-text-tertiary)] mt-1">
               Actividad y estadísticas de uso por usuario
             </p>
           </div>

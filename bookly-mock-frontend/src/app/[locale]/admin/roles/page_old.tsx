@@ -101,7 +101,7 @@ export default function RolesAdminPage() {
       cell: (role: Role) => (
         <div>
           <div className="font-medium text-white">{role.name}</div>
-          <div className="text-sm text-gray-400">{role.description}</div>
+          <div className="text-sm text-[var(--color-text-tertiary)]">{role.description}</div>
         </div>
       ),
     },
@@ -165,7 +165,7 @@ export default function RolesAdminPage() {
           <div className="font-medium text-white">
             {user.firstName} {user.lastName}
           </div>
-          <div className="text-sm text-gray-400">{user.email}</div>
+          <div className="text-sm text-[var(--color-text-tertiary)]">{user.email}</div>
         </div>
       ),
     },
@@ -352,7 +352,7 @@ export default function RolesAdminPage() {
                     ].map((perm) => (
                       <label
                         key={perm}
-                        className="flex items-center gap-2 text-sm text-gray-300"
+                        className="flex items-center gap-2 text-sm text-[var(--color-text-secondary)]"
                       >
                         <input
                           type="checkbox"

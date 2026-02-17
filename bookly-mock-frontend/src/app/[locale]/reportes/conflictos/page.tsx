@@ -23,6 +23,7 @@ import {
   Users,
   Zap,
 } from "lucide-react";
+import { useTranslations } from "next-intl";
 import * as React from "react";
 
 /**
@@ -125,6 +126,7 @@ const severityColors: Record<string, string> = {
 };
 
 export default function ConflictosPage() {
+  const t = useTranslations("reports");
   const [conflicts, setConflicts] = React.useState<ConflictEntry[]>([]);
   const [loading, setLoading] = React.useState(true);
   const [searchTerm, setSearchTerm] = React.useState("");

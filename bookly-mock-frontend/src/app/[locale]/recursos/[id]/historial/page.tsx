@@ -33,6 +33,7 @@ import {
   ChevronRight,
 } from "lucide-react";
 import { useParams, useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 import * as React from "react";
 
 /**
@@ -149,6 +150,7 @@ const typeBadgeVariant: Record<string, "success" | "error" | "warning" | "primar
 };
 
 export default function RecursoHistorialPage() {
+  const t = useTranslations("resources");
   const params = useParams();
   const router = useRouter();
   const resourceId = params.id as string;

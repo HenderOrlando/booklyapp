@@ -1,0 +1,19 @@
+{
+  "title": "Vigilancia",
+  "description": "Pantalla de control para el personal de vigilancia",
+  "today_reservations": "Reservas de hoy",
+  "active_now": "Activas ahora",
+  "upcoming": "Próximas",
+  "completed_today": "Completadas hoy",
+  "resource": "Recurso",
+  "user": "Usuario",
+  "time": "Hora",
+  "status": "Estado",
+  "confirmed": "Confirmada",
+  "in_use": "En uso",
+  "completed": "Completada",
+  "no_show": "No presentado",
+  "verify": "Verificar",
+  "scan_qr": "Escanear QR",
+  "search_placeholder": "Buscar reserva o usuario..."
+}

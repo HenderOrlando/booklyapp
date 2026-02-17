@@ -3,9 +3,19 @@
 import { Badge } from "@/components/atoms/Badge/Badge";
 import { Button } from "@/components/atoms/Button/Button";
 import { Card } from "@/components/atoms/Card/Card";
+import { AppHeader } from "@/components/organisms/AppHeader";
+import { AppSidebar } from "@/components/organisms/AppSidebar/AppSidebar";
+import { MainLayout } from "@/components/templates/MainLayout";
+import { useUnsatisfiedDemandReport } from "@/hooks/useReportData";
 import { cn } from "@/lib/utils";
-import { BarChart3, Download, TrendingDown, Calendar, AlertTriangle } from "lucide-react";
-import * as React from "react";
+import {
+  AlertTriangle,
+  BarChart3,
+  Calendar,
+  Download,
+  TrendingDown,
+} from "lucide-react";
+import { useTranslations } from "next-intl";
 
 /**
  * Page: Reporte de Demanda Insatisfecha — RF-37
@@ -61,148 +71,160 @@ const mockData: UnsatisfiedDemandItem[] = [
 ];
 
 export default function DemandaInsatisfechaPage() {
-  const totalRejected = mockData.reduce((sum, d) => sum + d.totalRejected, 0);
-  const totalWaitlisted = mockData.reduce((sum, d) => sum + d.totalWaitlisted, 0);
+  const t = useTranslations("reports");
+  const { data: serverData } = useUnsatisfiedDemandReport();
+  const data = (
+    serverData && serverData.length > 0 ? serverData : mockData
+  ) as UnsatisfiedDemandItem[];
+  const totalRejected = data.reduce((sum, d) => sum + d.totalRejected, 0);
+  const totalWaitlisted = data.reduce((sum, d) => sum + d.totalWaitlisted, 0);
 
   return (
-    <div className="space-y-6 p-6">
-      {/* Header */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-2xl font-bold text-[var(--color-text-primary)]">
-            Demanda Insatisfecha
-          </h1>
-          <p className="mt-1 text-sm text-[var(--color-text-secondary)]">
-            Recursos con alta demanda que no pudo ser cubierta
-          </p>
+    <MainLayout header={<AppHeader />} sidebar={<AppSidebar />}>
+      <div className="space-y-6">
+        {/* Header */}
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="text-2xl font-bold text-[var(--color-text-primary)]">
+              Demanda Insatisfecha
+            </h1>
+            <p className="mt-1 text-sm text-[var(--color-text-secondary)]">
+              Recursos con alta demanda que no pudo ser cubierta
+            </p>
+          </div>
+          <Button variant="outline" className="gap-2">
+            <Download className="h-4 w-4" />
+            Exportar
+          </Button>
         </div>
-        <Button variant="outline" className="gap-2">
-          <Download className="h-4 w-4" />
-          Exportar
-        </Button>
-      </div>
 
-      {/* KPIs */}
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
-        <Card className="p-4">
-          <div className="flex items-center gap-3">
-            <div className="rounded-lg bg-state-error-100 p-2">
-              <TrendingDown className="h-5 w-5 text-state-error-600" />
+        {/* KPIs */}
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
+          <Card className="p-4">
+            <div className="flex items-center gap-3">
+              <div className="rounded-lg bg-state-error-100 p-2">
+                <TrendingDown className="h-5 w-5 text-state-error-600" />
+              </div>
+              <div>
+                <p className="text-2xl font-bold text-[var(--color-text-primary)]">
+                  {totalRejected}
+                </p>
+                <p className="text-xs text-[var(--color-text-secondary)]">
+                  Reservas rechazadas
+                </p>
+              </div>
             </div>
-            <div>
-              <p className="text-2xl font-bold text-[var(--color-text-primary)]">
-                {totalRejected}
-              </p>
-              <p className="text-xs text-[var(--color-text-secondary)]">
-                Reservas rechazadas
-              </p>
+          </Card>
+          <Card className="p-4">
+            <div className="flex items-center gap-3">
+              <div className="rounded-lg bg-state-warning-100 p-2">
+                <AlertTriangle className="h-5 w-5 text-state-warning-600" />
+              </div>
+              <div>
+                <p className="text-2xl font-bold text-[var(--color-text-primary)]">
+                  {totalWaitlisted}
+                </p>
+                <p className="text-xs text-[var(--color-text-secondary)]">
+                  En lista de espera
+                </p>
+              </div>
             </div>
-          </div>
-        </Card>
-        <Card className="p-4">
-          <div className="flex items-center gap-3">
-            <div className="rounded-lg bg-state-warning-100 p-2">
-              <AlertTriangle className="h-5 w-5 text-state-warning-600" />
+          </Card>
+          <Card className="p-4">
+            <div className="flex items-center gap-3">
+              <div className="rounded-lg bg-brand-primary-100 p-2">
+                <BarChart3 className="h-5 w-5 text-brand-primary-600" />
+              </div>
+              <div>
+                <p className="text-2xl font-bold text-[var(--color-text-primary)]">
+                  {mockData.length}
+                </p>
+                <p className="text-xs text-[var(--color-text-secondary)]">
+                  Recursos afectados
+                </p>
+              </div>
             </div>
-            <div>
-              <p className="text-2xl font-bold text-[var(--color-text-primary)]">
-                {totalWaitlisted}
-              </p>
-              <p className="text-xs text-[var(--color-text-secondary)]">
-                En lista de espera
-              </p>
-            </div>
-          </div>
-        </Card>
-        <Card className="p-4">
-          <div className="flex items-center gap-3">
-            <div className="rounded-lg bg-brand-primary-100 p-2">
-              <BarChart3 className="h-5 w-5 text-brand-primary-600" />
-            </div>
-            <div>
-              <p className="text-2xl font-bold text-[var(--color-text-primary)]">
-                {mockData.length}
-              </p>
-              <p className="text-xs text-[var(--color-text-secondary)]">
-                Recursos afectados
-              </p>
-            </div>
-          </div>
-        </Card>
-      </div>
+          </Card>
+        </div>
 
-      {/* Table */}
-      <Card className="overflow-hidden">
-        <div className="overflow-x-auto">
-          <table className="w-full text-sm">
-            <thead>
-              <tr className="border-b bg-[var(--color-bg-muted)]">
-                <th className="px-4 py-3 text-left font-medium text-[var(--color-text-secondary)]">
-                  Recurso
-                </th>
-                <th className="px-4 py-3 text-center font-medium text-[var(--color-text-secondary)]">
-                  Rechazadas
-                </th>
-                <th className="px-4 py-3 text-center font-medium text-[var(--color-text-secondary)]">
-                  En espera
-                </th>
-                <th className="px-4 py-3 text-left font-medium text-[var(--color-text-secondary)]">
-                  Horarios pico
-                </th>
-                <th className="px-4 py-3 text-center font-medium text-[var(--color-text-secondary)]">
-                  Score demanda
-                </th>
-              </tr>
-            </thead>
-            <tbody>
-              {mockData.map((item) => (
-                <tr key={item.resourceId} className="border-b last:border-0 hover:bg-[var(--color-bg-muted)]/50">
-                  <td className="px-4 py-3 font-medium text-[var(--color-text-primary)]">
-                    {item.resourceName}
-                  </td>
-                  <td className="px-4 py-3 text-center">
-                    <Badge variant="error">{item.totalRejected}</Badge>
-                  </td>
-                  <td className="px-4 py-3 text-center">
-                    <Badge variant="warning">{item.totalWaitlisted}</Badge>
-                  </td>
-                  <td className="px-4 py-3">
-                    <div className="flex flex-wrap gap-1">
-                      {item.peakHours.map((h) => (
-                        <span
-                          key={h}
-                          className="inline-flex items-center gap-1 rounded bg-[var(--color-bg-muted)] px-2 py-0.5 text-xs"
-                        >
-                          <Calendar className="h-3 w-3" />
-                          {h}
-                        </span>
-                      ))}
-                    </div>
-                  </td>
-                  <td className="px-4 py-3 text-center">
-                    <div className="flex items-center justify-center gap-2">
-                      <div className="h-2 w-16 rounded-full bg-gray-200">
-                        <div
-                          className={cn(
-                            "h-full rounded-full",
-                            item.demandScore >= 80
-                              ? "bg-state-error-500"
-                              : item.demandScore >= 60
-                              ? "bg-state-warning-500"
-                              : "bg-brand-primary-500"
-                          )}
-                          style={{ width: `${item.demandScore}%` }}
-                        />
-                      </div>
-                      <span className="text-xs font-medium">{item.demandScore}%</span>
-                    </div>
-                  </td>
+        {/* Table */}
+        <Card className="overflow-hidden">
+          <div className="overflow-x-auto">
+            <table className="w-full text-sm">
+              <thead>
+                <tr className="border-b bg-[var(--color-bg-muted)]">
+                  <th className="px-4 py-3 text-left font-medium text-[var(--color-text-secondary)]">
+                    Recurso
+                  </th>
+                  <th className="px-4 py-3 text-center font-medium text-[var(--color-text-secondary)]">
+                    Rechazadas
+                  </th>
+                  <th className="px-4 py-3 text-center font-medium text-[var(--color-text-secondary)]">
+                    En espera
+                  </th>
+                  <th className="px-4 py-3 text-left font-medium text-[var(--color-text-secondary)]">
+                    Horarios pico
+                  </th>
+                  <th className="px-4 py-3 text-center font-medium text-[var(--color-text-secondary)]">
+                    Score demanda
+                  </th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      </Card>
-    </div>
+              </thead>
+              <tbody>
+                {mockData.map((item) => (
+                  <tr
+                    key={item.resourceId}
+                    className="border-b last:border-0 hover:bg-[var(--color-bg-muted)]/50"
+                  >
+                    <td className="px-4 py-3 font-medium text-[var(--color-text-primary)]">
+                      {item.resourceName}
+                    </td>
+                    <td className="px-4 py-3 text-center">
+                      <Badge variant="error">{item.totalRejected}</Badge>
+                    </td>
+                    <td className="px-4 py-3 text-center">
+                      <Badge variant="warning">{item.totalWaitlisted}</Badge>
+                    </td>
+                    <td className="px-4 py-3">
+                      <div className="flex flex-wrap gap-1">
+                        {item.peakHours.map((h) => (
+                          <span
+                            key={h}
+                            className="inline-flex items-center gap-1 rounded bg-[var(--color-bg-muted)] px-2 py-0.5 text-xs"
+                          >
+                            <Calendar className="h-3 w-3" />
+                            {h}
+                          </span>
+                        ))}
+                      </div>
+                    </td>
+                    <td className="px-4 py-3 text-center">
+                      <div className="flex items-center justify-center gap-2">
+                        <div className="h-2 w-16 rounded-full bg-[var(--color-bg-muted)]">
+                          <div
+                            className={cn(
+                              "h-full rounded-full",
+                              item.demandScore >= 80
+                                ? "bg-state-error-500"
+                                : item.demandScore >= 60
+                                  ? "bg-state-warning-500"
+                                  : "bg-brand-primary-500",
+                            )}
+                            style={{ width: `${item.demandScore}%` }}
+                          />
+                        </div>
+                        <span className="text-xs font-medium">
+                          {item.demandScore}%
+                        </span>
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </Card>
+      </div>
+    </MainLayout>
   );
 }

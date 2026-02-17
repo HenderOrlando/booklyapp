@@ -3,10 +3,44 @@
  */
 import { render, screen, waitFor } from "@testing-library/react";
 
-jest.mock("next-intl", () => ({ useTranslations: () => (k: string) => k, useLocale: () => "es" }));
-jest.mock("@/i18n/navigation", () => ({ Link: ({ children, href }: any) => <a href={href}>{children}</a>, useRouter: () => ({ push: jest.fn() }), usePathname: () => "/test", redirect: jest.fn() }));
-jest.mock("@/contexts/AuthContext", () => ({ useAuth: () => ({ user: { id: "u1", name: "Admin", email: "a@t.co", roles: [{ name: "admin" }] }, isLoading: false, isAuthenticated: true, permissions: ["admin:all"] }) }));
-jest.mock("@/infrastructure/http/httpClient", () => ({ httpClient: { get: jest.fn().mockResolvedValue({ success: true, data: [] }), post: jest.fn(), put: jest.fn(), patch: jest.fn(), delete: jest.fn() }, isMockMode: () => true }));
+jest.mock("next-intl", () => ({
+  useTranslations: () => (k: string) => k,
+  useLocale: () => "es",
+}));
+jest.mock("@/i18n/navigation", () => ({
+  Link: ({ children, href }: any) => <a href={href}>{children}</a>,
+  useRouter: () => ({ push: jest.fn() }),
+  usePathname: () => "/test",
+  redirect: jest.fn(),
+}));
+jest.mock("@/contexts/AuthContext", () => ({
+  useAuth: () => ({
+    user: {
+      id: "u1",
+      name: "Admin",
+      email: "a@t.co",
+      roles: [{ name: "admin" }],
+    },
+    isLoading: false,
+    isAuthenticated: true,
+    permissions: ["admin:all"],
+  }),
+}));
+jest.mock("@/infrastructure/http/httpClient", () => ({
+  httpClient: {
+    get: jest.fn().mockResolvedValue({ success: true, data: [] }),
+    post: jest.fn(),
+    put: jest.fn(),
+    patch: jest.fn(),
+    delete: jest.fn(),
+  },
+  isMockMode: () => true,
+}));
+jest.mock("@/hooks/useReportData", () => ({
+  useComplianceReport: () => ({ data: [], isLoading: false }),
+  useUnsatisfiedDemandReport: () => ({ data: [], isLoading: false }),
+  useReportDashboard: () => ({ data: null, isLoading: false }),
+}));
 
 import CumplimientoPage from "../page";
 

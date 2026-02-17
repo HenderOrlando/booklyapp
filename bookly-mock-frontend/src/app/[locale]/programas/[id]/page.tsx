@@ -279,14 +279,14 @@ export default function ProgramaDetallePage({
                 <TabsContent value="general">
                   <div className="space-y-4">
                     <div>
-                      <label className="block text-sm font-medium text-gray-400 mb-1">
+                      <label className="block text-sm font-medium text-[var(--color-text-tertiary)] mb-1">
                         {t("code")}
                       </label>
                       <p className="text-white font-mono">{program.code}</p>
                     </div>
 
                     <div>
-                      <label className="block text-sm font-medium text-gray-400 mb-1">
+                      <label className="block text-sm font-medium text-[var(--color-text-tertiary)] mb-1">
                         {t("name")}
                       </label>
                       <p className="text-white">{program.name}</p>
@@ -294,7 +294,7 @@ export default function ProgramaDetallePage({
 
                     {program.description && (
                       <div>
-                        <label className="block text-sm font-medium text-gray-400 mb-1">
+                        <label className="block text-sm font-medium text-[var(--color-text-tertiary)] mb-1">
                           {t("description_label")}
                         </label>
                         <p className="text-white">{program.description}</p>
@@ -303,7 +303,7 @@ export default function ProgramaDetallePage({
 
                     <div className="grid grid-cols-2 gap-4">
                       <div>
-                        <label className="block text-sm font-medium text-gray-400 mb-1">
+                        <label className="block text-sm font-medium text-[var(--color-text-tertiary)] mb-1">
                           {t("faculty")}
                         </label>
                         <p className="text-white">{program.faculty}</p>
@@ -311,7 +311,7 @@ export default function ProgramaDetallePage({
 
                       {program.department && (
                         <div>
-                          <label className="block text-sm font-medium text-gray-400 mb-1">
+                          <label className="block text-sm font-medium text-[var(--color-text-tertiary)] mb-1">
                             {t("department")}
                           </label>
                           <p className="text-white">{program.department}</p>
@@ -320,7 +320,7 @@ export default function ProgramaDetallePage({
                     </div>
 
                     <div>
-                      <label className="block text-sm font-medium text-gray-400 mb-1">
+                      <label className="block text-sm font-medium text-[var(--color-text-tertiary)] mb-1">
                         {t("status")}
                       </label>
                       {program.isActive ? (
@@ -347,7 +347,7 @@ export default function ProgramaDetallePage({
                           </Button>
                         </div>
                         {programResources.length === 0 ? (
-                          <p className="text-center text-gray-400 py-8">
+                          <p className="text-center text-[var(--color-text-tertiary)] py-8">
                             {t("no_resources_program")}
                           </p>
                         ) : (
@@ -355,13 +355,13 @@ export default function ProgramaDetallePage({
                             {programResources.map((resource: any) => (
                               <div
                                 key={resource.id}
-                                className="flex items-center justify-between p-4 bg-gray-800/50 rounded-lg"
+                                className="flex items-center justify-between p-4 bg-[var(--color-bg-primary)]/50 rounded-lg"
                               >
                                 <div>
                                   <p className="font-medium text-white">
                                     {resource.name}
                                   </p>
-                                  <p className="text-sm text-gray-400">
+                                  <p className="text-sm text-[var(--color-text-tertiary)]">
                                     {resource.code} - {t("capacity")}:{" "}
                                     {resource.capacity}
                                   </p>
@@ -418,7 +418,7 @@ export default function ProgramaDetallePage({
                             .map((resource) => (
                               <label
                                 key={resource.id}
-                                className="flex items-center justify-between p-4 bg-gray-800/50 rounded-lg cursor-pointer hover:bg-gray-800"
+                                className="flex items-center justify-between p-4 bg-[var(--color-bg-primary)]/50 rounded-lg cursor-pointer hover:bg-[var(--color-bg-primary)]"
                               >
                                 <div className="flex items-center gap-3">
                                   <input
@@ -429,13 +429,13 @@ export default function ProgramaDetallePage({
                                     onChange={() =>
                                       handleToggleResource(resource.id)
                                     }
-                                    className="w-5 h-5 rounded border-gray-600 bg-gray-700 text-brand-primary-500 focus:ring-brand-primary-500 focus:ring-offset-gray-900"
+                                    className="w-5 h-5 rounded border-gray-600 bg-[var(--color-bg-tertiary)] text-brand-primary-500 focus:ring-brand-primary-500 focus:ring-offset-gray-900"
                                   />
                                   <div>
                                     <p className="font-medium text-white">
                                       {resource.name}
                                     </p>
-                                    <p className="text-sm text-gray-400">
+                                    <p className="text-sm text-[var(--color-text-tertiary)]">
                                       {resource.code} - {t("type")}:{" "}
                                       {resource.type} -{t("capacity")}:{" "}
                                       {resource.capacity}
@@ -447,7 +447,7 @@ export default function ProgramaDetallePage({
                         </div>
 
                         <div className="flex items-center justify-between pt-4 border-t border-gray-700">
-                          <p className="text-sm text-gray-400">
+                          <p className="text-sm text-[var(--color-text-tertiary)]">
                             {t("selected_resources_count", {
                               count: selectedResourceIds.size,
                             })}
@@ -465,7 +465,7 @@ export default function ProgramaDetallePage({
                         {t("associated_users_title")}
                       </h3>
                       {programUsers.length === 0 ? (
-                        <p className="text-gray-400">
+                        <p className="text-[var(--color-text-tertiary)]">
                           {t("no_users_associated")}
                         </p>
                       ) : (
@@ -473,13 +473,13 @@ export default function ProgramaDetallePage({
                           {programUsers.map((user: any) => (
                             <div
                               key={user.id}
-                              className="flex items-center justify-between p-4 bg-gray-800/50 rounded-lg"
+                              className="flex items-center justify-between p-4 bg-[var(--color-bg-primary)]/50 rounded-lg"
                             >
                               <div>
                                 <p className="font-medium text-white">
                                   {user.name}
                                 </p>
-                                <p className="text-sm text-gray-400">
+                                <p className="text-sm text-[var(--color-text-tertiary)]">
                                   {user.email}
                                 </p>
                                 {user.programRole && (
@@ -512,7 +512,7 @@ export default function ProgramaDetallePage({
                         className="mb-4"
                       />
                       {filteredAvailableUsers.length === 0 ? (
-                        <p className="text-gray-400">
+                        <p className="text-[var(--color-text-tertiary)]">
                           {t("no_users_available")}
                         </p>
                       ) : (
@@ -520,13 +520,13 @@ export default function ProgramaDetallePage({
                           {filteredAvailableUsers.map((user) => (
                             <div
                               key={user.id}
-                              className="flex items-center justify-between p-4 bg-gray-800/50 rounded-lg"
+                              className="flex items-center justify-between p-4 bg-[var(--color-bg-primary)]/50 rounded-lg"
                             >
                               <div>
                                 <p className="font-medium text-white">
                                   {user.name}
                                 </p>
-                                <p className="text-sm text-gray-400">
+                                <p className="text-sm text-[var(--color-text-tertiary)]">
                                   {user.email}
                                 </p>
                               </div>

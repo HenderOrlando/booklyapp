@@ -1,0 +1,22 @@
+{
+  "title": "Check-in / Check-out",
+  "description": "Registro de entrada y salida para reservas activas",
+  "scan_code": "Escanear código",
+  "manual_entry": "Ingreso manual",
+  "reservation_code": "Código de reserva",
+  "check_in": "Registrar entrada",
+  "check_out": "Registrar salida",
+  "status": "Estado",
+  "checked_in": "Registrado",
+  "checked_out": "Finalizado",
+  "pending": "Pendiente",
+  "no_active": "No hay reservas activas para check-in",
+  "success_in": "Check-in registrado exitosamente",
+  "success_out": "Check-out registrado exitosamente",
+  "error_invalid": "Código de reserva inválido",
+  "error_expired": "La reserva ya expiró",
+  "resource": "Recurso",
+  "user": "Usuario",
+  "scheduled_time": "Hora programada",
+  "actual_time": "Hora real"
+}

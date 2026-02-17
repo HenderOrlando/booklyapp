@@ -1,0 +1,19 @@
+{
+  "title": "Vigilance",
+  "description": "Control screen for security personnel",
+  "today_reservations": "Today's reservations",
+  "active_now": "Active now",
+  "upcoming": "Upcoming",
+  "completed_today": "Completed today",
+  "resource": "Resource",
+  "user": "User",
+  "time": "Time",
+  "status": "Status",
+  "confirmed": "Confirmed",
+  "in_use": "In use",
+  "completed": "Completed",
+  "no_show": "No show",
+  "verify": "Verify",
+  "scan_qr": "Scan QR",
+  "search_placeholder": "Search reservation or user..."
+}

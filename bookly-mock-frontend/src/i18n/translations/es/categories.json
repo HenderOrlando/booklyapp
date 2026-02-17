@@ -1,0 +1,20 @@
+{
+  "title": "Categorías",
+  "description": "Gestión de categorías de recursos",
+  "create": "Crear categoría",
+  "edit": "Editar categoría",
+  "delete": "Eliminar categoría",
+  "name": "Nombre",
+  "code": "Código",
+  "description_field": "Descripción",
+  "color": "Color",
+  "icon": "Ícono",
+  "resources_count": "Recursos asociados",
+  "status": "Estado",
+  "active": "Activa",
+  "inactive": "Inactiva",
+  "no_categories": "No hay categorías registradas",
+  "confirm_delete": "¿Estás seguro de eliminar esta categoría?",
+  "save": "Guardar",
+  "cancel": "Cancelar"
+}

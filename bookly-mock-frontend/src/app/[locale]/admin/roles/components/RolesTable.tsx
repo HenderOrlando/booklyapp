@@ -48,7 +48,7 @@ export function RolesTable({
       cell: (role: RoleWithStats) => (
         <div>
           <div className="font-medium text-white">{role.name}</div>
-          <div className="text-sm text-gray-400">{role.description || ""}</div>
+          <div className="text-sm text-[var(--color-text-tertiary)]">{role.description || ""}</div>
         </div>
       ),
     },

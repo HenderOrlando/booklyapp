@@ -125,7 +125,7 @@ export function UserFormModal({
             <div className="grid grid-cols-2 gap-4">
               <div>
                 <label className="block text-sm font-medium text-white mb-2">
-                  {t("first_name")} <span className="text-red-500">*</span>
+                  {t("first_name")} <span className="text-state-error-500">*</span>
                 </label>
                 <Input
                   placeholder={t("first_name_placeholder")}
@@ -136,7 +136,7 @@ export function UserFormModal({
               </div>
               <div>
                 <label className="block text-sm font-medium text-white mb-2">
-                  {t("last_name")} <span className="text-red-500">*</span>
+                  {t("last_name")} <span className="text-state-error-500">*</span>
                 </label>
                 <Input
                   placeholder={t("last_name_placeholder")}
@@ -156,7 +156,7 @@ export function UserFormModal({
             <div className="grid grid-cols-2 gap-4">
               <div>
                 <label className="block text-sm font-medium text-white mb-2">
-                  {t("email")} <span className="text-red-500">*</span>
+                  {t("email")} <span className="text-state-error-500">*</span>
                 </label>
                 <Input
                   type="email"
@@ -166,14 +166,14 @@ export function UserFormModal({
                   disabled={isLoading || !!selectedUser}
                 />
                 {selectedUser && (
-                  <p className="text-xs text-gray-400 mt-1">
+                  <p className="text-xs text-[var(--color-text-tertiary)] mt-1">
                     {t("email_readonly")}
                   </p>
                 )}
               </div>
               <div>
                 <label className="block text-sm font-medium text-white mb-2">
-                  {t("username")} <span className="text-red-500">*</span>
+                  {t("username")} <span className="text-state-error-500">*</span>
                 </label>
                 <Input
                   placeholder={t("username_placeholder")}
@@ -182,7 +182,7 @@ export function UserFormModal({
                   disabled={isLoading || !!selectedUser}
                 />
                 {selectedUser && (
-                  <p className="text-xs text-gray-400 mt-1">
+                  <p className="text-xs text-[var(--color-text-tertiary)] mt-1">
                     {t("username_readonly")}
                   </p>
                 )}
@@ -191,7 +191,7 @@ export function UserFormModal({
             {!selectedUser && (
               <div className="mt-4">
                 <label className="block text-sm font-medium text-white mb-2">
-                  {t("password")} <span className="text-red-500">*</span>
+                  {t("password")} <span className="text-state-error-500">*</span>
                 </label>
                 <Input
                   type="password"
@@ -200,7 +200,7 @@ export function UserFormModal({
                   onChange={(e) => onPasswordChange(e.target.value)}
                   disabled={isLoading}
                 />
-                <p className="text-xs text-gray-400 mt-1">
+                <p className="text-xs text-[var(--color-text-tertiary)] mt-1">
                   {t("password_hint")}
                 </p>
               </div>
@@ -233,7 +233,7 @@ export function UserFormModal({
                   value={documentType}
                   onChange={(e) => onDocumentTypeChange(e.target.value)}
                   disabled={isLoading}
-                  className="w-full px-3 py-2 bg-gray-800 border border-gray-700 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-brand-primary-500"
+                  className="w-full px-3 py-2 bg-[var(--color-bg-primary)] border border-gray-700 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-brand-primary-500"
                 >
                   <option value="">{t("select_document_type")}</option>
                   <option value="DNI">DNI</option>
@@ -266,7 +266,7 @@ export function UserFormModal({
                 value={status}
                 onChange={(e) => onStatusChange(e.target.value as UserStatus)}
                 disabled={isLoading}
-                className="w-full px-3 py-2 bg-gray-800 border border-gray-700 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-brand-primary-500"
+                className="w-full px-3 py-2 bg-[var(--color-bg-primary)] border border-gray-700 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-brand-primary-500"
               >
                 <option value={UserStatus.ACTIVE}>{t("status_active")}</option>
                 <option value={UserStatus.INACTIVE}>
@@ -303,7 +303,7 @@ export function UserFormModal({
                   className={`flex items-center gap-3 p-3 rounded-lg cursor-pointer border transition-all ${
                     selectedRoles.includes(role.id)
                       ? "bg-brand-primary-500/10 border-brand-primary-500"
-                      : "bg-gray-800 border-gray-700 hover:bg-gray-750"
+                      : "bg-[var(--color-bg-primary)] border-gray-700 hover:bg-[var(--color-bg-secondary)]"
                   } ${isLoading ? "opacity-50 cursor-not-allowed" : ""}`}
                 >
                   <input
@@ -325,7 +325,7 @@ export function UserFormModal({
                       )}
                     </div>
                     {role.description && (
-                      <p className="text-xs text-gray-400 mt-1">
+                      <p className="text-xs text-[var(--color-text-tertiary)] mt-1">
                         {role.description}
                       </p>
                     )}

@@ -155,7 +155,7 @@ export default function ReservasPage() {
       <MainLayout header={header} sidebar={sidebar}>
         <div className="flex flex-col items-center justify-center min-h-[60vh]">
           <LoadingSpinner size="lg" />
-          <p className="mt-4 text-gray-400">{tCommon("loading")}</p>
+          <p className="mt-4 text-[var(--color-text-tertiary)]">{tCommon("loading")}</p>
         </div>
       </MainLayout>
     );
@@ -234,7 +234,7 @@ export default function ReservasPage() {
               <VirtualizedList
                 items={filteredReservations}
                 renderItem={(reservation: Reservation, index: number) => (
-                  <div className="p-4 border-b border-gray-700 hover:bg-gray-800/50 transition-colors">
+                  <div className="p-4 border-b border-gray-700 hover:bg-[var(--color-bg-primary)]/50 transition-colors">
                     <ReservationCard
                       reservation={reservation}
                       onView={handleView}

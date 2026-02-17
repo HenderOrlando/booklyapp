@@ -33,32 +33,32 @@ import * as React from "react";
 const getStatusColor = (status?: string) => {
   switch (status) {
     case "PENDING":
-      return "bg-yellow-100 text-yellow-800 dark:bg-yellow-900/20 dark:text-yellow-400";
+      return "bg-state-warning-100 text-yellow-800 dark:bg-state-warning-900/20 dark:text-state-warning-400";
     case "APPROVED":
-      return "bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-400";
+      return "bg-state-success-100 text-state-success-800 dark:bg-state-success-900/20 dark:text-state-success-400";
     case "REJECTED":
-      return "bg-red-100 text-red-800 dark:bg-red-900/20 dark:text-red-400";
+      return "bg-state-error-100 text-state-error-800 dark:bg-state-error-900/20 dark:text-state-error-400";
     case "IN_REVIEW":
-      return "bg-blue-100 text-blue-800 dark:bg-blue-900/20 dark:text-blue-400";
+      return "bg-brand-primary-100 text-brand-primary-800 dark:bg-brand-primary-900/20 dark:text-brand-primary-400";
     case "CANCELLED":
-      return "bg-gray-100 text-gray-800 dark:bg-gray-900/20 dark:text-gray-400";
+      return "bg-[var(--color-bg-tertiary)] text-[var(--color-text-primary)] dark:bg-[var(--color-bg-primary)]/20 dark:text-[var(--color-text-tertiary)]";
     default:
-      return "bg-gray-100 text-gray-800 dark:bg-gray-900/20 dark:text-gray-400";
+      return "bg-[var(--color-bg-tertiary)] text-[var(--color-text-primary)] dark:bg-[var(--color-bg-primary)]/20 dark:text-[var(--color-text-tertiary)]";
   }
 };
 
 const getPriorityColor = (priority?: string) => {
   switch (priority) {
     case "URGENT":
-      return "bg-red-100 text-red-800 dark:bg-red-900/20 dark:text-red-400";
+      return "bg-state-error-100 text-state-error-800 dark:bg-state-error-900/20 dark:text-state-error-400";
     case "HIGH":
       return "bg-orange-100 text-orange-800 dark:bg-orange-900/20 dark:text-orange-400";
     case "NORMAL":
-      return "bg-blue-100 text-blue-800 dark:bg-blue-900/20 dark:text-blue-400";
+      return "bg-brand-primary-100 text-brand-primary-800 dark:bg-brand-primary-900/20 dark:text-brand-primary-400";
     case "LOW":
-      return "bg-gray-100 text-gray-800 dark:bg-gray-900/20 dark:text-gray-400";
+      return "bg-[var(--color-bg-tertiary)] text-[var(--color-text-primary)] dark:bg-[var(--color-bg-primary)]/20 dark:text-[var(--color-text-tertiary)]";
     default:
-      return "bg-gray-100 text-gray-800 dark:bg-gray-900/20 dark:text-gray-400";
+      return "bg-[var(--color-bg-tertiary)] text-[var(--color-text-primary)] dark:bg-[var(--color-bg-primary)]/20 dark:text-[var(--color-text-tertiary)]";
   }
 };
 
@@ -145,17 +145,17 @@ export default function ApprovalDetailPage() {
     return (
       <MainLayout header={<AppHeader />} sidebar={<AppSidebar />}>
         <div className="max-w-4xl mx-auto py-12">
-          <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-6 text-center">
-            <AlertCircle className="h-12 w-12 text-red-600 dark:text-red-400 mx-auto mb-4" />
+          <div className="bg-state-error-50 dark:bg-state-error-900/20 border border-red-200 dark:border-red-800 rounded-lg p-6 text-center">
+            <AlertCircle className="h-12 w-12 text-state-error-600 dark:text-state-error-400 mx-auto mb-4" />
             <h2 className="text-xl font-semibold text-red-900 dark:text-red-100 mb-2">
               {t("error_loading")}
             </h2>
-            <p className="text-red-700 dark:text-red-300 mb-4">
+            <p className="text-state-error-700 dark:text-state-error-300 mb-4">
               {error?.message || t("request_not_found")}
             </p>
             <button
               onClick={() => router.push("/aprobaciones")}
-              className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700"
+              className="px-4 py-2 bg-state-error-600 text-white rounded-lg hover:bg-state-error-700"
             >
               {t("back_to_list")}
             </button>
@@ -172,15 +172,15 @@ export default function ApprovalDetailPage() {
         <div className="flex items-center gap-4">
           <button
             onClick={() => router.back()}
-            className="p-2 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg"
+            className="p-2 hover:bg-[var(--color-bg-tertiary)] dark:hover:bg-[var(--color-bg-primary)] rounded-lg"
           >
             <ArrowLeft className="h-5 w-5" />
           </button>
           <div className="flex-1">
-            <h1 className="text-3xl font-bold text-gray-900 dark:text-gray-100">
+            <h1 className="text-3xl font-bold text-[var(--color-text-primary)] dark:text-[var(--color-text-primary)]">
               {t("detail_title")}
             </h1>
-            <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
+            <p className="text-sm text-[var(--color-text-secondary)] dark:text-[var(--color-text-tertiary)] mt-1">
               ID: {request.id}
             </p>
           </div>
@@ -199,25 +199,25 @@ export default function ApprovalDetailPage() {
         </div>
 
         {/* Main Info Card */}
-        <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-6">
-          <h2 className="text-xl font-semibold text-gray-900 dark:text-gray-100 mb-4">
+        <div className="bg-[var(--color-bg-primary)] dark:bg-[var(--color-bg-secondary)] rounded-lg border border-[var(--color-border-primary)] dark:border-[var(--color-border-primary)] p-6">
+          <h2 className="text-xl font-semibold text-[var(--color-text-primary)] dark:text-[var(--color-text-primary)] mb-4">
             {t("request_information")}
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {/* Solicitante */}
             <div className="flex gap-3">
-              <User className="h-5 w-5 text-gray-400 mt-1" />
+              <User className="h-5 w-5 text-[var(--color-text-tertiary)] mt-1" />
               <div>
-                <p className="text-sm text-gray-600 dark:text-gray-400">
+                <p className="text-sm text-[var(--color-text-secondary)] dark:text-[var(--color-text-tertiary)]">
                   {t("requester")}
                 </p>
-                <p className="font-medium text-gray-900 dark:text-gray-100">
+                <p className="font-medium text-[var(--color-text-primary)] dark:text-[var(--color-text-primary)]">
                   {request.userName}
                 </p>
-                <p className="text-sm text-gray-600 dark:text-gray-400">
+                <p className="text-sm text-[var(--color-text-secondary)] dark:text-[var(--color-text-tertiary)]">
                   {request.userEmail}
                 </p>
-                <p className="text-sm text-gray-500 dark:text-gray-500">
+                <p className="text-sm text-[var(--color-text-tertiary)] dark:text-[var(--color-text-tertiary)]">
                   {request.userRole}
                 </p>
               </div>
@@ -225,15 +225,15 @@ export default function ApprovalDetailPage() {
 
             {/* Recurso */}
             <div className="flex gap-3">
-              <MapPin className="h-5 w-5 text-gray-400 mt-1" />
+              <MapPin className="h-5 w-5 text-[var(--color-text-tertiary)] mt-1" />
               <div>
-                <p className="text-sm text-gray-600 dark:text-gray-400">
+                <p className="text-sm text-[var(--color-text-secondary)] dark:text-[var(--color-text-tertiary)]">
                   {t("resource")}
                 </p>
-                <p className="font-medium text-gray-900 dark:text-gray-100">
+                <p className="font-medium text-[var(--color-text-primary)] dark:text-[var(--color-text-primary)]">
                   {request.resourceName}
                 </p>
-                <p className="text-sm text-gray-600 dark:text-gray-400">
+                <p className="text-sm text-[var(--color-text-secondary)] dark:text-[var(--color-text-tertiary)]">
                   {request.resourceType} - {request.categoryName}
                 </p>
               </div>
@@ -241,15 +241,15 @@ export default function ApprovalDetailPage() {
 
             {/* Fecha y Hora */}
             <div className="flex gap-3">
-              <Calendar className="h-5 w-5 text-gray-400 mt-1" />
+              <Calendar className="h-5 w-5 text-[var(--color-text-tertiary)] mt-1" />
               <div>
-                <p className="text-sm text-gray-600 dark:text-gray-400">
+                <p className="text-sm text-[var(--color-text-secondary)] dark:text-[var(--color-text-tertiary)]">
                   {t("schedule")}
                 </p>
-                <p className="font-medium text-gray-900 dark:text-gray-100">
+                <p className="font-medium text-[var(--color-text-primary)] dark:text-[var(--color-text-primary)]">
                   {new Date(request.startDate).toLocaleDateString()}
                 </p>
-                <p className="text-sm text-gray-600 dark:text-gray-400">
+                <p className="text-sm text-[var(--color-text-secondary)] dark:text-[var(--color-text-tertiary)]">
                   {new Date(request.startDate).toLocaleTimeString()} -{" "}
                   {new Date(request.endDate).toLocaleTimeString()}
                 </p>
@@ -258,12 +258,12 @@ export default function ApprovalDetailPage() {
 
             {/* Asistentes */}
             <div className="flex gap-3">
-              <Users className="h-5 w-5 text-gray-400 mt-1" />
+              <Users className="h-5 w-5 text-[var(--color-text-tertiary)] mt-1" />
               <div>
-                <p className="text-sm text-gray-600 dark:text-gray-400">
+                <p className="text-sm text-[var(--color-text-secondary)] dark:text-[var(--color-text-tertiary)]">
                   {t("attendees")}
                 </p>
-                <p className="font-medium text-gray-900 dark:text-gray-100">
+                <p className="font-medium text-[var(--color-text-primary)] dark:text-[var(--color-text-primary)]">
                   {request.attendees || 0} {t("people")}
                 </p>
               </div>
@@ -272,14 +272,14 @@ export default function ApprovalDetailPage() {
 
           {/* Propósito */}
           {request.purpose && (
-            <div className="mt-6 pt-6 border-t border-gray-200 dark:border-gray-700">
+            <div className="mt-6 pt-6 border-t border-[var(--color-border-primary)] dark:border-[var(--color-border-primary)]">
               <div className="flex gap-3">
-                <FileText className="h-5 w-5 text-gray-400 mt-1" />
+                <FileText className="h-5 w-5 text-[var(--color-text-tertiary)] mt-1" />
                 <div className="flex-1">
-                  <p className="text-sm text-gray-600 dark:text-gray-400 mb-2">
+                  <p className="text-sm text-[var(--color-text-secondary)] dark:text-[var(--color-text-tertiary)] mb-2">
                     {t("purpose")}
                   </p>
-                  <p className="text-gray-900 dark:text-gray-100">
+                  <p className="text-[var(--color-text-primary)] dark:text-[var(--color-text-primary)]">
                     {request.purpose}
                   </p>
                 </div>
@@ -290,8 +290,8 @@ export default function ApprovalDetailPage() {
 
         {/* Timeline / History */}
         {request.history && request.history.length > 0 && (
-          <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-6">
-            <h2 className="text-xl font-semibold text-gray-900 dark:text-gray-100 mb-4">
+          <div className="bg-[var(--color-bg-primary)] dark:bg-[var(--color-bg-secondary)] rounded-lg border border-[var(--color-border-primary)] dark:border-[var(--color-border-primary)] p-6">
+            <h2 className="text-xl font-semibold text-[var(--color-text-primary)] dark:text-[var(--color-text-primary)] mb-4">
               {t("history")}
             </h2>
             <div className="space-y-4">
@@ -301,34 +301,34 @@ export default function ApprovalDetailPage() {
                     <div
                       className={`p-2 rounded-full ${
                         entry.action === "APPROVE"
-                          ? "bg-green-100 dark:bg-green-900/20"
+                          ? "bg-state-success-100 dark:bg-state-success-900/20"
                           : entry.action === "REJECT"
-                            ? "bg-red-100 dark:bg-red-900/20"
-                            : "bg-blue-100 dark:bg-blue-900/20"
+                            ? "bg-state-error-100 dark:bg-state-error-900/20"
+                            : "bg-brand-primary-100 dark:bg-brand-primary-900/20"
                       }`}
                     >
                       {entry.action === "APPROVE" ? (
-                        <CheckCircle className="h-4 w-4 text-green-600 dark:text-green-400" />
+                        <CheckCircle className="h-4 w-4 text-state-success-600 dark:text-state-success-400" />
                       ) : entry.action === "REJECT" ? (
-                        <XCircle className="h-4 w-4 text-red-600 dark:text-red-400" />
+                        <XCircle className="h-4 w-4 text-state-error-600 dark:text-state-error-400" />
                       ) : (
-                        <Clock className="h-4 w-4 text-blue-600 dark:text-blue-400" />
+                        <Clock className="h-4 w-4 text-brand-primary-600 dark:text-brand-primary-400" />
                       )}
                     </div>
                     {index < request.history!.length - 1 && (
-                      <div className="w-0.5 h-full bg-gray-200 dark:bg-gray-700 my-1" />
+                      <div className="w-0.5 h-full bg-[var(--color-bg-muted)] dark:bg-[var(--color-bg-tertiary)] my-1" />
                     )}
                   </div>
                   <div className="flex-1 pb-4">
-                    <p className="font-medium text-gray-900 dark:text-gray-100">
+                    <p className="font-medium text-[var(--color-text-primary)] dark:text-[var(--color-text-primary)]">
                       {entry.action} - {entry.level}
                     </p>
-                    <p className="text-sm text-gray-600 dark:text-gray-400">
+                    <p className="text-sm text-[var(--color-text-secondary)] dark:text-[var(--color-text-tertiary)]">
                       {entry.performerName} •{" "}
                       {new Date(entry.timestamp).toLocaleString()}
                     </p>
                     {entry.comments && (
-                      <p className="mt-2 text-sm text-gray-700 dark:text-gray-300 bg-gray-50 dark:bg-gray-900/50 p-3 rounded">
+                      <p className="mt-2 text-sm text-[var(--color-text-secondary)] dark:text-[var(--color-text-secondary)] bg-[var(--color-bg-secondary)] dark:bg-[var(--color-bg-primary)]/50 p-3 rounded">
                         {entry.comments}
                       </p>
                     )}
@@ -341,15 +341,15 @@ export default function ApprovalDetailPage() {
 
         {/* Actions */}
         {request.status === "PENDING" && (
-          <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-6">
-            <h2 className="text-xl font-semibold text-gray-900 dark:text-gray-100 mb-4">
+          <div className="bg-[var(--color-bg-primary)] dark:bg-[var(--color-bg-secondary)] rounded-lg border border-[var(--color-border-primary)] dark:border-[var(--color-border-primary)] p-6">
+            <h2 className="text-xl font-semibold text-[var(--color-text-primary)] dark:text-[var(--color-text-primary)] mb-4">
               {t("actions")}
             </h2>
             <div className="flex gap-4">
               <button
                 onClick={() => setShowApproveModal(true)}
                 disabled={isActionLoading}
-                className="flex-1 px-6 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed font-medium"
+                className="flex-1 px-6 py-3 bg-green-600 text-white rounded-lg hover:bg-state-success-700 disabled:opacity-50 disabled:cursor-not-allowed font-medium"
               >
                 <CheckCircle className="h-5 w-5 inline mr-2" />
                 {t("approve")}
@@ -357,7 +357,7 @@ export default function ApprovalDetailPage() {
               <button
                 onClick={() => setShowRejectModal(true)}
                 disabled={isActionLoading}
-                className="flex-1 px-6 py-3 bg-red-600 text-white rounded-lg hover:bg-red-700 disabled:opacity-50 disabled:cursor-not-allowed font-medium"
+                className="flex-1 px-6 py-3 bg-state-error-600 text-white rounded-lg hover:bg-state-error-700 disabled:opacity-50 disabled:cursor-not-allowed font-medium"
               >
                 <XCircle className="h-5 w-5 inline mr-2" />
                 {t("reject")}
@@ -365,7 +365,7 @@ export default function ApprovalDetailPage() {
               <button
                 onClick={handleCancel}
                 disabled={isActionLoading}
-                className="px-6 py-3 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed font-medium"
+                className="px-6 py-3 border border-[var(--color-border-primary)] dark:border-[var(--color-border-primary)] text-[var(--color-text-secondary)] dark:text-[var(--color-text-secondary)] rounded-lg hover:bg-[var(--color-bg-secondary)] dark:hover:bg-[var(--color-bg-tertiary)] disabled:opacity-50 disabled:cursor-not-allowed font-medium"
               >
                 {t("cancel_request")}
               </button>
@@ -376,25 +376,25 @@ export default function ApprovalDetailPage() {
         {/* Approve Modal */}
         {showApproveModal && (
           <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-            <div className="bg-white dark:bg-gray-800 rounded-lg max-w-md w-full p-6">
-              <h3 className="text-xl font-semibold text-gray-900 dark:text-gray-100 mb-4">
+            <div className="bg-[var(--color-bg-primary)] dark:bg-[var(--color-bg-secondary)] rounded-lg max-w-md w-full p-6">
+              <h3 className="text-xl font-semibold text-[var(--color-text-primary)] dark:text-[var(--color-text-primary)] mb-4">
                 {t("approve_confirmation")}
               </h3>
-              <p className="text-gray-600 dark:text-gray-400 mb-4">
+              <p className="text-[var(--color-text-secondary)] dark:text-[var(--color-text-tertiary)] mb-4">
                 {t("approve_confirmation_text")}
               </p>
               <textarea
                 value={comment}
                 onChange={(e) => setComment(e.target.value)}
                 placeholder={t("comment_optional")}
-                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 mb-4"
+                className="w-full px-3 py-2 border border-[var(--color-border-primary)] dark:border-[var(--color-border-primary)] rounded-lg bg-[var(--color-bg-primary)] dark:bg-[var(--color-bg-primary)] text-[var(--color-text-primary)] dark:text-[var(--color-text-primary)] mb-4"
                 rows={3}
               />
               <div className="flex gap-3">
                 <button
                   onClick={handleApprove}
                   disabled={isActionLoading}
-                  className="flex-1 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:opacity-50"
+                  className="flex-1 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-state-success-700 disabled:opacity-50"
                 >
                   {t("confirm")}
                 </button>
@@ -403,7 +403,7 @@ export default function ApprovalDetailPage() {
                     setShowApproveModal(false);
                     setComment("");
                   }}
-                  className="flex-1 px-4 py-2 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700"
+                  className="flex-1 px-4 py-2 border border-[var(--color-border-primary)] dark:border-[var(--color-border-primary)] text-[var(--color-text-secondary)] dark:text-[var(--color-text-secondary)] rounded-lg hover:bg-[var(--color-bg-secondary)] dark:hover:bg-[var(--color-bg-tertiary)]"
                 >
                   {t("cancel")}
                 </button>
@@ -415,18 +415,18 @@ export default function ApprovalDetailPage() {
         {/* Reject Modal */}
         {showRejectModal && (
           <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-            <div className="bg-white dark:bg-gray-800 rounded-lg max-w-md w-full p-6">
-              <h3 className="text-xl font-semibold text-gray-900 dark:text-gray-100 mb-4">
+            <div className="bg-[var(--color-bg-primary)] dark:bg-[var(--color-bg-secondary)] rounded-lg max-w-md w-full p-6">
+              <h3 className="text-xl font-semibold text-[var(--color-text-primary)] dark:text-[var(--color-text-primary)] mb-4">
                 {t("reject_confirmation")}
               </h3>
-              <p className="text-gray-600 dark:text-gray-400 mb-4">
+              <p className="text-[var(--color-text-secondary)] dark:text-[var(--color-text-tertiary)] mb-4">
                 {t("reject_confirmation_text")}
               </p>
               <textarea
                 value={comment}
                 onChange={(e) => setComment(e.target.value)}
                 placeholder={t("reject_reason_required")}
-                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 mb-4"
+                className="w-full px-3 py-2 border border-[var(--color-border-primary)] dark:border-[var(--color-border-primary)] rounded-lg bg-[var(--color-bg-primary)] dark:bg-[var(--color-bg-primary)] text-[var(--color-text-primary)] dark:text-[var(--color-text-primary)] mb-4"
                 rows={3}
                 required
               />
@@ -434,7 +434,7 @@ export default function ApprovalDetailPage() {
                 <button
                   onClick={handleReject}
                   disabled={isActionLoading || !comment.trim()}
-                  className="flex-1 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 disabled:opacity-50"
+                  className="flex-1 px-4 py-2 bg-state-error-600 text-white rounded-lg hover:bg-state-error-700 disabled:opacity-50"
                 >
                   {t("confirm")}
                 </button>
@@ -443,7 +443,7 @@ export default function ApprovalDetailPage() {
                     setShowRejectModal(false);
                     setComment("");
                   }}
-                  className="flex-1 px-4 py-2 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700"
+                  className="flex-1 px-4 py-2 border border-[var(--color-border-primary)] dark:border-[var(--color-border-primary)] text-[var(--color-text-secondary)] dark:text-[var(--color-text-secondary)] rounded-lg hover:bg-[var(--color-bg-secondary)] dark:hover:bg-[var(--color-bg-tertiary)]"
                 >
                   {t("cancel")}
                 </button>

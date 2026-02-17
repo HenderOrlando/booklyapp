@@ -260,7 +260,7 @@ export default function CalendarioPage() {
         <div className="flex items-center justify-between">
           <div>
             <h2 className="text-3xl font-bold text-white">{t("title")}</h2>
-            <p className="text-gray-400 mt-1">{t("description")}</p>
+            <p className="text-[var(--color-text-tertiary)] mt-1">{t("description")}</p>
           </div>
           <Button onClick={() => handleOpenModal()}>
             <svg
@@ -281,10 +281,10 @@ export default function CalendarioPage() {
         </div>
 
         {/* Descripción */}
-        <div className="bg-blue-900/20 border border-blue-800 rounded-lg p-4">
+        <div className="bg-brand-primary-900/20 border border-blue-800 rounded-lg p-4">
           <div className="flex items-start gap-3">
             <svg
-              className="w-6 h-6 text-blue-400 flex-shrink-0 mt-0.5"
+              className="w-6 h-6 text-brand-primary-400 flex-shrink-0 mt-0.5"
               fill="none"
               stroke="currentColor"
               viewBox="0 0 24 24"
@@ -297,10 +297,10 @@ export default function CalendarioPage() {
               />
             </svg>
             <div>
-              <h3 className="font-semibold text-blue-300 mb-1">
+              <h3 className="font-semibold text-brand-primary-300 mb-1">
                 {t("view_title")}
               </h3>
-              <p className="text-sm text-gray-300">{t("view_desc")}</p>
+              <p className="text-sm text-[var(--color-text-secondary)]">{t("view_desc")}</p>
             </div>
           </div>
         </div>
@@ -329,7 +329,7 @@ export default function CalendarioPage() {
           {/* Botón toggle del panel */}
           <button
             onClick={() => setIsPanelOpen(!isPanelOpen)}
-            className="absolute left-0 top-4 z-10 bg-gray-800 hover:bg-gray-700 text-white p-2 rounded-r-lg border-l-0 border border-gray-700 transition-all shadow-lg"
+            className="absolute left-0 top-4 z-10 bg-[var(--color-bg-primary)] hover:bg-[var(--color-bg-tertiary)] text-white p-2 rounded-r-lg border-l-0 border border-gray-700 transition-all shadow-lg"
             style={{ left: isPanelOpen ? "320px" : "0px" }}
             title={isPanelOpen ? t("panel.hide") : t("panel.show")}
           >
@@ -382,47 +382,47 @@ export default function CalendarioPage() {
         />
 
         {/* Leyenda de colores - Actualizada para coincidir con calendario */}
-        <div className="bg-gray-800 rounded-lg p-4">
+        <div className="bg-[var(--color-bg-primary)] rounded-lg p-4">
           <h3 className="font-semibold text-white mb-3">{t("legend")}</h3>
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3">
             <div className="flex items-center gap-2">
-              <div className="w-4 h-4 rounded bg-yellow-500"></div>
-              <span className="text-sm text-gray-300">
+              <div className="w-4 h-4 rounded bg-state-warning-500"></div>
+              <span className="text-sm text-[var(--color-text-secondary)]">
                 {tReservations("statuses.PENDING")}
               </span>
             </div>
             <div className="flex items-center gap-2">
-              <div className="w-4 h-4 rounded bg-blue-500"></div>
-              <span className="text-sm text-gray-300">
+              <div className="w-4 h-4 rounded bg-brand-primary-500"></div>
+              <span className="text-sm text-[var(--color-text-secondary)]">
                 {tReservations("statuses.CONFIRMED")}
               </span>
             </div>
             <div className="flex items-center gap-2">
-              <div className="w-4 h-4 rounded bg-green-500"></div>
-              <span className="text-sm text-gray-300">
+              <div className="w-4 h-4 rounded bg-state-success-500"></div>
+              <span className="text-sm text-[var(--color-text-secondary)]">
                 {tReservations("statuses.IN_PROGRESS")}
               </span>
             </div>
             <div className="flex items-center gap-2">
-              <div className="w-4 h-4 rounded bg-gray-500"></div>
-              <span className="text-sm text-gray-300">
+              <div className="w-4 h-4 rounded bg-[var(--color-bg-secondary)]0"></div>
+              <span className="text-sm text-[var(--color-text-secondary)]">
                 {tReservations("statuses.COMPLETED")}
               </span>
             </div>
             <div className="flex items-center gap-2">
-              <div className="w-4 h-4 rounded bg-red-500"></div>
-              <span className="text-sm text-gray-300">
+              <div className="w-4 h-4 rounded bg-state-error-500"></div>
+              <span className="text-sm text-[var(--color-text-secondary)]">
                 {tReservations("statuses.CANCELLED")}
               </span>
             </div>
             <div className="flex items-center gap-2">
-              <div className="w-4 h-4 rounded bg-red-700"></div>
-              <span className="text-sm text-gray-300">
+              <div className="w-4 h-4 rounded bg-state-error-700"></div>
+              <span className="text-sm text-[var(--color-text-secondary)]">
                 {tReservations("statuses.REJECTED")}
               </span>
             </div>
           </div>
-          <p className="text-xs text-gray-500 mt-3">{t("tip")}</p>
+          <p className="text-xs text-[var(--color-text-tertiary)] mt-3">{t("tip")}</p>
         </div>
       </div>
     </MainLayout>

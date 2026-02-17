@@ -1,0 +1,20 @@
+{
+  "title": "Waitlist",
+  "description": "Waitlist management for high-demand resources",
+  "position": "Position",
+  "resource": "Resource",
+  "user": "User",
+  "requested_date": "Requested date",
+  "status": "Status",
+  "active": "Active",
+  "notified": "Notified",
+  "expired": "Expired",
+  "fulfilled": "Fulfilled",
+  "no_entries": "No waitlist entries",
+  "remove": "Remove from list",
+  "notify": "Notify availability",
+  "priority": "Priority",
+  "high": "High",
+  "medium": "Medium",
+  "low": "Low"
+}

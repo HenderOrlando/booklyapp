@@ -1,0 +1,20 @@
+{
+  "title": "Mantenimientos",
+  "description": "Gestión de mantenimientos programados de recursos",
+  "schedule": "Programar mantenimiento",
+  "resource": "Recurso",
+  "type": "Tipo",
+  "start_date": "Fecha inicio",
+  "end_date": "Fecha fin",
+  "status": "Estado",
+  "scheduled": "Programado",
+  "in_progress": "En progreso",
+  "completed": "Completado",
+  "cancelled": "Cancelado",
+  "preventive": "Preventivo",
+  "corrective": "Correctivo",
+  "notes": "Notas",
+  "no_records": "No hay mantenimientos registrados",
+  "complete": "Marcar completado",
+  "cancel": "Cancelar mantenimiento"
+}

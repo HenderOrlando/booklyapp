@@ -27,6 +27,7 @@ import {
 } from "@/hooks/mutations";
 import type { WaitlistEntry, WaitlistStats } from "@/types/entities/waitlist";
 import { useQuery } from "@tanstack/react-query";
+import { useTranslations } from "next-intl";
 import * as React from "react";
 
 /**
@@ -111,6 +112,7 @@ const getMockWaitlistData = () => ({
 });
 
 export default function ListaEsperaPage() {
+  const t = useTranslations("waitlist");
   const [selectedResourceId, setSelectedResourceId] =
     React.useState<string>("all");
 
@@ -218,7 +220,7 @@ export default function ListaEsperaPage() {
               <h3 className="font-semibold text-purple-300 mb-1">
                 Gestión de Lista de Espera
               </h3>
-              <p className="text-sm text-gray-300">
+              <p className="text-sm text-[var(--color-text-secondary)]">
                 Administra las solicitudes en lista de espera. Los usuarios son
                 ordenados por prioridad y tiempo de solicitud. Cuando un recurso
                 se libera, puedes notificar y asignar automáticamente al primero
@@ -239,7 +241,7 @@ export default function ListaEsperaPage() {
           <CardContent>
             <div className="flex flex-wrap gap-4 items-end">
               <div className="flex-1 min-w-[250px]">
-                <label className="block text-sm font-medium text-gray-400 mb-2">
+                <label className="block text-sm font-medium text-[var(--color-text-tertiary)] mb-2">
                   Recurso
                 </label>
                 <Select
@@ -282,9 +284,9 @@ export default function ListaEsperaPage() {
             <CardTitle>¿Cómo funciona la lista de espera?</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="space-y-3 text-sm text-gray-300">
+            <div className="space-y-3 text-sm text-[var(--color-text-secondary)]">
               <div className="flex items-start gap-2">
-                <span className="text-blue-400 font-bold">1.</span>
+                <span className="text-brand-primary-400 font-bold">1.</span>
                 <p>
                   <strong>Usuario solicita recurso ocupado:</strong> Se agrega
                   automáticamente a la lista de espera con su posición en la
@@ -292,7 +294,7 @@ export default function ListaEsperaPage() {
                 </p>
               </div>
               <div className="flex items-start gap-2">
-                <span className="text-blue-400 font-bold">2.</span>
+                <span className="text-brand-primary-400 font-bold">2.</span>
                 <p>
                   <strong>Ordenamiento por prioridad:</strong> URGENT {">"} HIGH{" "}
                   {">"} NORMAL {">"} LOW, con el tiempo de solicitud como
@@ -300,14 +302,14 @@ export default function ListaEsperaPage() {
                 </p>
               </div>
               <div className="flex items-start gap-2">
-                <span className="text-blue-400 font-bold">3.</span>
+                <span className="text-brand-primary-400 font-bold">3.</span>
                 <p>
                   <strong>Recurso se libera:</strong> El sistema notifica
                   automáticamente al primero en la cola (#1).
                 </p>
               </div>
               <div className="flex items-start gap-2">
-                <span className="text-blue-400 font-bold">4.</span>
+                <span className="text-brand-primary-400 font-bold">4.</span>
                 <p>
                   <strong>Usuario acepta/rechaza:</strong> Si acepta, se crea la
                   reserva. Si rechaza o no responde en 24h, se notifica al

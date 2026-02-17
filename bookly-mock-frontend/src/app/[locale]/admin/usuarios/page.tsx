@@ -296,7 +296,7 @@ export default function UsersAdminPage() {
         <div className="flex items-center justify-between">
           <div>
             <h1 className="text-3xl font-bold text-white">{t("page_title")}</h1>
-            <p className="text-gray-400 mt-1">{t("page_description")}</p>
+            <p className="text-[var(--color-text-tertiary)] mt-1">{t("page_description")}</p>
           </div>
           <Button onClick={handleOpenCreateModal} disabled={loading}>
             + {t("create_user")}

@@ -6,15 +6,19 @@ import { AppSidebar } from "@/components/organisms/AppSidebar/AppSidebar";
 import { ExportPanel } from "@/components/organisms/ExportPanel";
 import { ResourceUtilizationChart } from "@/components/organisms/ResourceUtilizationChart";
 import { MainLayout } from "@/components/templates/MainLayout";
+import { useReportByResource } from "@/hooks/useReportData";
 import { useReportExport } from "@/hooks/useReportExport";
 import { useReportFilters } from "@/hooks/useReportFilters";
 import { mockResourceUtilization } from "@/infrastructure/mock/data";
-import * as React from "react";
+import { useTranslations } from "next-intl";
 
 export default function ReportesRecursosPage() {
+  const t = useTranslations("reports");
   const { filters, setFilters } = useReportFilters();
   const { exportReport } = useReportExport();
-  const [resourceData] = React.useState(mockResourceUtilization);
+  const { data: serverData } = useReportByResource();
+  const resourceData =
+    serverData && serverData.length > 0 ? serverData : mockResourceUtilization;
 
   const handleExport = (format: "csv" | "excel" | "pdf", options: any) => {
     exportReport({ format, data: resourceData, filename: "recursos" });
@@ -25,10 +29,10 @@ export default function ReportesRecursosPage() {
       <div className="space-y-6">
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-3xl font-bold text-gray-900 dark:text-gray-100">
+            <h1 className="text-3xl font-bold text-[var(--color-text-primary)] dark:text-[var(--color-text-primary)]">
               Reportes por Recurso
             </h1>
-            <p className="text-gray-600 dark:text-gray-400 mt-1">
+            <p className="text-[var(--color-text-secondary)] dark:text-[var(--color-text-tertiary)] mt-1">
               Análisis detallado de utilización y ocupación de recursos
             </p>
           </div>

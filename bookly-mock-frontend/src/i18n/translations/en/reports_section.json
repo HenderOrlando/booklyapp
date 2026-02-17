@@ -2,5 +2,8 @@
   "dashboard": "Dashboard",
   "resources": "By Resource",
   "users": "By User",
-  "advanced": "Advanced Analysis"
+  "advanced": "Advanced Analysis",
+  "unsatisfied_demand": "Unsatisfied Demand",
+  "compliance": "Compliance",
+  "conflicts": "Conflicts"
 }

@@ -14,6 +14,7 @@ import {
 import { useToast } from "@/hooks/useToast";
 import type { CheckInOut } from "@/types/entities/checkInOut";
 import { AlertCircle, Calendar, CheckCircle, Clock } from "lucide-react";
+import { useTranslations } from "next-intl";
 import * as React from "react";
 
 /**
@@ -25,6 +26,7 @@ import * as React from "react";
  */
 
 export default function CheckInPage() {
+  const t = useTranslations("check_in");
   const { showSuccess, showError } = useToast();
   const [selectedReservation, setSelectedReservation] = React.useState<
     string | null
@@ -141,14 +143,14 @@ export default function CheckInPage() {
         {/* Header */}
         <div>
           <div className="flex items-center gap-3 mb-2">
-            <div className="p-2 bg-blue-100 dark:bg-blue-900/20 rounded-lg">
-              <CheckCircle className="h-6 w-6 text-blue-600 dark:text-blue-400" />
+            <div className="p-2 bg-brand-primary-100 dark:bg-brand-primary-900/20 rounded-lg">
+              <CheckCircle className="h-6 w-6 text-brand-primary-600 dark:text-brand-primary-400" />
             </div>
             <div>
-              <h1 className="text-3xl font-bold text-gray-900 dark:text-gray-100">
+              <h1 className="text-3xl font-bold text-[var(--color-text-primary)] dark:text-[var(--color-text-primary)]">
                 Check-in / Check-out
               </h1>
-              <p className="text-gray-600 dark:text-gray-400 mt-1">
+              <p className="text-[var(--color-text-secondary)] dark:text-[var(--color-text-tertiary)] mt-1">
                 Gestiona el acceso a tus reservas
               </p>
             </div>
@@ -156,11 +158,11 @@ export default function CheckInPage() {
         </div>
 
         {/* Información */}
-        <div className="bg-blue-50 dark:bg-blue-900/20 rounded-lg p-4 text-sm">
+        <div className="bg-brand-primary-50 dark:bg-brand-primary-900/20 rounded-lg p-4 text-sm">
           <h3 className="font-semibold text-blue-900 dark:text-blue-200 mb-2">
             ℹ️ Información Importante
           </h3>
-          <ul className="space-y-1 text-blue-800 dark:text-blue-300">
+          <ul className="space-y-1 text-brand-primary-800 dark:text-brand-primary-300">
             <li>
               • El check-in está disponible 15 minutos antes del horario de
               inicio
@@ -183,14 +185,14 @@ export default function CheckInPage() {
               <div>
                 <div className="flex items-center gap-2 mb-2">
                   <Badge variant="success">Activa</Badge>
-                  <span className="text-sm text-gray-600 dark:text-gray-400">
+                  <span className="text-sm text-[var(--color-text-secondary)] dark:text-[var(--color-text-tertiary)]">
                     Check-in realizado
                   </span>
                 </div>
-                <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100">
+                <h2 className="text-2xl font-bold text-[var(--color-text-primary)] dark:text-[var(--color-text-primary)]">
                   {activeReservation.resourceName}
                 </h2>
-                <p className="text-gray-600 dark:text-gray-400">
+                <p className="text-[var(--color-text-secondary)] dark:text-[var(--color-text-tertiary)]">
                   {activeReservation.resourceType}
                 </p>
               </div>
@@ -199,8 +201,8 @@ export default function CheckInPage() {
 
             <div className="grid grid-cols-2 gap-4 mb-4">
               <div className="flex items-center gap-2 text-sm">
-                <Clock className="h-4 w-4 text-gray-500" />
-                <span className="text-gray-700 dark:text-gray-300">
+                <Clock className="h-4 w-4 text-[var(--color-text-tertiary)]" />
+                <span className="text-[var(--color-text-secondary)] dark:text-[var(--color-text-secondary)]">
                   {new Date(activeReservation.startTime).toLocaleTimeString(
                     "es-ES",
                     {
@@ -219,8 +221,8 @@ export default function CheckInPage() {
                 </span>
               </div>
               <div className="flex items-center gap-2 text-sm">
-                <Calendar className="h-4 w-4 text-gray-500" />
-                <span className="text-gray-700 dark:text-gray-300">
+                <Calendar className="h-4 w-4 text-[var(--color-text-tertiary)]" />
+                <span className="text-[var(--color-text-secondary)] dark:text-[var(--color-text-secondary)]">
                   {new Date(activeReservation.startTime).toLocaleDateString(
                     "es-ES",
                     {
@@ -259,7 +261,7 @@ export default function CheckInPage() {
 
         {/* Próximas reservas */}
         <div>
-          <h2 className="text-xl font-semibold text-gray-900 dark:text-gray-100 mb-4">
+          <h2 className="text-xl font-semibold text-[var(--color-text-primary)] dark:text-[var(--color-text-primary)] mb-4">
             Próximas Reservas
           </h2>
 
@@ -281,14 +283,14 @@ export default function CheckInPage() {
                 return (
                   <div
                     key={reservation.reservationId}
-                    className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-4 hover:shadow-md transition-shadow"
+                    className="bg-[var(--color-bg-primary)] dark:bg-[var(--color-bg-secondary)] rounded-lg border border-[var(--color-border-primary)] dark:border-[var(--color-border-primary)] p-4 hover:shadow-md transition-shadow"
                   >
                     <div className="flex items-start justify-between mb-3">
                       <div className="flex-1">
-                        <h3 className="font-semibold text-gray-900 dark:text-gray-100">
+                        <h3 className="font-semibold text-[var(--color-text-primary)] dark:text-[var(--color-text-primary)]">
                           {reservation.resourceName}
                         </h3>
-                        <p className="text-sm text-gray-600 dark:text-gray-400">
+                        <p className="text-sm text-[var(--color-text-secondary)] dark:text-[var(--color-text-tertiary)]">
                           {reservation.resourceType}
                         </p>
                       </div>
@@ -302,8 +304,8 @@ export default function CheckInPage() {
                     </div>
 
                     <div className="space-y-2 text-sm mb-4">
-                      <div className="flex items-center gap-2 text-gray-700 dark:text-gray-300">
-                        <Clock className="h-4 w-4 text-gray-500" />
+                      <div className="flex items-center gap-2 text-[var(--color-text-secondary)] dark:text-[var(--color-text-secondary)]">
+                        <Clock className="h-4 w-4 text-[var(--color-text-tertiary)]" />
                         {new Date(reservation.startTime).toLocaleTimeString(
                           "es-ES",
                           {
@@ -320,8 +322,8 @@ export default function CheckInPage() {
                           }
                         )}
                       </div>
-                      <div className="flex items-center gap-2 text-gray-700 dark:text-gray-300">
-                        <Calendar className="h-4 w-4 text-gray-500" />
+                      <div className="flex items-center gap-2 text-[var(--color-text-secondary)] dark:text-[var(--color-text-secondary)]">
+                        <Calendar className="h-4 w-4 text-[var(--color-text-tertiary)]" />
                         {new Date(reservation.startTime).toLocaleDateString(
                           "es-ES",
                           {
@@ -360,9 +362,9 @@ export default function CheckInPage() {
               })}
             </div>
           ) : (
-            <div className="text-center py-12 bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700">
-              <AlertCircle className="h-12 w-12 text-gray-400 dark:text-gray-600 mx-auto mb-3" />
-              <p className="text-gray-600 dark:text-gray-400">
+            <div className="text-center py-12 bg-[var(--color-bg-primary)] dark:bg-[var(--color-bg-secondary)] rounded-lg border border-[var(--color-border-primary)] dark:border-[var(--color-border-primary)]">
+              <AlertCircle className="h-12 w-12 text-[var(--color-text-tertiary)] dark:text-[var(--color-text-secondary)] mx-auto mb-3" />
+              <p className="text-[var(--color-text-secondary)] dark:text-[var(--color-text-tertiary)]">
                 No tienes reservas próximas
               </p>
             </div>

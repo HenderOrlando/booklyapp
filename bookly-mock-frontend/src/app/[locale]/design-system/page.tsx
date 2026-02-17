@@ -92,31 +92,31 @@ export default function DesignSystemPage() {
       </a>
       <a
         href="/"
-        className="block px-4 py-2 rounded-md hover:bg-slate-700 text-gray-300"
+        className="block px-4 py-2 rounded-md hover:bg-slate-700 text-[var(--color-text-secondary)]"
       >
         Dashboard
       </a>
       <a
         href="/recursos"
-        className="block px-4 py-2 rounded-md hover:bg-slate-700 text-gray-300"
+        className="block px-4 py-2 rounded-md hover:bg-slate-700 text-[var(--color-text-secondary)]"
       >
         Recursos
       </a>
       <a
         href="/reservas"
-        className="block px-4 py-2 rounded-md hover:bg-slate-700 text-gray-300"
+        className="block px-4 py-2 rounded-md hover:bg-slate-700 text-[var(--color-text-secondary)]"
       >
         Reservas
       </a>
       <a
         href="/aprobaciones"
-        className="block px-4 py-2 rounded-md hover:bg-slate-700 text-gray-300"
+        className="block px-4 py-2 rounded-md hover:bg-slate-700 text-[var(--color-text-secondary)]"
       >
         Aprobaciones
       </a>
       <a
         href="/reportes"
-        className="block px-4 py-2 rounded-md hover:bg-slate-700 text-gray-300"
+        className="block px-4 py-2 rounded-md hover:bg-slate-700 text-[var(--color-text-secondary)]"
       >
         Reportes
       </a>
@@ -972,7 +972,7 @@ export default function DesignSystemPage() {
           </CardHeader>
           <CardContent>
             <div className="grid gap-4 md:grid-cols-3">
-              <div className="text-center p-4 bg-white dark:bg-slate-800 rounded-lg">
+              <div className="text-center p-4 bg-[var(--color-bg-primary)] dark:bg-slate-800 rounded-lg">
                 <div className="text-3xl font-bold text-brand-primary-500">
                   24
                 </div>
@@ -980,7 +980,7 @@ export default function DesignSystemPage() {
                   Componentes
                 </div>
               </div>
-              <div className="text-center p-4 bg-white dark:bg-slate-800 rounded-lg">
+              <div className="text-center p-4 bg-[var(--color-bg-primary)] dark:bg-slate-800 rounded-lg">
                 <div className="text-3xl font-bold text-brand-primary-500">
                   5
                 </div>
@@ -988,7 +988,7 @@ export default function DesignSystemPage() {
                   Layouts
                 </div>
               </div>
-              <div className="text-center p-4 bg-white dark:bg-slate-800 rounded-lg">
+              <div className="text-center p-4 bg-[var(--color-bg-primary)] dark:bg-slate-800 rounded-lg">
                 <div className="text-3xl font-bold text-brand-primary-500">
                   40+
                 </div>

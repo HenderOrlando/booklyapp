@@ -6,6 +6,7 @@ import { Input } from "@/components/atoms/Input";
 import { AuthLayout } from "@/components/templates/AuthLayout";
 import { httpClient } from "@/infrastructure/http";
 import Link from "next/link";
+import { useTranslations } from "next-intl";
 import * as React from "react";
 
 /**
@@ -25,6 +26,7 @@ interface ForgotPasswordResponse {
 }
 
 export default function ForgotPasswordPage() {
+  const t = useTranslations("auth");
   const [email, setEmail] = React.useState("");
   const [error, setError] = React.useState("");
   const [success, setSuccess] = React.useState(false);

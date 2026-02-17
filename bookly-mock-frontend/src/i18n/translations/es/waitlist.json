@@ -1,0 +1,20 @@
+{
+  "title": "Lista de Espera",
+  "description": "Gestión de listas de espera para recursos con alta demanda",
+  "position": "Posición",
+  "resource": "Recurso",
+  "user": "Usuario",
+  "requested_date": "Fecha solicitada",
+  "status": "Estado",
+  "active": "Activa",
+  "notified": "Notificado",
+  "expired": "Expirada",
+  "fulfilled": "Asignada",
+  "no_entries": "No hay entradas en lista de espera",
+  "remove": "Eliminar de lista",
+  "notify": "Notificar disponibilidad",
+  "priority": "Prioridad",
+  "high": "Alta",
+  "medium": "Media",
+  "low": "Baja"
+}

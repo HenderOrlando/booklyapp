@@ -236,7 +236,7 @@ export default function RecursosPage() {
       <MainLayout header={header} sidebar={sidebar}>
         <div className="flex flex-col items-center justify-center min-h-[60vh]">
           <LoadingSpinner size="lg" />
-          <p className="text-gray-400 mt-4">{t("loading")}</p>
+          <p className="text-[var(--color-text-tertiary)] mt-4">{t("loading")}</p>
         </div>
       </MainLayout>
     );

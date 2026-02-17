@@ -139,7 +139,7 @@ export default function RegisterPage() {
           <div className="grid grid-cols-2 gap-3">
             <div>
               <label className="block text-sm font-medium text-[var(--color-text-primary)] mb-1">
-                {t("first_name")} <span className="text-red-500">*</span>
+                {t("first_name")} <span className="text-state-error-500">*</span>
               </label>
               <Input
                 type="text"
@@ -154,7 +154,7 @@ export default function RegisterPage() {
 
             <div>
               <label className="block text-sm font-medium text-[var(--color-text-primary)] mb-1">
-                {t("last_name")} <span className="text-red-500">*</span>
+                {t("last_name")} <span className="text-state-error-500">*</span>
               </label>
               <Input
                 type="text"
@@ -177,7 +177,7 @@ export default function RegisterPage() {
 
           <div>
             <label className="block text-sm font-medium text-[var(--color-text-primary)] mb-1">
-              {t("email")} <span className="text-red-500">*</span>
+              {t("email")} <span className="text-state-error-500">*</span>
             </label>
             <Input
               type="email"
@@ -192,7 +192,7 @@ export default function RegisterPage() {
 
           <div>
             <label className="block text-sm font-medium text-[var(--color-text-primary)] mb-1">
-              {t("username")} <span className="text-red-500">*</span>
+              {t("username")} <span className="text-state-error-500">*</span>
             </label>
             <Input
               type="text"
@@ -208,7 +208,7 @@ export default function RegisterPage() {
           <div className="grid grid-cols-2 gap-3">
             <div>
               <label className="block text-sm font-medium text-[var(--color-text-primary)] mb-1">
-                {t("password")} <span className="text-red-500">*</span>
+                {t("password")} <span className="text-state-error-500">*</span>
               </label>
               <Input
                 type="password"
@@ -223,7 +223,7 @@ export default function RegisterPage() {
 
             <div>
               <label className="block text-sm font-medium text-[var(--color-text-primary)] mb-1">
-                {t("confirm_password")} <span className="text-red-500">*</span>
+                {t("confirm_password")} <span className="text-state-error-500">*</span>
               </label>
               <Input
                 type="password"
@@ -311,7 +311,7 @@ export default function RegisterPage() {
       {/* Información de campos obligatorios */}
       <div className="mt-6 p-3 bg-[var(--color-bg-muted)] rounded-md border border-[var(--color-border-subtle)]">
         <p className="text-xs text-[var(--color-text-secondary)]">
-          <span className="text-red-500">*</span> {t("required_fields")}
+          <span className="text-state-error-500">*</span> {t("required_fields")}
         </p>
         <p className="text-xs text-[var(--color-text-secondary)] mt-1">
           {t("password_requirement")}

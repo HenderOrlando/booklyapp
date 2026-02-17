@@ -24,6 +24,7 @@ import {
   Users,
   XCircle,
 } from "lucide-react";
+import { useTranslations } from "next-intl";
 import * as React from "react";
 
 /**
@@ -112,6 +113,7 @@ const mockReassignmentHistory: ReassignmentHistoryEntry[] = [
 ];
 
 export default function ReasignacionPage() {
+  const t = useTranslations("reservations");
   const [suggestions, setSuggestions] =
     React.useState<ReassignmentSuggestion[]>(mockSuggestions);
   const [history, setHistory] = React.useState<ReassignmentHistoryEntry[]>(

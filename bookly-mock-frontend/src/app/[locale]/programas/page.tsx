@@ -165,7 +165,7 @@ export default function ProgramasPage() {
       cell: (program: AcademicProgram) => (
         <div>
           <p className="font-medium text-white">{program.name}</p>
-          <p className="text-sm text-gray-400">{program.description}</p>
+          <p className="text-sm text-[var(--color-text-tertiary)]">{program.description}</p>
         </div>
       ),
     },
@@ -176,7 +176,7 @@ export default function ProgramasPage() {
         <div>
           <p className="text-white">{program.faculty}</p>
           {program.department && (
-            <p className="text-sm text-gray-400">{program.department}</p>
+            <p className="text-sm text-[var(--color-text-tertiary)]">{program.department}</p>
           )}
         </div>
       ),
@@ -363,7 +363,7 @@ export default function ProgramasPage() {
                         })
                       }
                       rows={3}
-                      className="w-full px-3 py-2 bg-gray-800 border border-[var(--color-border-subtle)] rounded-lg text-white"
+                      className="w-full px-3 py-2 bg-[var(--color-bg-primary)] border border-[var(--color-border-subtle)] rounded-lg text-white"
                     />
                   </div>
 
