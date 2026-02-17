@@ -1,7 +1,10 @@
+import { JWT_SECRET } from "@libs/common/constants";
 import { DatabaseModule, ReferenceDataModule } from "@libs/database";
 import { EventBusModule } from "@libs/event-bus";
+import { IdempotencyModule } from "@libs/idempotency";
 import { NotificationsModule } from "@libs/notifications";
 import { RedisModule } from "@libs/redis";
+import { AuthClientModule } from "@libs/security";
 import { Module } from "@nestjs/common";
 import { ConfigModule, ConfigService } from "@nestjs/config";
 import { CqrsModule } from "@nestjs/cqrs";
@@ -60,14 +63,25 @@ import { AvailabilityServiceClient } from "./infrastructure/clients/availability
 import { AllHandlers } from "./application/handlers";
 
 // Controllers
+import { LocationAnalyticsService } from "./application/services/location-analytics.service";
+import { MonitoringService } from "./application/services/monitoring.service";
 import {
   ApprovalFlowsController,
   ApprovalRequestsController,
   CheckInOutController,
   HealthController,
 } from "./infrastructure/controllers";
+import { DocumentController } from "./infrastructure/controllers/document.controller";
+import { LocationAnalyticsController } from "./infrastructure/controllers/location-analytics.controller";
 import { MetricsController } from "./infrastructure/controllers/metrics.controller";
+import { MonitoringController } from "./infrastructure/controllers/monitoring.controller";
+import { NotificationMetricsController } from "./infrastructure/controllers/notification-metrics.controller";
 import { ReferenceDataController } from "./infrastructure/controllers/reference-data.controller";
+import { IncidentRepository } from "./infrastructure/repositories/incident.repository";
+import {
+  Incident,
+  IncidentSchema,
+} from "./infrastructure/schemas/incident.schema";
 
 // Strategy
 import { JwtStrategy } from "./infrastructure/strategies/jwt.strategy";
@@ -105,11 +119,12 @@ import { EventBusIntegrationModule } from "./infrastructure/event-bus";
       { name: ApprovalAuditLog.name, schema: ApprovalAuditLogSchema },
       { name: CheckInOut.name, schema: CheckInOutSchema },
       { name: ReminderConfiguration.name, schema: ReminderConfigurationSchema },
+      { name: Incident.name, schema: IncidentSchema },
     ]),
     CqrsModule,
     PassportModule,
     JwtModule.register({
-      secret: process.env.JWT_SECRET || "bookly-secret-key",
+      secret: JWT_SECRET,
       signOptions: {
         expiresIn: process.env.JWT_EXPIRATION || "24h",
       },
@@ -123,6 +138,13 @@ import { EventBusIntegrationModule } from "./infrastructure/event-bus";
       }),
       inject: [ConfigService],
       serviceName: "stockpile-service",
+    }),
+    AuthClientModule.forRootAsync({
+      useFactory: (configService: ConfigService) => ({
+        authServiceUrl:
+          configService.get("AUTH_SERVICE_URL") || "http://localhost:3001",
+      }),
+      inject: [ConfigService],
     }),
     NotificationsModule.forRoot({
       brokerType: "rabbitmq",
@@ -166,6 +188,9 @@ import { EventBusIntegrationModule } from "./infrastructure/event-bus";
       inject: [ConfigService],
     }),
 
+    // Idempotency + Correlation
+    IdempotencyModule.forRoot({ keyPrefix: "stockpile" }),
+
     // Audit Decorators (event-driven audit)
     AuditDecoratorsModule,
 
@@ -176,6 +201,10 @@ import { EventBusIntegrationModule } from "./infrastructure/event-bus";
     ApprovalRequestsController,
     ApprovalFlowsController,
     CheckInOutController,
+    DocumentController,
+    LocationAnalyticsController,
+    MonitoringController,
+    NotificationMetricsController,
     ReferenceDataController,
     HealthController,
     MetricsController,
@@ -195,6 +224,10 @@ import { EventBusIntegrationModule } from "./infrastructure/event-bus";
     DigitalSignatureService,
     QRCodeService,
     GeolocationService,
+
+    // Domain Services
+    LocationAnalyticsService,
+    MonitoringService,
 
     // Clients
     AuthServiceClient,
@@ -225,6 +258,10 @@ import { EventBusIntegrationModule } from "./infrastructure/event-bus";
     {
       provide: "IApprovalAuditLogRepository",
       useClass: ApprovalAuditLogRepository,
+    },
+    {
+      provide: "IIncidentRepository",
+      useClass: IncidentRepository,
     },
 
     // Handlers (CQRS)

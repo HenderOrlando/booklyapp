@@ -67,7 +67,7 @@ export class MonitoringFiltersDto {
  * - Ver estadísticas y alertas
  */
 @ApiTags("Monitoring")
-@Controller("api/v1/monitoring")
+@Controller("monitoring")
 @UseGuards(JwtAuthGuard, RolesGuard)
 @ApiBearerAuth()
 export class MonitoringController {
