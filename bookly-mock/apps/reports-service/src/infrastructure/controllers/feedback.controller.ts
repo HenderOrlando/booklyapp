@@ -50,13 +50,13 @@ import {
  * Controlador para gestión de feedback de usuarios (RF-34)
  */
 @ApiTags("Feedback")
-@Controller("api/v1/feedback")
+@Controller("feedback")
 @UseGuards(JwtAuthGuard, PermissionsGuard)
 @ApiBearerAuth()
 export class FeedbackController {
   constructor(
     private readonly commandBus: CommandBus,
-    private readonly queryBus: QueryBus
+    private readonly queryBus: QueryBus,
   ) {}
 
   /**
@@ -83,7 +83,7 @@ export class FeedbackController {
       dto.rating,
       dto.comments,
       dto.category,
-      dto.isAnonymous
+      dto.isAnonymous,
     );
 
     return await this.commandBus.execute(command);
@@ -118,12 +118,12 @@ export class FeedbackController {
   @ApiResponse({ status: 200, description: "Lista de feedbacks del usuario" })
   async getUserFeedback(
     @Param("userId") userId: string,
-    @Query() queryDto: FeedbackQueryDto
+    @Query() queryDto: FeedbackQueryDto,
   ) {
     const query = new GetUserFeedbackQuery(
       userId,
       queryDto.page,
-      queryDto.limit
+      queryDto.limit,
     );
 
     return await this.queryBus.execute(query);
@@ -142,12 +142,12 @@ export class FeedbackController {
   @ApiResponse({ status: 200, description: "Lista de feedbacks del recurso" })
   async getResourceFeedback(
     @Param("resourceId") resourceId: string,
-    @Query() queryDto: FeedbackQueryDto
+    @Query() queryDto: FeedbackQueryDto,
   ) {
     const query = new GetResourceFeedbackQuery(
       resourceId,
       queryDto.page,
-      queryDto.limit
+      queryDto.limit,
     );
 
     return await this.queryBus.execute(query);
@@ -172,12 +172,12 @@ export class FeedbackController {
   @ApiResponse({ status: 200, description: "Lista de feedbacks por estado" })
   async getFeedbackByStatus(
     @Param("status") status: FeedbackStatus,
-    @Query() queryDto: FeedbackQueryDto
+    @Query() queryDto: FeedbackQueryDto,
   ) {
     const query = new GetFeedbackByStatusQuery(
       status,
       queryDto.page,
-      queryDto.limit
+      queryDto.limit,
     );
 
     return await this.queryBus.execute(query);
@@ -197,7 +197,7 @@ export class FeedbackController {
   async getAllFeedback(@Query() queryDto: FeedbackQueryDto) {
     const query = new GetAllFeedbackQuery(queryDto.page, queryDto.limit);
     const result = await this.queryBus.execute(query);
-    
+
     // Si el handler retorna estructura paginada
     if (result.data && result.meta) {
       return ResponseUtil.paginated(
@@ -205,10 +205,10 @@ export class FeedbackController {
         result.meta.total,
         queryDto.page || 1,
         queryDto.limit || 20,
-        'Feedback retrieved successfully'
+        "Feedback retrieved successfully",
       );
     }
-    
+
     // Fallback si retorna array directo
     const items = Array.isArray(result) ? result : [];
     return ResponseUtil.paginated(
@@ -216,7 +216,7 @@ export class FeedbackController {
       items.length,
       1,
       items.length,
-      'Feedback retrieved successfully'
+      "Feedback retrieved successfully",
     );
   }
 
@@ -233,12 +233,12 @@ export class FeedbackController {
   @ApiResponse({ status: 403, description: "Solo accesible por staff" })
   async respondToFeedback(
     @Param("id") id: string,
-    @Body() dto: RespondToFeedbackDto
+    @Body() dto: RespondToFeedbackDto,
   ) {
     const command = new RespondToFeedbackCommand(
       id,
       dto.response,
-      dto.respondedBy
+      dto.respondedBy,
     );
 
     return await this.commandBus.execute(command);
@@ -256,7 +256,7 @@ export class FeedbackController {
   @ApiResponse({ status: 404, description: "Feedback no encontrado" })
   async updateFeedbackStatus(
     @Param("id") id: string,
-    @Body() dto: UpdateFeedbackStatusDto
+    @Body() dto: UpdateFeedbackStatusDto,
   ) {
     const command = new UpdateFeedbackStatusCommand(id, dto.status);
 

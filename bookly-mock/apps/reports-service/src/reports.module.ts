@@ -1,6 +1,9 @@
+import { JWT_SECRET } from "@libs/common/constants";
 import { DatabaseModule, ReferenceDataModule } from "@libs/database";
 import { EventBusModule } from "@libs/event-bus";
+import { IdempotencyModule } from "@libs/idempotency";
 import { NotificationsModule } from "@libs/notifications";
+import { AuthClientModule } from "@libs/security";
 import { Module } from "@nestjs/common";
 import { ConfigModule, ConfigService } from "@nestjs/config";
 import { CqrsModule } from "@nestjs/cqrs";
@@ -168,10 +171,17 @@ import { JwtStrategy } from "./infrastructure/strategies/jwt.strategy";
     CqrsModule,
     PassportModule,
     JwtModule.register({
-      secret: process.env.JWT_SECRET || "bookly-secret-key",
+      secret: JWT_SECRET,
       signOptions: {
         expiresIn: process.env.JWT_EXPIRATION || "24h",
       },
+    }),
+    AuthClientModule.forRootAsync({
+      useFactory: (configService: ConfigService) => ({
+        authServiceUrl:
+          configService.get("AUTH_SERVICE_URL") || "http://localhost:3001",
+      }),
+      inject: [ConfigService],
     }),
     NotificationsModule.forRoot({
       brokerType: "rabbitmq",
@@ -185,6 +195,9 @@ import { JwtStrategy } from "./infrastructure/strategies/jwt.strategy";
       metricsEnabled: true,
       enableEventStore: false,
     }),
+
+    // Idempotency + Correlation
+    IdempotencyModule.forRoot({ keyPrefix: "reports" }),
 
     // Módulo de auditoría (escucha eventos de todos los microservicios)
     AuditModule,
