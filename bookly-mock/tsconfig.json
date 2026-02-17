@@ -43,6 +43,12 @@
       "@libs/kafka/*": ["libs/kafka/src/*"],
       "@libs/notifications": ["libs/notifications/src"],
       "@libs/notifications/*": ["libs/notifications/src/*"],
+      "@libs/security": ["libs/security/src"],
+      "@libs/security/*": ["libs/security/src/*"],
+      "@libs/idempotency": ["libs/idempotency/src"],
+      "@libs/idempotency/*": ["libs/idempotency/src/*"],
+      "@libs/storage": ["libs/storage/src"],
+      "@libs/storage/*": ["libs/storage/src/*"],
       "@reports/audit-decorators": [
         "apps/reports-service/src/libs/audit-decorators/src"
       ],
