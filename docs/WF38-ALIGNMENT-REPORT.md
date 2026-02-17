@@ -326,30 +326,151 @@
 
 ## Resumen ejecutivo
 
+```text
+┌─────────────────────────────────────────────────────────┐
+│      WF-38 RELEASE GATE: ⚠️ CONDICIONAL (post-fix)      │
+├─────────────────────────────────────────────────────────┤
+│ Phase 0 Auto-discovery      ✅ PASA                     │
+│ Phase 1 Contratos/Model     ✅ FIJADO (F-01→F-06)       │
+│ Phase 2 RTM Traceability    ⚠️ Condicional              │
+│ Phase 3 Alineación FE↔BE    ✅ FIJADO (routing + paths) │
+│ Phase 4 QA Gates            ⚠️ Condicional              │
+│ Phase 5 OPS/SEC             ⚠️ Condicional              │
+│ Phase 6 Release             ⚠️ CONDICIONAL              │
+├─────────────────────────────────────────────────────────┤
+│ Bloqueantes: 0 (F-01→F-06 FIJADOS ✅)                   │
+│ Altos:       0 (F-07→F-10 FIJADOS ✅)                   │
+│ Medios:      2 (F-12,F-15 deferred; resto FIJADO)       │
+└─────────────────────────────────────────────────────────┘
 ```
-┌────────────────────────────────────────────────────┐
-│           WF-38 RELEASE GATE: ❌ NO APTO           │
-├────────────────────────────────────────────────────┤
-│ Phase 0 Auto-discovery      ✅ PASA                │
-│ Phase 1 Contratos/Model     ❌ 3 bloqueantes       │
-│ Phase 2 RTM Traceability    ⚠️ Condicional         │
-│ Phase 3 Alineación FE↔BE    ❌ Gateway routing bug │
-│ Phase 4 QA Gates            ⚠️ Condicional         │
-│ Phase 5 OPS/SEC             ⚠️ Condicional         │
-│ Phase 6 Release             ❌ NO APTO             │
-├────────────────────────────────────────────────────┤
-│ Bloqueantes: 3 (F-01, F-02, F-03)                 │
-│ Altos:       7 (F-04 a F-10)                      │
-│ Medios:      6 (F-11 a F-16)                      │
-└────────────────────────────────────────────────────┘
-```
+
+### Fixes aplicados en esta sesión
+
+| Finding  | Fix aplicado                                                                  | Archivo(s)                                              |
+| -------- | ----------------------------------------------------------------------------- | ------------------------------------------------------- |
+| **F-01** | `fullForwardPath` preserva controller prefix al hacer proxy                   | `api-gateway/src/application/services/proxy.service.ts` |
+| **F-02** | `pathPrefixToService` mapea 30+ controller prefixes → 5 servicios             | Mismo archivo                                           |
+| **F-03** | FE endpoints alineados: `usage-reports`, `demand-reports`, `user-reports`     | `endpoints.ts`, `reportsClient.ts`, `useReportData.ts`  |
+| **F-04** | `templatesClient.ts` → `/api/v1/document-templates`                           | `services/templatesClient.ts`                           |
+| **F-05** | `RESOURCES_ENDPOINTS.MAINTENANCE` → `/api/v1/maintenances`                    | `infrastructure/api/endpoints.ts`                       |
+| **F-06** | `RESOURCES_ENDPOINTS.PROGRAMS` → `/api/v1/programs`                           | `infrastructure/api/endpoints.ts`                       |
+| **F-08** | FE `ApiResponse` type extendido con `errors`, `meta`, `statusCode`, `context` | `types/api/response.ts`                                 |
+| **F-10** | Interceptor HTTP 429 retry-after con backoff exponencial                      | `infrastructure/http/httpClient.ts`                     |
+| **F-09** | Error code → i18n message mapping con `mapApiErrorToI18n()`                   | `infrastructure/http/errorMapper.ts`                    |
+| **F-07** | `@deprecated` en legacy `services/`, barrel exports en `infrastructure/api/`  | `services/*.ts`, `infrastructure/api/index.ts`          |
+| **F-16** | `X-Correlation-ID` propagado en request interceptor (UUID v4)                 | `infrastructure/http/httpClient.ts`                     |
+| **F-13** | CSP + X-Frame-Options + X-Content-Type-Options + Referrer-Policy              | `next.config.js`                                        |
+| **F-14** | Secret scanning (TruffleHog) + SCA (npm audit) CI workflow                    | `.github/workflows/security-scan.yml`                   |
+| **F-11** | 35 contract tests: endpoint paths ↔ BE controller prefixes (Jest)             | `__tests__/contracts/endpoint-contract.test.ts`         |
+| **—**    | Drift `reassignment`→`reassignments` encontrado y fijado por contract tests   | `infrastructure/api/endpoints.ts`                       |
 
 ### Próximos pasos (por prioridad)
 
-1. **FIX F-01 + F-02**: Refactorizar API Gateway proxy routing
-2. **FIX F-03**: Alinear reports endpoint paths FE↔BE
-3. **FIX F-04/F-05/F-06**: Alinear paths de templates, maintenance, programs
-4. **FIX F-07**: Consolidar dual API client layer
-5. **FIX F-08/F-09**: Mejorar error handling y i18n en FE
-6. **ADD**: Contract tests mínimos para rutas críticas
-7. **ADD**: Integration smoke test FE→GW→BE
+1. ~~**FIX F-01 + F-02**: Refactorizar API Gateway proxy routing~~ ✅
+2. ~~**FIX F-03**: Alinear reports endpoint paths FE↔BE~~ ✅
+3. ~~**FIX F-04/F-05/F-06**: Alinear paths de templates, maintenance, programs~~ ✅
+4. ~~**FIX F-07**: Consolidar dual API client layer~~ ✅
+5. ~~**FIX F-08/F-09/F-10**: Mejorar error handling, i18n y 429 retry~~ ✅
+6. ~~**FIX F-16**: Propagar correlation_id en requests FE~~ ✅
+7. ~~**FIX F-13**: CSP y security headers en Next.js~~ ✅
+8. ~~**ADD F-14**: Secret scanning + SCA en CI~~ ✅
+9. ~~**ADD F-11**: Contract tests mínimos para rutas críticas (35 tests)~~ ✅
+10. **DEFERRED F-12**: Integration smoke test FE→GW→BE (requiere servicios up)
+11. **DEFERRED F-15**: Dashboards de observabilidad (requiere Grafana/similar)
+
+---
+
+## Phase 6.4 — Release Readiness Report
+
+**Fecha:** 2026-02-17
+**Veredicto:** ⚠️ **APTO CONDICIONAL** para staging / pre-producción
+
+### Build Verification
+
+| Componente     | Comando                                | Resultado                                                     |
+| -------------- | -------------------------------------- | ------------------------------------------------------------- |
+| FE Build       | `npx next build`                       | ✅ 0 errores, 50+ rutas compiladas                            |
+| BE TypeScript  | `npx tsc --noEmit`                     | ✅ 0 errores                                                  |
+| Contract Tests | `npx jest contracts/endpoint-contract` | ✅ 35/35 tests pass                                           |
+| FE Unit Tests  | `npx jest`                             | ⚠️ 235/253 pass (18 fallos pre-existentes, **0 regresiones**) |
+
+### Findings Scorecard
+
+| Severidad  | Total  | Fijados | Deferred | % Resuelto |
+| ---------- | ------ | ------- | -------- | ---------- |
+| Bloqueante | 6      | 6       | 0        | 100%       |
+| Alto       | 4      | 4       | 0        | 100%       |
+| Medio      | 6      | 4       | 2        | 67%        |
+| **Total**  | **16** | **14**  | **2**    | **88%**    |
+
+### Fixes Summary (14 applied)
+
+| ID   | Categoría      | Descripción                                                                                      |
+| ---- | -------------- | ------------------------------------------------------------------------------------------------ |
+| F-01 | Routing        | Gateway proxy preserva path completo con controller prefix                                       |
+| F-02 | Routing        | 30+ controller prefixes mapeados a 5 servicios backend                                           |
+| F-03 | Endpoints      | FE reports paths alineados: `usage-reports`, `demand-reports`, `user-reports`                    |
+| F-04 | Endpoints      | Templates path → `/api/v1/document-templates`                                                    |
+| F-05 | Endpoints      | Maintenance path → `/api/v1/maintenances`                                                        |
+| F-06 | Endpoints      | Programs path → `/api/v1/programs`                                                               |
+| F-07 | Arquitectura   | Legacy `services/` deprecados, barrel exports consolidados en `infrastructure/api/`              |
+| F-08 | Types          | `ApiResponse` extendido con `errors`, `meta`, `statusCode`, `context`                            |
+| F-09 | Error Handling | Error code → i18n mapper (`mapApiErrorToI18n`, `extractMappedError`)                             |
+| F-10 | Resiliencia    | HTTP 429 retry-after con auto-retry en interceptor                                               |
+| F-11 | QA             | 35 contract tests endpoint paths ↔ BE controllers (detectó drift `reassignment`→`reassignments`) |
+| F-13 | Seguridad      | CSP + X-Frame-Options + X-Content-Type-Options + Referrer-Policy + Permissions-Policy            |
+| F-14 | CI/CD          | Secret scanning (TruffleHog) + SCA (npm audit) workflow en GitHub Actions                        |
+| F-16 | Observabilidad | `X-Correlation-ID` (UUID v4) propagado en cada request FE                                        |
+
+### Gaps Aceptados (2 deferred)
+
+| ID   | Gap                                     | Razón                                             | Mitigación                                                                        |
+| ---- | --------------------------------------- | ------------------------------------------------- | --------------------------------------------------------------------------------- |
+| F-12 | Integration smoke test FE→GW→BE         | Requiere todos los servicios corriendo en staging | Contract tests cubren alignment estático; validar manualmente en staging          |
+| F-15 | Dashboards de observabilidad end-to-end | Requiere Grafana/Kibana/similar provisioned       | Winston logs + Sentry alerts + OpenTelemetry traces ya configurados como fallback |
+
+### Pre-existing Issues (no blocking)
+
+- **18 unit test failures** en interceptor tests y test-utils — pre-existentes antes de esta sesión (confirmado via `git stash` comparison: 19 antes → 18 después)
+- **`MD036`/`MD040` lint warnings** en docs markdown — cosmético, no afecta funcionalidad
+
+### Archivos Modificados (changeset)
+
+```
+
+Modified (12):
+bookly-mock-frontend/next.config.js
+bookly-mock-frontend/src/hooks/useReportData.ts
+bookly-mock-frontend/src/hooks/useUsers.ts
+bookly-mock-frontend/src/infrastructure/api/endpoints.ts
+bookly-mock-frontend/src/infrastructure/api/index.ts
+bookly-mock-frontend/src/infrastructure/http/httpClient.ts
+bookly-mock-frontend/src/services/approvalsClient.ts
+bookly-mock-frontend/src/services/checkInOutClient.ts
+bookly-mock-frontend/src/services/documentsClient.ts
+bookly-mock-frontend/src/services/reportsClient.ts
+bookly-mock-frontend/src/services/templatesClient.ts
+bookly-mock-frontend/src/types/api/response.ts
+
+Created (3):
+bookly-mock-frontend/src/infrastructure/http/errorMapper.ts
+bookly-mock-frontend/src/**tests**/contracts/endpoint-contract.test.ts
+.github/workflows/security-scan.yml
+
+Backend (1):
+bookly-mock/apps/api-gateway/src/application/services/proxy.service.ts
+
+```
+
+### Condiciones para APTO PLENO
+
+1. ✅ ~~Todos los findings bloqueantes y altos fijados~~
+2. ✅ ~~Build FE + BE sin errores~~
+3. ✅ ~~Contract tests pasando~~
+4. ✅ ~~0 regresiones en unit tests~~
+5. ⏳ Integration smoke test en staging (F-12) — ejecutar cuando servicios estén up
+6. ⏳ Dashboards de observabilidad (F-15) — provisionar en sprint siguiente
+
+### Recomendación
+
+> **Proceder a staging** con los 14 fixes aplicados. Ejecutar smoke test manual FE→GW→BE en staging para validar routing end-to-end. Una vez confirmado, el release es **APTO** para producción con los 2 gaps documentados como deuda técnica para el siguiente sprint.

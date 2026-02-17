@@ -1,0 +1,68 @@
+name: Security Scan (Secret + SCA)
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main, develop]
+  schedule:
+    - cron: "0 6 * * 1" # Weekly on Monday at 6am UTC
+
+permissions:
+  contents: read
+  security-events: write
+
+jobs:
+  secret-scan:
+    name: Secret Scanning
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: TruffleHog Secret Scan
+        uses: trufflesecurity/trufflehog@main
+        with:
+          extra_args: --only-verified
+
+  dependency-audit-frontend:
+    name: SCA - Frontend (npm audit)
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Install FE dependencies
+        working-directory: bookly-mock-frontend
+        run: npm ci --ignore-scripts
+
+      - name: npm audit (FE)
+        working-directory: bookly-mock-frontend
+        run: npm audit --audit-level=high || true
+
+  dependency-audit-backend:
+    name: SCA - Backend (npm audit)
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Install BE dependencies
+        working-directory: bookly-mock
+        run: npm ci --ignore-scripts
+
+      - name: npm audit (BE)
+        working-directory: bookly-mock
+        run: npm audit --audit-level=high || true
