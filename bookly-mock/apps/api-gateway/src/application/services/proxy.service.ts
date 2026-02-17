@@ -280,6 +280,18 @@ export class ProxyService {
 
       return response.data;
     } catch (error: any) {
+      const status = error.response?.status;
+
+      // 4xx errors are client errors — NOT service failures.
+      // Re-throw them directly so the circuit breaker counts only real outages.
+      if (status && status >= 400 && status < 500) {
+        this.logger.warn(
+          `[HTTP] Client error proxying to ${service}: ${status} ${error.message}`,
+        );
+        throw new HttpException(error.response.data || error.message, status);
+      }
+
+      // 5xx and network errors ARE service failures — let circuit breaker handle them
       this.logger.error(
         `[HTTP] Error proxying to ${service}: ${error.message}`,
       );

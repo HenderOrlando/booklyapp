@@ -157,6 +157,7 @@ const IMPORT_JOB_REPOSITORY = "IImportJobRepository";
         db: configService.get("REDIS_DB", 0),
       }),
       inject: [ConfigService],
+      serviceName: "resources-service",
     }),
 
     // Idempotency + Correlation

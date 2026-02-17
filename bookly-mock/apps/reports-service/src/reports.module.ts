@@ -159,6 +159,7 @@ import { JwtStrategy } from "./infrastructure/strategies/jwt.strategy";
         db: configService.get("REDIS_DB", 0),
       }),
       inject: [ConfigService],
+      serviceName: "reports-service",
     }),
     // MongoDB - Conexión global con librería estandarizada
     DatabaseModule,

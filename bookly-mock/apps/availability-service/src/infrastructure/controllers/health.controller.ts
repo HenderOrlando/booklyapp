@@ -1,5 +1,6 @@
+import { DatabaseService } from "@libs/database";
 import { Controller, Get } from "@nestjs/common";
-import { ApiTags } from "@nestjs/swagger";
+import { ApiOperation, ApiResponse, ApiTags } from "@nestjs/swagger";
 
 /**
  * Health Controller
@@ -8,13 +9,27 @@ import { ApiTags } from "@nestjs/swagger";
 @ApiTags("Health")
 @Controller("health")
 export class HealthController {
+  constructor(private readonly databaseService: DatabaseService) {}
+
   @Get()
-  check() {
+  @ApiOperation({ summary: "Check Availability Service health" })
+  @ApiResponse({ status: 200, description: "Availability Service is healthy" })
+  async check() {
+    const dbHealth = await this.databaseService.healthCheck();
+
     return {
-      status: "ok",
+      status: dbHealth.isHealthy ? "ok" : "degraded",
       service: "availability-service",
       timestamp: new Date().toISOString(),
+      uptime: process.uptime(),
       environment: process.env.NODE_ENV || "development",
+      database: {
+        connected: dbHealth.isHealthy,
+        name: dbHealth.database,
+        state: dbHealth.state,
+        latency: dbHealth.latency,
+        error: dbHealth.error,
+      },
     };
   }
 }
