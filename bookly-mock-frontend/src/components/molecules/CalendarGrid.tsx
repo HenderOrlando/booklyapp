@@ -53,11 +53,11 @@ export function CalendarGrid({
   return (
     <div className="flex flex-col">
       {/* Encabezado de días de la semana */}
-      <div className="grid grid-cols-7 border-b border-gray-200 bg-gray-50">
+      <div className="grid grid-cols-7 border-b border-[var(--color-border-subtle)] bg-[var(--color-bg-secondary)]">
         {weekDays.map((day) => (
           <div
             key={day.short}
-            className="py-3 text-center text-sm font-semibold text-gray-700 capitalize"
+            className="py-3 text-center text-sm font-semibold text-[var(--color-text-primary)] capitalize"
             title={day.full}
           >
             {day.short}
@@ -85,26 +85,26 @@ export function CalendarGrid({
       </div>
 
       {/* Leyenda de colores */}
-      <div className="flex items-center justify-center gap-6 py-4 bg-gray-50 border-t border-gray-200">
+      <div className="flex items-center justify-center gap-6 py-4 bg-[var(--color-bg-secondary)] border-t border-[var(--color-border-subtle)]">
         <div className="flex items-center gap-2">
           <div className="w-3 h-3 rounded-full bg-amber-500" />
-          <span className="text-xs text-gray-600">Pendiente</span>
+          <span className="text-xs text-[var(--color-text-secondary)]">Pendiente</span>
         </div>
         <div className="flex items-center gap-2">
           <div className="w-3 h-3 rounded-full bg-green-500" />
-          <span className="text-xs text-gray-600">Confirmada</span>
+          <span className="text-xs text-[var(--color-text-secondary)]">Confirmada</span>
         </div>
         <div className="flex items-center gap-2">
           <div className="w-3 h-3 rounded-full bg-blue-500" />
-          <span className="text-xs text-gray-600">En progreso</span>
+          <span className="text-xs text-[var(--color-text-secondary)]">En progreso</span>
         </div>
         <div className="flex items-center gap-2">
           <div className="w-3 h-3 rounded-full bg-red-500" />
-          <span className="text-xs text-gray-600">Cancelada</span>
+          <span className="text-xs text-[var(--color-text-secondary)]">Cancelada</span>
         </div>
         <div className="flex items-center gap-2">
-          <div className="w-3 h-3 rounded-full bg-gray-500" />
-          <span className="text-xs text-gray-600">Completada</span>
+          <div className="w-3 h-3 rounded-full bg-[var(--color-bg-secondary)]0" />
+          <span className="text-xs text-[var(--color-text-secondary)]">Completada</span>
         </div>
       </div>
     </div>

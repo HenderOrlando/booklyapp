@@ -83,15 +83,15 @@ export const ExportButton = React.memo<ExportButtonProps>(
       `,
       outline: `
         bg-transparent 
-        border-gray-300 dark:border-gray-600 
-        text-gray-700 dark:text-gray-300 
-        hover:bg-gray-50 dark:hover:bg-gray-800
+        border-[var(--color-border-strong)] dark:border-[var(--color-border-strong)] 
+        text-[var(--color-text-primary)] dark:text-[var(--color-text-tertiary)] 
+        hover:bg-[var(--color-bg-secondary)] dark:hover:bg-[var(--color-bg-inverse)]
       `,
       ghost: `
         bg-transparent 
         border-transparent 
-        text-gray-700 dark:text-gray-300 
-        hover:bg-gray-100 dark:hover:bg-gray-800
+        text-[var(--color-text-primary)] dark:text-[var(--color-text-tertiary)] 
+        hover:bg-[var(--color-bg-secondary)] dark:hover:bg-[var(--color-bg-inverse)]
       `,
     };
 

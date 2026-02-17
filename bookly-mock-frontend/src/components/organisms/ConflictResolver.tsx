@@ -88,14 +88,14 @@ export function ConflictResolver({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
-      <div className="w-full max-w-4xl max-h-[90vh] overflow-y-auto bg-gray-900 rounded-lg">
-        <div className="sticky top-0 bg-gray-900 border-b border-gray-700 p-6">
+      <div className="w-full max-w-4xl max-h-[90vh] overflow-y-auto bg-[var(--color-bg-inverse)] rounded-lg">
+        <div className="sticky top-0 bg-[var(--color-bg-inverse)] border-b border-[var(--color-border-strong)] p-6">
           <div className="flex items-start justify-between">
             <div>
               <h2 className="text-2xl font-bold text-white">
                 Resolver Conflicto
               </h2>
-              <p className="text-sm text-gray-400 mt-1">
+              <p className="text-sm text-[var(--color-text-tertiary)] mt-1">
                 {CONFLICT_TYPE_LABELS[conflict.type]}
               </p>
             </div>
@@ -114,24 +114,24 @@ export function ConflictResolver({
             <CardContent>
               <div className="space-y-3">
                 <div>
-                  <div className="text-sm text-gray-400">Descripción</div>
+                  <div className="text-sm text-[var(--color-text-tertiary)]">Descripción</div>
                   <div className="text-white mt-1">{conflict.description}</div>
                 </div>
                 <div className="grid grid-cols-3 gap-4">
                   <div>
-                    <div className="text-sm text-gray-400">Recurso</div>
+                    <div className="text-sm text-[var(--color-text-tertiary)]">Recurso</div>
                     <div className="text-white mt-1">
                       {conflict.resourceName}
                     </div>
                   </div>
                   <div>
-                    <div className="text-sm text-gray-400">Fecha</div>
+                    <div className="text-sm text-[var(--color-text-tertiary)]">Fecha</div>
                     <div className="text-white mt-1">
                       {new Date(conflict.date).toLocaleDateString("es-ES")}
                     </div>
                   </div>
                   <div>
-                    <div className="text-sm text-gray-400">Horario</div>
+                    <div className="text-sm text-[var(--color-text-tertiary)]">Horario</div>
                     <div className="text-white mt-1">
                       {conflict.startTime} - {conflict.endTime}
                     </div>
@@ -155,7 +155,7 @@ export function ConflictResolver({
                   className={`p-4 rounded-lg border-2 transition-all ${
                     resolution === res
                       ? "border-blue-600 bg-blue-900/20"
-                      : "border-gray-700 bg-gray-800 hover:border-gray-600"
+                      : "border-[var(--color-border-strong)] bg-[var(--color-bg-inverse)] hover:border-[var(--color-border-strong)]"
                   }`}
                 >
                   <div className="text-sm font-medium text-white">
@@ -190,8 +190,8 @@ export function ConflictResolver({
                         selectedResourceId === alt.resourceId
                           ? "border-blue-600 bg-blue-900/20"
                           : alt.available
-                            ? "border-gray-700 bg-gray-800 hover:border-gray-600"
-                            : "border-gray-800 bg-gray-900 opacity-50 cursor-not-allowed"
+                            ? "border-[var(--color-border-strong)] bg-[var(--color-bg-inverse)] hover:border-[var(--color-border-strong)]"
+                            : "border-[var(--color-border-strong)] bg-[var(--color-bg-inverse)] opacity-50 cursor-not-allowed"
                       }`}
                     >
                       <div className="flex items-center justify-between">
@@ -237,8 +237,8 @@ export function ConflictResolver({
                           selectedTimeSlot?.startTime === slot.startTime
                             ? "border-blue-600 bg-blue-900/20"
                             : slot.available
-                              ? "border-gray-700 bg-gray-800 hover:border-gray-600"
-                              : "border-gray-800 bg-gray-900 opacity-50 cursor-not-allowed"
+                              ? "border-[var(--color-border-strong)] bg-[var(--color-bg-inverse)] hover:border-[var(--color-border-strong)]"
+                              : "border-[var(--color-border-strong)] bg-[var(--color-bg-inverse)] opacity-50 cursor-not-allowed"
                         }`}
                       >
                         <div className="text-sm font-medium text-white text-center">
@@ -260,7 +260,7 @@ export function ConflictResolver({
               value={notes}
               onChange={(e) => setNotes(e.target.value)}
               placeholder="Agrega notas sobre cómo se resolvió el conflicto..."
-              className="w-full px-3 py-2 bg-gray-800 text-white rounded-lg resize-none"
+              className="w-full px-3 py-2 bg-[var(--color-bg-inverse)] text-white rounded-lg resize-none"
               rows={3}
             />
           </div>
@@ -274,12 +274,12 @@ export function ConflictResolver({
               <CardContent>
                 <div className="space-y-2 text-sm">
                   <div className="flex justify-between">
-                    <span className="text-gray-400">Tipo:</span>
+                    <span className="text-[var(--color-text-tertiary)]">Tipo:</span>
                     <span className="text-white font-medium">{resolution}</span>
                   </div>
                   {selectedResourceId && (
                     <div className="flex justify-between">
-                      <span className="text-gray-400">Nuevo recurso:</span>
+                      <span className="text-[var(--color-text-tertiary)]">Nuevo recurso:</span>
                       <span className="text-white">
                         {
                           conflict.alternativeResources?.find(
@@ -291,7 +291,7 @@ export function ConflictResolver({
                   )}
                   {selectedTimeSlot && (
                     <div className="flex justify-between">
-                      <span className="text-gray-400">Nuevo horario:</span>
+                      <span className="text-[var(--color-text-tertiary)]">Nuevo horario:</span>
                       <span className="text-white">
                         {selectedTimeSlot.startTime} -{" "}
                         {selectedTimeSlot.endTime}
@@ -305,7 +305,7 @@ export function ConflictResolver({
         </div>
 
         {/* Botones */}
-        <div className="sticky bottom-0 bg-gray-900 border-t border-gray-700 p-6 flex justify-end gap-3">
+        <div className="sticky bottom-0 bg-[var(--color-bg-inverse)] border-t border-[var(--color-border-strong)] p-6 flex justify-end gap-3">
           <Button variant="outline" onClick={onClose} disabled={loading}>
             Cancelar
           </Button>

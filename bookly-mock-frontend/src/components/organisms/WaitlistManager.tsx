@@ -25,7 +25,7 @@ interface WaitlistManagerProps {
 }
 
 const PRIORITY_COLORS: Record<string, string> = {
-  LOW: "bg-gray-600",
+  LOW: "bg-[var(--color-bg-elevated)]",
   NORMAL: "bg-blue-600",
   HIGH: "bg-orange-600",
   URGENT: "bg-red-600",
@@ -35,7 +35,7 @@ const STATUS_COLORS: Record<string, string> = {
   WAITING: "bg-yellow-600",
   NOTIFIED: "bg-blue-600",
   ASSIGNED: "bg-green-600",
-  EXPIRED: "bg-gray-600",
+  EXPIRED: "bg-[var(--color-bg-elevated)]",
   CANCELLED: "bg-red-600",
 };
 
@@ -66,7 +66,7 @@ export function WaitlistManager({
               <div className="text-2xl font-bold text-white">
                 {stats.totalWaiting}
               </div>
-              <div className="text-sm text-gray-400">En Espera</div>
+              <div className="text-sm text-[var(--color-text-tertiary)]">En Espera</div>
             </CardContent>
           </Card>
           <Card>
@@ -74,7 +74,7 @@ export function WaitlistManager({
               <div className="text-2xl font-bold text-white">
                 {stats.totalNotified}
               </div>
-              <div className="text-sm text-gray-400">Notificados</div>
+              <div className="text-sm text-[var(--color-text-tertiary)]">Notificados</div>
             </CardContent>
           </Card>
           <Card>
@@ -82,7 +82,7 @@ export function WaitlistManager({
               <div className="text-2xl font-bold text-white">
                 {stats.totalAssigned}
               </div>
-              <div className="text-sm text-gray-400">Asignados</div>
+              <div className="text-sm text-[var(--color-text-tertiary)]">Asignados</div>
             </CardContent>
           </Card>
           <Card>
@@ -90,7 +90,7 @@ export function WaitlistManager({
               <div className="text-2xl font-bold text-white">
                 {stats.averageWaitTime.toFixed(1)}d
               </div>
-              <div className="text-sm text-gray-400">Tiempo Promedio</div>
+              <div className="text-sm text-[var(--color-text-tertiary)]">Tiempo Promedio</div>
             </CardContent>
           </Card>
         </div>
@@ -101,13 +101,13 @@ export function WaitlistManager({
         <CardContent className="pt-6">
           <div className="flex flex-wrap gap-4">
             <div>
-              <label className="block text-sm font-medium text-gray-400 mb-2">
+              <label className="block text-sm font-medium text-[var(--color-text-tertiary)] mb-2">
                 Estado
               </label>
               <select
                 value={filterStatus}
                 onChange={(e) => setFilterStatus(e.target.value)}
-                className="px-3 py-2 bg-gray-700 text-white rounded-lg"
+                className="px-3 py-2 bg-[var(--color-bg-elevated)] text-white rounded-lg"
               >
                 <option value="all">Todos</option>
                 <option value="WAITING">En Espera</option>
@@ -118,13 +118,13 @@ export function WaitlistManager({
               </select>
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-400 mb-2">
+              <label className="block text-sm font-medium text-[var(--color-text-tertiary)] mb-2">
                 Prioridad
               </label>
               <select
                 value={filterPriority}
                 onChange={(e) => setFilterPriority(e.target.value)}
-                className="px-3 py-2 bg-gray-700 text-white rounded-lg"
+                className="px-3 py-2 bg-[var(--color-bg-elevated)] text-white rounded-lg"
               >
                 <option value="all">Todas</option>
                 <option value="LOW">Baja</option>
@@ -142,7 +142,7 @@ export function WaitlistManager({
         {filteredEntries.length === 0 ? (
           <Card>
             <CardContent className="py-12 text-center">
-              <div className="text-gray-400">
+              <div className="text-[var(--color-text-tertiary)]">
                 No hay entradas en lista de espera
               </div>
             </CardContent>
@@ -165,7 +165,7 @@ export function WaitlistManager({
                         <div className="font-medium text-white">
                           {entry.userName}
                         </div>
-                        <div className="text-sm text-gray-400">
+                        <div className="text-sm text-[var(--color-text-tertiary)]">
                           {entry.userEmail}
                         </div>
                       </div>
@@ -174,13 +174,13 @@ export function WaitlistManager({
                     {/* Recurso y Fecha */}
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-3 mt-3">
                       <div>
-                        <div className="text-xs text-gray-400">Recurso</div>
+                        <div className="text-xs text-[var(--color-text-tertiary)]">Recurso</div>
                         <div className="text-sm text-white">
                           {entry.resourceName}
                         </div>
                       </div>
                       <div>
-                        <div className="text-xs text-gray-400">
+                        <div className="text-xs text-[var(--color-text-tertiary)]">
                           Fecha Deseada
                         </div>
                         <div className="text-sm text-white">
@@ -190,7 +190,7 @@ export function WaitlistManager({
                         </div>
                       </div>
                       <div>
-                        <div className="text-xs text-gray-400">Horario</div>
+                        <div className="text-xs text-[var(--color-text-tertiary)]">Horario</div>
                         <div className="text-sm text-white">
                           {entry.startTime} - {entry.endTime}
                         </div>
@@ -199,7 +199,7 @@ export function WaitlistManager({
 
                     {/* Razón */}
                     {entry.reason && (
-                      <div className="mt-3 p-2 bg-gray-800 rounded text-sm text-gray-300">
+                      <div className="mt-3 p-2 bg-[var(--color-bg-inverse)] rounded text-sm text-[var(--color-text-tertiary)]">
                         {entry.reason}
                       </div>
                     )}

@@ -58,8 +58,8 @@ const statusConfig: Record<
     label: "Parcialmente disponible",
   },
   unavailable: {
-    color: "bg-gray-400",
-    bgColor: "bg-gray-100",
+    color: "bg-[var(--color-border-strong)]",
+    bgColor: "bg-[var(--color-bg-secondary)]",
     label: "No disponible",
   },
 };

@@ -102,7 +102,7 @@ export function ActivityTimeline({
                       <span className="text-sm">{activity.icon || "•"}</span>
                     </div>
                     {!isLast && (
-                      <div className="w-0.5 h-full bg-gray-700 mt-2" />
+                      <div className="w-0.5 h-full bg-[var(--color-bg-elevated)] mt-2" />
                     )}
                   </div>
 

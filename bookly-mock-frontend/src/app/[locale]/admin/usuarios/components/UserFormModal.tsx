@@ -233,7 +233,7 @@ export function UserFormModal({
                   value={documentType}
                   onChange={(e) => onDocumentTypeChange(e.target.value)}
                   disabled={isLoading}
-                  className="w-full px-3 py-2 bg-[var(--color-bg-primary)] border border-gray-700 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-brand-primary-500"
+                  className="w-full px-3 py-2 bg-[var(--color-bg-primary)] border border-[var(--color-border-strong)] rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-brand-primary-500"
                 >
                   <option value="">{t("select_document_type")}</option>
                   <option value="DNI">DNI</option>
@@ -266,7 +266,7 @@ export function UserFormModal({
                 value={status}
                 onChange={(e) => onStatusChange(e.target.value as UserStatus)}
                 disabled={isLoading}
-                className="w-full px-3 py-2 bg-[var(--color-bg-primary)] border border-gray-700 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-brand-primary-500"
+                className="w-full px-3 py-2 bg-[var(--color-bg-primary)] border border-[var(--color-border-strong)] rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-brand-primary-500"
               >
                 <option value={UserStatus.ACTIVE}>{t("status_active")}</option>
                 <option value={UserStatus.INACTIVE}>
@@ -303,7 +303,7 @@ export function UserFormModal({
                   className={`flex items-center gap-3 p-3 rounded-lg cursor-pointer border transition-all ${
                     selectedRoles.includes(role.id)
                       ? "bg-brand-primary-500/10 border-brand-primary-500"
-                      : "bg-[var(--color-bg-primary)] border-gray-700 hover:bg-[var(--color-bg-secondary)]"
+                      : "bg-[var(--color-bg-primary)] border-[var(--color-border-strong)] hover:bg-[var(--color-bg-secondary)]"
                   } ${isLoading ? "opacity-50 cursor-not-allowed" : ""}`}
                 >
                   <input
@@ -336,7 +336,7 @@ export function UserFormModal({
           </div>
 
           {/* Botones de acción */}
-          <div className="flex gap-2 justify-end pt-4 border-t border-gray-700">
+          <div className="flex gap-2 justify-end pt-4 border-t border-[var(--color-border-strong)]">
             <Button variant="outline" onClick={onClose} disabled={isLoading}>
               {t("cancel")}
             </Button>

@@ -6,9 +6,16 @@
 
 "use client";
 
+import { useDataMode } from "@/hooks/useDataMode";
 import { useWebSocket } from "@/hooks/useWebSocket";
-import { config, isMockMode } from "@/lib/config";
-import React, { createContext, useContext, useMemo } from "react";
+import { config } from "@/lib/config";
+import React, {
+  createContext,
+  useContext,
+  useEffect,
+  useMemo,
+  useRef,
+} from "react";
 
 interface WebSocketContextValue {
   isConnected: boolean;
@@ -37,8 +44,10 @@ export function WebSocketProvider({
   url = config.wsUrl,
   enabled = true,
 }: WebSocketProviderProps) {
-  // Desactivar WebSocket en modo mock o si está explícitamente deshabilitado
-  const shouldEnable = enabled && !isMockMode() && config.features.enableWebSocket;
+  const { isMock, useDirectServices } = useDataMode();
+
+  // WebSocket only enabled when: serve mode + gateway routing + feature flag on
+  const shouldEnable = enabled && !isMock && !useDirectServices;
 
   const websocket = useWebSocket({
     url,
@@ -47,9 +56,9 @@ export function WebSocketProvider({
         ? localStorage.getItem("token") || undefined
         : undefined,
     autoConnect: shouldEnable,
-    reconnect: shouldEnable, // No reconectar si está deshabilitado
+    reconnect: shouldEnable,
     onConnected: () => {
-      console.log("[WebSocketProvider] Conectado al servidor");
+      console.log("[WebSocketProvider] Conectado al servidor (serve+gateway)");
     },
     onDisconnected: () => {
       console.log("[WebSocketProvider] Desconectado del servidor");
@@ -59,7 +68,21 @@ export function WebSocketProvider({
     },
   });
 
-  // Usar contexto deshabilitado si WebSocket no está activo
+  // Disconnect when mode changes away from serve+gateway
+  const prevShouldEnable = useRef(shouldEnable);
+  useEffect(() => {
+    if (prevShouldEnable.current && !shouldEnable) {
+      console.log("[WebSocketProvider] Modo cambió — desconectando WebSocket");
+      websocket.disconnect();
+    } else if (!prevShouldEnable.current && shouldEnable) {
+      console.log(
+        "[WebSocketProvider] Modo serve+gateway — conectando WebSocket",
+      );
+      websocket.connect();
+    }
+    prevShouldEnable.current = shouldEnable;
+  }, [shouldEnable, websocket]);
+
   const contextValue = useMemo(() => {
     if (!shouldEnable) {
       return DISABLED_CONTEXT;
@@ -81,7 +104,7 @@ export function useWebSocketContext() {
   const context = useContext(WebSocketContext);
   if (!context) {
     throw new Error(
-      "useWebSocketContext must be used within WebSocketProvider"
+      "useWebSocketContext must be used within WebSocketProvider",
     );
   }
   return context;

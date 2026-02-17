@@ -126,7 +126,7 @@ export function ResourceFilterPanel({
       <CardContent className="flex-1 overflow-hidden flex flex-col gap-4 min-h-0">
         {/* Búsqueda */}
         <div className="relative">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-[var(--color-text-tertiary)]" />
           <Input
             type="text"
             placeholder="Buscar recursos..."
@@ -137,7 +137,7 @@ export function ResourceFilterPanel({
           {searchQuery && (
             <button
               onClick={() => setSearchQuery("")}
-              className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-white"
+              className="absolute right-3 top-1/2 -translate-y-1/2 text-[var(--color-text-tertiary)] hover:text-white"
             >
               <X className="h-4 w-4" />
             </button>
@@ -151,7 +151,7 @@ export function ResourceFilterPanel({
             className={`px-3 py-1 text-xs rounded-full transition-colors ${
               filterByType === "all"
                 ? "bg-blue-500 text-white"
-                : "bg-gray-700 text-gray-300 hover:bg-gray-600"
+                : "bg-[var(--color-bg-elevated)] text-[var(--color-text-tertiary)] hover:bg-[var(--color-bg-elevated)]"
             }`}
           >
             Todos
@@ -163,7 +163,7 @@ export function ResourceFilterPanel({
               className={`px-3 py-1 text-xs rounded-full transition-colors ${
                 filterByType === type
                   ? "bg-blue-500 text-white"
-                  : "bg-gray-700 text-gray-300 hover:bg-gray-600"
+                  : "bg-[var(--color-bg-elevated)] text-[var(--color-text-tertiary)] hover:bg-[var(--color-bg-elevated)]"
               }`}
             >
               {type}
@@ -186,11 +186,11 @@ export function ResourceFilterPanel({
         {/* Lista de recursos con checkboxes - Infinite Scroll */}
         <div className="flex-1 overflow-y-auto pr-2 min-h-0 space-y-2">
           {isLoading ? (
-            <div className="text-center py-8 text-gray-400">
+            <div className="text-center py-8 text-[var(--color-text-tertiary)]">
               Cargando recursos...
             </div>
           ) : filteredResources.length === 0 ? (
-            <div className="text-center py-8 text-gray-400">
+            <div className="text-center py-8 text-[var(--color-text-tertiary)]">
               No se encontraron recursos
             </div>
           ) : (
@@ -207,7 +207,7 @@ export function ResourceFilterPanel({
                     className={`flex items-start gap-3 p-3 rounded-lg border cursor-grab active:cursor-grabbing transition-all ${
                       isSelected
                         ? "border-blue-500 bg-blue-500/10"
-                        : "border-gray-700 hover:border-gray-600 hover:bg-gray-800/50"
+                        : "border-[var(--color-border-strong)] hover:border-[var(--color-border-strong)] hover:bg-[var(--color-bg-inverse)]/50"
                     }`}
                   >
                     <label className="flex items-start gap-3 flex-1">
@@ -215,7 +215,7 @@ export function ResourceFilterPanel({
                         type="checkbox"
                         checked={isSelected}
                         onChange={() => onResourceToggle(resource.id)}
-                        className="mt-0.5 h-4 w-4 rounded border-gray-600 text-blue-500 focus:ring-blue-500 focus:ring-offset-gray-900 cursor-pointer"
+                        className="mt-0.5 h-4 w-4 rounded border-[var(--color-border-strong)] text-blue-500 focus:ring-blue-500 focus:ring-offset-gray-900 cursor-pointer"
                       />
 
                       <div className="flex-1 min-w-0 ">
@@ -225,7 +225,7 @@ export function ResourceFilterPanel({
                           </span>
                         </div>
 
-                        <div className="flex justify-between gap-2 mt-1 text-xs text-gray-400">
+                        <div className="flex justify-between gap-2 mt-1 text-xs text-[var(--color-text-tertiary)]">
                           <Badge
                             variant={
                               resource.status === ResourceStatus.AVAILABLE
@@ -250,7 +250,7 @@ export function ResourceFilterPanel({
                           <span>{resource.type}</span>
                         </div>
 
-                        <div className="flex items-center justify-between gap-2 mt-1 text-xs text-gray-400">
+                        <div className="flex items-center justify-between gap-2 mt-1 text-xs text-[var(--color-text-tertiary)]">
                           <span className="font-mono">{resource.code}</span>
                           <span>•</span>
                           {resource.location && (
@@ -262,7 +262,7 @@ export function ResourceFilterPanel({
                         </div>
 
                         {resource.capacity && (
-                          <div className="mt-1 text-xs text-gray-400">
+                          <div className="mt-1 text-xs text-[var(--color-text-tertiary)]">
                             Capacidad: {resource.capacity} personas
                           </div>
                         )}
@@ -276,7 +276,7 @@ export function ResourceFilterPanel({
               {hasNextPage && (
                 <div
                   ref={loadMoreRef}
-                  className="py-4 text-center text-sm text-gray-400"
+                  className="py-4 text-center text-sm text-[var(--color-text-tertiary)]"
                 >
                   {isFetchingNextPage ? (
                     <div className="flex items-center justify-center gap-2">
@@ -294,7 +294,7 @@ export function ResourceFilterPanel({
 
         {/* Contador de resultados */}
         {!isLoading && filteredResources.length > 0 && (
-          <div className="text-xs text-gray-400 text-center pt-2 border-t border-gray-700">
+          <div className="text-xs text-[var(--color-text-tertiary)] text-center pt-2 border-t border-[var(--color-border-strong)]">
             Mostrando {filteredResources.length} de {resources.length} recursos
           </div>
         )}

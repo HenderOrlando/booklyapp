@@ -132,7 +132,7 @@ export function RoleFormModal({
           </div>
 
           {/* Tabs */}
-          <div className="border-b border-gray-700">
+          <div className="border-b border-[var(--color-border-strong)]">
             <nav className="flex gap-4">
               <button
                 onClick={() => onTabChange("permissions")}
@@ -182,7 +182,7 @@ export function RoleFormModal({
                     className={`flex items-center gap-3 p-3 rounded-lg cursor-pointer border transition-all ${
                       selectedPermissions.includes(perm.id)
                         ? "bg-brand-primary-500/10 border-brand-primary-500 hover:bg-brand-primary-500/20"
-                        : "bg-[var(--color-bg-primary)] border-gray-700 hover:bg-[var(--color-bg-secondary)] hover:border-gray-600"
+                        : "bg-[var(--color-bg-primary)] border-[var(--color-border-strong)] hover:bg-[var(--color-bg-secondary)] hover:border-[var(--color-border-strong)]"
                     } ${isLoading ? "opacity-50 cursor-not-allowed" : ""}`}
                   >
                     <input
@@ -236,7 +236,7 @@ export function RoleFormModal({
                     className={`flex items-center gap-3 p-3 rounded-lg cursor-pointer border transition-all ${
                       selectedUsers.includes(user.id)
                         ? "bg-brand-primary-500/10 border-brand-primary-500"
-                        : "bg-[var(--color-bg-primary)] border-gray-700 hover:bg-[var(--color-bg-secondary)]"
+                        : "bg-[var(--color-bg-primary)] border-[var(--color-border-strong)] hover:bg-[var(--color-bg-secondary)]"
                     } ${isLoading ? "opacity-50 cursor-not-allowed" : ""}`}
                   >
                     <input
@@ -280,7 +280,7 @@ export function RoleFormModal({
           )}
 
           {/* Botones de acción */}
-          <div className="flex gap-2 justify-end pt-4 border-t border-gray-700">
+          <div className="flex gap-2 justify-end pt-4 border-t border-[var(--color-border-strong)]">
             <Button variant="outline" onClick={onClose} disabled={isLoading}>
               {t("cancel")}
             </Button>

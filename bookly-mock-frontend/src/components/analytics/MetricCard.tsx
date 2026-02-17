@@ -75,7 +75,7 @@ export function MetricCard({
     return (
       <Card className="animate-pulse">
         <CardContent className="p-6">
-          <div className="h-20 bg-gray-700 rounded"></div>
+          <div className="h-20 bg-[var(--color-bg-elevated)] rounded"></div>
         </CardContent>
       </Card>
     );

@@ -228,7 +228,7 @@ export function UserDetailPanel({
                   {user.roles.map((role) => (
                     <div
                       key={role.id}
-                      className="p-4 bg-gradient-to-r from-gray-800 to-gray-750 rounded-lg border border-gray-700"
+                      className="p-4 bg-gradient-to-r from-gray-800 to-gray-750 rounded-lg border border-[var(--color-border-strong)]"
                     >
                       <div className="flex items-center justify-between mb-2">
                         <span className="text-white font-medium">
@@ -278,7 +278,7 @@ export function UserDetailPanel({
                   {filteredPermissions.map((perm: Permission) => (
                     <div
                       key={perm.id}
-                      className="p-3 bg-[var(--color-bg-primary)] rounded-lg border border-gray-700"
+                      className="p-3 bg-[var(--color-bg-primary)] rounded-lg border border-[var(--color-border-strong)]"
                     >
                       <div className="flex items-start gap-2">
                         <div className="flex-shrink-0 w-8 h-8 bg-brand-primary-500 rounded-lg flex items-center justify-center">
@@ -303,7 +303,7 @@ export function UserDetailPanel({
             </div>
 
             {/* Fechas */}
-            <div className="grid grid-cols-2 gap-4 pt-4 border-t border-gray-700">
+            <div className="grid grid-cols-2 gap-4 pt-4 border-t border-[var(--color-border-strong)]">
               <div>
                 <label className="text-sm font-medium text-[var(--color-text-tertiary)]">
                   {t("created_at")}

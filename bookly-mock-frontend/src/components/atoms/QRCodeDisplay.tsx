@@ -52,10 +52,10 @@ export const QRCodeDisplay = React.memo<QRCodeDisplayProps>(
     if (!QRCode) {
       return (
         <div
-          className={`flex items-center justify-center bg-gray-100 dark:bg-gray-800 ${className}`}
+          className={`flex items-center justify-center bg-[var(--color-bg-secondary)] dark:bg-[var(--color-bg-inverse)] ${className}`}
           style={{ width: size, height: size }}
         >
-          <div className="animate-pulse text-sm text-gray-500 dark:text-gray-400">
+          <div className="animate-pulse text-sm text-[var(--color-text-secondary)] dark:text-[var(--color-text-tertiary)]">
             Cargando QR...
           </div>
         </div>

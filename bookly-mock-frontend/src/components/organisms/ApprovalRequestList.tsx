@@ -140,20 +140,20 @@ export const ApprovalRequestList = React.memo<ApprovalRequestListProps>(
         <div className="flex flex-col sm:flex-row gap-3">
           {/* Búsqueda */}
           <div className="flex-1 relative">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-[var(--color-text-tertiary)]" />
             <input
               type="text"
               placeholder="Buscar por nombre, recurso, email o propósito..."
               value={searchQuery}
               onChange={(e) => handleSearchChange(e.target.value)}
-              className="w-full pl-10 pr-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-[var(--color-primary-base)]"
+              className="w-full pl-10 pr-4 py-2 border border-[var(--color-border-strong)] dark:border-[var(--color-border-strong)] rounded-lg bg-white dark:bg-[var(--color-bg-inverse)] text-[var(--color-text-primary)] dark:text-[var(--color-text-inverse)] placeholder:text-[var(--color-text-tertiary)] focus:outline-none focus:ring-2 focus:ring-[var(--color-primary-base)]"
             />
           </div>
 
           {/* Botón de filtros */}
           <button
             onClick={() => setShowFilters(!showFilters)}
-            className="flex items-center gap-2 px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800 text-gray-700 dark:text-gray-300"
+            className="flex items-center gap-2 px-4 py-2 border border-[var(--color-border-strong)] dark:border-[var(--color-border-strong)] rounded-lg hover:bg-[var(--color-bg-secondary)] dark:hover:bg-[var(--color-bg-inverse)] text-[var(--color-text-primary)] dark:text-[var(--color-text-tertiary)]"
           >
             <SlidersHorizontal className="h-4 w-4" />
             <span>Filtros</span>
@@ -167,15 +167,15 @@ export const ApprovalRequestList = React.memo<ApprovalRequestListProps>(
 
         {/* Panel de filtros expandible */}
         {showFilters && (
-          <div className="bg-gray-50 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700 rounded-lg p-4 space-y-4">
+          <div className="bg-[var(--color-bg-secondary)] dark:bg-[var(--color-bg-inverse)]/50 border border-[var(--color-border-subtle)] dark:border-[var(--color-border-strong)] rounded-lg p-4 space-y-4">
             <div className="flex items-center justify-between mb-2">
-              <h3 className="font-semibold text-gray-900 dark:text-gray-100">
+              <h3 className="font-semibold text-[var(--color-text-primary)] dark:text-[var(--color-text-inverse)]">
                 Filtros Avanzados
               </h3>
               {activeFiltersCount > 0 && (
                 <button
                   onClick={handleClearFilters}
-                  className="text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 flex items-center gap-1"
+                  className="text-sm text-[var(--color-text-secondary)] dark:text-[var(--color-text-tertiary)] hover:text-[var(--color-text-primary)] dark:hover:text-[var(--color-text-inverse)] flex items-center gap-1"
                 >
                   <X className="h-3 w-3" />
                   Limpiar filtros
@@ -186,7 +186,7 @@ export const ApprovalRequestList = React.memo<ApprovalRequestListProps>(
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
               {/* Filtro de Estado */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                <label className="block text-sm font-medium text-[var(--color-text-primary)] dark:text-[var(--color-text-tertiary)] mb-2">
                   Estado
                 </label>
                 <select
@@ -194,7 +194,7 @@ export const ApprovalRequestList = React.memo<ApprovalRequestListProps>(
                   onChange={(e) =>
                     handleFilterChange("status", e.target.value || undefined)
                   }
-                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100"
+                  className="w-full px-3 py-2 border border-[var(--color-border-strong)] dark:border-[var(--color-border-strong)] rounded-lg bg-white dark:bg-[var(--color-bg-inverse)] text-[var(--color-text-primary)] dark:text-[var(--color-text-inverse)]"
                 >
                   <option value="">Todos</option>
                   {STATUS_OPTIONS.map((opt) => (
@@ -207,7 +207,7 @@ export const ApprovalRequestList = React.memo<ApprovalRequestListProps>(
 
               {/* Filtro de Nivel */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                <label className="block text-sm font-medium text-[var(--color-text-primary)] dark:text-[var(--color-text-tertiary)] mb-2">
                   Nivel
                 </label>
                 <select
@@ -215,7 +215,7 @@ export const ApprovalRequestList = React.memo<ApprovalRequestListProps>(
                   onChange={(e) =>
                     handleFilterChange("level", e.target.value || undefined)
                   }
-                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100"
+                  className="w-full px-3 py-2 border border-[var(--color-border-strong)] dark:border-[var(--color-border-strong)] rounded-lg bg-white dark:bg-[var(--color-bg-inverse)] text-[var(--color-text-primary)] dark:text-[var(--color-text-inverse)]"
                 >
                   <option value="">Todos</option>
                   {LEVEL_OPTIONS.map((opt) => (
@@ -228,7 +228,7 @@ export const ApprovalRequestList = React.memo<ApprovalRequestListProps>(
 
               {/* Filtro de Prioridad */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                <label className="block text-sm font-medium text-[var(--color-text-primary)] dark:text-[var(--color-text-tertiary)] mb-2">
                   Prioridad
                 </label>
                 <select
@@ -236,7 +236,7 @@ export const ApprovalRequestList = React.memo<ApprovalRequestListProps>(
                   onChange={(e) =>
                     handleFilterChange("priority", e.target.value || undefined)
                   }
-                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100"
+                  className="w-full px-3 py-2 border border-[var(--color-border-strong)] dark:border-[var(--color-border-strong)] rounded-lg bg-white dark:bg-[var(--color-bg-inverse)] text-[var(--color-text-primary)] dark:text-[var(--color-text-inverse)]"
                 >
                   <option value="">Todas</option>
                   {PRIORITY_OPTIONS.map((opt) => (
@@ -254,7 +254,7 @@ export const ApprovalRequestList = React.memo<ApprovalRequestListProps>(
         {loading ? (
           <div className="flex items-center justify-center py-12">
             <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[var(--color-primary-base)]" />
-            <span className="ml-3 text-gray-600 dark:text-gray-400">
+            <span className="ml-3 text-[var(--color-text-secondary)] dark:text-[var(--color-text-tertiary)]">
               Cargando solicitudes...
             </span>
           </div>
@@ -273,8 +273,8 @@ export const ApprovalRequestList = React.memo<ApprovalRequestListProps>(
           </div>
         ) : (
           <div className="text-center py-12">
-            <Filter className="h-12 w-12 text-gray-400 dark:text-gray-600 mx-auto mb-3" />
-            <p className="text-gray-600 dark:text-gray-400">
+            <Filter className="h-12 w-12 text-[var(--color-text-tertiary)] dark:text-[var(--color-text-secondary)] mx-auto mb-3" />
+            <p className="text-[var(--color-text-secondary)] dark:text-[var(--color-text-tertiary)]">
               No se encontraron solicitudes
             </p>
             {(searchQuery || activeFiltersCount > 0) && (
@@ -293,7 +293,7 @@ export const ApprovalRequestList = React.memo<ApprovalRequestListProps>(
 
         {/* Contador de resultados */}
         {!loading && filteredRequests.length > 0 && (
-          <div className="text-center text-sm text-gray-600 dark:text-gray-400">
+          <div className="text-center text-sm text-[var(--color-text-secondary)] dark:text-[var(--color-text-tertiary)]">
             Mostrando {filteredRequests.length} de {requests.length} solicitudes
           </div>
         )}

@@ -194,17 +194,17 @@ export function CalendarView({
   // Loading state
   if (isLoading) {
     return (
-      <div className="flex items-center justify-center h-96 bg-white rounded-lg border border-gray-200">
+      <div className="flex items-center justify-center h-96 bg-white rounded-lg border border-[var(--color-border-subtle)]">
         <div className="flex flex-col items-center gap-4">
           <div className="w-12 h-12 border-4 border-blue-500 border-t-transparent rounded-full animate-spin" />
-          <p className="text-gray-600">Cargando calendario...</p>
+          <p className="text-[var(--color-text-secondary)]">Cargando calendario...</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="flex flex-col bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 shadow-sm overflow-hidden">
+    <div className="flex flex-col bg-white dark:bg-[var(--color-bg-inverse)] rounded-lg border border-[var(--color-border-subtle)] dark:border-[var(--color-border-strong)] shadow-sm overflow-hidden">
       <CalendarHeader
         currentDate={currentDate}
         view={view}
@@ -226,8 +226,8 @@ export function CalendarView({
         />
       ) : (
         // Vista diaria: lista detallada de eventos
-        <div className="p-6 bg-white dark:bg-gray-800 rounded-lg">
-          <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
+        <div className="p-6 bg-white dark:bg-[var(--color-bg-inverse)] rounded-lg">
+          <h3 className="text-lg font-semibold text-[var(--color-text-primary)] dark:text-white mb-4">
             Eventos del día
           </h3>
           {calendarDays[0]?.events.length > 0 ? (
@@ -238,8 +238,8 @@ export function CalendarView({
                   type="button"
                   onClick={() => onEventClick?.(event)}
                   className="
-                    w-full text-left p-4 rounded-lg border border-gray-200 dark:border-gray-700
-                    bg-gray-50 dark:bg-gray-900 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors
+                    w-full text-left p-4 rounded-lg border border-[var(--color-border-subtle)] dark:border-[var(--color-border-strong)]
+                    bg-[var(--color-bg-secondary)] dark:bg-[var(--color-bg-inverse)] hover:bg-[var(--color-bg-secondary)] dark:hover:bg-[var(--color-bg-elevated)] transition-colors
                   "
                   style={{
                     borderLeftWidth: "4px",
@@ -248,10 +248,10 @@ export function CalendarView({
                 >
                   <div className="flex items-start justify-between">
                     <div>
-                      <h4 className="font-semibold text-gray-900 dark:text-white">
+                      <h4 className="font-semibold text-[var(--color-text-primary)] dark:text-white">
                         {event.title}
                       </h4>
-                      <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
+                      <p className="text-sm text-[var(--color-text-secondary)] dark:text-[var(--color-text-tertiary)] mt-1">
                         {event.resourceName}
                       </p>
                     </div>
@@ -265,7 +265,7 @@ export function CalendarView({
                       {event.status}
                     </span>
                   </div>
-                  <p className="text-sm text-gray-700 dark:text-gray-300 mt-2">
+                  <p className="text-sm text-[var(--color-text-primary)] dark:text-[var(--color-text-tertiary)] mt-2">
                     {event.start.toLocaleTimeString("es", {
                       hour: "2-digit",
                       minute: "2-digit",
@@ -280,7 +280,7 @@ export function CalendarView({
               ))}
             </div>
           ) : (
-            <p className="text-gray-500 dark:text-gray-400 text-center py-8">
+            <p className="text-[var(--color-text-secondary)] dark:text-[var(--color-text-tertiary)] text-center py-8">
               No hay eventos para este día
             </p>
           )}

@@ -44,29 +44,29 @@ export const UserActivityTable = React.memo<UserActivityTableProps>(
 
     return (
       <div
-        className={`bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg ${className}`}
+        className={`bg-white dark:bg-[var(--color-bg-inverse)] border border-[var(--color-border-subtle)] dark:border-[var(--color-border-strong)] rounded-lg ${className}`}
       >
-        <div className="p-4 border-b border-gray-200 dark:border-gray-700">
+        <div className="p-4 border-b border-[var(--color-border-subtle)] dark:border-[var(--color-border-strong)]">
           <div className="relative">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-[var(--color-text-tertiary)]" />
             <input
               type="text"
               placeholder="Buscar usuario..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              className="w-full pl-10 pr-4 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100"
+              className="w-full pl-10 pr-4 py-2 text-sm border border-[var(--color-border-strong)] dark:border-[var(--color-border-strong)] rounded-lg bg-white dark:bg-[var(--color-bg-inverse)] text-[var(--color-text-primary)] dark:text-[var(--color-text-inverse)]"
             />
           </div>
         </div>
 
         <div className="overflow-x-auto">
           <table className="w-full">
-            <thead className="bg-gray-50 dark:bg-gray-900">
+            <thead className="bg-[var(--color-bg-secondary)] dark:bg-[var(--color-bg-inverse)]">
               <tr>
                 <th className="px-4 py-3 text-left">
                   <button
                     onClick={() => handleSort("userName")}
-                    className="flex items-center gap-1 text-xs font-medium text-gray-600 dark:text-gray-400"
+                    className="flex items-center gap-1 text-xs font-medium text-[var(--color-text-secondary)] dark:text-[var(--color-text-tertiary)]"
                   >
                     Usuario
                     {sortKey === "userName" &&
@@ -80,7 +80,7 @@ export const UserActivityTable = React.memo<UserActivityTableProps>(
                 <th className="px-4 py-3 text-right">
                   <button
                     onClick={() => handleSort("totalReservations")}
-                    className="flex items-center gap-1 ml-auto text-xs font-medium text-gray-600 dark:text-gray-400"
+                    className="flex items-center gap-1 ml-auto text-xs font-medium text-[var(--color-text-secondary)] dark:text-[var(--color-text-tertiary)]"
                   >
                     Reservas
                     {sortKey === "totalReservations" &&
@@ -94,7 +94,7 @@ export const UserActivityTable = React.memo<UserActivityTableProps>(
                 <th className="px-4 py-3 text-right">
                   <button
                     onClick={() => handleSort("totalHours")}
-                    className="flex items-center gap-1 ml-auto text-xs font-medium text-gray-600 dark:text-gray-400"
+                    className="flex items-center gap-1 ml-auto text-xs font-medium text-[var(--color-text-secondary)] dark:text-[var(--color-text-tertiary)]"
                   >
                     Horas
                     {sortKey === "totalHours" &&
@@ -108,7 +108,7 @@ export const UserActivityTable = React.memo<UserActivityTableProps>(
                 <th className="px-4 py-3 text-right">
                   <button
                     onClick={() => handleSort("cancelledReservations")}
-                    className="flex items-center gap-1 ml-auto text-xs font-medium text-gray-600 dark:text-gray-400"
+                    className="flex items-center gap-1 ml-auto text-xs font-medium text-[var(--color-text-secondary)] dark:text-[var(--color-text-tertiary)]"
                   >
                     Canceladas
                     {sortKey === "cancelledReservations" &&
@@ -126,7 +126,7 @@ export const UserActivityTable = React.memo<UserActivityTableProps>(
                 <tr>
                   <td
                     colSpan={4}
-                    className="px-4 py-8 text-center text-gray-500"
+                    className="px-4 py-8 text-center text-[var(--color-text-secondary)]"
                   >
                     Cargando...
                   </td>
@@ -135,7 +135,7 @@ export const UserActivityTable = React.memo<UserActivityTableProps>(
                 <tr>
                   <td
                     colSpan={4}
-                    className="px-4 py-8 text-center text-gray-500"
+                    className="px-4 py-8 text-center text-[var(--color-text-secondary)]"
                   >
                     No hay datos
                   </td>
@@ -147,20 +147,20 @@ export const UserActivityTable = React.memo<UserActivityTableProps>(
                     onClick={() => onUserClick?.(user.userId)}
                     className={
                       onUserClick
-                        ? "cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700/50"
+                        ? "cursor-pointer hover:bg-[var(--color-bg-secondary)] dark:hover:bg-[var(--color-bg-elevated)]/50"
                         : ""
                     }
                   >
-                    <td className="px-4 py-3 text-sm font-medium text-gray-900 dark:text-gray-100">
+                    <td className="px-4 py-3 text-sm font-medium text-[var(--color-text-primary)] dark:text-[var(--color-text-inverse)]">
                       {user.userName}
                     </td>
-                    <td className="px-4 py-3 text-sm text-right text-gray-600 dark:text-gray-400">
+                    <td className="px-4 py-3 text-sm text-right text-[var(--color-text-secondary)] dark:text-[var(--color-text-tertiary)]">
                       {user.totalReservations}
                     </td>
-                    <td className="px-4 py-3 text-sm text-right text-gray-600 dark:text-gray-400">
+                    <td className="px-4 py-3 text-sm text-right text-[var(--color-text-secondary)] dark:text-[var(--color-text-tertiary)]">
                       {user.totalHours}
                     </td>
-                    <td className="px-4 py-3 text-sm text-right text-gray-600 dark:text-gray-400">
+                    <td className="px-4 py-3 text-sm text-right text-[var(--color-text-secondary)] dark:text-[var(--color-text-tertiary)]">
                       {user.cancelledReservations}
                     </td>
                   </tr>

@@ -39,7 +39,7 @@ export const FilterTag = React.memo<FilterTagProps>(
       orange:
         "bg-orange-50 dark:bg-orange-900/20 text-orange-700 dark:text-orange-300 border-orange-200 dark:border-orange-800",
       red: "bg-red-50 dark:bg-red-900/20 text-red-700 dark:text-red-300 border-red-200 dark:border-red-800",
-      gray: "bg-gray-50 dark:bg-gray-800 text-gray-700 dark:text-gray-300 border-gray-200 dark:border-gray-700",
+      gray: "bg-[var(--color-bg-secondary)] dark:bg-[var(--color-bg-inverse)] text-[var(--color-text-primary)] dark:text-[var(--color-text-tertiary)] border-[var(--color-border-subtle)] dark:border-[var(--color-border-strong)]",
     };
 
     return (

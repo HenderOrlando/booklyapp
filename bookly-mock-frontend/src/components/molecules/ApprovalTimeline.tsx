@@ -73,7 +73,7 @@ export const ApprovalTimeline = React.memo<ApprovalTimelineProps>(
                       ? "bg-[var(--color-success-base)]"
                       : status === "rejected"
                         ? "bg-[var(--color-error-base)]"
-                        : "bg-gray-300 dark:bg-gray-600"
+                        : "bg-[var(--color-bg-muted)] dark:bg-[var(--color-bg-elevated)]"
                   }`}
                   style={{ height: "calc(100% - 2.5rem)" }}
                 />
@@ -90,16 +90,16 @@ export const ApprovalTimeline = React.memo<ApprovalTimelineProps>(
                 <div className="flex-1 pt-1">
                   {/* Acción y nivel */}
                   <div className="flex items-center gap-2 mb-1">
-                    <h4 className="font-semibold text-sm text-gray-900 dark:text-gray-100">
+                    <h4 className="font-semibold text-sm text-[var(--color-text-primary)] dark:text-[var(--color-text-inverse)]">
                       {ACTION_LABELS[entry.action] || entry.action}
                     </h4>
-                    <span className="text-xs text-gray-500 dark:text-gray-400 px-2 py-0.5 rounded-full bg-gray-100 dark:bg-gray-800">
+                    <span className="text-xs text-[var(--color-text-secondary)] dark:text-[var(--color-text-tertiary)] px-2 py-0.5 rounded-full bg-[var(--color-bg-secondary)] dark:bg-[var(--color-bg-inverse)]">
                       {entry.level.replace("_", " ")}
                     </span>
                   </div>
 
                   {/* Performer y timestamp */}
-                  <div className="text-sm text-gray-600 dark:text-gray-400 mb-2">
+                  <div className="text-sm text-[var(--color-text-secondary)] dark:text-[var(--color-text-tertiary)] mb-2">
                     <span className="font-medium">{entry.performerName}</span>
                     {entry.performerRole && (
                       <span className="text-xs ml-1">
@@ -122,8 +122,8 @@ export const ApprovalTimeline = React.memo<ApprovalTimelineProps>(
 
                   {/* Comentarios */}
                   {entry.comments && (
-                    <div className="mt-2 p-3 rounded-md bg-gray-50 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700">
-                      <p className="text-sm text-gray-700 dark:text-gray-300">
+                    <div className="mt-2 p-3 rounded-md bg-[var(--color-bg-secondary)] dark:bg-[var(--color-bg-inverse)]/50 border border-[var(--color-border-subtle)] dark:border-[var(--color-border-strong)]">
+                      <p className="text-sm text-[var(--color-text-primary)] dark:text-[var(--color-text-tertiary)]">
                         {entry.comments}
                       </p>
                     </div>
@@ -144,10 +144,10 @@ export const ApprovalTimeline = React.memo<ApprovalTimelineProps>(
                   {/* Metadata adicional */}
                   {entry.metadata && Object.keys(entry.metadata).length > 0 && (
                     <details className="mt-2">
-                      <summary className="text-xs text-gray-500 dark:text-gray-400 cursor-pointer hover:text-gray-700 dark:hover:text-gray-300">
+                      <summary className="text-xs text-[var(--color-text-secondary)] dark:text-[var(--color-text-tertiary)] cursor-pointer hover:text-[var(--color-text-primary)] dark:hover:text-[var(--color-text-tertiary)]">
                         Ver detalles técnicos
                       </summary>
-                      <pre className="mt-2 text-xs bg-gray-100 dark:bg-gray-800 p-2 rounded overflow-x-auto">
+                      <pre className="mt-2 text-xs bg-[var(--color-bg-secondary)] dark:bg-[var(--color-bg-inverse)] p-2 rounded overflow-x-auto">
                         {JSON.stringify(entry.metadata, null, 2)}
                       </pre>
                     </details>
@@ -160,7 +160,7 @@ export const ApprovalTimeline = React.memo<ApprovalTimelineProps>(
 
         {/* Estado final si no hay historial */}
         {history.length === 0 && (
-          <div className="text-center py-8 text-gray-500 dark:text-gray-400">
+          <div className="text-center py-8 text-[var(--color-text-secondary)] dark:text-[var(--color-text-tertiary)]">
             <p className="text-sm">No hay historial de aprobaciones aún</p>
           </div>
         )}

@@ -21,7 +21,7 @@ const badgeVariants = cva(
     variants: {
       variant: {
         default:
-          "border-transparent bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-300",
+          "border-transparent bg-[var(--color-bg-secondary)] text-[var(--color-text-primary)] dark:bg-[var(--color-bg-inverse)] dark:text-[var(--color-text-tertiary)]",
         success:
           "border-state-success-200 bg-[var(--color-state-success-bg)] text-[var(--color-state-success-text)]",
         warning:

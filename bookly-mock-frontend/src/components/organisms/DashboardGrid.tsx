@@ -32,7 +32,7 @@ export const DashboardGrid = React.memo<DashboardGridProps>(
       <div className={`space-y-6 ${className}`}>
         {/* KPIs Section */}
         <section>
-          <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4">
+          <h2 className="text-lg font-semibold text-[var(--color-text-primary)] dark:text-[var(--color-text-inverse)] mb-4">
             Métricas Clave
           </h2>
           <KPIGrid kpis={dashboardData?.kpis} loading={loading} />
@@ -77,26 +77,26 @@ export const DashboardGrid = React.memo<DashboardGridProps>(
         {dashboardData?.recentActivity &&
           dashboardData.recentActivity.length > 0 && (
             <section>
-              <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4">
+              <h2 className="text-lg font-semibold text-[var(--color-text-primary)] dark:text-[var(--color-text-inverse)] mb-4">
                 Actividad Reciente
               </h2>
-              <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg overflow-hidden">
+              <div className="bg-white dark:bg-[var(--color-bg-inverse)] border border-[var(--color-border-subtle)] dark:border-[var(--color-border-strong)] rounded-lg overflow-hidden">
                 <div className="divide-y divide-gray-200 dark:divide-gray-700">
                   {dashboardData.recentActivity.map((activity) => (
                     <div
                       key={activity.id}
-                      className="p-4 hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors"
+                      className="p-4 hover:bg-[var(--color-bg-secondary)] dark:hover:bg-[var(--color-bg-elevated)]/50 transition-colors"
                     >
                       <div className="flex items-start justify-between">
                         <div className="flex-1">
-                          <p className="text-sm font-medium text-gray-900 dark:text-gray-100">
+                          <p className="text-sm font-medium text-[var(--color-text-primary)] dark:text-[var(--color-text-inverse)]">
                             {activity.type}
                           </p>
-                          <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
+                          <p className="text-sm text-[var(--color-text-secondary)] dark:text-[var(--color-text-tertiary)] mt-1">
                             {activity.description}
                           </p>
                         </div>
-                        <time className="text-xs text-gray-500 dark:text-gray-500 ml-4">
+                        <time className="text-xs text-[var(--color-text-secondary)] dark:text-[var(--color-text-secondary)] ml-4">
                           {new Date(activity.timestamp).toLocaleString(
                             "es-ES",
                             {

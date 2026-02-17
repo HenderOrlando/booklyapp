@@ -21,7 +21,7 @@ export function ThemeToggle() {
 
   if (!mounted) {
     return (
-      <div className="w-14 h-7 bg-gray-700 rounded-full animate-pulse"></div>
+      <div className="w-14 h-7 bg-[var(--color-bg-elevated)] rounded-full animate-pulse"></div>
     );
   }
 
@@ -52,7 +52,7 @@ export function ThemeToggle() {
       <span className="absolute left-1.5 flex items-center">
         {/* Sol (light) */}
         <svg
-          className={`w-3 h-3 ${isDark ? "text-gray-500" : "text-yellow-500"}`}
+          className={`w-3 h-3 ${isDark ? "text-[var(--color-text-secondary)]" : "text-yellow-500"}`}
           fill="currentColor"
           viewBox="0 0 20 20"
         >
@@ -67,7 +67,7 @@ export function ThemeToggle() {
       <span className="absolute right-1.5 flex items-center">
         {/* Luna (dark) */}
         <svg
-          className={`w-3 h-3 ${isDark ? "text-yellow-300" : "text-gray-500"}`}
+          className={`w-3 h-3 ${isDark ? "text-yellow-300" : "text-[var(--color-text-secondary)]"}`}
           fill="currentColor"
           viewBox="0 0 20 20"
         >

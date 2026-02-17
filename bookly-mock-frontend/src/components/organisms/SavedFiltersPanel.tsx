@@ -47,14 +47,14 @@ export const SavedFiltersPanel = React.memo<SavedFiltersPanelProps>(
     return (
       <div
         className={`
-          bg-white dark:bg-gray-800 
-          border border-gray-200 dark:border-gray-700 
+          bg-white dark:bg-[var(--color-bg-inverse)] 
+          border border-[var(--color-border-subtle)] dark:border-[var(--color-border-strong)] 
           rounded-lg p-4
           ${className}
         `}
       >
         <div className="flex items-center justify-between mb-4">
-          <h3 className="text-sm font-semibold text-gray-900 dark:text-gray-100">
+          <h3 className="text-sm font-semibold text-[var(--color-text-primary)] dark:text-[var(--color-text-inverse)]">
             Filtros Guardados
           </h3>
           <button
@@ -67,13 +67,13 @@ export const SavedFiltersPanel = React.memo<SavedFiltersPanelProps>(
         </div>
 
         {showSaveDialog && (
-          <div className="mb-4 p-3 bg-gray-50 dark:bg-gray-900 rounded-lg">
+          <div className="mb-4 p-3 bg-[var(--color-bg-secondary)] dark:bg-[var(--color-bg-inverse)] rounded-lg">
             <input
               type="text"
               value={filterName}
               onChange={(e) => setFilterName(e.target.value)}
               placeholder="Nombre del filtro..."
-              className="w-full px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 mb-2"
+              className="w-full px-3 py-2 text-sm border border-[var(--color-border-strong)] dark:border-[var(--color-border-strong)] rounded-lg bg-white dark:bg-[var(--color-bg-inverse)] text-[var(--color-text-primary)] dark:text-[var(--color-text-inverse)] mb-2"
               onKeyDown={(e) => e.key === "Enter" && handleSave()}
             />
             <div className="flex gap-2">
@@ -89,7 +89,7 @@ export const SavedFiltersPanel = React.memo<SavedFiltersPanelProps>(
                   setShowSaveDialog(false);
                   setFilterName("");
                 }}
-                className="flex-1 px-3 py-1.5 text-sm border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700"
+                className="flex-1 px-3 py-1.5 text-sm border border-[var(--color-border-strong)] dark:border-[var(--color-border-strong)] rounded-lg hover:bg-[var(--color-bg-secondary)] dark:hover:bg-[var(--color-bg-elevated)]"
               >
                 Cancelar
               </button>
@@ -100,7 +100,7 @@ export const SavedFiltersPanel = React.memo<SavedFiltersPanelProps>(
         <div className="space-y-3">
           {favoriteFilters.length > 0 && (
             <div>
-              <p className="text-xs font-medium text-gray-600 dark:text-gray-400 mb-2">
+              <p className="text-xs font-medium text-[var(--color-text-secondary)] dark:text-[var(--color-text-tertiary)] mb-2">
                 Favoritos
               </p>
               <div className="space-y-1">
@@ -119,7 +119,7 @@ export const SavedFiltersPanel = React.memo<SavedFiltersPanelProps>(
 
           {otherFilters.length > 0 && (
             <div>
-              <p className="text-xs font-medium text-gray-600 dark:text-gray-400 mb-2">
+              <p className="text-xs font-medium text-[var(--color-text-secondary)] dark:text-[var(--color-text-tertiary)] mb-2">
                 Todos
               </p>
               <div className="space-y-1">
@@ -137,7 +137,7 @@ export const SavedFiltersPanel = React.memo<SavedFiltersPanelProps>(
           )}
 
           {savedFilters.length === 0 && (
-            <p className="text-sm text-gray-500 dark:text-gray-400 text-center py-4">
+            <p className="text-sm text-[var(--color-text-secondary)] dark:text-[var(--color-text-tertiary)] text-center py-4">
               No hay filtros guardados
             </p>
           )}
@@ -163,10 +163,10 @@ const FilterItem: React.FC<FilterItemProps> = ({
   onToggleFavorite,
 }) => {
   return (
-    <div className="flex items-center gap-2 p-2 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700/50 group">
+    <div className="flex items-center gap-2 p-2 rounded-lg hover:bg-[var(--color-bg-secondary)] dark:hover:bg-[var(--color-bg-elevated)]/50 group">
       <button
         onClick={() => onToggleFavorite(filter.id)}
-        className="p-1 hover:bg-gray-100 dark:hover:bg-gray-600 rounded transition-colors"
+        className="p-1 hover:bg-[var(--color-bg-secondary)] dark:hover:bg-[var(--color-bg-elevated)] rounded transition-colors"
         title={
           filter.isFavorite ? "Quitar de favoritos" : "Marcar como favorito"
         }
@@ -174,13 +174,13 @@ const FilterItem: React.FC<FilterItemProps> = ({
         {filter.isFavorite ? (
           <Star className="h-4 w-4 text-yellow-500 fill-yellow-500" />
         ) : (
-          <StarOff className="h-4 w-4 text-gray-400" />
+          <StarOff className="h-4 w-4 text-[var(--color-text-tertiary)]" />
         )}
       </button>
 
       <button
         onClick={() => onLoad(filter)}
-        className="flex-1 text-left text-sm text-gray-900 dark:text-gray-100 hover:text-[var(--color-primary-base)]"
+        className="flex-1 text-left text-sm text-[var(--color-text-primary)] dark:text-[var(--color-text-inverse)] hover:text-[var(--color-primary-base)]"
       >
         {filter.name}
       </button>

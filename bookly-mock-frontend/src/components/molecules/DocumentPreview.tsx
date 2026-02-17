@@ -80,7 +80,7 @@ export const DocumentPreview = React.memo<DocumentPreviewProps>(
           <div className="flex items-start justify-between">
             <div className="flex-1">
               <CardTitle className="flex items-center gap-2">
-                <FileText className="h-5 w-5 text-gray-500 dark:text-gray-400" />
+                <FileText className="h-5 w-5 text-[var(--color-text-secondary)] dark:text-[var(--color-text-tertiary)]" />
                 {title}
               </CardTitle>
               {description && (
@@ -98,7 +98,7 @@ export const DocumentPreview = React.memo<DocumentPreviewProps>(
             <div className="grid grid-cols-2 gap-3 text-sm">
               {fileSize && (
                 <div>
-                  <span className="text-gray-600 dark:text-gray-400">
+                  <span className="text-[var(--color-text-secondary)] dark:text-[var(--color-text-tertiary)]">
                     Tamaño:
                   </span>
                   <span className="ml-2 font-medium">
@@ -108,7 +108,7 @@ export const DocumentPreview = React.memo<DocumentPreviewProps>(
               )}
               {generatedAt && (
                 <div>
-                  <span className="text-gray-600 dark:text-gray-400">
+                  <span className="text-[var(--color-text-secondary)] dark:text-[var(--color-text-tertiary)]">
                     Generado:
                   </span>
                   <span className="ml-2 font-medium">
@@ -118,8 +118,8 @@ export const DocumentPreview = React.memo<DocumentPreviewProps>(
               )}
               {documentId && (
                 <div className="col-span-2">
-                  <span className="text-gray-600 dark:text-gray-400">ID:</span>
-                  <code className="ml-2 text-xs bg-gray-100 dark:bg-gray-800 px-2 py-0.5 rounded">
+                  <span className="text-[var(--color-text-secondary)] dark:text-[var(--color-text-tertiary)]">ID:</span>
+                  <code className="ml-2 text-xs bg-[var(--color-bg-secondary)] dark:bg-[var(--color-bg-inverse)] px-2 py-0.5 rounded">
                     {documentId}
                   </code>
                 </div>
@@ -129,7 +129,7 @@ export const DocumentPreview = React.memo<DocumentPreviewProps>(
 
           {/* Preview del PDF (iframe) */}
           {pdfUrl && !previewError && (
-            <div className="relative rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900 overflow-hidden">
+            <div className="relative rounded-lg border border-[var(--color-border-subtle)] dark:border-[var(--color-border-strong)] bg-[var(--color-bg-secondary)] dark:bg-[var(--color-bg-inverse)] overflow-hidden">
               <div className="aspect-[8.5/11] min-h-[300px]">
                 <iframe
                   src={pdfUrl}
@@ -143,12 +143,12 @@ export const DocumentPreview = React.memo<DocumentPreviewProps>(
 
           {/* Error de preview */}
           {pdfUrl && previewError && (
-            <div className="flex flex-col items-center justify-center p-8 rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900 text-center">
-              <FileText className="h-12 w-12 text-gray-400 dark:text-gray-600 mb-3" />
-              <p className="text-sm text-gray-600 dark:text-gray-400">
+            <div className="flex flex-col items-center justify-center p-8 rounded-lg border border-[var(--color-border-subtle)] dark:border-[var(--color-border-strong)] bg-[var(--color-bg-secondary)] dark:bg-[var(--color-bg-inverse)] text-center">
+              <FileText className="h-12 w-12 text-[var(--color-text-tertiary)] dark:text-[var(--color-text-secondary)] mb-3" />
+              <p className="text-sm text-[var(--color-text-secondary)] dark:text-[var(--color-text-tertiary)]">
                 No se puede mostrar la vista previa
               </p>
-              <p className="text-xs text-gray-500 dark:text-gray-500 mt-1">
+              <p className="text-xs text-[var(--color-text-secondary)] dark:text-[var(--color-text-secondary)] mt-1">
                 Use el botón de descarga para ver el documento
               </p>
             </div>
@@ -156,19 +156,19 @@ export const DocumentPreview = React.memo<DocumentPreviewProps>(
 
           {/* Si no hay pdfUrl, mostrar placeholder */}
           {!pdfUrl && (
-            <div className="flex flex-col items-center justify-center p-8 rounded-lg border border-dashed border-gray-300 dark:border-gray-700 bg-gray-50 dark:bg-gray-900 text-center">
-              <FileText className="h-12 w-12 text-gray-400 dark:text-gray-600 mb-3" />
-              <p className="text-sm text-gray-600 dark:text-gray-400">
+            <div className="flex flex-col items-center justify-center p-8 rounded-lg border border-dashed border-[var(--color-border-strong)] dark:border-[var(--color-border-strong)] bg-[var(--color-bg-secondary)] dark:bg-[var(--color-bg-inverse)] text-center">
+              <FileText className="h-12 w-12 text-[var(--color-text-tertiary)] dark:text-[var(--color-text-secondary)] mb-3" />
+              <p className="text-sm text-[var(--color-text-secondary)] dark:text-[var(--color-text-tertiary)]">
                 Documento disponible
               </p>
-              <p className="text-xs text-gray-500 dark:text-gray-500 mt-1">
+              <p className="text-xs text-[var(--color-text-secondary)] dark:text-[var(--color-text-secondary)] mt-1">
                 Use las opciones de abajo para visualizar
               </p>
             </div>
           )}
 
           {/* Acciones */}
-          <div className="flex flex-wrap gap-2 pt-4 border-t border-gray-200 dark:border-gray-700">
+          <div className="flex flex-wrap gap-2 pt-4 border-t border-[var(--color-border-subtle)] dark:border-[var(--color-border-strong)]">
             {onView && (
               <Button
                 variant="default"
@@ -205,7 +205,7 @@ export const DocumentPreview = React.memo<DocumentPreviewProps>(
           {loading && (
             <div className="flex items-center justify-center py-4">
               <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-[var(--color-primary-base)]" />
-              <span className="ml-3 text-sm text-gray-600 dark:text-gray-400">
+              <span className="ml-3 text-sm text-[var(--color-text-secondary)] dark:text-[var(--color-text-tertiary)]">
                 Generando documento...
               </span>
             </div>

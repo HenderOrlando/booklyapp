@@ -74,7 +74,7 @@ export function VirtualizedList<T extends { id: string }>({
   if (items.length === 0) {
     return (
       <div className="text-center py-12">
-        <p className="text-gray-400">{emptyMessage}</p>
+        <p className="text-[var(--color-text-tertiary)]">{emptyMessage}</p>
       </div>
     );
   }
@@ -82,14 +82,14 @@ export function VirtualizedList<T extends { id: string }>({
   return (
     <div className={className}>
       {/* Header con contador */}
-      <div className="mb-4 text-sm text-gray-400">
+      <div className="mb-4 text-sm text-[var(--color-text-tertiary)]">
         Total: {items.length} elementos
       </div>
 
       {/* Contenedor virtualizado */}
       <div
         ref={parentRef}
-        className="overflow-auto border border-gray-700 rounded-lg bg-gray-900/50"
+        className="overflow-auto border border-[var(--color-border-strong)] rounded-lg bg-[var(--color-bg-inverse)]/50"
         style={{ height: containerHeight }}
       >
         <div

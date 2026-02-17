@@ -62,11 +62,11 @@ export const DateRangePicker = React.memo<DateRangePickerProps>(
     return (
       <div className={`flex items-center gap-3 ${className}`}>
         {/* Ícono */}
-        <Calendar className="h-5 w-5 text-gray-400 dark:text-gray-500 flex-shrink-0" />
+        <Calendar className="h-5 w-5 text-[var(--color-text-tertiary)] dark:text-[var(--color-text-secondary)] flex-shrink-0" />
 
         {/* Fecha inicio */}
         <div className="flex flex-col gap-1">
-          <label className="text-xs font-medium text-gray-600 dark:text-gray-400">
+          <label className="text-xs font-medium text-[var(--color-text-secondary)] dark:text-[var(--color-text-tertiary)]">
             Desde
           </label>
           <input
@@ -85,10 +85,10 @@ export const DateRangePicker = React.memo<DateRangePickerProps>(
             className="
               px-3 py-2
               text-sm
-              border border-gray-300 dark:border-gray-600
+              border border-[var(--color-border-strong)] dark:border-[var(--color-border-strong)]
               rounded-lg
-              bg-white dark:bg-gray-800
-              text-gray-900 dark:text-gray-100
+              bg-white dark:bg-[var(--color-bg-inverse)]
+              text-[var(--color-text-primary)] dark:text-[var(--color-text-inverse)]
               focus:outline-none focus:ring-2 focus:ring-[var(--color-primary-base)] focus:border-transparent
               disabled:opacity-50 disabled:cursor-not-allowed
               transition-colors
@@ -97,11 +97,11 @@ export const DateRangePicker = React.memo<DateRangePickerProps>(
         </div>
 
         {/* Separador */}
-        <span className="text-gray-400 dark:text-gray-500 mt-5">→</span>
+        <span className="text-[var(--color-text-tertiary)] dark:text-[var(--color-text-secondary)] mt-5">→</span>
 
         {/* Fecha fin */}
         <div className="flex flex-col gap-1">
-          <label className="text-xs font-medium text-gray-600 dark:text-gray-400">
+          <label className="text-xs font-medium text-[var(--color-text-secondary)] dark:text-[var(--color-text-tertiary)]">
             Hasta
           </label>
           <input
@@ -120,10 +120,10 @@ export const DateRangePicker = React.memo<DateRangePickerProps>(
             className="
               px-3 py-2
               text-sm
-              border border-gray-300 dark:border-gray-600
+              border border-[var(--color-border-strong)] dark:border-[var(--color-border-strong)]
               rounded-lg
-              bg-white dark:bg-gray-800
-              text-gray-900 dark:text-gray-100
+              bg-white dark:bg-[var(--color-bg-inverse)]
+              text-[var(--color-text-primary)] dark:text-[var(--color-text-inverse)]
               focus:outline-none focus:ring-2 focus:ring-[var(--color-primary-base)] focus:border-transparent
               disabled:opacity-50 disabled:cursor-not-allowed
               transition-colors

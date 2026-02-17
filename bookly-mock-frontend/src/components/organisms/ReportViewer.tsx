@@ -68,7 +68,7 @@ export const ReportViewer = React.memo<ReportViewerProps>(
         return (
           <div className="flex flex-col items-center justify-center py-12">
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[var(--color-primary-base)] mb-4" />
-            <p className="text-gray-600 dark:text-gray-400">
+            <p className="text-[var(--color-text-secondary)] dark:text-[var(--color-text-tertiary)]">
               Generando reporte...
             </p>
           </div>
@@ -79,37 +79,37 @@ export const ReportViewer = React.memo<ReportViewerProps>(
       return (
         <div className="space-y-6">
           {/* Metadata */}
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 p-4 bg-gray-50 dark:bg-gray-900 rounded-lg">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 p-4 bg-[var(--color-bg-secondary)] dark:bg-[var(--color-bg-inverse)] rounded-lg">
             <div>
-              <p className="text-xs text-gray-600 dark:text-gray-400 mb-1">
+              <p className="text-xs text-[var(--color-text-secondary)] dark:text-[var(--color-text-tertiary)] mb-1">
                 Tipo
               </p>
-              <p className="font-medium text-gray-900 dark:text-gray-100">
+              <p className="font-medium text-[var(--color-text-primary)] dark:text-[var(--color-text-inverse)]">
                 {report.type}
               </p>
             </div>
             <div>
-              <p className="text-xs text-gray-600 dark:text-gray-400 mb-1">
+              <p className="text-xs text-[var(--color-text-secondary)] dark:text-[var(--color-text-tertiary)] mb-1">
                 Generado
               </p>
-              <p className="font-medium text-gray-900 dark:text-gray-100">
+              <p className="font-medium text-[var(--color-text-primary)] dark:text-[var(--color-text-inverse)]">
                 {formatDate(report.createdAt)}
               </p>
             </div>
             <div>
-              <p className="text-xs text-gray-600 dark:text-gray-400 mb-1">
+              <p className="text-xs text-[var(--color-text-secondary)] dark:text-[var(--color-text-tertiary)] mb-1">
                 Período
               </p>
-              <p className="font-medium text-gray-900 dark:text-gray-100">
+              <p className="font-medium text-[var(--color-text-primary)] dark:text-[var(--color-text-inverse)]">
                 {new Date(report.startDate).toLocaleDateString("es-ES")} -{" "}
                 {new Date(report.endDate).toLocaleDateString("es-ES")}
               </p>
             </div>
             <div>
-              <p className="text-xs text-gray-600 dark:text-gray-400 mb-1">
+              <p className="text-xs text-[var(--color-text-secondary)] dark:text-[var(--color-text-tertiary)] mb-1">
                 ID
               </p>
-              <p className="font-medium text-gray-900 dark:text-gray-100 truncate">
+              <p className="font-medium text-[var(--color-text-primary)] dark:text-[var(--color-text-inverse)] truncate">
                 {report.id}
               </p>
             </div>
@@ -117,7 +117,7 @@ export const ReportViewer = React.memo<ReportViewerProps>(
 
           {/* Data Preview */}
           <div className="prose dark:prose-invert max-w-none">
-            <pre className="bg-gray-50 dark:bg-gray-900 p-4 rounded-lg overflow-auto text-sm">
+            <pre className="bg-[var(--color-bg-secondary)] dark:bg-[var(--color-bg-inverse)] p-4 rounded-lg overflow-auto text-sm">
               {JSON.stringify(report, null, 2)}
             </pre>
           </div>
@@ -128,20 +128,20 @@ export const ReportViewer = React.memo<ReportViewerProps>(
     return (
       <div
         className={`
-          bg-white dark:bg-gray-800 
-          border border-gray-200 dark:border-gray-700 
+          bg-white dark:bg-[var(--color-bg-inverse)] 
+          border border-[var(--color-border-subtle)] dark:border-[var(--color-border-strong)] 
           rounded-lg
           ${className}
         `}
       >
         {/* Header */}
-        <div className="flex items-start justify-between p-6 border-b border-gray-200 dark:border-gray-700">
+        <div className="flex items-start justify-between p-6 border-b border-[var(--color-border-subtle)] dark:border-[var(--color-border-strong)]">
           <div className="flex-1">
-            <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-2">
+            <h2 className="text-2xl font-bold text-[var(--color-text-primary)] dark:text-[var(--color-text-inverse)] mb-2">
               {title}
             </h2>
             {description && (
-              <p className="text-gray-600 dark:text-gray-400">{description}</p>
+              <p className="text-[var(--color-text-secondary)] dark:text-[var(--color-text-tertiary)]">{description}</p>
             )}
           </div>
 
@@ -176,11 +176,11 @@ export const ReportViewer = React.memo<ReportViewerProps>(
                   inline-flex items-center gap-2
                   px-3 py-1.5
                   text-sm font-medium
-                  text-gray-700 dark:text-gray-300
+                  text-[var(--color-text-primary)] dark:text-[var(--color-text-tertiary)]
                   bg-transparent
-                  border border-gray-300 dark:border-gray-600
+                  border border-[var(--color-border-strong)] dark:border-[var(--color-border-strong)]
                   rounded-lg
-                  hover:bg-gray-50 dark:hover:bg-gray-800
+                  hover:bg-[var(--color-bg-secondary)] dark:hover:bg-[var(--color-bg-inverse)]
                   transition-colors
                 "
                 title="Imprimir"

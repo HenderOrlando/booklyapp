@@ -187,7 +187,7 @@ export function CategoryModal({
                 }
                 placeholder="Descripción breve de la categoría..."
                 rows={3}
-                className={`w-full px-3 py-2 bg-gray-800 border rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-brand-primary-500 ${
+                className={`w-full px-3 py-2 bg-[var(--color-bg-inverse)] border rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-brand-primary-500 ${
                   errors.description
                     ? "border-red-500"
                     : "border-[var(--color-border-subtle)]"
@@ -197,7 +197,7 @@ export function CategoryModal({
                 {errors.description && (
                   <p className="text-xs text-red-500">{errors.description}</p>
                 )}
-                <p className="text-xs text-gray-400 ml-auto">
+                <p className="text-xs text-[var(--color-text-tertiary)] ml-auto">
                   {formData.description?.length || 0}/200
                 </p>
               </div>
@@ -219,7 +219,7 @@ export function CategoryModal({
                     <p className="text-sm text-white font-medium">
                       Color seleccionado
                     </p>
-                    <p className="text-xs text-gray-400 font-mono">
+                    <p className="text-xs text-[var(--color-text-tertiary)] font-mono">
                       {formData.color}
                     </p>
                     <Badge
@@ -236,7 +236,7 @@ export function CategoryModal({
 
                 {/* Colores predefinidos */}
                 <div>
-                  <p className="text-xs text-gray-400 mb-2">
+                  <p className="text-xs text-[var(--color-text-tertiary)] mb-2">
                     Colores predefinidos
                   </p>
                   <div className="grid grid-cols-6 gap-2">
@@ -259,7 +259,7 @@ export function CategoryModal({
 
                 {/* Selector de color personalizado */}
                 <div>
-                  <p className="text-xs text-gray-400 mb-2">
+                  <p className="text-xs text-[var(--color-text-tertiary)] mb-2">
                     Color personalizado
                   </p>
                   <div className="flex items-center gap-3">
@@ -292,13 +292,13 @@ export function CategoryModal({
                   onChange={(e) =>
                     setFormData({ ...formData, isActive: e.target.checked })
                   }
-                  className="w-5 h-5 rounded border-[var(--color-border-subtle)] bg-gray-800 checked:bg-brand-primary-500"
+                  className="w-5 h-5 rounded border-[var(--color-border-subtle)] bg-[var(--color-bg-inverse)] checked:bg-brand-primary-500"
                 />
                 <div>
                   <p className="text-sm font-medium text-white">
                     Categoría activa
                   </p>
-                  <p className="text-xs text-gray-400">
+                  <p className="text-xs text-[var(--color-text-tertiary)]">
                     Las categorías inactivas no se mostrarán en los formularios
                   </p>
                 </div>

@@ -4,7 +4,7 @@ import { AppHeader } from "@/components/organisms/AppHeader";
 import { AppSidebar } from "@/components/organisms/AppSidebar";
 import { ReservationModal } from "@/components/organisms/ReservationModal";
 import { useCreateReservation } from "@/hooks/mutations";
-import { mockResourcesForReservations } from "@/infrastructure/mock/data/reservations-service.mock";
+import { useResources } from "@/hooks/useResources";
 import type { CreateReservationDto } from "@/types/entities/reservation";
 import { useTranslations } from "next-intl";
 import { useRouter, useSearchParams } from "next/navigation";
@@ -23,6 +23,8 @@ export default function NuevaReservaPage() {
 
   // Hook de React Query para crear reserva
   const createReservation = useCreateReservation();
+  const { data: resourcesData } = useResources();
+  const allResources = resourcesData?.items || [];
 
   // Detectar desde dónde se llamó
   const from = searchParams.get("from") || "reservas";
@@ -57,7 +59,7 @@ export default function NuevaReservaPage() {
             isOpen={true}
             onClose={handleClose}
             onSave={handleSave}
-            resources={mockResourcesForReservations as any}
+            resources={allResources as any}
             mode="create"
             loading={createReservation.isPending}
           />

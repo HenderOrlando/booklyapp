@@ -78,15 +78,15 @@ export const PieChartCard = React.memo<PieChartCardProps>(
     return (
       <div
         className={`
-          bg-white dark:bg-gray-800 
-          border border-gray-200 dark:border-gray-700 
+          bg-white dark:bg-[var(--color-bg-inverse)] 
+          border border-[var(--color-border-subtle)] dark:border-[var(--color-border-strong)] 
           rounded-lg p-6
           ${className}
         `}
       >
         {/* Title */}
         {title && (
-          <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4">
+          <h3 className="text-lg font-semibold text-[var(--color-text-primary)] dark:text-[var(--color-text-inverse)] mb-4">
             {title}
           </h3>
         )}
@@ -120,7 +120,7 @@ export const PieChartCard = React.memo<PieChartCardProps>(
                 verticalAlign="bottom"
                 height={36}
                 formatter={(value) => (
-                  <span className="text-sm text-gray-700 dark:text-gray-300">
+                  <span className="text-sm text-[var(--color-text-primary)] dark:text-[var(--color-text-tertiary)]">
                     {value}
                   </span>
                 )}
@@ -132,10 +132,10 @@ export const PieChartCard = React.memo<PieChartCardProps>(
         {/* Total (solo para donut) */}
         {donut && (
           <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-center">
-            <p className="text-3xl font-bold text-gray-900 dark:text-gray-100">
+            <p className="text-3xl font-bold text-[var(--color-text-primary)] dark:text-[var(--color-text-inverse)]">
               {data.reduce((sum, item) => sum + item[valueKey], 0)}
             </p>
-            <p className="text-sm text-gray-600 dark:text-gray-400">Total</p>
+            <p className="text-sm text-[var(--color-text-secondary)] dark:text-[var(--color-text-tertiary)]">Total</p>
           </div>
         )}
       </div>

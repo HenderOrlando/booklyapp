@@ -54,11 +54,11 @@ export const ExportPanel = React.memo<ExportPanelProps>(
 
     return (
       <div
-        className={`bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-6 ${className}`}
+        className={`bg-white dark:bg-[var(--color-bg-inverse)] border border-[var(--color-border-subtle)] dark:border-[var(--color-border-strong)] rounded-lg p-6 ${className}`}
       >
         <div className="flex items-center gap-2 mb-6">
-          <FileDown className="h-5 w-5 text-gray-600 dark:text-gray-400" />
-          <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100">
+          <FileDown className="h-5 w-5 text-[var(--color-text-secondary)] dark:text-[var(--color-text-tertiary)]" />
+          <h3 className="text-lg font-semibold text-[var(--color-text-primary)] dark:text-[var(--color-text-inverse)]">
             {title}
           </h3>
         </div>
@@ -66,7 +66,7 @@ export const ExportPanel = React.memo<ExportPanelProps>(
         <div className="space-y-6">
           {showDateRange && (
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              <label className="block text-sm font-medium text-[var(--color-text-primary)] dark:text-[var(--color-text-tertiary)] mb-2">
                 Período de Exportación
               </label>
               <DateRangePicker
@@ -82,7 +82,7 @@ export const ExportPanel = React.memo<ExportPanelProps>(
 
           {showOptions && (
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
+              <label className="block text-sm font-medium text-[var(--color-text-primary)] dark:text-[var(--color-text-tertiary)] mb-3">
                 Opciones de Exportación
               </label>
               <div className="space-y-2">
@@ -91,9 +91,9 @@ export const ExportPanel = React.memo<ExportPanelProps>(
                     type="checkbox"
                     checked={includeCharts}
                     onChange={(e) => setIncludeCharts(e.target.checked)}
-                    className="rounded border-gray-300 text-[var(--color-primary-base)] focus:ring-[var(--color-primary-base)]"
+                    className="rounded border-[var(--color-border-strong)] text-[var(--color-primary-base)] focus:ring-[var(--color-primary-base)]"
                   />
-                  <span className="text-sm text-gray-700 dark:text-gray-300">
+                  <span className="text-sm text-[var(--color-text-primary)] dark:text-[var(--color-text-tertiary)]">
                     Incluir gráficos
                   </span>
                 </label>
@@ -102,9 +102,9 @@ export const ExportPanel = React.memo<ExportPanelProps>(
                     type="checkbox"
                     checked={includeMetadata}
                     onChange={(e) => setIncludeMetadata(e.target.checked)}
-                    className="rounded border-gray-300 text-[var(--color-primary-base)] focus:ring-[var(--color-primary-base)]"
+                    className="rounded border-[var(--color-border-strong)] text-[var(--color-primary-base)] focus:ring-[var(--color-primary-base)]"
                   />
-                  <span className="text-sm text-gray-700 dark:text-gray-300">
+                  <span className="text-sm text-[var(--color-text-primary)] dark:text-[var(--color-text-tertiary)]">
                     Incluir metadatos
                   </span>
                 </label>
@@ -113,7 +113,7 @@ export const ExportPanel = React.memo<ExportPanelProps>(
           )}
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
+            <label className="block text-sm font-medium text-[var(--color-text-primary)] dark:text-[var(--color-text-tertiary)] mb-3">
               Formato de Archivo
             </label>
             <div className="flex flex-wrap gap-3">

@@ -113,7 +113,7 @@ export function RecurringPatternSelector({
                 className={`px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
                   pattern.daysOfWeek?.includes(day.value)
                     ? "bg-blue-600 text-white"
-                    : "bg-gray-700 text-gray-300 hover:bg-gray-600"
+                    : "bg-[var(--color-bg-elevated)] text-[var(--color-text-tertiary)] hover:bg-[var(--color-bg-elevated)]"
                 }`}
               >
                 {day.label}
@@ -153,7 +153,7 @@ export function RecurringPatternSelector({
             className={`flex-1 py-2 px-4 rounded-lg text-sm font-medium transition-colors ${
               endType === "date"
                 ? "bg-blue-600 text-white"
-                : "bg-gray-700 text-gray-300 hover:bg-gray-600"
+                : "bg-[var(--color-bg-elevated)] text-[var(--color-text-tertiary)] hover:bg-[var(--color-bg-elevated)]"
             }`}
           >
             En fecha
@@ -164,7 +164,7 @@ export function RecurringPatternSelector({
             className={`flex-1 py-2 px-4 rounded-lg text-sm font-medium transition-colors ${
               endType === "occurrences"
                 ? "bg-blue-600 text-white"
-                : "bg-gray-700 text-gray-300 hover:bg-gray-600"
+                : "bg-[var(--color-bg-elevated)] text-[var(--color-text-tertiary)] hover:bg-[var(--color-bg-elevated)]"
             }`}
           >
             Después de
@@ -199,7 +199,7 @@ export function RecurringPatternSelector({
                 })
               }
             />
-            <span className="text-sm text-gray-400">ocurrencias</span>
+            <span className="text-sm text-[var(--color-text-tertiary)]">ocurrencias</span>
           </div>
         )}
       </div>
@@ -207,7 +207,7 @@ export function RecurringPatternSelector({
       {/* Resumen */}
       <div className="p-3 bg-blue-900/20 border border-blue-800 rounded-lg">
         <div className="text-xs font-medium text-blue-300 mb-1">Resumen:</div>
-        <div className="text-sm text-gray-300">
+        <div className="text-sm text-[var(--color-text-tertiary)]">
           {pattern.frequency === "DAILY" &&
             `Cada ${pattern.interval} día${pattern.interval > 1 ? "s" : ""}`}
           {pattern.frequency === "WEEKLY" &&

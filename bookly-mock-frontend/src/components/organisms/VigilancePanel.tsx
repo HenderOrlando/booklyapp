@@ -153,10 +153,10 @@ export const VigilancePanel = React.memo<VigilancePanelProps>(
               {/* Header con estado */}
               <div className="flex items-start justify-between">
                 <div className="flex-1">
-                  <h4 className="font-semibold text-gray-900 dark:text-gray-100">
+                  <h4 className="font-semibold text-[var(--color-text-primary)] dark:text-[var(--color-text-inverse)]">
                     {reservation.resourceName}
                   </h4>
-                  <div className="flex items-center gap-2 mt-1 text-sm text-gray-600 dark:text-gray-400">
+                  <div className="flex items-center gap-2 mt-1 text-sm text-[var(--color-text-secondary)] dark:text-[var(--color-text-tertiary)]">
                     <MapPin className="h-3.5 w-3.5" />
                     <span>{reservation.resourceType}</span>
                   </div>
@@ -184,19 +184,19 @@ export const VigilancePanel = React.memo<VigilancePanelProps>(
 
               {/* Usuario */}
               <div className="flex items-center gap-2 text-sm">
-                <User className="h-4 w-4 text-gray-500 dark:text-gray-400" />
-                <span className="font-medium text-gray-900 dark:text-gray-100">
+                <User className="h-4 w-4 text-[var(--color-text-secondary)] dark:text-[var(--color-text-tertiary)]" />
+                <span className="font-medium text-[var(--color-text-primary)] dark:text-[var(--color-text-inverse)]">
                   {reservation.userName}
                 </span>
                 {reservation.userEmail && (
-                  <span className="text-xs text-gray-500 dark:text-gray-400">
+                  <span className="text-xs text-[var(--color-text-secondary)] dark:text-[var(--color-text-tertiary)]">
                     {reservation.userEmail}
                   </span>
                 )}
               </div>
 
               {/* Horario */}
-              <div className="flex items-center gap-4 text-sm text-gray-600 dark:text-gray-400">
+              <div className="flex items-center gap-4 text-sm text-[var(--color-text-secondary)] dark:text-[var(--color-text-tertiary)]">
                 <div className="flex items-center gap-1">
                   <Clock className="h-3.5 w-3.5" />
                   <span>
@@ -227,14 +227,14 @@ export const VigilancePanel = React.memo<VigilancePanelProps>(
 
               {/* Información de check-in */}
               {reservation.checkInTime && (
-                <div className="text-xs text-gray-500 dark:text-gray-400">
+                <div className="text-xs text-[var(--color-text-secondary)] dark:text-[var(--color-text-tertiary)]">
                   Check-in:{" "}
                   {format(new Date(reservation.checkInTime), "HH:mm:ss")}
                 </div>
               )}
 
               {/* Acciones */}
-              <div className="flex gap-2 pt-2 border-t border-gray-200 dark:border-gray-700">
+              <div className="flex gap-2 pt-2 border-t border-[var(--color-border-subtle)] dark:border-[var(--color-border-strong)]">
                 {onContact && (
                   <button
                     onClick={() => onContact(reservation.reservationId)}
@@ -269,14 +269,14 @@ export const VigilancePanel = React.memo<VigilancePanelProps>(
                   </div>
                   <div className="flex-1">
                     <div className="flex items-center gap-2">
-                      <h4 className="font-semibold text-gray-900 dark:text-gray-100">
+                      <h4 className="font-semibold text-[var(--color-text-primary)] dark:text-[var(--color-text-inverse)]">
                         {config.label}
                       </h4>
                       <Badge variant={config.variant} className="text-xs">
                         {alert.severity}
                       </Badge>
                     </div>
-                    <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
+                    <p className="text-sm text-[var(--color-text-secondary)] dark:text-[var(--color-text-tertiary)] mt-1">
                       {alert.message}
                     </p>
                   </div>
@@ -285,7 +285,7 @@ export const VigilancePanel = React.memo<VigilancePanelProps>(
 
               {/* Detalles de la reserva */}
               {alert.reservationId && (
-                <div className="text-sm text-gray-600 dark:text-gray-400">
+                <div className="text-sm text-[var(--color-text-secondary)] dark:text-[var(--color-text-tertiary)]">
                   <p>
                     <span className="font-medium">Reserva:</span>{" "}
                     {alert.reservationId}
@@ -294,7 +294,7 @@ export const VigilancePanel = React.memo<VigilancePanelProps>(
               )}
 
               {/* Timestamp */}
-              <div className="text-xs text-gray-500 dark:text-gray-400">
+              <div className="text-xs text-[var(--color-text-secondary)] dark:text-[var(--color-text-tertiary)]">
                 {format(new Date(alert.timestamp), "d 'de' MMM, HH:mm:ss", {
                   locale: es,
                 })}
@@ -325,10 +325,10 @@ export const VigilancePanel = React.memo<VigilancePanelProps>(
                 <CheckCircle className="h-6 w-6 text-green-600 dark:text-green-400" />
               </div>
               <div>
-                <p className="text-sm text-gray-600 dark:text-gray-400">
+                <p className="text-sm text-[var(--color-text-secondary)] dark:text-[var(--color-text-tertiary)]">
                   Activas
                 </p>
-                <p className="text-2xl font-bold text-gray-900 dark:text-gray-100">
+                <p className="text-2xl font-bold text-[var(--color-text-primary)] dark:text-[var(--color-text-inverse)]">
                   {stats.totalActive}
                 </p>
               </div>
@@ -341,10 +341,10 @@ export const VigilancePanel = React.memo<VigilancePanelProps>(
                 <XCircle className="h-6 w-6 text-red-600 dark:text-red-400" />
               </div>
               <div>
-                <p className="text-sm text-gray-600 dark:text-gray-400">
+                <p className="text-sm text-[var(--color-text-secondary)] dark:text-[var(--color-text-tertiary)]">
                   Con Retraso
                 </p>
-                <p className="text-2xl font-bold text-gray-900 dark:text-gray-100">
+                <p className="text-2xl font-bold text-[var(--color-text-primary)] dark:text-[var(--color-text-inverse)]">
                   {stats.totalOverdue}
                 </p>
               </div>
@@ -357,10 +357,10 @@ export const VigilancePanel = React.memo<VigilancePanelProps>(
                 <Bell className="h-6 w-6 text-orange-600 dark:text-orange-400" />
               </div>
               <div>
-                <p className="text-sm text-gray-600 dark:text-gray-400">
+                <p className="text-sm text-[var(--color-text-secondary)] dark:text-[var(--color-text-tertiary)]">
                   Alertas
                 </p>
-                <p className="text-2xl font-bold text-gray-900 dark:text-gray-100">
+                <p className="text-2xl font-bold text-[var(--color-text-primary)] dark:text-[var(--color-text-inverse)]">
                   {stats.totalAlerts}
                 </p>
               </div>
@@ -369,13 +369,13 @@ export const VigilancePanel = React.memo<VigilancePanelProps>(
         </div>
 
         {/* Tabs */}
-        <div className="flex gap-2 border-b border-gray-200 dark:border-gray-700">
+        <div className="flex gap-2 border-b border-[var(--color-border-subtle)] dark:border-[var(--color-border-strong)]">
           <button
             onClick={() => setSelectedTab("active")}
             className={`px-4 py-2 font-medium text-sm transition-colors ${
               selectedTab === "active"
                 ? "text-[var(--color-primary-base)] border-b-2 border-[var(--color-primary-base)]"
-                : "text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100"
+                : "text-[var(--color-text-secondary)] dark:text-[var(--color-text-tertiary)] hover:text-[var(--color-text-primary)] dark:hover:text-[var(--color-text-inverse)]"
             }`}
           >
             Activas ({stats.totalActive})
@@ -385,7 +385,7 @@ export const VigilancePanel = React.memo<VigilancePanelProps>(
             className={`px-4 py-2 font-medium text-sm transition-colors ${
               selectedTab === "overdue"
                 ? "text-[var(--color-primary-base)] border-b-2 border-[var(--color-primary-base)]"
-                : "text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100"
+                : "text-[var(--color-text-secondary)] dark:text-[var(--color-text-tertiary)] hover:text-[var(--color-text-primary)] dark:hover:text-[var(--color-text-inverse)]"
             }`}
           >
             Con Retraso ({stats.totalOverdue})
@@ -395,7 +395,7 @@ export const VigilancePanel = React.memo<VigilancePanelProps>(
             className={`px-4 py-2 font-medium text-sm transition-colors ${
               selectedTab === "alerts"
                 ? "text-[var(--color-primary-base)] border-b-2 border-[var(--color-primary-base)]"
-                : "text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100"
+                : "text-[var(--color-text-secondary)] dark:text-[var(--color-text-tertiary)] hover:text-[var(--color-text-primary)] dark:hover:text-[var(--color-text-inverse)]"
             }`}
           >
             Alertas ({stats.totalAlerts})
@@ -422,17 +422,17 @@ export const VigilancePanel = React.memo<VigilancePanelProps>(
 
             {/* Empty states */}
             {selectedTab === "active" && activeReservations.length === 0 && (
-              <div className="col-span-2 text-center py-12 text-gray-500 dark:text-gray-400">
+              <div className="col-span-2 text-center py-12 text-[var(--color-text-secondary)] dark:text-[var(--color-text-tertiary)]">
                 No hay reservas activas en este momento
               </div>
             )}
             {selectedTab === "overdue" && overdueReservations.length === 0 && (
-              <div className="col-span-2 text-center py-12 text-gray-500 dark:text-gray-400">
+              <div className="col-span-2 text-center py-12 text-[var(--color-text-secondary)] dark:text-[var(--color-text-tertiary)]">
                 ✅ No hay reservas con retraso
               </div>
             )}
             {selectedTab === "alerts" && stats.totalAlerts === 0 && (
-              <div className="col-span-2 text-center py-12 text-gray-500 dark:text-gray-400">
+              <div className="col-span-2 text-center py-12 text-[var(--color-text-secondary)] dark:text-[var(--color-text-tertiary)]">
                 ✅ No hay alertas activas
               </div>
             )}

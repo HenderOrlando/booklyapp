@@ -11,39 +11,48 @@
    */
   :root {
     /* Fondos */
-    --color-bg-app: #f9fafb;
+    --color-bg-app: #f8fafc;
+    --color-bg-primary: #ffffff;
+    --color-bg-secondary: #f1f5f9;
     --color-bg-surface: #ffffff;
-    --color-bg-muted: #f3f4f6;
+    --color-bg-muted: #f1f5f9;
     --color-bg-inverse: #1e293b;
+    --color-bg-elevated: #ffffff;
+    --color-bg-overlay: rgba(0, 0, 0, 0.5);
 
     /* Texto */
-    --color-text-primary: #111827;
-    --color-text-secondary: #6b7280;
+    --color-text-primary: #0f172a;
+    --color-text-secondary: #475569;
+    --color-text-tertiary: #94a3b8;
     --color-text-inverse: #ffffff;
-    --color-text-danger: #b91c1c;
+    --color-text-danger: #dc2626;
+    --color-text-link: #2563eb;
 
     /* Acciones */
     --color-action-primary: #2563eb;
     --color-action-primary-hover: #1d4ed8;
-    --color-action-primary-disabled: #d1d5db;
+    --color-action-primary-disabled: #cbd5e1;
     --color-action-secondary: #14b8a6;
     --color-action-secondary-hover: #0d9488;
-    --color-action-ghost-hover: #f3f4f6;
+    --color-action-ghost-hover: #f1f5f9;
 
     /* Estados */
-    --color-state-success-bg: #ecfdf5;
-    --color-state-success-text: #15803d;
-    --color-state-success-border: #a7f3d0;
-    --color-state-warning-bg: #fff7ed;
-    --color-state-warning-text: #c2410c;
-    --color-state-warning-border: #fed7aa;
+    --color-state-success-bg: #f0fdf4;
+    --color-state-success-text: #166534;
+    --color-state-success-border: #86efac;
+    --color-state-warning-bg: #fffbeb;
+    --color-state-warning-text: #b45309;
+    --color-state-warning-border: #fcd34d;
     --color-state-error-bg: #fef2f2;
-    --color-state-error-text: #b91c1c;
+    --color-state-error-text: #dc2626;
     --color-state-error-border: #fca5a5;
+    --color-state-info-bg: #eff6ff;
+    --color-state-info-text: #1d4ed8;
+    --color-state-info-border: #93c5fd;
 
     /* Bordes */
-    --color-border-subtle: #e5e7eb;
-    --color-border-strong: #d1d5db;
+    --color-border-subtle: #e2e8f0;
+    --color-border-strong: #cbd5e1;
     --color-border-focus: #2563eb;
 
     /* Shadcn/ui compatibility */
@@ -74,38 +83,47 @@
    * Modo Oscuro (Dark Mode)
    */
   .dark {
-    /* Fondos */
-    --color-bg-app: #1e293b;
-    --color-bg-surface: #0f172a;
-    --color-bg-muted: #1f2937;
-    --color-bg-inverse: #ffffff;
+    /* Fondos — darker base, lighter surfaces for depth */
+    --color-bg-app: #0c1222;
+    --color-bg-primary: #1e293b;
+    --color-bg-secondary: #172033;
+    --color-bg-surface: #1e293b;
+    --color-bg-muted: #1e293b;
+    --color-bg-inverse: #f8fafc;
+    --color-bg-elevated: #263548;
+    --color-bg-overlay: rgba(0, 0, 0, 0.7);
 
-    /* Texto */
-    --color-text-primary: #f9fafb;
-    --color-text-secondary: #cbd5e1;
-    --color-text-inverse: #111827;
-    --color-text-danger: #f87171;
+    /* Texto — high contrast for readability */
+    --color-text-primary: #f1f5f9;
+    --color-text-secondary: #94a3b8;
+    --color-text-tertiary: #64748b;
+    --color-text-inverse: #0f172a;
+    --color-text-danger: #fb7185;
+    --color-text-link: #60a5fa;
 
     /* Acciones */
     --color-action-primary: #3b82f6;
     --color-action-primary-hover: #60a5fa;
-    --color-action-primary-disabled: #4b5563;
+    --color-action-primary-disabled: #334155;
     --color-action-secondary: #2dd4bf;
-    --color-action-secondary-hover: #14b8a6;
+    --color-action-secondary-hover: #5eead4;
     --color-action-ghost-hover: #334155;
 
-    /* Estados */
-    --color-state-success-bg: #064e3b;
-    --color-state-success-text: #a7f3d0;
-    --color-state-success-border: #10b981;
-    --color-state-warning-bg: #7c2d12;
-    --color-state-warning-text: #fed7aa;
-    --color-state-warning-border: #fdba74;
-    --color-state-error-bg: #7f1d1d;
+    /* Estados — more saturated bg for visibility in dark */
+    --color-state-success-bg: #052e16;
+    --color-state-success-text: #86efac;
+    --color-state-success-border: #22c55e;
+    --color-state-warning-bg: #451a03;
+    --color-state-warning-text: #fcd34d;
+    --color-state-warning-border: #f59e0b;
+    --color-state-error-bg: #450a0a;
     --color-state-error-text: #fca5a5;
-    --color-state-error-border: #f87171;
+    --color-state-error-border: #ef4444;
+    --color-state-info-bg: #172554;
+    --color-state-info-text: #93c5fd;
+    --color-state-info-border: #3b82f6;
 
-    /* Bordes */
+    /* Bordes — visible but not harsh */
     --color-border-subtle: #334155;
     --color-border-strong: #475569;
     --color-border-focus: #60a5fa;

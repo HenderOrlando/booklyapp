@@ -79,7 +79,7 @@ export function RecurringReservationPreview({
                 <div className="text-2xl font-bold text-blue-600 dark:text-blue-400">
                   {instances.length}
                 </div>
-                <div className="text-sm text-gray-600 dark:text-gray-400">
+                <div className="text-sm text-[var(--color-text-secondary)] dark:text-[var(--color-text-tertiary)]">
                   Total Instancias
                 </div>
               </CardContent>
@@ -89,7 +89,7 @@ export function RecurringReservationPreview({
                 <div className="text-2xl font-bold text-green-600 dark:text-green-400">
                   {validation.successCount}
                 </div>
-                <div className="text-sm text-gray-600 dark:text-gray-400">
+                <div className="text-sm text-[var(--color-text-secondary)] dark:text-[var(--color-text-tertiary)]">
                   Sin Conflicto
                 </div>
               </CardContent>
@@ -99,7 +99,7 @@ export function RecurringReservationPreview({
                 <div className="text-2xl font-bold text-red-600 dark:text-red-400">
                   {validation.failureCount}
                 </div>
-                <div className="text-sm text-gray-600 dark:text-gray-400">
+                <div className="text-sm text-[var(--color-text-secondary)] dark:text-[var(--color-text-tertiary)]">
                   Con Conflicto
                 </div>
               </CardContent>
@@ -166,7 +166,7 @@ export function RecurringReservationPreview({
 
           {/* Lista de instancias */}
           <div>
-            <h4 className="font-semibold text-gray-900 dark:text-white mb-3">
+            <h4 className="font-semibold text-[var(--color-text-primary)] dark:text-white mb-3">
               Instancias a Crear ({instances.length})
             </h4>
             <div className="space-y-2 max-h-60 overflow-y-auto">
@@ -193,12 +193,12 @@ export function RecurringReservationPreview({
                           <CheckCircle className="w-5 h-5 text-green-600 dark:text-green-400" />
                         )}
                         <div>
-                          <p className="font-medium text-gray-900 dark:text-white">
+                          <p className="font-medium text-[var(--color-text-primary)] dark:text-white">
                             {format(date, "EEEE, d 'de' MMMM 'de' yyyy", {
                               locale: es,
                             })}
                           </p>
-                          <p className="text-sm text-gray-600 dark:text-gray-400">
+                          <p className="text-sm text-[var(--color-text-secondary)] dark:text-[var(--color-text-tertiary)]">
                             {format(new Date(instance.startDate), "HH:mm")} -{" "}
                             {format(new Date(instance.endDate), "HH:mm")}
                           </p>
@@ -223,7 +223,7 @@ export function RecurringReservationPreview({
           </div>
 
           {/* Acciones */}
-          <div className="flex gap-3 pt-4 border-t border-gray-200 dark:border-gray-700">
+          <div className="flex gap-3 pt-4 border-t border-[var(--color-border-subtle)] dark:border-[var(--color-border-strong)]">
             <Button
               type="button"
               variant="outline"

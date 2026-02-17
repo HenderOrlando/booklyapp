@@ -96,7 +96,7 @@ export function ResourcesTable({
 
   // Renderizado de item para lista virtualizada
   const renderResourceItem = (resource: Resource) => (
-    <div className="bg-[var(--color-bg-primary)] rounded-lg p-4 border border-gray-700 hover:border-gray-600 transition-colors">
+    <div className="bg-[var(--color-bg-primary)] rounded-lg p-4 border border-[var(--color-border-strong)] hover:border-[var(--color-border-strong)] transition-colors">
       <div className="flex items-start justify-between mb-3">
         <div className="flex-1">
           <div className="flex items-center gap-3 mb-2">
@@ -131,7 +131,7 @@ export function ResourcesTable({
         </p>
       )}
 
-      <div className="flex gap-2 pt-3 border-t border-gray-700">
+      <div className="flex gap-2 pt-3 border-t border-[var(--color-border-strong)]">
         <Button
           variant="ghost"
           size="sm"

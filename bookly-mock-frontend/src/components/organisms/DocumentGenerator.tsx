@@ -135,61 +135,61 @@ export const DocumentGenerator = React.memo<DocumentGeneratorProps>(
 
           <CardContent className="space-y-4">
             {/* Información de la solicitud */}
-            <div className="grid grid-cols-2 gap-4 p-4 bg-gray-50 dark:bg-gray-800 rounded-lg">
+            <div className="grid grid-cols-2 gap-4 p-4 bg-[var(--color-bg-secondary)] dark:bg-[var(--color-bg-inverse)] rounded-lg">
               <div>
-                <p className="text-sm font-medium text-gray-600 dark:text-gray-400">
+                <p className="text-sm font-medium text-[var(--color-text-secondary)] dark:text-[var(--color-text-tertiary)]">
                   Solicitante
                 </p>
-                <p className="text-gray-900 dark:text-gray-100 mt-1">
+                <p className="text-[var(--color-text-primary)] dark:text-[var(--color-text-inverse)] mt-1">
                   {approvalRequest.userName}
                 </p>
-                <p className="text-sm text-gray-600 dark:text-gray-400">
+                <p className="text-sm text-[var(--color-text-secondary)] dark:text-[var(--color-text-tertiary)]">
                   {approvalRequest.userEmail}
                 </p>
               </div>
               <div>
-                <p className="text-sm font-medium text-gray-600 dark:text-gray-400">
+                <p className="text-sm font-medium text-[var(--color-text-secondary)] dark:text-[var(--color-text-tertiary)]">
                   Recurso
                 </p>
-                <p className="text-gray-900 dark:text-gray-100 mt-1">
+                <p className="text-[var(--color-text-primary)] dark:text-[var(--color-text-inverse)] mt-1">
                   {approvalRequest.resourceName}
                 </p>
-                <p className="text-sm text-gray-600 dark:text-gray-400">
+                <p className="text-sm text-[var(--color-text-secondary)] dark:text-[var(--color-text-tertiary)]">
                   {approvalRequest.resourceType}
                 </p>
               </div>
               <div>
-                <p className="text-sm font-medium text-gray-600 dark:text-gray-400">
+                <p className="text-sm font-medium text-[var(--color-text-secondary)] dark:text-[var(--color-text-tertiary)]">
                   Fecha de Reserva
                 </p>
-                <p className="text-gray-900 dark:text-gray-100 mt-1">
+                <p className="text-[var(--color-text-primary)] dark:text-[var(--color-text-inverse)] mt-1">
                   {format(
                     new Date(approvalRequest.startDate),
                     "d 'de' MMMM, yyyy",
                     { locale: es }
                   )}
                 </p>
-                <p className="text-sm text-gray-600 dark:text-gray-400">
+                <p className="text-sm text-[var(--color-text-secondary)] dark:text-[var(--color-text-tertiary)]">
                   {format(new Date(approvalRequest.startDate), "HH:mm")} -{" "}
                   {format(new Date(approvalRequest.endDate), "HH:mm")}
                 </p>
               </div>
               <div>
-                <p className="text-sm font-medium text-gray-600 dark:text-gray-400">
+                <p className="text-sm font-medium text-[var(--color-text-secondary)] dark:text-[var(--color-text-tertiary)]">
                   ID de Solicitud
                 </p>
-                <p className="text-gray-900 dark:text-gray-100 mt-1 font-mono text-sm">
+                <p className="text-[var(--color-text-primary)] dark:text-[var(--color-text-inverse)] mt-1 font-mono text-sm">
                   {approvalRequest.id}
                 </p>
               </div>
             </div>
 
             {/* Preview del contenido del documento */}
-            <div className="p-4 border border-gray-200 dark:border-gray-700 rounded-lg">
-              <h4 className="font-semibold text-gray-900 dark:text-gray-100 mb-3">
+            <div className="p-4 border border-[var(--color-border-subtle)] dark:border-[var(--color-border-strong)] rounded-lg">
+              <h4 className="font-semibold text-[var(--color-text-primary)] dark:text-[var(--color-text-inverse)] mb-3">
                 Vista Previa del Contenido
               </h4>
-              <div className="space-y-2 text-sm text-gray-700 dark:text-gray-300">
+              <div className="space-y-2 text-sm text-[var(--color-text-primary)] dark:text-[var(--color-text-tertiary)]">
                 <p>
                   Estimado/a <strong>{approvalRequest.userName}</strong>,
                 </p>
@@ -297,7 +297,7 @@ export const DocumentGenerator = React.memo<DocumentGeneratorProps>(
                   value={emailAddress}
                   onChange={(e) => setEmailAddress(e.target.value)}
                   placeholder="correo@ejemplo.com"
-                  className="flex-1 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100"
+                  className="flex-1 px-3 py-2 border border-[var(--color-border-strong)] dark:border-[var(--color-border-strong)] rounded-lg bg-white dark:bg-[var(--color-bg-inverse)] text-[var(--color-text-primary)] dark:text-[var(--color-text-inverse)]"
                 />
                 <Button onClick={handleSendEmail} size="sm">
                   Enviar
@@ -330,7 +330,7 @@ export const DocumentGenerator = React.memo<DocumentGeneratorProps>(
         </Card>
 
         {/* Información adicional */}
-        <div className="text-xs text-gray-500 dark:text-gray-400">
+        <div className="text-xs text-[var(--color-text-secondary)] dark:text-[var(--color-text-tertiary)]">
           <p>
             * El documento será generado en formato PDF siguiendo la plantilla
             oficial de la institución.

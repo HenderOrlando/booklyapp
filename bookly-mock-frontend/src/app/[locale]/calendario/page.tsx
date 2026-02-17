@@ -12,7 +12,6 @@ import { useCreateReservation, useUpdateReservation } from "@/hooks/mutations";
 import { useReservations } from "@/hooks/useReservations";
 import { useResources } from "@/hooks/useResources";
 import { useRouter } from "@/i18n/navigation";
-import { mockResourcesForReservations } from "@/infrastructure/mock/data/reservations-service.mock";
 import type { CalendarEvent } from "@/types/calendar";
 import type {
   CreateReservationDto,
@@ -54,7 +53,7 @@ export default function CalendarioPage() {
     newDate: Date;
   } | null>(null);
   const [rescheduleConflicts, setRescheduleConflicts] = useState<Reservation[]>(
-    []
+    [],
   );
 
   // Leer query params y abrir modal si vienen date y resourceId
@@ -114,7 +113,7 @@ export default function CalendarioPage() {
     setSelectedResourceIds((prev) =>
       prev.includes(resourceId)
         ? prev.filter((id) => id !== resourceId)
-        : [...prev, resourceId]
+        : [...prev, resourceId],
     );
   };
 
@@ -159,7 +158,7 @@ export default function CalendarioPage() {
       event.resourceId,
       newStart.toISOString(),
       newEnd.toISOString(),
-      event.id
+      event.id,
     );
 
     if (conflicts.length > 0) {
@@ -178,7 +177,7 @@ export default function CalendarioPage() {
     resourceId: string,
     startDate: string,
     endDate: string,
-    excludeId: string
+    excludeId: string,
   ): Reservation[] => {
     if (!reservationsData?.items) return [];
 
@@ -210,7 +209,7 @@ export default function CalendarioPage() {
   const performReschedule = async (
     eventId: string,
     newStart: Date,
-    newEnd: Date
+    newEnd: Date,
   ) => {
     try {
       await updateReservation.mutateAsync({
@@ -260,7 +259,9 @@ export default function CalendarioPage() {
         <div className="flex items-center justify-between">
           <div>
             <h2 className="text-3xl font-bold text-white">{t("title")}</h2>
-            <p className="text-[var(--color-text-tertiary)] mt-1">{t("description")}</p>
+            <p className="text-[var(--color-text-tertiary)] mt-1">
+              {t("description")}
+            </p>
           </div>
           <Button onClick={() => handleOpenModal()}>
             <svg
@@ -300,7 +301,9 @@ export default function CalendarioPage() {
               <h3 className="font-semibold text-brand-primary-300 mb-1">
                 {t("view_title")}
               </h3>
-              <p className="text-sm text-[var(--color-text-secondary)]">{t("view_desc")}</p>
+              <p className="text-sm text-[var(--color-text-secondary)]">
+                {t("view_desc")}
+              </p>
             </div>
           </div>
         </div>
@@ -329,7 +332,7 @@ export default function CalendarioPage() {
           {/* Botón toggle del panel */}
           <button
             onClick={() => setIsPanelOpen(!isPanelOpen)}
-            className="absolute left-0 top-4 z-10 bg-[var(--color-bg-primary)] hover:bg-[var(--color-bg-tertiary)] text-white p-2 rounded-r-lg border-l-0 border border-gray-700 transition-all shadow-lg"
+            className="absolute left-0 top-4 z-10 bg-[var(--color-bg-primary)] hover:bg-[var(--color-bg-tertiary)] text-white p-2 rounded-r-lg border-l-0 border border-[var(--color-border-strong)] transition-all shadow-lg"
             style={{ left: isPanelOpen ? "320px" : "0px" }}
             title={isPanelOpen ? t("panel.hide") : t("panel.show")}
           >
@@ -364,7 +367,7 @@ export default function CalendarioPage() {
           isOpen={isModalOpen}
           onClose={handleCloseModal}
           onSave={handleSaveReservation}
-          resources={mockResourcesForReservations as any}
+          resources={allResources as any}
           mode="create"
           loading={createReservation.isPending}
           initialDate={selectedDate}
@@ -422,7 +425,9 @@ export default function CalendarioPage() {
               </span>
             </div>
           </div>
-          <p className="text-xs text-[var(--color-text-tertiary)] mt-3">{t("tip")}</p>
+          <p className="text-xs text-[var(--color-text-tertiary)] mt-3">
+            {t("tip")}
+          </p>
         </div>
       </div>
     </MainLayout>

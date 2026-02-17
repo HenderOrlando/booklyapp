@@ -95,7 +95,7 @@ export function MainLayout({
                 "fixed inset-y-0 left-0 z-50 w-64",
                 "flex flex-col",
                 "border-r border-[var(--color-border-subtle)]",
-                "bg-slate-800 text-gray-100",
+                "bg-slate-800 text-[var(--color-text-inverse)]",
                 "dark:bg-slate-900",
                 "transition-transform duration-300",
                 "lg:sticky lg:top-16 lg:h-[calc(100vh-4rem)] lg:translate-x-0",

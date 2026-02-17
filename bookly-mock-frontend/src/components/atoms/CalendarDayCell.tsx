@@ -78,12 +78,12 @@ export function CalendarDayCell({
       onDrop={handleDrop}
       disabled={day.isDisabled}
       className={`
-        relative min-h-[80px] p-2 border border-gray-200
+        relative min-h-[80px] p-2 border border-[var(--color-border-subtle)]
         transition-all duration-200
         ${
           !day.isCurrentMonth
-            ? "bg-gray-50 text-gray-400"
-            : "bg-white text-gray-900"
+            ? "bg-[var(--color-bg-secondary)] text-[var(--color-text-tertiary)]"
+            : "bg-white text-[var(--color-text-primary)]"
         }
         ${day.isToday ? "border-2 border-blue-500 ring-1 ring-blue-500" : ""}
         ${isSelected ? "bg-blue-50 border-blue-400" : ""}
@@ -94,7 +94,7 @@ export function CalendarDayCell({
             ? "cursor-not-allowed opacity-40"
             : "cursor-pointer hover:bg-blue-50 hover:border-blue-300"
         }
-        ${day.isWeekend && day.isCurrentMonth ? "bg-gray-50" : ""}
+        ${day.isWeekend && day.isCurrentMonth ? "bg-[var(--color-bg-secondary)]" : ""}
       `}
       aria-label={format(day.date, "d 'de' MMMM", { locale: es })}
       aria-current={day.isToday ? "date" : undefined}
@@ -139,7 +139,7 @@ export function CalendarDayCell({
             />
           ))}
           {eventCount > 3 && (
-            <span className="text-xs text-gray-500">+{eventCount - 3}</span>
+            <span className="text-xs text-[var(--color-text-secondary)]">+{eventCount - 3}</span>
           )}
         </div>
       )}
@@ -166,13 +166,13 @@ export function CalendarDayCell({
         <Tooltip.Trigger asChild>{buttonContent}</Tooltip.Trigger>
         <Tooltip.Portal>
           <Tooltip.Content
-            className="z-50 max-w-sm overflow-hidden rounded-md border border-gray-700 bg-gray-900 px-3 py-2 text-sm shadow-md animate-in fade-in-0 zoom-in-95"
+            className="z-50 max-w-sm overflow-hidden rounded-md border border-[var(--color-border-strong)] bg-[var(--color-bg-inverse)] px-3 py-2 text-sm shadow-md animate-in fade-in-0 zoom-in-95"
             sideOffset={5}
           >
             <div className="space-y-2">
-              <div className="font-semibold text-white border-b border-gray-700 pb-2">
+              <div className="font-semibold text-white border-b border-[var(--color-border-strong)] pb-2">
                 {format(day.date, "d 'de' MMMM 'de' yyyy", { locale: es })}
-                <span className="ml-2 text-xs text-gray-400">
+                <span className="ml-2 text-xs text-[var(--color-text-tertiary)]">
                   ({eventCount} evento{eventCount > 1 ? "s" : ""})
                 </span>
               </div>
@@ -180,7 +180,7 @@ export function CalendarDayCell({
                 {day.events.map((event) => (
                   <div
                     key={event.id}
-                    className="flex items-start gap-2 p-2 rounded bg-gray-800/50"
+                    className="flex items-start gap-2 p-2 rounded bg-[var(--color-bg-inverse)]/50"
                   >
                     <div
                       className="w-3 h-3 rounded-full mt-0.5 flex-shrink-0"
@@ -190,17 +190,17 @@ export function CalendarDayCell({
                       <div className="font-medium text-white truncate">
                         {event.title}
                       </div>
-                      <div className="text-xs text-gray-400">
+                      <div className="text-xs text-[var(--color-text-tertiary)]">
                         {format(new Date(event.start), "HH:mm", { locale: es })}{" "}
                         - {format(new Date(event.end), "HH:mm", { locale: es })}
                       </div>
                       {event.resourceName && (
-                        <div className="text-xs text-gray-500 mt-1">
+                        <div className="text-xs text-[var(--color-text-secondary)] mt-1">
                           📍 {event.resourceName}
                         </div>
                       )}
                       {event.userName && (
-                        <div className="text-xs text-gray-500">
+                        <div className="text-xs text-[var(--color-text-secondary)]">
                           👤 {event.userName}
                         </div>
                       )}

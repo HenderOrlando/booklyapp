@@ -430,12 +430,12 @@ export const ReservationModal = React.memo(function ReservationModal({
                     }}
                     className="rounded"
                   />
-                  <span className="text-sm text-gray-300">Activar</span>
+                  <span className="text-sm text-[var(--color-text-tertiary)]">Activar</span>
                 </label>
               </div>
 
               {showRecurringConfig && (
-                <div className="p-4 bg-gray-800 rounded-lg border border-gray-700">
+                <div className="p-4 bg-[var(--color-bg-inverse)] rounded-lg border border-[var(--color-border-strong)]">
                   <RecurringPatternSelector
                     pattern={recurringPattern}
                     onChange={(pattern) => {

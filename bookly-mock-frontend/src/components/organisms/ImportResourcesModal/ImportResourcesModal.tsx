@@ -136,7 +136,7 @@ export function ImportResourcesModal({
                 type="checkbox"
                 checked={skipErrors}
                 onChange={(e) => setSkipErrors(e.target.checked)}
-                className="rounded border-gray-300"
+                className="rounded border-[var(--color-border-strong)]"
               />
               <span className="text-[var(--color-text-secondary)]">
                 Continuar importación si hay errores en filas individuales

@@ -85,7 +85,7 @@ export function InfiniteResourceList({
   if (resources.length === 0) {
     return (
       <div className="text-center py-12">
-        <p className="text-gray-400">No se encontraron recursos</p>
+        <p className="text-[var(--color-text-tertiary)]">No se encontraron recursos</p>
       </div>
     );
   }
@@ -93,7 +93,7 @@ export function InfiniteResourceList({
   return (
     <div className={className}>
       {/* Header con count */}
-      <div className="mb-4 text-sm text-gray-400">
+      <div className="mb-4 text-sm text-[var(--color-text-tertiary)]">
         Mostrando {resources.length} de {totalCount} recursos
       </div>
 
@@ -119,7 +119,7 @@ export function InfiniteResourceList({
         )}
 
         {!hasNextPage && resources.length > 0 && (
-          <div className="text-center text-gray-500 text-sm">
+          <div className="text-center text-[var(--color-text-secondary)] text-sm">
             No hay más recursos para mostrar
           </div>
         )}

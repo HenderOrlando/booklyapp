@@ -185,7 +185,7 @@ export function AdvancedSearchModal({
                   className={`p-3 rounded-lg border text-sm transition-all ${
                     filters.types?.includes(type)
                       ? "border-brand-primary-500 bg-brand-primary-500/10 text-white"
-                      : "border-[var(--color-border-subtle)] bg-gray-800/50 text-gray-400 hover:bg-gray-800"
+                      : "border-[var(--color-border-subtle)] bg-[var(--color-bg-inverse)]/50 text-[var(--color-text-tertiary)] hover:bg-[var(--color-bg-inverse)]"
                   }`}
                 >
                   {type === ResourceType.CLASSROOM && "Aula"}
@@ -215,7 +215,7 @@ export function AdvancedSearchModal({
                   className={`p-3 rounded-lg border text-sm transition-all ${
                     filters.statuses?.includes(status)
                       ? "border-brand-primary-500 bg-brand-primary-500/10 text-white"
-                      : "border-[var(--color-border-subtle)] bg-gray-800/50 text-gray-400 hover:bg-gray-800"
+                      : "border-[var(--color-border-subtle)] bg-[var(--color-bg-inverse)]/50 text-[var(--color-text-tertiary)] hover:bg-[var(--color-bg-inverse)]"
                   }`}
                 >
                   {status === ResourceStatus.AVAILABLE && "Disponible"}
@@ -324,7 +324,7 @@ export function AdvancedSearchModal({
                   className={`flex items-center gap-3 p-3 rounded-lg border cursor-pointer transition-all ${
                     filters[attr.key as keyof AdvancedSearchFilters]
                       ? "border-brand-primary-500 bg-brand-primary-500/10"
-                      : "border-[var(--color-border-subtle)] bg-gray-800/50 hover:bg-gray-800"
+                      : "border-[var(--color-border-subtle)] bg-[var(--color-bg-inverse)]/50 hover:bg-[var(--color-bg-inverse)]"
                   }`}
                 >
                   <input

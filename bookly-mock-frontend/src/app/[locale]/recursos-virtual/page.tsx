@@ -138,7 +138,7 @@ export default function RecursosVirtualPage() {
                     onChange={(e) =>
                       handleFilterChange("status", e.target.value)
                     }
-                    className="w-full px-3 py-2 bg-[var(--color-bg-primary)] border border-gray-700 rounded-md text-white"
+                    className="w-full px-3 py-2 bg-[var(--color-bg-primary)] border border-[var(--color-border-strong)] rounded-md text-white"
                   >
                     <option value="">{t("filters.statuses")}</option>
                     <option value="AVAILABLE">{t("available")}</option>

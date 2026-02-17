@@ -50,10 +50,10 @@ export const PeriodComparison = React.memo<PeriodComparisonProps>(
         <div className="flex items-center gap-3">
           <Calendar className="h-6 w-6 text-[var(--color-primary-base)]" />
           <div>
-            <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100">
+            <h2 className="text-2xl font-bold text-[var(--color-text-primary)] dark:text-[var(--color-text-inverse)]">
               Comparación de Períodos
             </h2>
-            <p className="text-sm text-gray-600 dark:text-gray-400">
+            <p className="text-sm text-[var(--color-text-secondary)] dark:text-[var(--color-text-tertiary)]">
               {period1.label} vs {period2.label}
             </p>
           </div>

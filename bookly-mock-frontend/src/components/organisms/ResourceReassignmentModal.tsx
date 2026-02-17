@@ -107,10 +107,10 @@ export function ResourceReassignmentModal({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
-      <div className="w-full max-w-3xl max-h-[90vh] overflow-y-auto bg-gray-900 rounded-lg">
-        <div className="sticky top-0 bg-gray-900 border-b border-gray-700 p-6">
+      <div className="w-full max-w-3xl max-h-[90vh] overflow-y-auto bg-[var(--color-bg-inverse)] rounded-lg">
+        <div className="sticky top-0 bg-[var(--color-bg-inverse)] border-b border-[var(--color-border-strong)] p-6">
           <h2 className="text-2xl font-bold text-white">Reasignar Recurso</h2>
-          <p className="text-sm text-gray-400 mt-1">
+          <p className="text-sm text-[var(--color-text-tertiary)] mt-1">
             Cambiar el recurso asignado a esta reserva
           </p>
         </div>
@@ -127,7 +127,7 @@ export function ResourceReassignmentModal({
                   <div className="font-medium text-white">
                     {reservation.resourceName}
                   </div>
-                  <div className="text-sm text-gray-400 mt-1">
+                  <div className="text-sm text-[var(--color-text-tertiary)] mt-1">
                     {new Date(reservation.startDate).toLocaleDateString(
                       "es-ES"
                     )}{" "}
@@ -171,7 +171,7 @@ export function ResourceReassignmentModal({
               value={reasonDetails}
               onChange={(e) => setReasonDetails(e.target.value)}
               placeholder="Explica el motivo de la reasignación..."
-              className="w-full px-3 py-2 bg-gray-800 text-white rounded-lg resize-none"
+              className="w-full px-3 py-2 bg-[var(--color-bg-inverse)] text-white rounded-lg resize-none"
               rows={3}
             />
           </div>
@@ -190,7 +190,7 @@ export function ResourceReassignmentModal({
                   className={`w-full p-4 rounded-lg border-2 transition-all text-left ${
                     selectedResourceId === suggestion.resourceId
                       ? "border-blue-600 bg-blue-900/20"
-                      : "border-gray-700 bg-gray-800 hover:border-gray-600"
+                      : "border-[var(--color-border-strong)] bg-[var(--color-bg-inverse)] hover:border-[var(--color-border-strong)]"
                   }`}
                 >
                   <div className="flex items-start justify-between">
@@ -199,7 +199,7 @@ export function ResourceReassignmentModal({
                         <span className="font-medium text-white">
                           {suggestion.resourceName}
                         </span>
-                        <span className="px-2 py-1 bg-gray-700 text-xs rounded">
+                        <span className="px-2 py-1 bg-[var(--color-bg-elevated)] text-xs rounded">
                           {suggestion.resourceType}
                         </span>
                         {!suggestion.available && (
@@ -208,18 +208,18 @@ export function ResourceReassignmentModal({
                           </span>
                         )}
                       </div>
-                      <div className="text-sm text-gray-400 mt-1">
+                      <div className="text-sm text-[var(--color-text-tertiary)] mt-1">
                         {suggestion.location} • Capacidad: {suggestion.capacity}
                       </div>
                       {/* Match score */}
                       <div className="mt-2 flex items-center gap-2">
-                        <div className="flex-1 h-2 bg-gray-700 rounded-full overflow-hidden">
+                        <div className="flex-1 h-2 bg-[var(--color-bg-elevated)] rounded-full overflow-hidden">
                           <div
                             className="h-full bg-gradient-to-r from-green-600 to-blue-600"
                             style={{ width: `${suggestion.matchScore}%` }}
                           />
                         </div>
-                        <span className="text-xs text-gray-400">
+                        <span className="text-xs text-[var(--color-text-tertiary)]">
                           {suggestion.matchScore}%
                         </span>
                       </div>
@@ -247,7 +247,7 @@ export function ResourceReassignmentModal({
             {changeTime && (
               <div className="grid grid-cols-2 gap-4 mt-3">
                 <div>
-                  <label className="block text-sm text-gray-400 mb-1">
+                  <label className="block text-sm text-[var(--color-text-tertiary)] mb-1">
                     Hora inicio
                   </label>
                   <Input
@@ -257,7 +257,7 @@ export function ResourceReassignmentModal({
                   />
                 </div>
                 <div>
-                  <label className="block text-sm text-gray-400 mb-1">
+                  <label className="block text-sm text-[var(--color-text-tertiary)] mb-1">
                     Hora fin
                   </label>
                   <Input
@@ -294,7 +294,7 @@ export function ResourceReassignmentModal({
               <CardContent>
                 <div className="space-y-2 text-sm">
                   <div className="flex justify-between">
-                    <span className="text-gray-400">Recurso:</span>
+                    <span className="text-[var(--color-text-tertiary)]">Recurso:</span>
                     <span className="text-white">
                       {reservation.resourceName} →{" "}
                       <strong>{selectedResource.resourceName}</strong>
@@ -302,7 +302,7 @@ export function ResourceReassignmentModal({
                   </div>
                   {changeTime && (
                     <div className="flex justify-between">
-                      <span className="text-gray-400">Horario:</span>
+                      <span className="text-[var(--color-text-tertiary)]">Horario:</span>
                       <span className="text-white">
                         {currentStartTime}-{currentEndTime} →{" "}
                         <strong>
@@ -312,7 +312,7 @@ export function ResourceReassignmentModal({
                     </div>
                   )}
                   <div className="flex justify-between">
-                    <span className="text-gray-400">Notificación:</span>
+                    <span className="text-[var(--color-text-tertiary)]">Notificación:</span>
                     <span className="text-white">
                       {notifyUser ? "Sí" : "No"}
                     </span>
@@ -324,7 +324,7 @@ export function ResourceReassignmentModal({
         </div>
 
         {/* Botones */}
-        <div className="sticky bottom-0 bg-gray-900 border-t border-gray-700 p-6 flex justify-end gap-3">
+        <div className="sticky bottom-0 bg-[var(--color-bg-inverse)] border-t border-[var(--color-border-strong)] p-6 flex justify-end gap-3">
           <Button variant="outline" onClick={onClose} disabled={loading}>
             Cancelar
           </Button>

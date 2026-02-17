@@ -43,7 +43,7 @@ export function AppHeader({
           <div>
             <h1 className="text-2xl font-bold text-white">{title}</h1>
             {showUser && user && (
-              <p className="text-xs text-gray-300">
+              <p className="text-xs text-[var(--color-text-tertiary)]">
                 {user.firstName} {user.lastName}
               </p>
             )}
@@ -58,7 +58,7 @@ export function AppHeader({
             <span className="font-medium text-white">
               {user.firstName} {user.lastName}
             </span>
-            <span className="text-xs text-gray-300">{user.email}</span>
+            <span className="text-xs text-[var(--color-text-tertiary)]">{user.email}</span>
           </div>
         )}
 

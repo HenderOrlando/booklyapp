@@ -234,7 +234,7 @@ export default function ReservasPage() {
               <VirtualizedList
                 items={filteredReservations}
                 renderItem={(reservation: Reservation, index: number) => (
-                  <div className="p-4 border-b border-gray-700 hover:bg-[var(--color-bg-primary)]/50 transition-colors">
+                  <div className="p-4 border-b border-[var(--color-border-strong)] hover:bg-[var(--color-bg-primary)]/50 transition-colors">
                     <ReservationCard
                       reservation={reservation}
                       onView={handleView}

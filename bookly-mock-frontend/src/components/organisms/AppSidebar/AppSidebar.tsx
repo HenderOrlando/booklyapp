@@ -731,7 +731,7 @@ export function AppSidebar({
                   ${
                     isActive
                       ? "bg-brand-primary-600 text-white"
-                      : "hover:bg-slate-700 text-gray-300"
+                      : "hover:bg-slate-700 text-[var(--color-text-tertiary)]"
                   }
                 `}
               >
@@ -755,7 +755,7 @@ export function AppSidebar({
                   ${
                     isActive
                       ? "bg-brand-primary-600 text-white"
-                      : "hover:bg-slate-700 text-gray-300"
+                      : "hover:bg-slate-700 text-[var(--color-text-tertiary)]"
                   }
                 `}
               >
@@ -768,7 +768,7 @@ export function AppSidebar({
 
             {/* Submenú */}
             {hasChildren && isExpanded && (
-              <div className="ml-4 mt-1 pl-4 border-l border-gray-600 space-y-1">
+              <div className="ml-4 mt-1 pl-4 border-l border-[var(--color-border-strong)] space-y-1">
                 {item.children?.map((child) => {
                   const isChildActive = pathname === child.href;
                   return (
@@ -780,7 +780,7 @@ export function AppSidebar({
                         ${
                           isChildActive
                             ? "text-brand-primary-400 font-medium"
-                            : "text-gray-400 hover:text-white hover:bg-slate-700"
+                            : "text-[var(--color-text-tertiary)] hover:text-white hover:bg-slate-700"
                         }
                       `}
                     >

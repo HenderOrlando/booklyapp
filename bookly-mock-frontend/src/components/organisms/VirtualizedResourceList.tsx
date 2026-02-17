@@ -99,7 +99,7 @@ export function VirtualizedResourceList({
   if (resources.length === 0) {
     return (
       <div className="text-center py-12">
-        <p className="text-gray-400">No se encontraron recursos</p>
+        <p className="text-[var(--color-text-tertiary)]">No se encontraron recursos</p>
       </div>
     );
   }
@@ -107,7 +107,7 @@ export function VirtualizedResourceList({
   return (
     <div className={className}>
       {/* Header con contador */}
-      <div className="mb-4 text-sm text-gray-400">
+      <div className="mb-4 text-sm text-[var(--color-text-tertiary)]">
         Mostrando {resources.length} de {totalCount} recursos
         {isFetchingNextPage && " (cargando más...)"}
       </div>
@@ -115,7 +115,7 @@ export function VirtualizedResourceList({
       {/* Contenedor virtualizado */}
       <div
         ref={parentRef}
-        className="h-[600px] overflow-auto border border-gray-700 rounded-lg"
+        className="h-[600px] overflow-auto border border-[var(--color-border-strong)] rounded-lg"
       >
         <div
           style={{
@@ -159,7 +159,7 @@ export function VirtualizedResourceList({
 
       {/* Mensaje de fin */}
       {!hasNextPage && resources.length > 0 && (
-        <div className="text-center text-gray-500 text-sm py-4">
+        <div className="text-center text-[var(--color-text-secondary)] text-sm py-4">
           {resources.length === totalCount
             ? "Todos los recursos cargados"
             : `Mostrando ${resources.length} de ${totalCount} recursos`}

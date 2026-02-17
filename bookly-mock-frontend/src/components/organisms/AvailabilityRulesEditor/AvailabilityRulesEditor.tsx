@@ -55,7 +55,7 @@ export function AvailabilityRulesEditor({
           onClick={() => update("requiresApproval", !value.requiresApproval)}
           className={cn(
             "relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors",
-            value.requiresApproval ? "bg-brand-primary-500" : "bg-gray-200"
+            value.requiresApproval ? "bg-brand-primary-500" : "bg-[var(--color-bg-muted)]"
           )}
         >
           <span
@@ -149,7 +149,7 @@ export function AvailabilityRulesEditor({
           onClick={() => update("allowRecurring", !value.allowRecurring)}
           className={cn(
             "relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors",
-            value.allowRecurring ? "bg-brand-primary-500" : "bg-gray-200"
+            value.allowRecurring ? "bg-brand-primary-500" : "bg-[var(--color-bg-muted)]"
           )}
         >
           <span

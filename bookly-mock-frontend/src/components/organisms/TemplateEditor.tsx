@@ -72,19 +72,19 @@ export const TemplateEditor = React.memo<TemplateEditorProps>(
 
     return (
       <div
-        className={`bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-6 ${className}`}
+        className={`bg-white dark:bg-[var(--color-bg-inverse)] border border-[var(--color-border-subtle)] dark:border-[var(--color-border-strong)] rounded-lg p-6 ${className}`}
       >
         <div className="space-y-4">
           {/* Name */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+            <label className="block text-sm font-medium text-[var(--color-text-primary)] dark:text-[var(--color-text-tertiary)] mb-2">
               Nombre de la Plantilla *
             </label>
             <input
               type="text"
               value={name}
               onChange={(e) => setName(e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100"
+              className="w-full px-3 py-2 border border-[var(--color-border-strong)] dark:border-[var(--color-border-strong)] rounded-lg bg-white dark:bg-[var(--color-bg-inverse)] text-[var(--color-text-primary)] dark:text-[var(--color-text-inverse)]"
               placeholder="Ej: Notificación de Aprobación"
             />
           </div>
@@ -92,13 +92,13 @@ export const TemplateEditor = React.memo<TemplateEditorProps>(
           {/* Type and Category */}
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              <label className="block text-sm font-medium text-[var(--color-text-primary)] dark:text-[var(--color-text-tertiary)] mb-2">
                 Tipo *
               </label>
               <select
                 value={type}
                 onChange={(e) => setType(e.target.value as any)}
-                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100"
+                className="w-full px-3 py-2 border border-[var(--color-border-strong)] dark:border-[var(--color-border-strong)] rounded-lg bg-white dark:bg-[var(--color-bg-inverse)] text-[var(--color-text-primary)] dark:text-[var(--color-text-inverse)]"
               >
                 <option value="NOTIFICATION">Notificación</option>
                 <option value="APPROVAL">Aprobación</option>
@@ -108,13 +108,13 @@ export const TemplateEditor = React.memo<TemplateEditorProps>(
               </select>
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              <label className="block text-sm font-medium text-[var(--color-text-primary)] dark:text-[var(--color-text-tertiary)] mb-2">
                 Categoría *
               </label>
               <select
                 value={category}
                 onChange={(e) => setCategory(e.target.value as any)}
-                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100"
+                className="w-full px-3 py-2 border border-[var(--color-border-strong)] dark:border-[var(--color-border-strong)] rounded-lg bg-white dark:bg-[var(--color-bg-inverse)] text-[var(--color-text-primary)] dark:text-[var(--color-text-inverse)]"
               >
                 <option value="RESERVATION">Reserva</option>
                 <option value="APPROVAL">Aprobación</option>
@@ -128,14 +128,14 @@ export const TemplateEditor = React.memo<TemplateEditorProps>(
           {/* Subject (for emails) */}
           {(type === "EMAIL" || type === "NOTIFICATION") && (
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              <label className="block text-sm font-medium text-[var(--color-text-primary)] dark:text-[var(--color-text-tertiary)] mb-2">
                 Asunto
               </label>
               <input
                 type="text"
                 value={subject}
                 onChange={(e) => setSubject(e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100"
+                className="w-full px-3 py-2 border border-[var(--color-border-strong)] dark:border-[var(--color-border-strong)] rounded-lg bg-white dark:bg-[var(--color-bg-inverse)] text-[var(--color-text-primary)] dark:text-[var(--color-text-inverse)]"
                 placeholder="Ej: Tu solicitud ha sido aprobada"
               />
             </div>
@@ -143,17 +143,17 @@ export const TemplateEditor = React.memo<TemplateEditorProps>(
 
           {/* Body */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+            <label className="block text-sm font-medium text-[var(--color-text-primary)] dark:text-[var(--color-text-tertiary)] mb-2">
               Contenido *
             </label>
             <textarea
               value={body}
               onChange={(e) => setBody(e.target.value)}
               rows={12}
-              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono text-sm"
+              className="w-full px-3 py-2 border border-[var(--color-border-strong)] dark:border-[var(--color-border-strong)] rounded-lg bg-white dark:bg-[var(--color-bg-inverse)] text-[var(--color-text-primary)] dark:text-[var(--color-text-inverse)] font-mono text-sm"
               placeholder="Usa variables como {{userName}}, {{resourceName}}, {{date}}"
             />
-            <p className="mt-1 text-xs text-gray-500">
+            <p className="mt-1 text-xs text-[var(--color-text-secondary)]">
               Variables disponibles:{" "}
               {`{{userName}}, {{resourceName}}, {{date}}, {{time}}, {{status}}`}
             </p>
@@ -166,11 +166,11 @@ export const TemplateEditor = React.memo<TemplateEditorProps>(
               id="isActive"
               checked={isActive}
               onChange={(e) => setIsActive(e.target.checked)}
-              className="rounded border-gray-300 text-[var(--color-primary-base)] focus:ring-[var(--color-primary-base)]"
+              className="rounded border-[var(--color-border-strong)] text-[var(--color-primary-base)] focus:ring-[var(--color-primary-base)]"
             />
             <label
               htmlFor="isActive"
-              className="text-sm text-gray-700 dark:text-gray-300"
+              className="text-sm text-[var(--color-text-primary)] dark:text-[var(--color-text-tertiary)]"
             >
               Plantilla activa
             </label>
@@ -189,14 +189,14 @@ export const TemplateEditor = React.memo<TemplateEditorProps>(
             <button
               onClick={handlePreview}
               disabled={!body}
-              className="flex items-center gap-2 px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700"
+              className="flex items-center gap-2 px-4 py-2 border border-[var(--color-border-strong)] dark:border-[var(--color-border-strong)] rounded-lg hover:bg-[var(--color-bg-secondary)] dark:hover:bg-[var(--color-bg-elevated)]"
             >
               <Eye className="h-4 w-4" />
               Vista Previa
             </button>
             <button
               onClick={onCancel}
-              className="flex items-center gap-2 px-4 py-2 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg"
+              className="flex items-center gap-2 px-4 py-2 text-[var(--color-text-primary)] dark:text-[var(--color-text-tertiary)] hover:bg-[var(--color-bg-secondary)] dark:hover:bg-[var(--color-bg-elevated)] rounded-lg"
             >
               <X className="h-4 w-4" />
               Cancelar
@@ -207,14 +207,14 @@ export const TemplateEditor = React.memo<TemplateEditorProps>(
         {/* Preview Modal */}
         {showPreview && (
           <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-            <div className="bg-white dark:bg-gray-800 rounded-lg shadow-xl w-full max-w-2xl p-6 max-h-[90vh] overflow-y-auto">
+            <div className="bg-white dark:bg-[var(--color-bg-inverse)] rounded-lg shadow-xl w-full max-w-2xl p-6 max-h-[90vh] overflow-y-auto">
               <div className="flex justify-between items-start mb-4">
-                <h3 className="text-lg font-bold text-gray-900 dark:text-gray-100">
+                <h3 className="text-lg font-bold text-[var(--color-text-primary)] dark:text-[var(--color-text-inverse)]">
                   Vista Previa: {name || "Sin título"}
                 </h3>
                 <button
                   onClick={() => setShowPreview(false)}
-                  className="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
+                  className="text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] dark:text-[var(--color-text-tertiary)] dark:hover:text-[var(--color-text-inverse)]"
                 >
                   <X className="h-5 w-5" />
                 </button>
@@ -222,21 +222,21 @@ export const TemplateEditor = React.memo<TemplateEditorProps>(
 
               <div className="space-y-4">
                 {(type === "EMAIL" || type === "NOTIFICATION") && (
-                  <div className="border-b border-gray-200 dark:border-gray-700 pb-4">
-                    <p className="text-sm font-medium text-gray-500 dark:text-gray-400">
+                  <div className="border-b border-[var(--color-border-subtle)] dark:border-[var(--color-border-strong)] pb-4">
+                    <p className="text-sm font-medium text-[var(--color-text-secondary)] dark:text-[var(--color-text-tertiary)]">
                       Asunto
                     </p>
-                    <p className="text-gray-900 dark:text-gray-100 font-medium mt-1">
+                    <p className="text-[var(--color-text-primary)] dark:text-[var(--color-text-inverse)] font-medium mt-1">
                       {replaceVariables(subject, PREVIEW_DATA)}
                     </p>
                   </div>
                 )}
 
-                <div className="bg-gray-50 dark:bg-gray-900 p-4 rounded-lg border border-gray-200 dark:border-gray-700">
-                  <p className="text-sm font-medium text-gray-500 dark:text-gray-400 mb-2">
+                <div className="bg-[var(--color-bg-secondary)] dark:bg-[var(--color-bg-inverse)] p-4 rounded-lg border border-[var(--color-border-subtle)] dark:border-[var(--color-border-strong)]">
+                  <p className="text-sm font-medium text-[var(--color-text-secondary)] dark:text-[var(--color-text-tertiary)] mb-2">
                     Contenido
                   </p>
-                  <div className="prose dark:prose-invert max-w-none whitespace-pre-wrap font-mono text-sm text-gray-800 dark:text-gray-200">
+                  <div className="prose dark:prose-invert max-w-none whitespace-pre-wrap font-mono text-sm text-[var(--color-text-primary)] dark:text-[var(--color-text-inverse)]">
                     {replaceVariables(body, PREVIEW_DATA)}
                   </div>
                 </div>
@@ -244,7 +244,7 @@ export const TemplateEditor = React.memo<TemplateEditorProps>(
                 <div className="flex justify-end pt-2">
                   <button
                     onClick={() => setShowPreview(false)}
-                    className="px-4 py-2 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-600"
+                    className="px-4 py-2 bg-[var(--color-bg-secondary)] dark:bg-[var(--color-bg-elevated)] text-[var(--color-text-primary)] dark:text-[var(--color-text-tertiary)] rounded-lg hover:bg-[var(--color-bg-muted)] dark:hover:bg-[var(--color-bg-elevated)]"
                   >
                     Cerrar
                   </button>

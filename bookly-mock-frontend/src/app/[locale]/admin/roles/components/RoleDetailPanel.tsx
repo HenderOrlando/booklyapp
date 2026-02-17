@@ -148,7 +148,7 @@ export function RoleDetailPanel({
                   {filteredPermissions.map((perm: Permission) => (
                     <div
                       key={perm.id}
-                      className="p-3 bg-gradient-to-r from-gray-800 to-gray-750 rounded-lg border border-gray-700"
+                      className="p-3 bg-gradient-to-r from-gray-800 to-gray-750 rounded-lg border border-[var(--color-border-strong)]"
                     >
                       <div className="flex items-start gap-2">
                         <div className="flex-shrink-0 w-8 h-8 bg-brand-primary-500 rounded-lg flex items-center justify-center">
@@ -195,7 +195,7 @@ export function RoleDetailPanel({
                   {filteredUsers.map((user: User) => (
                     <div
                       key={user.id}
-                      className="p-3 bg-gradient-to-r from-gray-800 to-gray-750 rounded-lg border border-gray-700 hover:border-brand-primary-500 transition-colors"
+                      className="p-3 bg-gradient-to-r from-gray-800 to-gray-750 rounded-lg border border-[var(--color-border-strong)] hover:border-brand-primary-500 transition-colors"
                     >
                       <div className="flex items-center gap-3">
                         <div className="flex-shrink-0 w-10 h-10 bg-brand-primary-500 rounded-full flex items-center justify-center">
@@ -220,7 +220,7 @@ export function RoleDetailPanel({
             </div>
 
             {/* Fechas */}
-            <div className="grid grid-cols-2 gap-4 pt-4 border-t border-gray-700">
+            <div className="grid grid-cols-2 gap-4 pt-4 border-t border-[var(--color-border-strong)]">
               <div>
                 <label className="text-sm font-medium text-[var(--color-text-tertiary)]">
                   {t("created_at")}

@@ -27,7 +27,7 @@ export const LoadingState = React.memo<LoadingStateProps>(
       <div className="flex flex-col items-center justify-center gap-3">
         <LoadingSpinner size={size} />
         {message && (
-          <p className="text-sm text-gray-600 dark:text-gray-400 animate-pulse">
+          <p className="text-sm text-[var(--color-text-secondary)] dark:text-[var(--color-text-tertiary)] animate-pulse">
             {message}
           </p>
         )}
@@ -39,7 +39,7 @@ export const LoadingState = React.memo<LoadingStateProps>(
         <div
           className={`
             fixed inset-0 z-50
-            bg-white/80 dark:bg-gray-900/80
+            bg-white/80 dark:bg-[var(--color-bg-inverse)]/80
             backdrop-blur-sm
             flex items-center justify-center
             ${className}

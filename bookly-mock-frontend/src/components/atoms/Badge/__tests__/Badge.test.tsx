@@ -10,7 +10,7 @@ describe("Badge", () => {
   it("renders default variant", () => {
     render(<Badge>Default</Badge>);
     const badge = screen.getByText("Default");
-    expect(badge.className).toContain("bg-gray-100");
+    expect(badge.className).toContain("color-bg-secondary");
   });
 
   it("renders success variant with state tokens", () => {

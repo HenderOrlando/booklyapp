@@ -39,9 +39,9 @@ const STATUS_CONFIG = {
   },
   pending: {
     icon: Circle,
-    bgColor: "bg-gray-200 dark:bg-gray-700",
-    textColor: "text-gray-400 dark:text-gray-500",
-    borderColor: "border-gray-300 dark:border-gray-600",
+    bgColor: "bg-[var(--color-bg-muted)] dark:bg-[var(--color-bg-elevated)]",
+    textColor: "text-[var(--color-text-tertiary)] dark:text-[var(--color-text-secondary)]",
+    borderColor: "border-[var(--color-border-strong)] dark:border-[var(--color-border-strong)]",
   },
   rejected: {
     icon: XCircle,

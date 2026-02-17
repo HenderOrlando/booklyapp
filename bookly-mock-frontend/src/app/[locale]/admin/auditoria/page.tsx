@@ -454,7 +454,7 @@ export default function AuditoriaPage() {
               <VirtualizedList
                 items={filteredLogs}
                 renderItem={(log: AuditLog, index: number) => (
-                  <div className="p-4 border-b border-gray-700 hover:bg-[var(--color-bg-primary)]/50 transition-colors">
+                  <div className="p-4 border-b border-[var(--color-border-strong)] hover:bg-[var(--color-bg-primary)]/50 transition-colors">
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-4 flex-1">
                         <span className="text-xs text-[var(--color-text-tertiary)] font-mono w-12">

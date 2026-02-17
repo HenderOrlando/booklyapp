@@ -322,7 +322,7 @@ export function MaintenanceModal({
                 }
                 placeholder="Describe el mantenimiento a realizar..."
                 rows={3}
-                className={`w-full px-3 py-2 bg-gray-800 border rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-brand-primary-500 ${
+                className={`w-full px-3 py-2 bg-[var(--color-bg-inverse)] border rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-brand-primary-500 ${
                   errors.description
                     ? "border-red-500"
                     : "border-[var(--color-border-subtle)]"
@@ -388,7 +388,7 @@ export function MaintenanceModal({
                 }
                 placeholder="Notas, observaciones o comentarios..."
                 rows={3}
-                className="w-full px-3 py-2 bg-gray-800 border border-[var(--color-border-subtle)] rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-brand-primary-500"
+                className="w-full px-3 py-2 bg-[var(--color-bg-inverse)] border border-[var(--color-border-subtle)] rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-brand-primary-500"
               />
             </div>
 
