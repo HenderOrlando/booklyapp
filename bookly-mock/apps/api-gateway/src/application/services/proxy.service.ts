@@ -16,6 +16,7 @@ import { RateLimiterRedisService } from "./rate-limiter-redis.service";
 export class ProxyService {
   private readonly logger = createLogger("ProxyService");
   private readonly serviceUrls: Record<string, string>;
+  private readonly pathPrefixToService: Record<string, string>;
 
   constructor(
     private readonly httpService: HttpService,
@@ -40,6 +41,53 @@ export class ProxyService {
       reports:
         this.configService.get<string>("REPORTS_SERVICE_URL") ||
         "http://localhost:3005",
+    };
+
+    // Map controller path prefixes to their owning service
+    this.pathPrefixToService = {
+      // auth-service controllers
+      auth: "auth",
+      users: "auth",
+      roles: "auth",
+      permissions: "auth",
+      "auth/oauth": "auth",
+      // resources-service controllers
+      resources: "resources",
+      categories: "resources",
+      maintenances: "resources",
+      departments: "resources",
+      faculties: "resources",
+      programs: "resources",
+      // availability-service controllers
+      reservations: "availability",
+      availabilities: "availability",
+      "waiting-lists": "availability",
+      reassignments: "availability",
+      calendar: "availability",
+      schedules: "availability",
+      "calendar-integration": "availability",
+      // stockpile-service controllers
+      "approval-requests": "stockpile",
+      "approval-flows": "stockpile",
+      "check-in-out": "stockpile",
+      documents: "stockpile",
+      "document-templates": "stockpile",
+      monitoring: "stockpile",
+      notifications: "stockpile",
+      "notification-templates": "stockpile",
+      "tenant-notification-configs": "stockpile",
+      // reports-service controllers
+      "usage-reports": "reports",
+      "demand-reports": "reports",
+      "user-reports": "reports",
+      feedback: "reports",
+      evaluation: "reports",
+      evaluations: "reports",
+      audit: "reports",
+      // also accept the service names directly
+      stockpile: "stockpile",
+      reports: "reports",
+      availability: "availability",
     };
 
     // Registrar circuit breakers para cada servicio
@@ -83,11 +131,15 @@ export class ProxyService {
     userId?: string,
     userIp?: string,
   ): Promise<any> {
-    const serviceUrl = this.serviceUrls[service];
+    // Resolve the controller prefix to the owning service
+    const resolvedServiceName = this.pathPrefixToService[service] || service;
+    const serviceUrl = this.serviceUrls[resolvedServiceName];
 
     if (!serviceUrl) {
-      this.logger.error(`Service not found: ${service}`);
-      throw new HttpException(`Service ${service} not found`, 404);
+      this.logger.error(
+        `Service not found for prefix: ${service} (resolved: ${resolvedServiceName})`,
+      );
+      throw new HttpException(`Service for prefix '${service}' not found`, 404);
     }
 
     // 1. Aplicar Rate Limiting ANTES de procesar
@@ -104,19 +156,23 @@ export class ProxyService {
       "/auth/reset-password",
       "/auth/me",
     ];
+    // Build the full path to forward: /{service}{path}
+    // e.g., service="approval-requests", path="/123" → fullForwardPath="/approval-requests/123"
+    const fullForwardPath = `/${service}${path}`;
+
     const isSynchronousEndpoint = synchronousPaths.some((sp) =>
-      path.toLowerCase().startsWith(sp),
+      fullForwardPath.toLowerCase().startsWith(sp),
     );
 
     if (method.toUpperCase() === "GET" || isSynchronousEndpoint) {
       // Queries (GET) y endpoints síncronos → HTTP directo con Circuit Breaker
       return await this.circuitBreaker.execute(
-        service,
+        resolvedServiceName,
         async () => {
           return await this.proxyViaHttp(
-            service,
+            resolvedServiceName,
             serviceUrl,
-            path,
+            fullForwardPath,
             method,
             body,
             headers,
@@ -136,10 +192,10 @@ export class ProxyService {
         },
       );
     } else {
-      // Commands (POST/PUT/DELETE/PATCH) → Kafka para procesamiento asíncrono
+      // Commands (POST/PUT/DELETE/PATCH) → Event Bus para procesamiento asíncrono
       return await this.proxyViaEventBus(
-        service,
-        path,
+        resolvedServiceName,
+        fullForwardPath,
         method,
         body,
         headers,

@@ -58,21 +58,20 @@ export const RESOURCES_ENDPOINTS = {
   CATEGORIES: `${API_VERSION}/categories`,
   CATEGORY_BY_ID: (id: string) => `${API_VERSION}/categories/${id}`,
 
-  // Programas Académicos
-  PROGRAMS: `${API_VERSION}/resources/programs`,
-  PROGRAM_BY_ID: (id: string) => `${API_VERSION}/resources/programs/${id}`,
+  // Programas Académicos (BE controller: "programs")
+  PROGRAMS: `${API_VERSION}/programs`,
+  PROGRAM_BY_ID: (id: string) => `${API_VERSION}/programs/${id}`,
 
   // Importación/Exportación
   IMPORT_CSV: `${API_VERSION}/resources/import/csv`,
   EXPORT_CSV: `${API_VERSION}/resources/export/csv`,
   EXPORT_PDF: `${API_VERSION}/resources/export/pdf`,
 
-  // Mantenimiento
-  MAINTENANCE: `${API_VERSION}/resources/maintenance`,
-  MAINTENANCE_BY_ID: (id: string) =>
-    `${API_VERSION}/resources/maintenance/${id}`,
+  // Mantenimiento (BE controller: "maintenances")
+  MAINTENANCE: `${API_VERSION}/maintenances`,
+  MAINTENANCE_BY_ID: (id: string) => `${API_VERSION}/maintenances/${id}`,
   MAINTENANCE_HISTORY: (resourceId: string) =>
-    `${API_VERSION}/resources/${resourceId}/maintenance/history`,
+    `${API_VERSION}/maintenances?resourceId=${resourceId}`,
 
   // Disponibilidad
   AVAILABILITY: `${API_VERSION}/resources/availability`,
@@ -181,40 +180,40 @@ export const STOCKPILE_ENDPOINTS = {
  * Endpoints de Reportes y Análisis (Reports Service - Puerto 3005)
  */
 export const REPORTS_ENDPOINTS = {
-  // Dashboard
-  BASE: `${API_VERSION}/reports`,
-  DASHBOARD: `${API_VERSION}/reports/dashboard`,
-  DASHBOARD_ADMIN: `${API_VERSION}/reports/dashboard/admin`,
-  DASHBOARD_USER: `${API_VERSION}/reports/dashboard/user`,
+  // Dashboard (routed via reports service)
+  BASE: `${API_VERSION}/usage-reports`,
+  DASHBOARD: `${API_VERSION}/usage-reports`,
+  DASHBOARD_ADMIN: `${API_VERSION}/usage-reports?scope=admin`,
+  DASHBOARD_USER: `${API_VERSION}/usage-reports?scope=user`,
 
-  // Reportes de Uso
-  USAGE: `${API_VERSION}/reports/usage`,
+  // Reportes de Uso (BE controller: "usage-reports")
+  USAGE: `${API_VERSION}/usage-reports`,
   USAGE_BY_RESOURCE: (resourceId: string) =>
-    `${API_VERSION}/reports/usage/resource/${resourceId}`,
+    `${API_VERSION}/usage-reports?resourceId=${resourceId}`,
   USAGE_BY_USER: (userId: string) =>
-    `${API_VERSION}/reports/usage/user/${userId}`,
+    `${API_VERSION}/usage-reports?userId=${userId}`,
   USAGE_BY_PROGRAM: (programId: string) =>
-    `${API_VERSION}/reports/usage/program/${programId}`,
+    `${API_VERSION}/usage-reports?programId=${programId}`,
 
-  // Estadísticas
-  STATISTICS: `${API_VERSION}/reports/statistics`,
-  STATISTICS_SUMMARY: `${API_VERSION}/reports/statistics/summary`,
-  STATISTICS_TRENDS: `${API_VERSION}/reports/statistics/trends`,
+  // Estadísticas (via usage-reports generate)
+  STATISTICS: `${API_VERSION}/usage-reports/generate`,
+  STATISTICS_SUMMARY: `${API_VERSION}/usage-reports/generate?type=summary`,
+  STATISTICS_TRENDS: `${API_VERSION}/usage-reports/generate?type=trends`,
 
-  // Exportación
+  // Exportación (BE controller: "reports/export")
   EXPORT: `${API_VERSION}/reports/export`,
-  EXPORT_CSV: `${API_VERSION}/reports/export/csv`,
-  EXPORT_PDF: `${API_VERSION}/reports/export/pdf`,
-  EXPORT_EXCEL: `${API_VERSION}/reports/export/excel`,
+  EXPORT_CSV: `${API_VERSION}/reports/export`,
+  EXPORT_PDF: `${API_VERSION}/reports/export`,
+  EXPORT_EXCEL: `${API_VERSION}/reports/export`,
 
-  // Demanda Insatisfecha
-  UNSATISFIED_DEMAND: `${API_VERSION}/reports/unsatisfied-demand`,
+  // Demanda Insatisfecha (BE controller: "demand-reports")
+  UNSATISFIED_DEMAND: `${API_VERSION}/demand-reports`,
 
-  // Feedback y Evaluaciones
-  FEEDBACK: `${API_VERSION}/reports/feedback`,
-  FEEDBACK_BY_ID: (id: string) => `${API_VERSION}/reports/feedback/${id}`,
-  EVALUATIONS: `${API_VERSION}/reports/evaluations`,
-  EVALUATION_BY_ID: (id: string) => `${API_VERSION}/reports/evaluations/${id}`,
+  // Feedback y Evaluaciones (BE controllers: "feedback", "evaluation")
+  FEEDBACK: `${API_VERSION}/feedback`,
+  FEEDBACK_BY_ID: (id: string) => `${API_VERSION}/feedback/${id}`,
+  EVALUATIONS: `${API_VERSION}/evaluations`,
+  EVALUATION_BY_ID: (id: string) => `${API_VERSION}/evaluations/${id}`,
 
   // Categorías (compartido con Resources)
   CATEGORIES: `${API_VERSION}/categories`,

@@ -9,58 +9,63 @@ import type {
   UserReport,
 } from "@/types/entities/report";
 
-const REPORTS_PATH = "/api/v1/reports";
+const USAGE_REPORTS_PATH = "/api/v1/usage-reports";
+const DEMAND_REPORTS_PATH = "/api/v1/demand-reports";
+const USER_REPORTS_PATH = "/api/v1/user-reports";
+const EXPORT_PATH = "/api/v1/reports/export";
 
 export async function getUsageReport(
-  filters?: UsageFilters
+  filters?: UsageFilters,
 ): Promise<UsageReport> {
-  const response = await httpClient.get<UsageReport>(`${REPORTS_PATH}/usage`, {
+  const response = await httpClient.get<UsageReport>(USAGE_REPORTS_PATH, {
     params: filters,
   });
   return response.data;
 }
 
 export async function getResourceReport(
-  resourceId: string
+  resourceId: string,
 ): Promise<ResourceReport> {
   const response = await httpClient.get<ResourceReport>(
-    `${REPORTS_PATH}/resources/${resourceId}`
+    `${USAGE_REPORTS_PATH}?resourceId=${resourceId}`,
   );
   return response.data;
 }
 
 export async function getUserReport(userId: string): Promise<UserReport> {
   const response = await httpClient.get<UserReport>(
-    `${REPORTS_PATH}/users/${userId}`
+    `${USER_REPORTS_PATH}?userId=${userId}`,
   );
   return response.data;
 }
 
 export async function getDemandReport(
-  filters?: DemandFilters
+  filters?: DemandFilters,
 ): Promise<DemandReport> {
-  const response = await httpClient.get<DemandReport>(
-    `${REPORTS_PATH}/demand`,
-    { params: filters }
-  );
+  const response = await httpClient.get<DemandReport>(DEMAND_REPORTS_PATH, {
+    params: filters,
+  });
   return response.data;
 }
 
 export async function getKPIs(period?: string): Promise<KPIs> {
-  const response = await httpClient.get<KPIs>(`${REPORTS_PATH}/kpis`, {
-    params: { period },
-  });
+  const response = await httpClient.get<KPIs>(
+    `${USAGE_REPORTS_PATH}/generate`,
+    {
+      params: { period },
+    },
+  );
   return response.data;
 }
 
 export async function exportReport(
   reportId: string,
-  format: "csv" | "excel" | "pdf"
+  format: "csv" | "excel" | "pdf",
 ): Promise<Blob> {
   const response = await httpClient.post<Blob>(
-    `${REPORTS_PATH}/export`,
+    EXPORT_PATH,
     { reportId, format },
-    { responseType: "blob" }
+    { responseType: "blob" },
   );
   return response.data;
 }

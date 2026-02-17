@@ -10,11 +10,14 @@ import { useQuery } from "@tanstack/react-query";
 export const reportKeys = {
   all: ["reports"] as const,
   dashboard: () => [...reportKeys.all, "dashboard"] as const,
-  byResource: (filters?: any) => [...reportKeys.all, "by-resource", filters] as const,
+  byResource: (filters?: any) =>
+    [...reportKeys.all, "by-resource", filters] as const,
   byUser: (filters?: any) => [...reportKeys.all, "by-user", filters] as const,
   demand: (filters?: any) => [...reportKeys.all, "demand", filters] as const,
-  compliance: (filters?: any) => [...reportKeys.all, "compliance", filters] as const,
-  conflicts: (filters?: any) => [...reportKeys.all, "conflicts", filters] as const,
+  compliance: (filters?: any) =>
+    [...reportKeys.all, "compliance", filters] as const,
+  conflicts: (filters?: any) =>
+    [...reportKeys.all, "conflicts", filters] as const,
 };
 
 export interface ReportFilters {
@@ -29,7 +32,9 @@ export function useReportDashboard(filters?: ReportFilters) {
   return useQuery({
     queryKey: reportKeys.dashboard(),
     queryFn: async () => {
-      const response = await httpClient.get("reports/dashboard", { params: filters });
+      const response = await httpClient.get("usage-reports", {
+        params: filters,
+      });
       return response.data;
     },
     staleTime: 1000 * 60 * 5,
@@ -40,7 +45,9 @@ export function useReportByResource(filters?: ReportFilters) {
   return useQuery({
     queryKey: reportKeys.byResource(filters),
     queryFn: async () => {
-      const response = await httpClient.get("reports/by-resource", { params: filters });
+      const response = await httpClient.get("usage-reports", {
+        params: { ...filters, groupBy: "resource" },
+      });
       return response.data?.items || response.data || [];
     },
     staleTime: 1000 * 60 * 5,
@@ -51,7 +58,9 @@ export function useReportByUser(filters?: ReportFilters) {
   return useQuery({
     queryKey: reportKeys.byUser(filters),
     queryFn: async () => {
-      const response = await httpClient.get("reports/by-user", { params: filters });
+      const response = await httpClient.get("user-reports", {
+        params: filters,
+      });
       return response.data?.items || response.data || [];
     },
     staleTime: 1000 * 60 * 5,
@@ -62,7 +71,9 @@ export function useUnsatisfiedDemandReport(filters?: ReportFilters) {
   return useQuery({
     queryKey: reportKeys.demand(filters),
     queryFn: async () => {
-      const response = await httpClient.get("reports/unsatisfied-demand", { params: filters });
+      const response = await httpClient.get("demand-reports", {
+        params: filters,
+      });
       return response.data?.items || response.data || [];
     },
     staleTime: 1000 * 60 * 5,
@@ -73,7 +84,9 @@ export function useComplianceReport(filters?: ReportFilters) {
   return useQuery({
     queryKey: reportKeys.compliance(filters),
     queryFn: async () => {
-      const response = await httpClient.get("reports/compliance", { params: filters });
+      const response = await httpClient.get("usage-reports/generate", {
+        params: { ...filters, type: "compliance" },
+      });
       return response.data?.items || response.data || [];
     },
     staleTime: 1000 * 60 * 5,
@@ -84,7 +97,9 @@ export function useConflictReport(filters?: ReportFilters) {
   return useQuery({
     queryKey: reportKeys.conflicts(filters),
     queryFn: async () => {
-      const response = await httpClient.get("reports/conflicts", { params: filters });
+      const response = await httpClient.get("usage-reports/generate", {
+        params: { ...filters, type: "conflicts" },
+      });
       return response.data?.items || response.data || [];
     },
     staleTime: 1000 * 60 * 5,
