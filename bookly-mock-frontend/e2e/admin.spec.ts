@@ -1,4 +1,4 @@
-import { test, expect } from "@playwright/test";
+import { expect, test } from "@playwright/test";
 
 /**
  * E2E Tests: Admin Pages
@@ -8,8 +8,11 @@ import { test, expect } from "@playwright/test";
 test.describe("Admin Pages", () => {
   test.beforeEach(async ({ page }) => {
     await page.goto("/es/login");
-    await page.fill("input[type='email'], input[name='email']", "admin@ufps.edu.co");
-    await page.fill("input[type='password']", "Admin123!");
+    await page.fill(
+      "input[type='email'], input[name='email']",
+      "admin@ufps.edu.co",
+    );
+    await page.fill("input[type='password']", "admin123");
     await page.click("button[type='submit']");
     await page.waitForURL(/dashboard/, { timeout: 10000 });
   });
@@ -22,7 +25,9 @@ test.describe("Admin Pages", () => {
 
   test("should display roles page", async ({ page }) => {
     await page.goto("/es/admin/roles");
-    await expect(page.locator("h1, h2").filter({ hasText: /roles/i })).toBeVisible();
+    await expect(
+      page.locator("h1, h2").filter({ hasText: /roles/i }),
+    ).toBeVisible();
   });
 
   test("should display approval flows page", async ({ page }) => {

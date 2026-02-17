@@ -48,7 +48,7 @@ export default function LoginPage() {
     <AuthLayout title={t("login")} description={t("description")}>
       <form onSubmit={handleSubmit} className="space-y-4">
         {error && (
-          <Alert variant="error">
+          <Alert variant="error" data-testid="login-error-message">
             <AlertDescription>{error}</AlertDescription>
           </Alert>
         )}
@@ -64,6 +64,7 @@ export default function LoginPage() {
             onChange={(e) => setEmail(e.target.value)}
             required
             disabled={isLoading}
+            data-testid="login-email-input"
           />
         </div>
 
@@ -78,6 +79,7 @@ export default function LoginPage() {
             onChange={(e) => setPassword(e.target.value)}
             required
             disabled={isLoading}
+            data-testid="login-password-input"
           />
         </div>
 
@@ -106,6 +108,7 @@ export default function LoginPage() {
           type="submit"
           className="w-full"
           disabled={isLoading}
+          data-testid="login-submit-btn"
         >
           {isLoading ? t("logging_in") : t("login")}
         </ButtonWithLoading>

@@ -6,7 +6,11 @@
 import { isMockMode } from "@/lib/config";
 import { ApiResponse } from "@/types/api/response";
 import {
+  getApprovalHistory,
+  getApprovalRequestById,
   getMockLoginResponse,
+  mockApprovalRequests,
+  mockApprovalStats,
   mockAuditLogs,
   mockCredentials,
   mockDelay,
@@ -44,7 +48,7 @@ export class MockService {
   static async mockRequest<T>(
     endpoint: string,
     method: string = "GET",
-    data?: any
+    data?: any,
   ): Promise<ApiResponse<T>> {
     // Simular delay de red
     await mockDelay(300);
@@ -210,6 +214,57 @@ export class MockService {
     }
 
     // ============================================
+    // STOCKPILE SERVICE ENDPOINTS
+    // ============================================
+
+    if (
+      endpoint.includes("/approval-requests/statistics") &&
+      method === "GET"
+    ) {
+      return this.mockGetApprovalStatistics() as any;
+    }
+
+    if (
+      endpoint.includes("/approval-requests/active-today") &&
+      method === "GET"
+    ) {
+      return this.mockGetApprovalRequests() as any;
+    }
+
+    if (endpoint.includes("/approval-requests") && method === "GET") {
+      const idMatch = endpoint.match(/\/approval-requests\/([^/?]+)$/);
+      if (idMatch && !["active-today", "statistics"].includes(idMatch[1])) {
+        return this.mockGetApprovalRequestById(idMatch[1]) as any;
+      }
+      return this.mockGetApprovalRequests() as any;
+    }
+
+    if (endpoint.includes("/approval-requests") && method === "POST") {
+      const approveMatch = endpoint.match(
+        /\/approval-requests\/([^/]+)\/approve$/,
+      );
+      if (approveMatch) {
+        return this.mockApproveApprovalRequest(approveMatch[1], data) as any;
+      }
+
+      const rejectMatch = endpoint.match(
+        /\/approval-requests\/([^/]+)\/reject$/,
+      );
+      if (rejectMatch) {
+        return this.mockRejectApprovalRequest(rejectMatch[1], data) as any;
+      }
+
+      const cancelMatch = endpoint.match(
+        /\/approval-requests\/([^/]+)\/cancel$/,
+      );
+      if (cancelMatch) {
+        return this.mockCancelApprovalRequest(cancelMatch[1], data) as any;
+      }
+
+      return this.mockCreateApprovalRequest(data) as any;
+    }
+
+    // ============================================
     // RESERVATIONS SERVICE ENDPOINTS
     // ============================================
 
@@ -254,7 +309,7 @@ export class MockService {
   }): ApiResponse<any> {
     const result = getMockLoginResponse(
       credentials.email,
-      credentials.password
+      credentials.password,
     );
 
     if (!result) {
@@ -342,7 +397,7 @@ export class MockService {
 
     // En un sistema real, aquí se enviaría el email
     console.log(
-      `[MOCK] Enlace de recuperación: /reset-password?token=${resetToken}`
+      `[MOCK] Enlace de recuperación: /reset-password?token=${resetToken}`,
     );
 
     return {
@@ -577,7 +632,7 @@ export class MockService {
 
   private static mockGetResources(
     page: number = 1,
-    limit: number = 20
+    limit: number = 20,
   ): ApiResponse<any> {
     const total = this.resourcesData.length;
     const totalPages = Math.ceil(total / limit);
@@ -813,7 +868,7 @@ export class MockService {
 
   private static mockUpdateAcademicProgram(
     id: string,
-    data: any
+    data: any,
   ): ApiResponse<any> {
     const index = this.academicProgramsData.findIndex((p: any) => p.id === id);
 
@@ -860,13 +915,13 @@ export class MockService {
 
   private static mockGetProgramResources(programId: string): ApiResponse<any> {
     const associations = this.programResourceAssociationsData.filter(
-      (a: any) => a.programId === programId
+      (a: any) => a.programId === programId,
     );
 
     const resources = associations
       .map((assoc: any) => {
         const resource = this.resourcesData.find(
-          (r: any) => r.id === assoc.resourceId
+          (r: any) => r.id === assoc.resourceId,
         );
         return resource ? { ...resource, priority: assoc.priority } : null;
       })
@@ -902,10 +957,10 @@ export class MockService {
 
   private static mockRemoveResourceFromProgram(
     programId: string,
-    resourceId: string
+    resourceId: string,
   ): ApiResponse<any> {
     const index = this.programResourceAssociationsData.findIndex(
-      (a: any) => a.programId === programId && a.resourceId === resourceId
+      (a: any) => a.programId === programId && a.resourceId === resourceId,
     );
 
     if (index === -1) {
@@ -947,13 +1002,13 @@ export class MockService {
 
   private static mockGetProgramUsers(programId: string): ApiResponse<any> {
     const associations = this.programUserAssociationsData.filter(
-      (a: any) => a.programId === programId
+      (a: any) => a.programId === programId,
     );
 
     const users = associations
       .map((assoc: any) => {
         const user = this.resourceUsersData.find(
-          (u: any) => u.id === assoc.userId
+          (u: any) => u.id === assoc.userId,
         );
         return user
           ? {
@@ -995,10 +1050,10 @@ export class MockService {
 
   private static mockRemoveUserFromProgram(
     programId: string,
-    userId: string
+    userId: string,
   ): ApiResponse<any> {
     const index = this.programUserAssociationsData.findIndex(
-      (a: any) => a.programId === programId && a.userId === userId
+      (a: any) => a.programId === programId && a.userId === userId,
     );
 
     if (index === -1) {
@@ -1020,6 +1075,215 @@ export class MockService {
       data: { deleted: true },
       message: "User removed from program successfully",
       timestamp: new Date().toISOString(),
+    };
+  }
+
+  // ============================================
+  // STOCKPILE SERVICE ENDPOINTS
+  // ============================================
+
+  private static mockGetApprovalRequests(): ApiResponse<any> {
+    const items = mockApprovalRequests.map((request) => ({
+      ...request,
+      history: getApprovalHistory(request.id),
+    }));
+
+    return {
+      success: true,
+      data: {
+        items,
+        meta: {
+          total: items.length,
+          page: 1,
+          limit: items.length || 10,
+          totalPages: 1,
+          hasNextPage: false,
+          hasPreviousPage: false,
+        },
+      },
+      message: "Approval requests retrieved successfully",
+      timestamp: new Date().toISOString(),
+    };
+  }
+
+  private static mockGetApprovalStatistics(): ApiResponse<any> {
+    return {
+      success: true,
+      data: mockApprovalStats,
+      message: "Approval statistics retrieved successfully",
+      timestamp: new Date().toISOString(),
+    };
+  }
+
+  private static mockGetApprovalRequestById(id: string): ApiResponse<any> {
+    const request = getApprovalRequestById(id);
+
+    if (!request) {
+      throw {
+        response: {
+          status: 404,
+          data: {
+            success: false,
+            code: "STK-001",
+            message: `Approval request with ID ${id} not found`,
+            type: "error",
+            http_code: 404,
+          },
+        },
+      };
+    }
+
+    return {
+      success: true,
+      data: {
+        ...request,
+        history: getApprovalHistory(id),
+      },
+      message: "Approval request retrieved successfully",
+      timestamp: new Date().toISOString(),
+    };
+  }
+
+  private static mockCreateApprovalRequest(data: any): ApiResponse<any> {
+    const now = new Date().toISOString();
+
+    const newRequest = {
+      id: `apr_${Date.now()}`,
+      reservationId: data?.reservationId || "res_unknown",
+      userId: data?.userId || "user_1",
+      userName: data?.userName || "Usuario Mock",
+      userEmail: data?.userEmail || "mock@ufps.edu.co",
+      userRole: data?.userRole || "Profesor",
+      resourceId: data?.resourceId || "res_001",
+      resourceName: data?.resourceName || "Recurso Mock",
+      resourceType: data?.resourceType || "Aula",
+      categoryName: data?.categoryName || "General",
+      startDate: data?.startDate || now,
+      endDate: data?.endDate || now,
+      purpose: data?.purpose || "Solicitud generada en mock",
+      attendees: data?.attendees || 1,
+      status: "PENDING",
+      priority: data?.priority || "NORMAL",
+      currentLevel: data?.currentLevel || "FIRST_LEVEL",
+      maxLevel: data?.maxLevel || "FIRST_LEVEL",
+      requestedAt: now,
+      createdAt: now,
+      updatedAt: now,
+    };
+
+    mockApprovalRequests.unshift(newRequest as any);
+
+    return {
+      success: true,
+      data: newRequest,
+      message: "Approval request created successfully",
+      timestamp: now,
+    };
+  }
+
+  private static mockApproveApprovalRequest(
+    id: string,
+    data: any,
+  ): ApiResponse<any> {
+    const request = getApprovalRequestById(id);
+
+    if (!request) {
+      throw {
+        response: {
+          status: 404,
+          data: {
+            success: false,
+            code: "STK-001",
+            message: `Approval request with ID ${id} not found`,
+            type: "error",
+            http_code: 404,
+          },
+        },
+      };
+    }
+
+    const now = new Date().toISOString();
+    request.status = "APPROVED";
+    request.reviewedAt = now;
+    request.reviewerName = "Admin Sistema";
+    request.comments = data?.comment || "Aprobado";
+    request.updatedAt = now;
+
+    return {
+      success: true,
+      data: request,
+      message: "Approval request approved successfully",
+      timestamp: now,
+    };
+  }
+
+  private static mockRejectApprovalRequest(
+    id: string,
+    data: any,
+  ): ApiResponse<any> {
+    const request = getApprovalRequestById(id);
+
+    if (!request) {
+      throw {
+        response: {
+          status: 404,
+          data: {
+            success: false,
+            code: "STK-001",
+            message: `Approval request with ID ${id} not found`,
+            type: "error",
+            http_code: 404,
+          },
+        },
+      };
+    }
+
+    const now = new Date().toISOString();
+    request.status = "REJECTED";
+    request.reviewedAt = now;
+    request.reviewerName = "Admin Sistema";
+    request.rejectionReason = data?.comment || "Rechazado";
+    request.updatedAt = now;
+
+    return {
+      success: true,
+      data: request,
+      message: "Approval request rejected successfully",
+      timestamp: now,
+    };
+  }
+
+  private static mockCancelApprovalRequest(
+    id: string,
+    data: any,
+  ): ApiResponse<any> {
+    const request = getApprovalRequestById(id);
+
+    if (!request) {
+      throw {
+        response: {
+          status: 404,
+          data: {
+            success: false,
+            code: "STK-001",
+            message: `Approval request with ID ${id} not found`,
+            type: "error",
+            http_code: 404,
+          },
+        },
+      };
+    }
+
+    const now = new Date().toISOString();
+    request.status = "CANCELLED";
+    request.rejectionReason = data?.reason || "Cancelado";
+    request.updatedAt = now;
+
+    return {
+      success: true,
+      data: request,
+      message: "Approval request cancelled successfully",
+      timestamp: now,
     };
   }
 
@@ -1093,7 +1357,7 @@ export class MockService {
 
   private static mockUpdateReservation(
     id: string,
-    data: any
+    data: any,
   ): ApiResponse<any> {
     const index = this.reservationsData.findIndex((r: any) => r.id === id);
 
@@ -1171,7 +1435,7 @@ export class MockService {
   // ============================================
 
   static simulateNetworkError(
-    message: string = "No se pudo conectar con el backend"
+    message: string = "No se pudo conectar con el backend",
   ): never {
     throw {
       code: "NETWORK_ERROR",
