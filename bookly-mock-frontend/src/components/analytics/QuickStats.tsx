@@ -46,12 +46,16 @@ export function QuickStats({ title, stats, columns = 4 }: QuickStatsProps) {
           {stats.map((stat, index) => (
             <div
               key={index}
-              className="p-4 bg-gray-800/50 rounded-lg hover:bg-gray-800/70 transition-colors"
+              className="p-4 bg-muted rounded-lg hover:bg-accent transition-colors"
             >
               <div className="flex items-start justify-between">
                 <div className="flex-1">
-                  <p className="text-xs text-gray-400 mb-1">{stat.label}</p>
-                  <p className="text-xl font-bold text-white">{stat.value}</p>
+                  <p className="text-xs text-muted-foreground mb-1">
+                    {stat.label}
+                  </p>
+                  <p className="text-xl font-bold text-foreground">
+                    {stat.value}
+                  </p>
                   {stat.change && (
                     <p
                       className={`text-xs font-medium mt-1 ${

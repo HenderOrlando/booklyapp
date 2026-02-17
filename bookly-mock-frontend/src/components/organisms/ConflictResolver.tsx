@@ -92,7 +92,7 @@ export function ConflictResolver({
         <div className="sticky top-0 bg-[var(--color-bg-inverse)] border-b border-[var(--color-border-strong)] p-6">
           <div className="flex items-start justify-between">
             <div>
-              <h2 className="text-2xl font-bold text-white">
+              <h2 className="text-2xl font-bold text-foreground">
                 Resolver Conflicto
               </h2>
               <p className="text-sm text-[var(--color-text-tertiary)] mt-1">
@@ -114,25 +114,35 @@ export function ConflictResolver({
             <CardContent>
               <div className="space-y-3">
                 <div>
-                  <div className="text-sm text-[var(--color-text-tertiary)]">Descripción</div>
-                  <div className="text-white mt-1">{conflict.description}</div>
+                  <div className="text-sm text-[var(--color-text-tertiary)]">
+                    Descripción
+                  </div>
+                  <div className="text-foreground mt-1">
+                    {conflict.description}
+                  </div>
                 </div>
                 <div className="grid grid-cols-3 gap-4">
                   <div>
-                    <div className="text-sm text-[var(--color-text-tertiary)]">Recurso</div>
-                    <div className="text-white mt-1">
+                    <div className="text-sm text-[var(--color-text-tertiary)]">
+                      Recurso
+                    </div>
+                    <div className="text-foreground mt-1">
                       {conflict.resourceName}
                     </div>
                   </div>
                   <div>
-                    <div className="text-sm text-[var(--color-text-tertiary)]">Fecha</div>
-                    <div className="text-white mt-1">
+                    <div className="text-sm text-[var(--color-text-tertiary)]">
+                      Fecha
+                    </div>
+                    <div className="text-foreground mt-1">
                       {new Date(conflict.date).toLocaleDateString("es-ES")}
                     </div>
                   </div>
                   <div>
-                    <div className="text-sm text-[var(--color-text-tertiary)]">Horario</div>
-                    <div className="text-white mt-1">
+                    <div className="text-sm text-[var(--color-text-tertiary)]">
+                      Horario
+                    </div>
+                    <div className="text-foreground mt-1">
                       {conflict.startTime} - {conflict.endTime}
                     </div>
                   </div>
@@ -143,7 +153,7 @@ export function ConflictResolver({
 
           {/* Tipo de resolución */}
           <div>
-            <label className="block text-sm font-medium text-white mb-3">
+            <label className="block text-sm font-medium text-foreground mb-3">
               Seleccionar tipo de resolución
             </label>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
@@ -158,7 +168,7 @@ export function ConflictResolver({
                       : "border-[var(--color-border-strong)] bg-[var(--color-bg-inverse)] hover:border-[var(--color-border-strong)]"
                   }`}
                 >
-                  <div className="text-sm font-medium text-white">
+                  <div className="text-sm font-medium text-foreground">
                     {res === "MANUAL" && "Manual"}
                     {res === "AUTO_REASSIGN" && "Reasignar"}
                     {res === "WAITLIST" && "Lista Espera"}
@@ -195,7 +205,7 @@ export function ConflictResolver({
                       }`}
                     >
                       <div className="flex items-center justify-between">
-                        <span className="font-medium text-white">
+                        <span className="font-medium text-foreground">
                           {alt.resourceName}
                         </span>
                         {alt.available ? (
@@ -241,7 +251,7 @@ export function ConflictResolver({
                               : "border-[var(--color-border-strong)] bg-[var(--color-bg-inverse)] opacity-50 cursor-not-allowed"
                         }`}
                       >
-                        <div className="text-sm font-medium text-white text-center">
+                        <div className="text-sm font-medium text-foreground text-center">
                           {slot.startTime} - {slot.endTime}
                         </div>
                       </button>
@@ -253,14 +263,14 @@ export function ConflictResolver({
 
           {/* Notas */}
           <div>
-            <label className="block text-sm font-medium text-white mb-2">
+            <label className="block text-sm font-medium text-foreground mb-2">
               Notas de resolución
             </label>
             <textarea
               value={notes}
               onChange={(e) => setNotes(e.target.value)}
               placeholder="Agrega notas sobre cómo se resolvió el conflicto..."
-              className="w-full px-3 py-2 bg-[var(--color-bg-inverse)] text-white rounded-lg resize-none"
+              className="w-full px-3 py-2 bg-[var(--color-bg-inverse)] text-foreground rounded-lg resize-none"
               rows={3}
             />
           </div>
@@ -274,16 +284,22 @@ export function ConflictResolver({
               <CardContent>
                 <div className="space-y-2 text-sm">
                   <div className="flex justify-between">
-                    <span className="text-[var(--color-text-tertiary)]">Tipo:</span>
-                    <span className="text-white font-medium">{resolution}</span>
+                    <span className="text-[var(--color-text-tertiary)]">
+                      Tipo:
+                    </span>
+                    <span className="text-foreground font-medium">
+                      {resolution}
+                    </span>
                   </div>
                   {selectedResourceId && (
                     <div className="flex justify-between">
-                      <span className="text-[var(--color-text-tertiary)]">Nuevo recurso:</span>
-                      <span className="text-white">
+                      <span className="text-[var(--color-text-tertiary)]">
+                        Nuevo recurso:
+                      </span>
+                      <span className="text-foreground">
                         {
                           conflict.alternativeResources?.find(
-                            (a) => a.resourceId === selectedResourceId
+                            (a) => a.resourceId === selectedResourceId,
                           )?.resourceName
                         }
                       </span>
@@ -291,8 +307,10 @@ export function ConflictResolver({
                   )}
                   {selectedTimeSlot && (
                     <div className="flex justify-between">
-                      <span className="text-[var(--color-text-tertiary)]">Nuevo horario:</span>
-                      <span className="text-white">
+                      <span className="text-[var(--color-text-tertiary)]">
+                        Nuevo horario:
+                      </span>
+                      <span className="text-foreground">
                         {selectedTimeSlot.startTime} -{" "}
                         {selectedTimeSlot.endTime}
                       </span>

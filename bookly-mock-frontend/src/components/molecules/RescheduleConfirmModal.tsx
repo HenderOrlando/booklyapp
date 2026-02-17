@@ -56,7 +56,7 @@ export function RescheduleConfirmModal({
         <CardContent className="space-y-4">
           {/* Resumen del evento a reasignar */}
           <div className="p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg border border-blue-200 dark:border-blue-800">
-            <h4 className="font-semibold text-[var(--color-text-primary)] dark:text-white mb-2">
+            <h4 className="font-semibold text-[var(--color-text-primary)] dark:text-foreground mb-2">
               Evento a reasignar:
             </h4>
             <div className="text-sm text-[var(--color-text-primary)] dark:text-[var(--color-text-tertiary)]">
@@ -77,7 +77,7 @@ export function RescheduleConfirmModal({
 
           {/* Lista de conflictos */}
           <div>
-            <h4 className="font-semibold text-[var(--color-text-primary)] dark:text-white mb-2">
+            <h4 className="font-semibold text-[var(--color-text-primary)] dark:text-foreground mb-2">
               Reservas en conflicto:
             </h4>
             <div className="space-y-2 max-h-60 overflow-y-auto">
@@ -86,7 +86,7 @@ export function RescheduleConfirmModal({
                   key={conflict.id}
                   className="p-3 bg-red-50 dark:bg-red-900/20 rounded-lg border border-red-200 dark:border-red-800"
                 >
-                  <p className="font-medium text-[var(--color-text-primary)] dark:text-white">
+                  <p className="font-medium text-[var(--color-text-primary)] dark:text-foreground">
                     {conflict.title}
                   </p>
                   <p className="text-sm text-[var(--color-text-secondary)] dark:text-[var(--color-text-tertiary)]">

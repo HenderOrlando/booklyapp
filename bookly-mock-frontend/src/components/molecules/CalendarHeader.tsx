@@ -60,10 +60,10 @@ export function CalendarHeader({
   };
 
   return (
-    <div className="flex items-center justify-between p-4 bg-white dark:bg-[var(--color-bg-inverse)] border-b border-[var(--color-border-subtle)] dark:border-[var(--color-border-strong)]">
+    <div className="flex items-center justify-between p-4 bg-background border-b border-[var(--color-border-subtle)]">
       {/* Título y navegación */}
       <div className="flex items-center gap-4">
-        <h2 className="text-xl font-bold text-[var(--color-text-primary)] dark:text-white capitalize">
+        <h2 className="text-xl font-bold text-foreground capitalize">
           {getTitle()}
         </h2>
 
@@ -134,7 +134,7 @@ export function CalendarHeader({
       </div>
 
       {/* Selector de vista */}
-      <div className="flex items-center gap-2 bg-[var(--color-bg-secondary)] dark:bg-[var(--color-bg-inverse)] rounded-lg p-1">
+      <div className="flex items-center gap-2 bg-muted rounded-lg p-1">
         <button
           type="button"
           onClick={() => onViewChange("month")}
@@ -143,7 +143,7 @@ export function CalendarHeader({
             ${
               view === "month"
                 ? "bg-blue-600 text-white shadow-sm"
-                : "text-[var(--color-text-secondary)] dark:text-[var(--color-text-tertiary)] hover:text-[var(--color-text-primary)] dark:hover:text-white"
+                : "text-muted-foreground hover:text-foreground"
             }
           `}
         >
@@ -157,7 +157,7 @@ export function CalendarHeader({
             ${
               view === "week"
                 ? "bg-blue-600 text-white shadow-sm"
-                : "text-[var(--color-text-secondary)] dark:text-[var(--color-text-tertiary)] hover:text-[var(--color-text-primary)] dark:hover:text-white"
+                : "text-muted-foreground hover:text-foreground"
             }
           `}
         >
@@ -171,7 +171,7 @@ export function CalendarHeader({
             ${
               view === "day"
                 ? "bg-blue-600 text-white shadow-sm"
-                : "text-[var(--color-text-secondary)] dark:text-[var(--color-text-tertiary)] hover:text-[var(--color-text-primary)] dark:hover:text-white"
+                : "text-muted-foreground hover:text-foreground"
             }
           `}
         >

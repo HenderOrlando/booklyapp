@@ -65,7 +65,7 @@ export function RecurringPatternSelector({
     <div className="space-y-4">
       {/* Frecuencia */}
       <div>
-        <label className="block text-sm font-medium text-white mb-2">
+        <label className="block text-sm font-medium text-foreground mb-2">
           Repetir
         </label>
         <Select value={pattern.frequency} onValueChange={handleFrequencyChange}>
@@ -82,7 +82,7 @@ export function RecurringPatternSelector({
 
       {/* Intervalo */}
       <div>
-        <label className="block text-sm font-medium text-white mb-2">
+        <label className="block text-sm font-medium text-foreground mb-2">
           Cada {pattern.frequency === "DAILY" && "día(s)"}
           {pattern.frequency === "WEEKLY" && "semana(s)"}
           {pattern.frequency === "MONTHLY" && "mes(es)"}
@@ -101,7 +101,7 @@ export function RecurringPatternSelector({
       {/* Días de la semana (solo para semanal) */}
       {pattern.frequency === "WEEKLY" && (
         <div>
-          <label className="block text-sm font-medium text-white mb-2">
+          <label className="block text-sm font-medium text-foreground mb-2">
             Días de la semana
           </label>
           <div className="flex flex-wrap gap-2">
@@ -112,7 +112,7 @@ export function RecurringPatternSelector({
                 onClick={() => handleDayToggle(day.value)}
                 className={`px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
                   pattern.daysOfWeek?.includes(day.value)
-                    ? "bg-blue-600 text-white"
+                    ? "bg-blue-600 text-foreground"
                     : "bg-[var(--color-bg-elevated)] text-[var(--color-text-tertiary)] hover:bg-[var(--color-bg-elevated)]"
                 }`}
               >
@@ -126,7 +126,7 @@ export function RecurringPatternSelector({
       {/* Día del mes (solo para mensual) */}
       {pattern.frequency === "MONTHLY" && (
         <div>
-          <label className="block text-sm font-medium text-white mb-2">
+          <label className="block text-sm font-medium text-foreground mb-2">
             Día del mes
           </label>
           <Input
@@ -143,7 +143,7 @@ export function RecurringPatternSelector({
 
       {/* Fin de recurrencia */}
       <div>
-        <label className="block text-sm font-medium text-white mb-2">
+        <label className="block text-sm font-medium text-foreground mb-2">
           Termina
         </label>
         <div className="flex gap-2 mb-2">
@@ -152,7 +152,7 @@ export function RecurringPatternSelector({
             onClick={() => setEndType("date")}
             className={`flex-1 py-2 px-4 rounded-lg text-sm font-medium transition-colors ${
               endType === "date"
-                ? "bg-blue-600 text-white"
+                ? "bg-blue-600 text-foreground"
                 : "bg-[var(--color-bg-elevated)] text-[var(--color-text-tertiary)] hover:bg-[var(--color-bg-elevated)]"
             }`}
           >
@@ -163,7 +163,7 @@ export function RecurringPatternSelector({
             onClick={() => setEndType("occurrences")}
             className={`flex-1 py-2 px-4 rounded-lg text-sm font-medium transition-colors ${
               endType === "occurrences"
-                ? "bg-blue-600 text-white"
+                ? "bg-blue-600 text-foreground"
                 : "bg-[var(--color-bg-elevated)] text-[var(--color-text-tertiary)] hover:bg-[var(--color-bg-elevated)]"
             }`}
           >
@@ -199,7 +199,9 @@ export function RecurringPatternSelector({
                 })
               }
             />
-            <span className="text-sm text-[var(--color-text-tertiary)]">ocurrencias</span>
+            <span className="text-sm text-[var(--color-text-tertiary)]">
+              ocurrencias
+            </span>
           </div>
         )}
       </div>

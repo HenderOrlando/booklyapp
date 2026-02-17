@@ -83,16 +83,16 @@ export function CalendarDayCell({
         ${
           !day.isCurrentMonth
             ? "bg-[var(--color-bg-secondary)] text-[var(--color-text-tertiary)]"
-            : "bg-white text-[var(--color-text-primary)]"
+            : "bg-background text-[var(--color-text-primary)]"
         }
         ${day.isToday ? "border-2 border-blue-500 ring-1 ring-blue-500" : ""}
-        ${isSelected ? "bg-blue-50 border-blue-400" : ""}
-        ${isDragOver && !day.isDisabled ? "border-2 border-green-500 bg-green-50" : ""}
+        ${isSelected ? "bg-blue-50 dark:bg-blue-900/20 border-blue-400" : ""}
+        ${isDragOver && !day.isDisabled ? "border-2 border-green-500 bg-green-50 dark:bg-green-900/20" : ""}
         ${day.isPast && day.isCurrentMonth ? "opacity-60" : ""}
         ${
           day.isDisabled
             ? "cursor-not-allowed opacity-40"
-            : "cursor-pointer hover:bg-blue-50 hover:border-blue-300"
+            : "cursor-pointer hover:bg-blue-50 dark:hover:bg-blue-900/20 hover:border-blue-300"
         }
         ${day.isWeekend && day.isCurrentMonth ? "bg-[var(--color-bg-secondary)]" : ""}
       `}
@@ -139,7 +139,9 @@ export function CalendarDayCell({
             />
           ))}
           {eventCount > 3 && (
-            <span className="text-xs text-[var(--color-text-secondary)]">+{eventCount - 3}</span>
+            <span className="text-xs text-[var(--color-text-secondary)]">
+              +{eventCount - 3}
+            </span>
           )}
         </div>
       )}

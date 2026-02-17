@@ -33,7 +33,7 @@ export function StatsSummary({
 }: StatsSummaryProps) {
   function formatValue(
     value: number,
-    format: StatItem["format"] = "number"
+    format: StatItem["format"] = "number",
   ): string {
     switch (format) {
       case "percentage":
@@ -49,7 +49,7 @@ export function StatsSummary({
 
   function calculateChange(
     current: number,
-    previous: number
+    previous: number,
   ): {
     value: number;
     isPositive: boolean;
@@ -65,10 +65,12 @@ export function StatsSummary({
     <Card>
       <CardHeader>
         <CardTitle>{title}</CardTitle>
-        <div className="flex items-center gap-4 text-sm text-gray-400">
+        <div className="flex items-center gap-4 text-sm text-muted-foreground">
           <span>{period}</span>
           {previousPeriod && (
-            <span className="text-gray-600">vs {previousPeriod}</span>
+            <span className="text-muted-foreground/60">
+              vs {previousPeriod}
+            </span>
           )}
         </div>
       </CardHeader>
@@ -83,12 +85,12 @@ export function StatsSummary({
             return (
               <div
                 key={index}
-                className="flex items-center justify-between p-3 bg-gray-800/50 rounded-lg"
+                className="flex items-center justify-between p-3 bg-muted rounded-lg"
               >
                 <div className="flex-1">
-                  <p className="text-sm text-gray-400">{stat.label}</p>
+                  <p className="text-sm text-muted-foreground">{stat.label}</p>
                   <div className="flex items-baseline gap-2 mt-1">
-                    <p className="text-2xl font-bold text-white">
+                    <p className="text-2xl font-bold text-foreground">
                       {formatValue(stat.value, stat.format)}
                     </p>
                     {change && (
@@ -105,8 +107,8 @@ export function StatsSummary({
                 </div>
                 {hasComparison && (
                   <div className="text-right">
-                    <p className="text-xs text-gray-500">Anterior</p>
-                    <p className="text-sm text-gray-400">
+                    <p className="text-xs text-muted-foreground">Anterior</p>
+                    <p className="text-sm text-muted-foreground">
                       {formatValue(stat.previousValue!, stat.format)}
                     </p>
                   </div>

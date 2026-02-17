@@ -38,7 +38,7 @@ export function MainLayout({
       className={cn(
         "min-h-screen bg-[var(--color-bg-app)]",
         "dark:bg-[var(--color-bg-app)]",
-        className
+        className,
       )}
     >
       {/* Header */}
@@ -48,7 +48,7 @@ export function MainLayout({
             "sticky top-0 z-50 w-full",
             "border-b border-[var(--color-border-subtle)]",
             "bg-brand-primary-500 text-white",
-            "dark:bg-slate-900"
+            "dark:bg-slate-900",
           )}
         >
           <div className="flex h-16 items-center px-4">
@@ -99,7 +99,7 @@ export function MainLayout({
                 "dark:bg-slate-900",
                 "transition-transform duration-300",
                 "lg:sticky lg:top-16 lg:h-[calc(100vh-4rem)] lg:translate-x-0",
-                sidebarOpen ? "translate-x-0" : "-translate-x-full"
+                sidebarOpen ? "translate-x-0" : "-translate-x-full",
               )}
             >
               <div className="flex-1 overflow-y-auto p-4">{sidebar}</div>
@@ -111,10 +111,12 @@ export function MainLayout({
         <main
           className={cn(
             "flex-1 min-h-[calc(100vh-4rem)]",
-            "transition-all duration-300"
+            "transition-all duration-300",
           )}
         >
-          <div className="container mx-auto p-6">{children}</div>
+          <div className="container mx-auto p-6 min-w-0 overflow-x-hidden">
+            {children}
+          </div>
         </main>
       </div>
     </div>

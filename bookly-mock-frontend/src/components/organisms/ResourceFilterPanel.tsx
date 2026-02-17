@@ -50,7 +50,7 @@ export function ResourceFilterPanel({
   // Aplanar páginas de recursos
   const resources = useMemo(
     () => data?.pages.flatMap((page) => page.items) || [],
-    [data]
+    [data],
   );
 
   // Ref para intersection observer
@@ -66,7 +66,7 @@ export function ResourceFilterPanel({
         (r: Resource) =>
           r.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
           r.code.toLowerCase().includes(searchQuery.toLowerCase()) ||
-          r.location?.toLowerCase().includes(searchQuery.toLowerCase())
+          r.location?.toLowerCase().includes(searchQuery.toLowerCase()),
       );
     }
 
@@ -88,7 +88,7 @@ export function ResourceFilterPanel({
   const allSelected =
     filteredResources.length > 0 &&
     filteredResources.every((r: Resource) =>
-      selectedResourceIds.includes(r.id)
+      selectedResourceIds.includes(r.id),
     );
 
   // Intersection Observer para infinite scroll
@@ -101,7 +101,7 @@ export function ResourceFilterPanel({
           fetchNextPage();
         }
       },
-      { threshold: 0.1 }
+      { threshold: 0.1 },
     );
 
     observer.observe(loadMoreRef.current);
@@ -137,7 +137,7 @@ export function ResourceFilterPanel({
           {searchQuery && (
             <button
               onClick={() => setSearchQuery("")}
-              className="absolute right-3 top-1/2 -translate-y-1/2 text-[var(--color-text-tertiary)] hover:text-white"
+              className="absolute right-3 top-1/2 -translate-y-1/2 text-[var(--color-text-tertiary)] hover:text-foreground"
             >
               <X className="h-4 w-4" />
             </button>
@@ -150,7 +150,7 @@ export function ResourceFilterPanel({
             onClick={() => setFilterByType("all")}
             className={`px-3 py-1 text-xs rounded-full transition-colors ${
               filterByType === "all"
-                ? "bg-blue-500 text-white"
+                ? "bg-blue-500 text-foreground"
                 : "bg-[var(--color-bg-elevated)] text-[var(--color-text-tertiary)] hover:bg-[var(--color-bg-elevated)]"
             }`}
           >
@@ -162,7 +162,7 @@ export function ResourceFilterPanel({
               onClick={() => setFilterByType(type)}
               className={`px-3 py-1 text-xs rounded-full transition-colors ${
                 filterByType === type
-                  ? "bg-blue-500 text-white"
+                  ? "bg-blue-500 text-foreground"
                   : "bg-[var(--color-bg-elevated)] text-[var(--color-text-tertiary)] hover:bg-[var(--color-bg-elevated)]"
               }`}
             >
@@ -220,7 +220,7 @@ export function ResourceFilterPanel({
 
                       <div className="flex-1 min-w-0 ">
                         <div className="flex items-center justify-between gap-2">
-                          <span className="font-medium text-white truncate">
+                          <span className="font-medium text-foreground truncate">
                             {resource.name}
                           </span>
                         </div>

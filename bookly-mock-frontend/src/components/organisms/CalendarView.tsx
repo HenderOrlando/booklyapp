@@ -73,14 +73,14 @@ export function CalendarView({
     // Filtrar por recurso si se especifica
     if (resourceId) {
       filteredReservations = filteredReservations.filter(
-        (r: { resourceId: string }) => r.resourceId === resourceId
+        (r: { resourceId: string }) => r.resourceId === resourceId,
       );
     }
 
     // Filtrar por usuario si se especifica
     if (userId) {
       filteredReservations = filteredReservations.filter(
-        (r: { userId: string }) => r.userId === userId
+        (r: { userId: string }) => r.userId === userId,
       );
     }
 
@@ -194,17 +194,19 @@ export function CalendarView({
   // Loading state
   if (isLoading) {
     return (
-      <div className="flex items-center justify-center h-96 bg-white rounded-lg border border-[var(--color-border-subtle)]">
+      <div className="flex items-center justify-center h-96 bg-background rounded-lg border border-[var(--color-border-subtle)]">
         <div className="flex flex-col items-center gap-4">
           <div className="w-12 h-12 border-4 border-blue-500 border-t-transparent rounded-full animate-spin" />
-          <p className="text-[var(--color-text-secondary)]">Cargando calendario...</p>
+          <p className="text-[var(--color-text-secondary)]">
+            Cargando calendario...
+          </p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="flex flex-col bg-white dark:bg-[var(--color-bg-inverse)] rounded-lg border border-[var(--color-border-subtle)] dark:border-[var(--color-border-strong)] shadow-sm overflow-hidden">
+    <div className="flex flex-col bg-background rounded-lg border border-[var(--color-border-subtle)] dark:border-[var(--color-border-strong)] shadow-sm overflow-hidden">
       <CalendarHeader
         currentDate={currentDate}
         view={view}
@@ -226,7 +228,7 @@ export function CalendarView({
         />
       ) : (
         // Vista diaria: lista detallada de eventos
-        <div className="p-6 bg-white dark:bg-[var(--color-bg-inverse)] rounded-lg">
+        <div className="p-6 bg-background rounded-lg">
           <h3 className="text-lg font-semibold text-[var(--color-text-primary)] dark:text-white mb-4">
             Eventos del día
           </h3>

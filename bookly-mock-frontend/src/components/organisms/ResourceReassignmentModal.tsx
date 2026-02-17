@@ -80,10 +80,10 @@ export function ResourceReassignmentModal({
   const [notifyUser, setNotifyUser] = React.useState(true);
 
   const selectedResource = suggestions.find(
-    (s) => s.resourceId === selectedResourceId
+    (s) => s.resourceId === selectedResourceId,
   );
   const sortedSuggestions = [...suggestions].sort(
-    (a, b) => b.matchScore - a.matchScore
+    (a, b) => b.matchScore - a.matchScore,
   );
 
   const handleSubmit = () => {
@@ -109,7 +109,9 @@ export function ResourceReassignmentModal({
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
       <div className="w-full max-w-3xl max-h-[90vh] overflow-y-auto bg-[var(--color-bg-inverse)] rounded-lg">
         <div className="sticky top-0 bg-[var(--color-bg-inverse)] border-b border-[var(--color-border-strong)] p-6">
-          <h2 className="text-2xl font-bold text-white">Reasignar Recurso</h2>
+          <h2 className="text-2xl font-bold text-foreground">
+            Reasignar Recurso
+          </h2>
           <p className="text-sm text-[var(--color-text-tertiary)] mt-1">
             Cambiar el recurso asignado a esta reserva
           </p>
@@ -124,12 +126,12 @@ export function ResourceReassignmentModal({
             <CardContent>
               <div className="flex items-center justify-between">
                 <div>
-                  <div className="font-medium text-white">
+                  <div className="font-medium text-foreground">
                     {reservation.resourceName}
                   </div>
                   <div className="text-sm text-[var(--color-text-tertiary)] mt-1">
                     {new Date(reservation.startDate).toLocaleDateString(
-                      "es-ES"
+                      "es-ES",
                     )}{" "}
                     • {currentStartTime} - {currentEndTime}
                   </div>
@@ -143,7 +145,7 @@ export function ResourceReassignmentModal({
 
           {/* Razón */}
           <div>
-            <label className="block text-sm font-medium text-white mb-2">
+            <label className="block text-sm font-medium text-foreground mb-2">
               Razón de reasignación <span className="text-red-500">*</span>
             </label>
             <Select
@@ -164,21 +166,21 @@ export function ResourceReassignmentModal({
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-white mb-2">
+            <label className="block text-sm font-medium text-foreground mb-2">
               Detalles adicionales
             </label>
             <textarea
               value={reasonDetails}
               onChange={(e) => setReasonDetails(e.target.value)}
               placeholder="Explica el motivo de la reasignación..."
-              className="w-full px-3 py-2 bg-[var(--color-bg-inverse)] text-white rounded-lg resize-none"
+              className="w-full px-3 py-2 bg-[var(--color-bg-inverse)] text-foreground rounded-lg resize-none"
               rows={3}
             />
           </div>
 
           {/* Sugerencias de recursos */}
           <div>
-            <label className="block text-sm font-medium text-white mb-2">
+            <label className="block text-sm font-medium text-foreground mb-2">
               Seleccionar nuevo recurso <span className="text-red-500">*</span>
             </label>
             <div className="space-y-2">
@@ -196,7 +198,7 @@ export function ResourceReassignmentModal({
                   <div className="flex items-start justify-between">
                     <div className="flex-1">
                       <div className="flex items-center gap-3">
-                        <span className="font-medium text-white">
+                        <span className="font-medium text-foreground">
                           {suggestion.resourceName}
                         </span>
                         <span className="px-2 py-1 bg-[var(--color-bg-elevated)] text-xs rounded">
@@ -239,7 +241,7 @@ export function ResourceReassignmentModal({
                 onChange={(e) => setChangeTime(e.target.checked)}
                 className="rounded"
               />
-              <span className="text-sm text-white">
+              <span className="text-sm text-foreground">
                 También cambiar horario
               </span>
             </label>
@@ -279,7 +281,7 @@ export function ResourceReassignmentModal({
                 onChange={(e) => setNotifyUser(e.target.checked)}
                 className="rounded"
               />
-              <span className="text-sm text-white">
+              <span className="text-sm text-foreground">
                 Notificar al usuario sobre el cambio
               </span>
             </label>
@@ -294,16 +296,20 @@ export function ResourceReassignmentModal({
               <CardContent>
                 <div className="space-y-2 text-sm">
                   <div className="flex justify-between">
-                    <span className="text-[var(--color-text-tertiary)]">Recurso:</span>
-                    <span className="text-white">
+                    <span className="text-[var(--color-text-tertiary)]">
+                      Recurso:
+                    </span>
+                    <span className="text-foreground">
                       {reservation.resourceName} →{" "}
                       <strong>{selectedResource.resourceName}</strong>
                     </span>
                   </div>
                   {changeTime && (
                     <div className="flex justify-between">
-                      <span className="text-[var(--color-text-tertiary)]">Horario:</span>
-                      <span className="text-white">
+                      <span className="text-[var(--color-text-tertiary)]">
+                        Horario:
+                      </span>
+                      <span className="text-foreground">
                         {currentStartTime}-{currentEndTime} →{" "}
                         <strong>
                           {newStartTime}-{newEndTime}
@@ -312,8 +318,10 @@ export function ResourceReassignmentModal({
                     </div>
                   )}
                   <div className="flex justify-between">
-                    <span className="text-[var(--color-text-tertiary)]">Notificación:</span>
-                    <span className="text-white">
+                    <span className="text-[var(--color-text-tertiary)]">
+                      Notificación:
+                    </span>
+                    <span className="text-foreground">
                       {notifyUser ? "Sí" : "No"}
                     </span>
                   </div>

@@ -86,9 +86,11 @@ export function MetricCard({
       <CardContent className="p-6">
         <div className="flex items-center justify-between">
           <div className="flex-1">
-            <p className="text-sm font-medium text-gray-400 mb-2">{title}</p>
+            <p className="text-sm font-medium text-muted-foreground mb-2">
+              {title}
+            </p>
             <div className="flex items-baseline gap-2">
-              <h3 className="text-3xl font-bold text-white">{value}</h3>
+              <h3 className="text-3xl font-bold text-foreground">{value}</h3>
               {trend && (
                 <span
                   className={`text-sm font-medium ${
@@ -100,10 +102,12 @@ export function MetricCard({
               )}
             </div>
             {subtitle && (
-              <p className="text-xs text-gray-500 mt-1">{subtitle}</p>
+              <p className="text-xs text-muted-foreground mt-1">{subtitle}</p>
             )}
             {trend?.label && (
-              <p className="text-xs text-gray-500 mt-1">{trend.label}</p>
+              <p className="text-xs text-muted-foreground mt-1">
+                {trend.label}
+              </p>
             )}
           </div>
           {icon && (

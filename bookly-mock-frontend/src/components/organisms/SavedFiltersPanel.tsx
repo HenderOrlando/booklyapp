@@ -80,7 +80,7 @@ export const SavedFiltersPanel = React.memo<SavedFiltersPanelProps>(
               <button
                 onClick={handleSave}
                 disabled={!filterName.trim()}
-                className="flex-1 px-3 py-1.5 text-sm bg-[var(--color-primary-base)] text-white rounded-lg hover:bg-[var(--color-primary-dark)] disabled:opacity-50"
+                className="flex-1 px-3 py-1.5 text-sm bg-[var(--color-primary-base)] text-foreground rounded-lg hover:bg-[var(--color-primary-dark)] disabled:opacity-50"
               >
                 Guardar
               </button>
@@ -144,7 +144,7 @@ export const SavedFiltersPanel = React.memo<SavedFiltersPanelProps>(
         </div>
       </div>
     );
-  }
+  },
 );
 
 SavedFiltersPanel.displayName = "SavedFiltersPanel";

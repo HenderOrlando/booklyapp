@@ -161,7 +161,7 @@ export function AdvancedSearchModal({
         <CardContent className="space-y-6">
           {/* Búsqueda por texto */}
           <div>
-            <label className="block text-sm font-medium text-white mb-2">
+            <label className="block text-sm font-medium text-foreground mb-2">
               Búsqueda de Texto
             </label>
             <Input
@@ -173,7 +173,7 @@ export function AdvancedSearchModal({
 
           {/* Tipos de Recurso */}
           <div>
-            <label className="block text-sm font-medium text-white mb-3">
+            <label className="block text-sm font-medium text-foreground mb-3">
               Tipos de Recurso
             </label>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
@@ -184,7 +184,7 @@ export function AdvancedSearchModal({
                   onClick={() => handleTypeToggle(type)}
                   className={`p-3 rounded-lg border text-sm transition-all ${
                     filters.types?.includes(type)
-                      ? "border-brand-primary-500 bg-brand-primary-500/10 text-white"
+                      ? "border-brand-primary-500 bg-brand-primary-500/10 text-foreground"
                       : "border-[var(--color-border-subtle)] bg-[var(--color-bg-inverse)]/50 text-[var(--color-text-tertiary)] hover:bg-[var(--color-bg-inverse)]"
                   }`}
                 >
@@ -203,7 +203,7 @@ export function AdvancedSearchModal({
 
           {/* Estados */}
           <div>
-            <label className="block text-sm font-medium text-white mb-3">
+            <label className="block text-sm font-medium text-foreground mb-3">
               Estados
             </label>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
@@ -214,7 +214,7 @@ export function AdvancedSearchModal({
                   onClick={() => handleStatusToggle(status)}
                   className={`p-3 rounded-lg border text-sm transition-all ${
                     filters.statuses?.includes(status)
-                      ? "border-brand-primary-500 bg-brand-primary-500/10 text-white"
+                      ? "border-brand-primary-500 bg-brand-primary-500/10 text-foreground"
                       : "border-[var(--color-border-subtle)] bg-[var(--color-bg-inverse)]/50 text-[var(--color-text-tertiary)] hover:bg-[var(--color-bg-inverse)]"
                   }`}
                 >
@@ -229,7 +229,7 @@ export function AdvancedSearchModal({
 
           {/* Categoría */}
           <div>
-            <label className="block text-sm font-medium text-white mb-2">
+            <label className="block text-sm font-medium text-foreground mb-2">
               Categoría
             </label>
             <Select
@@ -264,7 +264,7 @@ export function AdvancedSearchModal({
 
           {/* Rango de Capacidad */}
           <div>
-            <label className="block text-sm font-medium text-white mb-2">
+            <label className="block text-sm font-medium text-foreground mb-2">
               Rango de Capacidad
             </label>
             <div className="grid grid-cols-2 gap-3">
@@ -305,7 +305,7 @@ export function AdvancedSearchModal({
 
           {/* Características */}
           <div>
-            <label className="block text-sm font-medium text-white mb-3">
+            <label className="block text-sm font-medium text-foreground mb-3">
               Características Requeridas
             </label>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
@@ -340,7 +340,7 @@ export function AdvancedSearchModal({
                     className="rounded w-4 h-4"
                   />
                   <span className="text-xl">{attr.icon}</span>
-                  <span className="text-sm text-white flex-1">
+                  <span className="text-sm text-foreground flex-1">
                     {attr.label}
                   </span>
                 </label>

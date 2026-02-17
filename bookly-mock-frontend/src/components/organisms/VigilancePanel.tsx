@@ -124,12 +124,12 @@ export const VigilancePanel = React.memo<VigilancePanelProps>(
         totalOverdue: overdueReservations.length,
         totalAlerts: alerts.filter((a) => !a.isResolved).length,
       }),
-      [activeReservations, overdueReservations, alerts]
+      [activeReservations, overdueReservations, alerts],
     );
 
     const renderReservationCard = (
       reservation: ActiveReservationView,
-      isOverdue = false
+      isOverdue = false,
     ) => {
       const now = new Date();
       const start = new Date(reservation.startTime);
@@ -238,7 +238,7 @@ export const VigilancePanel = React.memo<VigilancePanelProps>(
                 {onContact && (
                   <button
                     onClick={() => onContact(reservation.reservationId)}
-                    className="flex-1 flex items-center justify-center gap-2 px-3 py-2 text-sm font-medium text-[var(--color-primary-base)] border border-[var(--color-primary-base)] rounded-lg hover:bg-[var(--color-primary-base)] hover:text-white transition-colors"
+                    className="flex-1 flex items-center justify-center gap-2 px-3 py-2 text-sm font-medium text-[var(--color-primary-base)] border border-[var(--color-primary-base)] rounded-lg hover:bg-[var(--color-primary-base)] hover:text-foreground transition-colors"
                   >
                     <Phone className="h-4 w-4" />
                     Contactar
@@ -304,7 +304,7 @@ export const VigilancePanel = React.memo<VigilancePanelProps>(
               {!alert.isResolved && onResolveAlert && (
                 <button
                   onClick={() => onResolveAlert(alert.id)}
-                  className="w-full px-3 py-2 text-sm font-medium text-white bg-green-600 dark:bg-green-700 rounded-lg hover:bg-green-700 dark:hover:bg-green-600 transition-colors"
+                  className="w-full px-3 py-2 text-sm font-medium text-foreground bg-green-600 dark:bg-green-700 rounded-lg hover:bg-green-700 dark:hover:bg-green-600 transition-colors"
                 >
                   Marcar como Resuelta
                 </button>
@@ -413,7 +413,7 @@ export const VigilancePanel = React.memo<VigilancePanelProps>(
               activeReservations.map((res) => renderReservationCard(res))}
             {selectedTab === "overdue" &&
               overdueReservations.map((res) =>
-                renderReservationCard(res, true)
+                renderReservationCard(res, true),
               )}
             {selectedTab === "alerts" &&
               alerts
@@ -440,7 +440,7 @@ export const VigilancePanel = React.memo<VigilancePanelProps>(
         )}
       </div>
     );
-  }
+  },
 );
 
 VigilancePanel.displayName = "VigilancePanel";

@@ -52,7 +52,7 @@ export function ReservationTooltip({
             <div className="flex flex-col gap-2 min-w-[280px] max-w-[320px]">
               {/* Header con título y estado */}
               <div className="flex items-center justify-between border-b border-[var(--color-border-strong)] pb-2">
-                <h4 className="font-semibold text-white text-sm">
+                <h4 className="font-semibold text-foreground text-sm">
                   {reservation.title || "Reserva"}
                 </h4>
                 <StatusBadge type="reservation" status={reservation.status} />
@@ -62,8 +62,10 @@ export function ReservationTooltip({
               <div className="space-y-1.5 text-xs">
                 {/* Recurso */}
                 <div className="flex items-start gap-2">
-                  <span className="text-[var(--color-text-tertiary)] min-w-[70px]">Recurso:</span>
-                  <span className="text-white font-medium">
+                  <span className="text-[var(--color-text-tertiary)] min-w-[70px]">
+                    Recurso:
+                  </span>
+                  <span className="text-foreground font-medium">
                     {reservation.resourceName || "N/A"}
                   </span>
                 </div>
@@ -71,20 +73,30 @@ export function ReservationTooltip({
                 {/* Usuario */}
                 {reservation.userId && (
                   <div className="flex items-start gap-2">
-                    <span className="text-[var(--color-text-tertiary)] min-w-[70px]">Usuario:</span>
-                    <span className="text-white">{reservation.userName}</span>
+                    <span className="text-[var(--color-text-tertiary)] min-w-[70px]">
+                      Usuario:
+                    </span>
+                    <span className="text-foreground">
+                      {reservation.userName}
+                    </span>
                   </div>
                 )}
 
                 {/* Fecha y hora */}
                 <div className="flex items-start gap-2">
-                  <span className="text-[var(--color-text-tertiary)] min-w-[70px]">Fecha:</span>
-                  <span className="text-white">{formatDate(startDate)}</span>
+                  <span className="text-[var(--color-text-tertiary)] min-w-[70px]">
+                    Fecha:
+                  </span>
+                  <span className="text-foreground">
+                    {formatDate(startDate)}
+                  </span>
                 </div>
 
                 <div className="flex items-start gap-2">
-                  <span className="text-[var(--color-text-tertiary)] min-w-[70px]">Horario:</span>
-                  <span className="text-white">
+                  <span className="text-[var(--color-text-tertiary)] min-w-[70px]">
+                    Horario:
+                  </span>
+                  <span className="text-foreground">
                     {formatTime(startDate)} - {formatTime(endDate)}
                   </span>
                 </div>
@@ -95,7 +107,7 @@ export function ReservationTooltip({
                     <span className="text-[var(--color-text-tertiary)] min-w-[70px]">
                       Propósito:
                     </span>
-                    <span className="text-white line-clamp-2">
+                    <span className="text-foreground line-clamp-2">
                       {reservation.description}
                     </span>
                   </div>
@@ -107,7 +119,7 @@ export function ReservationTooltip({
                     <span className="text-[var(--color-text-tertiary)] min-w-[70px]">
                       Asistentes:
                     </span>
-                    <span className="text-white">
+                    <span className="text-foreground">
                       {reservation.attendees} persona(s)
                     </span>
                   </div>
@@ -116,8 +128,10 @@ export function ReservationTooltip({
                 {/* Código de reserva */}
                 {reservation.id && (
                   <div className="flex items-start gap-2">
-                    <span className="text-[var(--color-text-tertiary)] min-w-[70px]">Código:</span>
-                    <span className="text-white font-mono text-xs">
+                    <span className="text-[var(--color-text-tertiary)] min-w-[70px]">
+                      Código:
+                    </span>
+                    <span className="text-foreground font-mono text-xs">
                       {reservation.id}
                     </span>
                   </div>

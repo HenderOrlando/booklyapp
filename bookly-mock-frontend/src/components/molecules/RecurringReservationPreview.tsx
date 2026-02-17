@@ -166,13 +166,13 @@ export function RecurringReservationPreview({
 
           {/* Lista de instancias */}
           <div>
-            <h4 className="font-semibold text-[var(--color-text-primary)] dark:text-white mb-3">
+            <h4 className="font-semibold text-[var(--color-text-primary)] dark:text-foreground mb-3">
               Instancias a Crear ({instances.length})
             </h4>
             <div className="space-y-2 max-h-60 overflow-y-auto">
               {visibleInstances.map((instance, index) => {
                 const hasConflict = validation.conflicts.some(
-                  (c) => c.date === instance.startDate.split("T")[0]
+                  (c) => c.date === instance.startDate.split("T")[0],
                 );
                 const date = new Date(instance.startDate);
 
@@ -193,7 +193,7 @@ export function RecurringReservationPreview({
                           <CheckCircle className="w-5 h-5 text-green-600 dark:text-green-400" />
                         )}
                         <div>
-                          <p className="font-medium text-[var(--color-text-primary)] dark:text-white">
+                          <p className="font-medium text-[var(--color-text-primary)] dark:text-foreground">
                             {format(date, "EEEE, d 'de' MMMM 'de' yyyy", {
                               locale: es,
                             })}

@@ -17,7 +17,7 @@ export const TemplateEditor = React.memo<TemplateEditorProps>(
     const [body, setBody] = React.useState(template?.body || "");
     const [type, setType] = React.useState(template?.type || "NOTIFICATION");
     const [category, setCategory] = React.useState(
-      template?.category || "GENERAL"
+      template?.category || "GENERAL",
     );
     const [isActive, setIsActive] = React.useState(template?.isActive ?? true);
     const [showPreview, setShowPreview] = React.useState(false);
@@ -44,7 +44,7 @@ export const TemplateEditor = React.memo<TemplateEditorProps>(
 
     const replaceVariables = (
       text: string,
-      variables: Record<string, string>
+      variables: Record<string, string>,
     ) => {
       let result = text || "";
       Object.entries(variables).forEach(([key, value]) => {
@@ -181,7 +181,7 @@ export const TemplateEditor = React.memo<TemplateEditorProps>(
             <button
               onClick={handleSave}
               disabled={!name || !body}
-              className="flex items-center gap-2 px-4 py-2 bg-[var(--color-primary-base)] text-white rounded-lg hover:bg-[var(--color-primary-dark)] disabled:opacity-50 disabled:cursor-not-allowed"
+              className="flex items-center gap-2 px-4 py-2 bg-[var(--color-primary-base)] text-foreground rounded-lg hover:bg-[var(--color-primary-dark)] disabled:opacity-50 disabled:cursor-not-allowed"
             >
               <Save className="h-4 w-4" />
               Guardar
@@ -255,7 +255,7 @@ export const TemplateEditor = React.memo<TemplateEditorProps>(
         )}
       </div>
     );
-  }
+  },
 );
 
 TemplateEditor.displayName = "TemplateEditor";
