@@ -1,4 +1,5 @@
 import { createLogger } from "@libs/common";
+import { ReferenceDataRepository } from "@libs/database";
 import { NestFactory } from "@nestjs/core";
 import { getModelToken } from "@nestjs/mongoose";
 import { Model, Types } from "mongoose";
@@ -9,6 +10,7 @@ import {
   Notification,
 } from "../infrastructure/schemas";
 import { StockpileModule } from "../stockpile.module";
+import { STOCKPILE_REFERENCE_DATA } from "./reference-data.seed-data";
 
 const logger = createLogger("StockpileSeed");
 
@@ -22,16 +24,16 @@ async function seed() {
 
     const app = await NestFactory.createApplicationContext(StockpileModule);
     const approvalRequestModel = app.get<Model<ApprovalRequest>>(
-      getModelToken(ApprovalRequest.name)
+      getModelToken(ApprovalRequest.name),
     );
     const approvalFlowModel = app.get<Model<ApprovalFlow>>(
-      getModelToken(ApprovalFlow.name)
+      getModelToken(ApprovalFlow.name),
     );
     const documentTemplateModel = app.get<Model<DocumentTemplate>>(
-      getModelToken(DocumentTemplate.name)
+      getModelToken(DocumentTemplate.name),
     );
     const notificationModel = app.get<Model<Notification>>(
-      getModelToken(Notification.name)
+      getModelToken(Notification.name),
     );
 
     // Limpiar datos existentes (solo con flag --clean)
@@ -43,9 +45,21 @@ async function seed() {
       await notificationModel.deleteMany({});
     } else if (process.env.NODE_ENV === "development") {
       logger.info(
-        "ℹ️ Modo desarrollo detectado. Usar --clean para limpiar DB antes del seed."
+        "ℹ️ Modo desarrollo detectado. Usar --clean para limpiar DB antes del seed.",
       );
     }
+
+    // ── Reference Data (tipos, estados dinámicos del dominio stockpile) ──
+    const refDataRepo = app.get(ReferenceDataRepository);
+    logger.info(
+      `📋 Procesando ${STOCKPILE_REFERENCE_DATA.length} datos de referencia...`,
+    );
+    for (const rd of STOCKPILE_REFERENCE_DATA) {
+      await refDataRepo.upsert(rd);
+    }
+    logger.info(
+      `✅ ${STOCKPILE_REFERENCE_DATA.length} datos de referencia procesados (upsert)`,
+    );
 
     // ObjectIds fijos para consistencia
     const systemUserId = new Types.ObjectId("507f1f77bcf86cd799439000");
@@ -123,7 +137,7 @@ async function seed() {
       const doc = await approvalFlowModel.findOneAndUpdate(
         { name: flow.name },
         flow,
-        { upsert: true, new: true }
+        { upsert: true, new: true },
       );
       insertedFlows.push(doc);
     }
@@ -200,7 +214,7 @@ async function seed() {
     ];
 
     logger.info(
-      `Procesando ${documentTemplates.length} plantillas de documentos...`
+      `Procesando ${documentTemplates.length} plantillas de documentos...`,
     );
     const insertedTemplates: any[] = [];
 
@@ -208,7 +222,7 @@ async function seed() {
       const doc = await documentTemplateModel.findOneAndUpdate(
         { name: template.name },
         template,
-        { upsert: true, new: true }
+        { upsert: true, new: true },
       );
       insertedTemplates.push(doc);
     }
@@ -218,7 +232,7 @@ async function seed() {
     const reservation1Id = new Types.ObjectId("507f1f77bcf86cd799439031");
     const reservation2Id = new Types.ObjectId("507f1f77bcf86cd799439032");
     const COORDINADOR_SISTEMAS_ID = new Types.ObjectId(
-      "507f1f77bcf86cd799439021"
+      "507f1f77bcf86cd799439021",
     );
     const ESTUDIANTE_MARIA_ID = new Types.ObjectId("507f1f77bcf86cd799439023");
     const ADMIN_GENERAL_ID = new Types.ObjectId("507f1f77bcf86cd799439022");
@@ -277,7 +291,7 @@ async function seed() {
     ];
 
     logger.info(
-      `Procesando ${approvalRequests.length} solicitudes de aprobación...`
+      `Procesando ${approvalRequests.length} solicitudes de aprobación...`,
     );
     const insertedRequests: any[] = [];
 
@@ -285,7 +299,7 @@ async function seed() {
       const doc = await approvalRequestModel.findOneAndUpdate(
         { reservationId: request.reservationId },
         request,
-        { upsert: true, new: true }
+        { upsert: true, new: true },
       );
       insertedRequests.push(doc);
     }
@@ -334,7 +348,7 @@ async function seed() {
           relatedEntityId: notif.relatedEntityId,
         },
         notif,
-        { upsert: true, new: true }
+        { upsert: true, new: true },
       );
       insertedNotifications.push(doc);
     }

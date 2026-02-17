@@ -1,7 +1,5 @@
-import { MaintenanceType } from "@libs/common/enums";
 import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
 import { Document } from "mongoose";
-import { MaintenanceStatus } from '@resources/domain/entities/maintenance.entity';
 
 export type MaintenanceDocument = Maintenance & Document;
 
@@ -14,12 +12,8 @@ export class Maintenance {
   @Prop({ required: true, type: String })
   resourceId: string;
 
-  @Prop({
-    type: String,
-    enum: Object.values(MaintenanceType),
-    required: true,
-  })
-  type: MaintenanceType;
+  @Prop({ type: String, required: true })
+  type: string;
 
   @Prop({ required: true, trim: true })
   title: string;
@@ -39,12 +33,8 @@ export class Maintenance {
   @Prop({ type: Date })
   actualEndDate?: Date;
 
-  @Prop({
-    type: String,
-    enum: Object.values(MaintenanceStatus),
-    default: MaintenanceStatus.SCHEDULED,
-  })
-  status: MaintenanceStatus;
+  @Prop({ type: String, default: "SCHEDULED" })
+  status: string;
 
   @Prop({ type: String, trim: true })
   performedBy?: string;

@@ -1,4 +1,4 @@
-import { DatabaseModule } from "@libs/database";
+import { DatabaseModule, ReferenceDataModule } from "@libs/database";
 import { EventBusModule } from "@libs/event-bus";
 import { NotificationsModule } from "@libs/notifications";
 import { RedisModule } from "@libs/redis";
@@ -67,6 +67,7 @@ import {
   HealthController,
 } from "./infrastructure/controllers";
 import { MetricsController } from "./infrastructure/controllers/metrics.controller";
+import { ReferenceDataController } from "./infrastructure/controllers/reference-data.controller";
 
 // Strategy
 import { JwtStrategy } from "./infrastructure/strategies/jwt.strategy";
@@ -94,6 +95,8 @@ import { EventBusIntegrationModule } from "./infrastructure/event-bus";
     }),
     // DatabaseModule reemplaza MongooseModule.forRoot
     DatabaseModule,
+    // Reference Data (tipos, estados dinámicos del dominio stockpile)
+    ReferenceDataModule,
     MongooseModule.forFeature([
       { name: ApprovalRequest.name, schema: ApprovalRequestSchema },
       { name: ApprovalFlow.name, schema: ApprovalFlowSchema },
@@ -173,6 +176,7 @@ import { EventBusIntegrationModule } from "./infrastructure/event-bus";
     ApprovalRequestsController,
     ApprovalFlowsController,
     CheckInOutController,
+    ReferenceDataController,
     HealthController,
     MetricsController,
   ],

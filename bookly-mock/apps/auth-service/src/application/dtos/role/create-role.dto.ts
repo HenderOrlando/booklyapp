@@ -1,10 +1,8 @@
-import { UserRole } from "@libs/common/enums";
 import { ApiProperty } from "@nestjs/swagger";
 import {
   ArrayMinSize,
   IsArray,
   IsBoolean,
-  IsEnum,
   IsNotEmpty,
   IsOptional,
   IsString,
@@ -17,15 +15,12 @@ import {
  */
 export class CreateRoleDto {
   @ApiProperty({
-    description: "Nombre del rol (enum UserRole)",
-    example: UserRole.TEACHER,
-    enum: UserRole,
+    description: "Nombre del rol (string, ej: TEACHER, STUDENT, GENERAL_ADMIN)",
+    example: "TEACHER",
   })
-  @IsEnum(UserRole, {
-    message: "El nombre del rol debe ser un UserRole válido",
-  })
+  @IsString({ message: "El nombre del rol debe ser una cadena" })
   @IsNotEmpty({ message: "El nombre del rol es obligatorio" })
-  name: UserRole;
+  name: string;
 
   @ApiProperty({
     description: "Nombre para mostrar del rol",

@@ -1,4 +1,3 @@
-import { RecurrenceType, ReservationStatus } from "@libs/common/enums";
 import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
 import { Document, Types } from "mongoose";
 
@@ -35,12 +34,8 @@ export class Reservation {
   @Prop({ required: true })
   purpose: string;
 
-  @Prop({
-    type: String,
-    enum: Object.values(ReservationStatus),
-    default: ReservationStatus.PENDING,
-  })
-  status: ReservationStatus;
+  @Prop({ type: String, default: "PENDING" })
+  status: string;
 
   @Prop({ type: Boolean, default: false })
   isRecurring: boolean;
@@ -56,7 +51,7 @@ export class Reservation {
 
   @Prop({
     type: {
-      frequency: { type: String, enum: RecurrenceType },
+      frequency: { type: String },
       interval: Number,
       endDate: Date,
       occurrences: Number,
@@ -66,7 +61,7 @@ export class Reservation {
     required: false,
   })
   recurringPattern?: {
-    frequency: RecurrenceType;
+    frequency: string;
     interval: number;
     endDate?: Date;
     occurrences?: number;

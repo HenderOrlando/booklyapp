@@ -1,3 +1,10 @@
+import { CreateAvailabilityCommand } from "@availability/application/commands";
+import { DeleteAvailabilityCommand } from "@availability/application/commands/delete-availability.command";
+import {
+  CheckAvailabilityQuery,
+  GetAvailabilitiesQuery,
+  SearchAvailabilityQuery,
+} from "@availability/application/queries";
 import { ResponseUtil } from "@libs/common";
 import { CurrentUser } from "@libs/decorators";
 import { JwtAuthGuard } from "@libs/guards";
@@ -18,12 +25,6 @@ import {
   ApiResponse,
   ApiTags,
 } from "@nestjs/swagger";
-import { CreateAvailabilityCommand } from '@availability/application/commands';
-import {
-  CheckAvailabilityQuery,
-  GetAvailabilitiesQuery,
-  SearchAvailabilityQuery,
-} from '@availability/application/queries';
 import {
   CheckAvailabilityDto,
   CreateAvailabilityDto,
@@ -42,7 +43,7 @@ import {
 export class AvailabilitiesController {
   constructor(
     private readonly commandBus: CommandBus,
-    private readonly queryBus: QueryBus
+    private readonly queryBus: QueryBus,
   ) {}
 
   @Post()
@@ -57,7 +58,7 @@ export class AvailabilitiesController {
   })
   async create(
     @Body() dto: CreateAvailabilityDto,
-    @CurrentUser() user: any
+    @CurrentUser() user: any,
   ): Promise<any> {
     const command = new CreateAvailabilityCommand(
       dto.resourceId,
@@ -69,11 +70,14 @@ export class AvailabilitiesController {
       dto.effectiveFrom,
       dto.effectiveUntil,
       dto.notes,
-      user.sub
+      user.sub,
     );
 
     const availability = await this.commandBus.execute(command);
-    return ResponseUtil.success(availability, 'Availability created successfully');
+    return ResponseUtil.success(
+      availability,
+      "Availability created successfully",
+    );
   }
 
   @Get("resource/:resourceId")
@@ -85,7 +89,7 @@ export class AvailabilitiesController {
   async findByResource(
     @Param("resourceId") resourceId: string,
     @Query("page") page?: number,
-    @Query("limit") limit?: number
+    @Query("limit") limit?: number,
   ): Promise<any> {
     const query = new GetAvailabilitiesQuery(resourceId, {
       page: page || 1,
@@ -93,7 +97,7 @@ export class AvailabilitiesController {
     });
 
     const result = await this.queryBus.execute(query);
-    
+
     // Si el resultado ya tiene estructura de paginación
     if (result.data && result.meta) {
       return ResponseUtil.paginated(
@@ -101,11 +105,14 @@ export class AvailabilitiesController {
         result.meta.total,
         page || 1,
         limit || 10,
-        'Availabilities retrieved successfully'
+        "Availabilities retrieved successfully",
       );
     }
-    
-    return ResponseUtil.success(result, 'Availabilities retrieved successfully');
+
+    return ResponseUtil.success(
+      result,
+      "Availabilities retrieved successfully",
+    );
   }
 
   @Post("check")
@@ -118,11 +125,11 @@ export class AvailabilitiesController {
     const query = new CheckAvailabilityQuery(
       dto.resourceId,
       dto.startDate,
-      dto.endDate
+      dto.endDate,
     );
 
     const result = await this.queryBus.execute(query);
-    return ResponseUtil.success(result, 'Availability checked successfully');
+    return ResponseUtil.success(result, "Availability checked successfully");
   }
 
   @Post("search")
@@ -144,12 +151,10 @@ export class AvailabilitiesController {
     status: 401,
     description: "No autorizado - Token inválido o expirado",
   })
-  async searchAvailability(
-    @Body() dto: SearchAvailabilityDto
-  ): Promise<any> {
+  async searchAvailability(@Body() dto: SearchAvailabilityDto): Promise<any> {
     const query = new SearchAvailabilityQuery(dto);
     const result = await this.queryBus.execute(query);
-    return ResponseUtil.success(result, 'Available slots found successfully');
+    return ResponseUtil.success(result, "Available slots found successfully");
   }
 
   @Delete(":id")
@@ -162,9 +167,12 @@ export class AvailabilitiesController {
     status: 404,
     description: "Disponibilidad no encontrada",
   })
-  async remove(@Param("id") id: string): Promise<any> {
-    // Implementar DeleteAvailabilityCommand si es necesario
-    const result = { message: "Delete functionality to be implemented", id };
-    return ResponseUtil.success(result, 'Availability deleted successfully');
+  async remove(
+    @Param("id") id: string,
+    @CurrentUser("sub") userId: string,
+  ): Promise<any> {
+    const command = new DeleteAvailabilityCommand(id, userId);
+    await this.commandBus.execute(command);
+    return ResponseUtil.success({ id }, "Availability deleted successfully");
   }
 }

@@ -1,12 +1,10 @@
-import { UserRole } from "@libs/common/enums";
-
 /**
  * Query para obtener roles con filtros opcionales
  */
 export class GetRolesQuery {
   constructor(
     public readonly filters?: {
-      name?: UserRole;
+      name?: string;
       isActive?: boolean;
       isDefault?: boolean;
       search?: string; // Buscar en displayName o description
@@ -14,6 +12,6 @@ export class GetRolesQuery {
     public readonly pagination?: {
       page?: number;
       limit?: number;
-    }
+    },
   ) {}
 }

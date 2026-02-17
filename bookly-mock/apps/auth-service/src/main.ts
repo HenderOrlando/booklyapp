@@ -31,14 +31,14 @@ async function bootstrap() {
       transformOptions: {
         enableImplicitConversion: true,
       },
-    })
+    }),
   );
 
   // Swagger documentation
   const config = new DocumentBuilder()
     .setTitle("Bookly Auth Service")
     .setDescription(
-      "API de autenticación, gestión de usuarios, roles, permisos y auditoría para el sistema Bookly"
+      "API de autenticación, gestión de usuarios, roles, permisos y auditoría para el sistema Bookly",
     )
     .setVersion("1.0")
     .addBearerAuth()
@@ -47,13 +47,22 @@ async function bootstrap() {
     .addTag("Roles", "Endpoints para gestión de roles y asignación de permisos")
     .addTag(
       "Permissions",
-      "Endpoints para gestión de permisos granulares (resource:action)"
+      "Endpoints para gestión de permisos granulares (resource:action)",
     )
     .addTag(
       "Audit",
-      "Endpoints para consulta y exportación de logs de auditoría (solo administradores)"
+      "Endpoints para consulta y exportación de logs de auditoría (solo administradores)",
     )
     .addTag("Health", "Endpoints para health checks del servicio")
+    .addTag(
+      "OAuth / SSO",
+      "Endpoints para autenticación corporativa con Google",
+    )
+    .addTag(
+      "App Configuration",
+      "Configuración global de la aplicación (solo admin)",
+    )
+    .addTag("Reference Data", "Datos de referencia dinámicos del dominio auth")
     .build();
 
   const document = SwaggerModule.createDocument(app, config);

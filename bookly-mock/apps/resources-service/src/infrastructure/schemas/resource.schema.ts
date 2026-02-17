@@ -1,4 +1,3 @@
-import { ResourceStatus, ResourceType } from "@libs/common/enums";
 import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
 import { Document } from "mongoose";
 
@@ -19,12 +18,8 @@ export class Resource {
   @Prop({ required: true, trim: true })
   description: string;
 
-  @Prop({
-    type: String,
-    enum: Object.values(ResourceType),
-    required: true,
-  })
-  type: ResourceType;
+  @Prop({ type: String, required: true })
+  type: string;
 
   @Prop({ required: true, type: String })
   categoryId: string;
@@ -47,12 +42,8 @@ export class Resource {
   @Prop({ type: [String], default: [] })
   programIds: string[];
 
-  @Prop({
-    type: String,
-    enum: Object.values(ResourceStatus),
-    default: ResourceStatus.AVAILABLE,
-  })
-  status: ResourceStatus;
+  @Prop({ type: String, default: "AVAILABLE" })
+  status: string;
 
   @Prop({ default: true })
   isActive: boolean;

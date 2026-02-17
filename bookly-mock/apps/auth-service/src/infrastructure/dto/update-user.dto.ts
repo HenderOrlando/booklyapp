@@ -1,12 +1,5 @@
-import { UserRole } from "@libs/common/enums";
 import { ApiProperty } from "@nestjs/swagger";
-import {
-  IsArray,
-  IsBoolean,
-  IsEnum,
-  IsOptional,
-  IsString,
-} from "class-validator";
+import { IsArray, IsBoolean, IsOptional, IsString } from "class-validator";
 
 /**
  * Update User DTO
@@ -33,15 +26,14 @@ export class UpdateUserDto {
 
   @ApiProperty({
     description: "Roles del usuario",
-    example: [UserRole.STUDENT, UserRole.TEACHER],
-    enum: UserRole,
+    example: ["STUDENT", "TEACHER"],
     isArray: true,
     required: false,
   })
   @IsArray({ message: "Roles debe ser un array" })
-  @IsEnum(UserRole, { each: true, message: "Roles inválidos" })
+  @IsString({ each: true, message: "Cada rol debe ser un string" })
   @IsOptional()
-  roles?: UserRole[];
+  roles?: string[];
 
   @ApiProperty({
     description: "Permisos adicionales del usuario",

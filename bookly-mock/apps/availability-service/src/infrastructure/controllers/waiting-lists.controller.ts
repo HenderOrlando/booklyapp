@@ -1,3 +1,6 @@
+import { AddToWaitingListCommand } from "@availability/application/commands";
+import { CancelWaitingListCommand } from "@availability/application/commands/cancel-waiting-list.command";
+import { GetWaitingListQuery } from "@availability/application/queries";
 import { ResponseUtil } from "@libs/common";
 import { CurrentUser } from "@libs/decorators";
 import { JwtAuthGuard } from "@libs/guards";
@@ -18,8 +21,6 @@ import {
   ApiResponse,
   ApiTags,
 } from "@nestjs/swagger";
-import { AddToWaitingListCommand } from '@availability/application/commands';
-import { GetWaitingListQuery } from '@availability/application/queries';
 import { AddToWaitingListDto } from "../dtos";
 
 /**
@@ -33,7 +34,7 @@ import { AddToWaitingListDto } from "../dtos";
 export class WaitingListsController {
   constructor(
     private readonly commandBus: CommandBus,
-    private readonly queryBus: QueryBus
+    private readonly queryBus: QueryBus,
   ) {}
 
   @Post()
@@ -48,7 +49,7 @@ export class WaitingListsController {
   })
   async create(
     @Body() dto: AddToWaitingListDto,
-    @CurrentUser() user: any
+    @CurrentUser() user: any,
   ): Promise<any> {
     const command = new AddToWaitingListCommand(
       dto.resourceId,
@@ -58,11 +59,14 @@ export class WaitingListsController {
       dto.priority,
       dto.purpose,
       dto.expiresAt,
-      user.sub
+      user.sub,
     );
 
     const waitingListEntry = await this.commandBus.execute(command);
-    return ResponseUtil.success(waitingListEntry, 'Added to waiting list successfully');
+    return ResponseUtil.success(
+      waitingListEntry,
+      "Added to waiting list successfully",
+    );
   }
 
   @Get("resource/:resourceId")
@@ -74,7 +78,7 @@ export class WaitingListsController {
   async findByResource(
     @Param("resourceId") resourceId: string,
     @Query("page") page?: number,
-    @Query("limit") limit?: number
+    @Query("limit") limit?: number,
   ): Promise<any> {
     const query = new GetWaitingListQuery(resourceId, {
       page: page || 1,
@@ -82,7 +86,7 @@ export class WaitingListsController {
     });
 
     const result = await this.queryBus.execute(query);
-    
+
     // Si el resultado ya tiene estructura de paginación
     if (result.data && result.meta) {
       return ResponseUtil.paginated(
@@ -90,11 +94,11 @@ export class WaitingListsController {
         result.meta.total,
         page || 1,
         limit || 10,
-        'Waiting list retrieved successfully'
+        "Waiting list retrieved successfully",
       );
     }
-    
-    return ResponseUtil.success(result, 'Waiting list retrieved successfully');
+
+    return ResponseUtil.success(result, "Waiting list retrieved successfully");
   }
 
   @Delete(":id")
@@ -109,14 +113,13 @@ export class WaitingListsController {
   })
   async remove(
     @Param("id") id: string,
-    @CurrentUser() user: any
+    @CurrentUser("sub") userId: string,
   ): Promise<any> {
-    // Implementar CancelWaitingListCommand si es necesario
-    const result = {
-      message: "Cancel waiting list functionality to be implemented",
-      id,
-      userId: user.sub,
-    };
-    return ResponseUtil.success(result, 'Waiting list entry cancelled successfully');
+    const command = new CancelWaitingListCommand(id, userId);
+    const result = await this.commandBus.execute(command);
+    return ResponseUtil.success(
+      result,
+      "Waiting list entry cancelled successfully",
+    );
   }
 }

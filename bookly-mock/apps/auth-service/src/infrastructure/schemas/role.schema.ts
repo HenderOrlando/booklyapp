@@ -1,4 +1,3 @@
-import { UserRole } from "@libs/common/enums";
 import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
 import { Document } from "mongoose";
 
@@ -10,13 +9,8 @@ export type RoleDocument = Role & Document;
  */
 @Schema({ timestamps: true, collection: "roles" })
 export class Role {
-  @Prop({
-    type: String,
-    enum: Object.values(UserRole),
-    required: true,
-    unique: true,
-  })
-  name: UserRole;
+  @Prop({ type: String, required: true, unique: true })
+  name: string;
 
   @Prop({ required: true, trim: true })
   displayName: string;

@@ -1,9 +1,7 @@
-import { UserRole } from "@libs/common/enums";
-import { PaginationMeta, PaginationQuery } from "@libs/common";
-import { createLogger } from "@libs/common";
+import { UserEntity } from "@auth/domain/entities/user.entity";
+import { IUserRepository } from "@auth/domain/repositories/user.repository.interface";
+import { createLogger, PaginationMeta, PaginationQuery } from "@libs/common";
 import { Inject, Injectable, NotFoundException } from "@nestjs/common";
-import { UserEntity } from '@auth/domain/entities/user.entity';
-import { IUserRepository } from '@auth/domain/repositories/user.repository.interface';
 
 /**
  * User Service
@@ -15,7 +13,7 @@ export class UserService {
 
   constructor(
     @Inject("IUserRepository")
-    private readonly userRepository: IUserRepository
+    private readonly userRepository: IUserRepository,
   ) {}
 
   /**
@@ -49,7 +47,7 @@ export class UserService {
    */
   async getUsers(
     query: PaginationQuery,
-    filters?: Partial<UserEntity>
+    filters?: Partial<UserEntity>,
   ): Promise<{ users: UserEntity[]; meta: PaginationMeta }> {
     return await this.userRepository.findMany(query, filters);
   }
@@ -58,8 +56,8 @@ export class UserService {
    * Obtener usuarios por rol
    */
   async getUsersByRole(
-    role: UserRole,
-    query: PaginationQuery
+    role: string,
+    query: PaginationQuery,
   ): Promise<{ users: UserEntity[]; meta: PaginationMeta }> {
     return await this.userRepository.findByRole(role, query);
   }
@@ -69,7 +67,7 @@ export class UserService {
    */
   async updateUser(
     userId: string,
-    data: Partial<UserEntity>
+    data: Partial<UserEntity>,
   ): Promise<UserEntity> {
     const user = await this.getUserById(userId);
 
@@ -108,7 +106,7 @@ export class UserService {
   /**
    * Agregar rol a usuario
    */
-  async addRoleToUser(userId: string, role: UserRole): Promise<UserEntity> {
+  async addRoleToUser(userId: string, role: string): Promise<UserEntity> {
     const user = await this.getUserById(userId);
     user.addRole(role);
 
@@ -124,10 +122,7 @@ export class UserService {
   /**
    * Remover rol de usuario
    */
-  async removeRoleFromUser(
-    userId: string,
-    role: UserRole
-  ): Promise<UserEntity> {
+  async removeRoleFromUser(userId: string, role: string): Promise<UserEntity> {
     const user = await this.getUserById(userId);
     user.removeRole(role);
 

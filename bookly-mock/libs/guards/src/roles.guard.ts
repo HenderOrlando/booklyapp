@@ -1,4 +1,3 @@
-import { UserRole } from "@libs/common/enums";
 import {
   CanActivate,
   ExecutionContext,
@@ -9,17 +8,18 @@ import { Reflector } from "@nestjs/core";
 
 /**
  * Roles Guard
- * Validates user has required roles
+ * Validates user has required roles.
+ * Roles are plain strings loaded from the database.
  */
 @Injectable()
 export class RolesGuard implements CanActivate {
   constructor(private reflector: Reflector) {}
 
   canActivate(context: ExecutionContext): boolean {
-    const requiredRoles = this.reflector.getAllAndOverride<UserRole[]>(
-      "roles",
-      [context.getHandler(), context.getClass()]
-    );
+    const requiredRoles = this.reflector.getAllAndOverride<string[]>("roles", [
+      context.getHandler(),
+      context.getClass(),
+    ]);
 
     if (!requiredRoles || requiredRoles.length === 0) {
       return true;
@@ -36,7 +36,7 @@ export class RolesGuard implements CanActivate {
 
     if (!hasRole) {
       throw new ForbiddenException(
-        `User does not have any of the required roles: ${requiredRoles.join(", ")}`
+        `User does not have any of the required roles: ${requiredRoles.join(", ")}`,
       );
     }
 

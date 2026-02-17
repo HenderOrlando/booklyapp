@@ -1,4 +1,4 @@
-import { DatabaseModule } from "@libs/database";
+import { DatabaseModule, ReferenceDataModule } from "@libs/database";
 import { EventBusModule, EventBusService } from "@libs/event-bus";
 import { RedisModule, RedisService } from "@libs/redis";
 import { Module } from "@nestjs/common";
@@ -8,8 +8,8 @@ import { JwtModule } from "@nestjs/jwt";
 import { MongooseModule } from "@nestjs/mongoose";
 import { PassportModule } from "@nestjs/passport";
 import { AuditDecoratorsModule } from "@reports/audit-decorators";
-import { JwtStrategy } from "./infrastructure/strategies/jwt.strategy";
 import { ResourceImportService } from "./application/services/resource-import.service";
+import { JwtStrategy } from "./infrastructure/strategies/jwt.strategy";
 
 // Application Layer
 import * as EventHandlers from "./application/event-handlers";
@@ -22,14 +22,17 @@ import {
 } from "./application/services";
 
 // Infrastructure Layer
+import { ResourcesCacheService } from "./infrastructure/cache";
 import {
   CategoriesController,
   HealthController,
   ImportController,
   MaintenancesController,
+  ReferenceDataController,
   ResourcesController,
 } from "./infrastructure/controllers";
-import { ResourcesCacheService } from "./infrastructure/cache";
+import { DepartmentsController } from "./infrastructure/controllers/departments.controller";
+import { FacultiesController } from "./infrastructure/controllers/faculties.controller";
 import * as InfraEventHandlers from "./infrastructure/event-handlers";
 import {
   CategoryRepository,
@@ -40,6 +43,10 @@ import {
 import {
   Category,
   CategorySchema,
+  Department,
+  DepartmentSchema,
+  Faculty,
+  FacultySchema,
   ImportJob,
   ImportJobSchema,
   Maintenance,
@@ -74,6 +81,9 @@ const IMPORT_JOB_REPOSITORY = "IImportJobRepository";
     // MongoDB - Conexión global con librería estandarizada
     DatabaseModule,
 
+    // Reference Data (tipos, estados, categorías dinámicos)
+    ReferenceDataModule,
+
     // Schemas
     MongooseModule.forFeature([
       { name: Resource.name, schema: ResourceSchema },
@@ -81,6 +91,8 @@ const IMPORT_JOB_REPOSITORY = "IImportJobRepository";
       { name: Maintenance.name, schema: MaintenanceSchema },
       { name: Program.name, schema: ProgramSchema },
       { name: ImportJob.name, schema: ImportJobSchema },
+      { name: Faculty.name, schema: FacultySchema },
+      { name: Department.name, schema: DepartmentSchema },
     ]),
 
     // JWT
@@ -148,6 +160,9 @@ const IMPORT_JOB_REPOSITORY = "IImportJobRepository";
     CategoriesController,
     MaintenancesController,
     ImportController,
+    FacultiesController,
+    DepartmentsController,
+    ReferenceDataController,
     HealthController,
   ],
   providers: [
@@ -156,15 +171,18 @@ const IMPORT_JOB_REPOSITORY = "IImportJobRepository";
 
     // CQRS Handlers
     ...AllHandlers,
-    
+
     // Resource Import Service (with factory for interface injection)
     {
       provide: ResourceImportService,
       useFactory: (
         resourceRepository: ResourceRepository,
-        categoryRepository: CategoryRepository
+        categoryRepository: CategoryRepository,
       ) => {
-        return new ResourceImportService(resourceRepository, categoryRepository);
+        return new ResourceImportService(
+          resourceRepository,
+          categoryRepository,
+        );
       },
       inject: [RESOURCE_REPOSITORY, CATEGORY_REPOSITORY],
     },
@@ -218,13 +236,13 @@ const IMPORT_JOB_REPOSITORY = "IImportJobRepository";
         resourceRepository: ResourceRepository,
         eventBusService: any,
         attributeValidationService: AttributeValidationService,
-        redisService: any
+        redisService: any,
       ) => {
         return new ResourceService(
           resourceRepository,
           eventBusService,
           attributeValidationService,
-          redisService
+          redisService,
         );
       },
       inject: [
@@ -238,7 +256,7 @@ const IMPORT_JOB_REPOSITORY = "IImportJobRepository";
       provide: CategoryService,
       useFactory: (
         categoryRepository: CategoryRepository,
-        redisService: any
+        redisService: any,
       ) => {
         return new CategoryService(categoryRepository, redisService);
       },
@@ -246,8 +264,16 @@ const IMPORT_JOB_REPOSITORY = "IImportJobRepository";
     },
     {
       provide: MaintenanceService,
-      useFactory: (maintenanceRepository: MaintenanceRepository, resourceRepository: ResourceRepository, eventBusService: EventBusService) => {
-        return new MaintenanceService(maintenanceRepository, resourceRepository, eventBusService);
+      useFactory: (
+        maintenanceRepository: MaintenanceRepository,
+        resourceRepository: ResourceRepository,
+        eventBusService: EventBusService,
+      ) => {
+        return new MaintenanceService(
+          maintenanceRepository,
+          resourceRepository,
+          eventBusService,
+        );
       },
       inject: [MAINTENANCE_REPOSITORY, RESOURCE_REPOSITORY, EventBusService],
     },

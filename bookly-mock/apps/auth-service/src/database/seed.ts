@@ -1,5 +1,5 @@
 import { createLogger } from "@libs/common";
-import { UserRole } from "@libs/common/enums";
+import { ReferenceDataRepository } from "@libs/database";
 import { NestFactory } from "@nestjs/core";
 import { getModelToken } from "@nestjs/mongoose";
 import * as bcrypt from "bcryptjs";
@@ -9,6 +9,7 @@ import { Permission } from "../infrastructure/schemas/permission.schema";
 import { Role } from "../infrastructure/schemas/role.schema";
 import { User } from "../infrastructure/schemas/user.schema";
 import { ALL_PERMISSIONS } from "./permissions.seed-data";
+import { AUTH_REFERENCE_DATA } from "./reference-data.seed-data";
 import { ALL_ROLES } from "./roles.seed-data";
 
 const logger = createLogger("AuthSeed");
@@ -17,7 +18,7 @@ const logger = createLogger("AuthSeed");
  * Seed de permisos
  */
 async function seedPermissions(
-  permissionModel: Model<Permission>
+  permissionModel: Model<Permission>,
 ): Promise<Map<string, string>> {
   logger.info("🔑 Sembrando permisos...");
 
@@ -33,14 +34,14 @@ async function seedPermissions(
           updatedBy: "system",
         },
       },
-      { upsert: true, new: true }
+      { upsert: true, new: true },
     );
 
     permissionMap.set(permission.code, permission._id.toString());
   }
 
   logger.info(
-    `✅ ${ALL_PERMISSIONS.length} permisos procesados (creados/actualizados)`
+    `✅ ${ALL_PERMISSIONS.length} permisos procesados (creados/actualizados)`,
   );
   return permissionMap;
 }
@@ -50,11 +51,11 @@ async function seedPermissions(
  */
 async function seedRoles(
   roleModel: Model<Role>,
-  permissionMap: Map<string, string>
-): Promise<Map<UserRole, string>> {
+  permissionMap: Map<string, string>,
+): Promise<Map<string, string>> {
   logger.info("👥 Sembrando roles...");
 
-  const roleMap = new Map<UserRole, string>();
+  const roleMap = new Map<string, string>();
 
   for (const roleData of ALL_ROLES) {
     // Obtener IDs de permisos
@@ -84,7 +85,7 @@ async function seedRoles(
           updatedBy: "system",
         },
       },
-      { upsert: true, new: true }
+      { upsert: true, new: true },
     );
 
     roleMap.set(roleData.name, role._id.toString());
@@ -99,8 +100,8 @@ async function seedRoles(
  */
 async function seedUsers(
   userModel: Model<User>,
-  roleMap: Map<UserRole, string>,
-  defaultPasswordHash: string
+  roleMap: Map<string, string>,
+  defaultPasswordHash: string,
 ) {
   logger.info("👤 Sembrando usuarios...");
 
@@ -117,7 +118,7 @@ async function seedUsers(
       documentType: "CC",
       documentNumber: "1000000001",
       phone: "+573001234567",
-      roles: [UserRole.GENERAL_ADMIN],
+      roles: ["GENERAL_ADMIN"],
       programId: undefined, // Admin general no pertenece a programa específico
       coordinatedProgramId: undefined, // No coordina ningún programa
       isActive: true,
@@ -131,7 +132,7 @@ async function seedUsers(
       documentType: "CC",
       documentNumber: "1000000002",
       phone: "+573001234568",
-      roles: [UserRole.GENERAL_ADMIN],
+      roles: ["GENERAL_ADMIN"],
       programId: undefined, // Admin TI no pertenece a programa específico
       coordinatedProgramId: undefined,
       isActive: true,
@@ -145,7 +146,7 @@ async function seedUsers(
       documentType: "CC",
       documentNumber: "1000000003",
       phone: "+573001234569",
-      roles: [UserRole.TEACHER, UserRole.PROGRAM_ADMIN], // Es docente Y coordinador
+      roles: ["TEACHER", "PROGRAM_ADMIN"], // Es docente Y coordinador
       programId: PROGRAMA_SISTEMAS_ID, // Pertenece a Sistemas
       coordinatedProgramId: PROGRAMA_SISTEMAS_ID, // Coordina Sistemas
       isActive: true,
@@ -159,7 +160,7 @@ async function seedUsers(
       documentType: "TI",
       documentNumber: "1000000004",
       phone: "+573001234570",
-      roles: [UserRole.STUDENT],
+      roles: ["STUDENT"],
       programId: PROGRAMA_SISTEMAS_ID, // Pertenece a Sistemas
       coordinatedProgramId: undefined, // No coordina
       isActive: true,
@@ -173,7 +174,7 @@ async function seedUsers(
       documentType: "CC",
       documentNumber: "1000000005",
       phone: "+573001234571",
-      roles: [UserRole.SECURITY],
+      roles: ["SECURITY"],
       programId: undefined, // Personal no pertenece a programa
       coordinatedProgramId: undefined,
       isActive: true,
@@ -187,7 +188,7 @@ async function seedUsers(
       documentType: "CC",
       documentNumber: "1000000006",
       phone: "+573001234572",
-      roles: [UserRole.ADMINISTRATIVE_STAFF],
+      roles: ["ADMINISTRATIVE_STAFF"],
       programId: undefined, // Personal no pertenece a programa
       coordinatedProgramId: undefined,
       isActive: true,
@@ -201,7 +202,7 @@ async function seedUsers(
       documentType: "CC",
       documentNumber: "1000000007",
       phone: "+573001234573",
-      roles: [UserRole.TEACHER, UserRole.PROGRAM_ADMIN],
+      roles: ["TEACHER", "PROGRAM_ADMIN"],
       programId: PROGRAMA_INDUSTRIAL_ID, // Pertenece a Industrial
       coordinatedProgramId: PROGRAMA_INDUSTRIAL_ID, // Coordina Industrial
       isActive: true,
@@ -215,7 +216,7 @@ async function seedUsers(
       documentType: "CC",
       documentNumber: "1000000008",
       phone: "+573001234574",
-      roles: [UserRole.TEACHER],
+      roles: ["TEACHER"],
       programId: PROGRAMA_SISTEMAS_ID, // Pertenece a Sistemas
       coordinatedProgramId: undefined, // No coordina (es docente auxiliar)
       isActive: true,
@@ -229,7 +230,7 @@ async function seedUsers(
       documentType: "TI",
       documentNumber: "1000000009",
       phone: "+573001234575",
-      roles: [UserRole.STUDENT],
+      roles: ["STUDENT"],
       programId: PROGRAMA_INDUSTRIAL_ID, // Pertenece a Industrial
       coordinatedProgramId: undefined,
       isActive: true,
@@ -263,7 +264,7 @@ async function seedUsers(
           roles: userData.roles,
           roleIds: roleIds, // Asignar ObjectIds de roles
           isActive: userData.isActive,
-        }
+        },
       );
       updatedCount++;
     } else {
@@ -280,13 +281,13 @@ async function seedUsers(
   }
 
   logger.info(
-    `✅ Usuarios procesados: ${createdCount} creados, ${updatedCount} actualizados`
+    `✅ Usuarios procesados: ${createdCount} creados, ${updatedCount} actualizados`,
   );
 
   logger.info("👤 Usuarios disponibles:");
   users.forEach((user) => {
     logger.info(
-      `  - ${user.email} (${user.roles.join(", ")}) - Contraseña: 123456`
+      `  - ${user.email} (${user.roles.join(", ")}) - Contraseña: 123456`,
     );
   });
 }
@@ -302,7 +303,7 @@ async function seed() {
     const app = await NestFactory.createApplicationContext(AuthModule);
 
     const permissionModel = app.get<Model<Permission>>(
-      getModelToken(Permission.name)
+      getModelToken(Permission.name),
     );
     const roleModel = app.get<Model<Role>>(getModelToken(Role.name));
     const userModel = app.get<Model<User>>(getModelToken(User.name));
@@ -315,9 +316,21 @@ async function seed() {
       await userModel.deleteMany({});
     } else if (process.env.NODE_ENV === "development") {
       logger.info(
-        "ℹ️ Modo desarrollo detectado. Usar --clean para limpiar DB antes del seed."
+        "ℹ️ Modo desarrollo detectado. Usar --clean para limpiar DB antes del seed.",
       );
     }
+
+    // ── Reference Data (tipos, estados dinámicos del dominio auth) ──
+    const refDataRepo = app.get(ReferenceDataRepository);
+    logger.info(
+      `📋 Procesando ${AUTH_REFERENCE_DATA.length} datos de referencia...`,
+    );
+    for (const rd of AUTH_REFERENCE_DATA) {
+      await refDataRepo.upsert(rd);
+    }
+    logger.info(
+      `✅ ${AUTH_REFERENCE_DATA.length} datos de referencia procesados (upsert)`,
+    );
 
     // Sembrar permisos
     const permissionMap = await seedPermissions(permissionModel);

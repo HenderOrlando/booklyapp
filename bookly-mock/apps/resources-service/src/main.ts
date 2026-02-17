@@ -31,20 +31,27 @@ async function bootstrap() {
       transformOptions: {
         enableImplicitConversion: true,
       },
-    })
+    }),
   );
 
   // Swagger documentation
   const config = new DocumentBuilder()
     .setTitle("Bookly Resources Service")
     .setDescription(
-      "API de gestión de recursos, categorías y mantenimientos para el sistema Bookly"
+      "API de gestión de recursos, categorías y mantenimientos para el sistema Bookly",
     )
     .setVersion("1.0")
     .addBearerAuth()
     .addTag("Resources", "Endpoints para gestión de recursos")
     .addTag("Categories", "Endpoints para gestión de categorías")
     .addTag("Maintenances", "Endpoints para gestión de mantenimientos")
+    .addTag("Faculties", "Endpoints para gestión de facultades")
+    .addTag("Departments", "Endpoints para gestión de departamentos")
+    .addTag("Import", "Endpoints para importación masiva de recursos")
+    .addTag(
+      "Reference Data",
+      "Datos de referencia dinámicos del dominio recursos",
+    )
     .build();
 
   const document = SwaggerModule.createDocument(app, config);

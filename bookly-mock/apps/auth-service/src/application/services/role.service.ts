@@ -1,4 +1,4 @@
-import { UserRole } from "@libs/common/enums";
+import { Role } from "@auth/infrastructure/schemas/role.schema";
 import {
   BadRequestException,
   ConflictException,
@@ -7,7 +7,6 @@ import {
 } from "@nestjs/common";
 import { InjectModel } from "@nestjs/mongoose";
 import { Model } from "mongoose";
-import { Role } from '@auth/infrastructure/schemas/role.schema';
 import { CreateRoleDto } from "../dtos/role/create-role.dto";
 import { RoleResponseDto } from "../dtos/role/role-response.dto";
 import { UpdateRoleDto } from "../dtos/role/update-role.dto";
@@ -20,7 +19,7 @@ import { UpdateRoleDto } from "../dtos/role/update-role.dto";
 export class RoleService {
   constructor(
     @InjectModel(Role.name)
-    private readonly roleModel: Model<Role>
+    private readonly roleModel: Model<Role>,
   ) {}
 
   /**
@@ -28,13 +27,13 @@ export class RoleService {
    */
   async createRole(
     dto: CreateRoleDto,
-    createdBy: string
+    createdBy: string,
   ): Promise<RoleResponseDto> {
     // Validar que el rol no exista
     const existingRole = await this.roleModel.findOne({ name: dto.name });
     if (existingRole) {
       throw new ConflictException(
-        `El rol '${dto.name}' ya existe en el sistema`
+        `El rol '${dto.name}' ya existe en el sistema`,
       );
     }
 
@@ -64,7 +63,7 @@ export class RoleService {
   async updateRole(
     roleId: string,
     dto: UpdateRoleDto,
-    updatedBy: string
+    updatedBy: string,
   ): Promise<RoleResponseDto> {
     const role = await this.roleModel.findById(roleId);
 
@@ -75,7 +74,7 @@ export class RoleService {
     // No permitir actualizar roles del sistema ciertas propiedades
     if (role.isDefault && dto.displayName) {
       throw new BadRequestException(
-        "No se puede cambiar el nombre de un rol del sistema"
+        "No se puede cambiar el nombre de un rol del sistema",
       );
     }
 
@@ -121,7 +120,7 @@ export class RoleService {
 
     if (role.isDefault) {
       throw new BadRequestException(
-        "No se puede eliminar un rol del sistema (isDefault = true)"
+        "No se puede eliminar un rol del sistema (isDefault = true)",
       );
     }
 
@@ -141,7 +140,7 @@ export class RoleService {
    * Obtener roles con filtros
    */
   async getRoles(filters?: {
-    name?: UserRole;
+    name?: string;
     isActive?: boolean;
     isDefault?: boolean;
     search?: string;
@@ -201,7 +200,7 @@ export class RoleService {
    */
   async assignPermissions(
     roleId: string,
-    permissionIds: string[]
+    permissionIds: string[],
   ): Promise<RoleResponseDto> {
     const role = await this.roleModel.findById(roleId);
 
@@ -224,7 +223,7 @@ export class RoleService {
    */
   async removePermissions(
     roleId: string,
-    permissionIds: string[]
+    permissionIds: string[],
   ): Promise<RoleResponseDto> {
     const role = await this.roleModel.findById(roleId);
 
@@ -234,12 +233,12 @@ export class RoleService {
 
     // Validar que no se eliminen todos los permisos
     const remainingPermissions = role.permissions.filter(
-      (id) => !permissionIds.includes(id)
+      (id) => !permissionIds.includes(id),
     );
 
     if (remainingPermissions.length === 0) {
       throw new BadRequestException(
-        "No se puede remover todos los permisos de un rol"
+        "No se puede remover todos los permisos de un rol",
       );
     }
 
@@ -253,7 +252,7 @@ export class RoleService {
    * Obtener roles que tienen asignado un permiso específico
    */
   async getRolesWithPermission(
-    permissionId: string
+    permissionId: string,
   ): Promise<RoleResponseDto[]> {
     const roles = await this.roleModel.find({
       permissions: permissionId,

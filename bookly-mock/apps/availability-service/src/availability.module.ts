@@ -1,4 +1,4 @@
-import { DatabaseModule } from "@libs/database";
+import { DatabaseModule, ReferenceDataModule } from "@libs/database";
 import { EventBusModule } from "@libs/event-bus";
 import { RedisModule } from "@libs/redis";
 import { Module } from "@nestjs/common";
@@ -77,6 +77,7 @@ import { HistoryController } from "./infrastructure/controllers/history.controll
 import { MaintenanceBlocksController } from "./infrastructure/controllers/maintenance-blocks.controller";
 import { MetricsController } from "./infrastructure/controllers/metrics.controller";
 import { ReassignmentController } from "./infrastructure/controllers/reassignment.controller";
+import { ReferenceDataController } from "./infrastructure/controllers/reference-data.controller";
 
 // CronJobs
 import { ExceptionsCleanupCron } from "./infrastructure/cron/exceptions-cleanup.cron";
@@ -103,6 +104,8 @@ import * as InfraEventHandlers from "./infrastructure/event-handlers";
     }),
     // DatabaseModule reemplaza MongooseModule.forRoot
     DatabaseModule,
+    // Reference Data (tipos, estados dinámicos del dominio availability)
+    ReferenceDataModule,
     MongooseModule.forFeature([
       { name: Reservation.name, schema: ReservationSchema },
       { name: Availability.name, schema: AvailabilitySchema },
@@ -177,6 +180,7 @@ import * as InfraEventHandlers from "./infrastructure/event-handlers";
     AvailabilityExceptionsController,
     MaintenanceBlocksController,
     ReassignmentController,
+    ReferenceDataController,
     HealthController,
     MetricsController,
   ],

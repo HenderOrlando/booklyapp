@@ -31,14 +31,14 @@ async function bootstrap() {
       transformOptions: {
         enableImplicitConversion: true,
       },
-    })
+    }),
   );
 
   // Swagger configuration
   const config = new DocumentBuilder()
     .setTitle("Bookly Reports Service")
     .setDescription(
-      "API de reportes, análisis y dashboard de auditoría para el sistema Bookly"
+      "API de reportes, análisis y dashboard de auditoría para el sistema Bookly",
     )
     .setVersion("1.0")
     .addBearerAuth()
@@ -47,7 +47,16 @@ async function bootstrap() {
     .addTag("User Reports", "Reportes de actividad de usuarios")
     .addTag(
       "Audit Dashboard",
-      "Dashboard en tiempo real con estadísticas, alertas y análisis de auditoría"
+      "Dashboard en tiempo real con estadísticas, alertas y análisis de auditoría",
+    )
+    .addTag("Audit Records", "Registros de auditoría detallados")
+    .addTag("Dashboard", "Métricas de ocupación y KPIs principales")
+    .addTag("Feedback", "Feedback de usuarios sobre reservas")
+    .addTag("Evaluations", "Evaluaciones de usuarios por staff")
+    .addTag("Export", "Exportación de reportes en múltiples formatos")
+    .addTag(
+      "Reference Data",
+      "Datos de referencia dinámicos del dominio reportes",
     )
     .build();
 

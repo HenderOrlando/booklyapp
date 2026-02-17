@@ -1,4 +1,3 @@
-import { WeekDay } from "@libs/common/enums";
 import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
 import { Document, Types } from "mongoose";
 
@@ -17,12 +16,8 @@ export class Availability {
   @Prop({ type: Types.ObjectId, required: true })
   resourceId: Types.ObjectId;
 
-  @Prop({
-    type: String,
-    enum: Object.values(WeekDay),
-    required: true,
-  })
-  dayOfWeek: WeekDay;
+  @Prop({ type: String, required: true })
+  dayOfWeek: string;
 
   @Prop({ required: true })
   startTime: string;

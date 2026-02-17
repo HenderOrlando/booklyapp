@@ -1,4 +1,3 @@
-import { UserRole } from "@libs/common/enums";
 import { AuditInfo } from "@libs/common";
 
 /**
@@ -12,7 +11,7 @@ export class UserEntity {
     public password: string | undefined,
     public firstName: string,
     public lastName: string,
-    public roles: UserRole[],
+    public roles: string[],
     public permissions: string[],
     public isActive: boolean,
     public isEmailVerified: boolean,
@@ -25,7 +24,7 @@ export class UserEntity {
     public twoFactorBackupCodes?: string[],
     public lastLogin?: Date,
     public passwordChangedAt?: Date,
-    public audit?: AuditInfo
+    public audit?: AuditInfo,
   ) {}
 
   /**
@@ -38,21 +37,21 @@ export class UserEntity {
   /**
    * Verificar si el usuario tiene un rol específico
    */
-  hasRole(role: UserRole): boolean {
+  hasRole(role: string): boolean {
     return this.roles.includes(role);
   }
 
   /**
    * Verificar si el usuario tiene alguno de los roles especificados
    */
-  hasAnyRole(roles: UserRole[]): boolean {
+  hasAnyRole(roles: string[]): boolean {
     return roles.some((role) => this.hasRole(role));
   }
 
   /**
    * Verificar si el usuario tiene todos los roles especificados
    */
-  hasAllRoles(roles: UserRole[]): boolean {
+  hasAllRoles(roles: string[]): boolean {
     return roles.every((role) => this.hasRole(role));
   }
 
@@ -81,13 +80,13 @@ export class UserEntity {
    * Verificar si el usuario es administrador
    */
   isAdmin(): boolean {
-    return this.hasRole(UserRole.GENERAL_ADMIN);
+    return this.hasRole("GENERAL_ADMIN");
   }
 
   /**
    * Agregar rol al usuario
    */
-  addRole(role: UserRole): void {
+  addRole(role: string): void {
     if (!this.hasRole(role)) {
       this.roles.push(role);
     }
@@ -96,7 +95,7 @@ export class UserEntity {
   /**
    * Remover rol del usuario
    */
-  removeRole(role: UserRole): void {
+  removeRole(role: string): void {
     this.roles = this.roles.filter((r) => r !== role);
   }
 
@@ -179,7 +178,7 @@ export class UserEntity {
     provider: string,
     providerId: string,
     email: string,
-    photoUrl?: string
+    photoUrl?: string,
   ): void {
     this.ssoProvider = provider;
     this.ssoProviderId = providerId;
@@ -284,7 +283,7 @@ export class UserEntity {
       data.twoFactorBackupCodes || [],
       data.lastLogin,
       data.passwordChangedAt,
-      data.audit
+      data.audit,
     );
   }
 }

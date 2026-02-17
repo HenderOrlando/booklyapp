@@ -1,4 +1,3 @@
-import { UserRole } from "@libs/common/enums";
 import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
 import { Document } from "mongoose";
 
@@ -22,12 +21,8 @@ export class User {
   @Prop({ required: true, trim: true })
   lastName: string;
 
-  @Prop({
-    type: [String],
-    enum: Object.values(UserRole),
-    default: [UserRole.STUDENT],
-  })
-  roles: UserRole[];
+  @Prop({ type: [String], default: ["STUDENT"] })
+  roles: string[];
 
   @Prop({ type: [String], default: [] })
   roleIds: string[]; // ObjectIds de documentos Role
@@ -115,5 +110,5 @@ UserSchema.index({ programId: 1 });
 UserSchema.index({ coordinatedProgramId: 1 });
 UserSchema.index(
   { documentType: 1, documentNumber: 1 },
-  { sparse: true, unique: true }
+  { sparse: true, unique: true },
 );

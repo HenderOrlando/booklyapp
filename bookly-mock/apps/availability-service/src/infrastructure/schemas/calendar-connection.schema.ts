@@ -1,4 +1,3 @@
-import { OAuthProvider } from "@auth/modules/oauth";
 import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
 import { Document, Types } from "mongoose";
 
@@ -16,12 +15,8 @@ export class CalendarConnection {
   @Prop({ type: Types.ObjectId, required: true, index: true })
   userId: Types.ObjectId;
 
-  @Prop({
-    type: String,
-    enum: Object.values(OAuthProvider),
-    required: true,
-  })
-  provider: OAuthProvider;
+  @Prop({ type: String, required: true })
+  provider: string;
 
   @Prop({ type: String, required: true })
   externalUserId: string; // ID del usuario en el servicio externo

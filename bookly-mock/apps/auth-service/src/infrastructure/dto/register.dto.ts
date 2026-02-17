@@ -1,9 +1,7 @@
-import { UserRole } from "@libs/common/enums";
 import { ApiProperty } from "@nestjs/swagger";
 import {
   IsArray,
   IsEmail,
-  IsEnum,
   IsNotEmpty,
   IsOptional,
   IsString,
@@ -51,15 +49,14 @@ export class RegisterDto {
 
   @ApiProperty({
     description: "Roles del usuario",
-    example: [UserRole.STUDENT],
-    enum: UserRole,
+    example: ["STUDENT"],
     isArray: true,
     required: false,
   })
   @IsArray({ message: "Roles debe ser un array" })
-  @IsEnum(UserRole, { each: true, message: "Roles inválidos" })
+  @IsString({ each: true, message: "Cada rol debe ser un string" })
   @IsOptional()
-  roles?: UserRole[];
+  roles?: string[];
 
   @ApiProperty({
     description: "Permisos adicionales del usuario",

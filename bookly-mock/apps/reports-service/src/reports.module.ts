@@ -1,4 +1,4 @@
-import { DatabaseModule } from "@libs/database";
+import { DatabaseModule, ReferenceDataModule } from "@libs/database";
 import { EventBusModule } from "@libs/event-bus";
 import { NotificationsModule } from "@libs/notifications";
 import { Module } from "@nestjs/common";
@@ -96,6 +96,7 @@ import { DashboardController } from "./infrastructure/controllers/dashboard.cont
 import { EvaluationController } from "./infrastructure/controllers/evaluation.controller";
 import { ExportController } from "./infrastructure/controllers/export.controller";
 import { FeedbackController } from "./infrastructure/controllers/feedback.controller";
+import { ReferenceDataController } from "./infrastructure/controllers/reference-data.controller";
 
 // Consumers
 import { AuditEventsConsumer } from "./infrastructure/consumers/audit-events.consumer";
@@ -147,6 +148,8 @@ import { JwtStrategy } from "./infrastructure/strategies/jwt.strategy";
     }),
     // MongoDB - Conexión global con librería estandarizada
     DatabaseModule,
+    // Reference Data (tipos, estados dinámicos del dominio reports)
+    ReferenceDataModule,
     MongooseModule.forFeature([
       { name: ComplianceReport.name, schema: ComplianceReportSchema },
       { name: ConflictReport.name, schema: ConflictReportSchema },
@@ -196,6 +199,7 @@ import { JwtStrategy } from "./infrastructure/strategies/jwt.strategy";
     EvaluationController,
     ExportController,
     FeedbackController,
+    ReferenceDataController,
     HealthController,
   ],
   providers: [

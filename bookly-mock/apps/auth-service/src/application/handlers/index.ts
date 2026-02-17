@@ -1,5 +1,6 @@
 // Array de todos los handlers para fácil importación en módulos
 import { ChangePasswordHandler } from "./change-password.handler";
+import { DeleteUserHandler } from "./delete-user.handler";
 import { Disable2FAHandler } from "./disable-2fa.handler";
 import { Enable2FAHandler } from "./enable-2fa.handler";
 import { ForgotPasswordHandler } from "./forgot-password.handler";
@@ -12,6 +13,7 @@ import { RegenerateBackupCodesHandler } from "./regenerate-backup-codes.handler"
 import { RegisterUserHandler } from "./register-user.handler";
 import { ResetPasswordHandler } from "./reset-password.handler";
 import { Setup2FAHandler } from "./setup-2fa.handler";
+import { UpdateUserHandler } from "./update-user.handler";
 import { ValidateTokenHandler } from "./validate-token.handler";
 import { Verify2FAHandler } from "./verify-2fa.handler";
 
@@ -45,6 +47,9 @@ export const CommandHandlers = [
   RefreshTokenHandler,
   ForgotPasswordHandler,
   ResetPasswordHandler,
+  // Users CRUD
+  UpdateUserHandler,
+  DeleteUserHandler,
   // Two-Factor Authentication
   Setup2FAHandler,
   Enable2FAHandler,

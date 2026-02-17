@@ -1,4 +1,3 @@
-import { MaintenanceStatus } from "@libs/common/enums";
 import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
 import { Document, Types } from "mongoose";
 
@@ -33,12 +32,8 @@ export class MaintenanceBlock {
   @Prop({ type: Date, required: true })
   endDate: Date;
 
-  @Prop({
-    type: String,
-    enum: Object.values(MaintenanceStatus),
-    default: MaintenanceStatus.SCHEDULED,
-  })
-  status: MaintenanceStatus;
+  @Prop({ type: String, default: "SCHEDULED" })
+  status: string;
 
   @Prop({ type: Boolean, default: false })
   notifyUsers: boolean; // Si notificar a usuarios con reservas afectadas

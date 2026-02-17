@@ -1,0 +1,55 @@
+import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
+import { Document } from "mongoose";
+
+export type AppConfigurationDocument = AppConfiguration & Document;
+
+/**
+ * AppConfiguration MongoDB Schema
+ * Configuración global de la aplicación Bookly.
+ * Solo existe un documento en la colección (singleton).
+ * Gestionado exclusivamente por GENERAL_ADMIN.
+ */
+@Schema({ timestamps: true, collection: "app_configuration" })
+export class AppConfiguration {
+  @Prop({ default: true })
+  registrationEnabled: boolean;
+
+  @Prop({ default: true })
+  corporateAuthEnabled: boolean;
+
+  @Prop({ type: [String], default: ["ufps.edu.co"] })
+  allowedDomains: string[];
+
+  @Prop({ default: true })
+  autoRegisterOnSSO: boolean;
+
+  @Prop({ type: String, default: "system" })
+  themeMode: string;
+
+  @Prop({ type: String, default: "#3B82F6" })
+  primaryColor: string;
+
+  @Prop({ type: String, default: "#8B5CF6" })
+  secondaryColor: string;
+
+  @Prop({ type: String, default: "es" })
+  defaultLocale: string;
+
+  @Prop({ type: [String], default: ["es", "en"] })
+  supportedLocales: string[];
+
+  @Prop({ type: String, default: "Bookly UFPS" })
+  appName: string;
+
+  @Prop({ type: String, default: "" })
+  appLogoUrl: string;
+
+  @Prop({ default: false })
+  maintenanceMode: boolean;
+
+  @Prop({ type: String })
+  updatedBy?: string;
+}
+
+export const AppConfigurationSchema =
+  SchemaFactory.createForClass(AppConfiguration);

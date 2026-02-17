@@ -1,4 +1,3 @@
-import { CategoryType } from "@libs/common/enums";
 import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
 import { Document } from "mongoose";
 
@@ -19,12 +18,8 @@ export class Category {
   @Prop({ required: true, trim: true })
   description: string;
 
-  @Prop({
-    type: String,
-    enum: Object.values(CategoryType),
-    required: true,
-  })
-  type: CategoryType;
+  @Prop({ type: String, required: true })
+  type: string;
 
   @Prop({ type: String, trim: true })
   color?: string;

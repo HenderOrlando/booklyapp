@@ -1,4 +1,3 @@
-import { UserRole } from "@libs/common/enums";
 import { PaginationQuery } from "@libs/common";
 
 /**
@@ -10,8 +9,8 @@ export class GetUsersQuery {
     public readonly pagination: PaginationQuery,
     public readonly filters?: {
       email?: string;
-      role?: UserRole;
+      role?: string;
       isActive?: boolean;
-    }
+    },
   ) {}
 }

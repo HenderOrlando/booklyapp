@@ -1,7 +1,12 @@
-import { UserRole } from "@libs/common/enums";
+import {
+  EventDashboardDataDto,
+  EventMetricsResponseDto,
+  EventReplayFilterDto,
+  GetEventsQueryDto,
+} from "@gateway/application/dto/events.dto";
+import { EventsService } from "@gateway/application/services/events.service";
 import { Roles } from "@libs/decorators";
-import { JwtAuthGuard } from "@libs/guards";
-import { RolesGuard } from "@libs/guards";
+import { JwtAuthGuard, RolesGuard } from "@libs/guards";
 import {
   Body,
   Controller,
@@ -18,13 +23,6 @@ import {
   ApiResponse,
   ApiTags,
 } from "@nestjs/swagger";
-import {
-  EventDashboardDataDto,
-  EventMetricsResponseDto,
-  EventReplayFilterDto,
-  GetEventsQueryDto,
-} from '@gateway/application/dto/events.dto';
-import { EventsService } from '@gateway/application/services/events.service';
 
 @ApiTags("Events")
 @Controller("events")
@@ -37,7 +35,7 @@ export class EventsController {
    * Get Event Bus metrics (performance, throughput, errors)
    */
   @Get("metrics")
-  @Roles(UserRole.GENERAL_ADMIN, UserRole.PROGRAM_ADMIN)
+  @Roles("GENERAL_ADMIN", "PROGRAM_ADMIN")
   @ApiOperation({
     summary: "Get Event Bus metrics",
     description:
@@ -56,7 +54,7 @@ export class EventsController {
    * Get Dashboard data (overview of events)
    */
   @Get("dashboard")
-  @Roles(UserRole.GENERAL_ADMIN, UserRole.PROGRAM_ADMIN)
+  @Roles("GENERAL_ADMIN", "PROGRAM_ADMIN")
   @ApiOperation({
     summary: "Get Events Dashboard data",
     description:
@@ -75,7 +73,7 @@ export class EventsController {
    * Get events with filters
    */
   @Get()
-  @Roles(UserRole.GENERAL_ADMIN, UserRole.PROGRAM_ADMIN)
+  @Roles("GENERAL_ADMIN", "PROGRAM_ADMIN")
   @ApiOperation({
     summary: "Get events with filters",
     description: "Query events from Event Store with optional filters",
@@ -103,7 +101,7 @@ export class EventsController {
     if (aggregateType && aggregateId) {
       return this.eventsService.getEventsByAggregate(
         aggregateType,
-        aggregateId
+        aggregateId,
       );
     }
 
@@ -114,14 +112,14 @@ export class EventsController {
     if (startDate && endDate) {
       return this.eventsService.getEventsByDateRange(
         new Date(startDate),
-        new Date(endDate)
+        new Date(endDate),
       );
     }
 
     // Default: get recent events
     return this.eventsService.getEventsByDateRange(
       new Date(Date.now() - 24 * 60 * 60 * 1000), // Last 24 hours
-      new Date()
+      new Date(),
     );
   }
 
@@ -129,7 +127,7 @@ export class EventsController {
    * Get events by aggregate
    */
   @Get("aggregate/:aggregateType/:aggregateId")
-  @Roles(UserRole.GENERAL_ADMIN, UserRole.PROGRAM_ADMIN)
+  @Roles("GENERAL_ADMIN", "PROGRAM_ADMIN")
   @ApiOperation({
     summary: "Get events by aggregate",
     description:
@@ -138,7 +136,7 @@ export class EventsController {
   @ApiResponse({ status: 200, description: "Events retrieved successfully" })
   async getEventsByAggregate(
     @Param("aggregateType") aggregateType: string,
-    @Param("aggregateId") aggregateId: string
+    @Param("aggregateId") aggregateId: string,
   ) {
     return this.eventsService.getEventsByAggregate(aggregateType, aggregateId);
   }
@@ -147,7 +145,7 @@ export class EventsController {
    * Get events by type
    */
   @Get("type/:eventType")
-  @Roles(UserRole.GENERAL_ADMIN, UserRole.PROGRAM_ADMIN)
+  @Roles("GENERAL_ADMIN", "PROGRAM_ADMIN")
   @ApiOperation({
     summary: "Get events by type",
     description: "Get all events of a specific type (e.g., RESOURCE_CREATED)",
@@ -156,7 +154,7 @@ export class EventsController {
   @ApiResponse({ status: 200, description: "Events retrieved successfully" })
   async getEventsByType(
     @Param("eventType") eventType: string,
-    @Query("limit") limit?: number
+    @Query("limit") limit?: number,
   ) {
     return this.eventsService.getEventsByType(eventType, limit || 100);
   }
@@ -165,7 +163,7 @@ export class EventsController {
    * Replay events with filter
    */
   @Post("replay")
-  @Roles(UserRole.GENERAL_ADMIN)
+  @Roles("GENERAL_ADMIN")
   @ApiOperation({
     summary: "Replay events",
     description:

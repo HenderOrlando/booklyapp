@@ -293,11 +293,57 @@ export class BooklyWebSocketGateway
 
   /**
    * Inicializar listeners de eventos del Event Bus
+   * Escucha eventos CRUD de todos los microservicios y los reenvía via WebSocket
    */
   private initializeEventListeners() {
-    // Este método se puede extender para escuchar eventos específicos
-    // del Event Bus y reenviarlos via WebSocket
-    logger.info("Event listeners initialized");
+    const crudEvents = [
+      "resource.created",
+      "resource.updated",
+      "resource.deleted",
+      "reservation.created",
+      "reservation.updated",
+      "reservation.cancelled",
+      "reservation.approved",
+      "reservation.rejected",
+      "approval_request.created",
+      "approval_request.approved",
+      "approval_request.rejected",
+      "user.registered",
+      "user.updated",
+      "user.deleted",
+      "category.created",
+      "category.updated",
+      "maintenance.scheduled",
+      "maintenance.completed",
+      "feedback.submitted",
+      "report.generated",
+      "app_config.updated",
+    ];
+
+    for (const eventType of crudEvents) {
+      try {
+        this.eventBusService.subscribe(
+          eventType,
+          "gateway-ws-group",
+          async (eventData: any) => {
+            logger.debug(`Broadcasting event: ${eventType}`, {
+              eventId: eventData?.id,
+            });
+            this.server.emit("crud-event", {
+              type: eventType,
+              data: eventData,
+              timestamp: new Date(),
+            });
+          },
+        );
+      } catch (error) {
+        logger.warn(`Could not subscribe to event ${eventType}`, error);
+      }
+    }
+
+    logger.info(
+      `Event listeners initialized for ${crudEvents.length} CRUD event types`,
+    );
   }
 
   /**
@@ -371,9 +417,25 @@ export class BooklyWebSocketGateway
       return userId;
     }
 
-    // TODO: Extraer de JWT token en handshake.auth
-    // const token = client.handshake.auth.token;
-    // Decode JWT y extraer userId
+    // Extraer de JWT token en handshake.auth
+    const token = client.handshake.auth?.token as string;
+    if (token) {
+      try {
+        const base64Payload = token.split(".")[1];
+        if (base64Payload) {
+          const payload = JSON.parse(
+            Buffer.from(base64Payload, "base64").toString(),
+          );
+          if (payload.sub) {
+            return payload.sub;
+          }
+        }
+      } catch (error) {
+        logger.warn("Failed to extract userId from JWT token", {
+          error: (error as Error).message,
+        });
+      }
+    }
 
     return "anonymous";
   }

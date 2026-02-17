@@ -31,20 +31,33 @@ async function bootstrap() {
       transformOptions: {
         enableImplicitConversion: true,
       },
-    })
+    }),
   );
 
   // Swagger configuration
   const config = new DocumentBuilder()
     .setTitle("Bookly Availability Service")
     .setDescription(
-      "API de gestión de disponibilidad, reservas y lista de espera para el sistema Bookly"
+      "API de gestión de disponibilidad, reservas y lista de espera para el sistema Bookly",
     )
     .setVersion("1.0")
     .addBearerAuth()
     .addTag("Reservations", "Endpoints para gestión de reservas")
     .addTag("Availabilities", "Endpoints para gestión de disponibilidad")
     .addTag("Waiting Lists", "Endpoints para gestión de lista de espera")
+    .addTag("Calendar View", "Vista de calendario con slots y estados")
+    .addTag("History", "Historial de reservas y actividad de usuarios")
+    .addTag("Maintenance Blocks", "Bloqueos por mantenimiento de recursos")
+    .addTag("Reassignment", "Reasignación de reservas a recursos alternativos")
+    .addTag(
+      "Availability Exceptions",
+      "Excepciones de disponibilidad (festivos, eventos)",
+    )
+    .addTag("Metrics", "Métricas de cache y rendimiento")
+    .addTag(
+      "Reference Data",
+      "Datos de referencia dinámicos del dominio disponibilidad",
+    )
     .build();
 
   const document = SwaggerModule.createDocument(app, config);

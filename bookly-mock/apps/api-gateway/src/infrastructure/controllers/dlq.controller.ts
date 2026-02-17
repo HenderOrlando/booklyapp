@@ -1,8 +1,11 @@
-import { UserRole } from "@libs/common/enums";
+import {
+  DLQStatsResponseDto,
+  GetDLQEventsQueryDto,
+  ResolveDLQEventDto,
+} from "@gateway/application/dto/dlq.dto";
 import { Roles } from "@libs/decorators";
 import { DeadLetterQueueService } from "@libs/event-bus/dlq";
-import { JwtAuthGuard } from "@libs/guards";
-import { RolesGuard } from "@libs/guards";
+import { JwtAuthGuard, RolesGuard } from "@libs/guards";
 import {
   Body,
   Controller,
@@ -20,11 +23,6 @@ import {
   ApiResponse,
   ApiTags,
 } from "@nestjs/swagger";
-import {
-  DLQStatsResponseDto,
-  GetDLQEventsQueryDto,
-  ResolveDLQEventDto,
-} from '@gateway/application/dto/dlq.dto';
 
 @ApiTags("Dead Letter Queue")
 @Controller("dlq")
@@ -37,7 +35,7 @@ export class DLQController {
    * Get DLQ statistics
    */
   @Get("stats")
-  @Roles(UserRole.GENERAL_ADMIN)
+  @Roles("GENERAL_ADMIN")
   @ApiOperation({
     summary: "Get DLQ statistics",
     description:
@@ -56,7 +54,7 @@ export class DLQController {
    * Get DLQ events with filters
    */
   @Get()
-  @Roles(UserRole.GENERAL_ADMIN)
+  @Roles("GENERAL_ADMIN")
   @ApiOperation({
     summary: "Get DLQ events",
     description:
@@ -87,7 +85,7 @@ export class DLQController {
    * Get DLQ event by ID
    */
   @Get(":id")
-  @Roles(UserRole.GENERAL_ADMIN)
+  @Roles("GENERAL_ADMIN")
   @ApiOperation({
     summary: "Get DLQ event by ID",
     description: "Get details of a specific failed event",
@@ -108,7 +106,7 @@ export class DLQController {
    * Retry DLQ event manually
    */
   @Post(":id/retry")
-  @Roles(UserRole.GENERAL_ADMIN)
+  @Roles("GENERAL_ADMIN")
   @ApiOperation({
     summary: "Retry DLQ event",
     description: "Manually trigger retry of a failed event",
@@ -123,7 +121,7 @@ export class DLQController {
    * Resolve DLQ event manually
    */
   @Post(":id/resolve")
-  @Roles(UserRole.GENERAL_ADMIN)
+  @Roles("GENERAL_ADMIN")
   @ApiOperation({
     summary: "Resolve DLQ event",
     description: "Manually mark a failed event as resolved without retry",
@@ -132,12 +130,12 @@ export class DLQController {
   @ApiResponse({ status: 404, description: "DLQ event not found" })
   async resolveDLQEvent(
     @Param("id") id: string,
-    @Body() dto: ResolveDLQEventDto
+    @Body() dto: ResolveDLQEventDto,
   ) {
     return this.dlqService.resolveManually(
       id,
       dto.resolvedBy || "admin",
-      dto.resolution
+      dto.resolution,
     );
   }
 
@@ -145,7 +143,7 @@ export class DLQController {
    * Delete DLQ event
    */
   @Delete(":id")
-  @Roles(UserRole.GENERAL_ADMIN)
+  @Roles("GENERAL_ADMIN")
   @ApiOperation({
     summary: "Delete DLQ event",
     description: "Permanently delete a failed event from the Dead Letter Queue",

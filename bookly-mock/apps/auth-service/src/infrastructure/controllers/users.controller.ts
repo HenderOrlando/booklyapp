@@ -1,6 +1,8 @@
-import { UserRole } from "@libs/common/enums";
-import { PaginationQuery } from "@libs/common";
-import { ResponseUtil } from "@libs/common";
+import { DeleteUserCommand } from "@auth/application/commands/delete-user.command";
+import { UpdateUserCommand } from "@auth/application/commands/update-user.command";
+import { GetUserByIdQuery } from "@auth/application/queries/get-user-by-id.query";
+import { GetUsersQuery } from "@auth/application/queries/get-users.query";
+import { PaginationQuery, ResponseUtil } from "@libs/common";
 import { CurrentUser, Roles } from "@libs/decorators";
 import { JwtAuthGuard, RolesGuard } from "@libs/guards";
 import {
@@ -23,8 +25,6 @@ import {
   ApiTags,
 } from "@nestjs/swagger";
 import { Audit, AuditAction } from "@reports/audit-decorators";
-import { GetUserByIdQuery } from '@auth/application/queries/get-user-by-id.query';
-import { GetUsersQuery } from '@auth/application/queries/get-users.query';
 import { UpdateUserDto } from "../dto/update-user.dto";
 
 /**
@@ -38,7 +38,7 @@ import { UpdateUserDto } from "../dto/update-user.dto";
 export class UsersController {
   constructor(
     private readonly queryBus: QueryBus,
-    private readonly commandBus: CommandBus
+    private readonly commandBus: CommandBus,
   ) {}
 
   /**
@@ -64,7 +64,7 @@ export class UsersController {
    * Obtener todos los usuarios (paginado)
    */
   @Get()
-  @Roles(UserRole.GENERAL_ADMIN, UserRole.PROGRAM_ADMIN)
+  @Roles("GENERAL_ADMIN", "PROGRAM_ADMIN")
   @ApiOperation({
     summary: "Obtener todos los usuarios",
     description:
@@ -85,8 +85,8 @@ export class UsersController {
   @ApiQuery({
     name: "role",
     required: false,
-    enum: UserRole,
-    description: "Filtrar por rol",
+    type: String,
+    description: "Filtrar por rol (ej: GENERAL_ADMIN, STUDENT)",
   })
   @ApiResponse({
     status: 200,
@@ -101,7 +101,7 @@ export class UsersController {
     @Query("limit") limit?: number,
     @Query("sortBy") sortBy?: string,
     @Query("sortOrder") sortOrder?: "asc" | "desc",
-    @Query("role") role?: UserRole
+    @Query("role") role?: string,
   ) {
     const paginationQuery: PaginationQuery = {
       page: page ? Number(page) : 1,
@@ -112,7 +112,7 @@ export class UsersController {
 
     const query = new GetUsersQuery(
       paginationQuery,
-      role ? { role } : undefined
+      role ? { role } : undefined,
     );
     const result = await this.queryBus.execute(query);
 
@@ -123,7 +123,7 @@ export class UsersController {
    * Obtener usuario por ID
    */
   @Get(":id")
-  @Roles(UserRole.GENERAL_ADMIN, UserRole.PROGRAM_ADMIN)
+  @Roles("GENERAL_ADMIN", "PROGRAM_ADMIN")
   @ApiOperation({
     summary: "Obtener usuario por ID",
     description: "Retorna la información de un usuario específico",
@@ -157,7 +157,7 @@ export class UsersController {
     action: AuditAction.UPDATED,
     excludeFields: ["password"],
   })
-  @Roles(UserRole.GENERAL_ADMIN)
+  @Roles("GENERAL_ADMIN")
   @ApiOperation({
     summary: "Actualizar usuario",
     description: "Actualiza la información de un usuario (solo admin general)",
@@ -179,13 +179,14 @@ export class UsersController {
     status: 403,
     description: "No tiene permisos para actualizar usuarios",
   })
-  async updateUser(@Param("id") id: string, @Body() dto: UpdateUserDto) {
-    // TODO: Implementar UpdateUserCommand cuando sea necesario
-    // Por ahora retornamos un placeholder
-    return ResponseUtil.success(
-      { id, ...dto },
-      "Usuario actualizado exitosamente"
-    );
+  async updateUser(
+    @Param("id") id: string,
+    @Body() dto: UpdateUserDto,
+    @CurrentUser("sub") userId: string,
+  ) {
+    const command = new UpdateUserCommand(id, dto, userId);
+    const result = await this.commandBus.execute(command);
+    return ResponseUtil.success(result, "Usuario actualizado exitosamente");
   }
 
   /**
@@ -197,7 +198,7 @@ export class UsersController {
     action: AuditAction.DELETED,
     captureBeforeData: true,
   })
-  @Roles(UserRole.GENERAL_ADMIN)
+  @Roles("GENERAL_ADMIN")
   @ApiOperation({
     summary: "Eliminar usuario",
     description: "Elimina un usuario del sistema (solo admin general)",
@@ -219,9 +220,12 @@ export class UsersController {
     status: 403,
     description: "No tiene permisos para eliminar usuarios",
   })
-  async deleteUser(@Param("id") id: string) {
-    // TODO: Implementar DeleteUserCommand cuando sea necesario
-    // Por ahora retornamos un placeholder
-    return ResponseUtil.success(undefined, "Usuario eliminado exitosamente");
+  async deleteUser(
+    @Param("id") id: string,
+    @CurrentUser("sub") userId: string,
+  ) {
+    const command = new DeleteUserCommand(id, userId);
+    const result = await this.commandBus.execute(command);
+    return ResponseUtil.success(result, "Usuario eliminado exitosamente");
   }
 }

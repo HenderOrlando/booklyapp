@@ -6,6 +6,7 @@ import {
   ResourceStatus,
   ResourceType,
 } from "@libs/common/enums";
+import { ReferenceDataRepository } from "@libs/database";
 import { NestFactory } from "@nestjs/core";
 import { getModelToken } from "@nestjs/mongoose";
 import { Document, Model, Types } from "mongoose";
@@ -16,6 +17,7 @@ import {
   Resource,
 } from "../infrastructure/schemas";
 import { ResourcesModule } from "../resources.module";
+import { RESOURCES_REFERENCE_DATA } from "./reference-data.seed-data";
 
 const logger = createLogger("ResourcesSeed");
 
@@ -29,13 +31,13 @@ async function seed() {
 
     const app = await NestFactory.createApplicationContext(ResourcesModule);
     const resourceModel = app.get<Model<Resource>>(
-      getModelToken(Resource.name)
+      getModelToken(Resource.name),
     );
     const categoryModel = app.get<Model<Category>>(
-      getModelToken(Category.name)
+      getModelToken(Category.name),
     );
     const maintenanceModel = app.get<Model<Maintenance>>(
-      getModelToken(Maintenance.name)
+      getModelToken(Maintenance.name),
     );
     const programModel = app.get<Model<Program>>(getModelToken(Program.name));
 
@@ -48,9 +50,21 @@ async function seed() {
       await programModel.deleteMany({});
     } else if (process.env.NODE_ENV === "development") {
       logger.info(
-        "ℹ️ Modo desarrollo detectado. Usar --clean para limpiar DB antes del seed."
+        "ℹ️ Modo desarrollo detectado. Usar --clean para limpiar DB antes del seed.",
       );
     }
+
+    // ── Reference Data (tipos, estados, categorías dinámicos) ──
+    const refDataRepo = app.get(ReferenceDataRepository);
+    logger.info(
+      `📋 Procesando ${RESOURCES_REFERENCE_DATA.length} datos de referencia...`,
+    );
+    for (const rd of RESOURCES_REFERENCE_DATA) {
+      await refDataRepo.upsert(rd);
+    }
+    logger.info(
+      `✅ ${RESOURCES_REFERENCE_DATA.length} datos de referencia procesados (upsert)`,
+    );
 
     // IDs fijos para consistencia cross-service (según SEED_IDS_REFERENCE.md)
     const ADMIN_GENERAL_ID = "507f1f77bcf86cd799439022";
@@ -120,13 +134,13 @@ async function seed() {
       const doc = await programModel.findOneAndUpdate(
         { code: prog.code },
         prog,
-        { upsert: true, new: true }
+        { upsert: true, new: true },
       );
       insertedPrograms.push(doc as Document & Program);
     }
 
     logger.info(
-      `✅ ${insertedPrograms.length} programas procesados (creados/actualizados)`
+      `✅ ${insertedPrograms.length} programas procesados (creados/actualizados)`,
     );
 
     // Categorías
@@ -184,7 +198,7 @@ async function seed() {
       const doc = await categoryModel.findOneAndUpdate(
         { code: cat.code },
         cat,
-        { upsert: true, new: true }
+        { upsert: true, new: true },
       );
       insertedCategories.push(doc as Document & Category);
     }
@@ -336,7 +350,7 @@ async function seed() {
       const doc = await resourceModel.findOneAndUpdate(
         { code: res.code },
         res,
-        { upsert: true, new: true }
+        { upsert: true, new: true },
       );
       insertedResources.push(doc as Document & Resource);
     }
@@ -421,7 +435,7 @@ async function seed() {
         description: "Inspección rutinaria de sistemas de seguridad",
         scheduledStartDate: new Date(now.getTime() + 14 * 24 * 60 * 60 * 1000),
         scheduledEndDate: new Date(
-          now.getTime() + 14 * 24 * 60 * 60 * 1000 + 3 * 60 * 60 * 1000
+          now.getTime() + 14 * 24 * 60 * 60 * 1000 + 3 * 60 * 60 * 1000,
         ),
         status: MaintenanceStatus.CANCELLED,
         performedBy: "Equipo de Seguridad",
@@ -437,7 +451,7 @@ async function seed() {
     for (const maint of maintenances) {
       if (!maint.resourceId) {
         logger.warn(
-          `⚠️ Saltando mantenimiento "${maint.title}" - Recurso no encontrado`
+          `⚠️ Saltando mantenimiento "${maint.title}" - Recurso no encontrado`,
         );
         continue;
       }
@@ -445,7 +459,7 @@ async function seed() {
       const doc = await maintenanceModel.findOneAndUpdate(
         { title: maint.title },
         maint,
-        { upsert: true, new: true }
+        { upsert: true, new: true },
       );
       insertedMaintenances.push(doc as Document & Maintenance);
     }
@@ -454,7 +468,7 @@ async function seed() {
     logger.info("\n📊 Resumen de datos creados/actualizados:");
     logger.info(`  ✓ ${insertedCategories.length} categorías`);
     logger.info(
-      `  ✓ ${insertedResources.length} recursos con reglas de disponibilidad`
+      `  ✓ ${insertedResources.length} recursos con reglas de disponibilidad`,
     );
     logger.info(`  ✓ ${insertedMaintenances.length} mantenimientos`);
     logger.info("\n📦 Recursos disponibles:");

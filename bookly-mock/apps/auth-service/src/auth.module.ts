@@ -1,5 +1,5 @@
 import { JWT_EXPIRATION, JWT_SECRET } from "@libs/common/constants";
-import { DatabaseModule } from "@libs/database";
+import { DatabaseModule, ReferenceDataModule } from "@libs/database";
 import { EventBusModule } from "@libs/event-bus";
 import { RedisModule } from "@libs/redis";
 import { Module } from "@nestjs/common";
@@ -18,11 +18,13 @@ import { RoleService } from "./application/services/role.service";
 import { TwoFactorService } from "./application/services/two-factor.service";
 import { UserService } from "./application/services/user.service";
 import { AuthCacheService } from "./infrastructure/cache";
+import { AppConfigurationController } from "./infrastructure/controllers/app-configuration.controller";
 import { AuditController } from "./infrastructure/controllers/audit.controller";
 import { AuthController } from "./infrastructure/controllers/auth.controller";
 import { HealthController } from "./infrastructure/controllers/health.controller";
 import { OAuthController } from "./infrastructure/controllers/oauth.controller";
 import { PermissionController } from "./infrastructure/controllers/permission.controller";
+import { ReferenceDataController } from "./infrastructure/controllers/reference-data.controller";
 import { RoleController } from "./infrastructure/controllers/role.controller";
 import { UsersController } from "./infrastructure/controllers/users.controller";
 import { ActionGuard } from "./infrastructure/guards/action.guard";
@@ -30,6 +32,10 @@ import { PermissionsGuard } from "./infrastructure/guards/permissions.guard";
 import { RolesGuard } from "./infrastructure/guards/roles.guard";
 import { RoleRepository } from "./infrastructure/repositories/role.repository";
 import { UserRepository } from "./infrastructure/repositories/user.repository";
+import {
+  AppConfiguration,
+  AppConfigurationSchema,
+} from "./infrastructure/schemas/app-configuration.schema";
 import {
   AuditLog,
   AuditLogSchema,
@@ -105,12 +111,16 @@ import { OAuthModule, OAuthProvider, OAuthPurpose } from "./modules/oauth";
     // Database - Conexión global con librería estandarizada
     DatabaseModule,
 
+    // Reference Data (tipos, estados dinámicos del dominio auth)
+    ReferenceDataModule,
+
     // Mongoose schemas
     MongooseModule.forFeature([
       { name: User.name, schema: UserSchema },
       { name: Role.name, schema: RoleSchema },
       { name: Permission.name, schema: PermissionSchema },
       { name: AuditLog.name, schema: AuditLogSchema },
+      { name: AppConfiguration.name, schema: AppConfigurationSchema },
     ]),
 
     // Passport & JWT
@@ -139,10 +149,12 @@ import { OAuthModule, OAuthProvider, OAuthPurpose } from "./modules/oauth";
   controllers: [
     AuthController,
     OAuthController,
+    AppConfigurationController,
     UsersController,
     RoleController,
     PermissionController,
     AuditController,
+    ReferenceDataController,
     HealthController,
   ],
   providers: [

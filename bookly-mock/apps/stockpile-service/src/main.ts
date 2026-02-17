@@ -34,22 +34,30 @@ async function bootstrap() {
       transformOptions: {
         enableImplicitConversion: true,
       },
-    })
+    }),
   );
 
   // Swagger configuration
   const config = new DocumentBuilder()
     .setTitle("Bookly Stockpile Service")
     .setDescription(
-      "API de gestión de aprobaciones y flujos de trabajo para el sistema Bookly"
+      "API de gestión de aprobaciones y flujos de trabajo para el sistema Bookly",
     )
     .setVersion("1.0")
     .addBearerAuth()
     .addTag(
       "Approval Requests",
-      "Endpoints para gestión de solicitudes de aprobación"
+      "Endpoints para gestión de solicitudes de aprobación",
     )
     .addTag("Approval Flows", "Endpoints para gestión de flujos de aprobación")
+    .addTag("Check-In/Out", "Endpoints para check-in y check-out digital")
+    .addTag("Documents", "Generación y descarga de documentos de aprobación")
+    .addTag("Monitoring", "Dashboard de vigilancia y control de accesos")
+    .addTag("Notifications", "Configuración y métricas de notificaciones")
+    .addTag(
+      "Reference Data",
+      "Datos de referencia dinámicos del dominio aprobaciones",
+    )
     .build();
 
   const document = SwaggerModule.createDocument(app, config);
