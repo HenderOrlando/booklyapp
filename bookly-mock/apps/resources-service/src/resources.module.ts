@@ -1,6 +1,9 @@
+import { JWT_SECRET } from "@libs/common/constants";
 import { DatabaseModule, ReferenceDataModule } from "@libs/database";
 import { EventBusModule, EventBusService } from "@libs/event-bus";
+import { IdempotencyModule } from "@libs/idempotency";
 import { RedisModule, RedisService } from "@libs/redis";
+import { AuthClientModule } from "@libs/security";
 import { Module } from "@nestjs/common";
 import { ConfigModule, ConfigService } from "@nestjs/config";
 import { CqrsModule } from "@nestjs/cqrs";
@@ -33,6 +36,7 @@ import {
 } from "./infrastructure/controllers";
 import { DepartmentsController } from "./infrastructure/controllers/departments.controller";
 import { FacultiesController } from "./infrastructure/controllers/faculties.controller";
+import { ProgramsController } from "./infrastructure/controllers/programs.controller";
 import * as InfraEventHandlers from "./infrastructure/event-handlers";
 import {
   CategoryRepository,
@@ -97,15 +101,18 @@ const IMPORT_JOB_REPOSITORY = "IImportJobRepository";
 
     // JWT
     PassportModule.register({ defaultStrategy: "jwt" }),
-    JwtModule.registerAsync({
-      imports: [ConfigModule],
-      useFactory: async (configService: ConfigService) => ({
-        secret:
-          configService.get<string>("JWT_SECRET") ||
-          "bookly-secret-key-change-in-production",
-        signOptions: {
-          expiresIn: configService.get<string>("JWT_EXPIRATION") || "1d",
-        },
+    JwtModule.register({
+      secret: JWT_SECRET,
+      signOptions: {
+        expiresIn: process.env.JWT_EXPIRATION || "1d",
+      },
+    }),
+
+    // Auth Client (centralized auth via auth-service)
+    AuthClientModule.forRootAsync({
+      useFactory: (configService: ConfigService) => ({
+        authServiceUrl:
+          configService.get("AUTH_SERVICE_URL") || "http://localhost:3001",
       }),
       inject: [ConfigService],
     }),
@@ -152,6 +159,9 @@ const IMPORT_JOB_REPOSITORY = "IImportJobRepository";
       inject: [ConfigService],
     }),
 
+    // Idempotency + Correlation
+    IdempotencyModule.forRoot({ keyPrefix: "resources" }),
+
     // Audit Decorators (event-driven audit)
     AuditDecoratorsModule,
   ],
@@ -162,6 +172,7 @@ const IMPORT_JOB_REPOSITORY = "IImportJobRepository";
     ImportController,
     FacultiesController,
     DepartmentsController,
+    ProgramsController,
     ReferenceDataController,
     HealthController,
   ],
