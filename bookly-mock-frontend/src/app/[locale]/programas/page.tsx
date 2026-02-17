@@ -130,7 +130,7 @@ export default function ProgramasPage() {
             console.error("Error updating program:", err);
             alert(t("save_error"));
           },
-        }
+        },
       );
     }
   };
@@ -146,7 +146,7 @@ export default function ProgramasPage() {
           console.error("Error changing program status:", err);
           alert(t("status_change_error"));
         },
-      }
+      },
     );
   };
 
@@ -156,7 +156,7 @@ export default function ProgramasPage() {
       key: "code",
       header: t("code"),
       cell: (program: AcademicProgram) => (
-        <p className="font-mono text-white">{program.code}</p>
+        <p className="font-mono text-foreground">{program.code}</p>
       ),
     },
     {
@@ -164,8 +164,10 @@ export default function ProgramasPage() {
       header: t("name"),
       cell: (program: AcademicProgram) => (
         <div>
-          <p className="font-medium text-white">{program.name}</p>
-          <p className="text-sm text-[var(--color-text-tertiary)]">{program.description}</p>
+          <p className="font-medium text-foreground">{program.name}</p>
+          <p className="text-sm text-[var(--color-text-tertiary)]">
+            {program.description}
+          </p>
         </div>
       ),
     },
@@ -174,9 +176,11 @@ export default function ProgramasPage() {
       header: t("faculty"),
       cell: (program: AcademicProgram) => (
         <div>
-          <p className="text-white">{program.faculty}</p>
+          <p className="text-foreground">{program.faculty}</p>
           {program.department && (
-            <p className="text-sm text-[var(--color-text-tertiary)]">{program.department}</p>
+            <p className="text-sm text-[var(--color-text-tertiary)]">
+              {program.department}
+            </p>
           )}
         </div>
       ),
@@ -327,7 +331,7 @@ export default function ProgramasPage() {
                 <div className="space-y-4">
                   <div className="grid grid-cols-2 gap-4">
                     <div>
-                      <label className="block text-sm font-medium text-white mb-2">
+                      <label className="block text-sm font-medium text-[var(--color-text-primary)] mb-2">
                         {t("code")} *
                       </label>
                       <Input
@@ -338,7 +342,7 @@ export default function ProgramasPage() {
                       />
                     </div>
                     <div>
-                      <label className="block text-sm font-medium text-white mb-2">
+                      <label className="block text-sm font-medium text-[var(--color-text-primary)] mb-2">
                         {t("name")} *
                       </label>
                       <Input
@@ -351,7 +355,7 @@ export default function ProgramasPage() {
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-white mb-2">
+                    <label className="block text-sm font-medium text-[var(--color-text-primary)] mb-2">
                       {t("description_label")}
                     </label>
                     <textarea
@@ -363,13 +367,13 @@ export default function ProgramasPage() {
                         })
                       }
                       rows={3}
-                      className="w-full px-3 py-2 bg-[var(--color-bg-primary)] border border-[var(--color-border-subtle)] rounded-lg text-white"
+                      className="w-full px-3 py-2 bg-background border border-[var(--color-border-subtle)] rounded-lg text-foreground placeholder:text-muted-foreground"
                     />
                   </div>
 
                   <div className="grid grid-cols-2 gap-4">
                     <div>
-                      <label className="block text-sm font-medium text-white mb-2">
+                      <label className="block text-sm font-medium text-[var(--color-text-primary)] mb-2">
                         {t("faculty")} *
                       </label>
                       <Input
@@ -380,7 +384,7 @@ export default function ProgramasPage() {
                       />
                     </div>
                     <div>
-                      <label className="block text-sm font-medium text-white mb-2">
+                      <label className="block text-sm font-medium text-[var(--color-text-primary)] mb-2">
                         {t("department")}
                       </label>
                       <Input
@@ -404,7 +408,9 @@ export default function ProgramasPage() {
                       }
                       className="w-4 h-4"
                     />
-                    <span className="text-sm text-white">{t("is_active")}</span>
+                    <span className="text-sm text-[var(--color-text-primary)]">
+                      {t("is_active")}
+                    </span>
                   </label>
 
                   <div className="flex justify-end gap-3 pt-4">

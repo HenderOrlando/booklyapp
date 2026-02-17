@@ -47,7 +47,7 @@ export default function ProgramaDetallePage({
   // Estados manuales para recursos y usuarios (mantener por ahora)
   const [allResources, setAllResources] = React.useState<Resource[]>([]);
   const [programResources, setProgramResources] = React.useState<Resource[]>(
-    []
+    [],
   );
   const [allUsers, setAllUsers] = React.useState<User[]>([]);
   const [programUsers, setProgramUsers] = React.useState<User[]>([]);
@@ -101,13 +101,13 @@ export default function ProgramaDetallePage({
 
   // Usuarios disponibles (no asociados)
   const availableUsers = allUsers.filter(
-    (u) => !programUsers.some((pu: any) => pu.id === u.id)
+    (u) => !programUsers.some((pu: any) => pu.id === u.id),
   );
 
   const filteredAvailableUsers = availableUsers.filter(
     (u) =>
       u.name?.toLowerCase().includes(userFilter.toLowerCase()) ||
-      u.email?.toLowerCase().includes(userFilter.toLowerCase())
+      u.email?.toLowerCase().includes(userFilter.toLowerCase()),
   );
 
   // Iniciar modo edición de recursos
@@ -141,10 +141,10 @@ export default function ProgramaDetallePage({
     try {
       const currentIds = new Set(programResources.map((r) => r.id));
       const toAdd = Array.from(selectedResourceIds).filter(
-        (id) => !currentIds.has(id)
+        (id) => !currentIds.has(id),
       );
       const toRemove = Array.from(currentIds).filter(
-        (id) => !selectedResourceIds.has(id)
+        (id) => !selectedResourceIds.has(id),
       );
 
       // Agregar nuevos recursos
@@ -159,13 +159,13 @@ export default function ProgramaDetallePage({
       // Quitar recursos
       for (const resourceId of toRemove) {
         await httpClient.delete(
-          `program-resources?programId=${params.id}&resourceId=${resourceId}`
+          `program-resources?programId=${params.id}&resourceId=${resourceId}`,
         );
       }
 
       // Actualizar lista de recursos del programa
       const newProgramResources = allResources.filter((r) =>
-        selectedResourceIds.has(r.id)
+        selectedResourceIds.has(r.id),
       );
       setProgramResources(newProgramResources);
       setIsEditingResources(false);
@@ -201,7 +201,7 @@ export default function ProgramaDetallePage({
   const handleRemoveUser = async (userId: string) => {
     try {
       await httpClient.delete(
-        `program-users?programId=${params.id}&userId=${userId}`
+        `program-users?programId=${params.id}&userId=${userId}`,
       );
       setProgramUsers(programUsers.filter((u: any) => u.id !== userId));
     } catch (err: any) {
@@ -233,7 +233,7 @@ export default function ProgramaDetallePage({
       <MainLayout header={header} sidebar={sidebar}>
         <Card>
           <CardContent className="py-12 text-center">
-            <p className="text-white">{t("not_found")}</p>
+            <p className="text-foreground">{t("not_found")}</p>
             <Button onClick={() => router.push("/programas")} className="mt-4">
               {t("back_list")}
             </Button>
@@ -282,14 +282,16 @@ export default function ProgramaDetallePage({
                       <label className="block text-sm font-medium text-[var(--color-text-tertiary)] mb-1">
                         {t("code")}
                       </label>
-                      <p className="text-white font-mono">{program.code}</p>
+                      <p className="text-foreground font-mono">
+                        {program.code}
+                      </p>
                     </div>
 
                     <div>
                       <label className="block text-sm font-medium text-[var(--color-text-tertiary)] mb-1">
                         {t("name")}
                       </label>
-                      <p className="text-white">{program.name}</p>
+                      <p className="text-foreground">{program.name}</p>
                     </div>
 
                     {program.description && (
@@ -297,7 +299,7 @@ export default function ProgramaDetallePage({
                         <label className="block text-sm font-medium text-[var(--color-text-tertiary)] mb-1">
                           {t("description_label")}
                         </label>
-                        <p className="text-white">{program.description}</p>
+                        <p className="text-foreground">{program.description}</p>
                       </div>
                     )}
 
@@ -306,7 +308,7 @@ export default function ProgramaDetallePage({
                         <label className="block text-sm font-medium text-[var(--color-text-tertiary)] mb-1">
                           {t("faculty")}
                         </label>
-                        <p className="text-white">{program.faculty}</p>
+                        <p className="text-foreground">{program.faculty}</p>
                       </div>
 
                       {program.department && (
@@ -314,7 +316,9 @@ export default function ProgramaDetallePage({
                           <label className="block text-sm font-medium text-[var(--color-text-tertiary)] mb-1">
                             {t("department")}
                           </label>
-                          <p className="text-white">{program.department}</p>
+                          <p className="text-foreground">
+                            {program.department}
+                          </p>
                         </div>
                       )}
                     </div>
@@ -338,7 +342,7 @@ export default function ProgramaDetallePage({
                       // Modo Ver: Solo recursos asociados
                       <>
                         <div className="flex items-center justify-between mb-4">
-                          <h3 className="text-xl font-semibold text-white">
+                          <h3 className="text-xl font-semibold text-foreground">
                             {t("program_resources_title")} (
                             {programResources.length})
                           </h3>
@@ -358,7 +362,7 @@ export default function ProgramaDetallePage({
                                 className="flex items-center justify-between p-4 bg-[var(--color-bg-primary)]/50 rounded-lg"
                               >
                                 <div>
-                                  <p className="font-medium text-white">
+                                  <p className="font-medium text-foreground">
                                     {resource.name}
                                   </p>
                                   <p className="text-sm text-[var(--color-text-tertiary)]">
@@ -378,7 +382,7 @@ export default function ProgramaDetallePage({
                       // Modo Editar: Todos los recursos con checkboxes
                       <>
                         <div className="flex items-center justify-between mb-4">
-                          <h3 className="text-xl font-semibold text-white">
+                          <h3 className="text-xl font-semibold text-foreground">
                             {t("select_resources")}
                           </h3>
                           <div className="flex gap-2">
@@ -413,7 +417,7 @@ export default function ProgramaDetallePage({
                                   r.code
                                     .toLowerCase()
                                     .includes(resourceFilter.toLowerCase())
-                                : true
+                                : true,
                             )
                             .map((resource) => (
                               <label
@@ -424,7 +428,7 @@ export default function ProgramaDetallePage({
                                   <input
                                     type="checkbox"
                                     checked={selectedResourceIds.has(
-                                      resource.id
+                                      resource.id,
                                     )}
                                     onChange={() =>
                                       handleToggleResource(resource.id)
@@ -432,7 +436,7 @@ export default function ProgramaDetallePage({
                                     className="w-5 h-5 rounded border-[var(--color-border-strong)] bg-[var(--color-bg-tertiary)] text-brand-primary-500 focus:ring-brand-primary-500 focus:ring-offset-gray-900"
                                   />
                                   <div>
-                                    <p className="font-medium text-white">
+                                    <p className="font-medium text-foreground">
                                       {resource.name}
                                     </p>
                                     <p className="text-sm text-[var(--color-text-tertiary)]">
@@ -461,7 +465,7 @@ export default function ProgramaDetallePage({
                 <TabsContent value="users">
                   <div className="space-y-6">
                     <div>
-                      <h3 className="text-xl font-semibold text-white mb-4">
+                      <h3 className="text-xl font-semibold text-foreground mb-4">
                         {t("associated_users_title")}
                       </h3>
                       {programUsers.length === 0 ? (
@@ -476,7 +480,7 @@ export default function ProgramaDetallePage({
                               className="flex items-center justify-between p-4 bg-[var(--color-bg-primary)]/50 rounded-lg"
                             >
                               <div>
-                                <p className="font-medium text-white">
+                                <p className="font-medium text-foreground">
                                   {user.name}
                                 </p>
                                 <p className="text-sm text-[var(--color-text-tertiary)]">
@@ -502,7 +506,7 @@ export default function ProgramaDetallePage({
                     </div>
 
                     <div>
-                      <h3 className="text-xl font-semibold text-white mb-4">
+                      <h3 className="text-xl font-semibold text-foreground mb-4">
                         {t("add_users_title")}
                       </h3>
                       <Input
@@ -523,7 +527,7 @@ export default function ProgramaDetallePage({
                               className="flex items-center justify-between p-4 bg-[var(--color-bg-primary)]/50 rounded-lg"
                             >
                               <div>
-                                <p className="font-medium text-white">
+                                <p className="font-medium text-foreground">
                                   {user.name}
                                 </p>
                                 <p className="text-sm text-[var(--color-text-tertiary)]">
