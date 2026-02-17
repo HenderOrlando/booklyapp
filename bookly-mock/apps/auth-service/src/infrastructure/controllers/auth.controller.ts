@@ -1,9 +1,23 @@
+import { ChangePasswordCommand } from "@auth/application/commands/change-password.command";
+import { Disable2FACommand } from "@auth/application/commands/disable-2fa.command";
+import { Enable2FACommand } from "@auth/application/commands/enable-2fa.command";
+import { ForgotPasswordCommand } from "@auth/application/commands/forgot-password.command";
+import { LoginUserCommand } from "@auth/application/commands/login-user.command";
+import { LogoutCommand } from "@auth/application/commands/logout.command";
+import { RefreshTokenCommand } from "@auth/application/commands/refresh-token.command";
+import { RegenerateBackupCodesCommand } from "@auth/application/commands/regenerate-backup-codes.command";
+import { RegisterUserCommand } from "@auth/application/commands/register-user.command";
+import { ResetPasswordCommand } from "@auth/application/commands/reset-password.command";
+import { Setup2FACommand } from "@auth/application/commands/setup-2fa.command";
+import { ValidateTokenQuery } from "@auth/application/queries/validate-token.query";
+import { AppConfigurationService } from "@auth/application/services/app-configuration.service";
 import { ResponseUtil } from "@libs/common";
 import { CurrentUser } from "@libs/decorators";
 import { JwtAuthGuard } from "@libs/guards";
 import {
   Body,
   Controller,
+  ForbiddenException,
   Get,
   Headers,
   HttpCode,
@@ -19,18 +33,6 @@ import {
   ApiTags,
 } from "@nestjs/swagger";
 import { Audit, AuditAction } from "@reports/audit-decorators";
-import { ChangePasswordCommand } from '@auth/application/commands/change-password.command';
-import { Disable2FACommand } from '@auth/application/commands/disable-2fa.command';
-import { Enable2FACommand } from '@auth/application/commands/enable-2fa.command';
-import { ForgotPasswordCommand } from '@auth/application/commands/forgot-password.command';
-import { LoginUserCommand } from '@auth/application/commands/login-user.command';
-import { LogoutCommand } from '@auth/application/commands/logout.command';
-import { RefreshTokenCommand } from '@auth/application/commands/refresh-token.command';
-import { RegenerateBackupCodesCommand } from '@auth/application/commands/regenerate-backup-codes.command';
-import { RegisterUserCommand } from '@auth/application/commands/register-user.command';
-import { ResetPasswordCommand } from '@auth/application/commands/reset-password.command';
-import { Setup2FACommand } from '@auth/application/commands/setup-2fa.command';
-import { ValidateTokenQuery } from '@auth/application/queries/validate-token.query';
 import { ChangePasswordDto } from "../dto/change-password.dto";
 import { ForgotPasswordDto } from "../dto/forgot-password.dto";
 import { LoginDto } from "../dto/login.dto";
@@ -53,7 +55,8 @@ import { ValidateTokenDto } from "../dto/validate-token.dto";
 export class AuthController {
   constructor(
     private readonly commandBus: CommandBus,
-    private readonly queryBus: QueryBus
+    private readonly queryBus: QueryBus,
+    private readonly appConfigService: AppConfigurationService,
   ) {}
 
   /**
@@ -95,17 +98,29 @@ export class AuthController {
     description: "Datos de entrada inválidos",
   })
   @ApiResponse({
+    status: 403,
+    description: "El registro de usuarios está deshabilitado",
+  })
+  @ApiResponse({
     status: 409,
     description: "El email ya está registrado",
   })
   async register(@Body() dto: RegisterDto) {
+    const registrationEnabled =
+      await this.appConfigService.isRegistrationEnabled();
+    if (!registrationEnabled) {
+      throw new ForbiddenException(
+        "User registration is currently disabled. Contact your administrator.",
+      );
+    }
+
     const command = new RegisterUserCommand(
       dto.email,
       dto.password,
       dto.firstName,
       dto.lastName,
       dto.roles,
-      dto.permissions
+      dto.permissions,
     );
 
     const user = await this.commandBus.execute(command);
@@ -195,12 +210,12 @@ export class AuthController {
   })
   async changePassword(
     @CurrentUser("sub") userId: string,
-    @Body() dto: ChangePasswordDto
+    @Body() dto: ChangePasswordDto,
   ) {
     const command = new ChangePasswordCommand(
       userId,
       dto.currentPassword,
-      dto.newPassword
+      dto.newPassword,
     );
 
     await this.commandBus.execute(command);
@@ -276,7 +291,7 @@ export class AuthController {
   })
   async logout(
     @CurrentUser("sub") userId: string,
-    @Headers("authorization") authorization: string
+    @Headers("authorization") authorization: string,
   ) {
     // Extraer token del header "Bearer <token>"
     const accessToken = authorization?.replace("Bearer ", "") || "";
@@ -356,7 +371,7 @@ export class AuthController {
 
     return ResponseUtil.success(
       undefined,
-      "Contraseña restablecida exitosamente"
+      "Contraseña restablecida exitosamente",
     );
   }
 
@@ -444,7 +459,7 @@ export class AuthController {
 
     return ResponseUtil.success(
       result,
-      "Escanea el código QR con tu aplicación de autenticación"
+      "Escanea el código QR con tu aplicación de autenticación",
     );
   }
 
@@ -491,14 +506,14 @@ export class AuthController {
   })
   async enable2FA(
     @CurrentUser("sub") userId: string,
-    @Body() dto: Enable2FADto
+    @Body() dto: Enable2FADto,
   ) {
     const command = new Enable2FACommand(userId, dto.token, dto.secret);
     const result = await this.commandBus.execute(command);
 
     return ResponseUtil.success(
       result,
-      "2FA habilitado exitosamente. Guarda los códigos de backup en un lugar seguro"
+      "2FA habilitado exitosamente. Guarda los códigos de backup en un lugar seguro",
     );
   }
 
@@ -603,12 +618,12 @@ export class AuthController {
     });
     const tokens = await authService.loginWithBackupCode(
       dto.tempToken,
-      dto.backupCode
+      dto.backupCode,
     );
 
     return ResponseUtil.success(
       tokens,
-      "Autenticación con código de backup exitosa"
+      "Autenticación con código de backup exitosa",
     );
   }
 
@@ -653,7 +668,7 @@ export class AuthController {
 
     return ResponseUtil.success(
       result,
-      "Códigos de backup regenerados exitosamente"
+      "Códigos de backup regenerados exitosamente",
     );
   }
 }

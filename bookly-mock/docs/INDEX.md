@@ -128,13 +128,22 @@ Documentación de arquitectura, configuración y estado del proyecto.
 
 ## API
 
-Documentación de APIs, estándares de respuesta y Swagger.
+Documentación de APIs, estándares de respuesta, Swagger y AsyncAPI.
 
-- **[API_DOCUMENTATION_STATUS.md](./api/API_DOCUMENTATION_STATUS.md)** - Estado de documentación de APIs
+- **[API_DOCUMENTATION_STATUS.md](./api/API_DOCUMENTATION_STATUS.md)** - Estado de documentación de APIs (313 OpenAPI ops + 78 AsyncAPI channels)
 - **[API_RESPONSE_STANDARD.md](./api/API_RESPONSE_STANDARD.md)** - Estándar de respuestas API
 - **[API_SWAGGER_DOCUMENTATION.md](./api/API_SWAGGER_DOCUMENTATION.md)** - Documentación Swagger
 - **[RESPONSE_STANDARD_SUMMARY.md](./api/RESPONSE_STANDARD_SUMMARY.md)** - Resumen del estándar
 - **[RESPONSE_UTIL_USAGE_EXAMPLES.md](./api/RESPONSE_UTIL_USAGE_EXAMPLES.md)** - Ejemplos de uso
+
+### AsyncAPI Specs (Event-Driven Architecture)
+
+- **[auth-events.asyncapi.yaml](../apps/auth-service/docs/auth-events.asyncapi.yaml)** - Eventos de autenticación, usuarios y 2FA
+- **[resources-events.asyncapi.yaml](../apps/resources-service/docs/resources-events.asyncapi.yaml)** - Eventos de recursos, status y request-reply
+- **[availability-events.asyncapi.yaml](../apps/availability-service/docs/availability-events.asyncapi.yaml)** - Eventos de reservas, recurrentes, reasignación y mantenimiento
+- **[stockpile-events.asyncapi.yaml](../apps/stockpile-service/docs/stockpile-events.asyncapi.yaml)** - Eventos de check-in/out, aprobaciones y notificaciones
+- **[reports-events.asyncapi.yaml](../apps/reports-service/docs/reports-events.asyncapi.yaml)** - Eventos de exportación, evaluación y feedback
+- **[geolocation-dashboard.asyncapi.yaml](../apps/stockpile-service/src/infrastructure/gateways/geolocation-dashboard.asyncapi.yaml)** - WebSocket de geolocalización
 
 ---
 

@@ -1,7 +1,7 @@
 # 📚 Estado de Documentación de APIs - Bookly
 
-**Fecha**: 2025-11-20  
-**Estado**: ✅ Todos los microservicios operacionales
+**Fecha**: 2026-02-16  
+**Estado**: ✅ Todos los microservicios operacionales con OpenAPI + AsyncAPI documentados
 
 ---
 
@@ -9,14 +9,14 @@
 
 Todos los microservicios de Bookly están **activos y completamente documentados** con Swagger/OpenAPI 3.0.
 
-| Servicio                 | Puerto | Estado | Swagger | AsyncAPI | Health |
-| ------------------------ | ------ | ------ | ------- | -------- | ------ |
-| **API Gateway**          | 3000   | ✅     | ✅      | ✅       | ✅     |
-| **Auth Service**         | 3001   | ✅     | ✅      | ✅       | ✅     |
-| **Resources Service**    | 3002   | ✅     | ✅      | ✅       | ✅     |
-| **Availability Service** | 3003   | ✅     | ✅      | ✅       | ✅     |
-| **Stockpile Service**    | 3004   | ✅     | ✅      | ✅       | ✅     |
-| **Reports Service**      | 3005   | ✅     | ✅      | ✅       | ✅     |
+| Servicio                 | Puerto | Estado | Swagger (313 ops) | AsyncAPI Spec  | Health |
+| ------------------------ | ------ | ------ | ----------------- | -------------- | ------ |
+| **API Gateway**          | 3000   | ✅     | ✅ 9 controllers  | ✅ WebSocket   | ✅     |
+| **Auth Service**         | 3001   | ✅     | ✅ 9 controllers  | ✅ 8 channels  | ✅     |
+| **Resources Service**    | 3002   | ✅     | ✅ 8 controllers  | ✅ 14 channels | ✅     |
+| **Availability Service** | 3003   | ✅     | ✅ 11 controllers | ✅ 20 channels | ✅     |
+| **Stockpile Service**    | 3004   | ✅     | ✅ 12 controllers | ✅ 15 channels | ✅     |
+| **Reports Service**      | 3005   | ✅     | ✅ 11 controllers | ✅ 21 channels | ✅     |
 
 ---
 
@@ -48,12 +48,21 @@ http://localhost:3005/api/docs
 
 ### AsyncAPI (Event-Driven Architecture)
 
-La documentación de eventos asincrónicos está disponible en cada servicio:
+Cada servicio tiene su especificación AsyncAPI 2.6.0 en formato YAML:
 
 ```bash
-# Eventos globales del sistema
-http://localhost:3000/api/events/docs
+# AsyncAPI specs por servicio
+apps/auth-service/docs/auth-events.asyncapi.yaml
+apps/resources-service/docs/resources-events.asyncapi.yaml
+apps/availability-service/docs/availability-events.asyncapi.yaml
+apps/stockpile-service/docs/stockpile-events.asyncapi.yaml
+apps/reports-service/docs/reports-events.asyncapi.yaml
+apps/stockpile-service/src/infrastructure/gateways/geolocation-dashboard.asyncapi.yaml
+```
 
+Endpoints de métricas de eventos:
+
+```bash
 # Ver métricas de eventos
 http://localhost:3000/events/metrics
 
@@ -189,7 +198,7 @@ await eventBus.subscribe(
   "my-service-consumer",
   async (payload) => {
     console.log("Usuario creado:", payload);
-  }
+  },
 );
 ```
 
@@ -347,5 +356,5 @@ docker exec bookly-rabbitmq rabbitmqctl list_permissions -p /bookly
 
 ---
 
-**Última actualización**: 2025-11-20  
-**Estado**: ✅ Sistema completamente operacional y documentado
+**Última actualización**: 2026-02-16  
+**Estado**: ✅ Sistema completamente operacional y documentado (OpenAPI 313 ops + AsyncAPI 78 channels)

@@ -18,6 +18,7 @@ import {
 import { EventBus } from "@nestjs/cqrs";
 import { JwtService } from "@nestjs/jwt";
 import * as bcrypt from "bcryptjs";
+import { AppConfigurationService } from "./app-configuration.service";
 
 export interface AuthTokens {
   accessToken: string;
@@ -53,6 +54,7 @@ export class AuthService {
     private readonly jwtService: JwtService,
     private readonly redisService: RedisService,
     private readonly eventBus: EventBus,
+    private readonly appConfigService: AppConfigurationService,
   ) {}
 
   /**
@@ -653,7 +655,19 @@ export class AuthService {
         return this.generateTokens(user);
       }
 
-      // Usuario no existe - crear nuevo con SSO
+      // Usuario no existe - verificar si auto-registro por SSO está habilitado
+      const autoRegister =
+        await this.appConfigService.isAutoRegisterOnSSOEnabled();
+      if (!autoRegister) {
+        this.logger.warn("SSO auto-register disabled, user not found", {
+          email: ssoData.email,
+          provider: ssoData.ssoProvider,
+        });
+        throw new UnauthorizedException(
+          "Your account does not exist and automatic registration via SSO is disabled. Contact your administrator.",
+        );
+      }
+
       const roles = this.assignRolesByDomain(ssoData.email);
 
       const newUser = new UserEntity(

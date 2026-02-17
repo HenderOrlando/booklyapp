@@ -10,6 +10,7 @@ import { MongooseModule } from "@nestjs/mongoose";
 import { PassportModule } from "@nestjs/passport";
 import { AuditDecoratorsModule } from "@reports/audit-decorators";
 import { AllHandlers } from "./application/handlers";
+import { AppConfigurationService } from "./application/services/app-configuration.service";
 import { AuditService } from "./application/services/audit.service";
 import { AuthService } from "./application/services/auth.service";
 import { GoogleOAuthService } from "./application/services/google-oauth.service";
@@ -163,6 +164,7 @@ import { OAuthModule, OAuthProvider, OAuthPurpose } from "./modules/oauth";
     GoogleStrategy,
 
     // Services
+    AppConfigurationService,
     AuthService,
     UserService,
     RoleService,

@@ -94,13 +94,45 @@ async function bootstrap() {
           key,
           {
             name: s.name,
-            docs: `http://localhost:${s.port}/api/docs`,
-            docsJson: `http://localhost:${s.port}/api/docs-json`,
+            docs: `http://localhost:${port}/api/docs/${s.path}`,
+            docsJson: `http://localhost:${port}/api/docs/${s.path}/json`,
+            directDocs: `http://localhost:${s.port}/api/docs`,
+            directDocsJson: `http://localhost:${s.port}/api/docs-json`,
           },
         ]),
       ),
     });
   });
+
+  // Proxy endpoints for each microservice's OpenAPI JSON via Gateway
+  for (const [, svc] of Object.entries(serviceDocsMap)) {
+    httpAdapter.get(
+      `/api/docs/${svc.path}/json`,
+      async (_req: any, res: any) => {
+        try {
+          const response = await fetch(
+            `http://localhost:${svc.port}/api/docs-json`,
+          );
+          if (!response.ok) {
+            return res.status(response.status).json({
+              error: `${svc.name} docs unavailable (HTTP ${response.status})`,
+            });
+          }
+          const spec = await response.json();
+          res.json(spec);
+        } catch {
+          res.status(503).json({
+            error: `${svc.name} is not reachable at port ${svc.port}`,
+          });
+        }
+      },
+    );
+
+    // HTML redirect to the microservice's Swagger UI
+    httpAdapter.get(`/api/docs/${svc.path}`, (_req: any, res: any) => {
+      res.redirect(`http://localhost:${svc.port}/api/docs`);
+    });
+  }
 
   // Habilitar shutdown graceful para todos los providers (EventBus, Redis, DB)
   app.enableShutdownHooks();
