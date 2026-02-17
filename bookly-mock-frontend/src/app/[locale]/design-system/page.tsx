@@ -64,6 +64,14 @@ import * as React from "react";
  * siguiendo las reglas del design system.
  */
 
+type DemoResourceRow = {
+  id: string;
+  nombre: string;
+  tipo: string;
+  capacidad: number;
+  estado: "disponible" | "ocupado" | "mantenimiento";
+};
+
 export default function DesignSystemPage() {
   const [selectedDate, setSelectedDate] = React.useState<Date>();
   const [currentPage, setCurrentPage] = React.useState(1);
@@ -817,13 +825,13 @@ export default function DesignSystemPage() {
                   key: "nombre",
                   header: "Nombre",
                   sortable: true,
-                  cell: (item: any) => item.nombre,
+                  cell: (item: DemoResourceRow) => item.nombre,
                 },
                 {
                   key: "tipo",
                   header: "Tipo",
                   sortable: true,
-                  cell: (item: any) => (
+                  cell: (item: DemoResourceRow) => (
                     <Badge variant="outline">{item.tipo}</Badge>
                   ),
                 },
@@ -831,12 +839,12 @@ export default function DesignSystemPage() {
                   key: "capacidad",
                   header: "Capacidad",
                   sortable: true,
-                  cell: (item: any) => `${item.capacidad} personas`,
+                  cell: (item: DemoResourceRow) => `${item.capacidad} personas`,
                 },
                 {
                   key: "estado",
                   header: "Estado",
-                  cell: (item: any) => (
+                  cell: (item: DemoResourceRow) => (
                     <Badge
                       variant={
                         item.estado === "disponible"

@@ -35,7 +35,7 @@ export default function LoginPage() {
     try {
       await login(email, password, rememberMe);
       // AuthContext redirige automáticamente al dashboard
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error("Login error:", error);
       setError(
         resolveErrorMessage(error, tErrors as unknown as ErrorTranslator) ||
