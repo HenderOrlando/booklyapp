@@ -1,9 +1,23 @@
+import { JWT_SECRET } from "@libs/common/constants";
 import { DatabaseModule } from "@libs/database";
 import { EventBusModule } from "@libs/event-bus";
+import {
+  ChannelWebhookService,
+  FirebaseWebhookHandler,
+  MetaWhatsAppWebhookHandler,
+  NotificationMetricsService,
+  SendGridWebhookHandler,
+  TwilioWebhookHandler,
+} from "@libs/notifications";
 import { RedisModule } from "@libs/redis";
+import { AuthClientModule } from "@libs/security";
+import { StorageModule } from "@libs/storage";
 import { HttpModule } from "@nestjs/axios";
 import { MiddlewareConsumer, Module, NestModule } from "@nestjs/common";
 import { ConfigModule, ConfigService } from "@nestjs/config";
+import { JwtModule } from "@nestjs/jwt";
+import { MongooseModule } from "@nestjs/mongoose";
+import { PassportModule } from "@nestjs/passport";
 import { AuditDecoratorsModule } from "@reports/audit-decorators";
 import { CacheMetricsAggregatorService } from "./application/services/cache-metrics-aggregator.service";
 import { CircuitBreakerRedisService } from "./application/services/circuit-breaker-redis.service";
@@ -17,11 +31,19 @@ import { SagaService } from "./application/services/saga.service";
 import { CacheMetricsController } from "./infrastructure/controllers/cache-metrics.controller";
 import { DLQController } from "./infrastructure/controllers/dlq.controller";
 import { EventsController } from "./infrastructure/controllers/events.controller";
+import { FileManagerController } from "./infrastructure/controllers/file-manager.controller";
 import { HealthController } from "./infrastructure/controllers/health.controller";
 import { NotificationsController } from "./infrastructure/controllers/notifications.controller";
 import { ProxyController } from "./infrastructure/controllers/proxy.controller";
 import { JwtExtractorMiddleware } from "./infrastructure/middleware/jwt-extractor.middleware";
+import { JwtStrategy } from "./infrastructure/strategies/jwt.strategy";
 import { BooklyWebSocketGateway } from "./infrastructure/websocket/websocket.gateway";
+import { WebhookDashboardController } from "./webhooks/controllers/webhook-dashboard.controller";
+import {
+  WebhookLog,
+  WebhookLogSchema,
+} from "./webhooks/schemas/webhook-log.schema";
+import { Webhook, WebhookSchema } from "./webhooks/schemas/webhook.schema";
 
 /**
  * API Gateway Module
@@ -42,6 +64,25 @@ import { BooklyWebSocketGateway } from "./infrastructure/websocket/websocket.gat
     }),
     // Base de datos MongoDB usando librería estandarizada
     DatabaseModule,
+    MongooseModule.forFeature([
+      { name: Webhook.name, schema: WebhookSchema },
+      { name: WebhookLog.name, schema: WebhookLogSchema },
+    ]),
+    PassportModule,
+    JwtModule.register({
+      secret: JWT_SECRET,
+      signOptions: { expiresIn: "24h" },
+    }),
+    StorageModule.forRoot({ provider: "local" }),
+    AuthClientModule.forRootAsync({
+      useFactory: (configService: ConfigService) => ({
+        authServiceUrl:
+          configService.get("AUTH_SERVICE_URL") || "http://localhost:3001",
+        timeout: 5000,
+        maxRetries: 2,
+      }),
+      inject: [ConfigService],
+    }),
     EventBusModule.forRootAsync({
       useFactory: (configService: ConfigService) => ({
         brokerType:
@@ -92,6 +133,8 @@ import { BooklyWebSocketGateway } from "./infrastructure/websocket/websocket.gat
     DLQController,
     NotificationsController,
     CacheMetricsController,
+    FileManagerController,
+    WebhookDashboardController,
   ],
   providers: [
     ProxyService,
@@ -104,6 +147,17 @@ import { BooklyWebSocketGateway } from "./infrastructure/websocket/websocket.gat
     LogStreamingService,
     CacheMetricsAggregatorService,
     BooklyWebSocketGateway,
+
+    // JWT Strategy for admin endpoints
+    JwtStrategy,
+
+    // Webhook/Notification providers (registered directly to avoid duplicate EventBus connection)
+    ChannelWebhookService,
+    SendGridWebhookHandler,
+    TwilioWebhookHandler,
+    MetaWhatsAppWebhookHandler,
+    FirebaseWebhookHandler,
+    NotificationMetricsService,
   ],
 })
 export class ApiGatewayModule implements NestModule {
