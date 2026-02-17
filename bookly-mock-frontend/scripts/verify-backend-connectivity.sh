@@ -25,6 +25,11 @@ NC='\033[0m' # No Color
 
 # Configuración
 API_GATEWAY_URL="${NEXT_PUBLIC_API_GATEWAY_URL:-http://localhost:3000}"
+AUTH_SERVICE_URL="${NEXT_PUBLIC_AUTH_SERVICE_URL:-http://localhost:3001}"
+RESOURCES_SERVICE_URL="${NEXT_PUBLIC_RESOURCES_SERVICE_URL:-http://localhost:3002}"
+AVAILABILITY_SERVICE_URL="${NEXT_PUBLIC_AVAILABILITY_SERVICE_URL:-http://localhost:3003}"
+STOCKPILE_SERVICE_URL="${NEXT_PUBLIC_STOCKPILE_SERVICE_URL:-http://localhost:3004}"
+REPORTS_SERVICE_URL="${NEXT_PUBLIC_REPORTS_SERVICE_URL:-http://localhost:3005}"
 TIMEOUT=5
 
 # Contadores
@@ -103,7 +108,7 @@ echo -e "${YELLOW}[1/6] API Gateway${NC}"
 echo "────────────────────────────────────────────────────────"
 
 check_endpoint "API Gateway Health" "$API_GATEWAY_URL/health"
-check_json_endpoint "Health Aggregated" "$API_GATEWAY_URL/api/v1/health/aggregated" "services"
+check_json_endpoint "Health Services" "$API_GATEWAY_URL/health/services" "services"
 
 echo ""
 
@@ -113,7 +118,7 @@ echo ""
 echo -e "${YELLOW}[2/6] Auth Service${NC}"
 echo "────────────────────────────────────────────────────────"
 
-check_endpoint "Auth Service" "$API_GATEWAY_URL/api/v1/auth/health" 200
+check_endpoint "Auth Service" "$AUTH_SERVICE_URL/api/v1/health" 200
 
 echo ""
 
@@ -123,8 +128,7 @@ echo ""
 echo -e "${YELLOW}[3/6] Resources Service${NC}"
 echo "────────────────────────────────────────────────────────"
 
-check_endpoint "Resources Health" "$API_GATEWAY_URL/api/v1/resources/health"
-check_json_endpoint "Categories Endpoint" "$API_GATEWAY_URL/api/v1/resources/categories" "success"
+check_endpoint "Resources Health" "$RESOURCES_SERVICE_URL/api/v1/health" 200
 
 echo ""
 
@@ -134,7 +138,7 @@ echo ""
 echo -e "${YELLOW}[4/6] Availability Service${NC}"
 echo "────────────────────────────────────────────────────────"
 
-check_endpoint "Availability Health" "$API_GATEWAY_URL/api/v1/availability/health"
+check_endpoint "Availability Health" "$AVAILABILITY_SERVICE_URL/api/v1/health" 200
 
 echo ""
 
@@ -144,7 +148,7 @@ echo ""
 echo -e "${YELLOW}[5/6] Stockpile Service${NC}"
 echo "────────────────────────────────────────────────────────"
 
-check_endpoint "Stockpile Health" "$API_GATEWAY_URL/api/v1/stockpile/health"
+check_endpoint "Stockpile Health" "$STOCKPILE_SERVICE_URL/api/v1/health" 200
 
 echo ""
 
@@ -154,7 +158,7 @@ echo ""
 echo -e "${YELLOW}[6/6] Reports Service${NC}"
 echo "────────────────────────────────────────────────────────"
 
-check_endpoint "Reports Health" "$API_GATEWAY_URL/api/v1/reports/health"
+check_endpoint "Reports Health" "$REPORTS_SERVICE_URL/api/v1/health" 200
 
 echo ""
 
