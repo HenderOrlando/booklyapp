@@ -96,7 +96,7 @@ export default function ApprovalDetailPage() {
           setComment("");
           router.push("/aprobaciones");
         },
-      }
+      },
     );
   };
 
@@ -114,7 +114,7 @@ export default function ApprovalDetailPage() {
           setComment("");
           router.push("/aprobaciones");
         },
-      }
+      },
     );
   };
 
@@ -127,7 +127,7 @@ export default function ApprovalDetailPage() {
       { id: request.id, reason },
       {
         onSuccess: () => router.push("/aprobaciones"),
-      }
+      },
     );
   };
 
@@ -155,7 +155,7 @@ export default function ApprovalDetailPage() {
             </p>
             <button
               onClick={() => router.push("/aprobaciones")}
-              className="px-4 py-2 bg-state-error-600 text-white rounded-lg hover:bg-state-error-700"
+              className="px-4 py-2 bg-state-error-600 text-foreground rounded-lg hover:bg-state-error-700"
             >
               {t("back_to_list")}
             </button>
@@ -349,7 +349,7 @@ export default function ApprovalDetailPage() {
               <button
                 onClick={() => setShowApproveModal(true)}
                 disabled={isActionLoading}
-                className="flex-1 px-6 py-3 bg-green-600 text-white rounded-lg hover:bg-state-success-700 disabled:opacity-50 disabled:cursor-not-allowed font-medium"
+                className="flex-1 px-6 py-3 bg-green-600 text-foreground rounded-lg hover:bg-state-success-700 disabled:opacity-50 disabled:cursor-not-allowed font-medium"
               >
                 <CheckCircle className="h-5 w-5 inline mr-2" />
                 {t("approve")}
@@ -357,7 +357,7 @@ export default function ApprovalDetailPage() {
               <button
                 onClick={() => setShowRejectModal(true)}
                 disabled={isActionLoading}
-                className="flex-1 px-6 py-3 bg-state-error-600 text-white rounded-lg hover:bg-state-error-700 disabled:opacity-50 disabled:cursor-not-allowed font-medium"
+                className="flex-1 px-6 py-3 bg-state-error-600 text-foreground rounded-lg hover:bg-state-error-700 disabled:opacity-50 disabled:cursor-not-allowed font-medium"
               >
                 <XCircle className="h-5 w-5 inline mr-2" />
                 {t("reject")}
@@ -394,7 +394,7 @@ export default function ApprovalDetailPage() {
                 <button
                   onClick={handleApprove}
                   disabled={isActionLoading}
-                  className="flex-1 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-state-success-700 disabled:opacity-50"
+                  className="flex-1 px-4 py-2 bg-green-600 text-foreground rounded-lg hover:bg-state-success-700 disabled:opacity-50"
                 >
                   {t("confirm")}
                 </button>
@@ -434,7 +434,7 @@ export default function ApprovalDetailPage() {
                 <button
                   onClick={handleReject}
                   disabled={isActionLoading || !comment.trim()}
-                  className="flex-1 px-4 py-2 bg-state-error-600 text-white rounded-lg hover:bg-state-error-700 disabled:opacity-50"
+                  className="flex-1 px-4 py-2 bg-state-error-600 text-foreground rounded-lg hover:bg-state-error-700 disabled:opacity-50"
                 >
                   {t("confirm")}
                 </button>
