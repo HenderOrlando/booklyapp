@@ -61,7 +61,7 @@ export default function RecursosVirtualPage() {
               <span className="text-[var(--color-text-tertiary)] text-sm font-mono">
                 #{index + 1}
               </span>
-              <h3 className="font-semibold text-white">{resource.name}</h3>
+              <h3 className="font-semibold text-foreground">{resource.name}</h3>
               <StatusBadge type="resource" status={resource.status} />
             </div>
             <p className="text-sm text-[var(--color-text-tertiary)] mt-1">
@@ -103,7 +103,7 @@ export default function RecursosVirtualPage() {
           <CardContent className="p-6">
             <div className="space-y-4">
               <div>
-                <h2 className="text-xl font-bold text-white mb-2">
+                <h2 className="text-xl font-bold text-foreground mb-2">
                   {t("virtual_demo_title")}
                 </h2>
                 <p className="text-[var(--color-text-tertiary)] text-sm">
@@ -138,7 +138,7 @@ export default function RecursosVirtualPage() {
                     onChange={(e) =>
                       handleFilterChange("status", e.target.value)
                     }
-                    className="w-full px-3 py-2 bg-[var(--color-bg-primary)] border border-[var(--color-border-strong)] rounded-md text-white"
+                    className="w-full px-3 py-2 bg-[var(--color-bg-primary)] border border-[var(--color-border-strong)] rounded-md text-foreground"
                   >
                     <option value="">{t("filters.statuses")}</option>
                     <option value="AVAILABLE">{t("available")}</option>

@@ -25,16 +25,16 @@ export function ReservationStatsCards({
     // Por estado
     const pending = reservations.filter((r) => r.status === "PENDING").length;
     const confirmed = reservations.filter(
-      (r) => r.status === "CONFIRMED"
+      (r) => r.status === "CONFIRMED",
     ).length;
     const inProgress = reservations.filter(
-      (r) => r.status === "IN_PROGRESS"
+      (r) => r.status === "IN_PROGRESS",
     ).length;
     const completed = reservations.filter(
-      (r) => r.status === "COMPLETED"
+      (r) => r.status === "COMPLETED",
     ).length;
     const cancelled = reservations.filter(
-      (r) => r.status === "CANCELLED"
+      (r) => r.status === "CANCELLED",
     ).length;
 
     // Reservas activas (pendientes, confirmadas, en progreso)
@@ -84,7 +84,7 @@ export function ReservationStatsCards({
               <p className="text-sm font-medium text-[var(--color-text-tertiary)]">
                 {t("total") || "Total Reservas"}
               </p>
-              <h3 className="text-3xl font-bold text-white mt-2">
+              <h3 className="text-3xl font-bold text-foreground mt-2">
                 {stats.total}
               </h3>
               <p className="text-xs text-[var(--color-text-tertiary)] mt-1">
@@ -106,7 +106,7 @@ export function ReservationStatsCards({
               <p className="text-sm font-medium text-[var(--color-text-tertiary)]">
                 {t("today") || "Hoy"}
               </p>
-              <h3 className="text-3xl font-bold text-white mt-2">
+              <h3 className="text-3xl font-bold text-foreground mt-2">
                 {stats.today}
               </h3>
               <p className="text-xs text-[var(--color-text-tertiary)] mt-1">
@@ -128,7 +128,7 @@ export function ReservationStatsCards({
               <p className="text-sm font-medium text-[var(--color-text-tertiary)]">
                 {t("confirmed") || "Confirmadas"}
               </p>
-              <h3 className="text-3xl font-bold text-white mt-2">
+              <h3 className="text-3xl font-bold text-foreground mt-2">
                 {stats.confirmed}
               </h3>
               <p className="text-xs text-[var(--color-text-tertiary)] mt-1">
@@ -150,7 +150,7 @@ export function ReservationStatsCards({
               <p className="text-sm font-medium text-[var(--color-text-tertiary)]">
                 {t("completed") || "Completadas"}
               </p>
-              <h3 className="text-3xl font-bold text-white mt-2">
+              <h3 className="text-3xl font-bold text-foreground mt-2">
                 {stats.completed}
               </h3>
               <p className="text-xs text-[var(--color-text-tertiary)] mt-1">

@@ -258,7 +258,7 @@ export default function CalendarioPage() {
         {/* Header con botón */}
         <div className="flex items-center justify-between">
           <div>
-            <h2 className="text-3xl font-bold text-white">{t("title")}</h2>
+            <h2 className="text-3xl font-bold text-foreground">{t("title")}</h2>
             <p className="text-[var(--color-text-tertiary)] mt-1">
               {t("description")}
             </p>
@@ -332,7 +332,7 @@ export default function CalendarioPage() {
           {/* Botón toggle del panel */}
           <button
             onClick={() => setIsPanelOpen(!isPanelOpen)}
-            className="absolute left-0 top-4 z-10 bg-[var(--color-bg-primary)] hover:bg-[var(--color-bg-tertiary)] text-white p-2 rounded-r-lg border-l-0 border border-[var(--color-border-strong)] transition-all shadow-lg"
+            className="absolute left-0 top-4 z-10 bg-[var(--color-bg-primary)] hover:bg-[var(--color-bg-tertiary)] text-foreground p-2 rounded-r-lg border-l-0 border border-[var(--color-border-strong)] transition-all shadow-lg"
             style={{ left: isPanelOpen ? "320px" : "0px" }}
             title={isPanelOpen ? t("panel.hide") : t("panel.show")}
           >
@@ -386,7 +386,7 @@ export default function CalendarioPage() {
 
         {/* Leyenda de colores - Actualizada para coincidir con calendario */}
         <div className="bg-[var(--color-bg-primary)] rounded-lg p-4">
-          <h3 className="font-semibold text-white mb-3">{t("legend")}</h3>
+          <h3 className="font-semibold text-foreground mb-3">{t("legend")}</h3>
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3">
             <div className="flex items-center gap-2">
               <div className="w-4 h-4 rounded bg-state-warning-500"></div>

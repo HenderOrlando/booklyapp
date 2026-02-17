@@ -33,8 +33,8 @@ import {
 import { httpClient } from "@/infrastructure/http";
 import { Category } from "@/types/entities/resource";
 import { useQuery } from "@tanstack/react-query";
-import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
+import { useRouter } from "next/navigation";
 import * as React from "react";
 
 /**
@@ -145,7 +145,7 @@ export default function CategoriasPage() {
             console.error("Error al actualizar categoría:", err);
             alert("Error al actualizar la categoría");
           },
-        }
+        },
       );
     }
   };
@@ -178,7 +178,7 @@ export default function CategoriasPage() {
           console.error("Error al cambiar estado:", err);
           alert("Error al cambiar el estado de la categoría");
         },
-      }
+      },
     );
   };
 
@@ -193,8 +193,10 @@ export default function CategoriasPage() {
         <div className="flex items-center gap-3">
           <ColorSwatch color={category.color} size="md" />
           <div>
-            <p className="font-medium text-white">{category.name}</p>
-            <p className="text-sm text-[var(--color-text-tertiary)]">{category.description}</p>
+            <p className="font-medium text-foreground">{category.name}</p>
+            <p className="text-sm text-[var(--color-text-tertiary)]">
+              {category.description}
+            </p>
           </div>
         </div>
       ),
@@ -299,7 +301,7 @@ export default function CategoriasPage() {
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <p className="text-3xl font-bold text-white">
+              <p className="text-3xl font-bold text-foreground">
                 {categories.length}
               </p>
             </CardContent>
@@ -486,7 +488,7 @@ export default function CategoriasPage() {
                   style={{ backgroundColor: categoryToDelete.color }}
                 />
                 <div>
-                  <p className="font-medium text-white">
+                  <p className="font-medium text-foreground">
                     {categoryToDelete.name}
                   </p>
                   <p className="text-sm text-[var(--color-text-tertiary)]">

@@ -32,8 +32,8 @@ import { resourceKeys } from "@/hooks/useResources";
 import { httpClient } from "@/infrastructure/http";
 import { Maintenance, Resource } from "@/types/entities/resource";
 import { useQuery } from "@tanstack/react-query";
-import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
+import { useRouter } from "next/navigation";
 import * as React from "react";
 
 /**
@@ -88,7 +88,7 @@ export default function MantenimientosPage() {
     (maintenance: Maintenance) => {
       if (filter !== "") {
         const resource = resources.find(
-          (r: Resource) => r.id === maintenance.resourceId
+          (r: Resource) => r.id === maintenance.resourceId,
         );
         const searchTerm = filter.toLowerCase();
         const matchesText =
@@ -103,7 +103,7 @@ export default function MantenimientosPage() {
       }
 
       return true;
-    }
+    },
   );
 
   // Handlers
@@ -146,7 +146,7 @@ export default function MantenimientosPage() {
             console.error("Error al actualizar mantenimiento:", err);
             alert("Error al guardar el mantenimiento");
           },
-        }
+        },
       );
     }
   };
@@ -168,7 +168,7 @@ export default function MantenimientosPage() {
           console.error("Error al cancelar mantenimiento:", err);
           alert("Error al cancelar el mantenimiento");
         },
-      }
+      },
     );
   };
 
@@ -181,12 +181,14 @@ export default function MantenimientosPage() {
       header: "Recurso",
       cell: (maintenance: Maintenance) => {
         const resource = resources.find(
-          (r: Resource) => r.id === maintenance.resourceId
+          (r: Resource) => r.id === maintenance.resourceId,
         );
         return resource ? (
           <div>
-            <p className="font-medium text-white">{resource.name}</p>
-            <p className="text-sm text-[var(--color-text-tertiary)]">{resource.code}</p>
+            <p className="font-medium text-foreground">{resource.name}</p>
+            <p className="text-sm text-[var(--color-text-tertiary)]">
+              {resource.code}
+            </p>
           </div>
         ) : (
           <p className="text-[var(--color-text-tertiary)]">-</p>
@@ -211,7 +213,7 @@ export default function MantenimientosPage() {
       key: "scheduledDate",
       header: "Fecha Programada",
       cell: (maintenance: Maintenance) => (
-        <p className="text-white">
+        <p className="text-foreground">
           {new Date(maintenance.scheduledDate).toLocaleString()}
         </p>
       ),
@@ -220,7 +222,7 @@ export default function MantenimientosPage() {
       key: "technician",
       header: "Técnico",
       cell: (maintenance: Maintenance) => (
-        <p className="text-white">{maintenance.technician || "-"}</p>
+        <p className="text-foreground">{maintenance.technician || "-"}</p>
       ),
     },
     {
@@ -425,7 +427,7 @@ export default function MantenimientosPage() {
         >
           {maintenanceToDelete && (
             <div className="bg-[var(--color-bg-primary)] p-4 rounded-lg">
-              <p className="font-medium text-white">
+              <p className="font-medium text-foreground">
                 {maintenanceToDelete.description}
               </p>
               <p className="text-sm text-[var(--color-text-tertiary)]">
