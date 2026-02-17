@@ -20,7 +20,7 @@ const BASE_PATH = "/api/v1/approval-requests";
  * Obtener lista de solicitudes de aprobación con filtros
  */
 export async function getApprovalRequests(
-  filters?: ApprovalFilters
+  filters?: ApprovalFilters,
 ): Promise<ApprovalRequest[]> {
   const params = new URLSearchParams();
 
@@ -48,7 +48,7 @@ export async function getApprovalRequests(
  * Obtener detalle de una solicitud de aprobación
  */
 export async function getApprovalRequestById(
-  id: string
+  id: string,
 ): Promise<ApprovalRequest> {
   const response = await httpClient.get<ApprovalRequest>(`${BASE_PATH}/${id}`);
   return response.data;
@@ -58,7 +58,7 @@ export async function getApprovalRequestById(
  * Crear nueva solicitud de aprobación
  */
 export async function createApprovalRequest(
-  data: CreateApprovalRequestDto
+  data: CreateApprovalRequestDto,
 ): Promise<ApprovalRequest> {
   const response = await httpClient.post<ApprovalRequest>(BASE_PATH, data);
   return response.data;
@@ -69,11 +69,11 @@ export async function createApprovalRequest(
  */
 export async function updateApprovalRequest(
   id: string,
-  data: UpdateApprovalRequestDto
+  data: UpdateApprovalRequestDto,
 ): Promise<ApprovalRequest> {
   const response = await httpClient.patch<ApprovalRequest>(
     `${BASE_PATH}/${id}`,
-    data
+    data,
   );
   return response.data;
 }
@@ -83,11 +83,11 @@ export async function updateApprovalRequest(
  */
 export async function approveRequest(
   id: string,
-  action: ApprovalActionDto
+  action: ApprovalActionDto,
 ): Promise<ApprovalRequest> {
   const response = await httpClient.post<ApprovalRequest>(
     `${BASE_PATH}/${id}/approve`,
-    action
+    action,
   );
   return response.data;
 }
@@ -97,11 +97,11 @@ export async function approveRequest(
  */
 export async function rejectRequest(
   id: string,
-  action: ApprovalActionDto
+  action: ApprovalActionDto,
 ): Promise<ApprovalRequest> {
   const response = await httpClient.post<ApprovalRequest>(
     `${BASE_PATH}/${id}/reject`,
-    action
+    action,
   );
   return response.data;
 }
@@ -111,11 +111,11 @@ export async function rejectRequest(
  */
 export async function commentRequest(
   id: string,
-  action: ApprovalActionDto
+  action: ApprovalActionDto,
 ): Promise<ApprovalRequest> {
   const response = await httpClient.post<ApprovalRequest>(
     `${BASE_PATH}/${id}/comment`,
-    action
+    action,
   );
   return response.data;
 }
@@ -125,11 +125,11 @@ export async function commentRequest(
  */
 export async function delegateRequest(
   id: string,
-  action: ApprovalActionDto
+  action: ApprovalActionDto,
 ): Promise<ApprovalRequest> {
   const response = await httpClient.post<ApprovalRequest>(
     `${BASE_PATH}/${id}/delegate`,
-    action
+    action,
   );
   return response.data;
 }
@@ -146,7 +146,7 @@ export async function getApprovalHistory(id: string) {
  * Obtener estadísticas de aprobaciones
  */
 export async function getApprovalStats(
-  filters?: Pick<ApprovalFilters, "startDate" | "endDate">
+  filters?: Pick<ApprovalFilters, "startDate" | "endDate">,
 ): Promise<ApprovalStats> {
   const params = new URLSearchParams();
   if (filters?.startDate) params.append("startDate", filters.startDate);

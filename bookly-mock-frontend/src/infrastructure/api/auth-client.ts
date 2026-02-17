@@ -101,7 +101,7 @@ export class AuthClient {
    * ```
    */
   static async login(
-    credentials: LoginCredentials
+    credentials: LoginCredentials,
   ): Promise<ApiResponse<LoginResponse>> {
     return httpClient.post<LoginResponse>(AUTH_ENDPOINTS.LOGIN, credentials);
   }
@@ -146,11 +146,11 @@ export class AuthClient {
    * @returns Confirmación de envío
    */
   static async forgotPassword(
-    email: string
+    email: string,
   ): Promise<ApiResponse<{ message: string }>> {
     return httpClient.post<{ message: string }>(
       AUTH_ENDPOINTS.FORGOT_PASSWORD,
-      { email }
+      { email },
     );
   }
 
@@ -163,7 +163,7 @@ export class AuthClient {
    */
   static async resetPassword(
     token: string,
-    newPassword: string
+    newPassword: string,
   ): Promise<ApiResponse<{ message: string }>> {
     return httpClient.post<{ message: string }>(AUTH_ENDPOINTS.RESET_PASSWORD, {
       token,
@@ -178,11 +178,11 @@ export class AuthClient {
    * @returns Nuevo token
    */
   static async refreshToken(
-    refreshToken: string
+    refreshToken: string,
   ): Promise<ApiResponse<{ token: string; expiresIn: number }>> {
     return httpClient.post<{ token: string; expiresIn: number }>(
       AUTH_ENDPOINTS.REFRESH_TOKEN,
-      { refreshToken }
+      { refreshToken },
     );
   }
 
@@ -211,7 +211,7 @@ export class AuthClient {
    * @returns Perfil actualizado
    */
   static async updateProfile(
-    data: UpdateProfileDto
+    data: UpdateProfileDto,
   ): Promise<ApiResponse<User>> {
     return httpClient.patch<User>(AUTH_ENDPOINTS.PROFILE, data);
   }
@@ -223,11 +223,11 @@ export class AuthClient {
    * @returns Confirmación
    */
   static async changePassword(
-    data: ChangePasswordDto
+    data: ChangePasswordDto,
   ): Promise<ApiResponse<{ message: string }>> {
     return httpClient.post<{ message: string }>(
       AUTH_ENDPOINTS.CHANGE_PASSWORD,
-      data
+      data,
     );
   }
 
@@ -273,7 +273,7 @@ export class AuthClient {
    */
   static async updateUser(
     id: string,
-    data: Partial<UpdateUserDto>
+    data: Partial<UpdateUserDto>,
   ): Promise<ApiResponse<User>> {
     return httpClient.patch<User>(AUTH_ENDPOINTS.USER_BY_ID(id), data);
   }
@@ -322,7 +322,7 @@ export class AuthClient {
    */
   static async updateRole(
     id: string,
-    data: UpdateRoleDto
+    data: UpdateRoleDto,
   ): Promise<ApiResponse<Role>> {
     return httpClient.put<Role>(AUTH_ENDPOINTS.ROLE_BY_ID(id), data);
   }
@@ -339,7 +339,7 @@ export class AuthClient {
    */
   static async assignPermissionsToRole(
     id: string,
-    permissionIds: string[]
+    permissionIds: string[],
   ): Promise<ApiResponse<Role>> {
     return httpClient.post<Role>(AUTH_ENDPOINTS.ROLE_ASSIGN_PERMISSIONS(id), {
       permissionIds,
@@ -351,7 +351,7 @@ export class AuthClient {
    */
   static async removePermissionsFromRole(
     id: string,
-    permissionIds: string[]
+    permissionIds: string[],
   ): Promise<ApiResponse<Role>> {
     // Nota: El controlador usa DELETE pero con body. Axios soporta data en config.
     return httpClient.delete<Role>(AUTH_ENDPOINTS.ROLE_REMOVE_PERMISSIONS(id), {
@@ -376,10 +376,10 @@ export class AuthClient {
    * Obtiene permisos por módulo
    */
   static async getPermissionsByModule(
-    resource: string
+    resource: string,
   ): Promise<ApiResponse<Permission[]>> {
     return httpClient.get<Permission[]>(
-      AUTH_ENDPOINTS.PERMISSIONS_BY_MODULE(resource)
+      AUTH_ENDPOINTS.PERMISSIONS_BY_MODULE(resource),
     );
   }
 
@@ -387,7 +387,7 @@ export class AuthClient {
    * Crea un permiso
    */
   static async createPermission(
-    data: CreatePermissionDto
+    data: CreatePermissionDto,
   ): Promise<ApiResponse<Permission>> {
     return httpClient.post<Permission>(AUTH_ENDPOINTS.PERMISSIONS, data);
   }
@@ -397,11 +397,11 @@ export class AuthClient {
    */
   static async updatePermission(
     id: string,
-    data: UpdatePermissionDto
+    data: UpdatePermissionDto,
   ): Promise<ApiResponse<Permission>> {
     return httpClient.put<Permission>(
       AUTH_ENDPOINTS.PERMISSION_BY_ID(id),
-      data
+      data,
     );
   }
 
@@ -417,7 +417,7 @@ export class AuthClient {
    */
   static async assignRole(
     userId: string,
-    roleId: string
+    roleId: string,
   ): Promise<ApiResponse<User>> {
     return httpClient.post<User>(AUTH_ENDPOINTS.USER_ASSIGN_ROLE(userId), {
       roleId,
@@ -453,7 +453,7 @@ export class AuthClient {
     }
 
     return httpClient.get<PaginatedResponse<any>>(
-      `${AUTH_ENDPOINTS.PROFILE.replace("/profile", "")}/audit-logs?${queryParams.toString()}`
+      `${AUTH_ENDPOINTS.PROFILE.replace("/profile", "")}/audit-logs?${queryParams.toString()}`,
     );
   }
 }

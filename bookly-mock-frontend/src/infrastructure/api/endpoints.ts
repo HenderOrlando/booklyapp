@@ -248,7 +248,7 @@ export const SYSTEM_ENDPOINTS = {
  */
 export function buildUrl(
   endpoint: string,
-  params?: Record<string, any>
+  params?: Record<string, any>,
 ): string {
   if (!params || Object.keys(params).length === 0) {
     return endpoint;
@@ -256,11 +256,11 @@ export function buildUrl(
 
   const queryString = Object.entries(params)
     .filter(
-      ([_, value]) => value !== undefined && value !== null && value !== ""
+      ([_, value]) => value !== undefined && value !== null && value !== "",
     )
     .map(
       ([key, value]) =>
-        `${encodeURIComponent(key)}=${encodeURIComponent(String(value))}`
+        `${encodeURIComponent(key)}=${encodeURIComponent(String(value))}`,
     )
     .join("&");
 
@@ -273,7 +273,12 @@ export function buildUrl(
  */
 export function getServiceFromEndpoint(endpoint: string): string {
   // Auth Service (incluye auditoría)
-  if (endpoint.includes("/auth") || endpoint.includes("/users") || endpoint.includes("/audit")) return "AUTH";
+  if (
+    endpoint.includes("/auth") ||
+    endpoint.includes("/users") ||
+    endpoint.includes("/audit")
+  )
+    return "AUTH";
 
   // Resources Service
   if (

@@ -85,7 +85,7 @@ export class ResourcesClient {
    */
   static async getAll(): Promise<ApiResponse<PaginatedResponse<Resource>>> {
     return httpClient.get<PaginatedResponse<Resource>>(
-      RESOURCES_ENDPOINTS.BASE
+      RESOURCES_ENDPOINTS.BASE,
     );
   }
 
@@ -115,7 +115,7 @@ export class ResourcesClient {
    * ```
    */
   static async search(
-    filters: ResourceSearchFilters
+    filters: ResourceSearchFilters,
   ): Promise<ApiResponse<PaginatedResponse<Resource>>> {
     const queryParams = new URLSearchParams();
     Object.entries(filters).forEach(([key, value]) => {
@@ -125,7 +125,7 @@ export class ResourcesClient {
     });
 
     return httpClient.get<PaginatedResponse<Resource>>(
-      buildUrl(RESOURCES_ENDPOINTS.BASE, filters as Record<string, any>)
+      buildUrl(RESOURCES_ENDPOINTS.BASE, filters as Record<string, any>),
     );
   }
 
@@ -136,10 +136,7 @@ export class ResourcesClient {
    * @returns Recurso creado
    */
   static async create(data: CreateResourceDto): Promise<ApiResponse<Resource>> {
-    return httpClient.post<Resource>(
-      RESOURCES_ENDPOINTS.BASE,
-      data
-    );
+    return httpClient.post<Resource>(RESOURCES_ENDPOINTS.BASE, data);
   }
 
   /**
@@ -151,12 +148,9 @@ export class ResourcesClient {
    */
   static async update(
     id: string,
-    data: UpdateResourceDto
+    data: UpdateResourceDto,
   ): Promise<ApiResponse<Resource>> {
-    return httpClient.patch<Resource>(
-      RESOURCES_ENDPOINTS.BY_ID(id),
-      data
-    );
+    return httpClient.patch<Resource>(RESOURCES_ENDPOINTS.BY_ID(id), data);
   }
 
   /**
@@ -166,9 +160,125 @@ export class ResourcesClient {
    * @returns Recurso eliminado
    */
   static async delete(id: string): Promise<ApiResponse<Resource>> {
-    return httpClient.delete<Resource>(
-      RESOURCES_ENDPOINTS.BY_ID(id)
+    return httpClient.delete<Resource>(RESOURCES_ENDPOINTS.BY_ID(id));
+  }
+
+  // ============================================
+  // IMPORTACIÓN Y EXPORTACIÓN
+  // ============================================
+
+  /**
+   * Importa recursos desde CSV
+   *
+   * @param csvContent - Contenido del archivo CSV
+   * @param mode - Modo de importación (create, update, upsert)
+   * @param skipErrors - Si debe omitir errores y continuar
+   * @returns Resultado de la importación
+   */
+  static async importResources(
+    csvContent: string,
+    mode: "create" | "update" | "upsert" = "create",
+    skipErrors: boolean = false,
+  ): Promise<
+    ApiResponse<{
+      successCount: number;
+      updatedCount: number;
+      errorCount: number;
+      errors: string[];
+    }>
+  > {
+    return httpClient.post<any>(`${RESOURCES_ENDPOINTS.BASE}/import`, {
+      csvContent,
+      mode,
+      skipErrors,
+    });
+  }
+
+  /**
+   * Búsqueda avanzada de recursos
+   *
+   * @param filters - Filtros de búsqueda avanzada
+   * @returns Recursos que coinciden con los filtros
+   */
+  static async advancedSearch(filters: {
+    types?: ResourceType[];
+    minCapacity?: number;
+    maxCapacity?: number;
+    categoryIds?: string[];
+    programIds?: string[];
+    hasEquipment?: boolean;
+    location?: string;
+    building?: string;
+    status?: ResourceStatus;
+    availableOn?: string;
+    page?: number;
+    limit?: number;
+    sortBy?: string;
+    sortOrder?: "asc" | "desc";
+  }): Promise<ApiResponse<PaginatedResponse<Resource>>> {
+    return httpClient.get<PaginatedResponse<Resource>>(
+      `${RESOURCES_ENDPOINTS.BASE}/search/advanced`,
+      { params: filters },
     );
+  }
+
+  // ============================================
+  // GESTIÓN DE RECURSOS
+  // ============================================
+
+  /**
+   * Restaura un recurso eliminado (soft delete)
+   *
+   * @param id - ID del recurso
+   * @returns Recurso restaurado
+   */
+  static async restoreResource(id: string): Promise<ApiResponse<Resource>> {
+    return httpClient.post<Resource>(
+      `${RESOURCES_ENDPOINTS.BY_ID(id)}/restore`,
+    );
+  }
+
+  /**
+   * Obtiene las reglas de disponibilidad de un recurso
+   *
+   * @param id - ID del recurso
+   * @returns Reglas de disponibilidad
+   */
+  static async getAvailabilityRules(id: string): Promise<
+    ApiResponse<{
+      resourceId: string;
+      requiresApproval: boolean;
+      maxAdvanceBookingDays: number;
+      minBookingDurationMinutes: number;
+      maxBookingDurationMinutes: number;
+      allowRecurring: boolean;
+      customRules: {
+        businessHoursOnly: boolean;
+        weekdaysOnly: boolean;
+        maxConcurrentBookings: number;
+      };
+    }>
+  > {
+    return httpClient.get<any>(
+      `${RESOURCES_ENDPOINTS.BY_ID(id)}/availability-rules`,
+    );
+  }
+
+  /**
+   * Obtiene la categoría de un recurso específico
+   *
+   * @param id - ID del recurso
+   * @returns Categoría del recurso
+   */
+  static async getResourceCategory(id: string): Promise<
+    ApiResponse<{
+      id: string;
+      name: string;
+      code: string;
+      color: string;
+    }>
+  > {
+    return httpClient.get<any>(`${RESOURCES_ENDPOINTS.BY_ID(id)}/category`);
   }
 
   // ============================================
@@ -184,7 +294,7 @@ export class ResourcesClient {
     ApiResponse<PaginatedResponse<Category>>
   > {
     return httpClient.get<PaginatedResponse<Category>>(
-      RESOURCES_ENDPOINTS.CATEGORIES
+      RESOURCES_ENDPOINTS.CATEGORIES,
     );
   }
 
@@ -195,9 +305,7 @@ export class ResourcesClient {
    * @returns Categoría encontrada
    */
   static async getCategoryById(id: string): Promise<ApiResponse<Category>> {
-    return httpClient.get<Category>(
-      RESOURCES_ENDPOINTS.CATEGORY_BY_ID(id)
-    );
+    return httpClient.get<Category>(RESOURCES_ENDPOINTS.CATEGORY_BY_ID(id));
   }
 
   // ============================================
@@ -211,10 +319,10 @@ export class ResourcesClient {
    * @returns Lista de mantenimientos
    */
   static async getMaintenanceHistory(
-    resourceId: string
+    resourceId: string,
   ): Promise<ApiResponse<PaginatedResponse<Maintenance>>> {
     return httpClient.get<PaginatedResponse<Maintenance>>(
-      RESOURCES_ENDPOINTS.MAINTENANCE_HISTORY(resourceId)
+      RESOURCES_ENDPOINTS.MAINTENANCE_HISTORY(resourceId),
     );
   }
 
@@ -232,12 +340,12 @@ export class ResourcesClient {
       description: string;
       scheduledDate: string;
       estimatedDuration?: number;
-    }
+    },
   ): Promise<ApiResponse<Maintenance>> {
-    return httpClient.post<Maintenance>(
-      RESOURCES_ENDPOINTS.MAINTENANCE,
-      { resourceId, ...data }
-    );
+    return httpClient.post<Maintenance>(RESOURCES_ENDPOINTS.MAINTENANCE, {
+      resourceId,
+      ...data,
+    });
   }
 
   // ============================================
@@ -253,7 +361,7 @@ export class ResourcesClient {
     ApiResponse<PaginatedResponse<AcademicProgram>>
   > {
     return httpClient.get<PaginatedResponse<AcademicProgram>>(
-      RESOURCES_ENDPOINTS.PROGRAMS
+      RESOURCES_ENDPOINTS.PROGRAMS,
     );
   }
 
@@ -273,13 +381,13 @@ export class ResourcesClient {
   static async checkAvailability(
     resourceId: string,
     startDate: string,
-    endDate: string
+    endDate: string,
   ): Promise<ApiResponse<{ available: boolean; conflicts?: any[] }>> {
     return httpClient.get<{ available: boolean; conflicts?: any[] }>(
       buildUrl(RESOURCES_ENDPOINTS.AVAILABILITY_BY_ID(resourceId), {
         startDate,
         endDate,
-      })
+      }),
     );
   }
 
@@ -291,10 +399,10 @@ export class ResourcesClient {
    * @future Implementar cuando backend esté disponible
    */
   static async getSimilarResources(
-    resourceId: string
+    resourceId: string,
   ): Promise<ApiResponse<PaginatedResponse<Resource>>> {
     return httpClient.get<PaginatedResponse<Resource>>(
-      `${RESOURCES_ENDPOINTS.BY_ID(resourceId)}/similar`
+      `${RESOURCES_ENDPOINTS.BY_ID(resourceId)}/similar`,
     );
   }
 }

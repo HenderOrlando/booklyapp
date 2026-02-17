@@ -49,7 +49,7 @@ export class ReservationsClient {
    */
   static async getAll(): Promise<ApiResponse<PaginatedResponse<Reservation>>> {
     return await httpClient.get<PaginatedResponse<Reservation>>(
-      AVAILABILITY_ENDPOINTS.RESERVATIONS
+      AVAILABILITY_ENDPOINTS.RESERVATIONS,
     );
   }
 
@@ -68,7 +68,7 @@ export class ReservationsClient {
    */
   static async getById(id: string): Promise<ApiResponse<Reservation>> {
     return await httpClient.get<Reservation>(
-      AVAILABILITY_ENDPOINTS.RESERVATION_BY_ID(id)
+      AVAILABILITY_ENDPOINTS.RESERVATION_BY_ID(id),
     );
   }
 
@@ -89,11 +89,11 @@ export class ReservationsClient {
    * ```
    */
   static async create(
-    data: CreateReservationDto
+    data: CreateReservationDto,
   ): Promise<ApiResponse<Reservation>> {
     return await httpClient.post<Reservation>(
       AVAILABILITY_ENDPOINTS.RESERVATIONS,
-      data
+      data,
     );
   }
 
@@ -113,11 +113,11 @@ export class ReservationsClient {
    */
   static async update(
     id: string,
-    data: Partial<UpdateReservationDto>
+    data: Partial<UpdateReservationDto>,
   ): Promise<ApiResponse<Reservation>> {
     return await httpClient.patch<Reservation>(
       AVAILABILITY_ENDPOINTS.RESERVATION_BY_ID(id),
-      data
+      data,
     );
   }
 
@@ -134,7 +134,198 @@ export class ReservationsClient {
    */
   static async cancel(id: string): Promise<ApiResponse<Reservation>> {
     return await httpClient.delete<Reservation>(
-      AVAILABILITY_ENDPOINTS.RESERVATION_BY_ID(id)
+      AVAILABILITY_ENDPOINTS.RESERVATION_BY_ID(id),
+    );
+  }
+
+  // ============================================
+  // RESERVAS RECURRENTES
+  // ============================================
+
+  /**
+   * Crea una serie de reservas recurrentes
+   *
+   * @param data - Datos de la reserva recurrente
+   * @returns Serie creada con instancias
+   * @example
+   * ```typescript
+   * const series = await ReservationsClient.createRecurring({
+   *   baseReservation: {
+   *     resourceId: "res_001",
+   *     startDate: "2025-11-26T10:00:00",
+   *     endDate: "2025-11-26T12:00:00",
+   *     purpose: "Reunión semanal"
+   *   },
+   *   recurringPattern: {
+   *     type: "WEEKLY",
+   *     interval: 1,
+   *     daysOfWeek: [1, 3, 5], // Lunes, Miércoles, Viernes
+   *     endDate: "2026-02-26T23:59:59"
+   *   }
+   * });
+   * ```
+   */
+  static async createRecurring(data: any): Promise<ApiResponse<any>> {
+    return await httpClient.post<any>(AVAILABILITY_ENDPOINTS.RECURRING, data);
+  }
+
+  /**
+   * Previsualiza una serie recurrente sin crear reservas
+   *
+   * @param data - Datos para previsualizar
+   * @returns Preview de instancias y validación
+   */
+  static async previewRecurring(data: any): Promise<ApiResponse<any>> {
+    return await httpClient.post<any>(
+      `${AVAILABILITY_ENDPOINTS.RECURRING}/preview`,
+      data,
+    );
+  }
+
+  /**
+   * Obtiene series recurrentes del usuario
+   *
+   * @param filters - Filtros opcionales
+   * @returns Lista de series recurrentes
+   */
+  static async getRecurringSeries(filters?: any): Promise<ApiResponse<any[]>> {
+    return await httpClient.get<any[]>(AVAILABILITY_ENDPOINTS.RECURRING, {
+      params: filters,
+    });
+  }
+
+  /**
+   * Obtiene una serie recurrente específica
+   *
+   * @param seriesId - ID de la serie
+   * @param includeInstances - Incluir instancias individuales
+   * @returns Serie con sus instancias
+   */
+  static async getRecurringSeriesById(
+    seriesId: string,
+    includeInstances: boolean = true,
+  ): Promise<ApiResponse<any>> {
+    return await httpClient.get<any>(
+      `${AVAILABILITY_ENDPOINTS.RECURRING_BY_ID(seriesId)}?includeInstances=${includeInstances}`,
+    );
+  }
+
+  /**
+   * Actualiza una serie recurrente completa
+   *
+   * @param seriesId - ID de la serie
+   * @param data - Datos de actualización
+   * @returns Serie actualizada
+   */
+  static async updateRecurringSeries(
+    seriesId: string,
+    data: any,
+  ): Promise<ApiResponse<any>> {
+    return await httpClient.patch<any>(
+      AVAILABILITY_ENDPOINTS.RECURRING_BY_ID(seriesId),
+      data,
+    );
+  }
+
+  /**
+   * Cancela una serie recurrente completa
+   *
+   * @param seriesId - ID de la serie
+   * @param reason - Motivo de cancelación
+   * @returns Confirmación de cancelación
+   */
+  static async cancelRecurringSeries(
+    seriesId: string,
+    reason: string,
+  ): Promise<ApiResponse<any>> {
+    return await httpClient.delete<any>(
+      `${AVAILABILITY_ENDPOINTS.RECURRING_BY_ID(seriesId)}/cancel`,
+      { data: { reason } },
+    );
+  }
+
+  /**
+   * Cancela una instancia individual de una serie
+   *
+   * @param instanceId - ID de la instancia
+   * @param reason - Motivo de cancelación
+   * @returns Confirmación de cancelación
+   */
+  static async cancelRecurringInstance(
+    instanceId: string,
+    reason: string,
+  ): Promise<ApiResponse<any>> {
+    return await httpClient.post<any>(
+      `${AVAILABILITY_ENDPOINTS.RECURRING}/series/instances/${instanceId}/cancel`,
+      { reason },
+    );
+  }
+
+  /**
+   * Modifica una instancia individual de una serie
+   *
+   * @param instanceId - ID de la instancia
+   * @param data - Datos de modificación
+   * @returns Instancia modificada
+   */
+  static async modifyRecurringInstance(
+    instanceId: string,
+    data: any,
+  ): Promise<ApiResponse<any>> {
+    return await httpClient.patch<any>(
+      `${AVAILABILITY_ENDPOINTS.RECURRING}/series/instances/${instanceId}`,
+      data,
+    );
+  }
+
+  /**
+   * Obtiene analytics de series recurrentes
+   *
+   * @param filters - Filtros para analytics
+   * @returns Métricas y estadísticas
+   */
+  static async getRecurringAnalytics(filters?: any): Promise<ApiResponse<any>> {
+    return await httpClient.get<any>(
+      `${AVAILABILITY_ENDPOINTS.RECURRING}/analytics`,
+      { params: filters },
+    );
+  }
+
+  // ============================================
+  // CHECK-IN / CHECK-OUT
+  // ============================================
+
+  /**
+   * Realiza check-in de una reserva
+   *
+   * @param id - ID de la reserva
+   * @returns Confirmación de check-in
+   * @example
+   * ```typescript
+   * const checkin = await ReservationsClient.checkIn("rsv_001");
+   * console.log(checkin.data.message); // "Check-in completed successfully"
+   * ```
+   */
+  static async checkIn(id: string): Promise<ApiResponse<any>> {
+    return await httpClient.post<any>(
+      `${AVAILABILITY_ENDPOINTS.RESERVATION_BY_ID(id)}/check-in`,
+    );
+  }
+
+  /**
+   * Realiza check-out de una reserva
+   *
+   * @param id - ID de la reserva
+   * @returns Confirmación de check-out
+   * @example
+   * ```typescript
+   * const checkout = await ReservationsClient.checkOut("rsv_001");
+   * console.log(checkout.data.message); // "Check-out completed successfully"
+   * ```
+   */
+  static async checkOut(id: string): Promise<ApiResponse<any>> {
+    return await httpClient.post<any>(
+      `${AVAILABILITY_ENDPOINTS.RESERVATION_BY_ID(id)}/check-out`,
     );
   }
 
@@ -159,7 +350,7 @@ export class ReservationsClient {
     limit?: number;
   }): Promise<ApiResponse<PaginatedResponse<Reservation>>> {
     return await httpClient.get<PaginatedResponse<Reservation>>(
-      buildUrl(AVAILABILITY_ENDPOINTS.RESERVATIONS, filters)
+      buildUrl(AVAILABILITY_ENDPOINTS.RESERVATIONS, filters),
     );
   }
 
@@ -171,10 +362,10 @@ export class ReservationsClient {
    * @future Implementar cuando backend esté disponible
    */
   static async getByResource(
-    resourceId: string
+    resourceId: string,
   ): Promise<ApiResponse<PaginatedResponse<Reservation>>> {
     return await httpClient.get<PaginatedResponse<Reservation>>(
-      buildUrl(AVAILABILITY_ENDPOINTS.RESERVATIONS, { resourceId })
+      buildUrl(AVAILABILITY_ENDPOINTS.RESERVATIONS, { resourceId }),
     );
   }
 
@@ -186,10 +377,10 @@ export class ReservationsClient {
    * @future Implementar cuando backend esté disponible
    */
   static async getByUser(
-    userId: string
+    userId: string,
   ): Promise<ApiResponse<PaginatedResponse<Reservation>>> {
     return await httpClient.get<PaginatedResponse<Reservation>>(
-      buildUrl(AVAILABILITY_ENDPOINTS.RESERVATIONS, { userId })
+      buildUrl(AVAILABILITY_ENDPOINTS.RESERVATIONS, { userId }),
     );
   }
 
@@ -205,7 +396,7 @@ export class ReservationsClient {
   static async checkConflicts(
     resourceId: string,
     startDate: string,
-    endDate: string
+    endDate: string,
   ): Promise<
     ApiResponse<{
       hasConflict: boolean;
@@ -220,7 +411,7 @@ export class ReservationsClient {
         resourceId,
         startDate,
         endDate,
-      })
+      }),
     );
   }
 }
