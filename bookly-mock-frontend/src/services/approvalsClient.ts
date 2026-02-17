@@ -1,3 +1,9 @@
+/**
+ * @deprecated Use `ApprovalsClient` from `@/infrastructure/api` instead.
+ * This file is kept for backward compatibility with existing hooks.
+ * New code should import from `@/infrastructure/api/approvals-client`.
+ */
+
 import { httpClient } from "@/infrastructure/http/httpClient";
 import type {
   ApprovalActionDto,

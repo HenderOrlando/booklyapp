@@ -1,3 +1,8 @@
+/**
+ * @deprecated Migrate to a `TemplatesClient` class in `@/infrastructure/api/`.
+ * This file will be replaced when the templates-client is created in the API layer.
+ */
+
 import { httpClient } from "@/infrastructure/http/httpClient";
 import type {
   Template,
@@ -62,5 +67,5 @@ export async function renderTemplate(
     `${TEMPLATES_PATH}/${templateId}/render`,
     { variables },
   );
-  return response.data.rendered;
+  return response.data!.rendered;
 }

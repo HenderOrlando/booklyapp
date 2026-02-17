@@ -1,3 +1,9 @@
+/**
+ * @deprecated Use `CheckInClient` from `@/infrastructure/api` instead.
+ * This file is kept for backward compatibility with existing hooks.
+ * New code should import from `@/infrastructure/api/check-in-client`.
+ */
+
 import { httpClient } from "@/infrastructure/http/httpClient";
 import type {
   ActiveReservationView,
@@ -8,12 +14,6 @@ import type {
   VigilanceAlert,
 } from "@/types/entities/checkInOut";
 
-/**
- * Cliente HTTP para el servicio de Check-in/Check-out (Stockpile Service)
- *
- * Endpoints base: /api/v1/check-in-out
- */
-
 const BASE_PATH = "/api/v1/check-in-out";
 
 /**
@@ -22,7 +22,7 @@ const BASE_PATH = "/api/v1/check-in-out";
 export async function performCheckIn(data: CheckInDto): Promise<CheckInOut> {
   const response = await httpClient.post<CheckInOut>(
     `${BASE_PATH}/check-in`,
-    data
+    data,
   );
   return response.data;
 }
@@ -33,7 +33,7 @@ export async function performCheckIn(data: CheckInDto): Promise<CheckInOut> {
 export async function performCheckOut(data: CheckOutDto): Promise<CheckInOut> {
   const response = await httpClient.post<CheckInOut>(
     `${BASE_PATH}/check-out`,
-    data
+    data,
   );
   return response.data;
 }
@@ -42,10 +42,10 @@ export async function performCheckOut(data: CheckOutDto): Promise<CheckInOut> {
  * Obtener historial de check-in/check-out de una reserva
  */
 export async function getCheckInOutHistory(
-  reservationId: string
+  reservationId: string,
 ): Promise<CheckInOut[]> {
   const response = await httpClient.get<CheckInOut[]>(
-    `${BASE_PATH}/history/${reservationId}`
+    `${BASE_PATH}/history/${reservationId}`,
   );
   return response.data;
 }
@@ -57,7 +57,7 @@ export async function getActiveReservations(): Promise<
   ActiveReservationView[]
 > {
   const response = await httpClient.get<ActiveReservationView[]>(
-    `${BASE_PATH}/active/all`
+    `${BASE_PATH}/active/all`,
   );
   return response.data;
 }
@@ -69,7 +69,7 @@ export async function getOverdueReservations(): Promise<
   ActiveReservationView[]
 > {
   const response = await httpClient.get<ActiveReservationView[]>(
-    `${BASE_PATH}/overdue/all`
+    `${BASE_PATH}/overdue/all`,
   );
   return response.data;
 }
@@ -79,7 +79,7 @@ export async function getOverdueReservations(): Promise<
  */
 export async function getCheckInOutStats(
   startDate?: string,
-  endDate?: string
+  endDate?: string,
 ): Promise<CheckInOutStats> {
   const params = new URLSearchParams();
   if (startDate) params.append("startDate", startDate);
@@ -99,7 +99,7 @@ export async function getCheckInOutStats(
  */
 export async function getVigilanceAlerts(): Promise<VigilanceAlert[]> {
   const response = await httpClient.get<VigilanceAlert[]>(
-    `${BASE_PATH}/vigilance/alerts`
+    `${BASE_PATH}/vigilance/alerts`,
   );
   return response.data;
 }
@@ -115,10 +115,10 @@ export async function resolveVigilanceAlert(alertId: string): Promise<void> {
  * Validar si una reserva puede hacer check-in
  */
 export async function validateCheckIn(
-  reservationId: string
+  reservationId: string,
 ): Promise<{ valid: boolean; reason?: string }> {
   const response = await httpClient.get<{ valid: boolean; reason?: string }>(
-    `${BASE_PATH}/validate/check-in/${reservationId}`
+    `${BASE_PATH}/validate/check-in/${reservationId}`,
   );
   return response.data;
 }
@@ -127,10 +127,10 @@ export async function validateCheckIn(
  * Validar si una reserva puede hacer check-out
  */
 export async function validateCheckOut(
-  reservationId: string
+  reservationId: string,
 ): Promise<{ valid: boolean; reason?: string }> {
   const response = await httpClient.get<{ valid: boolean; reason?: string }>(
-    `${BASE_PATH}/validate/check-out/${reservationId}`
+    `${BASE_PATH}/validate/check-out/${reservationId}`,
   );
   return response.data;
 }

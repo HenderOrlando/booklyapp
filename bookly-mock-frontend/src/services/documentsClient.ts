@@ -1,3 +1,8 @@
+/**
+ * @deprecated Migrate to a `DocumentsClient` class in `@/infrastructure/api/`.
+ * This file will be replaced when the documents-client is created in the API layer.
+ */
+
 import { httpClient } from "@/infrastructure/http/httpClient";
 
 /**
@@ -58,10 +63,10 @@ export async function getDocumentTemplates(): Promise<DocumentTemplate[]> {
  * Obtener un template específico
  */
 export async function getDocumentTemplateById(
-  id: string
+  id: string,
 ): Promise<DocumentTemplate> {
   const response = await httpClient.get<DocumentTemplate>(
-    `${TEMPLATES_PATH}/${id}`
+    `${TEMPLATES_PATH}/${id}`,
   );
   return response.data;
 }
@@ -70,11 +75,11 @@ export async function getDocumentTemplateById(
  * Crear un nuevo template
  */
 export async function createDocumentTemplate(
-  data: Omit<DocumentTemplate, "id" | "createdAt" | "updatedAt">
+  data: Omit<DocumentTemplate, "id" | "createdAt" | "updatedAt">,
 ): Promise<DocumentTemplate> {
   const response = await httpClient.post<DocumentTemplate>(
     TEMPLATES_PATH,
-    data
+    data,
   );
   return response.data;
 }
@@ -84,11 +89,11 @@ export async function createDocumentTemplate(
  */
 export async function updateDocumentTemplate(
   id: string,
-  data: Partial<DocumentTemplate>
+  data: Partial<DocumentTemplate>,
 ): Promise<DocumentTemplate> {
   const response = await httpClient.patch<DocumentTemplate>(
     `${TEMPLATES_PATH}/${id}`,
-    data
+    data,
   );
   return response.data;
 }
@@ -104,11 +109,11 @@ export async function deleteDocumentTemplate(id: string): Promise<void> {
  * Generar documento PDF a partir de un template
  */
 export async function generateDocument(
-  data: GenerateDocumentDto
+  data: GenerateDocumentDto,
 ): Promise<GeneratedDocument> {
   const response = await httpClient.post<GeneratedDocument>(
     `${DOCS_PATH}/generate`,
-    data
+    data,
   );
   return response.data;
 }
@@ -117,10 +122,10 @@ export async function generateDocument(
  * Obtener documento generado por ID
  */
 export async function getGeneratedDocument(
-  id: string
+  id: string,
 ): Promise<GeneratedDocument> {
   const response = await httpClient.get<GeneratedDocument>(
-    `${DOCS_PATH}/${id}`
+    `${DOCS_PATH}/${id}`,
   );
   return response.data;
 }
@@ -140,7 +145,7 @@ export async function downloadDocument(id: string): Promise<Blob> {
  */
 export async function sendDocumentByEmail(
   documentId: string,
-  email: string
+  email: string,
 ): Promise<void> {
   await httpClient.post(`${DOCS_PATH}/${documentId}/send-email`, { email });
 }
@@ -149,10 +154,10 @@ export async function sendDocumentByEmail(
  * Obtener lista de documentos generados para una solicitud
  */
 export async function getDocumentsByApprovalRequest(
-  approvalRequestId: string
+  approvalRequestId: string,
 ): Promise<GeneratedDocument[]> {
   const response = await httpClient.get<GeneratedDocument[]>(
-    `${DOCS_PATH}/by-approval/${approvalRequestId}`
+    `${DOCS_PATH}/by-approval/${approvalRequestId}`,
   );
   return response.data;
 }

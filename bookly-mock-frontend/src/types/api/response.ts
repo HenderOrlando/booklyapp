@@ -7,8 +7,19 @@ export interface ApiResponse<T = any> {
   success: boolean;
   data: T;
   message?: string;
-  timestamp: string;
+  errors?: ApiFieldError[];
+  meta?: PaginationMeta;
+  timestamp?: string;
   path?: string;
+  method?: string;
+  statusCode?: number;
+  context?: Record<string, any>;
+}
+
+export interface ApiFieldError {
+  field: string;
+  message: string;
+  code?: string;
 }
 
 export interface ApiErrorResponse {
@@ -24,16 +35,19 @@ export interface ApiErrorResponse {
   details?: any;
 }
 
+export interface PaginationMeta {
+  total: number;
+  page: number;
+  limit: number;
+  totalPages: number;
+  hasNextPage: boolean;
+  hasPreviousPage: boolean;
+}
+
 export interface PaginatedResponse<T> {
   items: T[];
-  meta: {
-    total: number;
-    page: number;
-    limit: number;
-    totalPages: number;
-    hasNextPage: boolean;
-    hasPreviousPage: boolean;
-  };
+  data?: T[];
+  meta: PaginationMeta;
 }
 
 export interface QueryParams {

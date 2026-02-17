@@ -16,6 +16,7 @@ import { MockService } from "@/infrastructure/mock/mockService";
 import { config, getServiceUrl, isMockMode } from "@/lib/config";
 import { ApiResponse } from "@/types/api/response";
 import axios, { AxiosError, AxiosInstance, AxiosRequestConfig } from "axios";
+import { extractMappedError } from "./errorMapper";
 
 /**
  * Cliente Axios configurado para Serve Mode
@@ -43,10 +44,28 @@ function addRefreshSubscriber(callback: (token: string) => void) {
 }
 
 /**
- * Interceptor para agregar token de autenticación
+ * Genera un UUID v4 simple para correlation IDs
+ */
+function generateCorrelationId(): string {
+  if (typeof crypto !== "undefined" && crypto.randomUUID) {
+    return crypto.randomUUID();
+  }
+  // Fallback para entornos sin crypto.randomUUID
+  return "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g, (c) => {
+    const r = (Math.random() * 16) | 0;
+    const v = c === "x" ? r : (r & 0x3) | 0x8;
+    return v.toString(16);
+  });
+}
+
+/**
+ * Interceptor para agregar token de autenticación y correlation ID
  */
 axiosInstance.interceptors.request.use(
   (config) => {
+    // Agregar correlation ID para trazabilidad end-to-end
+    config.headers["X-Correlation-ID"] = generateCorrelationId();
+
     // Obtener token de localStorage
     if (typeof window !== "undefined") {
       const token = localStorage.getItem("accessToken");
@@ -139,6 +158,18 @@ axiosInstance.interceptors.response.use(
 
         return Promise.reject(refreshError);
       }
+    }
+
+    // Manejo de HTTP 429 (Rate Limited) con retry-after
+    if (error.response?.status === 429 && !originalRequest._rateLimitRetry) {
+      originalRequest._rateLimitRetry = true;
+      const retryAfter = error.response.headers["retry-after"];
+      const waitMs = retryAfter ? parseInt(retryAfter, 10) * 1000 : 2000; // Default 2s backoff
+
+      console.warn(`[HTTP 429] Rate limited. Retrying after ${waitMs}ms...`);
+
+      await new Promise((resolve) => setTimeout(resolve, waitMs));
+      return axiosInstance(originalRequest);
     }
 
     // Manejo de errores de servidor (500+)
@@ -420,26 +451,19 @@ class HttpClient {
   /**
    * Manejo centralizado de errores
    */
-  private handleError(error: any): Error {
-    if (axios.isAxiosError(error)) {
-      const axiosError = error as AxiosError<ApiResponse<any>>;
-
-      if (axiosError.response) {
-        // El servidor respondió con un error
-        return new Error(
-          axiosError.response.data?.message ||
-            "Error en la petición al servidor",
-        );
-      } else if (axiosError.request) {
-        // La petición se hizo pero no hubo respuesta
-        return new Error(
-          "No se pudo conectar con el servidor. Verifica tu conexión.",
-        );
-      }
-    }
-
-    // Error genérico
-    return error instanceof Error ? error : new Error("Error desconocido");
+  private handleError(
+    error: any,
+  ): Error & { mapped?: ReturnType<typeof extractMappedError> } {
+    const mapped = extractMappedError(error);
+    const err = new Error(mapped.fallbackMessage) as Error & {
+      mapped?: typeof mapped;
+      code?: string;
+      httpCode?: number;
+    };
+    err.mapped = mapped;
+    err.code = mapped.code;
+    err.httpCode = mapped.httpCode;
+    return err;
   }
 
   /**
