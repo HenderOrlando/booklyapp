@@ -186,19 +186,16 @@ export class RabbitMQAdapter implements IEventBus, OnModuleDestroy {
     }
 
     try {
-      // Create queue
       const queueName = this.config.queue || `${groupId}-${topic}`;
+
+      // Assert queue (plain, without DLX — compatible with existing CloudAMQP queues)
       await this.channel.assertQueue(queueName, {
         durable: this.config.durable !== false,
       });
 
       // Bind queue to exchange if using exchange
       if (this.config.exchange) {
-        await this.channel.bindQueue(
-          queueName,
-          this.config.exchange,
-          topic, // routing key pattern
-        );
+        await this.channel.bindQueue(queueName, this.config.exchange, topic);
       }
 
       // Start consuming
@@ -229,14 +226,41 @@ export class RabbitMQAdapter implements IEventBus, OnModuleDestroy {
               error as Error,
             );
 
-            // Negative acknowledge - requeue
             if (this.channel) {
-              this.channel.nack(msg, false, true);
+              // Check retry count from x-death header
+              const xDeath = msg.properties?.headers?.["x-death"];
+              const retryCount = Array.isArray(xDeath)
+                ? xDeath.reduce(
+                    (sum: number, d: any) => sum + (d.count || 0),
+                    0,
+                  )
+                : 0;
+              const maxRetries = 3;
+
+              if (retryCount < maxRetries) {
+                // Requeue for retry
+                this.channel.nack(msg, false, true);
+                logger.warn(
+                  `Message requeued for retry (${retryCount + 1}/${maxRetries})`,
+                  {
+                    topic,
+                    eventId: (JSON.parse(msg.content.toString()) as any)
+                      .eventId,
+                  },
+                );
+              } else {
+                // Max retries exceeded — reject to DLQ (no requeue)
+                this.channel.nack(msg, false, false);
+                logger.error(
+                  `Message sent to DLQ after ${maxRetries} retries: ${topic}`,
+                  error as Error,
+                );
+              }
             }
           }
         },
         {
-          noAck: false, // Manual acknowledgment
+          noAck: false,
         },
       );
 

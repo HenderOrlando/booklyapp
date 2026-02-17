@@ -32,7 +32,7 @@ export class EventBusService
 
   constructor(
     private readonly options: EventBusOptions,
-    private readonly eventStoreService?: EventStoreService
+    private readonly eventStoreService?: EventStoreService,
   ) {
     this.topicPrefix = options.topicPrefix || "";
 
@@ -92,7 +92,7 @@ export class EventBusService
   }
 
   async publishBatch<T = any>(
-    events: Array<{ topic: string; event: EventPayload<T> }>
+    events: Array<{ topic: string; event: EventPayload<T> }>,
   ): Promise<void> {
     // Save to event store
     if (this.eventStore) {
@@ -114,7 +114,7 @@ export class EventBusService
   async subscribe<T = any>(
     topic: string,
     groupId: string,
-    handler: (event: EventPayload<T>) => Promise<void>
+    handler: (event: EventPayload<T>) => Promise<void>,
   ): Promise<void> {
     const fullTopic = this.topicPrefix ? `${this.topicPrefix}.${topic}` : topic;
     await this.adapter.subscribe(fullTopic, groupId, handler);
@@ -159,6 +159,8 @@ export class EventBusService
     const aggregateType =
       (event as any).aggregateType || this.inferAggregateType(event.eventType);
 
+    const metadata = (event as any).metadata || {};
+
     return {
       eventId: event.eventId || `${Date.now()}-${Math.random()}`,
       eventType: event.eventType,
@@ -166,7 +168,10 @@ export class EventBusService
       aggregateType,
       version: (event as any).version || 1,
       data: event,
-      metadata: (event as any).metadata || {},
+      correlationId: metadata.correlationId || (event as any).correlationId,
+      causationId: metadata.causationId || (event as any).causationId,
+      idempotencyKey: metadata.idempotencyKey || (event as any).idempotencyKey,
+      metadata,
       timestamp: event.timestamp || new Date(),
       service: event.service || "unknown",
     };
