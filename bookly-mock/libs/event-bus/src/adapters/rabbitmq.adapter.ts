@@ -32,7 +32,7 @@ export class RabbitMQAdapter implements IEventBus, OnModuleDestroy {
 
     try {
       this.connection = (await amqp.connect(
-        this.config.url
+        this.config.url,
       )) as any as amqp.Connection;
       if (!this.connection) {
         throw new Error("Failed to establish connection");
@@ -46,7 +46,7 @@ export class RabbitMQAdapter implements IEventBus, OnModuleDestroy {
           this.config.exchangeType || "topic",
           {
             durable: this.config.durable !== false,
-          }
+          },
         );
       }
 
@@ -86,11 +86,21 @@ export class RabbitMQAdapter implements IEventBus, OnModuleDestroy {
 
     try {
       if (this.channel) {
-        await this.channel.close();
+        try {
+          await this.channel.close();
+        } catch {
+          // Channel may already be closed — safe to ignore
+        }
+        this.channel = null;
       }
 
       if (this.connection) {
-        await (this.connection as any).close();
+        try {
+          await (this.connection as any).close();
+        } catch {
+          // Connection may already be closed — safe to ignore
+        }
+        this.connection = null;
       }
 
       this.consumers.clear();
@@ -99,7 +109,6 @@ export class RabbitMQAdapter implements IEventBus, OnModuleDestroy {
       logger.info("RabbitMQ disconnected successfully");
     } catch (error) {
       logger.error("Error disconnecting RabbitMQ", error as Error);
-      throw error;
     }
   }
 
@@ -142,14 +151,14 @@ export class RabbitMQAdapter implements IEventBus, OnModuleDestroy {
         {
           eventId: event.eventId,
           eventType: event.eventType,
-        }
+        },
       );
       throw error;
     }
   }
 
   async publishBatch<T = any>(
-    events: Array<{ topic: string; event: EventPayload<T> }>
+    events: Array<{ topic: string; event: EventPayload<T> }>,
   ): Promise<void> {
     if (!this.channel) {
       throw new Error("RabbitMQ channel not initialized");
@@ -170,7 +179,7 @@ export class RabbitMQAdapter implements IEventBus, OnModuleDestroy {
   async subscribe<T = any>(
     topic: string,
     groupId: string,
-    handler: (event: EventPayload<T>) => Promise<void>
+    handler: (event: EventPayload<T>) => Promise<void>,
   ): Promise<void> {
     if (!this.channel) {
       throw new Error("RabbitMQ channel not initialized");
@@ -188,7 +197,7 @@ export class RabbitMQAdapter implements IEventBus, OnModuleDestroy {
         await this.channel.bindQueue(
           queueName,
           this.config.exchange,
-          topic // routing key pattern
+          topic, // routing key pattern
         );
       }
 
@@ -217,7 +226,7 @@ export class RabbitMQAdapter implements IEventBus, OnModuleDestroy {
           } catch (error) {
             logger.error(
               `Error processing message from RabbitMQ: ${topic}`,
-              error as Error
+              error as Error,
             );
 
             // Negative acknowledge - requeue
@@ -228,7 +237,7 @@ export class RabbitMQAdapter implements IEventBus, OnModuleDestroy {
         },
         {
           noAck: false, // Manual acknowledgment
-        }
+        },
       );
 
       logger.info(`Subscribed to RabbitMQ: ${topic}`, {
@@ -255,7 +264,7 @@ export class RabbitMQAdapter implements IEventBus, OnModuleDestroy {
     } catch (error) {
       logger.error(
         `Failed to unsubscribe from RabbitMQ: ${topic}`,
-        error as Error
+        error as Error,
       );
       throw error;
     }
@@ -289,7 +298,7 @@ export class RabbitMQAdapter implements IEventBus, OnModuleDestroy {
   async createExchange(
     name: string,
     type: "direct" | "topic" | "fanout" | "headers" = "topic",
-    options?: { durable?: boolean }
+    options?: { durable?: boolean },
   ): Promise<void> {
     if (!this.channel) {
       throw new Error("RabbitMQ channel not initialized");
@@ -304,7 +313,7 @@ export class RabbitMQAdapter implements IEventBus, OnModuleDestroy {
     } catch (error) {
       logger.error(
         `Failed to create RabbitMQ exchange: ${name}`,
-        error as Error
+        error as Error,
       );
       throw error;
     }
@@ -315,7 +324,7 @@ export class RabbitMQAdapter implements IEventBus, OnModuleDestroy {
    */
   async createQueue(
     name: string,
-    options?: { durable?: boolean; exclusive?: boolean; autoDelete?: boolean }
+    options?: { durable?: boolean; exclusive?: boolean; autoDelete?: boolean },
   ): Promise<void> {
     if (!this.channel) {
       throw new Error("RabbitMQ channel not initialized");

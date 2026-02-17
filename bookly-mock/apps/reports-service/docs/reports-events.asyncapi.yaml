@@ -1,0 +1,350 @@
+asyncapi: "2.6.0"
+info:
+  title: Reports Service Events API
+  version: "1.0.0"
+  description: |
+    Eventos asincrónicos publicados y consumidos por el Reports Service de Bookly.
+    Broker: RabbitMQ (exchange: bookly-events, type: topic)
+  contact:
+    name: Bookly Development Team
+  license:
+    name: MIT
+
+servers:
+  production:
+    url: amqps://horse.lmq.cloudamqp.com/iadjmjao
+    protocol: amqps
+    description: RabbitMQ en CloudAMQP (producción)
+  development:
+    url: amqp://bookly:bookly123@localhost:5672/bookly
+    protocol: amqp
+    description: RabbitMQ local (desarrollo)
+
+channels:
+  # ===== EVENTOS PUBLICADOS =====
+  reports.export.requested:
+    description: Exportación de reporte solicitada
+    publish:
+      operationId: publishExportRequested
+      summary: Publicado cuando un usuario solicita exportar un reporte
+      message:
+        $ref: "#/components/messages/ExportRequestedEvent"
+
+  reports.export.statusChanged:
+    description: Estado de exportación actualizado
+    publish:
+      operationId: publishExportStatusChanged
+      summary: Publicado cuando cambia el estado de una exportación
+      message:
+        $ref: "#/components/messages/ExportStatusChangedEvent"
+
+  reports.evaluation.created:
+    description: Evaluación de usuario creada
+    publish:
+      operationId: publishEvaluationCreated
+      summary: Publicado cuando un admin crea una evaluación de usuario
+      message:
+        $ref: "#/components/messages/EvaluationEvent"
+
+  reports.evaluation.updated:
+    description: Evaluación de usuario actualizada
+    publish:
+      operationId: publishEvaluationUpdated
+      summary: Publicado cuando se actualiza una evaluación
+      message:
+        $ref: "#/components/messages/EvaluationEvent"
+
+  reports.evaluation.priorityGranted:
+    description: Prioridad concedida a usuario por buena evaluación
+    publish:
+      operationId: publishEvaluationPriorityGranted
+      summary: Publicado cuando un usuario obtiene prioridad por buena evaluación
+      message:
+        $ref: "#/components/messages/EvaluationEvent"
+
+  reports.evaluation.priorityRevoked:
+    description: Prioridad revocada a usuario por mala evaluación
+    publish:
+      operationId: publishEvaluationPriorityRevoked
+      summary: Publicado cuando se revoca la prioridad de un usuario
+      message:
+        $ref: "#/components/messages/EvaluationEvent"
+
+  reports.feedback.created:
+    description: Feedback de usuario creado
+    publish:
+      operationId: publishFeedbackCreated
+      summary: Publicado cuando un usuario envía feedback sobre una reserva
+      message:
+        $ref: "#/components/messages/FeedbackEvent"
+
+  reports.feedback.responded:
+    description: Respuesta a feedback de usuario
+    publish:
+      operationId: publishFeedbackResponded
+      summary: Publicado cuando un admin responde al feedback
+      message:
+        $ref: "#/components/messages/FeedbackEvent"
+
+  reports.feedback.statusChanged:
+    description: Estado de feedback actualizado
+    publish:
+      operationId: publishFeedbackStatusChanged
+      summary: Publicado cuando cambia el estado de un feedback
+      message:
+        $ref: "#/components/messages/FeedbackEvent"
+
+  # ===== EVENTOS CONSUMIDOS =====
+  bookly.audit.*:
+    description: Eventos de auditoría (de auth-service)
+    subscribe:
+      operationId: handleAuditEvents
+      summary: Persiste registros de auditoría en la base de datos de reportes
+      message:
+        $ref: "#/components/messages/GenericEvent"
+
+  bookly.reservation.created:
+    description: Reserva creada (de availability-service)
+    subscribe:
+      operationId: handleReservationCreated
+      summary: Registra datos para reportes de uso y demanda
+      message:
+        $ref: "#/components/messages/GenericEvent"
+
+  bookly.reservation.cancelled:
+    description: Reserva cancelada (de availability-service)
+    subscribe:
+      operationId: handleReservationCancelled
+      summary: Actualiza métricas de cancelación
+      message:
+        $ref: "#/components/messages/GenericEvent"
+
+  bookly.reservation.modified:
+    description: Reserva modificada (de availability-service)
+    subscribe:
+      operationId: handleReservationModified
+      summary: Actualiza datos de reportes
+      message:
+        $ref: "#/components/messages/GenericEvent"
+
+  bookly.resource.created:
+    description: Recurso creado (de resources-service)
+    subscribe:
+      operationId: handleResourceCreated
+      summary: Registra recurso para dashboards y reportes
+      message:
+        $ref: "#/components/messages/GenericEvent"
+
+  bookly.resource.updated:
+    description: Recurso actualizado (de resources-service)
+    subscribe:
+      operationId: handleResourceUpdated
+      summary: Actualiza datos de recurso en reportes
+      message:
+        $ref: "#/components/messages/GenericEvent"
+
+  bookly.resource.deleted:
+    description: Recurso eliminado (de resources-service)
+    subscribe:
+      operationId: handleResourceDeleted
+      summary: Marca recurso como inactivo en reportes
+      message:
+        $ref: "#/components/messages/GenericEvent"
+
+  bookly.approval.approved:
+    description: Solicitud aprobada (de stockpile-service)
+    subscribe:
+      operationId: handleApprovalApproved
+      summary: Registra aprobación para dashboard de auditoría
+      message:
+        $ref: "#/components/messages/GenericEvent"
+
+  bookly.approval.rejected:
+    description: Solicitud rechazada (de stockpile-service)
+    subscribe:
+      operationId: handleApprovalRejected
+      summary: Registra rechazo para dashboard de auditoría
+      message:
+        $ref: "#/components/messages/GenericEvent"
+
+  bookly.user.created:
+    description: Usuario creado (de auth-service)
+    subscribe:
+      operationId: handleUserCreated
+      summary: Registra usuario para reportes por usuario
+      message:
+        $ref: "#/components/messages/GenericEvent"
+
+  bookly.checkin.completed:
+    description: Check-in completado (de stockpile-service)
+    subscribe:
+      operationId: handleCheckInCompleted
+      summary: Registra datos de cumplimiento de reserva
+      message:
+        $ref: "#/components/messages/GenericEvent"
+
+  bookly.checkout.completed:
+    description: Check-out completado (de stockpile-service)
+    subscribe:
+      operationId: handleCheckOutCompleted
+      summary: Calcula métricas de cumplimiento y ocupación
+      message:
+        $ref: "#/components/messages/GenericEvent"
+
+  reports.export.requested (consumer):
+    description: Exportación solicitada (self-consume para procesamiento async)
+    subscribe:
+      operationId: handleExportRequested
+      summary: Procesa exportación de reporte de forma asíncrona
+      message:
+        $ref: "#/components/messages/ExportRequestedEvent"
+
+components:
+  messages:
+    ExportRequestedEvent:
+      name: reports.export.requested
+      title: Exportación Solicitada
+      contentType: application/json
+      payload:
+        $ref: "#/components/schemas/ExportEventPayload"
+
+    ExportStatusChangedEvent:
+      name: reports.export.statusChanged
+      title: Estado de Exportación Actualizado
+      contentType: application/json
+      payload:
+        $ref: "#/components/schemas/ExportEventPayload"
+
+    EvaluationEvent:
+      name: reports.evaluation.event
+      title: Evento de Evaluación
+      contentType: application/json
+      payload:
+        $ref: "#/components/schemas/EvaluationEventPayload"
+
+    FeedbackEvent:
+      name: reports.feedback.event
+      title: Evento de Feedback
+      contentType: application/json
+      payload:
+        $ref: "#/components/schemas/FeedbackEventPayload"
+
+    GenericEvent:
+      name: generic-event
+      title: Evento Genérico
+      contentType: application/json
+      payload:
+        $ref: "#/components/schemas/GenericEventPayload"
+
+  schemas:
+    ExportEventPayload:
+      type: object
+      required: [eventId, eventType, timestamp, data]
+      properties:
+        eventId:
+          type: string
+        eventType:
+          type: string
+        timestamp:
+          type: string
+          format: date-time
+        data:
+          type: object
+          properties:
+            exportId:
+              type: string
+            userId:
+              type: string
+            format:
+              type: string
+              enum: [csv, xlsx, pdf]
+            reportType:
+              type: string
+            status:
+              type: string
+              enum: [pending, processing, completed, failed]
+            filters:
+              type: object
+
+    EvaluationEventPayload:
+      type: object
+      required: [eventId, eventType, timestamp, data]
+      properties:
+        eventId:
+          type: string
+        eventType:
+          type: string
+        timestamp:
+          type: string
+          format: date-time
+        data:
+          type: object
+          properties:
+            evaluationId:
+              type: string
+            evaluatedUserId:
+              type: string
+            evaluatorId:
+              type: string
+            score:
+              type: number
+            period:
+              type: string
+            hasPriority:
+              type: boolean
+
+    FeedbackEventPayload:
+      type: object
+      required: [eventId, eventType, timestamp, data]
+      properties:
+        eventId:
+          type: string
+        eventType:
+          type: string
+        timestamp:
+          type: string
+          format: date-time
+        data:
+          type: object
+          properties:
+            feedbackId:
+              type: string
+            userId:
+              type: string
+            reservationId:
+              type: string
+            resourceId:
+              type: string
+            rating:
+              type: integer
+              minimum: 1
+              maximum: 5
+            status:
+              type: string
+              enum: [pending, responded, closed]
+
+    GenericEventPayload:
+      type: object
+      required: [eventId, eventType, service, timestamp]
+      properties:
+        eventId:
+          type: string
+        eventType:
+          type: string
+        service:
+          type: string
+        timestamp:
+          type: string
+          format: date-time
+        data:
+          type: object
+
+tags:
+  - name: exports
+    description: Eventos de exportación de reportes
+  - name: evaluations
+    description: Eventos de evaluación de usuarios
+  - name: feedback
+    description: Eventos de feedback de reservas
+  - name: audit
+    description: Eventos de auditoría consumidos

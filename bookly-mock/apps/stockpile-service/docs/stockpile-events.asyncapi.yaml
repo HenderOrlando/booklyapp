@@ -1,0 +1,352 @@
+asyncapi: "2.6.0"
+info:
+  title: Stockpile Service Events API
+  version: "1.0.0"
+  description: |
+    Eventos asincrónicos publicados y consumidos por el Stockpile Service de Bookly.
+    Broker: RabbitMQ (exchange: bookly-events, type: topic)
+  contact:
+    name: Bookly Development Team
+  license:
+    name: MIT
+
+servers:
+  production:
+    url: amqps://horse.lmq.cloudamqp.com/iadjmjao
+    protocol: amqps
+    description: RabbitMQ en CloudAMQP (producción)
+  development:
+    url: amqp://bookly:bookly123@localhost:5672/bookly
+    protocol: amqp
+    description: RabbitMQ local (desarrollo)
+
+channels:
+  # ===== EVENTOS PUBLICADOS =====
+  bookly.checkin.completed:
+    description: Check-in digital completado
+    publish:
+      operationId: publishCheckInCompleted
+      summary: Publicado cuando un usuario completa check-in en un recurso
+      message:
+        $ref: "#/components/messages/CheckInEvent"
+
+  bookly.checkout.completed:
+    description: Check-out digital completado
+    publish:
+      operationId: publishCheckOutCompleted
+      summary: Publicado cuando un usuario completa check-out
+      message:
+        $ref: "#/components/messages/CheckOutEvent"
+
+  bookly.checkout.overdue:
+    description: Check-out con retraso detectado
+    publish:
+      operationId: publishCheckOutOverdue
+      summary: Publicado cuando un check-out se realiza después del horario
+      message:
+        $ref: "#/components/messages/CheckOutEvent"
+
+  bookly.approval-request.audit:
+    description: Acción crítica de aprobación registrada
+    publish:
+      operationId: publishApprovalAudit
+      summary: Publicado para acciones críticas en flujos de aprobación
+      message:
+        $ref: "#/components/messages/ApprovalAuditEvent"
+
+  bookly.notification.sent:
+    description: Notificación enviada exitosamente
+    publish:
+      operationId: publishNotificationSent
+      summary: Publicado cuando una notificación es enviada al usuario
+      message:
+        $ref: "#/components/messages/NotificationEvent"
+
+  bookly.notification.failed:
+    description: Notificación falló al enviarse
+    publish:
+      operationId: publishNotificationFailed
+      summary: Publicado cuando falla el envío de una notificación
+      message:
+        $ref: "#/components/messages/NotificationEvent"
+
+  # ===== EVENTOS CONSUMIDOS =====
+  bookly.reservation.created:
+    description: Reserva creada (de availability-service)
+    subscribe:
+      operationId: handleReservationCreated
+      summary: Inicia flujo de aprobación si el recurso lo requiere
+      message:
+        $ref: "#/components/messages/GenericEvent"
+
+  bookly.resource.status.changed:
+    description: Estado de recurso cambiado (de resources-service)
+    subscribe:
+      operationId: handleResourceStatusChanged
+      summary: Actualiza info de recursos en solicitudes pendientes
+      message:
+        $ref: "#/components/messages/GenericEvent"
+
+  bookly.user.created:
+    description: Usuario creado (de auth-service)
+    subscribe:
+      operationId: handleUserCreated
+      summary: Sincroniza datos de usuario para enriquecer solicitudes
+      message:
+        $ref: "#/components/messages/GenericEvent"
+
+  bookly.user.updated:
+    description: Usuario actualizado (de auth-service)
+    subscribe:
+      operationId: handleUserUpdated
+      summary: Actualiza datos de usuario en solicitudes pendientes
+      message:
+        $ref: "#/components/messages/GenericEvent"
+
+  bookly.role.assigned:
+    description: Rol asignado (de auth-service)
+    subscribe:
+      operationId: handleRoleAssigned
+      summary: Actualiza permisos de aprobación del usuario
+      message:
+        $ref: "#/components/messages/GenericEvent"
+
+  bookly.notification.send.email:
+    description: Solicitud de envío de notificación por email
+    subscribe:
+      operationId: handleSendEmailNotification
+      summary: Procesa envío de notificación por email
+      message:
+        $ref: "#/components/messages/NotificationSendRequest"
+
+  bookly.notification.send.whatsapp:
+    description: Solicitud de envío de notificación por WhatsApp
+    subscribe:
+      operationId: handleSendWhatsAppNotification
+      summary: Procesa envío de notificación por WhatsApp
+      message:
+        $ref: "#/components/messages/NotificationSendRequest"
+
+  bookly.permission.granted:
+    description: Permiso concedido (de auth-service)
+    subscribe:
+      operationId: handlePermissionGranted
+      summary: Actualiza capacidades de aprobación
+      message:
+        $ref: "#/components/messages/GenericEvent"
+
+  bookly.reservation.confirmed:
+    description: Reserva confirmada (de availability-service)
+    subscribe:
+      operationId: handleReservationConfirmed
+      summary: Completa flujo de aprobación
+      message:
+        $ref: "#/components/messages/GenericEvent"
+
+components:
+  messages:
+    CheckInEvent:
+      name: checkin.completed
+      title: Check-In Completado
+      contentType: application/json
+      payload:
+        $ref: "#/components/schemas/CheckInPayload"
+
+    CheckOutEvent:
+      name: checkout.completed
+      title: Check-Out Completado
+      contentType: application/json
+      payload:
+        $ref: "#/components/schemas/CheckOutPayload"
+
+    ApprovalAuditEvent:
+      name: approval-request.audit
+      title: Auditoría de Aprobación
+      contentType: application/json
+      payload:
+        $ref: "#/components/schemas/ApprovalAuditPayload"
+
+    NotificationEvent:
+      name: notification.event
+      title: Evento de Notificación
+      contentType: application/json
+      payload:
+        $ref: "#/components/schemas/NotificationEventPayload"
+
+    NotificationSendRequest:
+      name: notification.send
+      title: Solicitud de Envío de Notificación
+      contentType: application/json
+      payload:
+        $ref: "#/components/schemas/NotificationSendPayload"
+
+    GenericEvent:
+      name: generic-event
+      title: Evento Genérico
+      contentType: application/json
+      payload:
+        $ref: "#/components/schemas/GenericEventPayload"
+
+  schemas:
+    CheckInPayload:
+      type: object
+      required: [eventId, eventType, service, timestamp, data]
+      properties:
+        eventId:
+          type: string
+        eventType:
+          type: string
+          example: checkin.completed
+        service:
+          type: string
+          example: stockpile-service
+        timestamp:
+          type: string
+          format: date-time
+        data:
+          type: object
+          properties:
+            checkInId:
+              type: string
+            userId:
+              type: string
+            reservationId:
+              type: string
+            resourceId:
+              type: string
+            checkInTime:
+              type: string
+              format: date-time
+            coordinates:
+              type: object
+              properties:
+                latitude:
+                  type: number
+                longitude:
+                  type: number
+
+    CheckOutPayload:
+      type: object
+      required: [eventId, eventType, service, timestamp, data]
+      properties:
+        eventId:
+          type: string
+        eventType:
+          type: string
+          example: checkout.completed
+        service:
+          type: string
+          example: stockpile-service
+        timestamp:
+          type: string
+          format: date-time
+        data:
+          type: object
+          properties:
+            checkOutId:
+              type: string
+            userId:
+              type: string
+            resourceId:
+              type: string
+            checkOutTime:
+              type: string
+              format: date-time
+            isOverdue:
+              type: boolean
+            durationMinutes:
+              type: integer
+
+    ApprovalAuditPayload:
+      type: object
+      required: [eventId, eventType, service, timestamp, data]
+      properties:
+        eventId:
+          type: string
+        eventType:
+          type: string
+          example: APPROVAL_AUDIT_CRITICAL_ACTION
+        service:
+          type: string
+          example: stockpile-service
+        timestamp:
+          type: string
+          format: date-time
+        data:
+          type: object
+          properties:
+            approvalRequestId:
+              type: string
+            action:
+              type: string
+            userId:
+              type: string
+            isCritical:
+              type: boolean
+
+    NotificationEventPayload:
+      type: object
+      required: [eventId, eventType, service, timestamp, data]
+      properties:
+        eventId:
+          type: string
+        eventType:
+          type: string
+        service:
+          type: string
+          example: stockpile-service
+        timestamp:
+          type: string
+          format: date-time
+        data:
+          type: object
+          properties:
+            notificationId:
+              type: string
+            channel:
+              type: string
+              enum: [email, whatsapp, push]
+            recipientId:
+              type: string
+            status:
+              type: string
+              enum: [sent, failed]
+            error:
+              type: string
+
+    NotificationSendPayload:
+      type: object
+      properties:
+        recipientId:
+          type: string
+        channel:
+          type: string
+          enum: [email, whatsapp]
+        template:
+          type: string
+        data:
+          type: object
+
+    GenericEventPayload:
+      type: object
+      required: [eventId, eventType, service, timestamp]
+      properties:
+        eventId:
+          type: string
+        eventType:
+          type: string
+        service:
+          type: string
+        timestamp:
+          type: string
+          format: date-time
+        data:
+          type: object
+
+tags:
+  - name: approvals
+    description: Eventos de flujos de aprobación
+  - name: check-in-out
+    description: Eventos de check-in y check-out digital
+  - name: notifications
+    description: Eventos de notificaciones

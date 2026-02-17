@@ -1,0 +1,384 @@
+asyncapi: "2.6.0"
+info:
+  title: Availability Service Events API
+  version: "1.0.0"
+  description: |
+    Eventos asincrónicos publicados y consumidos por el Availability Service de Bookly.
+    Broker: RabbitMQ (exchange: bookly-events, type: topic)
+  contact:
+    name: Bookly Development Team
+  license:
+    name: MIT
+
+servers:
+  production:
+    url: amqps://horse.lmq.cloudamqp.com/iadjmjao
+    protocol: amqps
+    description: RabbitMQ en CloudAMQP (producción)
+  development:
+    url: amqp://bookly:bookly123@localhost:5672/bookly
+    protocol: amqp
+    description: RabbitMQ local (desarrollo)
+
+channels:
+  # ===== EVENTOS PUBLICADOS =====
+  bookly.recurring.series.created:
+    description: Serie de reservas recurrentes creada
+    publish:
+      operationId: publishRecurringSeriesCreated
+      summary: Publicado al crear una serie de reservas recurrentes
+      message:
+        $ref: "#/components/messages/RecurringSeriesEvent"
+
+  bookly.recurring.series.updated:
+    description: Serie de reservas recurrentes actualizada
+    publish:
+      operationId: publishRecurringSeriesUpdated
+      summary: Publicado al actualizar una serie recurrente
+      message:
+        $ref: "#/components/messages/RecurringSeriesEvent"
+
+  bookly.recurring.series.cancelled:
+    description: Serie de reservas recurrentes cancelada
+    publish:
+      operationId: publishRecurringSeriesCancelled
+      summary: Publicado al cancelar una serie recurrente completa
+      message:
+        $ref: "#/components/messages/RecurringSeriesEvent"
+
+  bookly.recurring.instance.modified:
+    description: Instancia individual de reserva recurrente modificada
+    publish:
+      operationId: publishRecurringInstanceModified
+      summary: Publicado al modificar una instancia individual
+      message:
+        $ref: "#/components/messages/RecurringInstanceEvent"
+
+  bookly.recurring.instance.cancelled:
+    description: Instancia individual de reserva recurrente cancelada
+    publish:
+      operationId: publishRecurringInstanceCancelled
+      summary: Publicado al cancelar una instancia individual
+      message:
+        $ref: "#/components/messages/RecurringInstanceEvent"
+
+  bookly.reassignment.suggested:
+    description: Reasignación de recurso sugerida
+    publish:
+      operationId: publishReassignmentSuggested
+      summary: Publicado cuando se sugiere reasignar una reserva a otro recurso
+      message:
+        $ref: "#/components/messages/ReassignmentEvent"
+
+  bookly.reassignment.accepted:
+    description: Reasignación de recurso aceptada
+    publish:
+      operationId: publishReassignmentAccepted
+      summary: Publicado cuando el usuario acepta la reasignación
+      message:
+        $ref: "#/components/messages/ReassignmentEvent"
+
+  bookly.reassignment.rejected:
+    description: Reasignación de recurso rechazada
+    publish:
+      operationId: publishReassignmentRejected
+      summary: Publicado cuando el usuario rechaza la reasignación
+      message:
+        $ref: "#/components/messages/ReassignmentEvent"
+
+  bookly.maintenance.started:
+    description: Mantenimiento de recurso iniciado
+    publish:
+      operationId: publishMaintenanceStarted
+      summary: Publicado cuando inicia un bloqueo de mantenimiento
+      message:
+        $ref: "#/components/messages/MaintenanceEvent"
+
+  bookly.maintenance.completed:
+    description: Mantenimiento de recurso completado
+    publish:
+      operationId: publishMaintenanceCompleted
+      summary: Publicado cuando se completa un mantenimiento
+      message:
+        $ref: "#/components/messages/MaintenanceEvent"
+
+  bookly.maintenance.cancelled:
+    description: Mantenimiento de recurso cancelado
+    publish:
+      operationId: publishMaintenanceCancelled
+      summary: Publicado cuando se cancela un mantenimiento programado
+      message:
+        $ref: "#/components/messages/MaintenanceEvent"
+
+  bookly.maintenance.user.notified:
+    description: Usuario notificado sobre mantenimiento que afecta su reserva
+    publish:
+      operationId: publishMaintenanceUserNotified
+      summary: Publicado para cada usuario afectado por un mantenimiento
+      message:
+        $ref: "#/components/messages/MaintenanceUserNotification"
+
+  # ===== EVENTOS CONSUMIDOS =====
+  bookly.resource.updated:
+    description: Recurso actualizado (de resources-service)
+    subscribe:
+      operationId: handleResourceUpdated
+      summary: Sincroniza metadata local del recurso
+      message:
+        $ref: "#/components/messages/GenericEvent"
+
+  bookly.resource.deleted:
+    description: Recurso eliminado (de resources-service)
+    subscribe:
+      operationId: handleResourceDeleted
+      summary: Cancela reservas activas del recurso eliminado
+      message:
+        $ref: "#/components/messages/GenericEvent"
+
+  bookly.resource.status.changed:
+    description: Estado de recurso cambiado (de resources-service)
+    subscribe:
+      operationId: handleResourceStatusChanged
+      summary: Actualiza disponibilidad basada en estado del recurso
+      message:
+        $ref: "#/components/messages/GenericEvent"
+
+  bookly.role.assigned:
+    description: Rol asignado a usuario (de auth-service)
+    subscribe:
+      operationId: handleRoleAssigned
+      summary: Actualiza permisos de disponibilidad por perfil
+      message:
+        $ref: "#/components/messages/GenericEvent"
+
+  bookly.approval.granted:
+    description: Aprobación concedida (de stockpile-service)
+    subscribe:
+      operationId: handleApprovalGranted
+      summary: Confirma reserva que requería aprobación
+      message:
+        $ref: "#/components/messages/GenericEvent"
+
+  bookly.approval.rejected:
+    description: Aprobación rechazada (de stockpile-service)
+    subscribe:
+      operationId: handleApprovalRejected
+      summary: Cancela reserva cuya aprobación fue rechazada
+      message:
+        $ref: "#/components/messages/GenericEvent"
+
+  bookly.maintenance.scheduled:
+    description: Mantenimiento programado (de resources-service)
+    subscribe:
+      operationId: handleMaintenanceScheduled
+      summary: Crea bloqueo de disponibilidad por mantenimiento
+      message:
+        $ref: "#/components/messages/GenericEvent"
+
+  bookly.availability.rules.updated:
+    description: Reglas de disponibilidad actualizadas (de resources-service)
+    subscribe:
+      operationId: handleAvailabilityRulesUpdated
+      summary: Recalcula slots disponibles
+      message:
+        $ref: "#/components/messages/GenericEvent"
+
+components:
+  messages:
+    RecurringSeriesEvent:
+      name: recurring.series.event
+      title: Evento de Serie Recurrente
+      contentType: application/json
+      payload:
+        $ref: "#/components/schemas/RecurringSeriesPayload"
+
+    RecurringInstanceEvent:
+      name: recurring.instance.event
+      title: Evento de Instancia Recurrente
+      contentType: application/json
+      payload:
+        $ref: "#/components/schemas/RecurringInstancePayload"
+
+    ReassignmentEvent:
+      name: reassignment.event
+      title: Evento de Reasignación
+      contentType: application/json
+      payload:
+        $ref: "#/components/schemas/ReassignmentPayload"
+
+    MaintenanceEvent:
+      name: maintenance.event
+      title: Evento de Mantenimiento
+      contentType: application/json
+      payload:
+        $ref: "#/components/schemas/MaintenancePayload"
+
+    MaintenanceUserNotification:
+      name: maintenance.user.notified
+      title: Notificación de Mantenimiento a Usuario
+      contentType: application/json
+      payload:
+        $ref: "#/components/schemas/MaintenanceUserNotificationPayload"
+
+    GenericEvent:
+      name: generic-event
+      title: Evento Genérico
+      contentType: application/json
+      payload:
+        $ref: "#/components/schemas/GenericEventPayload"
+
+  schemas:
+    RecurringSeriesPayload:
+      type: object
+      required: [eventId, eventType, service, timestamp, data]
+      properties:
+        eventId:
+          type: string
+        eventType:
+          type: string
+        service:
+          type: string
+          example: availability-service
+        timestamp:
+          type: string
+          format: date-time
+        data:
+          type: object
+          properties:
+            seriesId:
+              type: string
+            resourceId:
+              type: string
+            userId:
+              type: string
+            pattern:
+              type: string
+              description: Patrón de recurrencia (daily, weekly, monthly)
+            instanceCount:
+              type: integer
+        metadata:
+          type: object
+          properties:
+            aggregateId:
+              type: string
+
+    RecurringInstancePayload:
+      type: object
+      required: [eventId, eventType, service, timestamp, data]
+      properties:
+        eventId:
+          type: string
+        eventType:
+          type: string
+        service:
+          type: string
+          example: availability-service
+        timestamp:
+          type: string
+          format: date-time
+        data:
+          type: object
+          properties:
+            seriesId:
+              type: string
+            instanceId:
+              type: string
+            originalDate:
+              type: string
+              format: date-time
+
+    ReassignmentPayload:
+      type: object
+      required: [eventId, eventType, service, timestamp]
+      properties:
+        eventId:
+          type: string
+        eventType:
+          type: string
+        service:
+          type: string
+          example: availability-service
+        timestamp:
+          type: string
+          format: date-time
+        data:
+          type: object
+          properties:
+            reservationId:
+              type: string
+            originalResourceId:
+              type: string
+            suggestedResourceId:
+              type: string
+            userId:
+              type: string
+            reason:
+              type: string
+
+    MaintenancePayload:
+      type: object
+      required: [eventId, eventType, service, timestamp]
+      properties:
+        eventId:
+          type: string
+        eventType:
+          type: string
+        service:
+          type: string
+          example: availability-service
+        timestamp:
+          type: string
+          format: date-time
+        data:
+          type: object
+          properties:
+            maintenanceId:
+              type: string
+            resourceId:
+              type: string
+            startDate:
+              type: string
+              format: date-time
+            endDate:
+              type: string
+              format: date-time
+            description:
+              type: string
+
+    MaintenanceUserNotificationPayload:
+      type: object
+      properties:
+        maintenanceId:
+          type: string
+        resourceId:
+          type: string
+        userId:
+          type: string
+        reservationId:
+          type: string
+        userEmail:
+          type: string
+
+    GenericEventPayload:
+      type: object
+      required: [eventId, eventType, service, timestamp]
+      properties:
+        eventId:
+          type: string
+        eventType:
+          type: string
+        service:
+          type: string
+        timestamp:
+          type: string
+          format: date-time
+        data:
+          type: object
+
+tags:
+  - name: reservations
+    description: Eventos de reservas y series recurrentes
+  - name: reassignment
+    description: Eventos de reasignación de recursos
+  - name: maintenance
+    description: Eventos de mantenimiento y bloqueos

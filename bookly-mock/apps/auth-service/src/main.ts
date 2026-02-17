@@ -2,7 +2,6 @@
 import "tsconfig-paths/register";
 
 import { createLogger } from "@libs/common";
-import { DatabaseService } from "@libs/database";
 import { ValidationPipe } from "@nestjs/common";
 import { NestFactory } from "@nestjs/core";
 import { DocumentBuilder, SwaggerModule } from "@nestjs/swagger";
@@ -68,9 +67,8 @@ async function bootstrap() {
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup("api/docs", app, document);
 
-  // Habilitar shutdown graceful para base de datos
-  const databaseService = app.get(DatabaseService);
-  await databaseService.enableShutdownHooks(app);
+  // Habilitar shutdown graceful para todos los providers (EventBus, Redis, DB)
+  app.enableShutdownHooks();
 
   // Start server
   const port = process.env.AUTH_PORT || 3001;

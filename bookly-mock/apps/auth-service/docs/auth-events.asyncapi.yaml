@@ -1,0 +1,261 @@
+asyncapi: "2.6.0"
+info:
+  title: Auth Service Events API
+  version: "1.0.0"
+  description: |
+    Eventos asincrónicos publicados y consumidos por el Auth Service de Bookly.
+    Broker: RabbitMQ (exchange: bookly-events, type: topic)
+  contact:
+    name: Bookly Development Team
+  license:
+    name: MIT
+
+servers:
+  production:
+    url: amqps://horse.lmq.cloudamqp.com/iadjmjao
+    protocol: amqps
+    description: RabbitMQ en CloudAMQP (producción)
+  development:
+    url: amqp://bookly:bookly123@localhost:5672/bookly
+    protocol: amqp
+    description: RabbitMQ local (desarrollo)
+
+channels:
+  bookly.user.created:
+    description: Usuario registrado en el sistema
+    publish:
+      operationId: publishUserCreated
+      summary: Publicado cuando se registra un nuevo usuario
+      message:
+        $ref: "#/components/messages/UserCreated"
+
+  bookly.user.updated:
+    description: Datos de usuario actualizados
+    publish:
+      operationId: publishUserUpdated
+      summary: Publicado cuando se actualiza un usuario
+      message:
+        $ref: "#/components/messages/UserUpdated"
+
+  bookly.user.deleted:
+    description: Usuario eliminado del sistema
+    publish:
+      operationId: publishUserDeleted
+      summary: Publicado cuando se elimina un usuario
+      message:
+        $ref: "#/components/messages/UserDeleted"
+
+  bookly.role.assigned:
+    description: Rol asignado a un usuario
+    publish:
+      operationId: publishRoleAssigned
+      summary: Publicado cuando se asigna un rol a un usuario
+      message:
+        $ref: "#/components/messages/RoleAssigned"
+
+  bookly.auth.2fa.enabled:
+    description: 2FA habilitado para un usuario
+    publish:
+      operationId: publish2FAEnabled
+      summary: Publicado cuando un usuario habilita 2FA
+      message:
+        $ref: "#/components/messages/TwoFactorEnabled"
+
+  bookly.auth.2fa.disabled:
+    description: 2FA deshabilitado para un usuario
+    publish:
+      operationId: publish2FADisabled
+      summary: Publicado cuando un usuario deshabilita 2FA
+      message:
+        $ref: "#/components/messages/TwoFactorDisabled"
+
+  bookly.auth.2fa.verification.failed:
+    description: Intento fallido de verificación 2FA
+    publish:
+      operationId: publish2FAVerificationFailed
+      summary: Publicado cuando falla una verificación 2FA
+      message:
+        $ref: "#/components/messages/TwoFactorVerificationFailed"
+
+  bookly.audit.*:
+    description: Eventos de auditoría (publicados por AuditService)
+    publish:
+      operationId: publishAuditEvent
+      summary: Eventos de auditoría para acciones del sistema
+      message:
+        $ref: "#/components/messages/AuditEvent"
+
+components:
+  messages:
+    UserCreated:
+      name: user.created
+      title: Usuario Creado
+      contentType: application/json
+      payload:
+        $ref: "#/components/schemas/UserEventPayload"
+
+    UserUpdated:
+      name: user.updated
+      title: Usuario Actualizado
+      contentType: application/json
+      payload:
+        $ref: "#/components/schemas/UserEventPayload"
+
+    UserDeleted:
+      name: user.deleted
+      title: Usuario Eliminado
+      contentType: application/json
+      payload:
+        $ref: "#/components/schemas/UserEventPayload"
+
+    RoleAssigned:
+      name: role.assigned
+      title: Rol Asignado
+      contentType: application/json
+      payload:
+        $ref: "#/components/schemas/RoleAssignedPayload"
+
+    TwoFactorEnabled:
+      name: auth.2fa.enabled
+      title: 2FA Habilitado
+      contentType: application/json
+      payload:
+        $ref: "#/components/schemas/TwoFactorEventPayload"
+
+    TwoFactorDisabled:
+      name: auth.2fa.disabled
+      title: 2FA Deshabilitado
+      contentType: application/json
+      payload:
+        $ref: "#/components/schemas/TwoFactorEventPayload"
+
+    TwoFactorVerificationFailed:
+      name: auth.2fa.verification.failed
+      title: Verificación 2FA Fallida
+      contentType: application/json
+      payload:
+        $ref: "#/components/schemas/TwoFactorEventPayload"
+
+    AuditEvent:
+      name: audit.event
+      title: Evento de Auditoría
+      contentType: application/json
+      payload:
+        $ref: "#/components/schemas/AuditEventPayload"
+
+  schemas:
+    UserEventPayload:
+      type: object
+      required: [eventId, eventType, service, timestamp, data]
+      properties:
+        eventId:
+          type: string
+          description: ID único del evento
+        eventType:
+          type: string
+          description: Tipo de evento
+        service:
+          type: string
+          example: auth-service
+        timestamp:
+          type: string
+          format: date-time
+        data:
+          type: object
+          properties:
+            userId:
+              type: string
+            email:
+              type: string
+            firstName:
+              type: string
+            lastName:
+              type: string
+            roles:
+              type: array
+              items:
+                type: string
+
+    RoleAssignedPayload:
+      type: object
+      required: [eventId, eventType, service, timestamp, data]
+      properties:
+        eventId:
+          type: string
+        eventType:
+          type: string
+          example: role.assigned
+        service:
+          type: string
+          example: auth-service
+        timestamp:
+          type: string
+          format: date-time
+        data:
+          type: object
+          properties:
+            userId:
+              type: string
+            roleId:
+              type: string
+            roleName:
+              type: string
+
+    TwoFactorEventPayload:
+      type: object
+      required: [eventId, eventType, service, timestamp, data]
+      properties:
+        eventId:
+          type: string
+        eventType:
+          type: string
+        service:
+          type: string
+          example: auth-service
+        timestamp:
+          type: string
+          format: date-time
+        data:
+          type: object
+          properties:
+            userId:
+              type: string
+            email:
+              type: string
+
+    AuditEventPayload:
+      type: object
+      required: [eventId, eventType, service, timestamp, data]
+      properties:
+        eventId:
+          type: string
+        eventType:
+          type: string
+        service:
+          type: string
+          example: auth-service
+        timestamp:
+          type: string
+          format: date-time
+        data:
+          type: object
+          properties:
+            userId:
+              type: string
+            action:
+              type: string
+            resource:
+              type: string
+            status:
+              type: string
+              enum: [SUCCESS, FAILED]
+            ip:
+              type: string
+            userAgent:
+              type: string
+
+tags:
+  - name: auth
+    description: Eventos de autenticación y usuarios
+  - name: audit
+    description: Eventos de auditoría del sistema
