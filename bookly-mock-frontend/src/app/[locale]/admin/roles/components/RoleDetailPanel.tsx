@@ -47,7 +47,7 @@ export function RoleDetailPanel({
   if (!show || !role) return null;
 
   const usersWithRole = users.filter((u: User) =>
-    u.roles.some((r) => r.id === role.id)
+    u.roles.some((r) => r.id === role.id),
   );
 
   const filteredPermissions = role.permissions.filter(
@@ -56,7 +56,7 @@ export function RoleDetailPanel({
         ?.toLowerCase()
         .includes(filterPermissionDetail.toLowerCase()) ||
       p.resource.toLowerCase().includes(filterPermissionDetail.toLowerCase()) ||
-      p.action.toLowerCase().includes(filterPermissionDetail.toLowerCase())
+      p.action.toLowerCase().includes(filterPermissionDetail.toLowerCase()),
   );
 
   const filteredUsers = usersWithRole.filter(
@@ -64,7 +64,7 @@ export function RoleDetailPanel({
       `${u.firstName} ${u.lastName}`
         .toLowerCase()
         .includes(filterUserDetail.toLowerCase()) ||
-      u.email.toLowerCase().includes(filterUserDetail.toLowerCase())
+      u.email.toLowerCase().includes(filterUserDetail.toLowerCase()),
   );
 
   return (
@@ -94,7 +94,7 @@ export function RoleDetailPanel({
                 <label className="text-sm font-medium text-[var(--color-text-tertiary)]">
                   {t("name")}
                 </label>
-                <div className="text-white mt-1">{role.name}</div>
+                <div className="text-foreground mt-1">{role.name}</div>
               </div>
             </div>
 
@@ -102,7 +102,7 @@ export function RoleDetailPanel({
               <label className="text-sm font-medium text-[var(--color-text-tertiary)]">
                 {t("description")}
               </label>
-              <div className="text-white mt-1">{role.description}</div>
+              <div className="text-foreground mt-1">{role.description}</div>
             </div>
 
             <div className="grid grid-cols-2 gap-4">
@@ -110,7 +110,9 @@ export function RoleDetailPanel({
                 <label className="text-sm font-medium text-[var(--color-text-tertiary)]">
                   {t("assigned_users")}
                 </label>
-                <div className="text-white mt-1">{usersWithRole.length}</div>
+                <div className="text-foreground mt-1">
+                  {usersWithRole.length}
+                </div>
               </div>
               <div>
                 <label className="text-sm font-medium text-[var(--color-text-tertiary)]">
@@ -152,12 +154,12 @@ export function RoleDetailPanel({
                     >
                       <div className="flex items-start gap-2">
                         <div className="flex-shrink-0 w-8 h-8 bg-brand-primary-500 rounded-lg flex items-center justify-center">
-                          <span className="text-white text-xs font-bold">
+                          <span className="text-foreground text-xs font-bold">
                             {perm.resource.charAt(0).toUpperCase()}
                           </span>
                         </div>
                         <div className="flex-1 min-w-0">
-                          <div className="text-white text-sm font-medium">
+                          <div className="text-foreground text-sm font-medium">
                             {perm.description}
                           </div>
                           <div className="text-[var(--color-text-tertiary)] text-xs mt-1">
@@ -199,13 +201,13 @@ export function RoleDetailPanel({
                     >
                       <div className="flex items-center gap-3">
                         <div className="flex-shrink-0 w-10 h-10 bg-brand-primary-500 rounded-full flex items-center justify-center">
-                          <span className="text-white font-bold">
+                          <span className="text-foreground font-bold">
                             {user.firstName.charAt(0)}
                             {user.lastName.charAt(0)}
                           </span>
                         </div>
                         <div className="flex-1 min-w-0">
-                          <div className="text-white text-sm font-medium">
+                          <div className="text-foreground text-sm font-medium">
                             {user.firstName} {user.lastName}
                           </div>
                           <div className="text-xs text-[var(--color-text-tertiary)] truncate">
@@ -225,7 +227,7 @@ export function RoleDetailPanel({
                 <label className="text-sm font-medium text-[var(--color-text-tertiary)]">
                   {t("created_at")}
                 </label>
-                <div className="text-white mt-1">
+                <div className="text-foreground mt-1">
                   {new Date(role.createdAt).toLocaleString("es-ES")}
                 </div>
               </div>
@@ -233,7 +235,7 @@ export function RoleDetailPanel({
                 <label className="text-sm font-medium text-[var(--color-text-tertiary)]">
                   {t("updated_at")}
                 </label>
-                <div className="text-white mt-1">
+                <div className="text-foreground mt-1">
                   {new Date(role.updatedAt).toLocaleString("es-ES")}
                 </div>
               </div>

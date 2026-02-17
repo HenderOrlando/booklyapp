@@ -47,8 +47,10 @@ export function RolesTable({
       header: t("role_name"),
       cell: (role: RoleWithStats) => (
         <div>
-          <div className="font-medium text-white">{role.name}</div>
-          <div className="text-sm text-[var(--color-text-tertiary)]">{role.description || ""}</div>
+          <div className="font-medium text-foreground">{role.name}</div>
+          <div className="text-sm text-[var(--color-text-tertiary)]">
+            {role.description || ""}
+          </div>
         </div>
       ),
     },
@@ -97,7 +99,7 @@ export function RolesTable({
   const filteredRoles = roles.filter(
     (role: RoleWithStats) =>
       role.name.toLowerCase().includes(filter.toLowerCase()) ||
-      (role.description || "").toLowerCase().includes(filter.toLowerCase())
+      (role.description || "").toLowerCase().includes(filter.toLowerCase()),
   );
 
   return (

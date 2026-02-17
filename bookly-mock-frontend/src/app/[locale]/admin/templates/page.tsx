@@ -103,7 +103,7 @@ export default function TemplatesPage() {
           {!isEditing && (
             <button
               onClick={handleNew}
-              className="flex items-center gap-2 px-4 py-2 bg-[var(--color-primary-base)] text-white rounded-lg hover:bg-[var(--color-primary-dark)]"
+              className="flex items-center gap-2 px-4 py-2 bg-[var(--color-primary-base)] text-foreground rounded-lg hover:bg-[var(--color-primary-dark)]"
             >
               <Plus className="h-5 w-5" />
               {t("create")}

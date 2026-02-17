@@ -74,7 +74,7 @@ export function RoleFormModal({
         ?.toLowerCase()
         .includes(filterPermissionModal.toLowerCase()) ||
       p.resource.toLowerCase().includes(filterPermissionModal.toLowerCase()) ||
-      p.action.toLowerCase().includes(filterPermissionModal.toLowerCase())
+      p.action.toLowerCase().includes(filterPermissionModal.toLowerCase()),
   );
 
   const filteredUsers = users.filter(
@@ -82,7 +82,7 @@ export function RoleFormModal({
       `${u.firstName} ${u.lastName}`
         .toLowerCase()
         .includes(filterUserModal.toLowerCase()) ||
-      u.email.toLowerCase().includes(filterUserModal.toLowerCase())
+      u.email.toLowerCase().includes(filterUserModal.toLowerCase()),
   );
 
   return (
@@ -109,7 +109,7 @@ export function RoleFormModal({
         <CardContent className="space-y-4">
           {/* Formulario básico */}
           <div>
-            <label className="block text-sm font-medium text-white mb-2">
+            <label className="block text-sm font-medium text-foreground mb-2">
               {t("role_name_label")}
             </label>
             <Input
@@ -120,7 +120,7 @@ export function RoleFormModal({
             />
           </div>
           <div>
-            <label className="block text-sm font-medium text-white mb-2">
+            <label className="block text-sm font-medium text-foreground mb-2">
               {t("role_desc_label")}
             </label>
             <Input
@@ -140,7 +140,7 @@ export function RoleFormModal({
                 className={`pb-2 px-1 border-b-2 transition-colors ${
                   activeTab === "permissions"
                     ? "border-brand-primary-500 text-brand-primary-500"
-                    : "border-transparent text-[var(--color-text-tertiary)] hover:text-white"
+                    : "border-transparent text-[var(--color-text-tertiary)] hover:text-foreground"
                 }`}
               >
                 {t("tab_permissions")} ({selectedPermissions.length})
@@ -151,7 +151,7 @@ export function RoleFormModal({
                 className={`pb-2 px-1 border-b-2 transition-colors ${
                   activeTab === "users"
                     ? "border-brand-primary-500 text-brand-primary-500"
-                    : "border-transparent text-[var(--color-text-tertiary)] hover:text-white"
+                    : "border-transparent text-[var(--color-text-tertiary)] hover:text-foreground"
                 }`}
               >
                 {t("tab_users")} ({selectedUsers.length})
@@ -163,7 +163,7 @@ export function RoleFormModal({
           {activeTab === "permissions" && (
             <div>
               <div className="flex items-center justify-between mb-3">
-                <label className="text-sm font-medium text-white">
+                <label className="text-sm font-medium text-foreground">
                   {t("select_permissions")} ({selectedPermissions.length}{" "}
                   {t("selected")}, {filteredPermissions.length} {t("visible")})
                 </label>
@@ -194,12 +194,12 @@ export function RoleFormModal({
                     />
                     <div className="flex items-start gap-2 flex-1">
                       <div className="flex-shrink-0 w-8 h-8 bg-brand-primary-500 rounded-lg flex items-center justify-center">
-                        <span className="text-white text-xs font-bold">
+                        <span className="text-foreground text-xs font-bold">
                           {perm.resource.charAt(0).toUpperCase()}
                         </span>
                       </div>
                       <div className="flex-1 min-w-0">
-                        <div className="text-white text-sm font-medium">
+                        <div className="text-foreground text-sm font-medium">
                           {perm.description}
                         </div>
                         <div className="text-[var(--color-text-tertiary)] text-xs mt-1">
@@ -217,7 +217,7 @@ export function RoleFormModal({
           {activeTab === "users" && (
             <div>
               <div className="flex items-center justify-between mb-3">
-                <label className="text-sm font-medium text-white">
+                <label className="text-sm font-medium text-foreground">
                   {t("assign_users")} ({selectedUsers.length} {t("selected")},{" "}
                   {filteredUsers.length} {t("visible")})
                 </label>
@@ -247,13 +247,13 @@ export function RoleFormModal({
                       className="rounded w-4 h-4"
                     />
                     <div className="flex-shrink-0 w-10 h-10 bg-brand-primary-500 rounded-full flex items-center justify-center">
-                      <span className="text-white font-bold">
+                      <span className="text-foreground font-bold">
                         {user.firstName.charAt(0)}
                         {user.lastName.charAt(0)}
                       </span>
                     </div>
                     <div className="flex-1 min-w-0">
-                      <div className="text-white text-sm font-medium">
+                      <div className="text-foreground text-sm font-medium">
                         {user.firstName} {user.lastName}
                       </div>
                       <div className="text-xs text-[var(--color-text-tertiary)] truncate">

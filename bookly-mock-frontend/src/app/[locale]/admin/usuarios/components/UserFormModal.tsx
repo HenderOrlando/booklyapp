@@ -90,7 +90,7 @@ export function UserFormModal({
   const filteredRoles = allRoles.filter(
     (r: Role) =>
       r.name.toLowerCase().includes(filterRoles.toLowerCase()) ||
-      (r.description || "").toLowerCase().includes(filterRoles.toLowerCase())
+      (r.description || "").toLowerCase().includes(filterRoles.toLowerCase()),
   );
 
   return (
@@ -119,13 +119,14 @@ export function UserFormModal({
         <CardContent className="space-y-6">
           {/* Sección: Información básica */}
           <div>
-            <h3 className="text-lg font-semibold text-white mb-4">
+            <h3 className="text-lg font-semibold text-foreground mb-4">
               {t("basic_info")}
             </h3>
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <label className="block text-sm font-medium text-white mb-2">
-                  {t("first_name")} <span className="text-state-error-500">*</span>
+                <label className="block text-sm font-medium text-foreground mb-2">
+                  {t("first_name")}{" "}
+                  <span className="text-state-error-500">*</span>
                 </label>
                 <Input
                   placeholder={t("first_name_placeholder")}
@@ -135,8 +136,9 @@ export function UserFormModal({
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-white mb-2">
-                  {t("last_name")} <span className="text-state-error-500">*</span>
+                <label className="block text-sm font-medium text-foreground mb-2">
+                  {t("last_name")}{" "}
+                  <span className="text-state-error-500">*</span>
                 </label>
                 <Input
                   placeholder={t("last_name_placeholder")}
@@ -150,12 +152,12 @@ export function UserFormModal({
 
           {/* Sección: Credenciales */}
           <div>
-            <h3 className="text-lg font-semibold text-white mb-4">
+            <h3 className="text-lg font-semibold text-foreground mb-4">
               {t("credentials")}
             </h3>
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <label className="block text-sm font-medium text-white mb-2">
+                <label className="block text-sm font-medium text-foreground mb-2">
                   {t("email")} <span className="text-state-error-500">*</span>
                 </label>
                 <Input
@@ -172,8 +174,9 @@ export function UserFormModal({
                 )}
               </div>
               <div>
-                <label className="block text-sm font-medium text-white mb-2">
-                  {t("username")} <span className="text-state-error-500">*</span>
+                <label className="block text-sm font-medium text-foreground mb-2">
+                  {t("username")}{" "}
+                  <span className="text-state-error-500">*</span>
                 </label>
                 <Input
                   placeholder={t("username_placeholder")}
@@ -190,8 +193,9 @@ export function UserFormModal({
             </div>
             {!selectedUser && (
               <div className="mt-4">
-                <label className="block text-sm font-medium text-white mb-2">
-                  {t("password")} <span className="text-state-error-500">*</span>
+                <label className="block text-sm font-medium text-foreground mb-2">
+                  {t("password")}{" "}
+                  <span className="text-state-error-500">*</span>
                 </label>
                 <Input
                   type="password"
@@ -209,12 +213,12 @@ export function UserFormModal({
 
           {/* Sección: Información adicional */}
           <div>
-            <h3 className="text-lg font-semibold text-white mb-4">
+            <h3 className="text-lg font-semibold text-foreground mb-4">
               {t("additional_info")}
             </h3>
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <label className="block text-sm font-medium text-white mb-2">
+                <label className="block text-sm font-medium text-foreground mb-2">
                   {t("phone_number")}
                 </label>
                 <Input
@@ -226,14 +230,14 @@ export function UserFormModal({
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-white mb-2">
+                <label className="block text-sm font-medium text-foreground mb-2">
                   {t("document_type")}
                 </label>
                 <select
                   value={documentType}
                   onChange={(e) => onDocumentTypeChange(e.target.value)}
                   disabled={isLoading}
-                  className="w-full px-3 py-2 bg-[var(--color-bg-primary)] border border-[var(--color-border-strong)] rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-brand-primary-500"
+                  className="w-full px-3 py-2 bg-[var(--color-bg-primary)] border border-[var(--color-border-strong)] rounded-lg text-foreground focus:outline-none focus:ring-2 focus:ring-brand-primary-500"
                 >
                   <option value="">{t("select_document_type")}</option>
                   <option value="DNI">DNI</option>
@@ -244,7 +248,7 @@ export function UserFormModal({
               </div>
             </div>
             <div className="mt-4">
-              <label className="block text-sm font-medium text-white mb-2">
+              <label className="block text-sm font-medium text-foreground mb-2">
                 {t("document_number")}
               </label>
               <Input
@@ -259,14 +263,14 @@ export function UserFormModal({
           {/* Sección: Estado */}
           {selectedUser && (
             <div>
-              <h3 className="text-lg font-semibold text-white mb-4">
+              <h3 className="text-lg font-semibold text-foreground mb-4">
                 {t("account_status")}
               </h3>
               <select
                 value={status}
                 onChange={(e) => onStatusChange(e.target.value as UserStatus)}
                 disabled={isLoading}
-                className="w-full px-3 py-2 bg-[var(--color-bg-primary)] border border-[var(--color-border-strong)] rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-brand-primary-500"
+                className="w-full px-3 py-2 bg-[var(--color-bg-primary)] border border-[var(--color-border-strong)] rounded-lg text-foreground focus:outline-none focus:ring-2 focus:ring-brand-primary-500"
               >
                 <option value={UserStatus.ACTIVE}>{t("status_active")}</option>
                 <option value={UserStatus.INACTIVE}>
@@ -285,7 +289,7 @@ export function UserFormModal({
           {/* Sección: Roles */}
           <div>
             <div className="flex items-center justify-between mb-3">
-              <h3 className="text-lg font-semibold text-white">
+              <h3 className="text-lg font-semibold text-foreground">
                 {t("assign_roles")} ({selectedRoles.length} {t("selected")})
               </h3>
               <Input
@@ -315,7 +319,7 @@ export function UserFormModal({
                   />
                   <div className="flex-1">
                     <div className="flex items-center gap-2">
-                      <span className="text-white text-sm font-medium">
+                      <span className="text-foreground text-sm font-medium">
                         {role.name}
                       </span>
                       {role.isSystem && (

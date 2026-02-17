@@ -28,11 +28,11 @@ export function UserStatsCards({ users, roles }: UserStatsCardsProps) {
       });
       return acc;
     },
-    {} as Record<string, number>
+    {} as Record<string, number>,
   );
 
   const mostCommonRole = Object.entries(roleDistribution).sort(
-    ([, a], [, b]) => b - a
+    ([, a], [, b]) => b - a,
   )[0];
 
   return (
@@ -45,7 +45,7 @@ export function UserStatsCards({ users, roles }: UserStatsCardsProps) {
               <p className="text-sm font-medium text-[var(--color-text-tertiary)]">
                 {t("total_users")}
               </p>
-              <h3 className="text-3xl font-bold text-white mt-2">
+              <h3 className="text-3xl font-bold text-foreground mt-2">
                 {users.length}
               </h3>
             </div>
@@ -64,7 +64,7 @@ export function UserStatsCards({ users, roles }: UserStatsCardsProps) {
               <p className="text-sm font-medium text-[var(--color-text-tertiary)]">
                 {t("active_users")}
               </p>
-              <h3 className="text-3xl font-bold text-white mt-2">
+              <h3 className="text-3xl font-bold text-foreground mt-2">
                 {activeUsers.length}
               </h3>
               <p className="text-xs text-[var(--color-text-tertiary)] mt-1">
@@ -87,7 +87,7 @@ export function UserStatsCards({ users, roles }: UserStatsCardsProps) {
               <p className="text-sm font-medium text-[var(--color-text-tertiary)]">
                 {t("inactive_users")}
               </p>
-              <h3 className="text-3xl font-bold text-white mt-2">
+              <h3 className="text-3xl font-bold text-foreground mt-2">
                 {inactiveUsers.length}
               </h3>
               <p className="text-xs text-[var(--color-text-tertiary)] mt-1">
@@ -112,7 +112,7 @@ export function UserStatsCards({ users, roles }: UserStatsCardsProps) {
               <p className="text-sm font-medium text-[var(--color-text-tertiary)]">
                 {t("total_roles")}
               </p>
-              <h3 className="text-3xl font-bold text-white mt-2">
+              <h3 className="text-3xl font-bold text-foreground mt-2">
                 {roles.length}
               </h3>
               {mostCommonRole && (

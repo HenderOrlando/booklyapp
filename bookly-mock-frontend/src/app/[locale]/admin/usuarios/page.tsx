@@ -151,35 +151,35 @@ export default function UsersAdminPage() {
     if (!firstName.trim()) {
       showError(
         t("error") || "Error",
-        t("error_firstname_required") || "First name is required"
+        t("error_firstname_required") || "First name is required",
       );
       return;
     }
     if (!lastName.trim()) {
       showError(
         t("error") || "Error",
-        t("error_lastname_required") || "Last name is required"
+        t("error_lastname_required") || "Last name is required",
       );
       return;
     }
     if (!email.trim()) {
       showError(
         t("error") || "Error",
-        t("error_email_required") || "Email is required"
+        t("error_email_required") || "Email is required",
       );
       return;
     }
     if (!username.trim()) {
       showError(
         t("error") || "Error",
-        t("error_username_required") || "Username is required"
+        t("error_username_required") || "Username is required",
       );
       return;
     }
     if (!selectedUser && !password.trim()) {
       showError(
         t("error") || "Error",
-        t("error_password_required") || "Password is required"
+        t("error_password_required") || "Password is required",
       );
       return;
     }
@@ -199,7 +199,7 @@ export default function UsersAdminPage() {
 
         showSuccess(
           t("success") || "Success",
-          t("success_user_updated") || "User updated successfully"
+          t("success_user_updated") || "User updated successfully",
         );
       } else {
         // Crear nuevo usuario
@@ -216,7 +216,7 @@ export default function UsersAdminPage() {
 
         showSuccess(
           t("success") || "Success",
-          t("success_user_created") || "User created successfully"
+          t("success_user_created") || "User created successfully",
         );
       }
 
@@ -224,7 +224,7 @@ export default function UsersAdminPage() {
     } catch (error: any) {
       showError(
         t("error") || "Error",
-        error?.message || t("error_saving_user") || "Error saving user"
+        error?.message || t("error_saving_user") || "Error saving user",
       );
     }
   };
@@ -232,7 +232,7 @@ export default function UsersAdminPage() {
   const handleDeleteUser = async (userId: string) => {
     if (
       !confirm(
-        t("confirm_delete") || "Are you sure you want to delete this user?"
+        t("confirm_delete") || "Are you sure you want to delete this user?",
       )
     ) {
       return;
@@ -242,13 +242,13 @@ export default function UsersAdminPage() {
       await deleteUserMutation.mutateAsync(userId);
       showSuccess(
         t("success") || "Success",
-        t("success_user_deleted") || "User deleted successfully"
+        t("success_user_deleted") || "User deleted successfully",
       );
       handleCloseDetailPanel();
     } catch (error: any) {
       showError(
         t("error") || "Error",
-        error?.message || t("error_deleting_user") || "Error deleting user"
+        error?.message || t("error_deleting_user") || "Error deleting user",
       );
     }
   };
@@ -277,7 +277,7 @@ export default function UsersAdminPage() {
       user.firstName.toLowerCase().includes(filterUserTable.toLowerCase()) ||
       user.lastName.toLowerCase().includes(filterUserTable.toLowerCase()) ||
       user.email.toLowerCase().includes(filterUserTable.toLowerCase()) ||
-      user.username.toLowerCase().includes(filterUserTable.toLowerCase())
+      user.username.toLowerCase().includes(filterUserTable.toLowerCase()),
   );
 
   // ============================================
@@ -295,8 +295,12 @@ export default function UsersAdminPage() {
         {/* Header */}
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-3xl font-bold text-white">{t("page_title")}</h1>
-            <p className="text-[var(--color-text-tertiary)] mt-1">{t("page_description")}</p>
+            <h1 className="text-3xl font-bold text-foreground">
+              {t("page_title")}
+            </h1>
+            <p className="text-[var(--color-text-tertiary)] mt-1">
+              {t("page_description")}
+            </p>
           </div>
           <Button onClick={handleOpenCreateModal} disabled={loading}>
             + {t("create_user")}

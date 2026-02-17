@@ -59,7 +59,7 @@ export function UserDetailPanel({
     (p: Permission) =>
       p.description?.toLowerCase().includes(filterPermissions.toLowerCase()) ||
       p.resource.toLowerCase().includes(filterPermissions.toLowerCase()) ||
-      p.action.toLowerCase().includes(filterPermissions.toLowerCase())
+      p.action.toLowerCase().includes(filterPermissions.toLowerCase()),
   );
 
   const statusConfig: Record<
@@ -109,7 +109,7 @@ export function UserDetailPanel({
           <CardContent className="space-y-6">
             {/* Información personal */}
             <div>
-              <h3 className="text-lg font-semibold text-white mb-4">
+              <h3 className="text-lg font-semibold text-foreground mb-4">
                 {t("personal_info")}
               </h3>
               <div className="grid grid-cols-2 gap-4">
@@ -117,7 +117,7 @@ export function UserDetailPanel({
                   <label className="text-sm font-medium text-[var(--color-text-tertiary)]">
                     {t("full_name")}
                   </label>
-                  <div className="text-white mt-1">
+                  <div className="text-foreground mt-1">
                     {user.firstName} {user.lastName}
                   </div>
                 </div>
@@ -125,14 +125,14 @@ export function UserDetailPanel({
                   <label className="text-sm font-medium text-[var(--color-text-tertiary)]">
                     {t("username")}
                   </label>
-                  <div className="text-white mt-1">{user.username}</div>
+                  <div className="text-foreground mt-1">{user.username}</div>
                 </div>
                 <div>
                   <label className="text-sm font-medium text-[var(--color-text-tertiary)]">
                     {t("email")}
                   </label>
                   <div className="flex items-center gap-2 mt-1">
-                    <span className="text-white">{user.email}</span>
+                    <span className="text-foreground">{user.email}</span>
                     {user.emailVerified && (
                       <Badge variant="success" className="text-xs">
                         {t("verified")}
@@ -145,7 +145,7 @@ export function UserDetailPanel({
                     {t("phone_number")}
                   </label>
                   <div className="flex items-center gap-2 mt-1">
-                    <span className="text-white">
+                    <span className="text-foreground">
                       {user.phoneNumber || t("not_provided")}
                     </span>
                     {user.phoneVerified && (
@@ -164,7 +164,7 @@ export function UserDetailPanel({
                     <label className="text-sm font-medium text-[var(--color-text-tertiary)]">
                       {t("document_type")}
                     </label>
-                    <div className="text-white mt-1">
+                    <div className="text-foreground mt-1">
                       {user.documentType || t("not_provided")}
                     </div>
                   </div>
@@ -172,7 +172,7 @@ export function UserDetailPanel({
                     <label className="text-sm font-medium text-[var(--color-text-tertiary)]">
                       {t("document_number")}
                     </label>
-                    <div className="text-white mt-1">
+                    <div className="text-foreground mt-1">
                       {user.documentNumber || t("not_provided")}
                     </div>
                   </div>
@@ -206,7 +206,7 @@ export function UserDetailPanel({
                 <label className="text-sm font-medium text-[var(--color-text-tertiary)]">
                   {t("last_login")}
                 </label>
-                <div className="text-white mt-1">
+                <div className="text-foreground mt-1">
                   {user.lastLoginAt
                     ? new Date(user.lastLoginAt).toLocaleString("es-ES")
                     : t("never")}
@@ -216,7 +216,7 @@ export function UserDetailPanel({
 
             {/* Roles asignados */}
             <div>
-              <h3 className="text-lg font-semibold text-white mb-4">
+              <h3 className="text-lg font-semibold text-foreground mb-4">
                 {t("assigned_roles")} ({user.roles.length})
               </h3>
               {user.roles.length === 0 ? (
@@ -231,7 +231,7 @@ export function UserDetailPanel({
                       className="p-4 bg-gradient-to-r from-gray-800 to-gray-750 rounded-lg border border-[var(--color-border-strong)]"
                     >
                       <div className="flex items-center justify-between mb-2">
-                        <span className="text-white font-medium">
+                        <span className="text-foreground font-medium">
                           {role.name}
                         </span>
                         {role.isSystem && (
@@ -257,7 +257,7 @@ export function UserDetailPanel({
             {/* Permisos efectivos */}
             <div>
               <div className="flex items-center justify-between mb-3">
-                <h3 className="text-lg font-semibold text-white">
+                <h3 className="text-lg font-semibold text-foreground">
                   {t("effective_permissions")} ({filteredPermissions.length} /{" "}
                   {effectivePermissions.length})
                 </h3>
@@ -282,12 +282,12 @@ export function UserDetailPanel({
                     >
                       <div className="flex items-start gap-2">
                         <div className="flex-shrink-0 w-8 h-8 bg-brand-primary-500 rounded-lg flex items-center justify-center">
-                          <span className="text-white text-xs font-bold">
+                          <span className="text-foreground text-xs font-bold">
                             {perm.resource.charAt(0).toUpperCase()}
                           </span>
                         </div>
                         <div className="flex-1 min-w-0">
-                          <div className="text-white text-xs font-medium">
+                          <div className="text-foreground text-xs font-medium">
                             {perm.description ||
                               `${perm.resource}:${perm.action}`}
                           </div>
@@ -308,7 +308,7 @@ export function UserDetailPanel({
                 <label className="text-sm font-medium text-[var(--color-text-tertiary)]">
                   {t("created_at")}
                 </label>
-                <div className="text-white mt-1">
+                <div className="text-foreground mt-1">
                   {new Date(user.createdAt).toLocaleString("es-ES")}
                 </div>
               </div>
@@ -316,7 +316,7 @@ export function UserDetailPanel({
                 <label className="text-sm font-medium text-[var(--color-text-tertiary)]">
                   {t("updated_at")}
                 </label>
-                <div className="text-white mt-1">
+                <div className="text-foreground mt-1">
                   {new Date(user.updatedAt).toLocaleString("es-ES")}
                 </div>
               </div>

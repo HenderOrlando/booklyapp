@@ -65,7 +65,7 @@ export default function RolesAdminPage() {
     return roles.map((role) => ({
       ...role,
       usersCount: users.filter((user) =>
-        user.roles.some((r) => r.id === role.id)
+        user.roles.some((r) => r.id === role.id),
       ).length,
     }));
   }, [roles, users]);
@@ -83,7 +83,7 @@ export default function RolesAdminPage() {
   const [showRoleModal, setShowRoleModal] = React.useState(false);
   const [showRoleDetail, setShowRoleDetail] = React.useState(false);
   const [activeTab, setActiveTab] = React.useState<"permissions" | "users">(
-    "permissions"
+    "permissions",
   );
   const [selectedPermissions, setSelectedPermissions] = React.useState<
     string[]
@@ -119,8 +119,10 @@ export default function RolesAdminPage() {
       header: t("role_name"),
       cell: (role: Role) => (
         <div>
-          <div className="font-medium text-white">{role.name}</div>
-          <div className="text-sm text-[var(--color-text-tertiary)]">{role.description}</div>
+          <div className="font-medium text-foreground">{role.name}</div>
+          <div className="text-sm text-[var(--color-text-tertiary)]">
+            {role.description}
+          </div>
         </div>
       ),
     },
@@ -162,11 +164,11 @@ export default function RolesAdminPage() {
               setRoleName(role.name);
               setRoleDescription(role.description || "");
               setSelectedPermissions(
-                role.permissions.map((p: Permission) => p.id)
+                role.permissions.map((p: Permission) => p.id),
               );
               // Get users with this role
               const usersWithRole = users.filter((u: User) =>
-                u.roles.some((r) => r.id === role.id)
+                u.roles.some((r) => r.id === role.id),
               );
               setSelectedUsers(usersWithRole.map((u: User) => u.id));
               setShowRoleModal(true);
@@ -196,7 +198,7 @@ export default function RolesAdminPage() {
       header: t("permission"),
       cell: (perm: Permission) => (
         <div>
-          <div className="font-medium text-white">{perm.description}</div>
+          <div className="font-medium text-foreground">{perm.description}</div>
           <div className="text-sm text-[var(--color-text-tertiary)]">
             {perm.resource} : {perm.action}
           </div>
@@ -208,12 +210,14 @@ export default function RolesAdminPage() {
       header: t("roles_with_perm"),
       cell: (perm: Permission) => {
         const rolesWithPermission = roles.filter((role: Role) =>
-          role.permissions.some((p: Permission) => p.id === perm.id)
+          role.permissions.some((p: Permission) => p.id === perm.id),
         );
         return (
           <div className="flex flex-wrap gap-1">
             {rolesWithPermission.length === 0 ? (
-              <span className="text-[var(--color-text-tertiary)] text-sm">{t("no_roles")}</span>
+              <span className="text-[var(--color-text-tertiary)] text-sm">
+                {t("no_roles")}
+              </span>
             ) : (
               rolesWithPermission.map((role: Role) => (
                 <Badge key={role.id} variant="primary">
@@ -231,7 +235,7 @@ export default function RolesAdminPage() {
     if (!roleName.trim()) {
       showError(
         t("error") || "Error",
-        t("error_name_required") || "Name is required"
+        t("error_name_required") || "Name is required",
       );
       return;
     }
@@ -250,7 +254,7 @@ export default function RolesAdminPage() {
         });
         showSuccess(
           t("success") || "Success",
-          t("success_role_updated") || "Role updated successfully"
+          t("success_role_updated") || "Role updated successfully",
         );
       } else {
         // Crear nuevo rol
@@ -263,14 +267,14 @@ export default function RolesAdminPage() {
         });
         showSuccess(
           t("success") || "Success",
-          t("success_role_created") || "Role created successfully"
+          t("success_role_created") || "Role created successfully",
         );
       }
       handleCloseRoleModal();
     } catch (error: any) {
       showError(
         t("error") || "Error",
-        error?.message || t("error_saving_role") || "Error saving role"
+        error?.message || t("error_saving_role") || "Error saving role",
       );
     }
   };
@@ -296,7 +300,7 @@ export default function RolesAdminPage() {
   const handleDeleteRole = async (roleId: string) => {
     if (
       !confirm(
-        t("confirm_delete") || "Are you sure you want to delete this role?"
+        t("confirm_delete") || "Are you sure you want to delete this role?",
       )
     ) {
       return;
@@ -306,20 +310,20 @@ export default function RolesAdminPage() {
       await deleteRoleMutation.mutateAsync(roleId);
       showSuccess(
         t("success") || "Success",
-        t("success_role_deleted") || "Role deleted successfully"
+        t("success_role_deleted") || "Role deleted successfully",
       );
       handleCloseRoleDetail();
     } catch (error: any) {
       showError(
         t("error") || "Error",
-        error?.message || t("error_deleting_role") || "Error deleting role"
+        error?.message || t("error_deleting_role") || "Error deleting role",
       );
     }
   };
 
   const handleAssignPermissions = async (
     roleId: string,
-    permissionIds: string[]
+    permissionIds: string[],
   ) => {
     try {
       await assignPermissionsMutation.mutateAsync({
@@ -328,21 +332,22 @@ export default function RolesAdminPage() {
       });
       showSuccess(
         t("success") || "Success",
-        t("success_permissions_assigned") || "Permissions assigned successfully"
+        t("success_permissions_assigned") ||
+          "Permissions assigned successfully",
       );
     } catch (error: any) {
       showError(
         t("error") || "Error",
         error?.message ||
           t("error_assigning_permissions") ||
-          "Error assigning permissions"
+          "Error assigning permissions",
       );
     }
   };
 
   const handleRemovePermissions = async (
     roleId: string,
-    permissionIds: string[]
+    permissionIds: string[],
   ) => {
     try {
       await removePermissionsMutation.mutateAsync({
@@ -351,14 +356,14 @@ export default function RolesAdminPage() {
       });
       showSuccess(
         t("success") || "Success",
-        t("success_permissions_removed") || "Permissions removed successfully"
+        t("success_permissions_removed") || "Permissions removed successfully",
       );
     } catch (error: any) {
       showError(
         t("error") || "Error",
         error?.message ||
           t("error_removing_permissions") ||
-          "Error removing permissions"
+          "Error removing permissions",
       );
     }
   };
@@ -367,7 +372,7 @@ export default function RolesAdminPage() {
   const handlePermissionToggle = (permissionId: string) => {
     if (selectedPermissions.includes(permissionId)) {
       setSelectedPermissions(
-        selectedPermissions.filter((id) => id !== permissionId)
+        selectedPermissions.filter((id) => id !== permissionId),
       );
     } else {
       setSelectedPermissions([...selectedPermissions, permissionId]);
@@ -395,7 +400,7 @@ export default function RolesAdminPage() {
       role.name.toLowerCase().includes(filterRoleTable.toLowerCase()) ||
       (role.description || "")
         .toLowerCase()
-        .includes(filterRoleTable.toLowerCase())
+        .includes(filterRoleTable.toLowerCase()),
   );
 
   // Filtrar permisos para la tabla
@@ -407,7 +412,7 @@ export default function RolesAdminPage() {
       perm.resource
         .toLowerCase()
         .includes(filterPermissionTable.toLowerCase()) ||
-      perm.action.toLowerCase().includes(filterPermissionTable.toLowerCase())
+      perm.action.toLowerCase().includes(filterPermissionTable.toLowerCase()),
   );
 
   if (loading) {

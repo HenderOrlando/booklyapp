@@ -123,7 +123,7 @@ export default function AuditoriaPage() {
       header: t("table_timestamp"),
       cell: (log: AuditLog) => (
         <div className="text-sm">
-          <div className="font-medium text-white">
+          <div className="font-medium text-foreground">
             {new Date(log.timestamp).toLocaleDateString("es-ES")}
           </div>
           <div className="text-[var(--color-text-tertiary)]">
@@ -136,7 +136,7 @@ export default function AuditoriaPage() {
       key: "user",
       header: t("table_user"),
       cell: (log: AuditLog) => (
-        <div className="font-medium text-white">{log.user}</div>
+        <div className="font-medium text-foreground">{log.user}</div>
       ),
     },
     {
@@ -157,9 +157,11 @@ export default function AuditoriaPage() {
       header: t("table_entity"),
       cell: (log: AuditLog) => (
         <div>
-          <div className="font-medium text-white">{log.entity}</div>
+          <div className="font-medium text-foreground">{log.entity}</div>
           {log.entityId && (
-            <div className="text-xs text-[var(--color-text-tertiary)]">ID: {log.entityId}</div>
+            <div className="text-xs text-[var(--color-text-tertiary)]">
+              ID: {log.entityId}
+            </div>
           )}
         </div>
       ),
@@ -201,7 +203,9 @@ export default function AuditoriaPage() {
       key: "ip",
       header: t("table_ip"),
       cell: (log: AuditLog) => (
-        <div className="text-sm text-[var(--color-text-tertiary)]">{log.ipAddress}</div>
+        <div className="text-sm text-[var(--color-text-tertiary)]">
+          {log.ipAddress}
+        </div>
       ),
     },
     {
@@ -286,7 +290,9 @@ export default function AuditoriaPage() {
               <CardDescription>{t("errors_desc")}</CardDescription>
             </CardHeader>
             <CardContent>
-              <div className="text-4xl font-bold text-state-error-500">{errorLogs}</div>
+              <div className="text-4xl font-bold text-state-error-500">
+                {errorLogs}
+              </div>
             </CardContent>
           </Card>
 
@@ -462,7 +468,7 @@ export default function AuditoriaPage() {
                         </span>
                         <div className="flex-1 grid grid-cols-4 gap-4">
                           <div>
-                            <div className="text-sm font-medium text-white">
+                            <div className="text-sm font-medium text-foreground">
                               {new Date(log.timestamp).toLocaleDateString(
                                 "es-ES",
                               )}
@@ -474,7 +480,7 @@ export default function AuditoriaPage() {
                             </div>
                           </div>
                           <div>
-                            <div className="font-medium text-white">
+                            <div className="font-medium text-foreground">
                               {log.user}
                             </div>
                             <div className="text-xs text-[var(--color-text-tertiary)]">
@@ -569,13 +575,13 @@ export default function AuditoriaPage() {
                     <label className="text-sm font-medium text-[var(--color-text-tertiary)]">
                       ID
                     </label>
-                    <div className="text-white mt-1">{selectedLog.id}</div>
+                    <div className="text-foreground mt-1">{selectedLog.id}</div>
                   </div>
                   <div>
                     <label className="text-sm font-medium text-[var(--color-text-tertiary)]">
                       Timestamp
                     </label>
-                    <div className="text-white mt-1">
+                    <div className="text-foreground mt-1">
                       {new Date(selectedLog.timestamp).toLocaleString("es-ES")}
                     </div>
                   </div>
@@ -586,13 +592,15 @@ export default function AuditoriaPage() {
                     <label className="text-sm font-medium text-[var(--color-text-tertiary)]">
                       Usuario
                     </label>
-                    <div className="text-white mt-1">{selectedLog.user}</div>
+                    <div className="text-foreground mt-1">
+                      {selectedLog.user}
+                    </div>
                   </div>
                   <div>
                     <label className="text-sm font-medium text-[var(--color-text-tertiary)]">
                       IP Address
                     </label>
-                    <div className="text-white mt-1">
+                    <div className="text-foreground mt-1">
                       {selectedLog.ipAddress}
                     </div>
                   </div>
@@ -636,14 +644,16 @@ export default function AuditoriaPage() {
                     <label className="text-sm font-medium text-[var(--color-text-tertiary)]">
                       Entidad
                     </label>
-                    <div className="text-white mt-1">{selectedLog.entity}</div>
+                    <div className="text-foreground mt-1">
+                      {selectedLog.entity}
+                    </div>
                   </div>
                   {selectedLog.entityId && (
                     <div>
                       <label className="text-sm font-medium text-[var(--color-text-tertiary)]">
                         Entity ID
                       </label>
-                      <div className="text-white mt-1">
+                      <div className="text-foreground mt-1">
                         {selectedLog.entityId}
                       </div>
                     </div>
@@ -654,7 +664,7 @@ export default function AuditoriaPage() {
                   <label className="text-sm font-medium text-[var(--color-text-tertiary)]">
                     Detalles Completos
                   </label>
-                  <div className="text-white mt-1 p-3 bg-[var(--color-bg-primary)] rounded-lg">
+                  <div className="text-foreground mt-1 p-3 bg-[var(--color-bg-primary)] rounded-lg">
                     {selectedLog.details}
                   </div>
                 </div>

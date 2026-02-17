@@ -43,16 +43,18 @@ export function UsersTable({
       cell: (user: User) => (
         <div className="flex items-center gap-3">
           <div className="flex-shrink-0 w-10 h-10 bg-brand-primary-500 rounded-full flex items-center justify-center">
-            <span className="text-white font-bold text-sm">
+            <span className="text-foreground font-bold text-sm">
               {user.firstName.charAt(0)}
               {user.lastName.charAt(0)}
             </span>
           </div>
           <div>
-            <div className="text-white font-medium">
+            <div className="text-foreground font-medium">
               {user.firstName} {user.lastName}
             </div>
-            <div className="text-xs text-[var(--color-text-tertiary)]">{user.username}</div>
+            <div className="text-xs text-[var(--color-text-tertiary)]">
+              {user.username}
+            </div>
           </div>
         </div>
       ),
@@ -62,7 +64,7 @@ export function UsersTable({
       header: t("email"),
       cell: (user: User) => (
         <div>
-          <div className="text-white">{user.email}</div>
+          <div className="text-foreground">{user.email}</div>
           {user.emailVerified && (
             <Badge variant="success" className="text-xs mt-1">
               {t("verified")}
@@ -127,7 +129,7 @@ export function UsersTable({
       key: "lastLogin",
       header: t("last_login"),
       cell: (user: User) => (
-        <div className="text-white text-sm">
+        <div className="text-foreground text-sm">
           {user.lastLoginAt
             ? new Date(user.lastLoginAt).toLocaleDateString("es-ES", {
                 year: "numeric",
