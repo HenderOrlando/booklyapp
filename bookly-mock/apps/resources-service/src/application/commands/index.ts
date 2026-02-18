@@ -9,5 +9,6 @@ export * from "./rollback-import.command";
 export * from "./schedule-maintenance.command";
 export * from "./start-async-import.command";
 export * from "./start-maintenance.command";
+export * from "./update-category.command";
 export * from "./update-resource.command";
 export * from "./validate-import.command";

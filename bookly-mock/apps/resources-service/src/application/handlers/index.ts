@@ -7,6 +7,7 @@ export * from "./restore-resource.handler";
 export * from "./rollback-import.handler";
 export * from "./schedule-maintenance.handler";
 export * from "./start-async-import.handler";
+export * from "./update-category.handler";
 export * from "./update-maintenance-status.handlers";
 export * from "./update-resource.handler";
 export * from "./validate-import.handler";
@@ -41,6 +42,7 @@ import { RollbackImportHandler } from "./rollback-import.handler";
 import { ScheduleMaintenanceHandler } from "./schedule-maintenance.handler";
 import { SearchResourcesAdvancedHandler } from "./search-resources-advanced.handler";
 import { StartAsyncImportHandler } from "./start-async-import.handler";
+import { UpdateCategoryHandler } from "./update-category.handler";
 import {
   CancelMaintenanceHandler,
   CompleteMaintenanceHandler,
@@ -63,6 +65,7 @@ export const CommandHandlers = [
   CompleteMaintenanceHandler,
   CancelMaintenanceHandler,
   CreateCategoryHandler,
+  UpdateCategoryHandler,
 ];
 
 export const QueryHandlers = [
