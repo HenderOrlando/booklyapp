@@ -10,6 +10,26 @@ import { programKeys } from "./usePrograms";
 import { reservationKeys } from "./useReservations";
 import { resourceKeys } from "./useResources";
 
+interface PaginatedListPayload<T> {
+  items?: T[];
+}
+
+type PrefetchFilters = Record<string, string | number | boolean | undefined>;
+
+function extractListItems<T>(
+  data: PaginatedListPayload<T> | T[] | undefined,
+): T[] {
+  if (Array.isArray(data)) {
+    return data;
+  }
+
+  if (data?.items && Array.isArray(data.items)) {
+    return data.items;
+  }
+
+  return [];
+}
+
 /**
  * Hook para prefetch de recursos
  *
@@ -108,7 +128,7 @@ export function usePrefetchNextPage() {
   const prefetchNextPage = async (
     entity: "resources" | "reservations" | "programs",
     nextPage: number,
-    filters?: any,
+    filters?: PrefetchFilters,
   ) => {
     const baseUrl = `/${entity}`;
     const queryKey = [entity, "list", { page: nextPage, ...filters }];
@@ -116,10 +136,12 @@ export function usePrefetchNextPage() {
     await queryClient.prefetchQuery({
       queryKey,
       queryFn: async () => {
-        const response = await httpClient.get(baseUrl, {
+        const response = await httpClient.get<
+          PaginatedListPayload<unknown> | unknown[]
+        >(baseUrl, {
           params: { page: nextPage, ...filters },
         });
-        return response.data?.items || [];
+        return extractListItems(response.data);
       },
       staleTime: 1000 * 60 * 5,
     });

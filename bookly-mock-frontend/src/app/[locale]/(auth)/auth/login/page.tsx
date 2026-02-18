@@ -10,17 +10,36 @@ import {
   CardTitle,
 } from "@/components/atoms/Card";
 import { Input } from "@/components/atoms/Input";
+import { i18nConfig } from "@/i18n/config";
+import {
+  capturePostAuthRedirectFromLocation,
+  consumePostAuthRedirect,
+  resolveDashboardFallbackPath,
+  resolvePostAuthRedirect,
+} from "@/lib/auth/post-auth-redirect";
 import { signIn } from "next-auth/react";
-import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
+import { useEffect, useState } from "react";
 import { toast } from "sonner";
 
 export default function LoginPage() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [errors, setErrors] = useState({ email: "", password: "" });
+
+  useEffect(() => {
+    if (typeof window === "undefined") {
+      return;
+    }
+
+    capturePostAuthRedirectFromLocation(
+      window.location.pathname,
+      window.location.search,
+    );
+  }, []);
 
   const validateForm = () => {
     const newErrors = { email: "", password: "" };
@@ -66,7 +85,24 @@ export default function LoginPage() {
         toast.error(result.error);
       } else if (result?.ok) {
         toast.success("¡Bienvenido!");
-        router.push("/dashboard");
+
+        const fallbackPath = resolveDashboardFallbackPath(
+          window.location.pathname,
+          i18nConfig.locales,
+          i18nConfig.defaultLocale,
+        );
+
+        const redirectTarget = resolvePostAuthRedirect({
+          pathname: window.location.pathname,
+          search: searchParams.toString()
+            ? `?${searchParams.toString()}`
+            : window.location.search,
+          storageRedirect: consumePostAuthRedirect(),
+          origin: window.location.origin,
+          locales: i18nConfig.locales,
+        });
+
+        router.replace(redirectTarget ?? fallbackPath);
       }
     } catch (error) {
       toast.error("Error al iniciar sesión");

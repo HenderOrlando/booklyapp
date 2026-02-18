@@ -32,7 +32,7 @@ import * as React from "react";
 interface UpdateProfileData {
   firstName?: string;
   lastName?: string;
-  phoneNumber?: string;
+  phone?: string;
   documentType?: string;
   documentNumber?: string;
 }
@@ -61,7 +61,7 @@ export default function ProfilePage() {
   const [profileData, setProfileData] = React.useState<UpdateProfileData>({
     firstName: user?.firstName || "",
     lastName: user?.lastName || "",
-    phoneNumber: user?.phoneNumber || "",
+    phone: user?.phone || user?.phoneNumber || "",
     documentType: user?.documentType || "CC",
     documentNumber: user?.documentNumber || "",
   });
@@ -90,7 +90,7 @@ export default function ProfilePage() {
       setProfileData({
         firstName: user.firstName || "",
         lastName: user.lastName || "",
-        phoneNumber: user.phoneNumber || "",
+        phone: user.phone || user.phoneNumber || "",
         documentType: user.documentType || "CC",
         documentNumber: user.documentNumber || "",
       });
@@ -102,13 +102,17 @@ export default function ProfilePage() {
     setProfileError("");
     setProfileSuccess("");
 
-    updateProfile.mutate(profileData as any, {
+    updateProfile.mutate(profileData, {
       onSuccess: () => {
         setProfileSuccess(t("update_success"));
         setIsEditingProfile(false);
       },
-      onError: (error: any) => {
-        setProfileError(error?.message || t("update_error"));
+      onError: (mutationError: unknown) => {
+        setProfileError(
+          mutationError instanceof Error
+            ? mutationError.message
+            : t("update_error"),
+        );
       },
     });
   };
@@ -124,7 +128,7 @@ export default function ProfilePage() {
       return;
     }
 
-    if (passwordData.newPassword.length < 6) {
+    if (passwordData.newPassword.length < 8) {
       setPasswordError(t("password_min"));
       return;
     }
@@ -288,11 +292,11 @@ export default function ProfilePage() {
                     </label>
                     <Input
                       type="tel"
-                      value={profileData.phoneNumber}
+                      value={profileData.phone}
                       onChange={(e) =>
                         setProfileData({
                           ...profileData,
-                          phoneNumber: e.target.value,
+                          phone: e.target.value,
                         })
                       }
                     />
@@ -316,7 +320,9 @@ export default function ProfilePage() {
                         <option value="CC">{t("document_types.cc")}</option>
                         <option value="TI">{t("document_types.ti")}</option>
                         <option value="CE">{t("document_types.ce")}</option>
-                        <option value="PA">{t("document_types.pa")}</option>
+                        <option value="PASSPORT">
+                          {t("document_types.pa")}
+                        </option>
                       </select>
                     </div>
 
@@ -375,17 +381,26 @@ export default function ProfilePage() {
                     <p className="text-sm text-[var(--color-text-secondary)]">
                       {t("username")}
                     </p>
-                    <p className="font-medium">{user.username}</p>
+                    <p className="font-medium">{user.username || "—"}</p>
                   </div>
 
-                  {user.phoneNumber && (
+                  {(user.phone || user.phoneNumber) && (
                     <div>
                       <p className="text-sm text-[var(--color-text-secondary)]">
                         {tAuth("phone")}
                       </p>
-                      <p className="font-medium">{user.phoneNumber}</p>
+                      <p className="font-medium">
+                        {user.phone || user.phoneNumber}
+                      </p>
                     </div>
                   )}
+
+                  <div>
+                    <p className="text-sm text-[var(--color-text-secondary)]">
+                      {t("tenant_id")}
+                    </p>
+                    <p className="font-medium">{user.tenantId || "—"}</p>
+                  </div>
 
                   {user.documentNumber && (
                     <div>

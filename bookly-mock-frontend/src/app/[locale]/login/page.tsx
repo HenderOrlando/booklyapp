@@ -11,6 +11,7 @@ import {
   type ErrorTranslator,
   resolveErrorMessage,
 } from "@/infrastructure/http/errorMessageResolver";
+import { capturePostAuthRedirectFromLocation } from "@/lib/auth/post-auth-redirect";
 import { useTranslations } from "next-intl";
 import * as React from "react";
 
@@ -30,6 +31,17 @@ export default function LoginPage() {
   const [password, setPassword] = React.useState("");
   const [rememberMe, setRememberMe] = React.useState(false);
   const [error, setError] = React.useState("");
+
+  React.useEffect(() => {
+    if (typeof window === "undefined") {
+      return;
+    }
+
+    capturePostAuthRedirectFromLocation(
+      window.location.pathname,
+      window.location.search,
+    );
+  }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();

@@ -96,7 +96,7 @@ export const mockResources: Resource[] = [
       hasWhiteboard: true,
       hasComputers: false,
     },
-    programIds: ["ING-SIS", "ING-IND"],
+    programIds: ["prog_001", "prog_002", "prog_003", "prog_004", "prog_005"],
     status: ResourceStatus.AVAILABLE,
     isActive: true,
     availabilityRules: {
@@ -129,7 +129,7 @@ export const mockResources: Resource[] = [
       computerCount: 30,
       software: ["VS Code", "IntelliJ", "Docker", "MySQL"],
     },
-    programIds: ["ING-SIS"],
+    programIds: ["prog_001", "prog_003", "prog_005"],
     status: ResourceStatus.AVAILABLE,
     isActive: true,
     availabilityRules: {
@@ -166,7 +166,7 @@ export const mockResources: Resource[] = [
       hasStage: true,
       hasRecordingEquipment: true,
     },
-    programIds: [],
+    programIds: ["prog_004"],
     status: ResourceStatus.AVAILABLE,
     isActive: true,
     availabilityRules: {
@@ -261,7 +261,7 @@ export const mockResources: Resource[] = [
       hasComputers: false,
       equipment: ["Osciloscopio", "Multímetro", "Balanza analítica"],
     },
-    programIds: ["ING-MECA", "ING-ELEC"],
+    programIds: ["prog_001", "prog_002"],
     status: ResourceStatus.MAINTENANCE,
     isActive: true,
     maintenanceSchedule: {
@@ -297,7 +297,7 @@ export const mockResources: Resource[] = [
       hasWhiteboard: true,
       hasComputers: false,
     },
-    programIds: ["ING-SIS", "ING-IND", "ING-CIVIL"],
+    programIds: ["prog_001"],
     status: ResourceStatus.RESERVED,
     isActive: true,
     availabilityRules: {
@@ -328,7 +328,7 @@ export const mockResources: Resource[] = [
       hasWhiteboard: true,
       hasVideoConference: false,
     },
-    programIds: [],
+    programIds: ["prog_002"],
     status: ResourceStatus.UNAVAILABLE,
     isActive: false,
     availabilityRules: {

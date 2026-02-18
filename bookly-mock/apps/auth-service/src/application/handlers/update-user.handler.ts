@@ -1,6 +1,6 @@
+import { IUserRepository } from "@auth/domain/repositories/user.repository.interface";
 import { Inject } from "@nestjs/common";
 import { CommandHandler, EventBus, ICommandHandler } from "@nestjs/cqrs";
-import { IUserRepository } from "@auth/domain/repositories/user.repository.interface";
 import { UpdateUserCommand } from "../commands/update-user.command";
 
 /**
@@ -22,14 +22,28 @@ export class UpdateUserHandler implements ICommandHandler<UpdateUserCommand> {
     }
 
     const updateData: Record<string, any> = {};
-    if (command.data.firstName !== undefined) updateData.firstName = command.data.firstName;
-    if (command.data.lastName !== undefined) updateData.lastName = command.data.lastName;
+    if (command.data.firstName !== undefined)
+      updateData.firstName = command.data.firstName;
+    if (command.data.lastName !== undefined)
+      updateData.lastName = command.data.lastName;
     if (command.data.phone !== undefined) updateData.phone = command.data.phone;
+    if (command.data.documentType !== undefined)
+      updateData.documentType = command.data.documentType;
+    if (command.data.documentNumber !== undefined)
+      updateData.documentNumber = command.data.documentNumber;
     if (command.data.roles !== undefined) updateData.roles = command.data.roles;
-    if (command.data.isActive !== undefined) updateData.isActive = command.data.isActive;
+    if (command.data.isActive !== undefined)
+      updateData.isActive = command.data.isActive;
+    if (command.data.isEmailVerified !== undefined)
+      updateData.isEmailVerified = command.data.isEmailVerified;
+    if (command.data.isPhoneVerified !== undefined)
+      updateData.isPhoneVerified = command.data.isPhoneVerified;
     updateData["audit.updatedBy"] = command.updatedBy;
 
-    const updated = await this.userRepository.update(command.userId, updateData);
+    const updated = await this.userRepository.update(
+      command.userId,
+      updateData,
+    );
 
     return updated;
   }

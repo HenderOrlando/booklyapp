@@ -1,16 +1,51 @@
 /**
  * E2E Smoke: Authentication
  *
- * Coverage IDs: E2E-AUTH-001..005
+ * Coverage IDs: E2E-AUTH-001..007
  * RF: RF-43 (Autenticación y SSO)
  * HU: HU-35
  */
 
-import { test, expect } from "@playwright/test";
-import { LoginPage } from "../pages/login.page";
+import { expect, test } from "@playwright/test";
 import { TEST_USERS } from "../fixtures/test-users";
+import { LoginPage } from "../pages/login.page";
 
 test.describe("Auth Smoke", () => {
+  // E2E-AUTH-006 | HU-35 | RF-43 | callback redirect after protected-route login
+  test("restores protected route after login when callback is present", async ({
+    page,
+  }) => {
+    const loginPage = new LoginPage(page);
+    await page.goto("/es/recursos?from=auth-redirect");
+
+    await expect(page).toHaveURL(/\/es\/login\?/);
+
+    const redirectedUrl = new URL(page.url());
+    expect(redirectedUrl.searchParams.get("callback")).toContain(
+      "/es/recursos?from=auth-redirect",
+    );
+
+    await loginPage.login(TEST_USERS.admin.email, TEST_USERS.admin.password);
+
+    await page.waitForURL(/\/es\/recursos\?from=auth-redirect/, {
+      timeout: 15000,
+    });
+    await expect(page).toHaveURL(/\/es\/recursos\?from=auth-redirect/);
+  });
+
+  // E2E-AUTH-007 | HU-35 | RF-43 | direct login fallback to dashboard
+  test("redirects to dashboard after direct login without callback", async ({
+    page,
+  }) => {
+    const loginPage = new LoginPage(page);
+    await loginPage.goto();
+
+    await loginPage.login(TEST_USERS.admin.email, TEST_USERS.admin.password);
+
+    await page.waitForURL(/\/es\/dashboard/, { timeout: 15000 });
+    await expect(page).toHaveURL(/\/es\/dashboard/);
+  });
+
   // E2E-AUTH-001 | HU-35 | RF-43 | Login admin happy path
   test("admin logs in successfully and reaches dashboard", async ({ page }) => {
     const loginPage = new LoginPage(page);
@@ -40,7 +75,7 @@ test.describe("Auth Smoke", () => {
     // HTML5 required validation prevents submission — email field should show validity state
     const emailInput = loginPage.emailInput;
     const isInvalid = await emailInput.evaluate(
-      (el: HTMLInputElement) => !el.validity.valid
+      (el: HTMLInputElement) => !el.validity.valid,
     );
     expect(isInvalid).toBe(true);
   });

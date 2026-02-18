@@ -92,6 +92,7 @@ export interface UpdateUserDto {
   phone?: string;
   documentType?: string;
   documentNumber?: string;
+  roles?: Array<Role | string>;
   profilePicture?: string;
   status?: UserStatus;
   isActive?: boolean;

@@ -30,12 +30,12 @@ import { MainLayout } from "@/components/templates/MainLayout";
 import { httpClient } from "@/infrastructure/http";
 import {
   AcademicProgram,
+  AvailabilityRules,
   Category,
   Resource,
   ResourceType,
   UpdateResourceDto,
 } from "@/types/entities/resource";
-import { useTranslations } from "next-intl";
 import { useParams, useRouter } from "next/navigation";
 import * as React from "react";
 
@@ -52,6 +52,17 @@ interface CategoryCollectionPayload {
 
 interface ProgramCollectionPayload {
   items?: AcademicProgram[];
+}
+
+interface UpdateResourceRequestPayload
+  extends Omit<UpdateResourceDto, "availabilityRules"> {
+  availabilityRules?: {
+    requiresApproval?: boolean;
+    maxAdvanceBookingDays?: number;
+    minBookingDurationMinutes?: number;
+    maxBookingDurationMinutes?: number;
+    allowRecurring?: boolean;
+  };
 }
 
 function extractCategories(
@@ -87,7 +98,6 @@ function extractPrograms(
 }
 
 export default function EditResourcePage() {
-  const t = useTranslations("resources");
   const params = useParams();
   const router = useRouter();
   const resourceId = params.id as string;
@@ -175,7 +185,10 @@ export default function EditResourcePage() {
     setSelectedProgramIds(newSelection);
   };
 
-  const handleInputChange = (field: keyof UpdateResourceDto, value: any) => {
+  const handleInputChange = <K extends keyof UpdateResourceDto>(
+    field: K,
+    value: UpdateResourceDto[K],
+  ) => {
     setFormData((prev) => ({
       ...prev,
       [field]: value,
@@ -192,11 +205,23 @@ export default function EditResourcePage() {
     }));
   };
 
-  const handleAvailabilityRuleChange = (field: string, value: any) => {
+  const handleAvailabilityRuleChange = (
+    field: keyof AvailabilityRules,
+    value: AvailabilityRules[keyof AvailabilityRules],
+  ) => {
+    const defaultAvailabilityRules: AvailabilityRules = {
+      requiresApproval: false,
+      maxAdvanceBookingDays: 30,
+      minBookingDurationMinutes: 60,
+      maxBookingDurationMinutes: 240,
+      bufferTimeBetweenReservationsMinutes: 15,
+      allowRecurring: true,
+    };
+
     setFormData((prev) => ({
       ...prev,
       availabilityRules: {
-        ...prev.availabilityRules!,
+        ...(prev.availabilityRules ?? defaultAvailabilityRules),
         [field]: value,
       },
     }));
@@ -209,9 +234,21 @@ export default function EditResourcePage() {
     setSuccess(false);
 
     try {
-      const dataToSend: UpdateResourceDto = {
+      const dataToSend: UpdateResourceRequestPayload = {
         ...formData,
         programIds: Array.from(selectedProgramIds),
+        availabilityRules: formData.availabilityRules
+          ? {
+              requiresApproval: formData.availabilityRules.requiresApproval,
+              maxAdvanceBookingDays:
+                formData.availabilityRules.maxAdvanceBookingDays,
+              minBookingDurationMinutes:
+                formData.availabilityRules.minBookingDurationMinutes,
+              maxBookingDurationMinutes:
+                formData.availabilityRules.maxBookingDurationMinutes,
+              allowRecurring: formData.availabilityRules.allowRecurring,
+            }
+          : undefined,
       };
 
       const response = await httpClient.patch(

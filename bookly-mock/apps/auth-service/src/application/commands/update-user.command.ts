@@ -9,8 +9,12 @@ export class UpdateUserCommand {
       firstName?: string;
       lastName?: string;
       phone?: string;
+      documentType?: string;
+      documentNumber?: string;
       roles?: string[];
       isActive?: boolean;
+      isEmailVerified?: boolean;
+      isPhoneVerified?: boolean;
     },
     public readonly updatedBy: string,
   ) {}

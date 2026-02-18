@@ -25,6 +25,33 @@ export class UpdateUserDto {
   lastName?: string;
 
   @ApiProperty({
+    description: "Teléfono del usuario",
+    example: "+573001234567",
+    required: false,
+  })
+  @IsString({ message: "Teléfono debe ser un string" })
+  @IsOptional()
+  phone?: string;
+
+  @ApiProperty({
+    description: "Tipo de documento",
+    example: "CC",
+    required: false,
+  })
+  @IsString({ message: "Tipo de documento debe ser un string" })
+  @IsOptional()
+  documentType?: string;
+
+  @ApiProperty({
+    description: "Número de documento",
+    example: "1098723456",
+    required: false,
+  })
+  @IsString({ message: "Número de documento debe ser un string" })
+  @IsOptional()
+  documentNumber?: string;
+
+  @ApiProperty({
     description: "Roles del usuario",
     example: ["STUDENT", "TEACHER"],
     isArray: true,
@@ -62,4 +89,13 @@ export class UpdateUserDto {
   @IsBoolean({ message: "isEmailVerified debe ser un booleano" })
   @IsOptional()
   isEmailVerified?: boolean;
+
+  @ApiProperty({
+    description: "Estado de verificación del teléfono",
+    example: true,
+    required: false,
+  })
+  @IsBoolean({ message: "isPhoneVerified debe ser un booleano" })
+  @IsOptional()
+  isPhoneVerified?: boolean;
 }

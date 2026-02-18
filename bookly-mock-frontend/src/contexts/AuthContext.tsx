@@ -7,11 +7,19 @@ import {
   type ErrorTranslator,
   resolveErrorMessage,
 } from "@/infrastructure/http/errorMessageResolver";
+import {
+  clearPostAuthRedirect,
+  consumePostAuthRedirect,
+  isAuthEntryRoute,
+  resolveDashboardFallbackPath,
+  resolvePostAuthRedirect,
+} from "@/lib/auth/post-auth-redirect";
 import { User } from "@/types/entities/auth";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
 import React, {
   createContext,
+  useCallback,
   useContext,
   useEffect,
   useRef,
@@ -70,69 +78,6 @@ function toAuthContextHttpError(error: unknown): AuthContextHttpError {
   return { message: String(error) };
 }
 
-function isSupportedLocale(value: string): boolean {
-  return i18nConfig.locales.includes(
-    value as (typeof i18nConfig.locales)[number],
-  );
-}
-
-function getLocaleFromPath(pathname: string): string {
-  const [firstSegment] = pathname.split("/").filter(Boolean);
-  if (firstSegment && isSupportedLocale(firstSegment)) {
-    return firstSegment;
-  }
-
-  return i18nConfig.defaultLocale;
-}
-
-function isLoginRoute(pathname: string): boolean {
-  const segments = pathname.split("/").filter(Boolean);
-
-  if (segments.length === 1) {
-    return segments[0] === "login";
-  }
-
-  if (segments.length >= 2 && isSupportedLocale(segments[0])) {
-    return segments[1] === "login";
-  }
-
-  return false;
-}
-
-function resolvePostAuthDestination(pathname: string, search: string): string {
-  const locale = getLocaleFromPath(pathname);
-  const fallbackPath = `/${locale}/dashboard`;
-  const callbackUrl = new URLSearchParams(search).get("callbackUrl");
-
-  if (!callbackUrl || typeof window === "undefined") {
-    return fallbackPath;
-  }
-
-  try {
-    const parsedUrl = new URL(callbackUrl, window.location.origin);
-    if (parsedUrl.origin !== window.location.origin) {
-      return fallbackPath;
-    }
-
-    const candidatePath = `${parsedUrl.pathname}${parsedUrl.search}${parsedUrl.hash}`;
-    if (!candidatePath.startsWith("/") || candidatePath.startsWith("//")) {
-      return fallbackPath;
-    }
-
-    if (isLoginRoute(parsedUrl.pathname)) {
-      return fallbackPath;
-    }
-
-    return candidatePath;
-  } catch (error) {
-    console.warn(
-      "No se pudo resolver callbackUrl, usando dashboard por defecto",
-      error,
-    );
-    return fallbackPath;
-  }
-}
-
 export function AuthProvider({ children }: AuthProviderProps) {
   const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -149,6 +94,39 @@ export function AuthProvider({ children }: AuthProviderProps) {
   const checkAuthRetryRef = useRef<NodeJS.Timeout | null>(null);
   const retryCountRef = useRef<number>(0);
   const lastValidUserRef = useRef<User | null>(null);
+  const postAuthRedirectHandledRef = useRef(false);
+
+  const navigateToPostAuthDestination = useCallback(() => {
+    if (postAuthRedirectHandledRef.current) {
+      return;
+    }
+
+    const currentPath =
+      typeof window !== "undefined"
+        ? window.location.pathname
+        : `/${i18nConfig.defaultLocale}/login`;
+
+    const fallbackPath = resolveDashboardFallbackPath(
+      currentPath,
+      i18nConfig.locales,
+      i18nConfig.defaultLocale,
+    );
+
+    const destination =
+      typeof window !== "undefined"
+        ? (resolvePostAuthRedirect({
+            pathname: currentPath,
+            search: window.location.search,
+            storageRedirect: consumePostAuthRedirect(),
+            origin: window.location.origin,
+            locales: i18nConfig.locales,
+          }) ?? fallbackPath)
+        : fallbackPath;
+
+    postAuthRedirectHandledRef.current = true;
+    clearPostAuthRedirect();
+    router.replace(destination);
+  }, [router]);
 
   // Cargar usuario desde localStorage al montar (sincrónico)
   useEffect(() => {
@@ -179,24 +157,20 @@ export function AuthProvider({ children }: AuthProviderProps) {
     };
   }, [user]);
 
-  // Si ya hay sesión y estamos en login, redirigir a callbackUrl o dashboard
+  // Si ya hay sesión y estamos en login/callback, redirigir una sola vez
   useEffect(() => {
     if (!user || typeof window === "undefined") {
       return;
     }
 
     const currentPath = window.location.pathname;
-    if (!isLoginRoute(currentPath)) {
+    if (!isAuthEntryRoute(currentPath, i18nConfig.locales)) {
+      postAuthRedirectHandledRef.current = false;
       return;
     }
 
-    const destination = resolvePostAuthDestination(
-      currentPath,
-      window.location.search,
-    );
-
-    router.replace(destination);
-  }, [user, router]);
+    navigateToPostAuthDestination();
+  }, [user, navigateToPostAuthDestination]);
 
   const checkAuth = async () => {
     const token = getToken();
@@ -398,6 +372,8 @@ export function AuthProvider({ children }: AuthProviderProps) {
     password: string,
     rememberMe: boolean = false,
   ) => {
+    postAuthRedirectHandledRef.current = false;
+
     try {
       setIsLoading(true);
       const response = await AuthClient.login({ email, password });
@@ -421,15 +397,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
           `Bienvenido ${user.firstName || user.email}`,
         );
 
-        const destination =
-          typeof window !== "undefined"
-            ? resolvePostAuthDestination(
-                window.location.pathname,
-                window.location.search,
-              )
-            : `/${i18nConfig.defaultLocale}/dashboard`;
-
-        router.replace(destination);
+        navigateToPostAuthDestination();
       } else {
         throw new Error(response.message || "Error al iniciar sesión");
       }
@@ -465,6 +433,8 @@ export function AuthProvider({ children }: AuthProviderProps) {
       setUser(null);
       lastValidUserRef.current = null; // Limpiar cache de usuario
       setUserToStorage(null); // Limpiar de localStorage
+      postAuthRedirectHandledRef.current = false;
+      clearPostAuthRedirect();
 
       if (showMessage) {
         showInfo("Sesión cerrada", "Has cerrado sesión exitosamente");
