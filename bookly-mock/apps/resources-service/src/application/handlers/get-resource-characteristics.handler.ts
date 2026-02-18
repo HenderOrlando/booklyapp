@@ -1,6 +1,6 @@
 import { IQueryHandler, QueryHandler } from "@nestjs/cqrs";
-import { GetResourceCharacteristicsQuery } from "../queries/get-resource-characteristics.query";
-import { ResourceService } from "../services/resource.service";
+import { GetResourceCharacteristicsQuery } from "@resources/application/queries";
+import { ResourceService } from "@resources/application/services";
 
 /**
  * Get Resource Characteristics Query Handler

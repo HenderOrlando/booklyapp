@@ -7,13 +7,13 @@ import { CategoryType } from "@libs/common/enums";
 export class UpdateCategoryCommand {
   constructor(
     public readonly id: string,
-    public readonly name: string,
-    public readonly description: string,
-    public readonly type: CategoryType,
-    public readonly color: string,
-    public readonly icon: string,
-    public readonly isActive: boolean,
-    public readonly metadata: Record<string, any>,
     public readonly updatedBy: string,
+    public readonly name?: string,
+    public readonly description?: string,
+    public readonly type?: CategoryType,
+    public readonly color?: string,
+    public readonly icon?: string,
+    public readonly isActive?: boolean,
+    public readonly metadata?: Record<string, any>,
   ) {}
 }

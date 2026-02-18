@@ -18,7 +18,7 @@ import {
   UpdateCategoryCommand,
 } from "@resources/application/commands";
 import { GetCategoriesQuery } from "@resources/application/queries";
-import { CreateCategoryDto } from "../dto";
+import { CreateCategoryDto, UpdateCategoryDto } from "../dto";
 
 /**
  * Categories Controller
@@ -81,19 +81,19 @@ export class CategoriesController {
   @ApiOperation({ summary: "Actualizar una categoría existente" })
   async updateCategory(
     @Param("id") id: string,
-    @Body() updateData: any,
+    @Body() updateData: UpdateCategoryDto,
     @CurrentUser("sub") userId: string,
   ) {
     const command = new UpdateCategoryCommand(
       id,
+      userId,
       updateData.name,
       updateData.description,
-      updateData.type || "RESOURCE",
+      updateData.type,
       updateData.color,
       updateData.icon,
-      updateData.isActive !== undefined ? updateData.isActive : true,
-      updateData.metadata || {},
-      userId,
+      updateData.isActive,
+      updateData.metadata,
     );
 
     const category = await this.commandBus.execute(command);
