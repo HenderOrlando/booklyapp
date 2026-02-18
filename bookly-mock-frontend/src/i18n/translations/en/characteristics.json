@@ -1,0 +1,35 @@
+{
+  "title": "Characteristics",
+  "subtitle": "Manage the catalog of attributes for resources",
+  "create_button": "Create Characteristic",
+  "list_title": "Characteristics List",
+  "empty_state": {
+    "title": "No characteristics found",
+    "description": "Try changing the filters or create a new one."
+  },
+  "table": {
+    "name_code": "Name / Code",
+    "description": "Description",
+    "status": "Status",
+    "actions": "Actions"
+  },
+  "modal": {
+    "create_title": "Create Characteristic",
+    "edit_title": "Edit Characteristic",
+    "create_description": "Add a new characteristic to the global catalog",
+    "edit_description": "Modify characteristic data",
+    "name_label": "Name",
+    "code_label": "Code",
+    "description_label": "Description",
+    "status_label": "Active characteristic",
+    "status_hint": "Inactive ones cannot be assigned to new resources",
+    "code_hint": "Unique internal identifier. Letters, numbers and underscores only.",
+    "save_button": "Save Changes",
+    "creating_button": "Creating...",
+    "saving_button": "Saving..."
+  },
+  "delete_confirm": {
+    "title": "Delete Characteristic",
+    "description": "Are you sure? This action will deactivate the characteristic from the catalog."
+  }
+}

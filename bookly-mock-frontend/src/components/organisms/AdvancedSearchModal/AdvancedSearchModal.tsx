@@ -191,9 +191,9 @@ export function AdvancedSearchModal({
                   {type === ResourceType.CLASSROOM && "Aula"}
                   {type === ResourceType.LABORATORY && "Laboratorio"}
                   {type === ResourceType.AUDITORIUM && "Auditorio"}
-                  {type === ResourceType.CONFERENCE_ROOM && "Sala"}
-                  {type === ResourceType.SPORTS_FIELD && "Cancha"}
-                  {type === ResourceType.EQUIPMENT && "Equipo"}
+                  {type === ResourceType.MULTIMEDIA_EQUIPMENT && "Equipo"}
+                  {type === ResourceType.SPORTS_FACILITY && "Deporte"}
+                  {type === ResourceType.MEETING_ROOM && "Reunión"}
                   {type === ResourceType.VEHICLE && "Vehículo"}
                   {type === ResourceType.OTHER && "Otro"}
                 </button>

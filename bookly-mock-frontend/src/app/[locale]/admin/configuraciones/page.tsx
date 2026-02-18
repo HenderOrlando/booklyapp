@@ -65,6 +65,42 @@ const TABS: TabDef[] = [
   },
 ];
 
+function normalizeComparableHexColor(value: string | undefined): string {
+  const rawValue = typeof value === "string" ? value.trim() : "";
+  if (!rawValue) {
+    return "";
+  }
+
+  return (rawValue.startsWith("#") ? rawValue : `#${rawValue}`).toLowerCase();
+}
+
+function ThemeReloadSplash() {
+  return (
+    <div className="fixed inset-0 z-[10000] flex items-center justify-center bg-[var(--color-bg-app)]">
+      <div className="pointer-events-none absolute inset-0 overflow-hidden">
+        <div className="absolute -top-24 -left-24 h-72 w-72 rounded-full bg-[var(--color-action-primary)] opacity-20 blur-3xl animate-pulse" />
+        <div className="absolute -bottom-24 -right-20 h-72 w-72 rounded-full bg-[var(--color-action-secondary)] opacity-20 blur-3xl animate-pulse" />
+      </div>
+
+      <div className="relative flex w-[360px] max-w-[92vw] flex-col items-center gap-5 rounded-2xl border border-[var(--color-border-subtle)] bg-[var(--color-bg-surface)] px-8 py-8 shadow-xl">
+        <div className="relative flex items-center justify-center">
+          <Loader2 className="h-12 w-12 animate-spin text-[var(--color-action-primary)]" />
+          <span className="absolute h-2.5 w-2.5 rounded-full bg-[var(--color-action-secondary)] animate-ping" />
+        </div>
+
+        <div className="space-y-1 text-center">
+          <p className="text-sm font-semibold text-[var(--color-text-primary)]">
+            Aplicando nueva identidad visual...
+          </p>
+          <p className="text-xs text-[var(--color-text-secondary)]">
+            Recargando la plataforma para activar los colores guardados
+          </p>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 function ToggleSwitch({
   checked,
   onChange,
@@ -137,6 +173,7 @@ export default function ConfiguracionesPage() {
   const [hasChanges, setHasChanges] = React.useState(false);
   const [hasStorageChanges, setHasStorageChanges] = React.useState(false);
   const [domainInput, setDomainInput] = React.useState("");
+  const [isApplyingTheme, setIsApplyingTheme] = React.useState(false);
 
   React.useEffect(() => {
     if (serverConfig) {
@@ -158,26 +195,58 @@ export default function ConfiguracionesPage() {
     setHasChanges(true);
   };
 
+  const shouldReloadAfterThemeSave = React.useMemo(() => {
+    if (!serverConfig) {
+      return true;
+    }
+
+    return (
+      localConfig.themeMode !== serverConfig.themeMode ||
+      normalizeComparableHexColor(localConfig.primaryColor) !==
+        normalizeComparableHexColor(serverConfig.primaryColor) ||
+      normalizeComparableHexColor(localConfig.secondaryColor) !==
+        normalizeComparableHexColor(serverConfig.secondaryColor)
+    );
+  }, [
+    localConfig.primaryColor,
+    localConfig.secondaryColor,
+    localConfig.themeMode,
+    serverConfig,
+  ]);
+
   const handleSave = () => {
-    updateConfig.mutate({
-      registrationEnabled: localConfig.registrationEnabled,
-      corporateAuthEnabled: localConfig.corporateAuthEnabled,
-      allowedDomains: localConfig.allowedDomains,
-      autoRegisterOnSSO: localConfig.autoRegisterOnSSO,
-      themeMode: localConfig.themeMode,
-      primaryColor: localConfig.primaryColor,
-      secondaryColor: localConfig.secondaryColor,
-      defaultLocale: localConfig.defaultLocale,
-      supportedLocales: localConfig.supportedLocales,
-      appName: localConfig.appName,
-      logoLightUrl: localConfig.logoLightUrl,
-      logoDarkUrl: localConfig.logoDarkUrl,
-      faviconUrl: localConfig.faviconUrl,
-      timezone: localConfig.timezone,
-      maintenanceMode: localConfig.maintenanceMode,
-      features: localConfig.features,
-    });
-    setHasChanges(false);
+    updateConfig.mutate(
+      {
+        registrationEnabled: localConfig.registrationEnabled,
+        corporateAuthEnabled: localConfig.corporateAuthEnabled,
+        allowedDomains: localConfig.allowedDomains,
+        autoRegisterOnSSO: localConfig.autoRegisterOnSSO,
+        themeMode: localConfig.themeMode,
+        primaryColor: localConfig.primaryColor,
+        secondaryColor: localConfig.secondaryColor,
+        defaultLocale: localConfig.defaultLocale,
+        supportedLocales: localConfig.supportedLocales,
+        appName: localConfig.appName,
+        logoLightUrl: localConfig.logoLightUrl,
+        logoDarkUrl: localConfig.logoDarkUrl,
+        faviconUrl: localConfig.faviconUrl,
+        timezone: localConfig.timezone,
+        maintenanceMode: localConfig.maintenanceMode,
+        features: localConfig.features,
+      },
+      {
+        onSuccess: () => {
+          setHasChanges(false);
+
+          if (shouldReloadAfterThemeSave) {
+            setIsApplyingTheme(true);
+            window.setTimeout(() => {
+              window.location.reload();
+            }, 280);
+          }
+        },
+      },
+    );
   };
 
   const handleSaveStorage = () => {
@@ -215,6 +284,10 @@ export default function ConfiguracionesPage() {
 
   const header = <AppHeader title="Configuraciones" />;
   const sidebar = <AppSidebar />;
+
+  if (isApplyingTheme) {
+    return <ThemeReloadSplash />;
+  }
 
   if (isLoading) {
     return (

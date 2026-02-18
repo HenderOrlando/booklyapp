@@ -267,17 +267,57 @@ export class MockService {
       );
     }
 
-    if (endpoint.includes("/reference-data") && method === "GET") {
-      const queryString = endpoint.split("?")[1] || "";
-      const params = new URLSearchParams(queryString);
-      const group = params.get("group");
-      const active = params.get("active");
+    if (endpoint.includes("/reference-data")) {
+      const idMatch = endpoint.match(/\/reference-data\/([^/?]+)$/);
 
-      if (group === "resource_characteristic") {
-        const onlyActive = active === null ? true : active === "true";
+      if (method === "GET") {
+        const queryString = endpoint.split("?")[1] || "";
+        const params = new URLSearchParams(queryString);
+        const group = params.get("group");
+        const active = params.get("active");
+
+        if (group === "resource_characteristic") {
+          const onlyActive = active === null ? true : active === "true";
+          return this.castResponse<T>(
+            this.mockGetResourceCharacteristics(onlyActive),
+          );
+        }
+
+        if (idMatch) {
+          return this.castResponse<T>(
+            this.mockGetReferenceDataById(idMatch[1]),
+          );
+        }
+      }
+
+      if (method === "POST") {
         return this.castResponse<T>(
-          this.mockGetResourceCharacteristics(onlyActive),
+          this.mockCreateReferenceData(
+            payload as {
+              group: string;
+              code: string;
+              name: string;
+              description?: string;
+            },
+          ),
         );
+      }
+
+      if (method === "PATCH" && idMatch) {
+        return this.castResponse<T>(
+          this.mockUpdateReferenceData(
+            idMatch[1],
+            payload as Partial<{
+              name: string;
+              description: string;
+              isActive: boolean;
+            }>,
+          ),
+        );
+      }
+
+      if (method === "DELETE" && idMatch) {
+        return this.castResponse<T>(this.mockDeleteReferenceData(idMatch[1]));
       }
     }
 
@@ -1163,6 +1203,7 @@ export class MockService {
     const normalizedName = this.normalizeCharacteristicName(name);
     const created: ResourceCharacteristic = {
       id: this.getNextCharacteristicId(),
+      group: "resource_characteristic",
       code: this.toCharacteristicCode(normalizedName),
       name: normalizedName,
       isActive: true,
@@ -1311,6 +1352,121 @@ export class MockService {
     );
 
     return normalizedAttributes;
+  }
+
+  private static mockGetReferenceDataById(id: string): ApiResponse<unknown> {
+    const item = this.resourceCharacteristicsData.find(
+      (char) => char.id === id,
+    );
+    if (!item) {
+      throw {
+        response: {
+          status: 404,
+          data: {
+            success: false,
+            message: `Reference data with ID ${id} not found`,
+            http_code: 404,
+          },
+        },
+      };
+    }
+    return {
+      success: true,
+      data: item,
+      message: "Reference data retrieved successfully",
+      timestamp: new Date().toISOString(),
+    };
+  }
+
+  private static mockCreateReferenceData(data: {
+    group: string;
+    code: string;
+    name: string;
+    description?: string;
+  }): ApiResponse<unknown> {
+    const newItem: ResourceCharacteristic = {
+      id: `char_${Date.now()}`,
+      group: data.group,
+      code: data.code,
+      name: data.name,
+      description: data.description,
+      isActive: true,
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+    };
+
+    if (data.group === "resource_characteristic") {
+      this.resourceCharacteristicsData.push(newItem);
+    }
+
+    return {
+      success: true,
+      data: newItem,
+      message: "Reference data created successfully",
+      timestamp: new Date().toISOString(),
+    };
+  }
+
+  private static mockUpdateReferenceData(
+    id: string,
+    data: Partial<{ name: string; description: string; isActive: boolean }>,
+  ): ApiResponse<unknown> {
+    const index = this.resourceCharacteristicsData.findIndex(
+      (char) => char.id === id,
+    );
+    if (index === -1) {
+      throw {
+        response: {
+          status: 404,
+          data: {
+            success: false,
+            message: `Reference data with ID ${id} not found`,
+            http_code: 404,
+          },
+        },
+      };
+    }
+
+    const current = this.resourceCharacteristicsData[index];
+    this.resourceCharacteristicsData[index] = {
+      ...current,
+      ...data,
+      updatedAt: new Date().toISOString(),
+    };
+
+    return {
+      success: true,
+      data: this.resourceCharacteristicsData[index],
+      message: "Reference data updated successfully",
+      timestamp: new Date().toISOString(),
+    };
+  }
+
+  private static mockDeleteReferenceData(id: string): ApiResponse<unknown> {
+    const index = this.resourceCharacteristicsData.findIndex(
+      (char) => char.id === id,
+    );
+    if (index === -1) {
+      throw {
+        response: {
+          status: 404,
+          data: {
+            success: false,
+            message: `Reference data with ID ${id} not found`,
+            http_code: 404,
+          },
+        },
+      };
+    }
+
+    this.resourceCharacteristicsData.splice(index, 1);
+
+    return {
+      success: true,
+      data: { deleted: true },
+      message: "Reference data deleted successfully",
+      timestamp: new Date().toISOString(),
+    };
   }
 
   private static mockGetResourceCharacteristics(

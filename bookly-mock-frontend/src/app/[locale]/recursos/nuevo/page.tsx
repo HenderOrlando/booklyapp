@@ -34,6 +34,7 @@ import {
   CreateResourceDto,
   ResourceType,
 } from "@/types/entities/resource";
+import { Plus, Tag, X } from "lucide-react";
 import { useParams, useRouter } from "next/navigation";
 import * as React from "react";
 
@@ -52,6 +53,26 @@ interface ProgramCollectionPayload {
   items?: AcademicProgram[];
 }
 
+interface ResourceCharacteristicOption {
+  id?: string;
+  _id?: string;
+  code?: string;
+  name?: string;
+  icon?: string;
+  isActive?: boolean;
+}
+
+interface ResourceCharacteristicsCollectionPayload {
+  items?: ResourceCharacteristicOption[];
+}
+
+interface CharacteristicTag {
+  id?: string;
+  name: string;
+  normalizedName: string;
+  isNew: boolean;
+}
+
 interface CreateResourceRequestPayload
   extends Omit<CreateResourceDto, "availabilityRules"> {
   availabilityRules?: {
@@ -61,6 +82,61 @@ interface CreateResourceRequestPayload
     maxBookingDurationMinutes?: number;
     allowRecurring?: boolean;
   };
+}
+
+const BOOLEAN_ATTRIBUTE_TO_CHARACTERISTIC: Record<string, string> = {
+  hasProjector: "Proyector",
+  hasAirConditioning: "Aire acondicionado",
+  hasWhiteboard: "Tablero/Pizarra",
+  hasComputers: "Computadores",
+};
+
+function normalizeCharacteristicName(value: string): string {
+  return value.trim().replace(/\s+/g, " ");
+}
+
+function toCharacteristicKey(value: string): string {
+  return normalizeCharacteristicName(value).toLowerCase();
+}
+
+function toCharacteristicTestId(value: string): string {
+  return toCharacteristicKey(value).replace(/[^a-z0-9]+/g, "-");
+}
+
+function extractCharacteristicOptions(
+  data:
+    | ResourceCharacteristicsCollectionPayload
+    | ResourceCharacteristicOption[]
+    | undefined,
+): ResourceCharacteristicOption[] {
+  const rawItems = Array.isArray(data)
+    ? data
+    : Array.isArray(data?.items)
+      ? data.items
+      : [];
+
+  const normalized: ResourceCharacteristicOption[] = [];
+
+  rawItems.forEach((item) => {
+    const id = String(item.id ?? item._id ?? "").trim();
+    const name = normalizeCharacteristicName(String(item.name ?? ""));
+
+    if (!id || !name) {
+      return;
+    }
+
+    normalized.push({
+      ...item,
+      id,
+      name,
+    });
+  });
+
+  return Array.from(
+    new Map(normalized.map((item) => [item.id, item])).values(),
+  ).sort((a, b) =>
+    String(a.name ?? "").localeCompare(String(b.name ?? ""), "es"),
+  );
 }
 
 function extractCategories(
@@ -106,6 +182,67 @@ export default function CreateResourcePage() {
   const [error, setError] = React.useState("");
   const [success, setSuccess] = React.useState(false);
 
+  const [characteristicsCatalog, setCharacteristicsCatalog] = React.useState<
+    ResourceCharacteristicOption[]
+  >([]);
+  const [selectedCharacteristics, setSelectedCharacteristics] = React.useState<
+    CharacteristicTag[]
+  >([]);
+  const [characteristicQuery, setCharacteristicQuery] = React.useState("");
+
+  const selectedCharacteristicKeys = React.useMemo(
+    () => new Set(selectedCharacteristics.map((item) => item.normalizedName)),
+    [selectedCharacteristics],
+  );
+
+  const normalizedCharacteristicQuery =
+    normalizeCharacteristicName(characteristicQuery);
+
+  const filteredCharacteristics = React.useMemo(() => {
+    const normalizedQuery = normalizedCharacteristicQuery.toLowerCase();
+
+    const options = characteristicsCatalog.filter((characteristic) => {
+      const normalizedName = toCharacteristicKey(String(characteristic.name));
+
+      if (selectedCharacteristicKeys.has(normalizedName)) {
+        return false;
+      }
+
+      if (!normalizedQuery) {
+        return true;
+      }
+
+      return normalizedName.includes(normalizedQuery);
+    });
+
+    return normalizedQuery ? options : options.slice(0, 8);
+  }, [
+    characteristicsCatalog,
+    normalizedCharacteristicQuery,
+    selectedCharacteristicKeys,
+  ]);
+
+  const canCreateCharacteristic = React.useMemo(() => {
+    if (!normalizedCharacteristicQuery) {
+      return false;
+    }
+
+    const queryKey = toCharacteristicKey(normalizedCharacteristicQuery);
+    const catalogSet = new Set(
+      characteristicsCatalog.map((item) =>
+        toCharacteristicKey(String(item.name)),
+      ),
+    );
+
+    return (
+      !catalogSet.has(queryKey) && !selectedCharacteristicKeys.has(queryKey)
+    );
+  }, [
+    characteristicsCatalog,
+    normalizedCharacteristicQuery,
+    selectedCharacteristicKeys,
+  ]);
+
   // Estados del formulario
   const [formData, setFormData] = React.useState<CreateResourceDto>({
     code: "",
@@ -130,10 +267,7 @@ export default function CreateResourcePage() {
   });
 
   // Atributos dinámicos según tipo de recurso
-  const [hasProjector, setHasProjector] = React.useState(false);
-  const [hasAirConditioning, setHasAirConditioning] = React.useState(false);
-  const [hasWhiteboard, setHasWhiteboard] = React.useState(false);
-  const [hasComputers, setHasComputers] = React.useState(false);
+  // (Eliminados: hasProjector, hasAirConditioning, hasWhiteboard, hasComputers ya que se manejan vía selectedCharacteristics)
 
   // Cargar categorías y programas
   React.useEffect(() => {
@@ -154,6 +288,18 @@ export default function CreateResourcePage() {
         if (programsResponse.success && programsResponse.data) {
           setPrograms(extractPrograms(programsResponse.data));
         }
+
+        // Cargar catálogo de características
+        const characteristicsResponse = await httpClient.get<
+          | ResourceCharacteristicsCollectionPayload
+          | ResourceCharacteristicOption[]
+        >("resources/characteristics");
+
+        if (characteristicsResponse.success && characteristicsResponse.data) {
+          setCharacteristicsCatalog(
+            extractCharacteristicOptions(characteristicsResponse.data),
+          );
+        }
       } catch (err) {
         console.error("Error al cargar datos:", err);
       }
@@ -162,6 +308,60 @@ export default function CreateResourcePage() {
     fetchData();
   }, []);
 
+  const handleClearProgramSelection = () => {
+    setSelectedPrograms([]);
+    setFormData((prev) => ({ ...prev, programIds: [] }));
+  };
+
+  const handleSelectExistingCharacteristic = (
+    characteristic: ResourceCharacteristicOption,
+  ) => {
+    const normalizedName = normalizeCharacteristicName(
+      String(characteristic.name ?? ""),
+    );
+    const normalizedKey = toCharacteristicKey(normalizedName);
+
+    if (!normalizedName || selectedCharacteristicKeys.has(normalizedKey)) {
+      return;
+    }
+
+    setSelectedCharacteristics((prev) => [
+      ...prev,
+      {
+        id: characteristic.id ? String(characteristic.id) : undefined,
+        name: normalizedName,
+        normalizedName: normalizedKey,
+        isNew: false,
+      },
+    ]);
+    setCharacteristicQuery("");
+  };
+
+  const handleCreateCharacteristic = () => {
+    if (!canCreateCharacteristic) {
+      return;
+    }
+
+    const normalizedName = normalizeCharacteristicName(characteristicQuery);
+    const normalizedKey = toCharacteristicKey(normalizedName);
+
+    setSelectedCharacteristics((prev) => [
+      ...prev,
+      {
+        name: normalizedName,
+        normalizedName: normalizedKey,
+        isNew: true,
+      },
+    ]);
+    setCharacteristicQuery("");
+  };
+
+  const handleRemoveCharacteristic = (normalizedName: string) => {
+    setSelectedCharacteristics((prev) =>
+      prev.filter((item) => item.normalizedName !== normalizedName),
+    );
+  };
+
   const handleInputChange = <K extends keyof CreateResourceDto>(
     field: K,
     value: CreateResourceDto[K],
@@ -169,16 +369,6 @@ export default function CreateResourcePage() {
     setFormData((prev) => ({
       ...prev,
       [field]: value,
-    }));
-  };
-
-  const handleAttributeChange = (attribute: string, value: boolean) => {
-    setFormData((prev) => ({
-      ...prev,
-      attributes: {
-        ...prev.attributes,
-        [attribute]: value,
-      },
     }));
   };
 
@@ -246,17 +436,78 @@ export default function CreateResourcePage() {
         throw new Error("Por favor completa todos los campos obligatorios");
       }
 
-      // Construir atributos según tipo
-      const attributes: Record<string, boolean> = {
-        hasProjector,
-        hasAirConditioning,
-        hasWhiteboard,
-        hasComputers,
+      const characteristicNames = Array.from(
+        new Map(
+          selectedCharacteristics
+            .map((item) => normalizeCharacteristicName(item.name))
+            .filter(Boolean)
+            .map((name) => [toCharacteristicKey(name), name]),
+        ).values(),
+      );
+
+      const characteristicKeySet = new Set(
+        characteristicNames.map((name) => toCharacteristicKey(name)),
+      );
+
+      const characteristicValues = selectedCharacteristics.map((item) =>
+        item.id
+          ? item.id
+          : {
+              name: item.name,
+            },
+      );
+
+      const attributesPayload: Record<string, unknown> = {
+        ...(formData.attributes || {}),
+        characteristics: characteristicValues,
+        features: characteristicNames,
       };
+
+      // Inyectar atributos requeridos por el backend según el tipo de recurso para evitar 400 Bad Request
+      const effectiveType = formData.type;
+
+      if (effectiveType === ResourceType.MULTIMEDIA_EQUIPMENT) {
+        if (!attributesPayload.equipmentType) {
+          attributesPayload.equipmentType = "laptop"; // Valor por defecto seguro
+        }
+        if (attributesPayload.isPortable === undefined) {
+          attributesPayload.isPortable = true; // Valor por defecto seguro
+        }
+      } else if (effectiveType === ResourceType.LABORATORY) {
+        if (!attributesPayload.labType) {
+          attributesPayload.labType = "computer";
+        }
+        if (attributesPayload.capacity === undefined) {
+          attributesPayload.capacity = formData.capacity || 1;
+        }
+      } else if (effectiveType === ResourceType.SPORTS_FACILITY) {
+        if (!attributesPayload.sportType) {
+          attributesPayload.sportType = "soccer";
+        }
+        if (attributesPayload.isIndoor === undefined) {
+          attributesPayload.isIndoor = true;
+        }
+      } else if (effectiveType === ResourceType.MEETING_ROOM) {
+        if (attributesPayload.capacity === undefined) {
+          attributesPayload.capacity = formData.capacity || 2;
+        }
+      } else if (effectiveType === ResourceType.AUDITORIUM) {
+        if (attributesPayload.hasSoundSystem === undefined) {
+          attributesPayload.hasSoundSystem = true;
+        }
+      }
+
+      Object.entries(BOOLEAN_ATTRIBUTE_TO_CHARACTERISTIC).forEach(
+        ([attribute, characteristicName]) => {
+          attributesPayload[attribute] = characteristicKeySet.has(
+            toCharacteristicKey(characteristicName),
+          );
+        },
+      );
 
       const dataToSend: CreateResourceRequestPayload = {
         ...formData,
-        attributes,
+        attributes: attributesPayload,
         availabilityRules: formData.availabilityRules
           ? {
               requiresApproval: formData.availabilityRules.requiresApproval,
@@ -411,14 +662,14 @@ export default function CreateResourcePage() {
                           <SelectItem value={ResourceType.AUDITORIUM}>
                             Auditorio
                           </SelectItem>
-                          <SelectItem value={ResourceType.CONFERENCE_ROOM}>
-                            Sala de Conferencias
+                          <SelectItem value={ResourceType.MULTIMEDIA_EQUIPMENT}>
+                            Equipo Multimedial
                           </SelectItem>
-                          <SelectItem value={ResourceType.SPORTS_FIELD}>
-                            Cancha Deportiva
+                          <SelectItem value={ResourceType.SPORTS_FACILITY}>
+                            Instalación Deportiva
                           </SelectItem>
-                          <SelectItem value={ResourceType.EQUIPMENT}>
-                            Equipo
+                          <SelectItem value={ResourceType.MEETING_ROOM}>
+                            Sala de Juntas
                           </SelectItem>
                           <SelectItem value={ResourceType.VEHICLE}>
                             Vehículo
@@ -538,77 +789,109 @@ export default function CreateResourcePage() {
                     Selecciona las características del recurso
                   </CardDescription>
                 </CardHeader>
-                <CardContent>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <label className="flex items-center gap-3 p-3 bg-[var(--color-bg-primary)] rounded-lg cursor-pointer hover:bg-[var(--color-bg-secondary)]">
-                      <input
-                        type="checkbox"
-                        checked={hasProjector}
-                        onChange={(e) => {
-                          setHasProjector(e.target.checked);
-                          handleAttributeChange(
-                            "hasProjector",
-                            e.target.checked,
-                          );
-                        }}
-                        className="rounded w-4 h-4"
-                      />
-                      <span className="text-foreground text-sm">Proyector</span>
-                    </label>
+                <CardContent className="space-y-4">
+                  <div>
+                    <p className="text-sm font-medium text-[var(--color-text-primary)] mb-2">
+                      Seleccionadas ({selectedCharacteristics.length})
+                    </p>
+                    {selectedCharacteristics.length === 0 ? (
+                      <p className="text-sm text-[var(--color-text-tertiary)] p-4 rounded-lg border border-dashed border-[var(--color-border-subtle)]">
+                        No hay características seleccionadas.
+                      </p>
+                    ) : (
+                      <div
+                        className="flex flex-wrap gap-2"
+                        data-testid="resource-characteristics-selected"
+                      >
+                        {selectedCharacteristics.map((characteristic) => (
+                          <span
+                            key={characteristic.normalizedName}
+                            data-testid={`resource-characteristic-chip-${characteristic.isNew ? "new-" : ""}${toCharacteristicTestId(characteristic.name)}`}
+                            className={`inline-flex items-center gap-1.5 rounded-full border px-3 py-1 text-xs ${
+                              characteristic.isNew
+                                ? "border-[var(--color-border-focus)] bg-[var(--color-bg-secondary)] text-[var(--color-text-primary)]"
+                                : "border-[var(--color-border-subtle)] bg-[var(--color-bg-primary)] text-[var(--color-text-primary)]"
+                            }`}
+                          >
+                            {characteristic.isNew ? (
+                              <Plus className="h-3.5 w-3.5" />
+                            ) : (
+                              <Tag className="h-3.5 w-3.5" />
+                            )}
+                            <span>{characteristic.name}</span>
+                            {characteristic.isNew && (
+                              <span className="rounded-full bg-[var(--color-bg-tertiary)] px-1.5 py-0.5 text-[10px] font-medium">
+                                Nueva
+                              </span>
+                            )}
+                            <button
+                              type="button"
+                              data-testid={`resource-characteristic-remove-${toCharacteristicTestId(characteristic.name)}`}
+                              className="rounded p-0.5 text-[var(--color-text-tertiary)] hover:text-[var(--color-text-primary)]"
+                              onClick={() =>
+                                handleRemoveCharacteristic(
+                                  characteristic.normalizedName,
+                                )
+                              }
+                              aria-label={`Eliminar característica ${characteristic.name}`}
+                            >
+                              <X className="h-3.5 w-3.5" />
+                            </button>
+                          </span>
+                        ))}
+                      </div>
+                    )}
+                  </div>
 
-                    <label className="flex items-center gap-3 p-3 bg-[var(--color-bg-primary)] rounded-lg cursor-pointer hover:bg-[var(--color-bg-secondary)]">
-                      <input
-                        type="checkbox"
-                        checked={hasAirConditioning}
-                        onChange={(e) => {
-                          setHasAirConditioning(e.target.checked);
-                          handleAttributeChange(
-                            "hasAirConditioning",
-                            e.target.checked,
-                          );
-                        }}
-                        className="rounded w-4 h-4"
-                      />
-                      <span className="text-foreground text-sm">
-                        Aire Acondicionado
-                      </span>
-                    </label>
+                  <div className="space-y-2">
+                    <Input
+                      data-testid="resource-characteristics-search-input"
+                      placeholder="Buscar o crear característica..."
+                      value={characteristicQuery}
+                      onChange={(e) => setCharacteristicQuery(e.target.value)}
+                    />
 
-                    <label className="flex items-center gap-3 p-3 bg-[var(--color-bg-primary)] rounded-lg cursor-pointer hover:bg-[var(--color-bg-secondary)]">
-                      <input
-                        type="checkbox"
-                        checked={hasWhiteboard}
-                        onChange={(e) => {
-                          setHasWhiteboard(e.target.checked);
-                          handleAttributeChange(
-                            "hasWhiteboard",
-                            e.target.checked,
-                          );
-                        }}
-                        className="rounded w-4 h-4"
-                      />
-                      <span className="text-foreground text-sm">
-                        Tablero/Pizarra
-                      </span>
-                    </label>
+                    <div
+                      className="max-h-[280px] overflow-y-auto space-y-2 rounded-lg border border-[var(--color-border-subtle)] p-2"
+                      data-testid="resource-characteristics-options"
+                    >
+                      {filteredCharacteristics.map((characteristic) => (
+                        <button
+                          key={String(characteristic.id)}
+                          type="button"
+                          data-testid={`resource-characteristic-option-${toCharacteristicTestId(String(characteristic.name))}`}
+                          onClick={() =>
+                            handleSelectExistingCharacteristic(characteristic)
+                          }
+                          className="w-full text-left px-3 py-2 rounded-md hover:bg-[var(--color-bg-secondary)] text-sm text-[var(--color-text-primary)]"
+                        >
+                          {characteristic.name}
+                        </button>
+                      ))}
 
-                    <label className="flex items-center gap-3 p-3 bg-[var(--color-bg-primary)] rounded-lg cursor-pointer hover:bg-[var(--color-bg-secondary)]">
-                      <input
-                        type="checkbox"
-                        checked={hasComputers}
-                        onChange={(e) => {
-                          setHasComputers(e.target.checked);
-                          handleAttributeChange(
-                            "hasComputers",
-                            e.target.checked,
-                          );
-                        }}
-                        className="rounded w-4 h-4"
-                      />
-                      <span className="text-foreground text-sm">
-                        Computadores
-                      </span>
-                    </label>
+                      {canCreateCharacteristic && (
+                        <button
+                          type="button"
+                          data-testid="resource-characteristic-create-option"
+                          onClick={handleCreateCharacteristic}
+                          className="w-full text-left px-3 py-2 rounded-md border border-[var(--color-border-focus)] bg-[var(--color-bg-primary)] text-sm text-[var(--color-text-primary)]"
+                        >
+                          Crear &quot;{normalizedCharacteristicQuery}&quot;
+                        </button>
+                      )}
+
+                      {!canCreateCharacteristic &&
+                        filteredCharacteristics.length === 0 && (
+                          <p className="px-3 py-2 text-sm text-[var(--color-text-tertiary)]">
+                            No hay coincidencias disponibles.
+                          </p>
+                        )}
+                    </div>
+
+                    <p className="text-xs text-[var(--color-text-tertiary)]">
+                      Las características nuevas se crean solo al guardar el
+                      recurso.
+                    </p>
                   </div>
                 </CardContent>
               </Card>
@@ -634,15 +917,27 @@ export default function CreateResourcePage() {
                         {selectedPrograms.length} / {programs.length}
                       </div>
                     </div>
-                    <Button
-                      type="button"
-                      variant="outline"
-                      onClick={handleSelectAllPrograms}
-                    >
-                      {selectedPrograms.length === programs.length
-                        ? "Deseleccionar Todos"
-                        : "Seleccionar Todos"}
-                    </Button>
+                    <div className="flex gap-2">
+                      <Button
+                        type="button"
+                        variant="outline"
+                        size="sm"
+                        onClick={handleClearProgramSelection}
+                        data-testid="resource-program-clear-selection"
+                      >
+                        Limpiar selección
+                      </Button>
+                      <Button
+                        type="button"
+                        variant="outline"
+                        size="sm"
+                        onClick={handleSelectAllPrograms}
+                      >
+                        {selectedPrograms.length === programs.length
+                          ? "Deseleccionar Todos"
+                          : "Seleccionar Todos"}
+                      </Button>
+                    </div>
                   </div>
 
                   {/* Mensaje informativo */}

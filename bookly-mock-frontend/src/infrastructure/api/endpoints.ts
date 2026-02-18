@@ -91,9 +91,15 @@ export const RESOURCES_ENDPOINTS = {
   AVAILABILITY_BY_ID: (id: string) =>
     `${API_VERSION}/resources/${id}/availability`,
 
-  // Atributos
+  // Atributos y Características
   ATTRIBUTES: `${API_VERSION}/resources/attributes`,
+  CHARACTERISTICS: `${API_VERSION}/resources/characteristics`,
   EQUIPMENT: `${API_VERSION}/resources/equipment`,
+
+  // Datos de Referencia (BE controller: "reference-data")
+  REFERENCE_DATA: `${API_VERSION}/reference-data`,
+  REFERENCE_DATA_BY_ID: (id: string) => `${API_VERSION}/reference-data/${id}`,
+  REFERENCE_DATA_GROUPS: `${API_VERSION}/reference-data/groups`,
 } as const;
 
 /**
@@ -298,7 +304,8 @@ export function getServiceFromEndpoint(endpoint: string): string {
   if (
     endpoint.includes("/resources") ||
     endpoint.includes("/categories") ||
-    endpoint.includes("/programs")
+    endpoint.includes("/programs") ||
+    endpoint.includes("/reference-data")
   )
     return "RESOURCES";
 

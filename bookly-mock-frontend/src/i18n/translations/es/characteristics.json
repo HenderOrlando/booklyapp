@@ -1,0 +1,35 @@
+{
+  "title": "Características",
+  "subtitle": "Gestiona el catálogo de atributos para los recursos",
+  "create_button": "Crear Característica",
+  "list_title": "Lista de Características",
+  "empty_state": {
+    "title": "No se encontraron características",
+    "description": "Intenta cambiar los filtros o crea una nueva."
+  },
+  "table": {
+    "name_code": "Nombre / Código",
+    "description": "Descripción",
+    "status": "Estado",
+    "actions": "Acciones"
+  },
+  "modal": {
+    "create_title": "Crear Característica",
+    "edit_title": "Editar Característica",
+    "create_description": "Agrega una nueva característica al catálogo global",
+    "edit_description": "Modifica los datos de la característica",
+    "name_label": "Nombre",
+    "code_label": "Código",
+    "description_label": "Descripción",
+    "status_label": "Característica activa",
+    "status_hint": "Las inactivas no se podrán asignar a nuevos recursos",
+    "code_hint": "Identificador único interno. Solo letras, números y guiones bajos.",
+    "save_button": "Guardar Cambios",
+    "creating_button": "Creando...",
+    "saving_button": "Guardando..."
+  },
+  "delete_confirm": {
+    "title": "Eliminar Característica",
+    "description": "¿Estás seguro? Esta acción desactivará la característica del catálogo."
+  }
+}

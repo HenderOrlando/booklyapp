@@ -12,6 +12,7 @@ const TRANSLATION_KEYS: Record<string, string> = {
   "/profile": "navigation.profile",
   "/recursos": "navigation.resources",
   "/categorias": "navigation.categories",
+  "/caracteristicas": "navigation.characteristics",
   "/mantenimientos": "navigation.maintenance",
   "/programas": "navigation.programs",
   "/reservas": "navigation.reservations",
@@ -133,6 +134,26 @@ const navigationItems: NavItem[] = [
       </svg>
     ),
     roles: ["admin", "coordinador"], // Solo admin y coordinador pueden gestionar categorías
+  },
+  {
+    href: "/caracteristicas",
+    label: "Características",
+    icon: (
+      <svg
+        className="w-5 h-5"
+        fill="none"
+        stroke="currentColor"
+        viewBox="0 0 24 24"
+      >
+        <path
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          strokeWidth={2}
+          d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"
+        />
+      </svg>
+    ),
+    roles: ["admin", "coordinador"],
   },
   {
     href: "/mantenimientos",
@@ -637,7 +658,7 @@ export function AppSidebar({
   userRole: userRoleProp,
   className = "",
 }: AppSidebarProps) {
-  const { user, isLoading } = useAuth();
+  const { user } = useAuth();
   const t = useTranslations();
   const pathname = usePathname();
   const [expandedItems, setExpandedItems] = React.useState<string[]>([]);
@@ -663,7 +684,7 @@ export function AppSidebar({
     console.log("[AppSidebar] Roles normalizados:", normalizedRoles);
 
     return normalizedRoles;
-  }, [user?.roles, userRoleProp]);
+  }, [user, userRoleProp]);
 
   // Inicializar items expandidos basado en la ruta actual
   React.useEffect(() => {
@@ -756,8 +777,8 @@ export function AppSidebar({
                   flex items-center justify-between w-full px-4 py-2 rounded-md transition-colors
                   ${
                     isActive
-                      ? "bg-brand-primary-600 text-white"
-                      : "hover:bg-slate-700 text-[var(--color-text-tertiary)]"
+                      ? "bg-[var(--color-action-primary)] text-[var(--color-text-inverse)]"
+                      : "hover:bg-[var(--color-navigation-sidebar-hover,var(--color-bg-elevated))] text-[var(--color-text-tertiary)]"
                   }
                 `}
               >
@@ -780,8 +801,8 @@ export function AppSidebar({
                   flex items-center gap-3 px-4 py-2 rounded-md transition-colors
                   ${
                     isActive
-                      ? "bg-brand-primary-600 text-white"
-                      : "hover:bg-slate-700 text-[var(--color-text-tertiary)]"
+                      ? "bg-[var(--color-action-primary)] text-[var(--color-text-inverse)]"
+                      : "hover:bg-[var(--color-navigation-sidebar-hover,var(--color-bg-elevated))] text-[var(--color-text-tertiary)]"
                   }
                 `}
               >
@@ -805,8 +826,8 @@ export function AppSidebar({
                         block px-4 py-2 rounded-md transition-colors text-sm
                         ${
                           isChildActive
-                            ? "text-brand-primary-400 font-medium"
-                            : "text-[var(--color-text-tertiary)] hover:text-white hover:bg-slate-700"
+                            ? "text-[var(--color-action-primary)] font-medium"
+                            : "text-[var(--color-text-tertiary)] hover:text-[var(--color-text-inverse)] hover:bg-[var(--color-navigation-sidebar-hover,var(--color-bg-elevated))]"
                         }
                       `}
                     >

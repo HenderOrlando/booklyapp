@@ -47,15 +47,14 @@ export function MainLayout({
           className={cn(
             "sticky top-0 z-50 w-full",
             "border-b border-[var(--color-border-subtle)]",
-            "bg-brand-primary-500 text-white",
-            "dark:bg-slate-900",
+            "bg-[var(--color-navigation-header-bg,var(--color-action-primary))] text-[var(--color-text-inverse)]",
           )}
         >
           <div className="flex h-16 items-center px-4">
             {/* Botón toggle sidebar en mobile */}
             <button
               onClick={() => setSidebarOpen(!sidebarOpen)}
-              className="mr-4 lg:hidden p-2 rounded-md hover:bg-brand-primary-600"
+              className="mr-4 lg:hidden p-2 rounded-md hover:bg-[var(--color-navigation-header-hover,var(--color-action-primary-hover))]"
               aria-label="Toggle menu"
             >
               <svg
@@ -95,8 +94,7 @@ export function MainLayout({
                 "fixed inset-y-0 left-0 z-50 w-64",
                 "flex flex-col",
                 "border-r border-[var(--color-border-subtle)]",
-                "bg-slate-800 text-[var(--color-text-inverse)]",
-                "dark:bg-slate-900",
+                "bg-[var(--color-navigation-sidebar-bg,var(--color-bg-inverse))] text-[var(--color-text-inverse)]",
                 "transition-transform duration-300",
                 "lg:sticky lg:top-16 lg:h-[calc(100vh-4rem)] lg:translate-x-0",
                 sidebarOpen ? "translate-x-0" : "-translate-x-full",

@@ -718,6 +718,42 @@ export default function EditResourcePage() {
         features: characteristicNames,
       };
 
+      // Inyectar atributos requeridos por el backend según el tipo de recurso para evitar 400 Bad Request
+      const effectiveType = formData.type || resource?.type;
+
+      if (effectiveType === ResourceType.MULTIMEDIA_EQUIPMENT) {
+        if (!attributesPayload.equipmentType) {
+          attributesPayload.equipmentType = "laptop"; // Valor por defecto seguro
+        }
+        if (attributesPayload.isPortable === undefined) {
+          attributesPayload.isPortable = true; // Valor por defecto seguro
+        }
+      } else if (effectiveType === ResourceType.LABORATORY) {
+        if (!attributesPayload.labType) {
+          attributesPayload.labType = "computer";
+        }
+        if (attributesPayload.capacity === undefined) {
+          attributesPayload.capacity =
+            formData.capacity || resource?.capacity || 1;
+        }
+      } else if (effectiveType === ResourceType.SPORTS_FACILITY) {
+        if (!attributesPayload.sportType) {
+          attributesPayload.sportType = "soccer";
+        }
+        if (attributesPayload.isIndoor === undefined) {
+          attributesPayload.isIndoor = true;
+        }
+      } else if (effectiveType === ResourceType.MEETING_ROOM) {
+        if (attributesPayload.capacity === undefined) {
+          attributesPayload.capacity =
+            formData.capacity || resource?.capacity || 2;
+        }
+      } else if (effectiveType === ResourceType.AUDITORIUM) {
+        if (attributesPayload.hasSoundSystem === undefined) {
+          attributesPayload.hasSoundSystem = true;
+        }
+      }
+
       Object.entries(BOOLEAN_ATTRIBUTE_TO_CHARACTERISTIC).forEach(
         ([attribute, characteristicName]) => {
           attributesPayload[attribute] = characteristicKeySet.has(
@@ -905,14 +941,14 @@ export default function EditResourcePage() {
                           <SelectItem value={ResourceType.AUDITORIUM}>
                             Auditorio
                           </SelectItem>
-                          <SelectItem value={ResourceType.CONFERENCE_ROOM}>
-                            Sala de Conferencias
+                          <SelectItem value={ResourceType.MULTIMEDIA_EQUIPMENT}>
+                            Equipo Multimedial
                           </SelectItem>
-                          <SelectItem value={ResourceType.SPORTS_FIELD}>
-                            Cancha Deportiva
+                          <SelectItem value={ResourceType.SPORTS_FACILITY}>
+                            Instalación Deportiva
                           </SelectItem>
-                          <SelectItem value={ResourceType.EQUIPMENT}>
-                            Equipo
+                          <SelectItem value={ResourceType.MEETING_ROOM}>
+                            Sala de Juntas
                           </SelectItem>
                           <SelectItem value={ResourceType.VEHICLE}>
                             Vehículo

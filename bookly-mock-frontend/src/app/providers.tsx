@@ -16,6 +16,10 @@ interface ProvidersProps {
   children: React.ReactNode;
 }
 
+interface AppConfigColorVariablesProps {
+  children: React.ReactNode;
+}
+
 const DEFAULT_DARK_THEME_COLORS = {
   primary: "#3b82f6",
   secondary: "#2dd4bf",
@@ -115,8 +119,40 @@ function hexToHslToken(hexColor: string): string {
   return `${normalizedHue} ${normalizedSaturation}% ${normalizedLightness}%`;
 }
 
-function AppConfigColorVariables() {
-  const { data: publicConfig } = usePublicConfig();
+function ColorBootstrapSplash() {
+  return (
+    <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-[var(--color-bg-app)]">
+      <div className="pointer-events-none absolute inset-0 overflow-hidden">
+        <div className="absolute -top-28 -left-24 h-72 w-72 rounded-full bg-[var(--color-action-primary)] opacity-20 blur-3xl animate-pulse" />
+        <div className="absolute -bottom-20 -right-16 h-72 w-72 rounded-full bg-[var(--color-action-secondary)] opacity-20 blur-3xl animate-pulse" />
+      </div>
+
+      <div className="relative flex w-[340px] max-w-[90vw] flex-col items-center gap-5 rounded-2xl border border-[var(--color-border-subtle)] bg-[var(--color-bg-surface)] px-8 py-8 shadow-xl">
+        <div className="flex items-center gap-2">
+          <span className="h-3 w-3 rounded-full bg-[var(--color-action-primary)] animate-bounce [animation-delay:-0.2s]" />
+          <span className="h-3 w-3 rounded-full bg-[var(--color-action-secondary)] animate-bounce" />
+          <span className="h-3 w-3 rounded-full bg-[var(--color-action-primary)] animate-bounce [animation-delay:0.2s]" />
+        </div>
+
+        <div className="space-y-1 text-center">
+          <p className="text-sm font-semibold text-[var(--color-text-primary)]">
+            Aplicando tema institucional...
+          </p>
+          <p className="text-xs text-[var(--color-text-secondary)]">
+            Cargando colores y preparando la experiencia visual
+          </p>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function AppConfigColorVariables({ children }: AppConfigColorVariablesProps) {
+  const {
+    data: publicConfig,
+    isLoading: isPublicConfigLoading,
+    isFetching: isPublicConfigFetching,
+  } = usePublicConfig();
 
   const runtimeStyles = React.useMemo(() => {
     const lightPrimary = normalizeHexColor(
@@ -144,6 +180,10 @@ function AppConfigColorVariables() {
     const lightSecondaryHover = shadeHex(lightSecondary, 0.14);
     const darkPrimaryHover = shadeHex(darkPrimary, 0.12);
     const darkSecondaryHover = shadeHex(darkSecondary, 0.12);
+    const lightSidebarBackground = shadeHex(lightSecondary, 0.62);
+    const lightSidebarHover = shadeHex(lightSecondary, 0.52);
+    const darkSidebarBackground = shadeHex(darkSecondary, 0.62);
+    const darkSidebarHover = shadeHex(darkSecondary, 0.52);
 
     return `
 :root {
@@ -151,6 +191,10 @@ function AppConfigColorVariables() {
   --color-action-primary-hover: ${lightPrimaryHover};
   --color-action-secondary: ${lightSecondary};
   --color-action-secondary-hover: ${lightSecondaryHover};
+  --color-navigation-header-bg: ${lightPrimary};
+  --color-navigation-header-hover: ${lightPrimaryHover};
+  --color-navigation-sidebar-bg: ${lightSidebarBackground};
+  --color-navigation-sidebar-hover: ${lightSidebarHover};
   --color-border-focus: ${lightPrimary};
   --color-text-link: ${lightPrimary};
   --primary: ${hexToHslToken(lightPrimary)};
@@ -164,6 +208,10 @@ function AppConfigColorVariables() {
   --color-action-primary-hover: ${darkPrimaryHover};
   --color-action-secondary: ${darkSecondary};
   --color-action-secondary-hover: ${darkSecondaryHover};
+  --color-navigation-header-bg: ${darkPrimary};
+  --color-navigation-header-hover: ${darkPrimaryHover};
+  --color-navigation-sidebar-bg: ${darkSidebarBackground};
+  --color-navigation-sidebar-hover: ${darkSidebarHover};
   --color-border-focus: ${darkPrimary};
   --color-text-link: ${darkPrimary};
   --primary: ${hexToHslToken(darkPrimary)};
@@ -173,7 +221,24 @@ function AppConfigColorVariables() {
 `;
   }, [publicConfig?.primaryColor, publicConfig?.secondaryColor]);
 
-  return <style id="app-config-color-variables">{runtimeStyles}</style>;
+  const isBootstrappingColors =
+    !publicConfig && (isPublicConfigLoading || isPublicConfigFetching);
+
+  if (isBootstrappingColors) {
+    return (
+      <>
+        <style id="app-config-color-variables">{runtimeStyles}</style>
+        <ColorBootstrapSplash />
+      </>
+    );
+  }
+
+  return (
+    <>
+      <style id="app-config-color-variables">{runtimeStyles}</style>
+      {children}
+    </>
+  );
 }
 
 export function Providers({ children }: ProvidersProps) {
@@ -186,14 +251,15 @@ export function Providers({ children }: ProvidersProps) {
           enableSystem
           disableTransitionOnChange
         >
-          <AppConfigColorVariables />
-          <AuthProvider>
-            <WebSocketProvider>
-              <WebSocketToastBridge />
-              {children}
-              <ToastContainer />
-            </WebSocketProvider>
-          </AuthProvider>
+          <AppConfigColorVariables>
+            <AuthProvider>
+              <WebSocketProvider>
+                <WebSocketToastBridge />
+                {children}
+                <ToastContainer />
+              </WebSocketProvider>
+            </AuthProvider>
+          </AppConfigColorVariables>
         </ThemeProvider>
       </QueryProvider>
     </ReduxProvider>

@@ -76,15 +76,20 @@ export const mockCategories: Category[] = [
 
 export interface ResourceCharacteristic {
   id: string;
+  group: string;
   code: string;
   name: string;
+  description?: string;
   icon?: string;
   isActive: boolean;
+  createdAt?: string;
+  updatedAt?: string;
 }
 
 export const mockResourceCharacteristics: ResourceCharacteristic[] = [
   {
     id: "char_001",
+    group: "resource_characteristic",
     code: "PROYECTOR",
     name: "Proyector",
     icon: "projector",
@@ -92,6 +97,7 @@ export const mockResourceCharacteristics: ResourceCharacteristic[] = [
   },
   {
     id: "char_002",
+    group: "resource_characteristic",
     code: "AIRE_ACONDICIONADO",
     name: "Aire acondicionado",
     icon: "air-conditioner",
@@ -99,6 +105,7 @@ export const mockResourceCharacteristics: ResourceCharacteristic[] = [
   },
   {
     id: "char_003",
+    group: "resource_characteristic",
     code: "TABLERO_PIZARRA",
     name: "Tablero/Pizarra",
     icon: "whiteboard",
@@ -106,6 +113,7 @@ export const mockResourceCharacteristics: ResourceCharacteristic[] = [
   },
   {
     id: "char_004",
+    group: "resource_characteristic",
     code: "COMPUTADORES",
     name: "Computadores",
     icon: "computer",
@@ -113,6 +121,7 @@ export const mockResourceCharacteristics: ResourceCharacteristic[] = [
   },
   {
     id: "char_005",
+    group: "resource_characteristic",
     code: "SISTEMA_SONIDO",
     name: "Sistema de sonido",
     icon: "speaker",
@@ -120,6 +129,7 @@ export const mockResourceCharacteristics: ResourceCharacteristic[] = [
   },
   {
     id: "char_006",
+    group: "resource_characteristic",
     code: "VIDEOCONFERENCIA",
     name: "Videoconferencia",
     icon: "video-conference",
@@ -127,6 +137,7 @@ export const mockResourceCharacteristics: ResourceCharacteristic[] = [
   },
   {
     id: "char_007",
+    group: "resource_characteristic",
     code: "ACCESO_SILLA_RUEDAS",
     name: "Acceso para silla de ruedas",
     icon: "wheelchair",
@@ -134,6 +145,7 @@ export const mockResourceCharacteristics: ResourceCharacteristic[] = [
   },
   {
     id: "char_008",
+    group: "resource_characteristic",
     code: "ILUMINACION_ESPECIAL",
     name: "Iluminación especial",
     icon: "lightbulb",
@@ -252,7 +264,7 @@ export const mockResources: Resource[] = [
     code: "SALA-CONF-A",
     name: "Sala de Conferencias A",
     description: "Sala para videoconferencias con capacidad para 20 personas",
-    type: ResourceType.CONFERENCE_ROOM,
+    type: ResourceType.MULTIMEDIA_EQUIPMENT,
     categoryId: "cat_004",
     capacity: 20,
     location: "Edificio Administrativo - Piso 3",
@@ -284,7 +296,7 @@ export const mockResources: Resource[] = [
     code: "CANCHA-FUTBOL",
     name: "Cancha de Fútbol",
     description: "Cancha de fútbol sintético",
-    type: ResourceType.SPORTS_FIELD,
+    type: ResourceType.SPORTS_FACILITY,
     categoryId: "cat_005",
     capacity: 22,
     location: "Zona Deportiva",
@@ -383,7 +395,7 @@ export const mockResources: Resource[] = [
     code: "SALA-CONF-B",
     name: "Sala de Conferencias B",
     description: "Sala pequeña para reuniones",
-    type: ResourceType.CONFERENCE_ROOM,
+    type: ResourceType.MULTIMEDIA_EQUIPMENT,
     categoryId: "cat_004",
     capacity: 10,
     location: "Edificio Administrativo - Piso 2",
