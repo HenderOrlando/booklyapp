@@ -146,34 +146,17 @@ export default function RecursoDetailPage() {
         </CardContent>
       </Card>
 
-      {/* Reserva Rápida */}
-      <Card>
-        <CardHeader>
-          <CardTitle>{t("quick_reserve")}</CardTitle>
-          <CardDescription>{t("select_date")}</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <DatePicker
-            date={selectedDate}
-            onSelect={setSelectedDate}
-            placeholder={t("select_date_placeholder")}
-          />
-          <Button
-            className="w-full mt-4"
-            disabled={!selectedDate}
-            onClick={() => {
-              if (selectedDate && resource) {
-                const dateStr = selectedDate.toISOString().split("T")[0];
-                router.push(
-                  `/${locale}/calendario?date=${dateStr}&resourceId=${resource.id}`,
-                );
-              }
-            }}
-          >
-            {t("continue_reserve")}
-          </Button>
-        </CardContent>
-      </Card>
+      {/* Botón Reserva Rápida */}
+      <Button
+        className="w-full"
+        onClick={() => {
+          if (resource) {
+            router.push(`/${locale}/recursos/${resource.id}?tab=reserva`);
+          }
+        }}
+      >
+        {t("quick_reserve")}
+      </Button>
     </div>
   ) : null;
 
@@ -241,6 +224,7 @@ export default function RecursoDetailPage() {
           { label: t("breadcrumbs.resources"), href: `/${locale}/recursos` },
           { label: resource.name },
         ]}
+        defaultTab="reserva"
         tabs={[
           {
             value: "detalles",
@@ -343,7 +327,7 @@ export default function RecursoDetailPage() {
             ),
           },
           {
-            value: "disponibilidad",
+            value: "reserva",
             label: t("tabs.availability"),
             content: (
               <Card>

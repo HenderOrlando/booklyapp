@@ -24,6 +24,13 @@ jest.mock("@/infrastructure/http/errorMessageResolver", () => ({
   resolveErrorMessage: jest.fn(() => ""),
 }));
 
+jest.mock("@/hooks/useAppConfig", () => ({
+  usePublicConfig: () => ({
+    data: undefined,
+    isLoading: false,
+  }),
+}));
+
 const translations: Record<string, Record<string, string>> = {
   auth: {
     login: "Iniciar Sesión",
@@ -145,5 +152,20 @@ describe("LoginPage UI/UX", () => {
     expect(submitButton.className).toContain(
       "focus-visible:ring-[var(--color-border-focus)]",
     );
+  });
+
+  it("persists remember me preference in localStorage", async () => {
+    const user = userEvent.setup();
+    render(<LoginPage />);
+
+    const rememberCheckbox = screen.getByLabelText("Recordarme");
+
+    expect(rememberCheckbox).not.toBeChecked();
+    expect(window.localStorage.getItem("rememberMe")).toBe("false");
+
+    await user.click(rememberCheckbox);
+
+    expect(rememberCheckbox).toBeChecked();
+    expect(window.localStorage.getItem("rememberMe")).toBe("true");
   });
 });

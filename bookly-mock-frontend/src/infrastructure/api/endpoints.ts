@@ -18,7 +18,7 @@ export const AUTH_ENDPOINTS = {
   PROFILE_DETAILS: `${API_VERSION}/users/me/profile`,
   PROFILE_UPDATE: `${API_VERSION}/users/me/profile`,
   PROFILE_PHOTO: `${API_VERSION}/users/me/photo`,
-  PROFILE_PREFERENCES: `${API_VERSION}/users/me/preferences`,
+  PROFILE_PREFERENCES: `${API_VERSION}/users/me/profile`,
   REFRESH_TOKEN: `${API_VERSION}/auth/refresh`,
   VERIFY_EMAIL: `${API_VERSION}/auth/verify-email`,
   FORGOT_PASSWORD: `${API_VERSION}/auth/forgot-password`,

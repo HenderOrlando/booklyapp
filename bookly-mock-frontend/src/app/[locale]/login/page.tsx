@@ -29,7 +29,13 @@ export default function LoginPage() {
   const { isMock } = useDataMode();
   const [email, setEmail] = React.useState("");
   const [password, setPassword] = React.useState("");
-  const [rememberMe, setRememberMe] = React.useState(false);
+  const [rememberMe, setRememberMe] = React.useState<boolean>(() => {
+    if (typeof window === "undefined") {
+      return false;
+    }
+
+    return window.localStorage.getItem("rememberMe") === "true";
+  });
   const [error, setError] = React.useState("");
 
   React.useEffect(() => {
@@ -42,6 +48,14 @@ export default function LoginPage() {
       window.location.search,
     );
   }, []);
+
+  React.useEffect(() => {
+    if (typeof window === "undefined") {
+      return;
+    }
+
+    window.localStorage.setItem("rememberMe", rememberMe ? "true" : "false");
+  }, [rememberMe]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();

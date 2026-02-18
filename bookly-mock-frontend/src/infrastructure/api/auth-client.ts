@@ -45,6 +45,7 @@ export interface UpdateProfileDto {
   phone?: string;
   documentType?: string;
   documentNumber?: string;
+  preferences?: Partial<UserPreferences>;
 }
 
 interface BackendMyProfileResponse {
@@ -68,6 +69,45 @@ interface BackendMyProfileResponse {
   cuenta?: {
     fechaCreacion?: string | null;
     ultimaActualizacion?: string | null;
+  };
+  preferences?: {
+    language?: string;
+    theme?: "light" | "dark" | "system";
+    timezone?: string;
+    notifications?: {
+      email?: boolean;
+      push?: boolean;
+      sms?: boolean;
+    };
+  };
+}
+
+const DEFAULT_USER_PREFERENCES: UserPreferences = {
+  language: "es",
+  theme: "system",
+  notifications: {
+    email: true,
+    push: true,
+    sms: false,
+  },
+  timezone: "America/Bogota",
+};
+
+function normalizeProfilePreferences(
+  preferences: BackendMyProfileResponse["preferences"],
+): UserPreferences {
+  const notifications = preferences?.notifications;
+
+  return {
+    language: preferences?.language ?? DEFAULT_USER_PREFERENCES.language,
+    theme: preferences?.theme ?? DEFAULT_USER_PREFERENCES.theme,
+    timezone: preferences?.timezone ?? DEFAULT_USER_PREFERENCES.timezone,
+    notifications: {
+      email:
+        notifications?.email ?? DEFAULT_USER_PREFERENCES.notifications.email,
+      push: notifications?.push ?? DEFAULT_USER_PREFERENCES.notifications.push,
+      sms: notifications?.sms ?? DEFAULT_USER_PREFERENCES.notifications.sms,
+    },
   };
 }
 
@@ -406,6 +446,7 @@ function normalizeDetailedProfile(profile: BackendMyProfileResponse): User {
       }),
     ),
     permissions: [],
+    preferences: normalizeProfilePreferences(profile.preferences),
     createdAt:
       profile.cuenta?.fechaCreacion ||
       profile.cuenta?.ultimaActualizacion ||
@@ -754,19 +795,7 @@ export class AuthClient {
   static async updatePreferences(
     preferences: Partial<UserPreferences>,
   ): Promise<ApiResponse<User>> {
-    const response = await httpClient.put<unknown>(
-      AUTH_ENDPOINTS.PROFILE_PREFERENCES,
-      { preferences },
-    );
-
-    if (!response.success || !response.data) {
-      return response as ApiResponse<User>;
-    }
-
-    return {
-      ...response,
-      data: normalizeUser(response.data),
-    };
+    return this.updateProfile({ preferences });
   }
 
   //

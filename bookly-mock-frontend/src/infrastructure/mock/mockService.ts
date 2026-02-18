@@ -863,12 +863,40 @@ export class MockService {
           ? data.phoneNumber
           : undefined;
 
+    const incomingPreferences =
+      typeof data.preferences === "object" && data.preferences !== null
+        ? (data.preferences as Partial<UserPreferences>)
+        : undefined;
+
+    const currentPreferences = mockUsers[0].preferences ?? {
+      language: "es",
+      theme: "system" as const,
+      notifications: {
+        email: true,
+        push: true,
+        sms: false,
+      },
+      timezone: "America/Bogota",
+    };
+
+    const mergedPreferences = incomingPreferences
+      ? {
+          ...currentPreferences,
+          ...incomingPreferences,
+          notifications: {
+            ...currentPreferences.notifications,
+            ...(incomingPreferences.notifications ?? {}),
+          },
+        }
+      : currentPreferences;
+
     // Simular actualización de perfil exitosa
     const updatedUser: AuthUser = {
       ...mockUsers[0],
       ...data,
       phone: nextPhone ?? mockUsers[0].phone,
       phoneNumber: nextPhone ?? mockUsers[0].phoneNumber,
+      preferences: mergedPreferences,
       updatedAt: new Date().toISOString(),
     };
 
