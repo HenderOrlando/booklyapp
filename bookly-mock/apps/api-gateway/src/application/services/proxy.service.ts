@@ -164,6 +164,9 @@ export class ProxyService {
       "/users/me/preferences",
       "/config",
       "/app-config",
+      // Resources CRUD that require immediate persistence/response in UI flows
+      "/categories",
+      "/resources",
     ];
     // Build the full path to forward: /{service}{path}
     // e.g., service="approval-requests", path="/123" → fullForwardPath="/approval-requests/123"

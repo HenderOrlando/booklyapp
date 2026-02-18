@@ -37,6 +37,13 @@ import { useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
 import * as React from "react";
 
+type CategoryMutationApiResponse = {
+  success?: boolean;
+  data?: unknown;
+  status?: string;
+  message?: string;
+};
+
 /**
  * Página de Gestión de Categorías - Bookly
  *
@@ -60,7 +67,9 @@ export default function CategoriasPage() {
   } = useQuery({
     queryKey: categoryKeys.lists(),
     queryFn: async () => {
-      const response = await httpClient.get("categories");
+      const response = await httpClient.get<{ categories: Category[] }>(
+        "categories",
+      );
       console.log("Response from backend:", response);
       console.log("Response data:", response.data);
       return response.data?.categories || [];
@@ -120,35 +129,47 @@ export default function CategoriasPage() {
   };
 
   // Guardar categoría con React Query
-  const handleSave = (categoryData: Partial<Category>) => {
+  const hasImmediatePersistence = (response: CategoryMutationApiResponse) => {
+    if (
+      !response.success ||
+      !response.data ||
+      response.status === "processing"
+    ) {
+      return false;
+    }
+
+    const normalizedMessage = response.message?.toLowerCase() || "";
+    return (
+      !normalizedMessage.includes("queued for processing") &&
+      !normalizedMessage.includes("accepted and queued")
+    );
+  };
+
+  const handleSave = async (categoryData: Partial<Category>) => {
     if (modalMode === "create") {
-      createCategory.mutate(categoryData as any, {
-        onSuccess: () => {
+      try {
+        const response = await createCategory.mutateAsync(categoryData as any);
+        if (hasImmediatePersistence(response)) {
           setShowModal(false);
-        },
-        onError: (err) => {
-          console.error("Error al crear categoría:", err);
-          alert("Error al crear la categoría");
-        },
-      });
+        }
+      } catch (err) {
+        console.error("Error al crear categoría:", err);
+      }
     } else {
       if (!selectedCategory) return;
 
-      updateCategory.mutate(
-        {
+      try {
+        const response = await updateCategory.mutateAsync({
           id: selectedCategory.id,
           data: categoryData as any,
-        },
-        {
-          onSuccess: () => {
-            setShowModal(false);
-          },
-          onError: (err) => {
-            console.error("Error al actualizar categoría:", err);
-            alert("Error al actualizar la categoría");
-          },
-        },
-      );
+        });
+
+        if (hasImmediatePersistence(response)) {
+          setShowModal(false);
+        }
+      } catch (err) {
+        console.error("Error al actualizar categoría:", err);
+      }
     }
   };
 
@@ -480,6 +501,11 @@ export default function CategoriasPage() {
           onSave={handleSave}
           category={selectedCategory}
           mode={modalMode}
+          loading={
+            modalMode === "create"
+              ? createCategory.isPending
+              : updateCategory.isPending
+          }
         />
 
         {/* Modal de Confirmación de Eliminación */}

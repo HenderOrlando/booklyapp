@@ -68,12 +68,21 @@ interface ProgramApiItem {
   updatedAt?: string;
 }
 
-interface ResourceCollectionPayload {
-  items?: Resource[];
-  resources?: Resource[];
+interface ResourceCharacteristicOption {
+  id?: string;
+  _id?: string;
+  code?: string;
+  name?: string;
+  icon?: string;
+  isActive?: boolean;
+}
+
+interface ResourceCharacteristicsCollectionPayload {
+  items?: ResourceCharacteristicOption[];
 }
 
 interface CharacteristicTag {
+  id?: string;
   name: string;
   normalizedName: string;
   isNew: boolean;
@@ -89,17 +98,6 @@ interface UpdateResourceRequestPayload
     allowRecurring?: boolean;
   };
 }
-
-const DEFAULT_CHARACTERISTICS = [
-  "Proyector",
-  "Aire acondicionado",
-  "Tablero/Pizarra",
-  "Computadores",
-  "Sistema de sonido",
-  "Videoconferencia",
-  "Acceso para silla de ruedas",
-  "Iluminación especial",
-];
 
 const BOOLEAN_ATTRIBUTE_TO_CHARACTERISTIC: Record<string, string> = {
   hasProjector: "Proyector",
@@ -126,22 +124,17 @@ function isStringArray(value: unknown): value is string[] {
   );
 }
 
-function extractResources(
-  data: ResourceCollectionPayload | Resource[] | undefined,
-): Resource[] {
-  if (Array.isArray(data)) {
-    return data;
+function isLikelyCharacteristicIdentifier(value: string): boolean {
+  const normalized = value.trim();
+
+  if (!normalized) {
+    return false;
   }
 
-  if (data?.resources && Array.isArray(data.resources)) {
-    return data.resources;
-  }
-
-  if (data?.items && Array.isArray(data.items)) {
-    return data.items;
-  }
-
-  return [];
+  return (
+    /^[a-fA-F0-9]{24}$/.test(normalized) ||
+    /^char[_-][a-zA-Z0-9_-]+$/i.test(normalized)
+  );
 }
 
 function extractCharacteristicNamesFromAttributes(
@@ -163,7 +156,9 @@ function extractCharacteristicNamesFromAttributes(
     new Map(
       characteristicCandidates
         .map((name) => normalizeCharacteristicName(name))
-        .filter(Boolean)
+        .filter(
+          (name) => Boolean(name) && !isLikelyCharacteristicIdentifier(name),
+        )
         .map((name) => [toCharacteristicKey(name), name]),
     ).values(),
   );
@@ -181,31 +176,177 @@ function mapBooleanAttributesToCharacteristics(
     .map(([, characteristic]) => characteristic);
 }
 
-function buildCharacteristicsCatalog(resources: Resource[]): string[] {
-  const names = new Map<string, string>();
+function extractCharacteristicOptions(
+  data:
+    | ResourceCharacteristicsCollectionPayload
+    | ResourceCharacteristicOption[]
+    | undefined,
+): ResourceCharacteristicOption[] {
+  const rawItems = Array.isArray(data)
+    ? data
+    : Array.isArray(data?.items)
+      ? data.items
+      : [];
 
-  DEFAULT_CHARACTERISTICS.forEach((name) => {
-    const normalized = normalizeCharacteristicName(name);
-    names.set(toCharacteristicKey(normalized), normalized);
-  });
+  const normalized = rawItems
+    .map((item) => {
+      const id = String(item.id ?? item._id ?? "").trim();
+      const name = normalizeCharacteristicName(String(item.name ?? ""));
 
-  resources.forEach((resource) => {
-    const resourceAttributes = resource.attributes as Record<string, unknown>;
+      if (!id || !name) {
+        return null;
+      }
 
-    extractCharacteristicNamesFromAttributes(resourceAttributes).forEach(
-      (name) => {
-        names.set(toCharacteristicKey(name), normalizeCharacteristicName(name));
-      },
+      return {
+        ...item,
+        id,
+        name,
+      };
+    })
+    .filter((item): item is ResourceCharacteristicOption => Boolean(item));
+
+  return Array.from(
+    new Map(normalized.map((item) => [item.id, item])).values(),
+  ).sort((a, b) =>
+    String(a.name ?? "").localeCompare(String(b.name ?? ""), "es"),
+  );
+}
+
+function resolveSelectedCharacteristics(
+  attributes: Record<string, unknown> | undefined,
+  characteristicsCatalog: ResourceCharacteristicOption[],
+): CharacteristicTag[] {
+  if (!attributes) {
+    return [];
+  }
+
+  const catalogById = new Map(
+    characteristicsCatalog
+      .filter((item) => item.id && item.name)
+      .map((item) => [String(item.id), item]),
+  );
+
+  const catalogByCode = new Map(
+    characteristicsCatalog
+      .filter((item) => item.code && item.name)
+      .map((item) => [String(item.code).toUpperCase(), item]),
+  );
+
+  const catalogByName = new Map(
+    characteristicsCatalog
+      .filter((item) => item.name)
+      .map((item) => [toCharacteristicKey(String(item.name)), item]),
+  );
+
+  const tags = new Map<string, CharacteristicTag>();
+
+  const addTag = (tag: CharacteristicTag) => {
+    const existing = tags.get(tag.normalizedName);
+    if (!existing || (!existing.id && tag.id)) {
+      tags.set(tag.normalizedName, tag);
+    }
+  };
+
+  const rawCharacteristics = attributes.characteristics;
+  const normalizedCharacteristics = Array.isArray(rawCharacteristics)
+    ? rawCharacteristics
+    : [];
+
+  normalizedCharacteristics.forEach((item) => {
+    const rawId =
+      typeof item === "object" && item !== null
+        ? ((item as { id?: string; _id?: string }).id ??
+          (item as { _id?: string })._id)
+        : typeof item === "string"
+          ? item
+          : undefined;
+
+    const rawName =
+      typeof item === "object" && item !== null
+        ? (item as { name?: string }).name
+        : undefined;
+
+    const rawCode =
+      typeof item === "object" && item !== null
+        ? (item as { code?: string }).code
+        : undefined;
+
+    const byId = rawId ? catalogById.get(String(rawId)) : undefined;
+    const byCode = rawCode
+      ? catalogByCode.get(String(rawCode).toUpperCase())
+      : undefined;
+    const byName = rawName
+      ? catalogByName.get(toCharacteristicKey(String(rawName)))
+      : undefined;
+    const byStringName =
+      typeof item === "string"
+        ? catalogByName.get(toCharacteristicKey(item))
+        : undefined;
+
+    const catalogItem = byId ?? byCode ?? byName ?? byStringName;
+
+    if (catalogItem?.name) {
+      const normalizedName = toCharacteristicKey(String(catalogItem.name));
+      addTag({
+        id: String(catalogItem.id),
+        name: String(catalogItem.name),
+        normalizedName,
+        isNew: false,
+      });
+      return;
+    }
+
+    const fallbackName = normalizeCharacteristicName(
+      typeof rawName === "string"
+        ? rawName
+        : typeof item === "string"
+          ? item
+          : "",
     );
 
-    mapBooleanAttributesToCharacteristics(resourceAttributes).forEach(
-      (name) => {
-        names.set(toCharacteristicKey(name), normalizeCharacteristicName(name));
-      },
-    );
+    if (!fallbackName) {
+      return;
+    }
+
+    addTag({
+      name: fallbackName,
+      normalizedName: toCharacteristicKey(fallbackName),
+      isNew: false,
+    });
   });
 
-  return Array.from(names.values()).sort((a, b) => a.localeCompare(b));
+  [
+    ...extractCharacteristicNamesFromAttributes(attributes),
+    ...mapBooleanAttributesToCharacteristics(attributes),
+  ].forEach((name) => {
+    const normalizedName = normalizeCharacteristicName(name);
+
+    if (!normalizedName) {
+      return;
+    }
+
+    const catalogItem = catalogByName.get(toCharacteristicKey(normalizedName));
+
+    if (catalogItem?.name) {
+      addTag({
+        id: String(catalogItem.id),
+        name: String(catalogItem.name),
+        normalizedName: toCharacteristicKey(String(catalogItem.name)),
+        isNew: false,
+      });
+      return;
+    }
+
+    addTag({
+      name: normalizedName,
+      normalizedName: toCharacteristicKey(normalizedName),
+      isNew: false,
+    });
+  });
+
+  return Array.from(tags.values()).sort((a, b) =>
+    a.name.localeCompare(b.name, "es"),
+  );
 }
 
 function normalizeProgram(
@@ -300,8 +441,8 @@ export default function EditResourcePage() {
   >(new Set());
   const [programFilter, setProgramFilter] = React.useState("");
   const [characteristicsCatalog, setCharacteristicsCatalog] = React.useState<
-    string[]
-  >(DEFAULT_CHARACTERISTICS);
+    ResourceCharacteristicOption[]
+  >([]);
   const [selectedCharacteristics, setSelectedCharacteristics] = React.useState<
     CharacteristicTag[]
   >([]);
@@ -318,8 +459,8 @@ export default function EditResourcePage() {
   const filteredCharacteristics = React.useMemo(() => {
     const normalizedQuery = normalizedCharacteristicQuery.toLowerCase();
 
-    const options = characteristicsCatalog.filter((name) => {
-      const normalizedName = toCharacteristicKey(name);
+    const options = characteristicsCatalog.filter((characteristic) => {
+      const normalizedName = toCharacteristicKey(String(characteristic.name));
 
       if (selectedCharacteristicKeys.has(normalizedName)) {
         return false;
@@ -345,7 +486,11 @@ export default function EditResourcePage() {
     }
 
     const queryKey = toCharacteristicKey(normalizedCharacteristicQuery);
-    const catalogSet = new Set(characteristicsCatalog.map(toCharacteristicKey));
+    const catalogSet = new Set(
+      characteristicsCatalog.map((item) =>
+        toCharacteristicKey(String(item.name)),
+      ),
+    );
 
     return (
       !catalogSet.has(queryKey) && !selectedCharacteristicKeys.has(queryKey)
@@ -364,17 +509,25 @@ export default function EditResourcePage() {
           resourceResponse,
           categoriesResponse,
           programsResponse,
-          resourcesResponse,
+          characteristicsResponse,
         ] = await Promise.all([
           httpClient.get<Resource>(`resources/${resourceId}`),
           httpClient.get<CategoryCollectionPayload | Category[]>("categories"),
           httpClient.get<ProgramCollectionPayload | AcademicProgram[]>(
             "programs",
           ),
-          httpClient.get<ResourceCollectionPayload | Resource[]>("resources", {
-            params: { page: 1, limit: 500 },
-          }),
+          httpClient.get<
+            | ResourceCharacteristicsCollectionPayload
+            | ResourceCharacteristicOption[]
+          >("resources/characteristics"),
         ]);
+
+        const resolvedCharacteristicsCatalog =
+          characteristicsResponse.success && characteristicsResponse.data
+            ? extractCharacteristicOptions(characteristicsResponse.data)
+            : [];
+
+        setCharacteristicsCatalog(resolvedCharacteristicsCatalog);
 
         if (resourceResponse.success && resourceResponse.data) {
           const resourceData = resourceResponse.data;
@@ -386,24 +539,11 @@ export default function EditResourcePage() {
           const resourceAttributes =
             (resourceData.attributes as Record<string, unknown>) || {};
 
-          const persistedCharacteristicNames = Array.from(
-            new Map(
-              [
-                ...mapBooleanAttributesToCharacteristics(resourceAttributes),
-                ...extractCharacteristicNamesFromAttributes(resourceAttributes),
-              ]
-                .map((name) => normalizeCharacteristicName(name))
-                .filter(Boolean)
-                .map((name) => [toCharacteristicKey(name), name]),
-            ).values(),
-          );
-
           setSelectedCharacteristics(
-            persistedCharacteristicNames.map((name) => ({
-              name,
-              normalizedName: toCharacteristicKey(name),
-              isNew: false,
-            })),
+            resolveSelectedCharacteristics(
+              resourceAttributes,
+              resolvedCharacteristicsCatalog,
+            ),
           );
 
           setFormData({
@@ -428,14 +568,6 @@ export default function EditResourcePage() {
 
         if (programsResponse.success && programsResponse.data) {
           setAllPrograms(extractPrograms(programsResponse.data));
-        }
-
-        if (resourcesResponse.success && resourcesResponse.data) {
-          setCharacteristicsCatalog(
-            buildCharacteristicsCatalog(
-              extractResources(resourcesResponse.data),
-            ),
-          );
         }
       } catch (err) {
         setError("Error al cargar el recurso");
@@ -471,8 +603,12 @@ export default function EditResourcePage() {
     setSelectedProgramIds(new Set());
   };
 
-  const handleSelectExistingCharacteristic = (name: string) => {
-    const normalizedName = normalizeCharacteristicName(name);
+  const handleSelectExistingCharacteristic = (
+    characteristic: ResourceCharacteristicOption,
+  ) => {
+    const normalizedName = normalizeCharacteristicName(
+      String(characteristic.name ?? ""),
+    );
     const normalizedKey = toCharacteristicKey(normalizedName);
 
     if (!normalizedName || selectedCharacteristicKeys.has(normalizedKey)) {
@@ -482,6 +618,7 @@ export default function EditResourcePage() {
     setSelectedCharacteristics((prev) => [
       ...prev,
       {
+        id: String(characteristic.id),
         name: normalizedName,
         normalizedName: normalizedKey,
         isNew: false,
@@ -567,9 +704,17 @@ export default function EditResourcePage() {
         characteristicNames.map((name) => toCharacteristicKey(name)),
       );
 
+      const characteristicValues = selectedCharacteristics.map((item) =>
+        item.id
+          ? item.id
+          : {
+              name: item.name,
+            },
+      );
+
       const attributesPayload: Record<string, unknown> = {
         ...(formData.attributes || {}),
-        characteristics: characteristicNames,
+        characteristics: characteristicValues,
         features: characteristicNames,
       };
 
@@ -660,6 +805,7 @@ export default function EditResourcePage() {
           </div>
           <Button
             variant="outline"
+            data-testid="resource-edit-cancel-btn"
             onClick={() => router.push(`/${locale}/recursos/${resourceId}`)}
           >
             Cancelar
@@ -939,17 +1085,17 @@ export default function EditResourcePage() {
                       className="max-h-[280px] overflow-y-auto space-y-2 rounded-lg border border-[var(--color-border-subtle)] p-2"
                       data-testid="resource-characteristics-options"
                     >
-                      {filteredCharacteristics.map((name) => (
+                      {filteredCharacteristics.map((characteristic) => (
                         <button
-                          key={name}
+                          key={String(characteristic.id)}
                           type="button"
-                          data-testid={`resource-characteristic-option-${toCharacteristicTestId(name)}`}
+                          data-testid={`resource-characteristic-option-${toCharacteristicTestId(String(characteristic.name))}`}
                           onClick={() =>
-                            handleSelectExistingCharacteristic(name)
+                            handleSelectExistingCharacteristic(characteristic)
                           }
                           className="w-full text-left px-3 py-2 rounded-md hover:bg-[var(--color-bg-secondary)] text-sm text-[var(--color-text-primary)]"
                         >
-                          {name}
+                          {characteristic.name}
                         </button>
                       ))}
 

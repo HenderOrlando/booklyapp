@@ -74,6 +74,73 @@ export const mockCategories: Category[] = [
   },
 ];
 
+export interface ResourceCharacteristic {
+  id: string;
+  code: string;
+  name: string;
+  icon?: string;
+  isActive: boolean;
+}
+
+export const mockResourceCharacteristics: ResourceCharacteristic[] = [
+  {
+    id: "char_001",
+    code: "PROYECTOR",
+    name: "Proyector",
+    icon: "projector",
+    isActive: true,
+  },
+  {
+    id: "char_002",
+    code: "AIRE_ACONDICIONADO",
+    name: "Aire acondicionado",
+    icon: "air-conditioner",
+    isActive: true,
+  },
+  {
+    id: "char_003",
+    code: "TABLERO_PIZARRA",
+    name: "Tablero/Pizarra",
+    icon: "whiteboard",
+    isActive: true,
+  },
+  {
+    id: "char_004",
+    code: "COMPUTADORES",
+    name: "Computadores",
+    icon: "computer",
+    isActive: true,
+  },
+  {
+    id: "char_005",
+    code: "SISTEMA_SONIDO",
+    name: "Sistema de sonido",
+    icon: "speaker",
+    isActive: true,
+  },
+  {
+    id: "char_006",
+    code: "VIDEOCONFERENCIA",
+    name: "Videoconferencia",
+    icon: "video-conference",
+    isActive: true,
+  },
+  {
+    id: "char_007",
+    code: "ACCESO_SILLA_RUEDAS",
+    name: "Acceso para silla de ruedas",
+    icon: "wheelchair",
+    isActive: true,
+  },
+  {
+    id: "char_008",
+    code: "ILUMINACION_ESPECIAL",
+    name: "Iluminación especial",
+    icon: "lightbulb",
+    isActive: true,
+  },
+];
+
 // ============================================
 // RESOURCES
 // ============================================
