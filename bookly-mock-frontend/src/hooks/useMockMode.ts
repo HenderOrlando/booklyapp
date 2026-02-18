@@ -1,19 +1,14 @@
 "use client";
 
+import { useDataMode } from "@/hooks/useDataMode";
 import { MockService } from "@/infrastructure/mock/mockService";
-import { isMockMode } from "@/lib/config";
-import { useEffect, useState } from "react";
 
 /**
  * Hook para detectar y gestionar el modo Mock
  * Útil para mostrar indicadores UI cuando estamos en modo de desarrollo
  */
 export function useMockMode() {
-  const [isMock, setIsMock] = useState(false);
-
-  useEffect(() => {
-    setIsMock(isMockMode());
-  }, []);
+  const { isMock, mode } = useDataMode();
 
   /**
    * Ejecuta una petición en mock o real según el modo
@@ -21,7 +16,7 @@ export function useMockMode() {
   const request = async <T>(
     endpoint: string,
     method: string = "GET",
-    data?: any
+    data?: unknown,
   ) => {
     if (isMock) {
       return await MockService.mockRequest<T>(endpoint, method, data);
@@ -34,6 +29,6 @@ export function useMockMode() {
   return {
     isMock,
     request,
-    mode: isMock ? "mock" : "serve",
+    mode,
   };
 }

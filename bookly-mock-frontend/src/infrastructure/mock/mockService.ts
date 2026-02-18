@@ -318,7 +318,7 @@ export class MockService {
           status: 401,
           data: {
             success: false,
-            code: "AUTH-001",
+            code: "AUTH-0001",
             message: "Credenciales inválidas",
             type: "error",
             http_code: 401,
@@ -667,7 +667,7 @@ export class MockService {
           status: 404,
           data: {
             success: false,
-            code: "RSRC-001",
+            code: "RSRC-0301",
             message: `Resource with ID ${id} not found`,
             type: "error",
             http_code: 404,
@@ -713,7 +713,7 @@ export class MockService {
           status: 404,
           data: {
             success: false,
-            code: "RSRC-001",
+            code: "RSRC-0301",
             message: `Resource with ID ${id} not found`,
             type: "error",
             http_code: 404,
@@ -745,7 +745,7 @@ export class MockService {
           status: 404,
           data: {
             success: false,
-            code: "RSRC-001",
+            code: "RSRC-0301",
             message: `Resource with ID ${id} not found`,
             type: "error",
             http_code: 404,
@@ -1124,7 +1124,7 @@ export class MockService {
           status: 404,
           data: {
             success: false,
-            code: "STK-001",
+            code: "STCK-0001",
             message: `Approval request with ID ${id} not found`,
             type: "error",
             http_code: 404,
@@ -1193,7 +1193,7 @@ export class MockService {
           status: 404,
           data: {
             success: false,
-            code: "STK-001",
+            code: "STCK-0001",
             message: `Approval request with ID ${id} not found`,
             type: "error",
             http_code: 404,
@@ -1229,7 +1229,7 @@ export class MockService {
           status: 404,
           data: {
             success: false,
-            code: "STK-001",
+            code: "STCK-0001",
             message: `Approval request with ID ${id} not found`,
             type: "error",
             http_code: 404,
@@ -1265,7 +1265,7 @@ export class MockService {
           status: 404,
           data: {
             success: false,
-            code: "STK-001",
+            code: "STCK-0001",
             message: `Approval request with ID ${id} not found`,
             type: "error",
             http_code: 404,
@@ -1319,7 +1319,7 @@ export class MockService {
           status: 404,
           data: {
             success: false,
-            code: "RSVN-001",
+            code: "AVAIL-0001",
             message: `Reservation with ID ${id} not found`,
             type: "error",
             http_code: 404,
@@ -1367,7 +1367,7 @@ export class MockService {
           status: 404,
           data: {
             success: false,
-            code: "RSVN-001",
+            code: "AVAIL-0001",
             message: `Reservation with ID ${id} not found`,
             type: "error",
             http_code: 404,
@@ -1399,7 +1399,7 @@ export class MockService {
           status: 404,
           data: {
             success: false,
-            code: "RSVN-001",
+            code: "AVAIL-0001",
             message: `Reservation with ID ${id} not found`,
             type: "error",
             http_code: 404,

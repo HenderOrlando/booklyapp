@@ -6,7 +6,7 @@
  * HU: HU-17
  */
 
-import { test, expect } from "@playwright/test";
+import { expect, test } from "@playwright/test";
 import { authStatePath } from "../fixtures/test-users";
 
 test.describe("Approvals Smoke", () => {
@@ -16,7 +16,10 @@ test.describe("Approvals Smoke", () => {
   test("displays approvals list page", async ({ page }) => {
     await page.goto("/es/aprobaciones");
     await expect(
-      page.locator("h1, h2").filter({ hasText: /aprobaciones|solicitudes/i })
+      page
+        .locator("h1, h2")
+        .filter({ hasText: /aprobaciones|solicitudes/i })
+        .first(),
     ).toBeVisible({ timeout: 10000 });
   });
 

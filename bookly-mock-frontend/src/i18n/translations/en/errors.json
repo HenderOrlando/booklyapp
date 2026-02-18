@@ -10,10 +10,12 @@
     "RSRC-0301": "The requested resource does not exist or was deleted."
   },
   "availability": {
-    "default": "Availability module error"
+    "default": "Availability module error",
+    "AVAIL-0001": "The requested reservation does not exist or was deleted."
   },
   "stockpile": {
-    "default": "Approval module error"
+    "default": "Approval module error",
+    "STCK-0001": "The requested approval request does not exist or was deleted."
   },
   "reports": {
     "default": "Reports module error"

@@ -24,6 +24,26 @@ interface WebSocketToastConfig {
   showSystemMessages?: boolean;
 }
 
+interface ReservationToastPayload {
+  reservation?: {
+    resourceName?: string;
+  };
+}
+
+interface ResourceToastPayload {
+  resourceName?: string;
+}
+
+interface SystemToastPayload {
+  message?: string;
+}
+
+interface NotificationToastPayload {
+  type?: "success" | "warning" | "error" | "info";
+  title?: string;
+  message?: string;
+}
+
 export function useWebSocketToasts(config: WebSocketToastConfig = {}) {
   const {
     enabled = true,
@@ -32,81 +52,111 @@ export function useWebSocketToasts(config: WebSocketToastConfig = {}) {
     showSystemMessages = true,
   } = config;
 
-  const { socket, isConnected } = useWebSocket();
+  const { socket, isConnected, wsEnabled } = useWebSocket();
   const { showSuccess, showInfo, showWarning, showError } = useToast();
 
   useEffect(() => {
-    if (!enabled || !socket || !isConnected) return;
+    if (!enabled || !socket || !isConnected || !wsEnabled) return;
 
     const cleanups: Array<() => void> = [];
 
     // Reservation events
     if (showReservationEvents) {
-      const onCreated = (data: any) => {
+      const onCreated = (data: ReservationToastPayload) => {
         showSuccess(
           "Reserva creada",
-          `Tu reserva de ${data?.reservation?.resourceName || "recurso"} fue registrada.`
+          `Tu reserva de ${data?.reservation?.resourceName || "recurso"} fue registrada.`,
         );
       };
-      socket.on(reservationEvents.confirmed, (data: any) => {
+
+      const onConfirmed = (data: ReservationToastPayload) => {
         showSuccess(
           "Reserva confirmada",
-          `Tu reserva de ${data?.reservation?.resourceName || "recurso"} fue aprobada.`
+          `Tu reserva de ${data?.reservation?.resourceName || "recurso"} fue aprobada.`,
         );
-      });
-      socket.on(reservationEvents.cancelled, (data: any) => {
+      };
+
+      const onCancelled = (data: ReservationToastPayload) => {
         showWarning(
           "Reserva cancelada",
-          `La reserva de ${data?.reservation?.resourceName || "recurso"} fue cancelada.`
+          `La reserva de ${data?.reservation?.resourceName || "recurso"} fue cancelada.`,
         );
-      });
-      socket.on(reservationEvents.reminderSent, (data: any) => {
+      };
+
+      const onReminderSent = (data: ReservationToastPayload) => {
         showInfo(
           "Recordatorio",
-          `Tu reserva de ${data?.reservation?.resourceName || "recurso"} comienza pronto.`
+          `Tu reserva de ${data?.reservation?.resourceName || "recurso"} comienza pronto.`,
         );
-      });
+      };
+
       socket.on(reservationEvents.created, onCreated);
+      socket.on(reservationEvents.confirmed, onConfirmed);
+      socket.on(reservationEvents.cancelled, onCancelled);
+      socket.on(reservationEvents.reminderSent, onReminderSent);
 
       cleanups.push(
         () => socket.off(reservationEvents.created, onCreated),
-        () => socket.off(reservationEvents.confirmed, () => {}),
-        () => socket.off(reservationEvents.cancelled, () => {}),
-        () => socket.off(reservationEvents.reminderSent, () => {})
+        () => socket.off(reservationEvents.confirmed, onConfirmed),
+        () => socket.off(reservationEvents.cancelled, onCancelled),
+        () => socket.off(reservationEvents.reminderSent, onReminderSent),
       );
     }
 
     // Resource events
     if (showResourceEvents) {
-      socket.on(resourceEvents.maintenanceScheduled, (data: any) => {
+      const onMaintenanceScheduled = (data: ResourceToastPayload) => {
         showWarning(
           "Mantenimiento programado",
-          `${data?.resourceName || "Un recurso"} entrará en mantenimiento.`
+          `${data?.resourceName || "Un recurso"} entrará en mantenimiento.`,
         );
-      });
-      socket.on(resourceEvents.availabilityChanged, (data: any) => {
+      };
+
+      const onAvailabilityChanged = (data: ResourceToastPayload) => {
         showInfo(
           "Disponibilidad actualizada",
-          `La disponibilidad de ${data?.resourceName || "un recurso"} cambió.`
+          `La disponibilidad de ${data?.resourceName || "un recurso"} cambió.`,
         );
-      });
+      };
+
+      socket.on(resourceEvents.maintenanceScheduled, onMaintenanceScheduled);
+      socket.on(resourceEvents.availabilityChanged, onAvailabilityChanged);
+
+      cleanups.push(
+        () =>
+          socket.off(
+            resourceEvents.maintenanceScheduled,
+            onMaintenanceScheduled,
+          ),
+        () =>
+          socket.off(resourceEvents.availabilityChanged, onAvailabilityChanged),
+      );
     }
 
     // System events
     if (showSystemMessages) {
-      socket.on(systemEvents.broadcast, (data: any) => {
+      const onBroadcast = (data: SystemToastPayload) => {
         showInfo("Aviso del sistema", data?.message || "Mensaje del sistema");
-      });
-      socket.on(systemEvents.maintenance, (data: any) => {
+      };
+
+      const onMaintenance = (data: SystemToastPayload) => {
         showWarning(
           "Mantenimiento del sistema",
-          data?.message || "El sistema entrará en mantenimiento."
+          data?.message || "El sistema entrará en mantenimiento.",
         );
-      });
+      };
+
+      socket.on(systemEvents.broadcast, onBroadcast);
+      socket.on(systemEvents.maintenance, onMaintenance);
+
+      cleanups.push(
+        () => socket.off(systemEvents.broadcast, onBroadcast),
+        () => socket.off(systemEvents.maintenance, onMaintenance),
+      );
     }
 
     // Notification events (always active)
-    socket.on(notificationEvents.new, (data: any) => {
+    const onNotification = (data: NotificationToastPayload) => {
       const type = data?.type || "info";
       const title = data?.title || "Nueva notificación";
       const message = data?.message || "";
@@ -124,7 +174,10 @@ export function useWebSocketToasts(config: WebSocketToastConfig = {}) {
         default:
           showInfo(title, message);
       }
-    });
+    };
+
+    socket.on(notificationEvents.new, onNotification);
+    cleanups.push(() => socket.off(notificationEvents.new, onNotification));
 
     return () => {
       cleanups.forEach((fn) => fn());
@@ -133,6 +186,7 @@ export function useWebSocketToasts(config: WebSocketToastConfig = {}) {
     enabled,
     socket,
     isConnected,
+    wsEnabled,
     showReservationEvents,
     showResourceEvents,
     showSystemMessages,

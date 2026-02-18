@@ -126,12 +126,11 @@ function getRoutingEffects(
         type: "info",
       },
       {
-        icon:
-          isServe ? (
-            <Wifi className="h-4 w-4" />
-          ) : (
-            <WifiOff className="h-4 w-4" />
-          ),
+        icon: isServe ? (
+          <Wifi className="h-4 w-4" />
+        ) : (
+          <WifiOff className="h-4 w-4" />
+        ),
         label: isServe
           ? "WebSocket: Se activará"
           : "WebSocket: Inactivo (modo Mock)",
@@ -204,6 +203,16 @@ export function ModeChangeModal({
       "text-[var(--color-state-success-text)] bg-[var(--color-state-success-bg)] border-[var(--color-state-success-border)]",
   };
 
+  const modeBadgeClass = (value: string) =>
+    value === "mock"
+      ? "bg-[var(--color-state-warning-bg)] text-[var(--color-state-warning-text)]"
+      : "bg-[var(--color-state-success-bg)] text-[var(--color-state-success-text)]";
+
+  const routingBadgeClass = (value: string) =>
+    value === "gateway"
+      ? "bg-[var(--color-state-info-bg)] text-[var(--color-state-info-text)]"
+      : "bg-[var(--color-bg-muted)] text-[var(--color-text-secondary)]";
+
   return (
     <div className="fixed inset-0 z-[100] flex items-center justify-center bg-[var(--color-bg-overlay)]">
       <div className="relative mx-4 w-full max-w-md rounded-xl border border-[var(--color-border-subtle)] bg-[var(--color-bg-primary)] p-6 shadow-2xl">
@@ -226,12 +235,8 @@ export function ModeChangeModal({
             className={cn(
               "rounded-full px-3 py-1 text-xs font-semibold",
               changeType === "data"
-                ? currentMode === "mock"
-                  ? "bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-300"
-                  : "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-300"
-                : currentRouting === "gateway"
-                  ? "bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300"
-                  : "bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-300",
+                ? modeBadgeClass(currentMode)
+                : routingBadgeClass(currentRouting),
             )}
           >
             {changeType === "data"
@@ -243,12 +248,8 @@ export function ModeChangeModal({
             className={cn(
               "rounded-full px-3 py-1 text-xs font-semibold",
               changeType === "data"
-                ? newMode === "mock"
-                  ? "bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-300"
-                  : "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-300"
-                : newRouting === "gateway"
-                  ? "bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300"
-                  : "bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-300",
+                ? modeBadgeClass(newMode)
+                : routingBadgeClass(newRouting),
             )}
           >
             {changeType === "data"
@@ -283,17 +284,10 @@ export function ModeChangeModal({
 
         {/* Actions */}
         <div className="flex gap-3">
-          <Button
-            variant="outline"
-            className="flex-1"
-            onClick={onClose}
-          >
+          <Button variant="outline" className="flex-1" onClick={onClose}>
             Cancelar
           </Button>
-          <Button
-            className="flex-1"
-            onClick={onConfirm}
-          >
+          <Button className="flex-1" onClick={onConfirm}>
             Confirmar cambio
           </Button>
         </div>

@@ -10,10 +10,12 @@
     "RSRC-0301": "El recurso solicitado no existe o fue eliminado."
   },
   "availability": {
-    "default": "Error en el modulo de disponibilidad"
+    "default": "Error en el modulo de disponibilidad",
+    "AVAIL-0001": "La reserva solicitada no existe o fue eliminada."
   },
   "stockpile": {
-    "default": "Error en el modulo de aprobaciones"
+    "default": "Error en el modulo de aprobaciones",
+    "STCK-0001": "La solicitud de aprobacion solicitada no existe o fue eliminada."
   },
   "reports": {
     "default": "Error en el modulo de reportes"
