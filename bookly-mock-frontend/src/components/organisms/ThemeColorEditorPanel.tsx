@@ -9,6 +9,7 @@ import {
   CardTitle,
 } from "@/components/atoms/Card";
 import { Input } from "@/components/atoms/Input";
+import { usePublicConfig } from "@/hooks/useAppConfig";
 import { useTheme } from "next-themes";
 import * as React from "react";
 
@@ -166,9 +167,39 @@ function isThemeEditorState(value: unknown): value is ThemeEditorState {
 }
 
 export function ThemeColorEditorPanel() {
+  const { data: publicConfig, isLoading: configLoading } = usePublicConfig();
   const { theme, resolvedTheme, setTheme } = useTheme();
   const [mounted, setMounted] = React.useState(false);
-  const [themeState, setThemeState] = React.useState<ThemeEditorState>(DEFAULT_STATE);
+  const [previewOverride, setPreviewOverride] =
+    React.useState<ThemeEditorState | null>(null);
+
+  const baseColors = React.useMemo(
+    () => ({
+      light: {
+        primary: publicConfig?.primaryColor || DEFAULT_STATE.light.primary,
+        secondary:
+          publicConfig?.secondaryColor || DEFAULT_STATE.light.secondary,
+      },
+      dark: {
+        primary: shadeHex(
+          publicConfig?.primaryColor || DEFAULT_STATE.light.primary,
+          0.12,
+        ),
+        secondary: shadeHex(
+          publicConfig?.secondaryColor || DEFAULT_STATE.light.secondary,
+          0.12,
+        ),
+      },
+    }),
+    [publicConfig],
+  );
+
+  // Sync theme mode from app config with next-themes
+  React.useEffect(() => {
+    if (publicConfig?.themeMode && theme !== publicConfig.themeMode) {
+      setTheme(publicConfig.themeMode);
+    }
+  }, [publicConfig?.themeMode, theme, setTheme]);
 
   React.useEffect(() => {
     setMounted(true);
@@ -184,16 +215,22 @@ export function ThemeColorEditorPanel() {
         return;
       }
 
-      setThemeState({
+      setPreviewOverride({
         light: {
-          primary: normalizeHexColor(parsed.light.primary, DEFAULT_STATE.light.primary),
+          primary: normalizeHexColor(
+            parsed.light.primary,
+            DEFAULT_STATE.light.primary,
+          ),
           secondary: normalizeHexColor(
             parsed.light.secondary,
             DEFAULT_STATE.light.secondary,
           ),
         },
         dark: {
-          primary: normalizeHexColor(parsed.dark.primary, DEFAULT_STATE.dark.primary),
+          primary: normalizeHexColor(
+            parsed.dark.primary,
+            DEFAULT_STATE.dark.primary,
+          ),
           secondary: normalizeHexColor(
             parsed.dark.secondary,
             DEFAULT_STATE.dark.secondary,
@@ -202,29 +239,34 @@ export function ThemeColorEditorPanel() {
         persistPreview: parsed.persistPreview,
       });
     } catch (error) {
-      console.warn("No se pudo cargar el Theme Color Editor desde localStorage", error);
+      console.warn(
+        "No se pudo cargar el Theme Color Editor desde localStorage",
+        error,
+      );
     }
   }, []);
 
   React.useEffect(() => {
-    if (!mounted) {
+    if (!mounted || !previewOverride) {
       return;
     }
 
-    if (themeState.persistPreview) {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(themeState));
+    if (previewOverride.persistPreview) {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(previewOverride));
       return;
     }
 
     localStorage.removeItem(STORAGE_KEY);
-  }, [mounted, themeState]);
+  }, [mounted, previewOverride]);
 
   const activeMode: ThemeMode =
     theme === "dark" || (theme === "system" && resolvedTheme === "dark")
       ? "dark"
       : "light";
 
-  const activePalette = themeState[activeMode];
+  const activePalette = previewOverride
+    ? previewOverride[activeMode]
+    : baseColors[activeMode];
 
   const primaryContrast = React.useMemo(
     () => getContrastRatio(activePalette.primary, "#ffffff"),
@@ -237,54 +279,64 @@ export function ThemeColorEditorPanel() {
   );
 
   const runtimeStyles = React.useMemo(() => {
-    const lightPrimaryHover = shadeHex(themeState.light.primary, 0.14);
-    const lightSecondaryHover = shadeHex(themeState.light.secondary, 0.14);
-    const darkPrimaryHover = shadeHex(themeState.dark.primary, 0.12);
-    const darkSecondaryHover = shadeHex(themeState.dark.secondary, 0.12);
+    const currentColors = previewOverride || baseColors;
+    const lightPrimaryHover = shadeHex(currentColors.light.primary, 0.14);
+    const lightSecondaryHover = shadeHex(currentColors.light.secondary, 0.14);
+    const darkPrimaryHover = shadeHex(currentColors.dark.primary, 0.12);
+    const darkSecondaryHover = shadeHex(currentColors.dark.secondary, 0.12);
 
     return `
 :root {
-  --color-action-primary: ${themeState.light.primary};
+  --color-action-primary: ${currentColors.light.primary};
   --color-action-primary-hover: ${lightPrimaryHover};
-  --color-action-secondary: ${themeState.light.secondary};
+  --color-action-secondary: ${currentColors.light.secondary};
   --color-action-secondary-hover: ${lightSecondaryHover};
-  --color-border-focus: ${themeState.light.primary};
-  --color-text-link: ${themeState.light.primary};
-  --primary: ${hexToHslToken(themeState.light.primary)};
-  --secondary: ${hexToHslToken(themeState.light.secondary)};
-  --ring: ${hexToHslToken(themeState.light.primary)};
+  --color-border-focus: ${currentColors.light.primary};
+  --color-text-link: ${currentColors.light.primary};
+  --primary: ${hexToHslToken(currentColors.light.primary)};
+  --secondary: ${hexToHslToken(currentColors.light.secondary)};
+  --ring: ${hexToHslToken(currentColors.light.primary)};
 }
 .dark,
 :root[data-theme="dark"] {
-  --color-action-primary: ${themeState.dark.primary};
+  --color-action-primary: ${currentColors.dark.primary};
   --color-action-primary-hover: ${darkPrimaryHover};
-  --color-action-secondary: ${themeState.dark.secondary};
+  --color-action-secondary: ${currentColors.dark.secondary};
   --color-action-secondary-hover: ${darkSecondaryHover};
-  --color-border-focus: ${themeState.dark.primary};
-  --color-text-link: ${themeState.dark.primary};
-  --primary: ${hexToHslToken(themeState.dark.primary)};
-  --secondary: ${hexToHslToken(themeState.dark.secondary)};
-  --ring: ${hexToHslToken(themeState.dark.primary)};
+  --color-border-focus: ${currentColors.dark.primary};
+  --color-text-link: ${currentColors.dark.primary};
+  --primary: ${hexToHslToken(currentColors.dark.primary)};
+  --secondary: ${hexToHslToken(currentColors.dark.secondary)};
+  --ring: ${hexToHslToken(currentColors.dark.primary)};
 }
 `;
-  }, [themeState]);
+  }, [previewOverride, baseColors]);
 
   const updateColor = (
     mode: ThemeMode,
     token: EditableColorToken,
     newValue: string,
   ) => {
-    setThemeState((previousState) => ({
-      ...previousState,
-      [mode]: {
-        ...previousState[mode],
-        [token]: normalizeHexColor(newValue, previousState[mode][token]),
-      },
-    }));
+    setPreviewOverride((previousState) => {
+      const currentState = previousState || {
+        light: { ...baseColors.light },
+        dark: { ...baseColors.dark },
+        persistPreview: false,
+      };
+
+      return {
+        ...currentState,
+        [mode]: {
+          ...currentState[mode],
+          [token]: normalizeHexColor(newValue, currentState[mode][token]),
+        },
+        persistPreview: true,
+      };
+    });
   };
 
   const resetDefaults = () => {
-    setThemeState(DEFAULT_STATE);
+    setPreviewOverride(null);
     localStorage.removeItem(STORAGE_KEY);
   };
 
@@ -296,8 +348,8 @@ export function ThemeColorEditorPanel() {
         <CardHeader>
           <CardTitle>Theme Color Editor</CardTitle>
           <CardDescription>
-            Edita tokens semanticos de accion (primario/secundario), alterna modo
-            light/dark y previsualiza componentes en vivo.
+            Edita tokens semanticos de accion (primario/secundario), alterna
+            modo light/dark y previsualiza componentes en vivo.
           </CardDescription>
         </CardHeader>
 
@@ -319,7 +371,12 @@ export function ThemeColorEditorPanel() {
             >
               Dark
             </Button>
-            <Button type="button" variant="ghost" size="sm" onClick={resetDefaults}>
+            <Button
+              type="button"
+              variant="ghost"
+              size="sm"
+              onClick={resetDefaults}
+            >
               Reset defaults
             </Button>
           </div>
@@ -348,7 +405,8 @@ export function ThemeColorEditorPanel() {
                 />
               </div>
               <p className="text-xs text-[var(--color-text-secondary)]">
-                Contraste con texto blanco: {primaryContrast.toFixed(2)}:1 {" · "}
+                Contraste con texto blanco: {primaryContrast.toFixed(2)}:1{" "}
+                {" · "}
                 {primaryContrast >= 4.5 ? "AA OK" : "AA bajo"}
               </p>
             </div>
@@ -376,7 +434,8 @@ export function ThemeColorEditorPanel() {
                 />
               </div>
               <p className="text-xs text-[var(--color-text-secondary)]">
-                Contraste con texto blanco: {secondaryContrast.toFixed(2)}:1 {" · "}
+                Contraste con texto blanco: {secondaryContrast.toFixed(2)}:1{" "}
+                {" · "}
                 {secondaryContrast >= 4.5 ? "AA OK" : "AA bajo"}
               </p>
             </div>
@@ -385,10 +444,14 @@ export function ThemeColorEditorPanel() {
           <label className="flex items-center gap-2 text-sm text-[var(--color-text-secondary)]">
             <input
               type="checkbox"
-              checked={themeState.persistPreview}
+              checked={previewOverride?.persistPreview || false}
               onChange={(event) =>
-                setThemeState((previousState) => ({
-                  ...previousState,
+                setPreviewOverride((previousState) => ({
+                  ...(previousState || {
+                    light: { ...baseColors.light },
+                    dark: { ...baseColors.dark },
+                    persistPreview: false,
+                  }),
                   persistPreview: event.target.checked,
                 }))
               }
@@ -397,9 +460,14 @@ export function ThemeColorEditorPanel() {
             Persistir en localStorage (solo preview)
           </label>
 
+          {configLoading && (
+            <p className="text-xs text-[var(--color-text-secondary)]">
+              Cargando configuración de la aplicación...
+            </p>
+          )}
           {!mounted && (
             <p className="text-xs text-[var(--color-text-secondary)]">
-              Cargando preferencias del editor de theme...
+              Inicializando editor de tema...
             </p>
           )}
         </CardContent>
