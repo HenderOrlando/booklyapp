@@ -80,6 +80,57 @@ export class UserService {
   }
 
   /**
+   * Actualizar perfil propio del usuario autenticado
+   */
+  async updateMyProfile(
+    userId: string,
+    data: {
+      firstName?: string;
+      lastName?: string;
+      phone?: string;
+      documentType?: string;
+      documentNumber?: string;
+    },
+  ): Promise<UserEntity> {
+    const user = await this.getUserById(userId);
+
+    const updateData: Record<string, unknown> = {};
+
+    if (data.firstName !== undefined) {
+      updateData.firstName = data.firstName;
+    }
+    if (data.lastName !== undefined) {
+      updateData.lastName = data.lastName;
+    }
+    if (data.phone !== undefined) {
+      updateData.phone = data.phone;
+      // Si cambia el teléfono, requiere reverificación.
+      updateData.isPhoneVerified = false;
+    }
+    if (data.documentType !== undefined) {
+      updateData.documentType = data.documentType;
+    }
+    if (data.documentNumber !== undefined) {
+      updateData.documentNumber = data.documentNumber;
+    }
+
+    if (Object.keys(updateData).length === 0) {
+      return user;
+    }
+
+    updateData["audit.updatedBy"] = userId;
+
+    const updatedUser = await this.userRepository.update(
+      userId,
+      updateData as Partial<UserEntity>,
+    );
+
+    this.logger.info("User profile updated successfully", { userId });
+
+    return updatedUser;
+  }
+
+  /**
    * Desactivar usuario
    */
   async deactivateUser(userId: string): Promise<void> {

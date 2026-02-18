@@ -4,5 +4,6 @@ export * from "./login.dto";
 export * from "./refresh-token.dto";
 export * from "./register.dto";
 export * from "./reset-password.dto";
+export * from "./update-my-profile.dto";
 export * from "./update-user.dto";
 export * from "./validate-token.dto";

@@ -13,6 +13,7 @@ import { RegenerateBackupCodesHandler } from "./regenerate-backup-codes.handler"
 import { RegisterUserHandler } from "./register-user.handler";
 import { ResetPasswordHandler } from "./reset-password.handler";
 import { Setup2FAHandler } from "./setup-2fa.handler";
+import { UpdateMyProfileHandler } from "./update-my-profile.handler";
 import { UpdateUserHandler } from "./update-user.handler";
 import { ValidateTokenHandler } from "./validate-token.handler";
 import { Verify2FAHandler } from "./verify-2fa.handler";
@@ -56,6 +57,7 @@ export const CommandHandlers = [
   ResetPasswordHandler,
   // Users CRUD
   UpdateUserHandler,
+  UpdateMyProfileHandler,
   DeleteUserHandler,
   // Two-Factor Authentication
   Setup2FAHandler,

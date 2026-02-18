@@ -1,7 +1,9 @@
 import { DeleteUserCommand } from "@auth/application/commands/delete-user.command";
+import { UpdateMyProfileCommand } from "@auth/application/commands/update-my-profile.command";
 import { UpdateUserCommand } from "@auth/application/commands/update-user.command";
 import { GetUserByIdQuery } from "@auth/application/queries/get-user-by-id.query";
 import { GetUsersQuery } from "@auth/application/queries/get-users.query";
+import { UserEntity } from "@auth/domain/entities/user.entity";
 import { PaginationQuery, ResponseUtil } from "@libs/common";
 import { CurrentUser, Roles } from "@libs/decorators";
 import { JwtAuthGuard, RolesGuard } from "@libs/guards";
@@ -25,7 +27,38 @@ import {
   ApiTags,
 } from "@nestjs/swagger";
 import { Audit, AuditAction } from "@reports/audit-decorators";
+import { UpdateMyProfileDto } from "../dto/update-my-profile.dto";
 import { UpdateUserDto } from "../dto/update-user.dto";
+
+interface MyProfileResponseDto {
+  personal: {
+    userId: string;
+    nombreCompleto: string;
+    correo: string;
+    usuario: string;
+    estadoCuenta: "ACTIVE" | "INACTIVE";
+    tenantId: string;
+    phone?: string;
+    documentType?: string;
+    documentNumber?: string;
+  };
+  roles: Array<{
+    code: string;
+    name: string;
+  }>;
+  verificaciones: {
+    emailVerificado: boolean;
+    telefonoVerificado: boolean;
+    twoFactor: {
+      habilitada: boolean;
+      metodos: string[];
+    };
+  };
+  cuenta: {
+    fechaCreacion: string | null;
+    ultimaActualizacion: string | null;
+  };
+}
 
 /**
  * Users Controller
@@ -58,6 +91,54 @@ export class UsersController {
     const user = await this.queryBus.execute(query);
 
     return ResponseUtil.success(user, "Perfil obtenido exitosamente");
+  }
+
+  /**
+   * Obtener perfil detallado del usuario autenticado
+   */
+  @Get("me/profile")
+  @ApiOperation({
+    summary: "Obtener perfil detallado propio",
+    description: "Retorna el perfil detallado del usuario autenticado",
+  })
+  @ApiResponse({
+    status: 200,
+    description: "Perfil detallado obtenido exitosamente",
+  })
+  async getMyProfile(@CurrentUser("sub") userId: string) {
+    const query = new GetUserByIdQuery(userId);
+    const user = await this.queryBus.execute(query);
+    const profile = this.toMyProfileResponse(user);
+
+    return ResponseUtil.success(profile, "Perfil obtenido exitosamente");
+  }
+
+  /**
+   * Actualizar perfil propio del usuario autenticado
+   */
+  @Patch("me/profile")
+  @Audit({
+    entityType: "USER",
+    action: AuditAction.UPDATED,
+  })
+  @ApiOperation({
+    summary: "Actualizar perfil propio",
+    description:
+      "Actualiza los datos permitidos del perfil del usuario autenticado",
+  })
+  @ApiResponse({
+    status: 200,
+    description: "Perfil actualizado exitosamente",
+  })
+  async updateMyProfile(
+    @CurrentUser("sub") userId: string,
+    @Body() dto: UpdateMyProfileDto,
+  ) {
+    const command = new UpdateMyProfileCommand(userId, dto);
+    const result = await this.commandBus.execute(command);
+    const profile = this.toMyProfileResponse(result);
+
+    return ResponseUtil.success(profile, "Perfil actualizado exitosamente");
   }
 
   /**
@@ -227,5 +308,48 @@ export class UsersController {
     const command = new DeleteUserCommand(id, userId);
     const result = await this.commandBus.execute(command);
     return ResponseUtil.success(result, "Usuario eliminado exitosamente");
+  }
+
+  private toMyProfileResponse(user: UserEntity): MyProfileResponseDto {
+    const roleNameMap: Record<string, string> = {
+      GENERAL_ADMIN: "Administrador General",
+      PROGRAM_ADMIN: "Administrador de Programa",
+      TEACHER: "Docente",
+      STUDENT: "Estudiante",
+      SECURITY: "Vigilante",
+      ADMINISTRATIVE_STAFF: "Administrativo General",
+    };
+
+    return {
+      personal: {
+        userId: user.id,
+        nombreCompleto: `${user.firstName} ${user.lastName}`.trim(),
+        correo: user.email,
+        usuario: user.username || user.email,
+        estadoCuenta: user.isActive ? "ACTIVE" : "INACTIVE",
+        tenantId: user.tenantId || "UFPS",
+        phone: user.phone,
+        documentType: user.documentType,
+        documentNumber: user.documentNumber,
+      },
+      roles: (user.roles || []).map((roleCode) => ({
+        code: roleCode,
+        name: roleNameMap[roleCode] || roleCode,
+      })),
+      verificaciones: {
+        emailVerificado: user.isEmailVerified,
+        telefonoVerificado: user.isPhoneVerified ?? false,
+        twoFactor: {
+          habilitada: user.twoFactorEnabled === true,
+          metodos: ["EMAIL", "TOTP"],
+        },
+      },
+      cuenta: {
+        fechaCreacion: user.createdAt ? user.createdAt.toISOString() : null,
+        ultimaActualizacion: user.updatedAt
+          ? user.updatedAt.toISOString()
+          : null,
+      },
+    };
   }
 }

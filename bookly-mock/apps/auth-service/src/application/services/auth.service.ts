@@ -28,6 +28,8 @@ export interface AuthTokens {
 export interface JwtPayload {
   sub: string;
   email: string;
+  username?: string;
+  tenantId?: string;
   roles: string[];
   permissions: string[];
 }
@@ -264,6 +266,11 @@ export class AuthService {
     lastName: string,
     roles: string[],
     permissions: string[],
+    username?: string,
+    phone?: string,
+    documentType?: string,
+    documentNumber?: string,
+    tenantId: string = "UFPS",
   ): Promise<UserEntity> {
     // Verificar si el email ya existe
     const existingUser = await this.userRepository.findByEmail(email);
@@ -274,6 +281,8 @@ export class AuthService {
 
     // Hash password
     const hashedPassword = await bcrypt.hash(password, this.SALT_ROUNDS);
+
+    const resolvedUsername = username?.trim() || email.split("@")[0];
 
     // Crear usuario
     const user = new UserEntity(
@@ -298,6 +307,14 @@ export class AuthService {
       {
         createdBy: "system",
       },
+      resolvedUsername, // username
+      false, // isPhoneVerified
+      tenantId, // tenantId
+      undefined, // createdAt
+      undefined, // updatedAt
+      phone,
+      documentType,
+      documentNumber,
     );
 
     const createdUser = await this.userRepository.create(user);
@@ -354,6 +371,8 @@ export class AuthService {
     const payload: JwtPayload = {
       sub: user.id,
       email: user.email,
+      username: user.username,
+      tenantId: user.tenantId || "UFPS",
       roles: user.roles,
       permissions: user.permissions,
     };
@@ -689,6 +708,10 @@ export class AuthService {
         [], // twoFactorBackupCodes
         new Date(), // lastLogin
         undefined, // passwordChangedAt
+        undefined, // audit
+        ssoData.email.split("@")[0], // username
+        false, // isPhoneVerified
+        "UFPS", // tenantId
       );
 
       const createdUser = await this.userRepository.create(newUser);

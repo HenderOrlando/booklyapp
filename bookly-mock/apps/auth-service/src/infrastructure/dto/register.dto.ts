@@ -2,6 +2,7 @@ import { ApiProperty } from "@nestjs/swagger";
 import {
   IsArray,
   IsEmail,
+  IsIn,
   IsNotEmpty,
   IsOptional,
   IsString,
@@ -20,6 +21,15 @@ export class RegisterDto {
   @IsEmail({}, { message: "Email debe ser válido" })
   @IsNotEmpty({ message: "Email es requerido" })
   email: string;
+
+  @ApiProperty({
+    description: "Nombre de usuario",
+    example: "juan.perez",
+    required: false,
+  })
+  @IsString({ message: "Username debe ser un string" })
+  @IsOptional()
+  username?: string;
 
   @ApiProperty({
     description: "Contraseña del usuario",
@@ -67,4 +77,43 @@ export class RegisterDto {
   @IsString({ each: true, message: "Cada permiso debe ser un string" })
   @IsOptional()
   permissions?: string[];
+
+  @ApiProperty({
+    description: "Teléfono del usuario",
+    example: "+573001234567",
+    required: false,
+  })
+  @IsString({ message: "Teléfono debe ser un string" })
+  @IsOptional()
+  phone?: string;
+
+  @ApiProperty({
+    description: "Tipo de documento",
+    enum: ["CC", "TI", "CE", "PASSPORT"],
+    example: "CC",
+    required: false,
+  })
+  @IsIn(["CC", "TI", "CE", "PASSPORT"], {
+    message: "Tipo de documento inválido",
+  })
+  @IsOptional()
+  documentType?: string;
+
+  @ApiProperty({
+    description: "Número de documento",
+    example: "1098723456",
+    required: false,
+  })
+  @IsString({ message: "Número de documento debe ser un string" })
+  @IsOptional()
+  documentNumber?: string;
+
+  @ApiProperty({
+    description: "Tenant del usuario",
+    example: "UFPS",
+    required: false,
+  })
+  @IsString({ message: "tenantId debe ser un string" })
+  @IsOptional()
+  tenantId?: string;
 }

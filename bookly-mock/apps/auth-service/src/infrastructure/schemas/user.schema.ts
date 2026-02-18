@@ -12,6 +12,15 @@ export class User {
   @Prop({ required: true, unique: true, lowercase: true, trim: true })
   email: string;
 
+  @Prop({
+    required: false,
+    unique: true,
+    sparse: true,
+    lowercase: true,
+    trim: true,
+  })
+  username?: string;
+
   @Prop({ required: false })
   password?: string;
 
@@ -35,6 +44,12 @@ export class User {
 
   @Prop({ default: false })
   isEmailVerified: boolean;
+
+  @Prop({ default: false })
+  isPhoneVerified: boolean;
+
+  @Prop({ required: true, default: "UFPS", trim: true })
+  tenantId: string;
 
   // Document Information
   @Prop({ type: String, enum: ["CC", "TI", "CE", "PASSPORT"] })
@@ -101,9 +116,11 @@ export const UserSchema = SchemaFactory.createForClass(User);
 
 // Indexes
 UserSchema.index({ email: 1 }, { unique: true });
+UserSchema.index({ username: 1 }, { unique: true, sparse: true });
 UserSchema.index({ roles: 1 });
 UserSchema.index({ roleIds: 1 });
 UserSchema.index({ isActive: 1 });
+UserSchema.index({ tenantId: 1 });
 UserSchema.index({ createdAt: -1 });
 UserSchema.index({ ssoProviderId: 1, ssoProvider: 1 }, { sparse: true });
 UserSchema.index({ programId: 1 });

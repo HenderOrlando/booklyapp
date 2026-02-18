@@ -25,6 +25,16 @@ export class UserEntity {
     public lastLogin?: Date,
     public passwordChangedAt?: Date,
     public audit?: AuditInfo,
+    public username?: string,
+    public isPhoneVerified?: boolean,
+    public tenantId?: string,
+    public createdAt?: Date,
+    public updatedAt?: Date,
+    public phone?: string,
+    public documentType?: string,
+    public documentNumber?: string,
+    public programId?: string,
+    public coordinatedProgramId?: string,
   ) {}
 
   /**
@@ -257,6 +267,16 @@ export class UserEntity {
       lastLogin: this.lastLogin,
       passwordChangedAt: this.passwordChangedAt,
       audit: this.audit,
+      username: this.username,
+      isPhoneVerified: this.isPhoneVerified,
+      tenantId: this.tenantId,
+      createdAt: this.createdAt,
+      updatedAt: this.updatedAt,
+      phone: this.phone,
+      documentType: this.documentType,
+      documentNumber: this.documentNumber,
+      programId: this.programId,
+      coordinatedProgramId: this.coordinatedProgramId,
     };
   }
 
@@ -284,6 +304,16 @@ export class UserEntity {
       data.lastLogin,
       data.passwordChangedAt,
       data.audit,
+      data.username,
+      data.isPhoneVerified ?? false,
+      data.tenantId ?? "UFPS",
+      data.createdAt,
+      data.updatedAt,
+      data.phone,
+      data.documentType,
+      data.documentNumber,
+      data.programId,
+      data.coordinatedProgramId,
     );
   }
 }

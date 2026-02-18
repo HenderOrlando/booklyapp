@@ -125,6 +125,11 @@ export class AuthController {
       dto.lastName,
       dto.roles,
       dto.permissions,
+      dto.username,
+      dto.phone,
+      dto.documentType,
+      dto.documentNumber,
+      dto.tenantId,
     );
 
     const user = await this.commandBus.execute(command);

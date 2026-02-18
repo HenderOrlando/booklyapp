@@ -10,5 +10,10 @@ export class RegisterUserCommand {
     public readonly lastName: string,
     public readonly roles: string[] = ["STUDENT"],
     public readonly permissions: string[] = [],
+    public readonly username?: string,
+    public readonly phone?: string,
+    public readonly documentType?: string,
+    public readonly documentNumber?: string,
+    public readonly tenantId?: string,
   ) {}
 }

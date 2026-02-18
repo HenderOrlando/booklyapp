@@ -1,5 +1,5 @@
+import { UserEntity } from "@auth/domain/entities/user.entity";
 import { CommandHandler, ICommandHandler } from "@nestjs/cqrs";
-import { UserEntity } from '@auth/domain/entities/user.entity';
 import { RegisterUserCommand } from "../commands/register-user.command";
 import { AuthService } from "../services/auth.service";
 
@@ -14,8 +14,19 @@ export class RegisterUserHandler
   constructor(private readonly authService: AuthService) {}
 
   async execute(command: RegisterUserCommand): Promise<UserEntity> {
-    const { email, password, firstName, lastName, roles, permissions } =
-      command;
+    const {
+      email,
+      password,
+      firstName,
+      lastName,
+      roles,
+      permissions,
+      username,
+      phone,
+      documentType,
+      documentNumber,
+      tenantId,
+    } = command;
 
     return await this.authService.register(
       email,
@@ -23,7 +34,12 @@ export class RegisterUserHandler
       firstName,
       lastName,
       roles,
-      permissions
+      permissions,
+      username,
+      phone,
+      documentType,
+      documentNumber,
+      tenantId,
     );
   }
 }

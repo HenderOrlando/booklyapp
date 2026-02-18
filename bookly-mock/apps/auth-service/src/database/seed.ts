@@ -243,6 +243,7 @@ async function seedUsers(
 
   for (const userData of users) {
     const existingUser = await userModel.findOne({ email: userData.email });
+    const username = userData.email.split("@")[0];
 
     // Obtener ObjectIds de los roles (roleMap ya contiene strings de ObjectIds)
     const roleIds = userData.roles
@@ -264,12 +265,19 @@ async function seedUsers(
           roles: userData.roles,
           roleIds: roleIds, // Asignar ObjectIds de roles
           isActive: userData.isActive,
+          isEmailVerified: userData.isEmailVerified,
+          isPhoneVerified: false,
+          username,
+          tenantId: "UFPS",
         },
       );
       updatedCount++;
     } else {
       await userModel.create({
         ...userData,
+        username,
+        isPhoneVerified: false,
+        tenantId: "UFPS",
         roleIds: roleIds, // Asignar ObjectIds de roles
         audit: {
           createdBy: "system",
