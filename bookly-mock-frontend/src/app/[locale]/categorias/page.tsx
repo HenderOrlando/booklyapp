@@ -61,7 +61,9 @@ export default function CategoriasPage() {
     queryKey: categoryKeys.lists(),
     queryFn: async () => {
       const response = await httpClient.get("categories");
-      return response.data?.items || [];
+      console.log("Response from backend:", response);
+      console.log("Response data:", response.data);
+      return response.data?.categories || [];
     },
     staleTime: 1000 * 60 * 5, // 5 minutos
   });

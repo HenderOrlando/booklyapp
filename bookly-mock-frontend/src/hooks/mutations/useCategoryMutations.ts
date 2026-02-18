@@ -69,13 +69,18 @@ export function useCreateCategory() {
       return response;
     },
     onSuccess: (data: any) => {
-      const name = data?.data?.name || "Categoría";
-      showSuccess(
-        "Categoría Creada",
-        `La categoría "${name}" se creó exitosamente`
-      );
-      queryClient.invalidateQueries({ queryKey: categoryKeys.lists() });
-      queryClient.invalidateQueries({ queryKey: resourceKeys.categories });
+      // Verificar que realmente se creó la categoría
+      if (data?.data && data?.success) {
+        const name = data?.data?.name || "Categoría";
+        showSuccess(
+          "Categoría Creada",
+          `La categoría "${name}" se creó exitosamente`,
+        );
+        queryClient.invalidateQueries({ queryKey: categoryKeys.lists() });
+        queryClient.invalidateQueries({ queryKey: resourceKeys.categories });
+      } else {
+        showError("Error", "No se pudo crear la categoría");
+      }
     },
     onError: (error: any) => {
       const errorMessage =
@@ -107,7 +112,7 @@ export function useUpdateCategory() {
     onSuccess: (_, variables) => {
       showSuccess(
         "Categoría Actualizada",
-        "Los cambios se guardaron correctamente"
+        "Los cambios se guardaron correctamente",
       );
       queryClient.invalidateQueries({
         queryKey: categoryKeys.detail(variables.id),
@@ -140,7 +145,7 @@ export function useDeleteCategory() {
     onSuccess: (id) => {
       showSuccess(
         "Categoría Eliminada",
-        "La categoría se eliminó correctamente"
+        "La categoría se eliminó correctamente",
       );
       queryClient.invalidateQueries({
         queryKey: categoryKeys.detail(id),
