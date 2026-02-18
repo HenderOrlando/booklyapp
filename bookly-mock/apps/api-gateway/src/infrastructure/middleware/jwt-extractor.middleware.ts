@@ -29,12 +29,13 @@ export class JwtExtractorMiddleware implements NestMiddleware {
             id: payload.sub || payload.userId || payload.id,
             email: payload.email,
             username: payload.username,
+            tenantId: payload.tenantId,
             roles: payload.roles || [],
             permissions: payload.permissions || [],
           };
 
           this.logger.debug(
-            `JWT extracted for user: ${(req as any).user.id || "unknown"}`
+            `JWT extracted for user: ${(req as any).user.id || "unknown"}`,
           );
         }
       } catch (error) {

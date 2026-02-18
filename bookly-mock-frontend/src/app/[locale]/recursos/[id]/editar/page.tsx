@@ -45,11 +45,53 @@ import * as React from "react";
  * Formulario completo para editar un recurso existente
  */
 
+interface CategoryCollectionPayload {
+  items?: Category[];
+  categories?: Category[];
+}
+
+interface ProgramCollectionPayload {
+  items?: AcademicProgram[];
+}
+
+function extractCategories(
+  data: CategoryCollectionPayload | Category[] | undefined,
+): Category[] {
+  if (Array.isArray(data)) {
+    return data;
+  }
+
+  if (data?.categories && Array.isArray(data.categories)) {
+    return data.categories;
+  }
+
+  if (data?.items && Array.isArray(data.items)) {
+    return data.items;
+  }
+
+  return [];
+}
+
+function extractPrograms(
+  data: ProgramCollectionPayload | AcademicProgram[] | undefined,
+): AcademicProgram[] {
+  if (Array.isArray(data)) {
+    return data;
+  }
+
+  if (data?.items && Array.isArray(data.items)) {
+    return data.items;
+  }
+
+  return [];
+}
+
 export default function EditResourcePage() {
   const t = useTranslations("resources");
   const params = useParams();
   const router = useRouter();
   const resourceId = params.id as string;
+  const locale = (params.locale as string) || "es";
 
   const [loading, setLoading] = React.useState(true);
   const [saving, setSaving] = React.useState(false);
@@ -72,21 +114,22 @@ export default function EditResourcePage() {
   React.useEffect(() => {
     const fetchData = async () => {
       try {
-        const [
-          resourceResponse,
-          categoriesResponse,
-          programsResponse,
-          programResourcesResponse,
-        ] = await Promise.all([
-          httpClient.get(`resources/${resourceId}`),
-          httpClient.get("categories"),
-          httpClient.get("academic-programs"),
-          httpClient.get(`program-resources?programId=all`),
-        ]);
+        const [resourceResponse, categoriesResponse, programsResponse] =
+          await Promise.all([
+            httpClient.get<Resource>(`resources/${resourceId}`),
+            httpClient.get<CategoryCollectionPayload | Category[]>(
+              "categories",
+            ),
+            httpClient.get<ProgramCollectionPayload | AcademicProgram[]>(
+              "programs",
+            ),
+          ]);
 
         if (resourceResponse.success && resourceResponse.data) {
           const resourceData = resourceResponse.data;
           setResource(resourceData);
+          setSelectedProgramIds(new Set(resourceData.programIds || []));
+
           setFormData({
             code: resourceData.code,
             name: resourceData.name,
@@ -98,27 +141,19 @@ export default function EditResourcePage() {
             floor: resourceData.floor,
             building: resourceData.building,
             attributes: resourceData.attributes || {},
+            programIds: resourceData.programIds || [],
             availabilityRules: resourceData.availabilityRules,
           });
         }
 
         if (categoriesResponse.success && categoriesResponse.data) {
-          setCategories(categoriesResponse.data.items || []);
+          setCategories(extractCategories(categoriesResponse.data));
         }
 
         if (programsResponse.success && programsResponse.data) {
-          setAllPrograms(programsResponse.data.items || []);
+          setAllPrograms(extractPrograms(programsResponse.data));
         }
-
-        // Cargar programas asociados al recurso
-        if (programResourcesResponse.success && programResourcesResponse.data) {
-          const associations = programResourcesResponse.data.items || [];
-          const programIds = associations
-            .filter((a: any) => a.resourceId === resourceId)
-            .map((a: any) => a.programId);
-          setSelectedProgramIds(new Set(programIds));
-        }
-      } catch (err: any) {
+      } catch (err) {
         setError("Error al cargar el recurso");
         console.error(err);
       } finally {
@@ -174,56 +209,26 @@ export default function EditResourcePage() {
     setSuccess(false);
 
     try {
-      // 1. Actualizar recurso
+      const dataToSend: UpdateResourceDto = {
+        ...formData,
+        programIds: Array.from(selectedProgramIds),
+      };
+
       const response = await httpClient.patch(
         `resources/${resourceId}`,
-        formData,
+        dataToSend,
       );
 
       if (response.success) {
-        // 2. Actualizar asociaciones de programas
-        // Obtener asociaciones actuales
-        const currentProgramsRes = await httpClient.get(
-          `program-resources?programId=all`,
-        );
-        const currentAssociations = currentProgramsRes.data?.items || [];
-        const currentProgramIds = new Set<string>(
-          currentAssociations
-            .filter((a: any) => a.resourceId === resourceId)
-            .map((a: any) => a.programId as string),
-        );
-
-        // Programas a agregar y quitar
-        const toAdd = Array.from(selectedProgramIds).filter(
-          (id) => !currentProgramIds.has(id),
-        );
-        const toRemove = Array.from(currentProgramIds).filter(
-          (id) => !selectedProgramIds.has(id),
-        );
-
-        // Agregar nuevos programas
-        for (const programId of toAdd) {
-          await httpClient.post("program-resources", {
-            programId,
-            resourceId: resourceId,
-            priority: 3,
-          });
-        }
-
-        // Quitar programas
-        for (const programId of toRemove) {
-          await httpClient.delete(
-            `program-resources?programId=${programId}&resourceId=${resourceId}`,
-          );
-        }
-
         setSuccess(true);
         setTimeout(() => {
-          router.push(`/recursos/${resourceId}`);
+          router.push(`/${locale}/recursos/${resourceId}`);
         }, 2000);
       }
-    } catch (err: any) {
-      setError(err.message || "Error al actualizar el recurso");
+    } catch (err) {
+      const message =
+        err instanceof Error ? err.message : "Error al actualizar el recurso";
+      setError(message);
     } finally {
       setSaving(false);
     }
@@ -270,7 +275,7 @@ export default function EditResourcePage() {
           </div>
           <Button
             variant="outline"
-            onClick={() => router.push(`/recursos/${resourceId}`)}
+            onClick={() => router.push(`/${locale}/recursos/${resourceId}`)}
           >
             Cancelar
           </Button>
@@ -711,7 +716,7 @@ export default function EditResourcePage() {
             <Button
               type="button"
               variant="outline"
-              onClick={() => router.push(`/recursos/${resourceId}`)}
+              onClick={() => router.push(`/${locale}/recursos/${resourceId}`)}
               disabled={saving}
             >
               Cancelar

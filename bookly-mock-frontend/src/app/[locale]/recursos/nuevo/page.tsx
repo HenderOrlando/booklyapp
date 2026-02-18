@@ -34,7 +34,7 @@ import {
   ResourceType,
 } from "@/types/entities/resource";
 import { useTranslations } from "next-intl";
-import { useRouter } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import * as React from "react";
 
 /**
@@ -43,9 +43,52 @@ import * as React from "react";
  * Formulario completo para crear un nuevo recurso en el sistema
  */
 
+interface CategoryCollectionPayload {
+  items?: Category[];
+  categories?: Category[];
+}
+
+interface ProgramCollectionPayload {
+  items?: AcademicProgram[];
+}
+
+function extractCategories(
+  data: CategoryCollectionPayload | Category[] | undefined,
+): Category[] {
+  if (Array.isArray(data)) {
+    return data;
+  }
+
+  if (data?.categories && Array.isArray(data.categories)) {
+    return data.categories;
+  }
+
+  if (data?.items && Array.isArray(data.items)) {
+    return data.items;
+  }
+
+  return [];
+}
+
+function extractPrograms(
+  data: ProgramCollectionPayload | AcademicProgram[] | undefined,
+): AcademicProgram[] {
+  if (Array.isArray(data)) {
+    return data;
+  }
+
+  if (data?.items && Array.isArray(data.items)) {
+    return data.items;
+  }
+
+  return [];
+}
+
 export default function CreateResourcePage() {
   const t = useTranslations("resources");
+  const params = useParams();
   const router = useRouter();
+  const locale = (params.locale as string) || "es";
   const [loading, setLoading] = React.useState(false);
   const [categories, setCategories] = React.useState<Category[]>([]);
   const [programs, setPrograms] = React.useState<AcademicProgram[]>([]);
@@ -87,17 +130,21 @@ export default function CreateResourcePage() {
     const fetchData = async () => {
       try {
         // Cargar categorías
-        const categoriesResponse = await httpClient.get("categories");
+        const categoriesResponse = await httpClient.get<
+          CategoryCollectionPayload | Category[]
+        >("categories");
         if (categoriesResponse.success && categoriesResponse.data) {
-          setCategories(categoriesResponse.data.items || []);
+          setCategories(extractCategories(categoriesResponse.data));
         }
 
         // Cargar programas académicos
-        const programsResponse = await httpClient.get("programs");
+        const programsResponse = await httpClient.get<
+          ProgramCollectionPayload | AcademicProgram[]
+        >("programs");
         if (programsResponse.success && programsResponse.data) {
-          setPrograms(programsResponse.data.items || []);
+          setPrograms(extractPrograms(programsResponse.data));
         }
-      } catch (err: any) {
+      } catch (err) {
         console.error("Error al cargar datos:", err);
       }
     };
@@ -193,11 +240,13 @@ export default function CreateResourcePage() {
         setSuccess(true);
         // Redirigir al listado después de 2 segundos
         setTimeout(() => {
-          router.push("/recursos");
+          router.push(`/${locale}/recursos`);
         }, 2000);
       }
-    } catch (err: any) {
-      setError(err.message || "Error al crear el recurso");
+    } catch (err) {
+      const message =
+        err instanceof Error ? err.message : "Error al crear el recurso";
+      setError(message);
     } finally {
       setLoading(false);
     }
@@ -219,7 +268,10 @@ export default function CreateResourcePage() {
               Completa el formulario para agregar un nuevo recurso al sistema
             </p>
           </div>
-          <Button variant="outline" onClick={() => router.push("/recursos")}>
+          <Button
+            variant="outline"
+            onClick={() => router.push(`/${locale}/recursos`)}
+          >
             Cancelar
           </Button>
         </div>
@@ -778,7 +830,7 @@ export default function CreateResourcePage() {
             <Button
               type="button"
               variant="outline"
-              onClick={() => router.push("/recursos")}
+              onClick={() => router.push(`/${locale}/recursos`)}
               disabled={loading}
             >
               Cancelar

@@ -101,6 +101,7 @@ import { EvaluationController } from "./infrastructure/controllers/evaluation.co
 import { ExportController } from "./infrastructure/controllers/export.controller";
 import { FeedbackController } from "./infrastructure/controllers/feedback.controller";
 import { ReferenceDataController } from "./infrastructure/controllers/reference-data.controller";
+import { ReportsDashboardController } from "./infrastructure/controllers/reports-dashboard.controller";
 
 // Consumers
 import { AuditEventsConsumer } from "./infrastructure/consumers/audit-events.consumer";
@@ -221,6 +222,7 @@ import { JwtStrategy } from "./infrastructure/strategies/jwt.strategy";
     AuditDashboardController,
     AuditRecordsController,
     DashboardController,
+    ReportsDashboardController,
     EvaluationController,
     ExportController,
     FeedbackController,

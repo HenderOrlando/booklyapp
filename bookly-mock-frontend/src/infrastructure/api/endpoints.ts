@@ -14,7 +14,7 @@ export const AUTH_ENDPOINTS = {
   LOGIN: `${API_VERSION}/auth/login`,
   REGISTER: `${API_VERSION}/auth/register`,
   LOGOUT: `${API_VERSION}/auth/logout`,
-  PROFILE: `${API_VERSION}/users/me`,
+  PROFILE: `${API_VERSION}/users/me/profile`,
   REFRESH_TOKEN: `${API_VERSION}/auth/refresh`,
   VERIFY_EMAIL: `${API_VERSION}/auth/verify-email`,
   FORGOT_PASSWORD: `${API_VERSION}/auth/forgot-password`,
@@ -182,9 +182,9 @@ export const STOCKPILE_ENDPOINTS = {
 export const REPORTS_ENDPOINTS = {
   // Dashboard (routed via reports service)
   BASE: `${API_VERSION}/usage-reports`,
-  DASHBOARD: `${API_VERSION}/usage-reports`,
-  DASHBOARD_ADMIN: `${API_VERSION}/usage-reports?scope=admin`,
-  DASHBOARD_USER: `${API_VERSION}/usage-reports?scope=user`,
+  DASHBOARD: `${API_VERSION}/reports/dashboard`,
+  DASHBOARD_ADMIN: `${API_VERSION}/reports/dashboard?scope=admin`,
+  DASHBOARD_USER: `${API_VERSION}/reports/dashboard?scope=user`,
 
   // Reportes de Uso (BE controller: "usage-reports")
   USAGE: `${API_VERSION}/usage-reports`,
@@ -247,7 +247,7 @@ export const SYSTEM_ENDPOINTS = {
  */
 export function buildUrl(
   endpoint: string,
-  params?: Record<string, any>,
+  params?: Record<string, unknown>,
 ): string {
   if (!params || Object.keys(params).length === 0) {
     return endpoint;
@@ -255,7 +255,7 @@ export function buildUrl(
 
   const queryString = Object.entries(params)
     .filter(
-      ([_, value]) => value !== undefined && value !== null && value !== "",
+      ([, value]) => value !== undefined && value !== null && value !== "",
     )
     .map(
       ([key, value]) =>

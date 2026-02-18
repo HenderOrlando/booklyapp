@@ -13,7 +13,7 @@ import { useTranslations } from "next-intl";
 export default function ReportesPage() {
   const t = useTranslations("reports");
   const { filters, setFilters } = useReportFilters();
-  const { data: serverDashboard } = useReportDashboard();
+  const { data: serverDashboard } = useReportDashboard(filters);
   const dashboardData = serverDashboard || mockDashboardData;
 
   return (

@@ -225,8 +225,11 @@ export class MockService {
       const params = new URLSearchParams(queryString);
       const page = parseInt(params.get("page") || "1");
       const limit = parseInt(params.get("limit") || "20");
+      const programId = params.get("programId") || undefined;
 
-      return this.castResponse<T>(this.mockGetResources(page, limit));
+      return this.castResponse<T>(
+        this.mockGetResources(page, limit, programId),
+      );
     }
 
     if (endpoint.includes("/resources") && method === "POST") {
@@ -259,8 +262,14 @@ export class MockService {
       return this.castResponse<T>(this.mockGetMaintenances());
     }
 
-    if (endpoint.includes("/academic-programs") && method === "GET") {
-      const idMatch = endpoint.match(/\/academic-programs\/([^/]+)$/);
+    if (
+      (endpoint.includes("/programs") ||
+        endpoint.includes("/academic-programs")) &&
+      method === "GET"
+    ) {
+      const idMatch = endpoint.match(
+        /\/(?:programs|academic-programs)\/([^/?]+)$/,
+      );
       if (idMatch) {
         return this.castResponse<T>(
           this.mockGetAcademicProgramById(idMatch[1]),
@@ -269,14 +278,24 @@ export class MockService {
       return this.castResponse<T>(this.mockGetAcademicPrograms());
     }
 
-    if (endpoint.includes("/academic-programs") && method === "POST") {
+    if (
+      (endpoint.includes("/programs") ||
+        endpoint.includes("/academic-programs")) &&
+      method === "POST"
+    ) {
       return this.castResponse<T>(
         this.mockCreateAcademicProgram(payload as CreateAcademicProgramDto),
       );
     }
 
-    if (endpoint.includes("/academic-programs") && method === "PUT") {
-      const idMatch = endpoint.match(/\/academic-programs\/([^/]+)$/);
+    if (
+      (endpoint.includes("/programs") ||
+        endpoint.includes("/academic-programs")) &&
+      method === "PUT"
+    ) {
+      const idMatch = endpoint.match(
+        /\/(?:programs|academic-programs)\/([^/?]+)$/,
+      );
       if (idMatch) {
         return this.castResponse<T>(
           this.mockUpdateAcademicProgram(
@@ -412,6 +431,10 @@ export class MockService {
     // ============================================
     // RESERVATIONS SERVICE ENDPOINTS
     // ============================================
+
+    if (endpoint.includes("/reports/dashboard") && method === "GET") {
+      return this.castResponse<T>(this.mockGetAggregatedDashboard(endpoint));
+    }
 
     if (endpoint.includes("/dashboard/kpis") && method === "GET") {
       return this.castResponse<T>(this.mockGetDashboardKPIs());
@@ -821,12 +844,25 @@ export class MockService {
   private static mockGetResources(
     page: number = 1,
     limit: number = 20,
+    programId?: string,
   ): ApiResponse<unknown> {
-    const total = this.resourcesData.length;
+    const normalizedProgramId = programId?.trim().toLowerCase();
+    const filteredResources = normalizedProgramId
+      ? this.resourcesData.filter(
+          (resource) =>
+            Array.isArray(resource.programIds) &&
+            resource.programIds.some(
+              (resourceProgramId) =>
+                String(resourceProgramId).toLowerCase() === normalizedProgramId,
+            ),
+        )
+      : this.resourcesData;
+
+    const total = filteredResources.length;
     const totalPages = Math.ceil(total / limit);
     const startIndex = (page - 1) * limit;
     const endIndex = startIndex + limit;
-    const paginatedItems = this.resourcesData.slice(startIndex, endIndex);
+    const paginatedItems = filteredResources.slice(startIndex, endIndex);
 
     return {
       success: true,
@@ -1514,6 +1550,484 @@ export class MockService {
   // ============================================
   // REPORTS SERVICE ENDPOINTS
   // ============================================
+
+  private static mockGetAggregatedDashboard(
+    endpoint: string,
+  ): ApiResponse<unknown> {
+    const queryString = endpoint.split("?")[1] || "";
+    const params = new URLSearchParams(queryString);
+
+    const includeValues = params.getAll("include");
+    const normalizedInclude = (
+      includeValues.length > 0
+        ? includeValues
+        : ["kpis,summary,trend,activity,recentReservations,topResources"]
+    )
+      .flatMap((value) => value.split(","))
+      .map((value) => value.trim())
+      .filter(Boolean);
+
+    const includeSet = new Set(normalizedInclude);
+    const period = (params.get("period") || "last30").toLowerCase();
+    const tz = params.get("tz") || "America/Bogota";
+    const resourceTypeId = params.get("resourceTypeId") || undefined;
+    const locationId = params.get("locationId") || undefined;
+    const programId = params.get("programId") || undefined;
+
+    const parseDate = (value: string | null): Date | null => {
+      if (!value) {
+        return null;
+      }
+
+      const parsed = new Date(value);
+      return Number.isNaN(parsed.getTime()) ? null : parsed;
+    };
+
+    const now = new Date();
+    const startOfToday = new Date(now);
+    startOfToday.setHours(0, 0, 0, 0);
+
+    let from = parseDate(params.get("from"));
+    let to = parseDate(params.get("to"));
+
+    if (!from || !to || from > to) {
+      to = now;
+
+      if (period === "today") {
+        from = startOfToday;
+      } else if (period === "week") {
+        from = new Date(startOfToday.getTime() - 7 * 24 * 60 * 60 * 1000);
+      } else if (period === "month") {
+        from = new Date(now.getFullYear(), now.getMonth(), 1);
+      } else {
+        from = new Date(startOfToday.getTime() - 30 * 24 * 60 * 60 * 1000);
+      }
+    }
+
+    const hasResourceFilters = Boolean(
+      resourceTypeId || locationId || programId,
+    );
+    const normalizedResourceType = resourceTypeId?.toLowerCase();
+    const normalizedLocation = locationId?.toLowerCase();
+    const normalizedProgram = programId?.toLowerCase();
+
+    const filteredResources = this.resourcesData.filter((resource) => {
+      const matchesType =
+        !normalizedResourceType ||
+        String(resource.type || "").toLowerCase() === normalizedResourceType;
+
+      const matchesLocation =
+        !normalizedLocation ||
+        String(resource.location || "")
+          .toLowerCase()
+          .includes(normalizedLocation);
+
+      const matchesProgram =
+        !normalizedProgram ||
+        (Array.isArray(resource.programIds) &&
+          resource.programIds.some(
+            (program) => String(program).toLowerCase() === normalizedProgram,
+          ));
+
+      return matchesType && matchesLocation && matchesProgram;
+    });
+
+    const allowedResourceIds = new Set(
+      filteredResources.map((resource) => resource.id),
+    );
+
+    const fromMs = from.getTime();
+    const toMs = to.getTime();
+
+    const filteredReservations = this.reservationsData.filter((reservation) => {
+      const reservationDate = new Date(
+        reservation.startDate || reservation.createdAt || now.toISOString(),
+      );
+      const reservationTime = reservationDate.getTime();
+
+      if (
+        Number.isNaN(reservationTime) ||
+        reservationTime < fromMs ||
+        reservationTime > toMs
+      ) {
+        return false;
+      }
+
+      if (
+        hasResourceFilters &&
+        reservation.resourceId &&
+        !allowedResourceIds.has(reservation.resourceId)
+      ) {
+        return false;
+      }
+
+      return true;
+    });
+
+    const buildSummary = (items: Reservation[]) => {
+      return items.reduce(
+        (acc, reservation) => {
+          const status = String(reservation.status || "").toUpperCase();
+
+          if (status === "PENDING") {
+            acc.pending += 1;
+          }
+
+          if (status === "CONFIRMED") {
+            acc.confirmed += 1;
+          }
+
+          if (status === "CANCELLED") {
+            acc.cancelled += 1;
+          }
+
+          if (status === "COMPLETED") {
+            acc.completed += 1;
+          }
+
+          if (status === "IN_PROGRESS") {
+            acc.inProgress += 1;
+          }
+
+          return acc;
+        },
+        {
+          pending: 0,
+          confirmed: 0,
+          cancelled: 0,
+          completed: 0,
+          inProgress: 0,
+        },
+      );
+    };
+
+    const currentSummary = buildSummary(filteredReservations);
+
+    const periodMs = Math.max(toMs - fromMs, 24 * 60 * 60 * 1000);
+    const previousTo = new Date(fromMs - 1);
+    const previousFrom = new Date(previousTo.getTime() - periodMs);
+
+    const previousReservations = this.reservationsData.filter((reservation) => {
+      const reservationDate = new Date(
+        reservation.startDate || reservation.createdAt || now.toISOString(),
+      );
+      const reservationTime = reservationDate.getTime();
+
+      if (
+        Number.isNaN(reservationTime) ||
+        reservationTime < previousFrom.getTime() ||
+        reservationTime > previousTo.getTime()
+      ) {
+        return false;
+      }
+
+      if (
+        hasResourceFilters &&
+        reservation.resourceId &&
+        !allowedResourceIds.has(reservation.resourceId)
+      ) {
+        return false;
+      }
+
+      return true;
+    });
+
+    const previousSummary = buildSummary(previousReservations);
+
+    const toPct = (current: number, previous: number): number => {
+      if (previous === 0) {
+        return current > 0 ? 100 : 0;
+      }
+
+      return Number((((current - previous) / previous) * 100).toFixed(2));
+    };
+
+    const resourcesInScope = hasResourceFilters
+      ? filteredResources
+      : this.resourcesData;
+    const totalResources = resourcesInScope.length;
+
+    const activeStatuses = new Set(["PENDING", "CONFIRMED", "IN_PROGRESS"]);
+
+    const activeReservations = filteredReservations.filter((reservation) =>
+      activeStatuses.has(String(reservation.status || "").toUpperCase()),
+    );
+
+    const activeResourceIds = new Set(
+      activeReservations
+        .map((reservation) => reservation.resourceId)
+        .filter((resourceId): resourceId is string => Boolean(resourceId)),
+    );
+
+    const availableResources = Math.max(
+      totalResources - activeResourceIds.size,
+      0,
+    );
+    const utilizationRate =
+      totalResources > 0
+        ? Number(((activeResourceIds.size / totalResources) * 100).toFixed(2))
+        : 0;
+
+    const satisfactionRate =
+      filteredReservations.length > 0
+        ? Number(
+            (
+              ((currentSummary.confirmed + currentSummary.completed) /
+                filteredReservations.length) *
+              100
+            ).toFixed(2),
+          )
+        : 0;
+
+    const pendingApprovals = mockApprovalRequests.filter((request) =>
+      ["PENDING", "IN_REVIEW"].includes(
+        String(request.status || "").toUpperCase(),
+      ),
+    ).length;
+
+    const summaryPayload = {
+      total: filteredReservations.length,
+      pending: currentSummary.pending,
+      confirmed: currentSummary.confirmed,
+      cancelled: currentSummary.cancelled,
+      completed: currentSummary.completed,
+    };
+
+    const toIsoDate = (date: Date): string => date.toISOString().slice(0, 10);
+
+    const trendDays = Math.min(
+      Math.max(Math.ceil(periodMs / (24 * 60 * 60 * 1000)), 1),
+      30,
+    );
+    const trendStart = new Date(toMs - (trendDays - 1) * 24 * 60 * 60 * 1000);
+
+    const reservationsByDate = filteredReservations.reduce<
+      Record<string, number>
+    >((acc, reservation) => {
+      const reservationDate = new Date(
+        reservation.startDate || reservation.createdAt || now.toISOString(),
+      );
+      const key = toIsoDate(reservationDate);
+      acc[key] = (acc[key] || 0) + 1;
+      return acc;
+    }, {});
+
+    const trend = Array.from({ length: trendDays }, (_, index) => {
+      const day = new Date(trendStart.getTime() + index * 24 * 60 * 60 * 1000);
+      const date = toIsoDate(day);
+      const reservations = reservationsByDate[date] || 0;
+
+      return {
+        date,
+        reservations,
+        utilizationRate:
+          totalResources > 0
+            ? Number(
+                Math.min(100, (reservations / totalResources) * 100).toFixed(2),
+              )
+            : null,
+      };
+    });
+
+    const recentActivity = filteredReservations
+      .slice()
+      .sort((a, b) => {
+        const dateA = new Date(a.updatedAt || a.createdAt || 0).getTime();
+        const dateB = new Date(b.updatedAt || b.createdAt || 0).getTime();
+        return dateB - dateA;
+      })
+      .slice(0, 10)
+      .map((reservation) => ({
+        id: `activity-${reservation.id}`,
+        type: `reservation.${String(reservation.status || "").toLowerCase()}`,
+        title: reservation.title || "Reserva actualizada",
+        description: `${reservation.userName || reservation.userId || "Usuario"} en ${reservation.resourceName || "Recurso"}`,
+        at:
+          reservation.updatedAt ||
+          reservation.createdAt ||
+          new Date().toISOString(),
+        source: "availability-service",
+        metadata: {
+          reservationId: reservation.id,
+          userName: reservation.userName,
+          resourceId: reservation.resourceId,
+          resourceName: reservation.resourceName,
+        },
+      }));
+
+    const recentReservations = filteredReservations
+      .slice()
+      .sort((a, b) => {
+        const dateA = new Date(a.createdAt || 0).getTime();
+        const dateB = new Date(b.createdAt || 0).getTime();
+        return dateB - dateA;
+      })
+      .slice(0, 10)
+      .map((reservation) => ({
+        id: reservation.id,
+        reservationId: reservation.id,
+        resourceId: reservation.resourceId,
+        resourceName: reservation.resourceName || "Recurso",
+        userId: reservation.userId,
+        status: String(reservation.status || "PENDING"),
+        startAt: reservation.startDate,
+        endAt: reservation.endDate,
+        createdAt: reservation.createdAt,
+      }));
+
+    const usageByResource = filteredReservations.reduce<
+      Record<string, { reservations: number; hoursUsed: number }>
+    >((acc, reservation) => {
+      if (!reservation.resourceId) {
+        return acc;
+      }
+
+      const startAt = new Date(reservation.startDate).getTime();
+      const endAt = new Date(reservation.endDate).getTime();
+      const durationHours =
+        Number.isFinite(startAt) && Number.isFinite(endAt) && endAt > startAt
+          ? (endAt - startAt) / (1000 * 60 * 60)
+          : 0;
+
+      const current = acc[reservation.resourceId] || {
+        reservations: 0,
+        hoursUsed: 0,
+      };
+
+      current.reservations += 1;
+      current.hoursUsed += durationHours;
+      acc[reservation.resourceId] = current;
+
+      return acc;
+    }, {});
+
+    const topResources = Object.entries(usageByResource)
+      .map(([resourceId, usage]) => {
+        const resource = this.resourcesData.find(
+          (item) => item.id === resourceId,
+        );
+
+        return {
+          resourceId,
+          name: resource?.name || "Recurso",
+          type: String(resource?.type || "UNKNOWN"),
+          reservations: usage.reservations,
+          utilizationRate:
+            filteredReservations.length > 0
+              ? Number(
+                  (
+                    (usage.reservations / filteredReservations.length) *
+                    100
+                  ).toFixed(2),
+                )
+              : null,
+          hoursUsed: Number(usage.hoursUsed.toFixed(2)),
+          share:
+            filteredReservations.length > 0
+              ? Number(
+                  (
+                    (usage.reservations / filteredReservations.length) *
+                    100
+                  ).toFixed(2),
+                )
+              : 0,
+        };
+      })
+      .sort((a, b) => b.reservations - a.reservations)
+      .slice(0, 10);
+
+    const isIncluded = (section: string): boolean => includeSet.has(section);
+
+    return {
+      success: true,
+      data: {
+        generatedAt: new Date().toISOString(),
+        filters: {
+          from: from.toISOString(),
+          to: to.toISOString(),
+          period,
+          tz,
+          include: normalizedInclude,
+          resourceTypeId,
+          locationId,
+          programId,
+        },
+        refresh: {
+          intervalSeconds: 15,
+          websocketEvent: "dashboard:metrics:updated",
+        },
+        kpis: isIncluded("kpis")
+          ? {
+              totalReservations: filteredReservations.length,
+              activeReservations:
+                currentSummary.pending +
+                currentSummary.confirmed +
+                currentSummary.inProgress,
+              pendingApprovals,
+              totalResources,
+              availableResources,
+              utilizationRate,
+              satisfactionRate,
+              delta: {
+                totalReservationsPct: toPct(
+                  filteredReservations.length,
+                  previousReservations.length,
+                ),
+                activeReservationsPct: toPct(
+                  currentSummary.pending +
+                    currentSummary.confirmed +
+                    currentSummary.inProgress,
+                  previousSummary.pending +
+                    previousSummary.confirmed +
+                    previousSummary.inProgress,
+                ),
+                pendingApprovalsPct: 0,
+                utilizationRatePct: toPct(
+                  utilizationRate,
+                  totalResources > 0
+                    ? Number(
+                        (
+                          ((previousSummary.pending +
+                            previousSummary.confirmed +
+                            previousSummary.inProgress) /
+                            totalResources) *
+                          100
+                        ).toFixed(2),
+                      )
+                    : 0,
+                ),
+                satisfactionRatePct: toPct(
+                  satisfactionRate,
+                  previousReservations.length > 0
+                    ? Number(
+                        (
+                          ((previousSummary.confirmed +
+                            previousSummary.completed) /
+                            previousReservations.length) *
+                          100
+                        ).toFixed(2),
+                      )
+                    : 0,
+                ),
+              },
+            }
+          : null,
+        reservationSummary: isIncluded("summary") ? summaryPayload : null,
+        trend: isIncluded("trend") ? trend : [],
+        recentActivity: isIncluded("activity") ? recentActivity : [],
+        recentReservations: isIncluded("recentReservations")
+          ? recentReservations
+          : [],
+        topResources: isIncluded("topResources") ? topResources : [],
+        access: {
+          canViewFullOccupancy: true,
+          maskedSections: [],
+        },
+      },
+      message: "Dashboard data retrieved successfully",
+      timestamp: new Date().toISOString(),
+    };
+  }
 
   private static mockGetDashboardKPIs(): ApiResponse<unknown> {
     const totalResources = this.resourcesData.length;

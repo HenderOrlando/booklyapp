@@ -30,12 +30,13 @@ export interface ButtonWithLoadingProps
 
 const variantClasses = {
   primary:
-    "bg-primary-600 hover:bg-primary-700 text-white disabled:bg-primary-300",
+    "border border-[var(--color-action-primary)] bg-[var(--color-action-primary)] text-[var(--color-text-inverse)] hover:border-[var(--color-action-primary-hover)] hover:bg-[var(--color-action-primary-hover)] disabled:border-[var(--color-action-primary-disabled)] disabled:bg-[var(--color-action-primary-disabled)] disabled:text-[var(--color-text-secondary)]",
   secondary:
-    "bg-secondary-600 hover:bg-secondary-700 text-white disabled:bg-secondary-300",
+    "border border-[var(--color-action-secondary)] bg-[var(--color-action-secondary)] text-[var(--color-text-inverse)] hover:border-[var(--color-action-secondary-hover)] hover:bg-[var(--color-action-secondary-hover)] disabled:border-[var(--color-action-primary-disabled)] disabled:bg-[var(--color-action-primary-disabled)] disabled:text-[var(--color-text-secondary)]",
   outline:
-    "border-2 border-primary-600 text-primary-600 hover:bg-primary-50 disabled:border-primary-300 disabled:text-primary-300",
-  danger: "bg-red-600 hover:bg-red-700 text-white disabled:bg-red-300",
+    "border border-[var(--color-border-strong)] bg-transparent text-[var(--color-text-primary)] hover:bg-[var(--color-bg-muted)] disabled:border-[var(--color-border-subtle)] disabled:text-[var(--color-text-tertiary)]",
+  danger:
+    "border border-[var(--color-state-error-text)] bg-[var(--color-state-error-text)] text-[var(--color-text-inverse)] hover:brightness-95 disabled:border-[var(--color-state-error-border)] disabled:bg-[var(--color-state-error-border)] disabled:text-[var(--color-text-inverse)]",
 };
 
 const sizeClasses = {
@@ -63,6 +64,7 @@ export const ButtonWithLoading = React.memo<ButtonWithLoadingProps>(
           ${variantClasses[variant]}
           ${sizeClasses[size]}
           rounded-lg font-medium
+          focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-border-focus)] focus-visible:ring-offset-2
           transition-all duration-200
           disabled:cursor-not-allowed disabled:opacity-60
           flex items-center justify-center gap-2
@@ -74,7 +76,7 @@ export const ButtonWithLoading = React.memo<ButtonWithLoadingProps>(
         <span>{isLoading && loadingText ? loadingText : children}</span>
       </button>
     );
-  }
+  },
 );
 
 ButtonWithLoading.displayName = "ButtonWithLoading";

@@ -45,6 +45,7 @@ const BE_CONTROLLERS = {
     "notification-templates",
   ],
   reports: [
+    "reports",
     "usage-reports",
     "demand-reports",
     "user-reports",
@@ -201,20 +202,20 @@ describe("Contract: API version consistency", () => {
 
   it("all static endpoints use /api/v1 prefix", () => {
     const staticEndpoints = Object.entries(allEndpoints).filter(
-      ([_, v]) => typeof v === "string",
+      ([, value]) => typeof value === "string",
     );
 
-    for (const [name, path] of staticEndpoints) {
+    for (const [, path] of staticEndpoints) {
       expect(path).toMatch(new RegExp(`^${API_V1}/`));
     }
   });
 
   it("all dynamic endpoint factories produce /api/v1 paths", () => {
     const dynamicEndpoints = Object.entries(allEndpoints).filter(
-      ([_, v]) => typeof v === "function",
+      ([, value]) => typeof value === "function",
     ) as [string, (id: string) => string][];
 
-    for (const [name, factory] of dynamicEndpoints) {
+    for (const [, factory] of dynamicEndpoints) {
       const result = factory("test-id");
       expect(result).toMatch(new RegExp(`^${API_V1}/`));
     }

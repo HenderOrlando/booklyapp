@@ -195,6 +195,126 @@ export interface DashboardData {
 }
 
 /**
+ * Aggregated Dashboard (reports/dashboard)
+ */
+export type DashboardPeriodFilter =
+  | "today"
+  | "week"
+  | "month"
+  | "last30"
+  | "custom";
+
+export type DashboardIncludeSection =
+  | "kpis"
+  | "summary"
+  | "trend"
+  | "activity"
+  | "recentReservations"
+  | "topResources";
+
+export interface DashboardQueryFilters {
+  period?: DashboardPeriodFilter;
+  from?: string;
+  to?: string;
+  tz?: string;
+  resourceTypeId?: string;
+  locationId?: string;
+  programId?: string;
+  include?: DashboardIncludeSection[];
+}
+
+export interface DashboardAggregatedKpis {
+  totalReservations: number;
+  activeReservations: number;
+  pendingApprovals: number;
+  totalResources: number;
+  availableResources: number;
+  utilizationRate: number;
+  satisfactionRate: number;
+  delta: {
+    totalReservationsPct: number;
+    activeReservationsPct: number;
+    pendingApprovalsPct: number;
+    utilizationRatePct: number;
+    satisfactionRatePct: number;
+  };
+}
+
+export interface DashboardReservationSummary {
+  total: number;
+  pending: number;
+  confirmed: number;
+  cancelled: number;
+  completed: number;
+}
+
+export interface DashboardTrendPoint {
+  date: string;
+  reservations: number;
+  utilizationRate: number | null;
+}
+
+export interface DashboardActivityItem {
+  id: string;
+  type: string;
+  title: string;
+  description: string;
+  at: string;
+  source: string;
+  metadata?: Record<string, unknown>;
+}
+
+export interface DashboardRecentReservationItem {
+  id: string;
+  reservationId: string;
+  resourceId: string;
+  resourceName: string;
+  userId: string;
+  status: string;
+  startAt: string;
+  endAt: string;
+  createdAt: string;
+}
+
+export interface DashboardTopResourceItem {
+  resourceId: string;
+  name: string;
+  type: string;
+  reservations: number;
+  utilizationRate: number | null;
+  hoursUsed: number;
+  share: number;
+}
+
+export interface DashboardAggregatedResponse {
+  generatedAt: string;
+  filters: {
+    from: string;
+    to: string;
+    period: DashboardPeriodFilter;
+    tz: string;
+    include: DashboardIncludeSection[];
+    resourceTypeId?: string;
+    locationId?: string;
+    programId?: string;
+  };
+  refresh: {
+    intervalSeconds: number;
+    websocketEvent: string;
+  };
+  kpis: DashboardAggregatedKpis | null;
+  reservationSummary: DashboardReservationSummary | null;
+  trend: DashboardTrendPoint[];
+  recentActivity: DashboardActivityItem[];
+  recentReservations: DashboardRecentReservationItem[];
+  topResources: DashboardTopResourceItem[];
+  access: {
+    canViewFullOccupancy: boolean;
+    maskedSections: DashboardIncludeSection[];
+  };
+}
+
+/**
  * KPIs
  */
 export interface KPIs {

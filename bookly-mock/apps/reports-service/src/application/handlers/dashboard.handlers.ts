@@ -1,6 +1,7 @@
 import { createLogger } from "@libs/common";
 import { IQueryHandler, QueryHandler } from "@nestjs/cqrs";
 import {
+  GetDashboardDataQuery,
   GetDashboardOverviewQuery,
   GetMainKPIsQuery,
   GetOccupancyMetricsQuery,
@@ -10,6 +11,26 @@ import {
 import { DashboardService } from "../services";
 
 const logger = createLogger("DashboardHandlers");
+
+@QueryHandler(GetDashboardDataQuery)
+export class GetDashboardDataHandler
+  implements IQueryHandler<GetDashboardDataQuery>
+{
+  constructor(private readonly dashboardService: DashboardService) {}
+
+  async execute(query: GetDashboardDataQuery): Promise<any> {
+    logger.info("Executing GetDashboardDataQuery", {
+      period: query.filters.period,
+      include: query.filters.include,
+      roles: query.context.roles,
+    });
+
+    return await this.dashboardService.getDashboardData(
+      query.filters,
+      query.context,
+    );
+  }
+}
 
 /**
  * Get Dashboard Overview Handler
@@ -60,7 +81,7 @@ export class GetTrendAnalysisHandler
     return await this.dashboardService.getTrendAnalysis(
       query.period,
       query.startDate,
-      query.endDate
+      query.endDate,
     );
   }
 }

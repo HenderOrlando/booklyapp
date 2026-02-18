@@ -78,9 +78,7 @@ export function usePrefetchProgram() {
     await queryClient.prefetchQuery({
       queryKey: programKeys.detail(programId),
       queryFn: async () => {
-        const response = await httpClient.get(
-          `/academic-programs/${programId}`
-        );
+        const response = await httpClient.get(`/programs/${programId}`);
         return response.data;
       },
       staleTime: 1000 * 60 * 10,
@@ -110,7 +108,7 @@ export function usePrefetchNextPage() {
   const prefetchNextPage = async (
     entity: "resources" | "reservations" | "programs",
     nextPage: number,
-    filters?: any
+    filters?: any,
   ) => {
     const baseUrl = `/${entity}`;
     const queryKey = [entity, "list", { page: nextPage, ...filters }];
@@ -154,7 +152,7 @@ export function useSmartPrefetch() {
 
   const onHover = (
     type: "resource" | "reservation" | "program",
-    id: string
+    id: string,
   ) => {
     switch (type) {
       case "resource":
@@ -168,7 +166,7 @@ export function useSmartPrefetch() {
 
   const predictive = (
     type: "resource" | "reservation" | "program",
-    id: string
+    id: string,
   ) => {
     // Implementar lógica predictiva basada en patrones de navegación
     // Por ahora, simplemente hace prefetch

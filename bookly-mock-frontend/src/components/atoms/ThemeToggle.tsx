@@ -1,5 +1,6 @@
 "use client";
 
+import { cn } from "@/lib/utils";
 import { useTheme } from "next-themes";
 import * as React from "react";
 
@@ -10,7 +11,15 @@ import * as React from "react";
  * Usa next-themes para persistencia
  */
 
-export function ThemeToggle() {
+interface ThemeToggleProps {
+  className?: string;
+  testId?: string;
+}
+
+export function ThemeToggle({
+  className,
+  testId = "theme-toggle-btn",
+}: ThemeToggleProps) {
   const { theme, setTheme, systemTheme } = useTheme();
   const [mounted, setMounted] = React.useState(false);
 
@@ -21,7 +30,12 @@ export function ThemeToggle() {
 
   if (!mounted) {
     return (
-      <div className="w-14 h-7 bg-[var(--color-bg-elevated)] rounded-full animate-pulse"></div>
+      <div
+        className={cn(
+          "h-7 w-14 animate-pulse rounded-full bg-[var(--color-bg-elevated)]",
+          className,
+        )}
+      />
     );
   }
 
@@ -35,13 +49,18 @@ export function ThemeToggle() {
   return (
     <button
       onClick={toggleTheme}
-      className="relative inline-flex h-7 w-14 items-center rounded-full border border-[var(--color-border-subtle)] transition-colors focus:outline-none focus:ring-2 focus:ring-[var(--color-border-focus)] focus:ring-offset-2"
+      className={cn(
+        "relative inline-flex h-7 w-14 items-center rounded-full border border-[var(--color-border-subtle)] transition-colors focus:outline-none focus:ring-2 focus:ring-[var(--color-border-focus)] focus:ring-offset-2",
+        className,
+      )}
       style={{
         backgroundColor: isDark
           ? "var(--color-bg-primary)"
           : "var(--color-border-strong)",
       }}
+      data-testid={testId}
       aria-label={`Cambiar a tema ${isDark ? "claro" : "oscuro"}`}
+      aria-pressed={isDark}
     >
       {/* Slider */}
       <span

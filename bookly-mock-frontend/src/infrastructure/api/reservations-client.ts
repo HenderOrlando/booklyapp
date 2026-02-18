@@ -33,6 +33,68 @@ import type {
 import { AVAILABILITY_ENDPOINTS, buildUrl } from "./endpoints";
 import type { PaginatedResponse } from "./types";
 
+const BACKEND_RESERVATION_STATUSES = [
+  "PENDING",
+  "CONFIRMED",
+  "APPROVED",
+  "REJECTED",
+  "CHECKED_IN",
+  "ACTIVE",
+  "COMPLETED",
+  "CANCELLED",
+] as const;
+
+export type BackendReservationStatus =
+  (typeof BACKEND_RESERVATION_STATUSES)[number];
+
+export interface ReservationSearchFilters {
+  resourceId?: string;
+  userId?: string;
+  status?: BackendReservationStatus;
+  startDate?: string;
+  endDate?: string;
+  page?: number;
+  limit?: number;
+}
+
+const backendReservationStatusSet: ReadonlySet<string> = new Set(
+  BACKEND_RESERVATION_STATUSES,
+);
+
+export function sanitizeReservationSearchFilters(
+  filters: ReservationSearchFilters,
+): ReservationSearchFilters {
+  const normalizedFilters = {
+    ...filters,
+  } as ReservationSearchFilters & { status?: string };
+
+  if (!normalizedFilters.status) {
+    return normalizedFilters;
+  }
+
+  const normalizedStatus = normalizedFilters.status.toUpperCase();
+
+  if (backendReservationStatusSet.has(normalizedStatus)) {
+    normalizedFilters.status = normalizedStatus as BackendReservationStatus;
+    return normalizedFilters;
+  }
+
+  if (process.env.NODE_ENV !== "production") {
+    console.warn(
+      `[ReservationsClient.search] Ignorando status no soportado por backend: ${normalizedFilters.status}`,
+    );
+  }
+
+  delete normalizedFilters.status;
+
+  // "upcoming" es semántica de frontend; se traduce al contrato real del backend.
+  if (normalizedStatus === "UPCOMING" && !normalizedFilters.startDate) {
+    normalizedFilters.startDate = new Date().toISOString();
+  }
+
+  return normalizedFilters;
+}
+
 /**
  * Cliente HTTP para operaciones de reservas
  */
@@ -340,17 +402,13 @@ export class ReservationsClient {
    * @returns Lista filtrada de reservas
    * @future Implementar cuando backend esté disponible
    */
-  static async search(filters: {
-    resourceId?: string;
-    userId?: string;
-    status?: string;
-    startDate?: string;
-    endDate?: string;
-    page?: number;
-    limit?: number;
-  }): Promise<ApiResponse<PaginatedResponse<Reservation>>> {
+  static async search(
+    filters: ReservationSearchFilters,
+  ): Promise<ApiResponse<PaginatedResponse<Reservation>>> {
+    const sanitizedFilters = sanitizeReservationSearchFilters(filters);
+
     return await httpClient.get<PaginatedResponse<Reservation>>(
-      buildUrl(AVAILABILITY_ENDPOINTS.RESERVATIONS, filters),
+      buildUrl(AVAILABILITY_ENDPOINTS.RESERVATIONS, sanitizedFilters),
     );
   }
 

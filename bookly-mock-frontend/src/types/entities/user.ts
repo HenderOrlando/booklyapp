@@ -6,16 +6,21 @@ export interface User {
   id: string;
   email: string;
   username: string;
+  tenantId?: string;
   firstName: string;
   lastName: string;
   fullName?: string;
   phoneNumber?: string;
+  phone?: string;
   documentType?: string;
   documentNumber?: string;
   profilePicture?: string;
   status: UserStatus;
+  isActive?: boolean;
   emailVerified: boolean;
+  isEmailVerified?: boolean;
   phoneVerified: boolean;
+  isPhoneVerified?: boolean;
   twoFactorEnabled: boolean;
   roles: Role[];
   permissions: Permission[];
@@ -34,7 +39,9 @@ export enum UserStatus {
 
 export interface Role {
   id: string;
+  code?: string;
   name: string;
+  displayName?: string;
   description?: string;
   permissions: Permission[];
   isSystem: boolean;
@@ -44,6 +51,8 @@ export interface Role {
 
 export interface Permission {
   id: string;
+  code?: string;
+  name?: string;
   resource: string;
   action: string;
   description?: string;
@@ -69,8 +78,10 @@ export interface CreateUserDto {
   firstName: string;
   lastName: string;
   phoneNumber?: string;
+  phone?: string;
   documentType?: string;
   documentNumber?: string;
+  tenantId?: string;
   roleIds?: string[];
 }
 
@@ -78,10 +89,14 @@ export interface UpdateUserDto {
   firstName?: string;
   lastName?: string;
   phoneNumber?: string;
+  phone?: string;
   documentType?: string;
   documentNumber?: string;
   profilePicture?: string;
   status?: UserStatus;
+  isActive?: boolean;
+  isEmailVerified?: boolean;
+  isPhoneVerified?: boolean;
   preferences?: Partial<UserPreferences>;
 }
 

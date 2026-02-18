@@ -1,4 +1,5 @@
 import type {
+  DashboardAggregatedResponse,
   DashboardData,
   DemandReport,
   KPIs,
@@ -218,6 +219,132 @@ export const mockDashboardData: DashboardData = {
       timestamp: new Date().toISOString(),
     },
   ],
+};
+
+export const mockDashboardAggregatedResponse: DashboardAggregatedResponse = {
+  generatedAt: new Date().toISOString(),
+  filters: {
+    from: "2024-11-01T00:00:00.000Z",
+    to: "2024-11-30T23:59:59.999Z",
+    period: "month",
+    tz: "America/Bogota",
+    include: [
+      "kpis",
+      "summary",
+      "trend",
+      "activity",
+      "recentReservations",
+      "topResources",
+    ],
+  },
+  refresh: {
+    intervalSeconds: 15,
+    websocketEvent: "dashboard:metrics:updated",
+  },
+  kpis: {
+    totalReservations: mockKPIs.totalReservations,
+    activeReservations: 198,
+    pendingApprovals: 24,
+    totalResources: mockKPIs.totalResources,
+    availableResources: 42,
+    utilizationRate: mockKPIs.averageOccupancy,
+    satisfactionRate: mockKPIs.satisfactionRate,
+    delta: {
+      totalReservationsPct: mockKPIs.comparedToPrevious.reservations,
+      activeReservationsPct: 7.5,
+      pendingApprovalsPct: -4.2,
+      utilizationRatePct: mockKPIs.comparedToPrevious.occupancy,
+      satisfactionRatePct: 2.1,
+    },
+  },
+  reservationSummary: {
+    total: mockKPIs.totalReservations,
+    pending: 24,
+    confirmed: 362,
+    cancelled: 64,
+    completed: 784,
+  },
+  trend: Array.from({ length: 30 }, (_, index) => ({
+    date: `2024-11-${String(index + 1).padStart(2, "0")}`,
+    reservations: Math.max(12, Math.round(20 + Math.sin(index / 4) * 10)),
+    utilizationRate: Number((55 + Math.cos(index / 5) * 12).toFixed(2)),
+  })),
+  recentActivity: [
+    {
+      id: "activity-1",
+      type: "reservation.confirmed",
+      title: "Reserva confirmada",
+      description: "Juan Pérez reservó Laboratorio A",
+      at: new Date().toISOString(),
+      source: "availability-service",
+      metadata: {
+        reservationId: "res-001",
+        userName: "Juan Pérez",
+        resourceName: "Laboratorio A",
+      },
+    },
+    {
+      id: "activity-2",
+      type: "reservation.cancelled",
+      title: "Reserva cancelada",
+      description: "María García canceló Sala de Juntas",
+      at: new Date(Date.now() - 3600000).toISOString(),
+      source: "availability-service",
+      metadata: {
+        reservationId: "res-002",
+        userName: "María García",
+        resourceName: "Sala de Juntas",
+      },
+    },
+  ],
+  recentReservations: [
+    {
+      id: "reservation-1",
+      reservationId: "reservation-1",
+      resourceId: "r1",
+      resourceName: "Laboratorio A",
+      userId: "u1",
+      status: "CONFIRMED",
+      startAt: "2024-11-30T10:00:00.000Z",
+      endAt: "2024-11-30T12:00:00.000Z",
+      createdAt: "2024-11-29T08:00:00.000Z",
+    },
+    {
+      id: "reservation-2",
+      reservationId: "reservation-2",
+      resourceId: "r2",
+      resourceName: "Sala de Juntas",
+      userId: "u2",
+      status: "PENDING",
+      startAt: "2024-11-30T14:00:00.000Z",
+      endAt: "2024-11-30T15:00:00.000Z",
+      createdAt: "2024-11-29T09:00:00.000Z",
+    },
+  ],
+  topResources: [
+    {
+      resourceId: "r1",
+      name: "Laboratorio A",
+      type: "LABORATORY",
+      reservations: 45,
+      utilizationRate: 84.2,
+      hoursUsed: 180,
+      share: 36.4,
+    },
+    {
+      resourceId: "r2",
+      name: "Sala de Juntas",
+      type: "ROOM",
+      reservations: 38,
+      utilizationRate: 71.8,
+      hoursUsed: 152,
+      share: 30.8,
+    },
+  ],
+  access: {
+    canViewFullOccupancy: true,
+    maskedSections: [],
+  },
 };
 
 export const mockResourceUtilization: ResourceUtilization[] = [

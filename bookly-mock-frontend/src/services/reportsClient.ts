@@ -4,6 +4,7 @@
  * New code should import from `@/infrastructure/api/reports-client`.
  */
 
+import { ReportsClient } from "@/infrastructure/api/reports-client";
 import { httpClient } from "@/infrastructure/http/httpClient";
 import type {
   DemandFilters,
@@ -15,52 +16,36 @@ import type {
   UserReport,
 } from "@/types/entities/report";
 
-const USAGE_REPORTS_PATH = "/api/v1/usage-reports";
-const DEMAND_REPORTS_PATH = "/api/v1/demand-reports";
-const USER_REPORTS_PATH = "/api/v1/user-reports";
 const EXPORT_PATH = "/api/v1/reports/export";
 
 export async function getUsageReport(
   filters?: UsageFilters,
 ): Promise<UsageReport> {
-  const response = await httpClient.get<UsageReport>(USAGE_REPORTS_PATH, {
-    params: filters,
-  });
+  const response = await ReportsClient.getUsageReport(filters);
   return response.data;
 }
 
 export async function getResourceReport(
   resourceId: string,
 ): Promise<ResourceReport> {
-  const response = await httpClient.get<ResourceReport>(
-    `${USAGE_REPORTS_PATH}?resourceId=${resourceId}`,
-  );
+  const response = await ReportsClient.getResourceReport(resourceId);
   return response.data;
 }
 
 export async function getUserReport(userId: string): Promise<UserReport> {
-  const response = await httpClient.get<UserReport>(
-    `${USER_REPORTS_PATH}?userId=${userId}`,
-  );
+  const response = await ReportsClient.getUserReport(userId);
   return response.data;
 }
 
 export async function getDemandReport(
   filters?: DemandFilters,
 ): Promise<DemandReport> {
-  const response = await httpClient.get<DemandReport>(DEMAND_REPORTS_PATH, {
-    params: filters,
-  });
+  const response = await ReportsClient.getDemandReport(filters);
   return response.data;
 }
 
 export async function getKPIs(period?: string): Promise<KPIs> {
-  const response = await httpClient.get<KPIs>(
-    `${USAGE_REPORTS_PATH}/generate`,
-    {
-      params: { period },
-    },
-  );
+  const response = await ReportsClient.getKPIs(period);
   return response.data;
 }
 
@@ -68,6 +53,16 @@ export async function exportReport(
   reportId: string,
   format: "csv" | "excel" | "pdf",
 ): Promise<Blob> {
+  if (format === "csv") {
+    const response = await ReportsClient.exportToCSV(reportId);
+    return response.data;
+  }
+
+  if (format === "pdf") {
+    const response = await ReportsClient.exportToPDF(reportId);
+    return response.data;
+  }
+
   const response = await httpClient.post<Blob>(
     EXPORT_PATH,
     { reportId, format },

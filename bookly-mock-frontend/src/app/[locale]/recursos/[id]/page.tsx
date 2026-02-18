@@ -26,6 +26,24 @@ import { useTranslations } from "next-intl";
 import { useParams, useRouter } from "next/navigation";
 import * as React from "react";
 
+interface ProgramCollectionPayload {
+  items?: AcademicProgram[];
+}
+
+function extractPrograms(
+  data: ProgramCollectionPayload | AcademicProgram[] | undefined,
+): AcademicProgram[] {
+  if (Array.isArray(data)) {
+    return data;
+  }
+
+  if (data?.items && Array.isArray(data.items)) {
+    return data.items;
+  }
+
+  return [];
+}
+
 /**
  * Página de Detalle de Recurso - Bookly
  *
@@ -56,38 +74,19 @@ export default function RecursoDetailPage() {
   const [resourcePrograms, setResourcePrograms] = React.useState<
     AcademicProgram[]
   >([]);
-  const [programFilter, setProgramFilter] = React.useState("");
-  const [isEditingPrograms, setIsEditingPrograms] = React.useState(false);
-  const [selectedProgramIds, setSelectedProgramIds] = React.useState<
-    Set<string>
-  >(new Set());
 
-  // Cargar programas académicos (se mantiene para la asociación)
+  // Cargar programas académicos
   React.useEffect(() => {
     const fetchPrograms = async () => {
       try {
-        const [programsRes, resourceProgramsRes] = await Promise.all([
-          httpClient.get("academic-programs"),
-          httpClient.get(`program-resources?programId=all`),
-        ]);
+        const programsRes = await httpClient.get<
+          ProgramCollectionPayload | AcademicProgram[]
+        >("programs");
 
-        if (programsRes.success && programsRes.data) {
-          setAllPrograms(programsRes.data.items || []);
+        if (programsRes.success) {
+          setAllPrograms(extractPrograms(programsRes.data));
         }
-
-        // Filtrar programas que tienen este recurso
-        if (resourceProgramsRes.success && resourceProgramsRes.data) {
-          const associations = resourceProgramsRes.data.items || [];
-          const programIds = associations
-            .filter((a: any) => a.resourceId === resourceId)
-            .map((a: any) => a.programId);
-
-          const associatedProgs = (programsRes.data?.items || []).filter(
-            (p: AcademicProgram) => programIds.includes(p.id),
-          );
-          setResourcePrograms(associatedProgs);
-        }
-      } catch (err: any) {
+      } catch (err) {
         console.error("Error al cargar programas:", err);
       }
     };
@@ -97,11 +96,18 @@ export default function RecursoDetailPage() {
     }
   }, [resourceId]);
 
-  // Inicializar selección de programas cuando se cargan
+  // Calcular programas asociados al recurso a partir de resource.programIds
   React.useEffect(() => {
-    const ids = new Set(resourcePrograms.map((p) => p.id));
-    setSelectedProgramIds(ids);
-  }, [resourcePrograms]);
+    if (!resource?.programIds?.length) {
+      setResourcePrograms([]);
+      return;
+    }
+
+    const programIds = new Set(resource.programIds);
+    setResourcePrograms(
+      allPrograms.filter((program) => programIds.has(program.id)),
+    );
+  }, [allPrograms, resource]);
 
   // Eliminar recurso
   const handleDelete = async () => {
@@ -109,73 +115,10 @@ export default function RecursoDetailPage() {
 
     try {
       await httpClient.delete(`resources/${resource.id}`);
-      router.push("/recursos");
-    } catch (err: any) {
+      router.push(`/${locale}/recursos`);
+    } catch (err) {
       console.error("Error al eliminar recurso:", err);
       alert(t("delete_error"));
-    }
-  };
-
-  // Iniciar modo edición de programas
-  const handleStartEditPrograms = () => {
-    setProgramFilter("");
-  };
-
-  // Cancelar edición de programas
-  const handleCancelEditPrograms = () => {
-    // Restaurar selección original
-    const ids = new Set(resourcePrograms.map((p) => p.id));
-    setSelectedProgramIds(ids);
-    setProgramFilter("");
-  };
-
-  // Toggle selección de programa
-  const handleToggleProgram = (programId: string) => {
-    const newSelection = new Set(selectedProgramIds);
-    if (newSelection.has(programId)) {
-      newSelection.delete(programId);
-    } else {
-      newSelection.add(programId);
-    }
-    setSelectedProgramIds(newSelection);
-  };
-
-  // Guardar cambios en programas
-  const handleSavePrograms = async () => {
-    try {
-      const currentIds = new Set(resourcePrograms.map((p) => p.id));
-      const toAdd = Array.from(selectedProgramIds).filter(
-        (id) => !currentIds.has(id),
-      );
-      const toRemove = Array.from(currentIds).filter(
-        (id) => !selectedProgramIds.has(id),
-      );
-
-      // Agregar nuevos programas
-      for (const programId of toAdd) {
-        await httpClient.post("program-resources", {
-          programId,
-          resourceId: resourceId,
-          priority: 3,
-        });
-      }
-
-      // Quitar programas
-      for (const programId of toRemove) {
-        await httpClient.delete(
-          `program-resources?programId=${programId}&resourceId=${resourceId}`,
-        );
-      }
-
-      // Actualizar lista de programas del recurso
-      const newResourcePrograms = allPrograms.filter((p) =>
-        selectedProgramIds.has(p.id),
-      );
-      setResourcePrograms(newResourcePrograms);
-      setProgramFilter("");
-    } catch (err: any) {
-      console.error("Error al guardar programas:", err);
-      alert(t("save_programs_error"));
     }
   };
 
@@ -222,7 +165,7 @@ export default function RecursoDetailPage() {
               if (selectedDate && resource) {
                 const dateStr = selectedDate.toISOString().split("T")[0];
                 router.push(
-                  `/calendario?date=${dateStr}&resourceId=${resource.id}`,
+                  `/${locale}/calendario?date=${dateStr}&resourceId=${resource.id}`,
                 );
               }
             }}
@@ -249,7 +192,10 @@ export default function RecursoDetailPage() {
       <MainLayout header={header} sidebar={sidebar}>
         <div className="max-w-2xl mx-auto mt-12">
           <Alert variant="error">{error || t("not_found")}</Alert>
-          <Button className="mt-4" onClick={() => router.push("/recursos")}>
+          <Button
+            className="mt-4"
+            onClick={() => router.push(`/${locale}/recursos`)}
+          >
             {t("back_list")}
           </Button>
         </div>
@@ -291,8 +237,8 @@ export default function RecursoDetailPage() {
           variant: "default",
         }}
         breadcrumbs={[
-          { label: t("breadcrumbs.home"), href: "/dashboard" },
-          { label: t("breadcrumbs.resources"), href: "/recursos" },
+          { label: t("breadcrumbs.home"), href: `/${locale}/dashboard` },
+          { label: t("breadcrumbs.resources"), href: `/${locale}/recursos` },
           { label: resource.name },
         ]}
         tabs={[
@@ -713,7 +659,7 @@ export default function RecursoDetailPage() {
                             variant="outline"
                             size="sm"
                             onClick={() =>
-                              router.push(`/programas/${program.id}`)
+                              router.push(`/${locale}/programas/${program.id}`)
                             }
                           >
                             {t("view_detail")}
@@ -729,8 +675,8 @@ export default function RecursoDetailPage() {
           },
         ]}
         sidebar={sidebarContent}
-        onBack={() => router.push("/recursos")}
-        onEdit={() => router.push(`/recursos/${resource.id}/editar`)}
+        onBack={() => router.push(`/${locale}/recursos`)}
+        onEdit={() => router.push(`/${locale}/recursos/${resource.id}/editar`)}
         onDelete={() => setShowDeleteModal(true)}
       />
     </MainLayout>

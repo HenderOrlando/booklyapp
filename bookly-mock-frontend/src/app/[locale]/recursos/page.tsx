@@ -18,7 +18,7 @@ import { categoryKeys, useDeleteResource } from "@/hooks/mutations";
 import { resourceKeys } from "@/hooks/useResources";
 import { useRouter } from "@/i18n/navigation";
 import { httpClient } from "@/infrastructure/http";
-import type { Resource } from "@/types/entities/resource";
+import type { Category, Resource } from "@/types/entities/resource";
 import { useQuery } from "@tanstack/react-query";
 import { useTranslations } from "next-intl";
 import * as React from "react";
@@ -27,6 +27,52 @@ import {
   ResourceStatsCards,
   ResourcesTable,
 } from "./components";
+
+interface ResourceCollectionPayload {
+  resources?: Resource[];
+  items?: Resource[];
+}
+
+interface CategoryCollectionPayload {
+  categories?: Category[];
+  items?: Category[];
+}
+
+function extractResources(
+  data: ResourceCollectionPayload | Resource[] | undefined,
+): Resource[] {
+  if (Array.isArray(data)) {
+    return data;
+  }
+
+  if (data?.resources && Array.isArray(data.resources)) {
+    return data.resources;
+  }
+
+  if (data?.items && Array.isArray(data.items)) {
+    return data.items;
+  }
+
+  return [];
+}
+
+function extractCategories(
+  data: CategoryCollectionPayload | Category[] | undefined,
+): Category[] {
+  if (Array.isArray(data)) {
+    return data;
+  }
+
+  if (data?.categories && Array.isArray(data.categories)) {
+    return data.categories;
+  }
+
+  if (data?.items && Array.isArray(data.items)) {
+    return data.items;
+  }
+
+  return [];
+}
 
 /**
  * Página de Recursos - Bookly
@@ -46,21 +92,11 @@ export default function RecursosPage() {
   const { data: resources = [], isLoading: loading } = useQuery({
     queryKey: resourceKeys.lists(),
     queryFn: async () => {
-      const response = await httpClient.get("resources");
-      console.log("📦 Resources Response:", response);
+      const response = await httpClient.get<
+        ResourceCollectionPayload | Resource[]
+      >("resources");
 
-      // Manejar diferentes estructuras de response
-      if (Array.isArray(response.data)) {
-        return response.data;
-      }
-
-      // Backend de Bookly retorna: { data: { resources: [...], meta: {...} } }
-      if (response.data?.resources) {
-        return response.data.resources;
-      }
-
-      // Fallback para estructura con items
-      return response.data?.items || [];
+      return extractResources(response.data);
     },
     staleTime: 1000 * 60 * 5,
   });
@@ -68,21 +104,11 @@ export default function RecursosPage() {
   const { data: categories = [] } = useQuery({
     queryKey: categoryKeys.lists(),
     queryFn: async () => {
-      const response = await httpClient.get("categories");
-      console.log("🏷️ Categories Response:", response);
+      const response = await httpClient.get<
+        CategoryCollectionPayload | Category[]
+      >("categories");
 
-      // Manejar diferentes estructuras de response
-      if (Array.isArray(response.data)) {
-        return response.data;
-      }
-
-      // Backend de Bookly retorna: { data: { categories: [...], meta: {...} } }
-      if (response.data?.categories) {
-        return response.data.categories;
-      }
-
-      // Fallback para estructura con items
-      return response.data?.items || [];
+      return extractCategories(response.data);
     },
     staleTime: 1000 * 60 * 5,
   });
@@ -115,7 +141,7 @@ export default function RecursosPage() {
 
   const applyAdvancedFilters = (
     resource: Resource,
-    filters: AdvancedSearchFilters
+    filters: AdvancedSearchFilters,
   ): boolean => {
     // Filtro por texto
     if (filters.text) {
@@ -236,7 +262,9 @@ export default function RecursosPage() {
       <MainLayout header={header} sidebar={sidebar}>
         <div className="flex flex-col items-center justify-center min-h-[60vh]">
           <LoadingSpinner size="lg" />
-          <p className="text-[var(--color-text-tertiary)] mt-4">{t("loading")}</p>
+          <p className="text-[var(--color-text-tertiary)] mt-4">
+            {t("loading")}
+          </p>
         </div>
       </MainLayout>
     );
@@ -281,7 +309,7 @@ export default function RecursosPage() {
                 size="sm"
                 onClick={() => setUseVirtualScrolling(!useVirtualScrolling)}
               >
-                {useVirtualScrolling ? t("view_table") : t("view_virtual")}
+                {useVirtualScrolling ? t("view_table") : t("view_list")}
               </Button>
             </div>
 
