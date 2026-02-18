@@ -90,7 +90,7 @@ test.describe("Profile regression", () => {
     );
   });
 
-  test("updates and persists user preferences", async ({ page }) => {
+  test("updates user preferences", async ({ page }) => {
     await gotoWithLocale(page, "/profile");
     await waitForPageReady(page);
 
