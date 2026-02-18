@@ -188,22 +188,22 @@ function extractCharacteristicOptions(
       ? data.items
       : [];
 
-  const normalized = rawItems
-    .map((item) => {
-      const id = String(item.id ?? item._id ?? "").trim();
-      const name = normalizeCharacteristicName(String(item.name ?? ""));
+  const normalized: ResourceCharacteristicOption[] = [];
 
-      if (!id || !name) {
-        return null;
-      }
+  rawItems.forEach((item) => {
+    const id = String(item.id ?? item._id ?? "").trim();
+    const name = normalizeCharacteristicName(String(item.name ?? ""));
 
-      return {
-        ...item,
-        id,
-        name,
-      };
-    })
-    .filter((item): item is ResourceCharacteristicOption => Boolean(item));
+    if (!id || !name) {
+      return;
+    }
+
+    normalized.push({
+      ...item,
+      id,
+      name,
+    });
+  });
 
   return Array.from(
     new Map(normalized.map((item) => [item.id, item])).values(),
@@ -618,7 +618,7 @@ export default function EditResourcePage() {
     setSelectedCharacteristics((prev) => [
       ...prev,
       {
-        id: String(characteristic.id),
+        id: characteristic.id ? String(characteristic.id) : undefined,
         name: normalizedName,
         normalizedName: normalizedKey,
         isNew: false,

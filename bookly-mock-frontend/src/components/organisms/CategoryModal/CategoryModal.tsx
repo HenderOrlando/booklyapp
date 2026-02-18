@@ -125,7 +125,6 @@ export function CategoryModal({
     if (!validate()) return;
 
     onSave(formData);
-    onClose();
   };
 
   const handleColorSelect = (color: string) => {

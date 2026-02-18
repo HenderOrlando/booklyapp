@@ -30,6 +30,187 @@ interface ProgramCollectionPayload {
   items?: AcademicProgram[];
 }
 
+interface ResourceCharacteristicOption {
+  id?: string;
+  _id?: string;
+  code?: string;
+  name?: string;
+  icon?: string;
+  isActive?: boolean;
+}
+
+interface ResourceCharacteristicsCollectionPayload {
+  items?: ResourceCharacteristicOption[];
+}
+
+const BOOLEAN_ATTRIBUTE_TO_CHARACTERISTIC: Record<string, string> = {
+  hasProjector: "Proyector",
+  hasAirConditioning: "Aire acondicionado",
+  hasWhiteboard: "Tablero/Pizarra",
+  hasComputers: "Computadores",
+};
+
+function normalizeCharacteristicName(value: string): string {
+  return value.trim().replace(/\s+/g, " ");
+}
+
+function toCharacteristicKey(value: string): string {
+  return normalizeCharacteristicName(value).toLowerCase();
+}
+
+function isLikelyCharacteristicIdentifier(value: string): boolean {
+  const normalized = value.trim();
+
+  if (!normalized) {
+    return false;
+  }
+
+  return (
+    /^[a-fA-F0-9]{24}$/.test(normalized) ||
+    /^char[_-][a-zA-Z0-9_-]+$/i.test(normalized)
+  );
+}
+
+function extractCharacteristicOptions(
+  data:
+    | ResourceCharacteristicsCollectionPayload
+    | ResourceCharacteristicOption[]
+    | undefined,
+): ResourceCharacteristicOption[] {
+  const rawItems = Array.isArray(data)
+    ? data
+    : Array.isArray(data?.items)
+      ? data.items
+      : [];
+
+  const normalized: ResourceCharacteristicOption[] = [];
+
+  rawItems.forEach((item) => {
+    const id = String(item.id ?? item._id ?? "").trim();
+    const name = normalizeCharacteristicName(String(item.name ?? ""));
+
+    if (!id || !name) {
+      return;
+    }
+
+    normalized.push({
+      ...item,
+      id,
+      name,
+    });
+  });
+
+  return normalized;
+}
+
+function resolveResourceCharacteristicNames(
+  attributes: Record<string, unknown> | undefined,
+  characteristicsCatalog: ResourceCharacteristicOption[],
+): string[] {
+  if (!attributes) {
+    return [];
+  }
+
+  const catalogById = new Map(
+    characteristicsCatalog
+      .filter((item) => item.id && item.name)
+      .map((item) => [String(item.id), String(item.name)]),
+  );
+
+  const catalogByCode = new Map(
+    characteristicsCatalog
+      .filter((item) => item.code && item.name)
+      .map((item) => [String(item.code).toUpperCase(), String(item.name)]),
+  );
+
+  const catalogByName = new Map(
+    characteristicsCatalog
+      .filter((item) => item.name)
+      .map((item) => [
+        toCharacteristicKey(String(item.name)),
+        String(item.name),
+      ]),
+  );
+
+  const names = new Map<string, string>();
+
+  const addName = (value: string | undefined) => {
+    if (!value) {
+      return;
+    }
+
+    const normalized = normalizeCharacteristicName(value);
+    if (!normalized || isLikelyCharacteristicIdentifier(normalized)) {
+      return;
+    }
+
+    names.set(toCharacteristicKey(normalized), normalized);
+  };
+
+  const rawCharacteristics = Array.isArray(attributes.characteristics)
+    ? attributes.characteristics
+    : [];
+
+  rawCharacteristics.forEach((item) => {
+    const rawId =
+      typeof item === "object" && item !== null
+        ? ((item as { id?: string; _id?: string }).id ??
+          (item as { _id?: string })._id)
+        : typeof item === "string"
+          ? item
+          : undefined;
+    const rawCode =
+      typeof item === "object" && item !== null
+        ? (item as { code?: string }).code
+        : undefined;
+    const rawName =
+      typeof item === "object" && item !== null
+        ? (item as { name?: string }).name
+        : undefined;
+
+    if (rawId && catalogById.has(String(rawId))) {
+      addName(catalogById.get(String(rawId)));
+      return;
+    }
+
+    if (rawCode && catalogByCode.has(String(rawCode).toUpperCase())) {
+      addName(catalogByCode.get(String(rawCode).toUpperCase()));
+      return;
+    }
+
+    if (rawName) {
+      const byName = catalogByName.get(toCharacteristicKey(rawName));
+      addName(byName ?? rawName);
+      return;
+    }
+
+    if (typeof item === "string") {
+      const byId = catalogById.get(item);
+      const byName = catalogByName.get(toCharacteristicKey(item));
+      addName(byId ?? byName ?? item);
+    }
+  });
+
+  const rawFeatures = Array.isArray(attributes.features)
+    ? attributes.features
+    : [];
+  rawFeatures.forEach((feature) => {
+    if (typeof feature === "string") {
+      addName(feature);
+    }
+  });
+
+  Object.entries(BOOLEAN_ATTRIBUTE_TO_CHARACTERISTIC).forEach(
+    ([attribute, name]) => {
+      if (attributes[attribute] === true) {
+        addName(name);
+      }
+    },
+  );
+
+  return Array.from(names.values()).sort((a, b) => a.localeCompare(b, "es"));
+}
+
 function extractPrograms(
   data: ProgramCollectionPayload | AcademicProgram[] | undefined,
 ): AcademicProgram[] {
@@ -74,6 +255,9 @@ export default function RecursoDetailPage() {
   const [resourcePrograms, setResourcePrograms] = React.useState<
     AcademicProgram[]
   >([]);
+  const [characteristicsCatalog, setCharacteristicsCatalog] = React.useState<
+    ResourceCharacteristicOption[]
+  >([]);
 
   // Cargar programas académicos
   React.useEffect(() => {
@@ -96,6 +280,29 @@ export default function RecursoDetailPage() {
     }
   }, [resourceId]);
 
+  React.useEffect(() => {
+    const fetchCharacteristicsCatalog = async () => {
+      try {
+        const characteristicsResponse = await httpClient.get<
+          | ResourceCharacteristicsCollectionPayload
+          | ResourceCharacteristicOption[]
+        >("resources/characteristics");
+
+        if (characteristicsResponse.success) {
+          setCharacteristicsCatalog(
+            extractCharacteristicOptions(characteristicsResponse.data),
+          );
+        }
+      } catch (err) {
+        console.error("Error al cargar características de recursos:", err);
+      }
+    };
+
+    if (resourceId) {
+      fetchCharacteristicsCatalog();
+    }
+  }, [resourceId]);
+
   // Calcular programas asociados al recurso a partir de resource.programIds
   React.useEffect(() => {
     if (!resource?.programIds?.length) {
@@ -108,6 +315,16 @@ export default function RecursoDetailPage() {
       allPrograms.filter((program) => programIds.has(program.id)),
     );
   }, [allPrograms, resource]);
+
+  const resourceCharacteristicNames = React.useMemo(
+    () =>
+      resolveResourceCharacteristicNames(
+        (resource?.attributes as Record<string, unknown> | undefined) ??
+          undefined,
+        characteristicsCatalog,
+      ),
+    [characteristicsCatalog, resource],
+  );
 
   // Eliminar recurso
   const handleDelete = async () => {
@@ -384,65 +601,25 @@ export default function RecursoDetailPage() {
                   <CardDescription>{t("features_desc")}</CardDescription>
                 </CardHeader>
                 <CardContent>
-                  <div className="grid gap-4 md:grid-cols-2">
-                    {[
-                      { key: "hasProjector", label: "Proyector", icon: "📽️" },
-                      {
-                        key: "hasAirConditioning",
-                        label: "Aire Acondicionado",
-                        icon: "❄️",
-                      },
-                      {
-                        key: "hasWhiteboard",
-                        label: "Tablero/Pizarra",
-                        icon: "📝",
-                      },
-                      {
-                        key: "hasComputers",
-                        label: "Computadores",
-                        icon: "💻",
-                      },
-                    ].map((attr) => {
-                      const hasAttribute =
-                        resource.attributes?.[
-                          attr.key as keyof typeof resource.attributes
-                        ];
-                      return (
+                  {resourceCharacteristicNames.length === 0 ? (
+                    <p className="text-center text-[var(--color-text-secondary)] py-8">
+                      {t("no_features")}
+                    </p>
+                  ) : (
+                    <div className="grid gap-3 md:grid-cols-2">
+                      {resourceCharacteristicNames.map((name) => (
                         <div
-                          key={attr.key}
-                          className={`flex items-center gap-3 p-4 rounded-lg border ${
-                            hasAttribute
-                              ? "border-green-500/50 bg-state-success-500/10"
-                              : "border-[var(--color-border-subtle)] bg-[var(--color-bg-primary)]/50"
-                          }`}
+                          key={name}
+                          className="flex items-center justify-between rounded-lg border border-[var(--color-border-subtle)] bg-state-success-500/10 p-4"
                         >
-                          <span className="text-2xl">{attr.icon}</span>
-                          <div className="flex-1">
-                            <p className="font-medium text-[var(--color-text-primary)]">
-                              {attr.label}
-                            </p>
-                            <p className="text-xs text-[var(--color-text-secondary)]">
-                              {hasAttribute
-                                ? t("available")
-                                : t("not_available")}
-                            </p>
-                          </div>
-                          {hasAttribute ? (
-                            <Badge variant="success">✓</Badge>
-                          ) : (
-                            <Badge variant="secondary">—</Badge>
-                          )}
+                          <p className="font-medium text-[var(--color-text-primary)]">
+                            {name}
+                          </p>
+                          <Badge variant="success">✓</Badge>
                         </div>
-                      );
-                    })}
-                  </div>
-
-                  {resource.attributes &&
-                    Object.keys(resource.attributes).length === 0 && (
-                      <p className="text-center text-[var(--color-text-secondary)] py-8">
-                        {t("no_features")}
-                      </p>
-                    )}
+                      ))}
+                    </div>
+                  )}
                 </CardContent>
               </Card>
             ),

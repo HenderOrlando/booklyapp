@@ -29,12 +29,12 @@ import {
   useCreateCategory,
   useDeleteCategory,
   useUpdateCategory,
+  type CreateCategoryDto,
+  type UpdateCategoryDto,
 } from "@/hooks/mutations";
 import { httpClient } from "@/infrastructure/http";
 import { Category } from "@/types/entities/resource";
 import { useQuery } from "@tanstack/react-query";
-import { useTranslations } from "next-intl";
-import { useRouter } from "next/navigation";
 import * as React from "react";
 
 type CategoryMutationApiResponse = {
@@ -56,15 +56,8 @@ type CategoryMutationApiResponse = {
  */
 
 export default function CategoriasPage() {
-  const t = useTranslations("categories");
-  const router = useRouter();
-
   // React Query para cargar categorías
-  const {
-    data: categories = [],
-    isLoading: loading,
-    refetch,
-  } = useQuery({
+  const { data: categories = [], isLoading: loading } = useQuery({
     queryKey: categoryKeys.lists(),
     queryFn: async () => {
       const response = await httpClient.get<{ categories: Category[] }>(
@@ -148,26 +141,39 @@ export default function CategoriasPage() {
   const handleSave = async (categoryData: Partial<Category>) => {
     if (modalMode === "create") {
       try {
-        const response = await createCategory.mutateAsync(categoryData as any);
+        const createPayload: CreateCategoryDto = {
+          name: categoryData.name || "",
+          description: categoryData.description,
+          color: categoryData.color,
+          icon: categoryData.icon,
+        };
+        const response = await createCategory.mutateAsync(createPayload);
         if (hasImmediatePersistence(response)) {
           setShowModal(false);
         }
-      } catch (err) {
+      } catch (err: unknown) {
         console.error("Error al crear categoría:", err);
       }
     } else {
       if (!selectedCategory) return;
 
       try {
+        const updatePayload: UpdateCategoryDto = {
+          name: categoryData.name,
+          description: categoryData.description,
+          color: categoryData.color,
+          icon: categoryData.icon,
+          isActive: categoryData.isActive,
+        };
         const response = await updateCategory.mutateAsync({
           id: selectedCategory.id,
-          data: categoryData as any,
+          data: updatePayload,
         });
 
         if (hasImmediatePersistence(response)) {
           setShowModal(false);
         }
-      } catch (err) {
+      } catch (err: unknown) {
         console.error("Error al actualizar categoría:", err);
       }
     }
@@ -191,13 +197,14 @@ export default function CategoriasPage() {
 
   // Alternar estado con React Query
   const handleToggleStatus = (category: Category) => {
+    const updatePayload: UpdateCategoryDto = { isActive: !category.isActive };
     updateCategory.mutate(
       {
         id: category.id,
-        data: { isActive: !category.isActive } as any,
+        data: updatePayload,
       },
       {
-        onError: (err) => {
+        onError: (err: unknown) => {
           console.error("Error al cambiar estado:", err);
           alert("Error al cambiar el estado de la categoría");
         },

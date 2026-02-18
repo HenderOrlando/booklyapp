@@ -43,6 +43,7 @@ import { mockReservations } from "./data/reservations-service.mock";
 import type {
   ProgramResourceAssociation,
   ProgramUserAssociation,
+  ResourceCharacteristic,
   User as ResourceUser,
 } from "./data/resources-service.mock";
 import {
@@ -51,6 +52,7 @@ import {
   mockMaintenances,
   mockProgramResourceAssociations,
   mockProgramUserAssociations,
+  mockResourceCharacteristics,
   mockResources,
   mockUsers as mockResourceUsers,
 } from "./data/resources-service.mock";
@@ -112,10 +114,20 @@ interface ApprovalActionInput {
   reason?: string;
 }
 
+const BOOLEAN_ATTRIBUTE_TO_CHARACTERISTIC: Record<string, string> = {
+  hasProjector: "Proyector",
+  hasAirConditioning: "Aire acondicionado",
+  hasWhiteboard: "Tablero/Pizarra",
+  hasComputers: "Computadores",
+};
+
 export class MockService {
   // Copias mutables de los datos mock
   private static resourcesData: Resource[] = [...mockResources];
   private static categoriesData: Category[] = [...mockCategories];
+  private static resourceCharacteristicsData: ResourceCharacteristic[] = [
+    ...mockResourceCharacteristics,
+  ];
   private static maintenancesData: Maintenance[] = [...mockMaintenances];
   private static academicProgramsData: AcademicProgram[] = [
     ...mockAcademicPrograms,
@@ -243,6 +255,31 @@ export class MockService {
     // ============================================
     // RESOURCES SERVICE ENDPOINTS
     // ============================================
+
+    if (endpoint.includes("/resources/characteristics") && method === "GET") {
+      const queryString = endpoint.split("?")[1] || "";
+      const params = new URLSearchParams(queryString);
+      const active = params.get("active");
+      const onlyActive = active === null ? true : active === "true";
+
+      return this.castResponse<T>(
+        this.mockGetResourceCharacteristics(onlyActive),
+      );
+    }
+
+    if (endpoint.includes("/reference-data") && method === "GET") {
+      const queryString = endpoint.split("?")[1] || "";
+      const params = new URLSearchParams(queryString);
+      const group = params.get("group");
+      const active = params.get("active");
+
+      if (group === "resource_characteristic") {
+        const onlyActive = active === null ? true : active === "true";
+        return this.castResponse<T>(
+          this.mockGetResourceCharacteristics(onlyActive),
+        );
+      }
+    }
 
     if (endpoint.includes("/resources") && method === "GET") {
       // Verificar si es un ID específico
@@ -1082,6 +1119,217 @@ export class MockService {
   // RESOURCES SERVICE ENDPOINTS
   // ============================================
 
+  private static normalizeCharacteristicName(value: string): string {
+    return value.trim().replace(/\s+/g, " ");
+  }
+
+  private static toCharacteristicCode(value: string): string {
+    return this.normalizeCharacteristicName(value)
+      .normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, "")
+      .replace(/[^a-zA-Z0-9]+/g, "_")
+      .replace(/^_+|_+$/g, "")
+      .toUpperCase();
+  }
+
+  private static isLikelyCharacteristicId(value: string): boolean {
+    const normalized = value.trim();
+
+    if (!normalized) {
+      return false;
+    }
+
+    return (
+      /^[a-fA-F0-9]{24}$/.test(normalized) ||
+      /^char[_-][a-zA-Z0-9_-]+$/i.test(normalized)
+    );
+  }
+
+  private static getNextCharacteristicId(): string {
+    const maxCurrent = this.resourceCharacteristicsData.reduce((max, item) => {
+      const numeric = Number.parseInt(item.id.replace(/^char[_-]/i, ""), 10);
+      if (Number.isFinite(numeric)) {
+        return Math.max(max, numeric);
+      }
+      return max;
+    }, 0);
+
+    return `char_${String(maxCurrent + 1).padStart(3, "0")}`;
+  }
+
+  private static createResourceCharacteristic(
+    name: string,
+  ): ResourceCharacteristic {
+    const normalizedName = this.normalizeCharacteristicName(name);
+    const created: ResourceCharacteristic = {
+      id: this.getNextCharacteristicId(),
+      code: this.toCharacteristicCode(normalizedName),
+      name: normalizedName,
+      isActive: true,
+    };
+
+    this.resourceCharacteristicsData.push(created);
+    return created;
+  }
+
+  private static resolveCharacteristicInput(
+    input: unknown,
+  ): ResourceCharacteristic | null {
+    const findById = (id: string) =>
+      this.resourceCharacteristicsData.find(
+        (item) => String(item.id) === String(id),
+      );
+
+    const findByCode = (code: string) =>
+      this.resourceCharacteristicsData.find(
+        (item) => String(item.code).toUpperCase() === code.toUpperCase(),
+      );
+
+    const findByName = (name: string) => {
+      const normalizedName =
+        this.normalizeCharacteristicName(name).toLowerCase();
+      return this.resourceCharacteristicsData.find(
+        (item) =>
+          this.normalizeCharacteristicName(item.name).toLowerCase() ===
+          normalizedName,
+      );
+    };
+
+    if (typeof input === "string") {
+      const trimmed = input.trim();
+      if (!trimmed) {
+        return null;
+      }
+
+      const byId = findById(trimmed);
+      if (byId) {
+        return byId;
+      }
+
+      const byCode = findByCode(this.toCharacteristicCode(trimmed));
+      if (byCode) {
+        return byCode;
+      }
+
+      const byName = findByName(trimmed);
+      if (byName) {
+        return byName;
+      }
+
+      if (this.isLikelyCharacteristicId(trimmed)) {
+        return null;
+      }
+
+      return this.createResourceCharacteristic(trimmed);
+    }
+
+    if (typeof input === "object" && input !== null) {
+      const candidate = input as {
+        id?: string;
+        _id?: string;
+        code?: string;
+        name?: string;
+      };
+
+      if (candidate.id || candidate._id) {
+        const byId = findById(String(candidate.id ?? candidate._id));
+        if (byId) {
+          return byId;
+        }
+      }
+
+      if (candidate.code) {
+        const byCode = findByCode(String(candidate.code));
+        if (byCode) {
+          return byCode;
+        }
+      }
+
+      if (candidate.name) {
+        const byName = findByName(candidate.name);
+        if (byName) {
+          return byName;
+        }
+
+        return this.createResourceCharacteristic(candidate.name);
+      }
+    }
+
+    return null;
+  }
+
+  private static normalizeResourceAttributes(
+    attributes: Record<string, unknown> | undefined,
+  ): Record<string, unknown> | undefined {
+    if (!attributes) {
+      return attributes;
+    }
+
+    const rawCharacteristics = Array.isArray(attributes.characteristics)
+      ? attributes.characteristics
+      : [];
+    const rawFeatures = Array.isArray(attributes.features)
+      ? attributes.features
+      : [];
+
+    const source =
+      rawCharacteristics.length > 0
+        ? rawCharacteristics
+        : rawFeatures.filter(
+            (item): item is string => typeof item === "string",
+          );
+
+    if (source.length === 0) {
+      return attributes;
+    }
+
+    const resolved = source
+      .map((item) => this.resolveCharacteristicInput(item))
+      .filter((item): item is ResourceCharacteristic => Boolean(item));
+
+    const uniqueResolved = Array.from(
+      new Map(resolved.map((item) => [item.id, item])).values(),
+    );
+
+    const names = uniqueResolved.map((item) => item.name);
+    const normalizedNameSet = new Set(
+      names.map((item) => this.normalizeCharacteristicName(item).toLowerCase()),
+    );
+
+    const normalizedAttributes: Record<string, unknown> = {
+      ...attributes,
+      characteristics: uniqueResolved.map((item) => item.id),
+      features: names,
+    };
+
+    Object.entries(BOOLEAN_ATTRIBUTE_TO_CHARACTERISTIC).forEach(
+      ([attribute, characteristicName]) => {
+        normalizedAttributes[attribute] = normalizedNameSet.has(
+          this.normalizeCharacteristicName(characteristicName).toLowerCase(),
+        );
+      },
+    );
+
+    return normalizedAttributes;
+  }
+
+  private static mockGetResourceCharacteristics(
+    onlyActive: boolean,
+  ): ApiResponse<unknown> {
+    const items = onlyActive
+      ? this.resourceCharacteristicsData.filter((item) => item.isActive)
+      : this.resourceCharacteristicsData;
+
+    return {
+      success: true,
+      data: {
+        items,
+      },
+      message: "Resource characteristics retrieved successfully",
+      timestamp: new Date().toISOString(),
+    };
+  }
+
   private static mockGetResources(
     page: number = 1,
     limit: number = 20,
@@ -1154,9 +1402,14 @@ export class MockService {
   private static mockCreateResource(
     data: CreateResourceDto,
   ): ApiResponse<unknown> {
+    const normalizedAttributes = this.normalizeResourceAttributes(
+      data.attributes as Record<string, unknown> | undefined,
+    );
+
     const newResource = {
       id: `res_${Date.now()}`,
       ...data,
+      attributes: normalizedAttributes ?? data.attributes,
       status: "AVAILABLE",
       isActive: true,
       createdAt: new Date().toISOString(),
@@ -1196,9 +1449,17 @@ export class MockService {
       };
     }
 
+    const normalizedAttributes = this.normalizeResourceAttributes(
+      data.attributes as Record<string, unknown> | undefined,
+    );
+
     this.resourcesData[index] = {
       ...this.resourcesData[index],
       ...data,
+      attributes:
+        normalizedAttributes ??
+        data.attributes ??
+        this.resourcesData[index].attributes,
       updatedAt: new Date().toISOString(),
     };
 
