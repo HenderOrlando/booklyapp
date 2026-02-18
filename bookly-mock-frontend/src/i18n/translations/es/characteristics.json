@@ -31,5 +31,12 @@
   "delete_confirm": {
     "title": "Eliminar Característica",
     "description": "¿Estás seguro? Esta acción desactivará la característica del catálogo."
+  },
+  "filter": {
+    "all": "Todas",
+    "active": "Activas",
+    "inactive": "Inactivas",
+    "search_label": "Búsqueda",
+    "status_label": "Estado"
   }
 }

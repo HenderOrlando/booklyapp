@@ -11,6 +11,7 @@ const protectedRoutes = [
   "/profile",
   "/recursos",
   "/categorias",
+  "/caracteristicas",
   "/mantenimientos",
   "/programas",
   "/reservas",

@@ -54,6 +54,8 @@ export default function CaracteristicasPage() {
   const updateCharacteristic = useUpdateCharacteristic();
   const deleteCharacteristic = useDeleteCharacteristic();
   const t = useTranslations("characteristics");
+  const tCommon = useTranslations("common");
+  const tNav = useTranslations("navigation");
 
   const [filter, setFilter] = React.useState("");
   const [statusFilter, setStatusFilter] = React.useState<
@@ -168,7 +170,7 @@ export default function CaracteristicasPage() {
       cell: (char: Characteristic) => (
         <div className="flex gap-2">
           <Button variant="outline" size="sm" onClick={() => handleEdit(char)}>
-            {t("common.edit", { defaultValue: "Editar" })}
+            {tCommon("edit")}
           </Button>
           <Button
             variant="outline"
@@ -178,7 +180,7 @@ export default function CaracteristicasPage() {
               setShowDeleteModal(true);
             }}
           >
-            {t("common.delete", { defaultValue: "Eliminar" })}
+            {tCommon("delete")}
           </Button>
         </div>
       ),
@@ -316,7 +318,7 @@ export default function CaracteristicasPage() {
           onConfirm={handleDelete}
           title={t("delete_confirm.title")}
           description={t("delete_confirm.description")}
-          confirmText={t("common.delete", { defaultValue: "Eliminar" })}
+          confirmText={tCommon("delete")}
           variant="destructive"
         />
       </div>

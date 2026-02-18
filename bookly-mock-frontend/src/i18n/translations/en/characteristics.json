@@ -31,5 +31,12 @@
   "delete_confirm": {
     "title": "Delete Characteristic",
     "description": "Are you sure? This action will deactivate the characteristic from the catalog."
+  },
+  "filter": {
+    "all": "All",
+    "active": "Active",
+    "inactive": "Inactive",
+    "search_label": "Search",
+    "status_label": "Status"
   }
 }

@@ -26,6 +26,12 @@ const namespaces = [
   "reports",
   "programs",
   "resource_detail",
+  "characteristics",
+  "categories",
+  "maintenance",
+  "check_in",
+  "vigilance",
+  "waitlist",
 ];
 
 export default getRequestConfig(async ({ requestLocale }) => {
