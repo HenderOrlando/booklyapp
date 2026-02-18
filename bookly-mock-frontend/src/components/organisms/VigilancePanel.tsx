@@ -144,7 +144,7 @@ export const VigilancePanel = React.memo<VigilancePanelProps>(
           key={reservation.reservationId}
           className={`${
             isOverdue
-              ? "border-red-300 dark:border-red-800 bg-red-50 dark:bg-red-900/10"
+              ? "border-[var(--color-state-error-border)] bg-[var(--color-state-error-bg)]"
               : ""
           }`}
         >
@@ -204,7 +204,7 @@ export const VigilancePanel = React.memo<VigilancePanelProps>(
                   </span>
                 </div>
                 {isActive && (
-                  <span className="text-xs text-green-600 dark:text-green-400">
+                  <span className="text-xs text-[var(--color-state-success-text)]">
                     • En curso
                   </span>
                 )}
@@ -212,7 +212,7 @@ export const VigilancePanel = React.memo<VigilancePanelProps>(
 
               {/* Alerta de retraso */}
               {isOverdue && (
-                <div className="flex items-start gap-2 p-2 rounded-md bg-red-100 dark:bg-red-900/20 text-red-800 dark:text-red-200 text-sm">
+                <div className="flex items-start gap-2 p-2 rounded-md bg-[var(--color-state-error-bg)] text-[var(--color-state-error-text)] text-sm">
                   <AlertCircle className="h-4 w-4 flex-shrink-0 mt-0.5" />
                   <div>
                     <p className="font-medium">
@@ -238,7 +238,7 @@ export const VigilancePanel = React.memo<VigilancePanelProps>(
                 {onContact && (
                   <button
                     onClick={() => onContact(reservation.reservationId)}
-                    className="flex-1 flex items-center justify-center gap-2 px-3 py-2 text-sm font-medium text-[var(--color-primary-base)] border border-[var(--color-primary-base)] rounded-lg hover:bg-[var(--color-primary-base)] hover:text-foreground transition-colors"
+                    className="flex-1 flex items-center justify-center gap-2 px-3 py-2 text-sm font-medium text-[var(--color-action-primary)] border border-[var(--color-action-primary)] rounded-lg hover:bg-[var(--color-action-primary)] hover:text-[var(--color-text-inverse)] transition-colors"
                   >
                     <Phone className="h-4 w-4" />
                     Contactar
@@ -258,14 +258,14 @@ export const VigilancePanel = React.memo<VigilancePanelProps>(
       return (
         <Card
           key={alert.id}
-          className="border-orange-300 dark:border-orange-800"
+          className="border-[var(--color-state-warning-border)]"
         >
           <CardContent className="p-4">
             <div className="space-y-3">
               <div className="flex items-start justify-between">
                 <div className="flex items-start gap-3 flex-1">
-                  <div className="p-2 bg-orange-100 dark:bg-orange-900/20 rounded-lg">
-                    <Icon className="h-5 w-5 text-orange-600 dark:text-orange-400" />
+                  <div className="p-2 bg-[var(--color-state-warning-bg)] rounded-lg">
+                    <Icon className="h-5 w-5 text-[var(--color-state-warning-text)]" />
                   </div>
                   <div className="flex-1">
                     <div className="flex items-center gap-2">
@@ -304,7 +304,7 @@ export const VigilancePanel = React.memo<VigilancePanelProps>(
               {!alert.isResolved && onResolveAlert && (
                 <button
                   onClick={() => onResolveAlert(alert.id)}
-                  className="w-full px-3 py-2 text-sm font-medium text-foreground bg-green-600 dark:bg-green-700 rounded-lg hover:bg-green-700 dark:hover:bg-green-600 transition-colors"
+                  className="w-full px-3 py-2 text-sm font-medium text-[var(--color-text-inverse)] bg-[var(--color-action-secondary)] rounded-lg hover:bg-[var(--color-action-secondary-hover)] transition-colors"
                 >
                   Marcar como Resuelta
                 </button>
@@ -321,8 +321,8 @@ export const VigilancePanel = React.memo<VigilancePanelProps>(
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <Card>
             <CardContent className="p-4 flex items-center gap-3">
-              <div className="p-3 bg-green-100 dark:bg-green-900/20 rounded-lg">
-                <CheckCircle className="h-6 w-6 text-green-600 dark:text-green-400" />
+              <div className="p-3 bg-[var(--color-state-success-bg)] rounded-lg">
+                <CheckCircle className="h-6 w-6 text-[var(--color-state-success-text)]" />
               </div>
               <div>
                 <p className="text-sm text-[var(--color-text-secondary)] dark:text-[var(--color-text-tertiary)]">
@@ -337,8 +337,8 @@ export const VigilancePanel = React.memo<VigilancePanelProps>(
 
           <Card>
             <CardContent className="p-4 flex items-center gap-3">
-              <div className="p-3 bg-red-100 dark:bg-red-900/20 rounded-lg">
-                <XCircle className="h-6 w-6 text-red-600 dark:text-red-400" />
+              <div className="p-3 bg-[var(--color-state-error-bg)] rounded-lg">
+                <XCircle className="h-6 w-6 text-[var(--color-state-error-text)]" />
               </div>
               <div>
                 <p className="text-sm text-[var(--color-text-secondary)] dark:text-[var(--color-text-tertiary)]">
@@ -353,8 +353,8 @@ export const VigilancePanel = React.memo<VigilancePanelProps>(
 
           <Card>
             <CardContent className="p-4 flex items-center gap-3">
-              <div className="p-3 bg-orange-100 dark:bg-orange-900/20 rounded-lg">
-                <Bell className="h-6 w-6 text-orange-600 dark:text-orange-400" />
+              <div className="p-3 bg-[var(--color-state-warning-bg)] rounded-lg">
+                <Bell className="h-6 w-6 text-[var(--color-state-warning-text)]" />
               </div>
               <div>
                 <p className="text-sm text-[var(--color-text-secondary)] dark:text-[var(--color-text-tertiary)]">
@@ -374,7 +374,7 @@ export const VigilancePanel = React.memo<VigilancePanelProps>(
             onClick={() => setSelectedTab("active")}
             className={`px-4 py-2 font-medium text-sm transition-colors ${
               selectedTab === "active"
-                ? "text-[var(--color-primary-base)] border-b-2 border-[var(--color-primary-base)]"
+                ? "text-[var(--color-action-primary)] border-b-2 border-[var(--color-action-primary)]"
                 : "text-[var(--color-text-secondary)] dark:text-[var(--color-text-tertiary)] hover:text-[var(--color-text-primary)] dark:hover:text-[var(--color-text-inverse)]"
             }`}
           >
@@ -384,7 +384,7 @@ export const VigilancePanel = React.memo<VigilancePanelProps>(
             onClick={() => setSelectedTab("overdue")}
             className={`px-4 py-2 font-medium text-sm transition-colors ${
               selectedTab === "overdue"
-                ? "text-[var(--color-primary-base)] border-b-2 border-[var(--color-primary-base)]"
+                ? "text-[var(--color-action-primary)] border-b-2 border-[var(--color-action-primary)]"
                 : "text-[var(--color-text-secondary)] dark:text-[var(--color-text-tertiary)] hover:text-[var(--color-text-primary)] dark:hover:text-[var(--color-text-inverse)]"
             }`}
           >
@@ -394,7 +394,7 @@ export const VigilancePanel = React.memo<VigilancePanelProps>(
             onClick={() => setSelectedTab("alerts")}
             className={`px-4 py-2 font-medium text-sm transition-colors ${
               selectedTab === "alerts"
-                ? "text-[var(--color-primary-base)] border-b-2 border-[var(--color-primary-base)]"
+                ? "text-[var(--color-action-primary)] border-b-2 border-[var(--color-action-primary)]"
                 : "text-[var(--color-text-secondary)] dark:text-[var(--color-text-tertiary)] hover:text-[var(--color-text-primary)] dark:hover:text-[var(--color-text-inverse)]"
             }`}
           >
@@ -405,7 +405,7 @@ export const VigilancePanel = React.memo<VigilancePanelProps>(
         {/* Contenido */}
         {loading ? (
           <div className="flex items-center justify-center py-12">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[var(--color-primary-base)]" />
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[var(--color-action-primary)]" />
           </div>
         ) : (
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">

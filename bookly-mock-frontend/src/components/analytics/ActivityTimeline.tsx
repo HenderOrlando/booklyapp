@@ -28,24 +28,24 @@ interface ActivityTimelineProps {
 
 const typeStyles = {
   success: {
-    bg: "bg-green-500/20",
-    border: "border-green-500",
-    text: "text-green-400",
+    bg: "bg-[var(--color-state-success-bg)]",
+    border: "border-[var(--color-state-success-border)]",
+    text: "text-[var(--color-state-success-text)]",
   },
   warning: {
-    bg: "bg-yellow-500/20",
-    border: "border-yellow-500",
-    text: "text-yellow-400",
+    bg: "bg-[var(--color-state-warning-bg)]",
+    border: "border-[var(--color-state-warning-border)]",
+    text: "text-[var(--color-state-warning-text)]",
   },
   error: {
-    bg: "bg-red-500/20",
-    border: "border-red-500",
-    text: "text-red-400",
+    bg: "bg-[var(--color-state-error-bg)]",
+    border: "border-[var(--color-state-error-border)]",
+    text: "text-[var(--color-state-error-text)]",
   },
   info: {
-    bg: "bg-blue-500/20",
-    border: "border-blue-500",
-    text: "text-blue-400",
+    bg: "bg-[var(--color-state-info-bg)]",
+    border: "border-[var(--color-state-info-border)]",
+    text: "text-[var(--color-state-info-text)]",
   },
 };
 
@@ -84,7 +84,7 @@ export function ActivityTimeline({
       <CardContent>
         <div className="space-y-4">
           {displayedActivities.length === 0 ? (
-            <p className="text-center text-gray-500 py-8">
+            <p className="text-center text-[var(--color-text-secondary)] py-8">
               No hay actividades recientes
             </p>
           ) : (
@@ -114,12 +114,12 @@ export function ActivityTimeline({
                           {activity.title}
                         </p>
                         {activity.description && (
-                          <p className="text-sm text-gray-400 mt-1">
+                          <p className="text-sm text-[var(--color-text-tertiary)] mt-1">
                             {activity.description}
                           </p>
                         )}
                       </div>
-                      <span className="text-xs text-gray-500 whitespace-nowrap ml-2">
+                      <span className="text-xs text-[var(--color-text-tertiary)] whitespace-nowrap ml-2">
                         {formatTimestamp(activity.timestamp)}
                       </span>
                     </div>

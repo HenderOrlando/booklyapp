@@ -42,7 +42,32 @@ export class AppConfiguration {
   appName: string;
 
   @Prop({ type: String, default: "" })
-  appLogoUrl: string;
+  logoLightUrl: string;
+
+  @Prop({ type: String, default: "" })
+  logoDarkUrl: string;
+
+  @Prop({ type: String, default: "" })
+  faviconUrl: string;
+
+  @Prop({ type: String, default: "America/Bogota" })
+  timezone: string;
+
+  @Prop({
+    type: {
+      enableNotifications: { type: Boolean, default: true },
+      enableRealtime: { type: Boolean, default: true },
+    },
+    _id: false,
+    default: {
+      enableNotifications: true,
+      enableRealtime: true,
+    },
+  })
+  features?: {
+    enableNotifications?: boolean;
+    enableRealtime?: boolean;
+  };
 
   @Prop({ default: false })
   maintenanceMode: boolean;

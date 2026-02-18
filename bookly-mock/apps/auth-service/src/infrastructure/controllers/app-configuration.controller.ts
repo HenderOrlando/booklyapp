@@ -7,6 +7,10 @@ import {
   GetPublicAppConfigQuery,
   GetStorageConfigQuery,
 } from "@auth/application/queries/app-config.queries";
+import {
+  UpdateAppConfigDto,
+  UpdateStorageConfigDto,
+} from "@auth/infrastructure/dto/app-config.dto";
 import { ResponseUtil } from "@libs/common";
 import { CurrentUser, Roles } from "@libs/decorators";
 import { JwtAuthGuard, RolesGuard } from "@libs/guards";
@@ -26,7 +30,7 @@ import {
  * El endpoint /public es accesible sin autenticación.
  */
 @ApiTags("App Configuration")
-@Controller("app-config")
+@Controller(["app-config", "config"])
 export class AppConfigurationController {
   constructor(
     private readonly commandBus: CommandBus,
@@ -81,21 +85,7 @@ export class AppConfigurationController {
   @ApiResponse({ status: 200, description: "Configuración actualizada" })
   @ApiResponse({ status: 403, description: "No tiene permisos" })
   async updateConfig(
-    @Body()
-    dto: {
-      registrationEnabled?: boolean;
-      corporateAuthEnabled?: boolean;
-      allowedDomains?: string[];
-      autoRegisterOnSSO?: boolean;
-      themeMode?: string;
-      primaryColor?: string;
-      secondaryColor?: string;
-      defaultLocale?: string;
-      supportedLocales?: string[];
-      appName?: string;
-      appLogoUrl?: string;
-      maintenanceMode?: boolean;
-    },
+    @Body() dto: UpdateAppConfigDto,
     @CurrentUser("sub") userId: string,
   ) {
     const command = new UpdateAppConfigCommand(userId, dto);
@@ -134,24 +124,7 @@ export class AppConfigurationController {
   })
   @ApiResponse({ status: 200, description: "Storage config actualizada" })
   async updateStorageConfig(
-    @Body()
-    dto: {
-      storageProvider: "local" | "s3" | "gcs";
-      storageS3Config?: {
-        bucket?: string;
-        region?: string;
-        accessKeyId?: string;
-        secretAccessKey?: string;
-        endpoint?: string;
-      };
-      storageGcsConfig?: {
-        bucket?: string;
-        projectId?: string;
-        keyFilePath?: string;
-        clientEmail?: string;
-        privateKey?: string;
-      };
-    },
+    @Body() dto: UpdateStorageConfigDto,
     @CurrentUser("sub") userId: string,
   ) {
     const command = new UpdateStorageConfigCommand(

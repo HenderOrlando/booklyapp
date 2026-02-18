@@ -198,7 +198,7 @@ export const ApprovalModal = React.memo<ApprovalModalProps>(
 
             {/* Alerta de expiración */}
             {isExpiring && request.status === "PENDING" && (
-              <div className="flex items-start gap-2 p-3 rounded-lg bg-yellow-50 dark:bg-yellow-900/20 text-yellow-800 dark:text-yellow-200">
+              <div className="flex items-start gap-2 p-3 rounded-lg bg-[var(--color-state-warning-bg)] text-[var(--color-state-warning-text)]">
                 <AlertCircle className="h-5 w-5 flex-shrink-0 mt-0.5" />
                 <div className="flex-1">
                   <p className="font-medium text-sm">Solicitud por expirar</p>
@@ -219,7 +219,7 @@ export const ApprovalModal = React.memo<ApprovalModalProps>(
                 onClick={() => setActiveTab("details")}
                 className={`px-4 py-2 font-medium text-sm transition-colors ${
                   activeTab === "details"
-                    ? "text-[var(--color-primary-base)] border-b-2 border-[var(--color-primary-base)]"
+                    ? "text-[var(--color-action-primary)] border-b-2 border-[var(--color-action-primary)]"
                     : "text-[var(--color-text-secondary)] dark:text-[var(--color-text-tertiary)] hover:text-[var(--color-text-primary)] dark:hover:text-[var(--color-text-inverse)]"
                 }`}
               >
@@ -229,7 +229,7 @@ export const ApprovalModal = React.memo<ApprovalModalProps>(
                 onClick={() => setActiveTab("timeline")}
                 className={`px-4 py-2 font-medium text-sm transition-colors ${
                   activeTab === "timeline"
-                    ? "text-[var(--color-primary-base)] border-b-2 border-[var(--color-primary-base)]"
+                    ? "text-[var(--color-action-primary)] border-b-2 border-[var(--color-action-primary)]"
                     : "text-[var(--color-text-secondary)] dark:text-[var(--color-text-tertiary)] hover:text-[var(--color-text-primary)] dark:hover:text-[var(--color-text-inverse)]"
                 }`}
               >
@@ -240,7 +240,7 @@ export const ApprovalModal = React.memo<ApprovalModalProps>(
                   onClick={() => setActiveTab("document")}
                   className={`px-4 py-2 font-medium text-sm transition-colors ${
                     activeTab === "document"
-                      ? "text-[var(--color-primary-base)] border-b-2 border-[var(--color-primary-base)]"
+                      ? "text-[var(--color-action-primary)] border-b-2 border-[var(--color-action-primary)]"
                       : "text-[var(--color-text-secondary)] dark:text-[var(--color-text-tertiary)] hover:text-[var(--color-text-primary)] dark:hover:text-[var(--color-text-inverse)]"
                   }`}
                 >
@@ -329,7 +329,7 @@ export const ApprovalModal = React.memo<ApprovalModalProps>(
                           (
                           {Math.round(
                             (endDate.getTime() - startDate.getTime()) /
-                              (1000 * 60)
+                              (1000 * 60),
                           )}{" "}
                           minutos)
                         </span>
@@ -446,11 +446,11 @@ export const ApprovalModal = React.memo<ApprovalModalProps>(
                           </div>
                         )}
                         {request.rejectionReason && (
-                          <div className="p-3 bg-red-50 dark:bg-red-900/20 rounded-lg text-sm">
-                            <span className="font-medium text-red-800 dark:text-red-200">
+                          <div className="p-3 bg-[var(--color-state-error-bg)] rounded-lg text-sm">
+                            <span className="font-medium text-[var(--color-state-error-text)]">
                               Razón de rechazo:
                             </span>
-                            <p className="text-red-700 dark:text-red-300 mt-1">
+                            <p className="text-[var(--color-state-error-text)] mt-1">
                               {request.rejectionReason}
                             </p>
                           </div>
@@ -540,7 +540,7 @@ export const ApprovalModal = React.memo<ApprovalModalProps>(
                     onClick={() => setNotificationMedium("email")}
                     className={`w-full flex items-center gap-3 p-3 rounded-lg border-2 transition-colors ${
                       notificationMedium === "email"
-                        ? "border-[var(--color-primary-base)] bg-[var(--color-primary-base)]/5"
+                        ? "border-[var(--color-action-primary)] bg-[var(--color-state-info-bg)]"
                         : "border-[var(--color-border-subtle)] dark:border-[var(--color-border-strong)] hover:border-[var(--color-border-strong)] dark:hover:border-[var(--color-border-strong)]"
                     }`}
                   >
@@ -552,7 +552,7 @@ export const ApprovalModal = React.memo<ApprovalModalProps>(
                       </p>
                     </div>
                     {notificationMedium === "email" && (
-                      <div className="h-2 w-2 rounded-full bg-[var(--color-primary-base)]" />
+                      <div className="h-2 w-2 rounded-full bg-[var(--color-action-primary)]" />
                     )}
                   </button>
 
@@ -560,7 +560,7 @@ export const ApprovalModal = React.memo<ApprovalModalProps>(
                     onClick={() => setNotificationMedium("sms")}
                     className={`w-full flex items-center gap-3 p-3 rounded-lg border-2 transition-colors ${
                       notificationMedium === "sms"
-                        ? "border-[var(--color-primary-base)] bg-[var(--color-primary-base)]/5"
+                        ? "border-[var(--color-action-primary)] bg-[var(--color-state-info-bg)]"
                         : "border-[var(--color-border-subtle)] dark:border-[var(--color-border-strong)] hover:border-[var(--color-border-strong)] dark:hover:border-[var(--color-border-strong)]"
                     }`}
                   >
@@ -572,7 +572,7 @@ export const ApprovalModal = React.memo<ApprovalModalProps>(
                       </p>
                     </div>
                     {notificationMedium === "sms" && (
-                      <div className="h-2 w-2 rounded-full bg-[var(--color-primary-base)]" />
+                      <div className="h-2 w-2 rounded-full bg-[var(--color-action-primary)]" />
                     )}
                   </button>
 
@@ -580,7 +580,7 @@ export const ApprovalModal = React.memo<ApprovalModalProps>(
                     onClick={() => setNotificationMedium("whatsapp")}
                     className={`w-full flex items-center gap-3 p-3 rounded-lg border-2 transition-colors ${
                       notificationMedium === "whatsapp"
-                        ? "border-[var(--color-primary-base)] bg-[var(--color-primary-base)]/5"
+                        ? "border-[var(--color-action-primary)] bg-[var(--color-state-info-bg)]"
                         : "border-[var(--color-border-subtle)] dark:border-[var(--color-border-strong)] hover:border-[var(--color-border-strong)] dark:hover:border-[var(--color-border-strong)]"
                     }`}
                   >
@@ -592,7 +592,7 @@ export const ApprovalModal = React.memo<ApprovalModalProps>(
                       </p>
                     </div>
                     {notificationMedium === "whatsapp" && (
-                      <div className="h-2 w-2 rounded-full bg-[var(--color-primary-base)]" />
+                      <div className="h-2 w-2 rounded-full bg-[var(--color-action-primary)]" />
                     )}
                   </button>
                 </div>
@@ -610,11 +610,11 @@ export const ApprovalModal = React.memo<ApprovalModalProps>(
               <button
                 onClick={handleSendNotification}
                 disabled={isSharing}
-                className="px-4 py-2 text-sm font-medium text-white bg-[var(--color-primary-base)] hover:bg-[var(--color-primary-dark)] rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+                className="px-4 py-2 text-sm font-medium text-[var(--color-text-inverse)] bg-[var(--color-action-primary)] hover:bg-[var(--color-action-primary-hover)] rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
               >
                 {isSharing ? (
                   <>
-                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white" />
+                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-[var(--color-text-inverse)]" />
                     Enviando...
                   </>
                 ) : (
@@ -626,7 +626,7 @@ export const ApprovalModal = React.memo<ApprovalModalProps>(
         </Dialog>
       </>
     );
-  }
+  },
 );
 
 ApprovalModal.displayName = "ApprovalModal";

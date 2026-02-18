@@ -28,7 +28,7 @@ interface TrendChartProps {
 export function TrendChart({
   title,
   data,
-  color = "#3b82f6",
+  color = "var(--color-action-primary)",
   showGrid = true,
   height = 200,
 }: TrendChartProps) {
@@ -40,6 +40,21 @@ export function TrendChart({
     const canvas = canvasRef.current;
     const ctx = canvas.getContext("2d");
     if (!ctx) return;
+
+    // Helper to resolve CSS variable
+    const getVar = (v: string) => {
+      if (v.startsWith("var(")) {
+        const varName = v.match(/var\(([^)]+)\)/)?.[1];
+        if (varName) {
+          return getComputedStyle(canvas).getPropertyValue(varName).trim();
+        }
+      }
+      return v;
+    };
+
+    const resolvedColor = getVar(color);
+    const gridColor = getVar("var(--color-border-subtle)");
+    const labelColor = getVar("var(--color-text-tertiary)");
 
     // Set canvas size
     const rect = canvas.getBoundingClientRect();
@@ -64,7 +79,7 @@ export function TrendChart({
 
     // Draw grid
     if (showGrid) {
-      ctx.strokeStyle = "#374151";
+      ctx.strokeStyle = gridColor || "#374151";
       ctx.lineWidth = 1;
       ctx.setLineDash([5, 5]);
 
@@ -81,7 +96,7 @@ export function TrendChart({
     }
 
     // Draw line
-    ctx.strokeStyle = color;
+    ctx.strokeStyle = resolvedColor || color;
     ctx.lineWidth = 3;
     ctx.lineCap = "round";
     ctx.lineJoin = "round";
@@ -100,7 +115,7 @@ export function TrendChart({
     ctx.stroke();
 
     // Draw points
-    ctx.fillStyle = color;
+    ctx.fillStyle = resolvedColor || color;
     data.forEach((point, i) => {
       const x = padding + i * xStep;
       const y = chartHeight - padding - (point.value - minValue) * yScale;
@@ -111,7 +126,7 @@ export function TrendChart({
     });
 
     // Draw labels
-    ctx.fillStyle = "#9ca3af";
+    ctx.fillStyle = labelColor || "#9ca3af";
     ctx.font = "12px sans-serif";
     ctx.textAlign = "center";
 

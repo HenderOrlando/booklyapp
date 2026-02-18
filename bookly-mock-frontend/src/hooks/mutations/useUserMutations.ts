@@ -12,8 +12,8 @@ import {
   type ChangePasswordDto,
   type UpdateProfileDto,
 } from "@/infrastructure/api/auth-client";
-import { httpClient } from "@/infrastructure/http/httpClient";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { UserPreferences } from "../../types/entities/user";
 
 /**
  * DTO para actualizar perfil de usuario
@@ -128,11 +128,7 @@ export function useUploadProfilePhoto() {
 
   return useMutation({
     mutationFn: async (file: File) => {
-      const formData = new FormData();
-      formData.append("photo", file);
-
-      const response = await httpClient.post("/users/profile/photo", formData);
-      return response;
+      return AuthClient.uploadProfilePhoto(file);
     },
     onSuccess: () => {
       showSuccess(
@@ -169,11 +165,8 @@ export function useUpdateUserPreferences() {
   const { showSuccess, showError } = useToast();
 
   return useMutation({
-    mutationFn: async (preferences: Record<string, unknown>) => {
-      const response = await httpClient.put("/users/preferences", {
-        preferences,
-      });
-      return response;
+    mutationFn: async (preferences: Partial<UserPreferences>) => {
+      return AuthClient.updatePreferences(preferences);
     },
     onSuccess: () => {
       showSuccess(

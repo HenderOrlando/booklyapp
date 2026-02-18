@@ -45,7 +45,7 @@ const getMockApprovalHistory = (): ApprovalRequest[] => [
     categoryName: "Espacios Académicos",
     startDate: new Date(Date.now() + 2 * 24 * 60 * 60 * 1000).toISOString(),
     endDate: new Date(
-      Date.now() + 2 * 24 * 60 * 60 * 1000 + 2 * 60 * 60 * 1000
+      Date.now() + 2 * 24 * 60 * 60 * 1000 + 2 * 60 * 60 * 1000,
     ).toISOString(),
     purpose: "Conferencia magistral sobre IA",
     attendees: 150,
@@ -94,7 +94,7 @@ const getMockApprovalHistory = (): ApprovalRequest[] => [
     categoryName: "Espacios Administrativos",
     startDate: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000).toISOString(),
     endDate: new Date(
-      Date.now() - 1 * 24 * 60 * 60 * 1000 + 1 * 60 * 60 * 1000
+      Date.now() - 1 * 24 * 60 * 60 * 1000 + 1 * 60 * 60 * 1000,
     ).toISOString(),
     purpose: "Reunión de grupo",
     attendees: 8,
@@ -135,7 +135,7 @@ const getMockApprovalHistory = (): ApprovalRequest[] => [
 export default function HistorialAprobacionesPage() {
   const t = useTranslations("approvals");
   const [expandedItems, setExpandedItems] = React.useState<Set<string>>(
-    new Set()
+    new Set(),
   );
   const [filterStatus, setFilterStatus] = React.useState<string>("all");
   const [searchQuery, setSearchQuery] = React.useState("");
@@ -191,8 +191,8 @@ export default function HistorialAprobacionesPage() {
         <div className="flex items-start justify-between">
           <div>
             <div className="flex items-center gap-3 mb-2">
-              <div className="p-2 bg-purple-100 dark:bg-purple-900/20 rounded-lg">
-                <FileText className="h-6 w-6 text-purple-600 dark:text-purple-400" />
+              <div className="p-2 bg-[var(--color-state-info-bg)] rounded-lg">
+                <FileText className="h-6 w-6 text-[var(--color-state-info-text)]" />
               </div>
               <div>
                 <h1 className="text-3xl font-bold text-[var(--color-text-primary)] dark:text-[var(--color-text-primary)]">
@@ -219,13 +219,13 @@ export default function HistorialAprobacionesPage() {
               placeholder="Buscar por usuario, recurso o propósito..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-10 pr-4 py-2 border border-[var(--color-border-primary)] dark:border-[var(--color-border-primary)] rounded-lg bg-[var(--color-bg-primary)] dark:bg-[var(--color-bg-secondary)] text-[var(--color-text-primary)] dark:text-[var(--color-text-primary)]"
+              className="w-full pl-10 pr-4 py-2 border border-[var(--color-border-strong)] rounded-lg bg-[var(--color-bg-surface)] text-[var(--color-text-primary)]"
             />
           </div>
           <select
             value={filterStatus}
             onChange={(e) => setFilterStatus(e.target.value)}
-            className="px-4 py-2 border border-[var(--color-border-primary)] dark:border-[var(--color-border-primary)] rounded-lg bg-[var(--color-bg-primary)] dark:bg-[var(--color-bg-secondary)] text-[var(--color-text-primary)] dark:text-[var(--color-text-primary)]"
+            className="px-4 py-2 border border-[var(--color-border-strong)] rounded-lg bg-[var(--color-bg-surface)] text-[var(--color-text-primary)]"
           >
             <option value="all">Todos los estados</option>
             <option value="APPROVED">Aprobadas</option>
@@ -238,7 +238,7 @@ export default function HistorialAprobacionesPage() {
         {/* Lista de historial */}
         {isLoading ? (
           <div className="flex items-center justify-center py-12">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[var(--color-primary-base)]" />
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[var(--color-action-primary)]" />
           </div>
         ) : filteredHistory.length > 0 ? (
           <div className="space-y-3">
@@ -248,7 +248,7 @@ export default function HistorialAprobacionesPage() {
               return (
                 <div
                   key={item.id}
-                  className="bg-[var(--color-bg-primary)] dark:bg-[var(--color-bg-secondary)] rounded-lg border border-[var(--color-border-primary)] dark:border-[var(--color-border-primary)] overflow-hidden"
+                  className="bg-[var(--color-bg-surface)] rounded-lg border border-[var(--color-border-subtle)] overflow-hidden"
                 >
                   {/* Header colapsable */}
                   <button
@@ -280,7 +280,7 @@ export default function HistorialAprobacionesPage() {
                                   "d MMM yyyy",
                                   {
                                     locale: es,
-                                  }
+                                  },
                                 )}
                               </span>
                             </>
@@ -305,7 +305,7 @@ export default function HistorialAprobacionesPage() {
 
                   {/* Contenido expandible */}
                   {isExpanded && (
-                    <div className="px-6 py-4 border-t border-[var(--color-border-primary)] dark:border-[var(--color-border-primary)] space-y-4">
+                    <div className="px-6 py-4 border-t border-[var(--color-border-subtle)] space-y-4">
                       {/* Información detallada */}
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div>
@@ -343,7 +343,7 @@ export default function HistorialAprobacionesPage() {
                               "d 'de' MMMM, yyyy",
                               {
                                 locale: es,
-                              }
+                              },
                             )}
                           </div>
                           <div className="flex items-center gap-2 text-sm text-[var(--color-text-secondary)] dark:text-[var(--color-text-tertiary)] mt-1">
@@ -368,21 +368,21 @@ export default function HistorialAprobacionesPage() {
 
                       {/* Comentarios / Razón de rechazo */}
                       {item.comments && (
-                        <div className="p-3 bg-state-success-50 dark:bg-state-success-900/20 rounded-lg">
-                          <p className="text-sm font-medium text-state-success-800 dark:text-green-200 mb-1">
+                        <div className="p-3 bg-[var(--color-state-success-bg)] rounded-lg">
+                          <p className="text-sm font-medium text-[var(--color-state-success-text)] mb-1">
                             Comentarios
                           </p>
-                          <p className="text-sm text-state-success-700 dark:text-state-success-300">
+                          <p className="text-sm text-[var(--color-state-success-text)]">
                             {item.comments}
                           </p>
                         </div>
                       )}
                       {item.rejectionReason && (
-                        <div className="p-3 bg-state-error-50 dark:bg-state-error-900/20 rounded-lg">
-                          <p className="text-sm font-medium text-state-error-800 dark:text-red-200 mb-1">
+                        <div className="p-3 bg-[var(--color-state-error-bg)] rounded-lg">
+                          <p className="text-sm font-medium text-[var(--color-state-error-text)] mb-1">
                             Razón de Rechazo
                           </p>
-                          <p className="text-sm text-state-error-700 dark:text-state-error-300">
+                          <p className="text-sm text-[var(--color-state-error-text)]">
                             {item.rejectionReason}
                           </p>
                         </div>
@@ -404,7 +404,7 @@ export default function HistorialAprobacionesPage() {
             })}
           </div>
         ) : (
-          <div className="text-center py-12 bg-[var(--color-bg-primary)] dark:bg-[var(--color-bg-secondary)] rounded-lg border border-[var(--color-border-primary)] dark:border-[var(--color-border-primary)]">
+          <div className="text-center py-12 bg-[var(--color-bg-surface)] rounded-lg border border-[var(--color-border-subtle)]">
             <FileText className="h-12 w-12 text-[var(--color-text-tertiary)] dark:text-[var(--color-text-secondary)] mx-auto mb-3" />
             <p className="text-[var(--color-text-secondary)] dark:text-[var(--color-text-tertiary)]">
               No se encontraron registros

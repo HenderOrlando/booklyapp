@@ -51,6 +51,15 @@ export const AUTH_ENDPOINTS = {
 } as const;
 
 /**
+ * Endpoints de Configuración Global (Auth Service - Puerto 3001)
+ */
+export const CONFIG_ENDPOINTS = {
+  BASE: `${API_VERSION}/config`,
+  PUBLIC: `${API_VERSION}/config/public`,
+  STORAGE: `${API_VERSION}/config/storage`,
+} as const;
+
+/**
  * Endpoints de Recursos (Resources Service - Puerto 3002)
  */
 export const RESOURCES_ENDPOINTS = {
@@ -279,7 +288,9 @@ export function getServiceFromEndpoint(endpoint: string): string {
   if (
     endpoint.includes("/auth") ||
     endpoint.includes("/users") ||
-    endpoint.includes("/audit")
+    endpoint.includes("/audit") ||
+    endpoint.includes("/config") ||
+    endpoint.includes("/app-config")
   )
     return "AUTH";
 

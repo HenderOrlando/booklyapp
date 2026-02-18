@@ -16,7 +16,14 @@ export class UpdateAppConfigCommand {
       defaultLocale?: string;
       supportedLocales?: string[];
       appName?: string;
-      appLogoUrl?: string;
+      logoLightUrl?: string;
+      logoDarkUrl?: string;
+      faviconUrl?: string;
+      timezone?: string;
+      features?: {
+        enableNotifications?: boolean;
+        enableRealtime?: boolean;
+      };
       maintenanceMode?: boolean;
     },
   ) {}

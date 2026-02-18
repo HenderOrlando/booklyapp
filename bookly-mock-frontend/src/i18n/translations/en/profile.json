@@ -36,6 +36,7 @@
   "updated_at": "Last Updated",
   "full_name": "Full Name",
   "username": "Username",
+  "tenant_id": "Organizacion ID",
   "document": "Document",
   "account_status": "Account Status",
   "yes": "Yes",

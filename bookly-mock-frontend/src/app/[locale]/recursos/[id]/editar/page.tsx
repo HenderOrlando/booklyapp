@@ -36,6 +36,7 @@ import {
   ResourceType,
   UpdateResourceDto,
 } from "@/types/entities/resource";
+import { Plus, Tag, X } from "lucide-react";
 import { useParams, useRouter } from "next/navigation";
 import * as React from "react";
 
@@ -51,7 +52,31 @@ interface CategoryCollectionPayload {
 }
 
 interface ProgramCollectionPayload {
-  items?: AcademicProgram[];
+  items?: ProgramApiItem[];
+}
+
+interface ProgramApiItem {
+  id?: string;
+  _id?: string;
+  code?: string;
+  name?: string;
+  description?: string;
+  faculty?: string;
+  department?: string;
+  isActive?: boolean;
+  createdAt?: string;
+  updatedAt?: string;
+}
+
+interface ResourceCollectionPayload {
+  items?: Resource[];
+  resources?: Resource[];
+}
+
+interface CharacteristicTag {
+  name: string;
+  normalizedName: string;
+  isNew: boolean;
 }
 
 interface UpdateResourceRequestPayload
@@ -62,6 +87,153 @@ interface UpdateResourceRequestPayload
     minBookingDurationMinutes?: number;
     maxBookingDurationMinutes?: number;
     allowRecurring?: boolean;
+  };
+}
+
+const DEFAULT_CHARACTERISTICS = [
+  "Proyector",
+  "Aire acondicionado",
+  "Tablero/Pizarra",
+  "Computadores",
+  "Sistema de sonido",
+  "Videoconferencia",
+  "Acceso para silla de ruedas",
+  "Iluminación especial",
+];
+
+const BOOLEAN_ATTRIBUTE_TO_CHARACTERISTIC: Record<string, string> = {
+  hasProjector: "Proyector",
+  hasAirConditioning: "Aire acondicionado",
+  hasWhiteboard: "Tablero/Pizarra",
+  hasComputers: "Computadores",
+};
+
+function normalizeCharacteristicName(value: string): string {
+  return value.trim().replace(/\s+/g, " ");
+}
+
+function toCharacteristicKey(value: string): string {
+  return normalizeCharacteristicName(value).toLowerCase();
+}
+
+function toCharacteristicTestId(value: string): string {
+  return toCharacteristicKey(value).replace(/[^a-z0-9]+/g, "-");
+}
+
+function isStringArray(value: unknown): value is string[] {
+  return (
+    Array.isArray(value) && value.every((item) => typeof item === "string")
+  );
+}
+
+function extractResources(
+  data: ResourceCollectionPayload | Resource[] | undefined,
+): Resource[] {
+  if (Array.isArray(data)) {
+    return data;
+  }
+
+  if (data?.resources && Array.isArray(data.resources)) {
+    return data.resources;
+  }
+
+  if (data?.items && Array.isArray(data.items)) {
+    return data.items;
+  }
+
+  return [];
+}
+
+function extractCharacteristicNamesFromAttributes(
+  attributes: Record<string, unknown> | undefined,
+): string[] {
+  const characteristicCandidates: string[] = [];
+
+  const characteristicsValue = attributes?.characteristics;
+  if (isStringArray(characteristicsValue)) {
+    characteristicCandidates.push(...characteristicsValue);
+  }
+
+  const featuresValue = attributes?.features;
+  if (isStringArray(featuresValue)) {
+    characteristicCandidates.push(...featuresValue);
+  }
+
+  return Array.from(
+    new Map(
+      characteristicCandidates
+        .map((name) => normalizeCharacteristicName(name))
+        .filter(Boolean)
+        .map((name) => [toCharacteristicKey(name), name]),
+    ).values(),
+  );
+}
+
+function mapBooleanAttributesToCharacteristics(
+  attributes: Record<string, unknown> | undefined,
+): string[] {
+  if (!attributes) {
+    return [];
+  }
+
+  return Object.entries(BOOLEAN_ATTRIBUTE_TO_CHARACTERISTIC)
+    .filter(([attribute]) => attributes[attribute] === true)
+    .map(([, characteristic]) => characteristic);
+}
+
+function buildCharacteristicsCatalog(resources: Resource[]): string[] {
+  const names = new Map<string, string>();
+
+  DEFAULT_CHARACTERISTICS.forEach((name) => {
+    const normalized = normalizeCharacteristicName(name);
+    names.set(toCharacteristicKey(normalized), normalized);
+  });
+
+  resources.forEach((resource) => {
+    const resourceAttributes = resource.attributes as Record<string, unknown>;
+
+    extractCharacteristicNamesFromAttributes(resourceAttributes).forEach(
+      (name) => {
+        names.set(toCharacteristicKey(name), normalizeCharacteristicName(name));
+      },
+    );
+
+    mapBooleanAttributesToCharacteristics(resourceAttributes).forEach(
+      (name) => {
+        names.set(toCharacteristicKey(name), normalizeCharacteristicName(name));
+      },
+    );
+  });
+
+  return Array.from(names.values()).sort((a, b) => a.localeCompare(b));
+}
+
+function normalizeProgram(
+  program: ProgramApiItem,
+  index: number,
+): AcademicProgram | null {
+  const rawId =
+    program.id ??
+    (typeof program._id === "string" ? program._id : undefined) ??
+    program.code;
+
+  if (!rawId) {
+    return null;
+  }
+
+  const programId = String(rawId);
+  const programCode = normalizeCharacteristicName(program.code ?? programId);
+
+  return {
+    id: programId,
+    code: programCode,
+    name: normalizeCharacteristicName(program.name ?? `Programa ${index + 1}`),
+    description: program.description,
+    faculty: normalizeCharacteristicName(program.faculty ?? "Sin facultad"),
+    department: program.department,
+    isActive: program.isActive ?? true,
+    createdAt: program.createdAt ?? "",
+    updatedAt: program.updatedAt ?? "",
   };
 }
 
@@ -86,15 +258,23 @@ function extractCategories(
 function extractPrograms(
   data: ProgramCollectionPayload | AcademicProgram[] | undefined,
 ): AcademicProgram[] {
-  if (Array.isArray(data)) {
-    return data;
-  }
+  const rawPrograms = Array.isArray(data)
+    ? (data as ProgramApiItem[])
+    : (data?.items ?? []);
 
-  if (data?.items && Array.isArray(data.items)) {
-    return data.items;
-  }
+  const seenProgramIds = new Set<string>();
 
-  return [];
+  return rawPrograms
+    .map((program, index) => normalizeProgram(program, index))
+    .filter((program): program is AcademicProgram => Boolean(program))
+    .filter((program) => {
+      if (seenProgramIds.has(program.id)) {
+        return false;
+      }
+
+      seenProgramIds.add(program.id);
+      return true;
+    });
 }
 
 export default function EditResourcePage() {
@@ -119,26 +299,112 @@ export default function EditResourcePage() {
     Set<string>
   >(new Set());
   const [programFilter, setProgramFilter] = React.useState("");
+  const [characteristicsCatalog, setCharacteristicsCatalog] = React.useState<
+    string[]
+  >(DEFAULT_CHARACTERISTICS);
+  const [selectedCharacteristics, setSelectedCharacteristics] = React.useState<
+    CharacteristicTag[]
+  >([]);
+  const [characteristicQuery, setCharacteristicQuery] = React.useState("");
+
+  const selectedCharacteristicKeys = React.useMemo(
+    () => new Set(selectedCharacteristics.map((item) => item.normalizedName)),
+    [selectedCharacteristics],
+  );
+
+  const normalizedCharacteristicQuery =
+    normalizeCharacteristicName(characteristicQuery);
+
+  const filteredCharacteristics = React.useMemo(() => {
+    const normalizedQuery = normalizedCharacteristicQuery.toLowerCase();
+
+    const options = characteristicsCatalog.filter((name) => {
+      const normalizedName = toCharacteristicKey(name);
+
+      if (selectedCharacteristicKeys.has(normalizedName)) {
+        return false;
+      }
+
+      if (!normalizedQuery) {
+        return true;
+      }
+
+      return normalizedName.includes(normalizedQuery);
+    });
+
+    return normalizedQuery ? options : options.slice(0, 8);
+  }, [
+    characteristicsCatalog,
+    normalizedCharacteristicQuery,
+    selectedCharacteristicKeys,
+  ]);
+
+  const canCreateCharacteristic = React.useMemo(() => {
+    if (!normalizedCharacteristicQuery) {
+      return false;
+    }
+
+    const queryKey = toCharacteristicKey(normalizedCharacteristicQuery);
+    const catalogSet = new Set(characteristicsCatalog.map(toCharacteristicKey));
+
+    return (
+      !catalogSet.has(queryKey) && !selectedCharacteristicKeys.has(queryKey)
+    );
+  }, [
+    characteristicsCatalog,
+    normalizedCharacteristicQuery,
+    selectedCharacteristicKeys,
+  ]);
 
   // Cargar recurso, categorías y programas
   React.useEffect(() => {
     const fetchData = async () => {
       try {
-        const [resourceResponse, categoriesResponse, programsResponse] =
-          await Promise.all([
-            httpClient.get<Resource>(`resources/${resourceId}`),
-            httpClient.get<CategoryCollectionPayload | Category[]>(
-              "categories",
-            ),
-            httpClient.get<ProgramCollectionPayload | AcademicProgram[]>(
-              "programs",
-            ),
-          ]);
+        const [
+          resourceResponse,
+          categoriesResponse,
+          programsResponse,
+          resourcesResponse,
+        ] = await Promise.all([
+          httpClient.get<Resource>(`resources/${resourceId}`),
+          httpClient.get<CategoryCollectionPayload | Category[]>("categories"),
+          httpClient.get<ProgramCollectionPayload | AcademicProgram[]>(
+            "programs",
+          ),
+          httpClient.get<ResourceCollectionPayload | Resource[]>("resources", {
+            params: { page: 1, limit: 500 },
+          }),
+        ]);
 
         if (resourceResponse.success && resourceResponse.data) {
           const resourceData = resourceResponse.data;
           setResource(resourceData);
-          setSelectedProgramIds(new Set(resourceData.programIds || []));
+          setSelectedProgramIds(
+            new Set((resourceData.programIds || []).map((id) => String(id))),
+          );
+
+          const resourceAttributes =
+            (resourceData.attributes as Record<string, unknown>) || {};
+
+          const persistedCharacteristicNames = Array.from(
+            new Map(
+              [
+                ...mapBooleanAttributesToCharacteristics(resourceAttributes),
+                ...extractCharacteristicNamesFromAttributes(resourceAttributes),
+              ]
+                .map((name) => normalizeCharacteristicName(name))
+                .filter(Boolean)
+                .map((name) => [toCharacteristicKey(name), name]),
+            ).values(),
+          );
+
+          setSelectedCharacteristics(
+            persistedCharacteristicNames.map((name) => ({
+              name,
+              normalizedName: toCharacteristicKey(name),
+              isNew: false,
+            })),
+          );
 
           setFormData({
             code: resourceData.code,
@@ -150,7 +416,7 @@ export default function EditResourcePage() {
             location: resourceData.location,
             floor: resourceData.floor,
             building: resourceData.building,
-            attributes: resourceData.attributes || {},
+            attributes: resourceAttributes,
             programIds: resourceData.programIds || [],
             availabilityRules: resourceData.availabilityRules,
           });
@@ -162,6 +428,14 @@ export default function EditResourcePage() {
 
         if (programsResponse.success && programsResponse.data) {
           setAllPrograms(extractPrograms(programsResponse.data));
+        }
+
+        if (resourcesResponse.success && resourcesResponse.data) {
+          setCharacteristicsCatalog(
+            buildCharacteristicsCatalog(
+              extractResources(resourcesResponse.data),
+            ),
+          );
         }
       } catch (err) {
         setError("Error al cargar el recurso");
@@ -176,13 +450,69 @@ export default function EditResourcePage() {
 
   // Toggle selección de programa
   const handleToggleProgram = (programId: string) => {
-    const newSelection = new Set(selectedProgramIds);
-    if (newSelection.has(programId)) {
-      newSelection.delete(programId);
-    } else {
-      newSelection.add(programId);
+    if (!programId) {
+      return;
     }
-    setSelectedProgramIds(newSelection);
+
+    setSelectedProgramIds((previousSelection) => {
+      const newSelection = new Set(previousSelection);
+
+      if (newSelection.has(programId)) {
+        newSelection.delete(programId);
+      } else {
+        newSelection.add(programId);
+      }
+
+      return newSelection;
+    });
+  };
+
+  const handleClearProgramSelection = () => {
+    setSelectedProgramIds(new Set());
+  };
+
+  const handleSelectExistingCharacteristic = (name: string) => {
+    const normalizedName = normalizeCharacteristicName(name);
+    const normalizedKey = toCharacteristicKey(normalizedName);
+
+    if (!normalizedName || selectedCharacteristicKeys.has(normalizedKey)) {
+      return;
+    }
+
+    setSelectedCharacteristics((prev) => [
+      ...prev,
+      {
+        name: normalizedName,
+        normalizedName: normalizedKey,
+        isNew: false,
+      },
+    ]);
+    setCharacteristicQuery("");
+  };
+
+  const handleCreateCharacteristic = () => {
+    if (!canCreateCharacteristic) {
+      return;
+    }
+
+    const normalizedName = normalizeCharacteristicName(characteristicQuery);
+    const normalizedKey = toCharacteristicKey(normalizedName);
+
+    setSelectedCharacteristics((prev) => [
+      ...prev,
+      {
+        name: normalizedName,
+        normalizedName: normalizedKey,
+        isNew: true,
+      },
+    ]);
+    setCharacteristicQuery("");
+  };
+
+  const handleRemoveCharacteristic = (normalizedName: string) => {
+    setSelectedCharacteristics((prev) =>
+      prev.filter((item) => item.normalizedName !== normalizedName),
+    );
   };
 
   const handleInputChange = <K extends keyof UpdateResourceDto>(
@@ -192,16 +522,6 @@ export default function EditResourcePage() {
     setFormData((prev) => ({
       ...prev,
       [field]: value,
-    }));
-  };
-
-  const handleAttributeChange = (attribute: string, value: boolean) => {
-    setFormData((prev) => ({
-      ...prev,
-      attributes: {
-        ...prev.attributes,
-        [attribute]: value,
-      },
     }));
   };
 
@@ -234,9 +554,37 @@ export default function EditResourcePage() {
     setSuccess(false);
 
     try {
+      const characteristicNames = Array.from(
+        new Map(
+          selectedCharacteristics
+            .map((item) => normalizeCharacteristicName(item.name))
+            .filter(Boolean)
+            .map((name) => [toCharacteristicKey(name), name]),
+        ).values(),
+      );
+
+      const characteristicKeySet = new Set(
+        characteristicNames.map((name) => toCharacteristicKey(name)),
+      );
+
+      const attributesPayload: Record<string, unknown> = {
+        ...(formData.attributes || {}),
+        characteristics: characteristicNames,
+        features: characteristicNames,
+      };
+
+      Object.entries(BOOLEAN_ATTRIBUTE_TO_CHARACTERISTIC).forEach(
+        ([attribute, characteristicName]) => {
+          attributesPayload[attribute] = characteristicKeySet.has(
+            toCharacteristicKey(characteristicName),
+          );
+        },
+      );
+
       const dataToSend: UpdateResourceRequestPayload = {
         ...formData,
-        programIds: Array.from(selectedProgramIds),
+        attributes: attributesPayload,
+        programIds: Array.from(selectedProgramIds).filter(Boolean),
         availabilityRules: formData.availabilityRules
           ? {
               requiresApproval: formData.availabilityRules.requiresApproval,
@@ -327,7 +675,7 @@ export default function EditResourcePage() {
         )}
 
         {/* Formulario */}
-        <form onSubmit={handleSubmit}>
+        <form onSubmit={handleSubmit} data-testid="resource-edit-form">
           <Tabs defaultValue="basica" className="w-full">
             <TabsList className="grid w-full grid-cols-5 mb-6">
               <TabsTrigger value="basica">Información Básica</TabsTrigger>
@@ -525,35 +873,109 @@ export default function EditResourcePage() {
                 <CardHeader>
                   <CardTitle>Características y Equipamiento</CardTitle>
                 </CardHeader>
-                <CardContent>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    {[
-                      "hasProjector",
-                      "hasAirConditioning",
-                      "hasWhiteboard",
-                      "hasComputers",
-                    ].map((attr) => (
-                      <label
-                        key={attr}
-                        className="flex items-center gap-3 p-3 bg-[var(--color-bg-primary)] rounded-lg cursor-pointer hover:bg-[var(--color-bg-secondary)]"
+                <CardContent className="space-y-4">
+                  <div>
+                    <p className="text-sm font-medium text-[var(--color-text-primary)] mb-2">
+                      Seleccionadas ({selectedCharacteristics.length})
+                    </p>
+                    {selectedCharacteristics.length === 0 ? (
+                      <p className="text-sm text-[var(--color-text-tertiary)] p-4 rounded-lg border border-dashed border-[var(--color-border-subtle)]">
+                        No hay características seleccionadas.
+                      </p>
+                    ) : (
+                      <div
+                        className="flex flex-wrap gap-2"
+                        data-testid="resource-characteristics-selected"
                       >
-                        <input
-                          type="checkbox"
-                          checked={formData.attributes?.[attr] || false}
-                          onChange={(e) =>
-                            handleAttributeChange(attr, e.target.checked)
+                        {selectedCharacteristics.map((characteristic) => (
+                          <span
+                            key={characteristic.normalizedName}
+                            data-testid={`resource-characteristic-chip-${characteristic.isNew ? "new-" : ""}${toCharacteristicTestId(characteristic.name)}`}
+                            className={`inline-flex items-center gap-1.5 rounded-full border px-3 py-1 text-xs ${
+                              characteristic.isNew
+                                ? "border-[var(--color-border-focus)] bg-[var(--color-bg-secondary)] text-[var(--color-text-primary)]"
+                                : "border-[var(--color-border-subtle)] bg-[var(--color-bg-primary)] text-[var(--color-text-primary)]"
+                            }`}
+                          >
+                            {characteristic.isNew ? (
+                              <Plus className="h-3.5 w-3.5" />
+                            ) : (
+                              <Tag className="h-3.5 w-3.5" />
+                            )}
+                            <span>{characteristic.name}</span>
+                            {characteristic.isNew && (
+                              <span className="rounded-full bg-[var(--color-bg-tertiary)] px-1.5 py-0.5 text-[10px] font-medium">
+                                Nueva
+                              </span>
+                            )}
+                            <button
+                              type="button"
+                              data-testid={`resource-characteristic-remove-${toCharacteristicTestId(characteristic.name)}`}
+                              className="rounded p-0.5 text-[var(--color-text-tertiary)] hover:text-[var(--color-text-primary)]"
+                              onClick={() =>
+                                handleRemoveCharacteristic(
+                                  characteristic.normalizedName,
+                                )
+                              }
+                              aria-label={`Eliminar característica ${characteristic.name}`}
+                            >
+                              <X className="h-3.5 w-3.5" />
+                            </button>
+                          </span>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+
+                  <div className="space-y-2">
+                    <Input
+                      data-testid="resource-characteristics-search-input"
+                      placeholder="Buscar o crear característica..."
+                      value={characteristicQuery}
+                      onChange={(e) => setCharacteristicQuery(e.target.value)}
+                    />
+
+                    <div
+                      className="max-h-[280px] overflow-y-auto space-y-2 rounded-lg border border-[var(--color-border-subtle)] p-2"
+                      data-testid="resource-characteristics-options"
+                    >
+                      {filteredCharacteristics.map((name) => (
+                        <button
+                          key={name}
+                          type="button"
+                          data-testid={`resource-characteristic-option-${toCharacteristicTestId(name)}`}
+                          onClick={() =>
+                            handleSelectExistingCharacteristic(name)
                           }
-                          className="rounded w-4 h-4"
-                        />
-                        <span className="text-foreground text-sm">
-                          {attr === "hasProjector" && "Proyector"}
-                          {attr === "hasAirConditioning" &&
-                            "Aire Acondicionado"}
-                          {attr === "hasWhiteboard" && "Tablero/Pizarra"}
-                          {attr === "hasComputers" && "Computadores"}
-                        </span>
-                      </label>
-                    ))}
+                          className="w-full text-left px-3 py-2 rounded-md hover:bg-[var(--color-bg-secondary)] text-sm text-[var(--color-text-primary)]"
+                        >
+                          {name}
+                        </button>
+                      ))}
+
+                      {canCreateCharacteristic && (
+                        <button
+                          type="button"
+                          data-testid="resource-characteristic-create-option"
+                          onClick={handleCreateCharacteristic}
+                          className="w-full text-left px-3 py-2 rounded-md border border-[var(--color-border-focus)] bg-[var(--color-bg-primary)] text-sm text-[var(--color-text-primary)]"
+                        >
+                          Crear &quot;{normalizedCharacteristicQuery}&quot;
+                        </button>
+                      )}
+
+                      {!canCreateCharacteristic &&
+                        filteredCharacteristics.length === 0 && (
+                          <p className="px-3 py-2 text-sm text-[var(--color-text-tertiary)]">
+                            No hay coincidencias disponibles.
+                          </p>
+                        )}
+                    </div>
+
+                    <p className="text-xs text-[var(--color-text-tertiary)]">
+                      Las características nuevas se crean solo al guardar el
+                      recurso.
+                    </p>
                   </div>
                 </CardContent>
               </Card>
@@ -691,7 +1113,26 @@ export default function EditResourcePage() {
                 </CardHeader>
                 <CardContent>
                   <div className="space-y-4">
+                    <div className="flex items-center justify-between">
+                      <p
+                        className="text-sm text-[var(--color-text-tertiary)]"
+                        data-testid="resource-program-selected-count"
+                      >
+                        {selectedProgramIds.size} programa(s) seleccionado(s)
+                      </p>
+                      <Button
+                        type="button"
+                        variant="outline"
+                        size="sm"
+                        onClick={handleClearProgramSelection}
+                        data-testid="resource-program-clear-selection"
+                      >
+                        Limpiar selección
+                      </Button>
+                    </div>
+
                     <Input
+                      data-testid="resource-program-search-input"
                       placeholder="Buscar por código o nombre..."
                       value={programFilter}
                       onChange={(e) => setProgramFilter(e.target.value)}
@@ -712,10 +1153,12 @@ export default function EditResourcePage() {
                         .map((program) => (
                           <label
                             key={program.id}
+                            data-testid={`resource-program-option-${program.id}`}
                             className="flex items-center justify-between p-4 bg-[var(--color-bg-primary)]/50 rounded-lg cursor-pointer hover:bg-[var(--color-bg-primary)]"
                           >
                             <div className="flex items-center gap-3">
                               <input
+                                data-testid={`resource-program-checkbox-${program.id}`}
                                 type="checkbox"
                                 checked={selectedProgramIds.has(program.id)}
                                 onChange={() => handleToggleProgram(program.id)}
@@ -726,7 +1169,8 @@ export default function EditResourcePage() {
                                   {program.name}
                                 </p>
                                 <p className="text-sm text-[var(--color-text-tertiary)]">
-                                  {program.code} - {program.faculty}
+                                  {program.code} -{" "}
+                                  {program.faculty || "Sin facultad"}
                                 </p>
                               </div>
                             </div>
@@ -738,7 +1182,10 @@ export default function EditResourcePage() {
                     </div>
 
                     <div className="flex items-center justify-between pt-4 border-t border-[var(--color-border-strong)]">
-                      <p className="text-sm text-[var(--color-text-tertiary)]">
+                      <p
+                        className="text-sm text-[var(--color-text-tertiary)]"
+                        data-testid="resource-program-selected-count-footer"
+                      >
                         {selectedProgramIds.size} programa(s) seleccionado(s)
                       </p>
                     </div>
@@ -758,7 +1205,11 @@ export default function EditResourcePage() {
             >
               Cancelar
             </Button>
-            <Button type="submit" disabled={saving}>
+            <Button
+              type="submit"
+              disabled={saving}
+              data-testid="resource-edit-save-btn"
+            >
               {saving ? "Guardando..." : "Guardar Cambios"}
             </Button>
           </div>

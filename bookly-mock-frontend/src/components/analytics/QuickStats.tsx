@@ -60,8 +60,8 @@ export function QuickStats({ title, stats, columns = 4 }: QuickStatsProps) {
                     <p
                       className={`text-xs font-medium mt-1 ${
                         stat.change.isPositive
-                          ? "text-green-400"
-                          : "text-red-400"
+                          ? "text-[var(--color-state-success-text)]"
+                          : "text-[var(--color-state-error-text)]"
                       }`}
                     >
                       {stat.change.isPositive ? "↑" : "↓"}{" "}

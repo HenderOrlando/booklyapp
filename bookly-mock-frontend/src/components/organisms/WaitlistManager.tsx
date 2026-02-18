@@ -25,18 +25,23 @@ interface WaitlistManagerProps {
 }
 
 const PRIORITY_COLORS: Record<string, string> = {
-  LOW: "bg-[var(--color-bg-elevated)]",
-  NORMAL: "bg-blue-600",
-  HIGH: "bg-orange-600",
-  URGENT: "bg-red-600",
+  LOW: "bg-[var(--color-bg-muted)] text-[var(--color-text-secondary)]",
+  NORMAL: "bg-[var(--color-state-info-bg)] text-[var(--color-state-info-text)]",
+  HIGH: "bg-[var(--color-state-warning-bg)] text-[var(--color-state-warning-text)]",
+  URGENT:
+    "bg-[var(--color-state-error-bg)] text-[var(--color-state-error-text)]",
 };
 
 const STATUS_COLORS: Record<string, string> = {
-  WAITING: "bg-yellow-600",
-  NOTIFIED: "bg-blue-600",
-  ASSIGNED: "bg-green-600",
-  EXPIRED: "bg-[var(--color-bg-elevated)]",
-  CANCELLED: "bg-red-600",
+  WAITING:
+    "bg-[var(--color-state-warning-bg)] text-[var(--color-state-warning-text)]",
+  NOTIFIED:
+    "bg-[var(--color-state-info-bg)] text-[var(--color-state-info-text)]",
+  ASSIGNED:
+    "bg-[var(--color-state-success-bg)] text-[var(--color-state-success-text)]",
+  EXPIRED: "bg-[var(--color-bg-muted)] text-[var(--color-text-secondary)]",
+  CANCELLED:
+    "bg-[var(--color-state-error-bg)] text-[var(--color-state-error-text)]",
 };
 
 export function WaitlistManager({
@@ -159,14 +164,14 @@ export function WaitlistManager({
           filteredEntries.map((entry) => (
             <Card
               key={entry.id}
-              className="hover:border-blue-600 transition-colors"
+              className="hover:border-[var(--color-action-primary)] transition-colors"
             >
               <CardContent className="pt-6">
                 <div className="flex items-start justify-between">
                   <div className="flex-1">
                     {/* Posición y Usuario */}
                     <div className="flex items-center gap-3 mb-2">
-                      <div className="flex items-center justify-center w-10 h-10 rounded-full bg-blue-900 text-blue-200 font-bold">
+                      <div className="flex items-center justify-center w-10 h-10 rounded-full bg-[var(--color-state-info-bg)] text-[var(--color-state-info-text)] font-bold">
                         #{entry.position}
                       </div>
                       <div>
@@ -225,7 +230,9 @@ export function WaitlistManager({
                         {entry.priority}
                       </Badge>
                       {entry.notificationSent && (
-                        <Badge className="bg-purple-600">Notificado</Badge>
+                        <Badge className="bg-[var(--color-state-info-bg)] text-[var(--color-state-info-text)]">
+                          Notificado
+                        </Badge>
                       )}
                     </div>
                   </div>

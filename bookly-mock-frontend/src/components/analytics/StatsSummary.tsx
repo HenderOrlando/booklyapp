@@ -96,7 +96,9 @@ export function StatsSummary({
                     {change && (
                       <span
                         className={`text-sm font-medium ${
-                          change.isPositive ? "text-green-400" : "text-red-400"
+                          change.isPositive
+                            ? "text-[var(--color-state-success-text)]"
+                            : "text-[var(--color-state-error-text)]"
                         }`}
                       >
                         {change.isPositive ? "↑" : "↓"}{" "}

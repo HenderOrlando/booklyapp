@@ -50,6 +50,8 @@ interface AuthProviderProps {
 const SESSION_TIMEOUT = 30 * 60 * 1000; // 30 minutos de inactividad
 const SESSION_WARNING_TIME = 5 * 60 * 1000; // Avisar 5 minutos antes
 const REFRESH_TOKEN_INTERVAL = 10 * 60 * 1000; // Refresh cada 10 minutos
+const POST_AUTH_REDIRECT_RETRY_DELAY = 220;
+const POST_AUTH_REDIRECT_MAX_RETRIES = 2;
 
 interface TokenRefreshPayload {
   accessToken?: string;
@@ -95,6 +97,8 @@ export function AuthProvider({ children }: AuthProviderProps) {
   const retryCountRef = useRef<number>(0);
   const lastValidUserRef = useRef<User | null>(null);
   const postAuthRedirectHandledRef = useRef(false);
+  const postAuthRedirectRetryRef = useRef<NodeJS.Timeout | null>(null);
+  const postAuthRedirectRetryCountRef = useRef(0);
 
   const navigateToPostAuthDestination = useCallback(() => {
     if (postAuthRedirectHandledRef.current) {
@@ -127,6 +131,40 @@ export function AuthProvider({ children }: AuthProviderProps) {
     clearPostAuthRedirect();
     router.replace(destination);
   }, [router]);
+
+  const schedulePostAuthRedirectRetry = useCallback(() => {
+    if (typeof window === "undefined") {
+      return;
+    }
+
+    if (postAuthRedirectRetryRef.current) {
+      clearTimeout(postAuthRedirectRetryRef.current);
+    }
+
+    postAuthRedirectRetryRef.current = setTimeout(() => {
+      const stillOnAuthEntry = isAuthEntryRoute(
+        window.location.pathname,
+        i18nConfig.locales,
+      );
+
+      if (!stillOnAuthEntry || !getToken()) {
+        postAuthRedirectRetryCountRef.current = 0;
+        return;
+      }
+
+      if (
+        postAuthRedirectRetryCountRef.current >= POST_AUTH_REDIRECT_MAX_RETRIES
+      ) {
+        postAuthRedirectRetryCountRef.current = 0;
+        return;
+      }
+
+      postAuthRedirectRetryCountRef.current += 1;
+      postAuthRedirectHandledRef.current = false;
+      navigateToPostAuthDestination();
+      schedulePostAuthRedirectRetry();
+    }, POST_AUTH_REDIRECT_RETRY_DELAY);
+  }, [navigateToPostAuthDestination]);
 
   // Cargar usuario desde localStorage al montar (sincrónico)
   useEffect(() => {
@@ -166,11 +204,17 @@ export function AuthProvider({ children }: AuthProviderProps) {
     const currentPath = window.location.pathname;
     if (!isAuthEntryRoute(currentPath, i18nConfig.locales)) {
       postAuthRedirectHandledRef.current = false;
+      postAuthRedirectRetryCountRef.current = 0;
+      if (postAuthRedirectRetryRef.current) {
+        clearTimeout(postAuthRedirectRetryRef.current);
+        postAuthRedirectRetryRef.current = null;
+      }
       return;
     }
 
     navigateToPostAuthDestination();
-  }, [user, navigateToPostAuthDestination]);
+    schedulePostAuthRedirectRetry();
+  }, [user, navigateToPostAuthDestination, schedulePostAuthRedirectRetry]);
 
   const checkAuth = async () => {
     const token = getToken();
@@ -398,6 +442,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
         );
 
         navigateToPostAuthDestination();
+        schedulePostAuthRedirectRetry();
       } else {
         throw new Error(response.message || "Error al iniciar sesión");
       }
@@ -434,6 +479,11 @@ export function AuthProvider({ children }: AuthProviderProps) {
       lastValidUserRef.current = null; // Limpiar cache de usuario
       setUserToStorage(null); // Limpiar de localStorage
       postAuthRedirectHandledRef.current = false;
+      postAuthRedirectRetryCountRef.current = 0;
+      if (postAuthRedirectRetryRef.current) {
+        clearTimeout(postAuthRedirectRetryRef.current);
+        postAuthRedirectRetryRef.current = null;
+      }
       clearPostAuthRedirect();
 
       if (showMessage) {
@@ -583,6 +633,10 @@ export function AuthProvider({ children }: AuthProviderProps) {
     }
     if (checkAuthRetryRef.current) {
       clearTimeout(checkAuthRetryRef.current);
+    }
+    if (postAuthRedirectRetryRef.current) {
+      clearTimeout(postAuthRedirectRetryRef.current);
+      postAuthRedirectRetryRef.current = null;
     }
   };
 

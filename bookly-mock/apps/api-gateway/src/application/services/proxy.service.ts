@@ -50,6 +50,8 @@ export class ProxyService {
       users: "auth",
       roles: "auth",
       permissions: "auth",
+      config: "auth",
+      "app-config": "auth",
       "auth/oauth": "auth",
       // resources-service controllers
       resources: "resources",

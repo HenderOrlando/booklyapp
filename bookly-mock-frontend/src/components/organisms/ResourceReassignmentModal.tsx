@@ -136,7 +136,7 @@ export function ResourceReassignmentModal({
                     • {currentStartTime} - {currentEndTime}
                   </div>
                 </div>
-                <div className="px-3 py-1 bg-red-900/30 text-red-400 rounded-full text-sm">
+                <div className="px-3 py-1 bg-[var(--color-state-error-bg)] text-[var(--color-state-error-text)] rounded-full text-sm">
                   A reasignar
                 </div>
               </div>
@@ -146,7 +146,8 @@ export function ResourceReassignmentModal({
           {/* Razón */}
           <div>
             <label className="block text-sm font-medium text-foreground mb-2">
-              Razón de reasignación <span className="text-red-500">*</span>
+              Razón de reasignación{" "}
+              <span className="text-[var(--color-state-error-text)]">*</span>
             </label>
             <Select
               value={reason}
@@ -181,7 +182,8 @@ export function ResourceReassignmentModal({
           {/* Sugerencias de recursos */}
           <div>
             <label className="block text-sm font-medium text-foreground mb-2">
-              Seleccionar nuevo recurso <span className="text-red-500">*</span>
+              Seleccionar nuevo recurso{" "}
+              <span className="text-[var(--color-state-error-text)]">*</span>
             </label>
             <div className="space-y-2">
               {sortedSuggestions.map((suggestion) => (
@@ -191,7 +193,7 @@ export function ResourceReassignmentModal({
                   onClick={() => setSelectedResourceId(suggestion.resourceId)}
                   className={`w-full p-4 rounded-lg border-2 transition-all text-left ${
                     selectedResourceId === suggestion.resourceId
-                      ? "border-blue-600 bg-blue-900/20"
+                      ? "border-[var(--color-action-primary)] bg-[var(--color-state-info-bg)]"
                       : "border-[var(--color-border-strong)] bg-[var(--color-bg-inverse)] hover:border-[var(--color-border-strong)]"
                   }`}
                 >
@@ -205,7 +207,7 @@ export function ResourceReassignmentModal({
                           {suggestion.resourceType}
                         </span>
                         {!suggestion.available && (
-                          <span className="px-2 py-1 bg-red-900 text-red-200 text-xs rounded">
+                          <span className="px-2 py-1 bg-[var(--color-state-error-bg)] text-[var(--color-state-error-text)] text-xs rounded">
                             No disponible
                           </span>
                         )}
@@ -217,7 +219,7 @@ export function ResourceReassignmentModal({
                       <div className="mt-2 flex items-center gap-2">
                         <div className="flex-1 h-2 bg-[var(--color-bg-elevated)] rounded-full overflow-hidden">
                           <div
-                            className="h-full bg-gradient-to-r from-green-600 to-blue-600"
+                            className="h-full bg-gradient-to-r from-[var(--color-state-success-border)] to-[var(--color-action-primary)]"
                             style={{ width: `${suggestion.matchScore}%` }}
                           />
                         </div>
@@ -289,7 +291,7 @@ export function ResourceReassignmentModal({
 
           {/* Preview */}
           {selectedResource && (
-            <Card className="border-blue-600">
+            <Card className="border-[var(--color-action-primary)]">
               <CardHeader>
                 <CardTitle>Vista Previa de Cambios</CardTitle>
               </CardHeader>

@@ -632,7 +632,9 @@ export class AuthClient {
    * ```
    */
   static async getProfile(): Promise<ApiResponse<User>> {
-    const response = await httpClient.get<unknown>(AUTH_ENDPOINTS.PROFILE);
+    const response = await httpClient.get<unknown>(
+      AUTH_ENDPOINTS.PROFILE_DETAILS,
+    );
 
     if (!response.success || !response.data) {
       return response as ApiResponse<User>;

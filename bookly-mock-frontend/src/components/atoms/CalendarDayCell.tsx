@@ -85,14 +85,14 @@ export function CalendarDayCell({
             ? "bg-[var(--color-bg-secondary)] text-[var(--color-text-tertiary)]"
             : "bg-background text-[var(--color-text-primary)]"
         }
-        ${day.isToday ? "border-2 border-blue-500 ring-1 ring-blue-500" : ""}
-        ${isSelected ? "bg-blue-50 dark:bg-blue-900/20 border-blue-400" : ""}
-        ${isDragOver && !day.isDisabled ? "border-2 border-green-500 bg-green-50 dark:bg-green-900/20" : ""}
+        ${day.isToday ? "border-2 border-[var(--color-border-focus)] ring-1 ring-[var(--color-border-focus)]" : ""}
+        ${isSelected ? "bg-[var(--color-state-info-bg)] border-[var(--color-state-info-border)]" : ""}
+        ${isDragOver && !day.isDisabled ? "border-2 border-[var(--color-state-success-border)] bg-[var(--color-state-success-bg)]" : ""}
         ${day.isPast && day.isCurrentMonth ? "opacity-60" : ""}
         ${
           day.isDisabled
             ? "cursor-not-allowed opacity-40"
-            : "cursor-pointer hover:bg-blue-50 dark:hover:bg-blue-900/20 hover:border-blue-300"
+            : "cursor-pointer hover:bg-[var(--color-state-info-bg)] hover:border-[var(--color-state-info-border)]"
         }
         ${day.isWeekend && day.isCurrentMonth ? "bg-[var(--color-bg-secondary)]" : ""}
       `}
@@ -105,7 +105,7 @@ export function CalendarDayCell({
         <span
           className={`
             text-sm font-medium
-            ${day.isToday ? "text-blue-600 font-bold" : ""}
+            ${day.isToday ? "text-[var(--color-text-link)] font-bold" : ""}
           `}
         >
           {format(day.date, "d")}
@@ -117,7 +117,7 @@ export function CalendarDayCell({
             className="
               inline-flex items-center justify-center
               w-5 h-5 text-xs font-semibold
-              bg-blue-500 text-white rounded-full
+              bg-[var(--color-action-primary)] text-[var(--color-text-inverse)] rounded-full
             "
             aria-label={`${eventCount} evento${eventCount > 1 ? "s" : ""}`}
           >
@@ -129,7 +129,7 @@ export function CalendarDayCell({
       {/* Dots de eventos (máximo 3 visibles) */}
       {hasEvents && (
         <div className="flex gap-1 flex-wrap">
-          {day.events.slice(0, 3).map((event, index) => (
+          {day.events.slice(0, 3).map((event) => (
             <div
               key={event.id}
               className="w-2 h-2 rounded-full"
@@ -149,7 +149,7 @@ export function CalendarDayCell({
       {/* Indicador de hoy */}
       {day.isToday && (
         <div
-          className="absolute top-1 right-1 w-2 h-2 bg-blue-500 rounded-full"
+          className="absolute top-1 right-1 w-2 h-2 bg-[var(--color-action-primary)] rounded-full"
           aria-hidden="true"
         />
       )}
@@ -172,7 +172,7 @@ export function CalendarDayCell({
             sideOffset={5}
           >
             <div className="space-y-2">
-              <div className="font-semibold text-white border-b border-[var(--color-border-strong)] pb-2">
+              <div className="font-semibold text-[var(--color-text-inverse)] border-b border-[var(--color-border-strong)] pb-2">
                 {format(day.date, "d 'de' MMMM 'de' yyyy", { locale: es })}
                 <span className="ml-2 text-xs text-[var(--color-text-tertiary)]">
                   ({eventCount} evento{eventCount > 1 ? "s" : ""})
@@ -189,7 +189,7 @@ export function CalendarDayCell({
                       style={{ backgroundColor: event.color }}
                     />
                     <div className="flex-1 min-w-0">
-                      <div className="font-medium text-white truncate">
+                      <div className="font-medium text-[var(--color-text-inverse)] truncate">
                         {event.title}
                       </div>
                       <div className="text-xs text-[var(--color-text-tertiary)]">
@@ -211,7 +211,7 @@ export function CalendarDayCell({
                 ))}
               </div>
             </div>
-            <Tooltip.Arrow className="fill-gray-700" />
+            <Tooltip.Arrow className="fill-[var(--color-bg-inverse)]" />
           </Tooltip.Content>
         </Tooltip.Portal>
       </Tooltip.Root>

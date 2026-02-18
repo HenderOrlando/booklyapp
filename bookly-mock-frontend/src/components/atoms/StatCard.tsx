@@ -43,9 +43,10 @@ export const StatCard = React.memo<StatCardProps>(
   }) => {
     // Determinar color según tendencia
     const trendColors = {
-      up: "text-green-600 dark:text-green-400 bg-green-50 dark:bg-green-900/20",
-      down: "text-red-600 dark:text-red-400 bg-red-50 dark:bg-red-900/20",
-      neutral: "text-[var(--color-text-secondary)] dark:text-[var(--color-text-tertiary)] bg-[var(--color-bg-secondary)] dark:bg-[var(--color-bg-inverse)]",
+      up: "text-[var(--color-state-success-text)] bg-[var(--color-state-success-bg)]",
+      down: "text-[var(--color-state-error-text)] bg-[var(--color-state-error-bg)]",
+      neutral:
+        "text-[var(--color-text-secondary)] bg-[var(--color-bg-secondary)]",
     };
 
     // Icono de tendencia
@@ -56,8 +57,8 @@ export const StatCard = React.memo<StatCardProps>(
       return (
         <div
           className={`
-            bg-white dark:bg-[var(--color-bg-inverse)] 
-            border border-[var(--color-border-subtle)] dark:border-[var(--color-border-strong)] 
+            bg-[var(--color-bg-surface)] 
+            border border-[var(--color-border-subtle)] 
             rounded-lg p-6 
             animate-pulse
             ${className}
@@ -77,8 +78,8 @@ export const StatCard = React.memo<StatCardProps>(
     return (
       <div
         className={`
-          bg-white dark:bg-[var(--color-bg-inverse)] 
-          border border-[var(--color-border-subtle)] dark:border-[var(--color-border-strong)] 
+          bg-[var(--color-bg-surface)] 
+          border border-[var(--color-border-subtle)] 
           rounded-lg p-6 
           transition-all duration-200
           hover:shadow-md
@@ -89,18 +90,18 @@ export const StatCard = React.memo<StatCardProps>(
           {/* Content */}
           <div className="flex-1">
             {/* Title */}
-            <p className="text-sm font-medium text-[var(--color-text-secondary)] dark:text-[var(--color-text-tertiary)] mb-1">
+            <p className="text-sm font-medium text-[var(--color-text-secondary)] mb-1">
               {title}
             </p>
 
             {/* Value */}
-            <p className="text-3xl font-bold text-[var(--color-text-primary)] dark:text-[var(--color-text-inverse)] mb-2">
+            <p className="text-3xl font-bold text-[var(--color-text-primary)] mb-2">
               {value}
             </p>
 
             {/* Subtitle or Change */}
             {subtitle ? (
-              <p className="text-xs text-[var(--color-text-secondary)] dark:text-[var(--color-text-secondary)]">
+              <p className="text-xs text-[var(--color-text-secondary)]">
                 {subtitle}
               </p>
             ) : (
@@ -118,7 +119,7 @@ export const StatCard = React.memo<StatCardProps>(
                     <TrendIcon className="h-3 w-3" />
                     {Math.abs(change)}%
                   </span>
-                  <span className="text-xs text-[var(--color-text-secondary)] dark:text-[var(--color-text-secondary)]">
+                  <span className="text-xs text-[var(--color-text-secondary)]">
                     vs período anterior
                   </span>
                 </div>
@@ -132,9 +133,9 @@ export const StatCard = React.memo<StatCardProps>(
               className="
                 w-12 h-12 
                 rounded-lg 
-                bg-[var(--color-primary-base)]/10 
+                bg-[var(--color-state-info-bg)] 
                 flex items-center justify-center
-                text-[var(--color-primary-base)]
+                text-[var(--color-action-primary)]
               "
             >
               {icon}
@@ -143,7 +144,7 @@ export const StatCard = React.memo<StatCardProps>(
         </div>
       </div>
     );
-  }
+  },
 );
 
 StatCard.displayName = "StatCard";

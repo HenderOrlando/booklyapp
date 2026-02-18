@@ -103,7 +103,7 @@ export const ApprovalRequestList = React.memo<ApprovalRequestListProps>(
           req.userName.toLowerCase().includes(query) ||
           req.resourceName.toLowerCase().includes(query) ||
           req.purpose?.toLowerCase().includes(query) ||
-          req.userEmail.toLowerCase().includes(query)
+          req.userEmail.toLowerCase().includes(query),
       );
     }, [requests, searchQuery]);
 
@@ -146,7 +146,7 @@ export const ApprovalRequestList = React.memo<ApprovalRequestListProps>(
               placeholder="Buscar por nombre, recurso, email o propósito..."
               value={searchQuery}
               onChange={(e) => handleSearchChange(e.target.value)}
-              className="w-full pl-10 pr-4 py-2 border border-[var(--color-border-strong)] dark:border-[var(--color-border-strong)] rounded-lg bg-white dark:bg-[var(--color-bg-inverse)] text-[var(--color-text-primary)] dark:text-[var(--color-text-inverse)] placeholder:text-[var(--color-text-tertiary)] focus:outline-none focus:ring-2 focus:ring-[var(--color-primary-base)]"
+              className="w-full pl-10 pr-4 py-2 border border-[var(--color-border-strong)] rounded-lg bg-[var(--color-bg-surface)] text-[var(--color-text-primary)] placeholder:text-[var(--color-text-tertiary)] focus:outline-none focus:ring-2 focus:ring-[var(--color-border-focus)]"
             />
           </div>
 
@@ -194,7 +194,7 @@ export const ApprovalRequestList = React.memo<ApprovalRequestListProps>(
                   onChange={(e) =>
                     handleFilterChange("status", e.target.value || undefined)
                   }
-                  className="w-full px-3 py-2 border border-[var(--color-border-strong)] dark:border-[var(--color-border-strong)] rounded-lg bg-white dark:bg-[var(--color-bg-inverse)] text-[var(--color-text-primary)] dark:text-[var(--color-text-inverse)]"
+                  className="w-full px-3 py-2 border border-[var(--color-border-strong)] rounded-lg bg-[var(--color-bg-surface)] text-[var(--color-text-primary)]"
                 >
                   <option value="">Todos</option>
                   {STATUS_OPTIONS.map((opt) => (
@@ -215,7 +215,7 @@ export const ApprovalRequestList = React.memo<ApprovalRequestListProps>(
                   onChange={(e) =>
                     handleFilterChange("level", e.target.value || undefined)
                   }
-                  className="w-full px-3 py-2 border border-[var(--color-border-strong)] dark:border-[var(--color-border-strong)] rounded-lg bg-white dark:bg-[var(--color-bg-inverse)] text-[var(--color-text-primary)] dark:text-[var(--color-text-inverse)]"
+                  className="w-full px-3 py-2 border border-[var(--color-border-strong)] rounded-lg bg-[var(--color-bg-surface)] text-[var(--color-text-primary)]"
                 >
                   <option value="">Todos</option>
                   {LEVEL_OPTIONS.map((opt) => (
@@ -236,7 +236,7 @@ export const ApprovalRequestList = React.memo<ApprovalRequestListProps>(
                   onChange={(e) =>
                     handleFilterChange("priority", e.target.value || undefined)
                   }
-                  className="w-full px-3 py-2 border border-[var(--color-border-strong)] dark:border-[var(--color-border-strong)] rounded-lg bg-white dark:bg-[var(--color-bg-inverse)] text-[var(--color-text-primary)] dark:text-[var(--color-text-inverse)]"
+                  className="w-full px-3 py-2 border border-[var(--color-border-strong)] rounded-lg bg-[var(--color-bg-surface)] text-[var(--color-text-primary)]"
                 >
                   <option value="">Todas</option>
                   {PRIORITY_OPTIONS.map((opt) => (
@@ -253,7 +253,7 @@ export const ApprovalRequestList = React.memo<ApprovalRequestListProps>(
         {/* Lista de solicitudes */}
         {loading ? (
           <div className="flex items-center justify-center py-12">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[var(--color-primary-base)]" />
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[var(--color-action-primary)]" />
             <span className="ml-3 text-[var(--color-text-secondary)] dark:text-[var(--color-text-tertiary)]">
               Cargando solicitudes...
             </span>
@@ -283,7 +283,7 @@ export const ApprovalRequestList = React.memo<ApprovalRequestListProps>(
                   setSearchQuery("");
                   handleClearFilters();
                 }}
-                className="mt-2 text-sm text-[var(--color-primary-base)] hover:underline"
+                className="mt-2 text-sm text-[var(--color-action-primary)] hover:underline"
               >
                 Limpiar búsqueda y filtros
               </button>
@@ -299,7 +299,7 @@ export const ApprovalRequestList = React.memo<ApprovalRequestListProps>(
         )}
       </div>
     );
-  }
+  },
 );
 
 ApprovalRequestList.displayName = "ApprovalRequestList";

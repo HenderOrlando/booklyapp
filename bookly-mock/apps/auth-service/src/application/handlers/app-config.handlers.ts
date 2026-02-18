@@ -224,7 +224,11 @@ export class GetPublicAppConfigHandler
       defaultLocale: config.defaultLocale,
       supportedLocales: config.supportedLocales,
       appName: config.appName,
-      appLogoUrl: config.appLogoUrl,
+      logoLightUrl: config.logoLightUrl,
+      logoDarkUrl: config.logoDarkUrl,
+      faviconUrl: config.faviconUrl,
+      timezone: config.timezone,
+      features: config.features,
       maintenanceMode: config.maintenanceMode,
     };
   }

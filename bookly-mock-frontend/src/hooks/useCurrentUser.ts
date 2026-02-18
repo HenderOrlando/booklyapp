@@ -5,8 +5,9 @@
  */
 
 import { useAuth } from "@/contexts/AuthContext";
-import { httpClient } from "@/infrastructure/http/httpClient";
-import type { User } from "@/types/entities/user";
+import { AuthClient } from "@/infrastructure/api/auth-client";
+import type { LoginDto } from "@/types/entities/auth";
+import type { Permission, Role, User } from "@/types/entities/user";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 // ============================================
@@ -55,11 +56,13 @@ export function useCurrentUser() {
 export function useCurrentUserPermissions() {
   const { data: user } = useCurrentUser();
 
-  return useQuery({
+  return useQuery<Permission[]>({
     queryKey: currentUserKeys.permissions(),
     queryFn: async () => {
-      const response = await httpClient.get("/auth/permissions");
-      return response.data || [];
+      const response = await AuthClient.getPermissions();
+      return response.success && Array.isArray(response.data)
+        ? response.data
+        : [];
     },
     enabled: !!user, // Solo ejecutar si hay usuario
     staleTime: 1000 * 60 * 15, // 15 minutos
@@ -72,11 +75,13 @@ export function useCurrentUserPermissions() {
 export function useCurrentUserRoles() {
   const { data: user } = useCurrentUser();
 
-  return useQuery({
+  return useQuery<Role[]>({
     queryKey: currentUserKeys.roles(),
     queryFn: async () => {
-      const response = await httpClient.get("/auth/roles");
-      return response.data || [];
+      const response = await AuthClient.getRoles();
+      return response.success && Array.isArray(response.data)
+        ? response.data
+        : [];
     },
     enabled: !!user,
     staleTime: 1000 * 60 * 15,
@@ -96,11 +101,24 @@ export function useLogin() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async (credentials: { email: string; password: string }) => {
-      const response = await httpClient.post("/auth/login", credentials);
-      return response.data;
+    mutationFn: async (credentials: LoginDto) => {
+      const response = await AuthClient.login(credentials);
+
+      if (!response.success || !response.data) {
+        return null;
+      }
+
+      return {
+        user: response.data.user,
+        accessToken: response.data.tokens?.accessToken,
+        refreshToken: response.data.tokens?.refreshToken,
+      };
     },
     onSuccess: (data) => {
+      if (!data?.user) {
+        return;
+      }
+
       // SISTEMA REAL: Guardar en sessionStorage + cookies (como /login)
       if (data.accessToken) {
         // 1. SessionStorage
@@ -111,12 +129,18 @@ export function useLogin() {
         document.cookie = `accessToken=${data.accessToken}; path=/; max-age=86400`;
       }
 
+      if (data.refreshToken) {
+        sessionStorage.setItem("refreshToken", data.refreshToken);
+      }
+
       // 3. Setear usuario en cache
       queryClient.setQueryData(currentUserKeys.user(), data.user);
 
-      // Prefetch permisos y roles
-      queryClient.prefetchQuery({ queryKey: currentUserKeys.permissions() });
-      queryClient.prefetchQuery({ queryKey: currentUserKeys.roles() });
+      // Disparar refresco de permisos y roles
+      queryClient.invalidateQueries({
+        queryKey: currentUserKeys.permissions(),
+      });
+      queryClient.invalidateQueries({ queryKey: currentUserKeys.roles() });
     },
   });
 }
@@ -131,7 +155,7 @@ export function useLogout() {
 
   return useMutation({
     mutationFn: async () => {
-      await httpClient.post("/auth/logout");
+      await AuthClient.logout();
     },
     onSuccess: () => {
       // SISTEMA REAL: Limpiar sessionStorage + cookies
@@ -158,10 +182,20 @@ export function useUpdateCurrentUser() {
 
   return useMutation({
     mutationFn: async (data: Partial<User>) => {
-      const response = await httpClient.put("/auth/profile", data);
-      return response.data;
+      const response = await AuthClient.updateProfile({
+        firstName: data.firstName,
+        lastName: data.lastName,
+        phone: data.phone ?? data.phoneNumber,
+        documentType: data.documentType,
+        documentNumber: data.documentNumber,
+      });
+      return response.success ? (response.data ?? null) : null;
     },
     onSuccess: (updatedUser) => {
+      if (!updatedUser) {
+        return;
+      }
+
       // Actualizar usuario en cache
       queryClient.setQueryData(currentUserKeys.user(), updatedUser);
     },
@@ -207,7 +241,8 @@ export function useHasPermission() {
 
   const hasPermission = (resource: string, action: string): boolean => {
     return permissions.some(
-      (p: any) => p.resource === resource && p.action === action
+      (permission) =>
+        permission.resource === resource && permission.action === action,
     );
   };
 
@@ -229,7 +264,7 @@ export function useHasRole() {
   const { data: roles = [] } = useCurrentUserRoles();
 
   const hasRole = (roleName: string): boolean => {
-    return roles.some((r: any) => r.name === roleName);
+    return roles.some((role) => role.name === roleName);
   };
 
   return { hasRole, roles };

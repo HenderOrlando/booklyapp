@@ -2,7 +2,15 @@ import { config } from "@/lib/config";
 
 export type ServiceKey = keyof typeof config.serviceUrls;
 
-const authPrefixes = ["auth", "users", "roles", "permissions", "audit"];
+const authPrefixes = [
+  "auth",
+  "users",
+  "roles",
+  "permissions",
+  "audit",
+  "config",
+  "app-config",
+];
 const resourcesPrefixes = [
   "resources",
   "categories",

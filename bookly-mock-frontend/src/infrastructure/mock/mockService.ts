@@ -21,6 +21,7 @@ import type {
   UpdateAcademicProgramDto,
   UpdateResourceDto,
 } from "@/types/entities/resource";
+import type { User as AuthUser, UserPreferences } from "@/types/entities/user";
 import {
   getApprovalHistory,
   getApprovalRequestById,
@@ -171,6 +172,29 @@ export class MockService {
       return this.castResponse<T>(this.mockGetCurrentUser());
     }
 
+    if (endpoint.includes("/users/me/profile") && method === "GET") {
+      return this.castResponse<T>(this.mockGetCurrentUser());
+    }
+
+    if (endpoint.includes("/users/me/photo") && method === "POST") {
+      return this.castResponse<T>(this.mockUploadProfilePhoto(payload));
+    }
+
+    if (
+      endpoint.includes("/users/me/preferences") &&
+      (method === "PUT" || method === "PATCH")
+    ) {
+      return this.castResponse<T>(
+        this.mockUpdatePreferences(payload as RequestPayload),
+      );
+    }
+
+    if (endpoint.includes("/users/me/profile") && method === "PATCH") {
+      return this.castResponse<T>(
+        this.mockUpdateProfile(payload as RequestPayload),
+      );
+    }
+
     if (endpoint.includes("/users/me") && method === "GET") {
       return this.castResponse<T>(this.mockGetCurrentUser());
     }
@@ -181,7 +205,10 @@ export class MockService {
       );
     }
 
-    if (endpoint.includes("/auth/profile") && method === "PUT") {
+    if (
+      endpoint.includes("/auth/profile") &&
+      (method === "PUT" || method === "PATCH")
+    ) {
       return this.castResponse<T>(
         this.mockUpdateProfile(payload as RequestPayload),
       );
@@ -544,6 +571,109 @@ export class MockService {
     };
   }
 
+  private static mockUploadProfilePhoto(
+    payload: unknown,
+  ): ApiResponse<unknown> {
+    let profilePicture = mockUsers[0].profilePicture;
+
+    if (typeof FormData !== "undefined" && payload instanceof FormData) {
+      const rawPhoto = payload.get("photo");
+
+      if (typeof rawPhoto === "string" && rawPhoto.length > 0) {
+        profilePicture = rawPhoto;
+      } else if (
+        rawPhoto &&
+        typeof rawPhoto === "object" &&
+        "name" in rawPhoto
+      ) {
+        const fileName = String(
+          (rawPhoto as { name?: string }).name || "profile-photo",
+        );
+        profilePicture =
+          "https://api.dicebear.com/7.x/avataaars/svg?seed=" +
+          encodeURIComponent(fileName);
+      }
+    }
+
+    if (!profilePicture) {
+      profilePicture =
+        "https://api.dicebear.com/7.x/avataaars/svg?seed=profile-" + Date.now();
+    }
+
+    const updatedUser: AuthUser = {
+      ...mockUsers[0],
+      profilePicture,
+      updatedAt: new Date().toISOString(),
+    };
+
+    mockUsers[0] = updatedUser;
+
+    return {
+      success: true,
+      data: updatedUser,
+      message: "Foto de perfil actualizada correctamente",
+      timestamp: new Date().toISOString(),
+    };
+  }
+
+  private static mockUpdatePreferences(
+    data: RequestPayload,
+  ): ApiResponse<unknown> {
+    const incomingPreferences =
+      typeof data.preferences === "object" && data.preferences !== null
+        ? (data.preferences as Partial<UserPreferences>)
+        : {};
+
+    const currentPreferences = mockUsers[0].preferences ?? {
+      language: "es",
+      theme: "light" as const,
+      notifications: {
+        email: true,
+        push: true,
+        sms: false,
+      },
+      timezone: "America/Bogota",
+    };
+
+    const currentNotifications = currentPreferences.notifications ?? {
+      email: true,
+      push: true,
+      sms: false,
+    };
+
+    const incomingNotifications =
+      typeof incomingPreferences.notifications === "object" &&
+      incomingPreferences.notifications !== null
+        ? incomingPreferences.notifications
+        : undefined;
+
+    const updatedPreferences: UserPreferences = {
+      language: incomingPreferences.language ?? currentPreferences.language,
+      theme: incomingPreferences.theme ?? currentPreferences.theme,
+      timezone: incomingPreferences.timezone ?? currentPreferences.timezone,
+      notifications: {
+        email: incomingNotifications?.email ?? currentNotifications.email,
+        push: incomingNotifications?.push ?? currentNotifications.push,
+        sms: incomingNotifications?.sms ?? currentNotifications.sms,
+      },
+    };
+
+    const updatedUser: AuthUser = {
+      ...mockUsers[0],
+      preferences: updatedPreferences,
+      updatedAt: new Date().toISOString(),
+    };
+
+    mockUsers[0] = updatedUser;
+
+    return {
+      success: true,
+      data: updatedUser,
+      message: "Preferencias actualizadas correctamente",
+      timestamp: new Date().toISOString(),
+    };
+  }
+
   private static mockRegister(userData: RequestPayload): ApiResponse<unknown> {
     // Simular registro exitoso
     const newUser = {
@@ -680,12 +810,23 @@ export class MockService {
   }
 
   private static mockUpdateProfile(data: RequestPayload): ApiResponse<unknown> {
+    const nextPhone =
+      typeof data.phone === "string"
+        ? data.phone
+        : typeof data.phoneNumber === "string"
+          ? data.phoneNumber
+          : undefined;
+
     // Simular actualización de perfil exitosa
-    const updatedUser = {
+    const updatedUser: AuthUser = {
       ...mockUsers[0],
       ...data,
+      phone: nextPhone ?? mockUsers[0].phone,
+      phoneNumber: nextPhone ?? mockUsers[0].phoneNumber,
       updatedAt: new Date().toISOString(),
     };
+
+    mockUsers[0] = updatedUser;
 
     return {
       success: true,
