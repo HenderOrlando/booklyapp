@@ -1,6 +1,7 @@
 "use client";
 
 import { useToast } from "@/hooks/useToast";
+import { i18nConfig } from "@/i18n/config";
 import { AuthClient } from "@/infrastructure/api/auth-client";
 import {
   type ErrorTranslator,
@@ -41,6 +42,96 @@ interface AuthProviderProps {
 const SESSION_TIMEOUT = 30 * 60 * 1000; // 30 minutos de inactividad
 const SESSION_WARNING_TIME = 5 * 60 * 1000; // Avisar 5 minutos antes
 const REFRESH_TOKEN_INTERVAL = 10 * 60 * 1000; // Refresh cada 10 minutos
+
+interface TokenRefreshPayload {
+  accessToken?: string;
+  token?: string;
+  refreshToken?: string;
+}
+
+interface AuthContextHttpError {
+  message?: string;
+  code?: string;
+  response?: {
+    status?: number;
+    data?: unknown;
+  };
+}
+
+function toAuthContextHttpError(error: unknown): AuthContextHttpError {
+  if (typeof error === "object" && error !== null) {
+    return error as AuthContextHttpError;
+  }
+
+  if (error instanceof Error) {
+    return { message: error.message };
+  }
+
+  return { message: String(error) };
+}
+
+function isSupportedLocale(value: string): boolean {
+  return i18nConfig.locales.includes(
+    value as (typeof i18nConfig.locales)[number],
+  );
+}
+
+function getLocaleFromPath(pathname: string): string {
+  const [firstSegment] = pathname.split("/").filter(Boolean);
+  if (firstSegment && isSupportedLocale(firstSegment)) {
+    return firstSegment;
+  }
+
+  return i18nConfig.defaultLocale;
+}
+
+function isLoginRoute(pathname: string): boolean {
+  const segments = pathname.split("/").filter(Boolean);
+
+  if (segments.length === 1) {
+    return segments[0] === "login";
+  }
+
+  if (segments.length >= 2 && isSupportedLocale(segments[0])) {
+    return segments[1] === "login";
+  }
+
+  return false;
+}
+
+function resolvePostAuthDestination(pathname: string, search: string): string {
+  const locale = getLocaleFromPath(pathname);
+  const fallbackPath = `/${locale}/dashboard`;
+  const callbackUrl = new URLSearchParams(search).get("callbackUrl");
+
+  if (!callbackUrl || typeof window === "undefined") {
+    return fallbackPath;
+  }
+
+  try {
+    const parsedUrl = new URL(callbackUrl, window.location.origin);
+    if (parsedUrl.origin !== window.location.origin) {
+      return fallbackPath;
+    }
+
+    const candidatePath = `${parsedUrl.pathname}${parsedUrl.search}${parsedUrl.hash}`;
+    if (!candidatePath.startsWith("/") || candidatePath.startsWith("//")) {
+      return fallbackPath;
+    }
+
+    if (isLoginRoute(parsedUrl.pathname)) {
+      return fallbackPath;
+    }
+
+    return candidatePath;
+  } catch (error) {
+    console.warn(
+      "No se pudo resolver callbackUrl, usando dashboard por defecto",
+      error,
+    );
+    return fallbackPath;
+  }
+}
 
 export function AuthProvider({ children }: AuthProviderProps) {
   const [user, setUser] = useState<User | null>(null);
@@ -87,6 +178,25 @@ export function AuthProvider({ children }: AuthProviderProps) {
       removeActivityListeners();
     };
   }, [user]);
+
+  // Si ya hay sesión y estamos en login, redirigir a callbackUrl o dashboard
+  useEffect(() => {
+    if (!user || typeof window === "undefined") {
+      return;
+    }
+
+    const currentPath = window.location.pathname;
+    if (!isLoginRoute(currentPath)) {
+      return;
+    }
+
+    const destination = resolvePostAuthDestination(
+      currentPath,
+      window.location.search,
+    );
+
+    router.replace(destination);
+  }, [user, router]);
 
   const checkAuth = async () => {
     const token = getToken();
@@ -149,22 +259,26 @@ export function AuthProvider({ children }: AuthProviderProps) {
           }
         }
       }
-    } catch (error: any) {
+    } catch (error: unknown) {
+      const normalizedError = toAuthContextHttpError(error);
       console.error("❌ checkAuth - Error capturado:", {
-        message: error?.message,
-        status: error?.response?.status,
-        data: error?.response?.data,
+        message: normalizedError.message,
+        status: normalizedError.response?.status,
+        data: normalizedError.response?.data,
       });
 
       // Solo limpiar sesión si es un error de autenticación válido
       const isAuthError =
-        error?.response?.status === 401 || error?.response?.status === 403;
+        normalizedError.response?.status === 401 ||
+        normalizedError.response?.status === 403;
+
+      const normalizedMessage = (normalizedError.message || "").toLowerCase();
 
       const isNetworkError =
-        !error?.response ||
-        error?.message?.includes("network") ||
-        error?.message?.includes("fetch") ||
-        error?.code === "ECONNREFUSED";
+        !normalizedError.response ||
+        normalizedMessage.includes("network") ||
+        normalizedMessage.includes("fetch") ||
+        normalizedError.code === "ECONNREFUSED";
 
       if (isAuthError) {
         console.log(
@@ -230,7 +344,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
         // Otro tipo de error: ser conservador y mantener sesión completa
         console.warn(
           "⚠️ checkAuth - Error desconocido, manteniendo sesión completa. Error:",
-          error?.message,
+          normalizedError.message,
         );
         // Si hay un usuario válido previo, usarlo
         if (lastValidUserRef.current && !user) {
@@ -257,9 +371,9 @@ export function AuthProvider({ children }: AuthProviderProps) {
       const response = await AuthClient.refreshToken(currentRefreshToken);
 
       if (response.success && response.data) {
-        const newAccessToken =
-          (response.data as any).accessToken || (response.data as any).token;
-        const newRefreshToken = (response.data as any).refreshToken;
+        const tokenPayload = response.data as TokenRefreshPayload;
+        const newAccessToken = tokenPayload.accessToken || tokenPayload.token;
+        const newRefreshToken = tokenPayload.refreshToken;
         const rememberMe = isRememberMeEnabled();
 
         if (newAccessToken) {
@@ -307,12 +421,19 @@ export function AuthProvider({ children }: AuthProviderProps) {
           `Bienvenido ${user.firstName || user.email}`,
         );
 
-        // Redirigir al dashboard
-        router.push("/dashboard");
+        const destination =
+          typeof window !== "undefined"
+            ? resolvePostAuthDestination(
+                window.location.pathname,
+                window.location.search,
+              )
+            : `/${i18nConfig.defaultLocale}/dashboard`;
+
+        router.replace(destination);
       } else {
         throw new Error(response.message || "Error al iniciar sesión");
       }
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error("Error en login:", error);
       const resolvedMessage = resolveErrorMessage(
         error,
@@ -377,9 +498,9 @@ export function AuthProvider({ children }: AuthProviderProps) {
 
       if (response.success && response.data) {
         // El backend puede devolver { token, expiresIn } o { accessToken, refreshToken }
-        const newAccessToken =
-          (response.data as any).accessToken || (response.data as any).token;
-        const newRefreshToken = (response.data as any).refreshToken;
+        const tokenPayload = response.data as TokenRefreshPayload;
+        const newAccessToken = tokenPayload.accessToken || tokenPayload.token;
+        const newRefreshToken = tokenPayload.refreshToken;
         const rememberMe = isRememberMeEnabled();
 
         if (newAccessToken) {

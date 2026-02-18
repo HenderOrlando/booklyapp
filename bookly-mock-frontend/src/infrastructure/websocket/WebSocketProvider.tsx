@@ -61,6 +61,7 @@ export function WebSocketProvider({
       typeof window !== "undefined"
         ? localStorage.getItem("accessToken") || undefined
         : undefined,
+    enabled: shouldEnable,
     autoConnect: shouldEnable,
     reconnect: shouldEnable,
     onConnected: () => {
@@ -136,19 +137,6 @@ export function WebSocketProvider({
       subscriptionsRef.current.delete(event);
     });
   }, []);
-
-  const prevShouldEnable = useRef(shouldEnable);
-
-  useEffect(() => {
-    if (prevShouldEnable.current && !shouldEnable) {
-      unsubscribeAll();
-      websocket.disconnect();
-    } else if (!prevShouldEnable.current && shouldEnable) {
-      websocket.connect();
-    }
-
-    prevShouldEnable.current = shouldEnable;
-  }, [shouldEnable, unsubscribeAll, websocket]);
 
   useEffect(() => {
     return () => {

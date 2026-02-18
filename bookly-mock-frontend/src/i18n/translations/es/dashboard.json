@@ -13,7 +13,7 @@
   "no_data": "No hay datos disponibles",
   "reservations_count": "reservas",
   "total_this_month": "Total este mes",
-  "of_total": "De {{total}} totales",
+  "of_total": "De {total} totales",
   "require_attention": "Requieren atención",
   "monthly_avg": "Promedio mensual",
   "resource": "Recurso"

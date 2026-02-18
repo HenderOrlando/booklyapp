@@ -6,6 +6,7 @@
 
 import { ReportsClient } from "@/infrastructure/api/reports-client";
 import { ReservationsClient } from "@/infrastructure/api/reservations-client";
+import type { Reservation } from "@/types/entities/reservation";
 import { useQuery } from "@tanstack/react-query";
 import { useCurrentUser } from "./useCurrentUser";
 
@@ -104,8 +105,10 @@ export function useUserStats() {
         throw new Error("User ID not available");
       }
       const response = await ReportsClient.getUserReport(userId);
+      const userStats = response.data as unknown as UserStats | undefined;
+
       return (
-        (response.data as any) || {
+        userStats || {
           totalReservations: 0,
           activeReservations: 0,
           canceledReservations: 0,
@@ -133,8 +136,10 @@ export function useDashboardMetrics() {
     queryKey: dashboardKeys.metrics(),
     queryFn: async () => {
       const response = await ReportsClient.getKPIs();
+      const metrics = response.data as unknown as DashboardMetrics | undefined;
+
       return (
-        (response.data as any) || {
+        metrics || {
           totalResources: 0,
           availableResources: 0,
           resourcesInUse: 0,
@@ -166,8 +171,12 @@ export function useResourceStats() {
     queryFn: async () => {
       // Usamos getDashboardData como proxy para overview
       const response = await ReportsClient.getDashboardData("overview");
+      const resourceStats = response.data as unknown as
+        | ResourceStats
+        | undefined;
+
       return (
-        (response.data as any) || {
+        resourceStats || {
           byCategory: {},
           byStatus: {},
           utilizationByResource: [],
@@ -191,8 +200,12 @@ export function useReservationStats() {
     queryKey: dashboardKeys.reservationStats(),
     queryFn: async () => {
       const response = await ReportsClient.getOccupancyReport();
+      const reservationStats = response.data as unknown as
+        | ReservationStats
+        | undefined;
+
       return (
-        (response.data as any) || {
+        reservationStats || {
           byStatus: {},
           byProgram: {},
           peakHours: [],
@@ -218,7 +231,13 @@ export function useRecentActivity(limit: number = 10) {
     queryKey: [...dashboardKeys.recentActivity(), limit],
     queryFn: async () => {
       const response = await ReportsClient.getAnalytics("recent");
-      return (response.data as any)?.items || [];
+      const analyticsPayload = response.data as
+        | { items?: unknown[] }
+        | undefined;
+
+      return Array.isArray(analyticsPayload?.items)
+        ? analyticsPayload.items
+        : [];
     },
     staleTime: 1000 * 60 * 1, // 1 minuto (muy dinámico)
   });
@@ -233,14 +252,39 @@ export function useRecentActivity(limit: number = 10) {
  * ```
  */
 export function useUpcomingReservations() {
-  return useQuery({
+  return useQuery<Reservation[]>({
     queryKey: dashboardKeys.upcomingReservations(),
     queryFn: async () => {
       const response = await ReservationsClient.search({
-        status: "upcoming",
+        startDate: new Date().toISOString(),
         limit: 10,
       });
-      return response.data?.items || [];
+
+      const now = Date.now();
+      const reservations = response.data?.items || [];
+
+      return reservations
+        .filter((reservation) => {
+          const normalizedStatus = String(
+            reservation.status || "",
+          ).toUpperCase();
+
+          if (
+            normalizedStatus === "CANCELLED" ||
+            normalizedStatus === "COMPLETED" ||
+            normalizedStatus === "REJECTED"
+          ) {
+            return false;
+          }
+
+          const startsAt = new Date(reservation.startDate).getTime();
+          return Number.isFinite(startsAt) && startsAt >= now;
+        })
+        .sort(
+          (a, b) =>
+            new Date(a.startDate).getTime() - new Date(b.startDate).getTime(),
+        )
+        .slice(0, 10);
     },
     staleTime: 1000 * 60 * 3, // 3 minutos
   });

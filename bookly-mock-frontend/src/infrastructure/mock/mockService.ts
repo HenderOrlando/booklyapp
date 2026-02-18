@@ -5,6 +5,22 @@
 
 import { isMockMode } from "@/lib/config";
 import { ApiResponse } from "@/types/api/response";
+import type { ApprovalRequest } from "@/types/entities/approval";
+import type {
+  CreateReservationDto,
+  Reservation,
+  UpdateReservationDto,
+} from "@/types/entities/reservation";
+import type {
+  AcademicProgram,
+  Category,
+  CreateAcademicProgramDto,
+  CreateResourceDto,
+  Maintenance,
+  Resource,
+  UpdateAcademicProgramDto,
+  UpdateResourceDto,
+} from "@/types/entities/resource";
 import {
   getApprovalHistory,
   getApprovalRequestById,
@@ -19,6 +35,11 @@ import {
   mockUsers,
 } from "./data";
 import { mockReservations } from "./data/reservations-service.mock";
+import type {
+  ProgramResourceAssociation,
+  ProgramUserAssociation,
+  User as ResourceUser,
+} from "./data/resources-service.mock";
 import {
   mockAcademicPrograms,
   mockCategories,
@@ -29,18 +50,84 @@ import {
   mockUsers as mockResourceUsers,
 } from "./data/resources-service.mock";
 
+type RequestPayload = Record<string, unknown>;
+
+interface LoginPayload {
+  email: string;
+  password: string;
+}
+
+interface ForgotPasswordPayload {
+  email: string;
+}
+
+interface ResetPasswordPayload {
+  token: string;
+  newPassword: string;
+}
+
+interface ChangePasswordPayload {
+  currentPassword: string;
+  newPassword: string;
+}
+
+interface ProgramResourceAssociationInput {
+  programId: string;
+  resourceId: string;
+  priority?: number;
+}
+
+interface ProgramUserAssociationInput {
+  programId: string;
+  userId: string;
+  role?: ProgramUserAssociation["role"];
+}
+
+interface ApprovalRequestInput {
+  reservationId?: string;
+  userId?: string;
+  userName?: string;
+  userEmail?: string;
+  userRole?: string;
+  resourceId?: string;
+  resourceName?: string;
+  resourceType?: string;
+  categoryName?: string;
+  startDate?: string;
+  endDate?: string;
+  purpose?: string;
+  attendees?: number;
+  priority?: ApprovalRequest["priority"];
+  currentLevel?: ApprovalRequest["currentLevel"];
+  maxLevel?: ApprovalRequest["maxLevel"];
+}
+
+interface ApprovalActionInput {
+  comment?: string;
+  reason?: string;
+}
+
 export class MockService {
   // Copias mutables de los datos mock
-  private static resourcesData = [...mockResources];
-  private static categoriesData = [...mockCategories];
-  private static maintenancesData = [...mockMaintenances];
-  private static academicProgramsData = [...mockAcademicPrograms];
-  private static programResourceAssociationsData = [
-    ...mockProgramResourceAssociations,
+  private static resourcesData: Resource[] = [...mockResources];
+  private static categoriesData: Category[] = [...mockCategories];
+  private static maintenancesData: Maintenance[] = [...mockMaintenances];
+  private static academicProgramsData: AcademicProgram[] = [
+    ...mockAcademicPrograms,
   ];
-  private static programUserAssociationsData = [...mockProgramUserAssociations];
-  private static resourceUsersData = [...mockResourceUsers];
-  private static reservationsData = [...mockReservations];
+  private static programResourceAssociationsData: ProgramResourceAssociation[] =
+    [...mockProgramResourceAssociations];
+  private static programUserAssociationsData: ProgramUserAssociation[] = [
+    ...mockProgramUserAssociations,
+  ];
+  private static resourceUsersData: ResourceUser[] = [...mockResourceUsers];
+  private static reservationsData: Reservation[] = [...mockReservations];
+
+  private static castResponse<T>(
+    response: ApiResponse<unknown>,
+  ): ApiResponse<T> {
+    return response as ApiResponse<T>;
+  }
 
   /**
    * Simula una llamada HTTP con datos mock
@@ -48,66 +135,78 @@ export class MockService {
   static async mockRequest<T>(
     endpoint: string,
     method: string = "GET",
-    data?: any,
+    data?: unknown,
   ): Promise<ApiResponse<T>> {
     // Simular delay de red
     await mockDelay(300);
 
+    const payload = data as unknown;
+
     // Simular diferentes endpoints
     if (endpoint.includes("/auth/login") && method === "POST") {
-      return this.mockLogin(data) as any;
+      return this.castResponse<T>(this.mockLogin(payload as LoginPayload));
     }
 
     if (endpoint.includes("/auth/register") && method === "POST") {
-      return this.mockRegister(data) as any;
+      return this.castResponse<T>(this.mockRegister(payload as RequestPayload));
     }
 
     if (endpoint.includes("/auth/forgot-password") && method === "POST") {
-      return this.mockForgotPassword(data) as any;
+      return this.castResponse<T>(
+        this.mockForgotPassword(payload as ForgotPasswordPayload),
+      );
     }
 
     if (endpoint.includes("/auth/reset-password") && method === "POST") {
-      return this.mockResetPassword(data) as any;
+      return this.castResponse<T>(
+        this.mockResetPassword(payload as ResetPasswordPayload),
+      );
     }
 
     if (endpoint.includes("/auth/me") && method === "GET") {
-      return this.mockGetCurrentUser() as any;
+      return this.castResponse<T>(this.mockGetCurrentUser());
     }
 
     if (endpoint.includes("/auth/profile") && method === "GET") {
-      return this.mockGetCurrentUser() as any;
+      return this.castResponse<T>(this.mockGetCurrentUser());
     }
 
     if (endpoint.includes("/users/me") && method === "GET") {
-      return this.mockGetCurrentUser() as any;
+      return this.castResponse<T>(this.mockGetCurrentUser());
     }
 
     if (endpoint.includes("/users/me") && method === "PUT") {
-      return this.mockUpdateProfile(data) as any;
+      return this.castResponse<T>(
+        this.mockUpdateProfile(payload as RequestPayload),
+      );
     }
 
     if (endpoint.includes("/auth/profile") && method === "PUT") {
-      return this.mockUpdateProfile(data) as any;
+      return this.castResponse<T>(
+        this.mockUpdateProfile(payload as RequestPayload),
+      );
     }
 
     if (endpoint.includes("/auth/change-password") && method === "POST") {
-      return this.mockChangePassword(data) as any;
+      return this.castResponse<T>(
+        this.mockChangePassword(payload as ChangePasswordPayload),
+      );
     }
 
     if (endpoint.includes("/users") && method === "GET") {
-      return this.mockGetUsers() as any;
+      return this.castResponse<T>(this.mockGetUsers());
     }
 
     if (endpoint.includes("/roles") && method === "GET") {
-      return this.mockGetRoles() as any;
+      return this.castResponse<T>(this.mockGetRoles());
     }
 
     if (endpoint.includes("/permissions") && method === "GET") {
-      return this.mockGetPermissions() as any;
+      return this.castResponse<T>(this.mockGetPermissions());
     }
 
     if (endpoint.includes("/audit/logs") && method === "GET") {
-      return this.mockGetAuditLogs() as any;
+      return this.castResponse<T>(this.mockGetAuditLogs());
     }
 
     // ============================================
@@ -118,7 +217,7 @@ export class MockService {
       // Verificar si es un ID específico
       const idMatch = endpoint.match(/\/resources\/([^/]+)$/);
       if (idMatch && idMatch[1] !== "search") {
-        return this.mockGetResourceById(idMatch[1]) as any;
+        return this.castResponse<T>(this.mockGetResourceById(idMatch[1]));
       }
 
       // Extraer query params sin usar URL externa
@@ -127,89 +226,116 @@ export class MockService {
       const page = parseInt(params.get("page") || "1");
       const limit = parseInt(params.get("limit") || "20");
 
-      return this.mockGetResources(page, limit) as any;
+      return this.castResponse<T>(this.mockGetResources(page, limit));
     }
 
     if (endpoint.includes("/resources") && method === "POST") {
-      return this.mockCreateResource(data) as any;
+      return this.castResponse<T>(
+        this.mockCreateResource(payload as CreateResourceDto),
+      );
     }
 
     if (endpoint.includes("/resources") && method === "PATCH") {
       const idMatch = endpoint.match(/\/resources\/([^/]+)$/);
       if (idMatch) {
-        return this.mockUpdateResource(idMatch[1], data) as any;
+        return this.castResponse<T>(
+          this.mockUpdateResource(idMatch[1], payload as UpdateResourceDto),
+        );
       }
     }
 
     if (endpoint.includes("/resources") && method === "DELETE") {
       const idMatch = endpoint.match(/\/resources\/([^/]+)$/);
       if (idMatch) {
-        return this.mockDeleteResource(idMatch[1]) as any;
+        return this.castResponse<T>(this.mockDeleteResource(idMatch[1]));
       }
     }
 
     if (endpoint.includes("/categories") && method === "GET") {
-      return this.mockGetCategories() as any;
+      return this.castResponse<T>(this.mockGetCategories());
     }
 
     if (endpoint.includes("/maintenances") && method === "GET") {
-      return this.mockGetMaintenances() as any;
+      return this.castResponse<T>(this.mockGetMaintenances());
     }
 
     if (endpoint.includes("/academic-programs") && method === "GET") {
       const idMatch = endpoint.match(/\/academic-programs\/([^/]+)$/);
       if (idMatch) {
-        return this.mockGetAcademicProgramById(idMatch[1]) as any;
+        return this.castResponse<T>(
+          this.mockGetAcademicProgramById(idMatch[1]),
+        );
       }
-      return this.mockGetAcademicPrograms() as any;
+      return this.castResponse<T>(this.mockGetAcademicPrograms());
     }
 
     if (endpoint.includes("/academic-programs") && method === "POST") {
-      return this.mockCreateAcademicProgram(data) as any;
+      return this.castResponse<T>(
+        this.mockCreateAcademicProgram(payload as CreateAcademicProgramDto),
+      );
     }
 
     if (endpoint.includes("/academic-programs") && method === "PUT") {
       const idMatch = endpoint.match(/\/academic-programs\/([^/]+)$/);
       if (idMatch) {
-        return this.mockUpdateAcademicProgram(idMatch[1], data) as any;
+        return this.castResponse<T>(
+          this.mockUpdateAcademicProgram(
+            idMatch[1],
+            payload as UpdateAcademicProgramDto,
+          ),
+        );
       }
     }
 
     if (endpoint.includes("/program-resources") && method === "GET") {
       const programIdMatch = endpoint.match(/programId=([^&]+)/);
       if (programIdMatch) {
-        return this.mockGetProgramResources(programIdMatch[1]) as any;
+        return this.castResponse<T>(
+          this.mockGetProgramResources(programIdMatch[1]),
+        );
       }
-      return this.mockGetProgramResourceAssociations() as any;
+      return this.castResponse<T>(this.mockGetProgramResourceAssociations());
     }
 
     if (endpoint.includes("/program-resources") && method === "POST") {
-      return this.mockAddResourceToProgram(data) as any;
+      return this.castResponse<T>(
+        this.mockAddResourceToProgram(
+          payload as ProgramResourceAssociationInput,
+        ),
+      );
     }
 
     if (endpoint.includes("/program-resources") && method === "DELETE") {
       const match = endpoint.match(/programId=([^&]+)&resourceId=([^&]+)/);
       if (match) {
-        return this.mockRemoveResourceFromProgram(match[1], match[2]) as any;
+        return this.castResponse<T>(
+          this.mockRemoveResourceFromProgram(match[1], match[2]),
+        );
       }
     }
 
     if (endpoint.includes("/program-users") && method === "GET") {
       const programIdMatch = endpoint.match(/programId=([^&]+)/);
       if (programIdMatch) {
-        return this.mockGetProgramUsers(programIdMatch[1]) as any;
+        return this.castResponse<T>(
+          this.mockGetProgramUsers(programIdMatch[1]),
+        );
       }
-      return this.mockGetProgramUserAssociations() as any;
+      return this.castResponse<T>(this.mockGetProgramUserAssociations());
     }
 
     if (endpoint.includes("/program-users") && method === "POST") {
-      return this.mockAddUserToProgram(data) as any;
+      return this.castResponse<T>(
+        this.mockAddUserToProgram(payload as ProgramUserAssociationInput),
+      );
     }
 
     if (endpoint.includes("/program-users") && method === "DELETE") {
       const match = endpoint.match(/programId=([^&]+)&userId=([^&]+)/);
       if (match) {
-        return this.mockRemoveUserFromProgram(match[1], match[2]) as any;
+        return this.castResponse<T>(
+          this.mockRemoveUserFromProgram(match[1], match[2]),
+        );
       }
     }
 
@@ -221,22 +347,24 @@ export class MockService {
       endpoint.includes("/approval-requests/statistics") &&
       method === "GET"
     ) {
-      return this.mockGetApprovalStatistics() as any;
+      return this.castResponse<T>(this.mockGetApprovalStatistics());
     }
 
     if (
       endpoint.includes("/approval-requests/active-today") &&
       method === "GET"
     ) {
-      return this.mockGetApprovalRequests() as any;
+      return this.castResponse<T>(this.mockGetApprovalRequests());
     }
 
     if (endpoint.includes("/approval-requests") && method === "GET") {
       const idMatch = endpoint.match(/\/approval-requests\/([^/?]+)$/);
       if (idMatch && !["active-today", "statistics"].includes(idMatch[1])) {
-        return this.mockGetApprovalRequestById(idMatch[1]) as any;
+        return this.castResponse<T>(
+          this.mockGetApprovalRequestById(idMatch[1]),
+        );
       }
-      return this.mockGetApprovalRequests() as any;
+      return this.castResponse<T>(this.mockGetApprovalRequests());
     }
 
     if (endpoint.includes("/approval-requests") && method === "POST") {
@@ -244,54 +372,112 @@ export class MockService {
         /\/approval-requests\/([^/]+)\/approve$/,
       );
       if (approveMatch) {
-        return this.mockApproveApprovalRequest(approveMatch[1], data) as any;
+        return this.castResponse<T>(
+          this.mockApproveApprovalRequest(
+            approveMatch[1],
+            payload as ApprovalActionInput,
+          ),
+        );
       }
 
       const rejectMatch = endpoint.match(
         /\/approval-requests\/([^/]+)\/reject$/,
       );
       if (rejectMatch) {
-        return this.mockRejectApprovalRequest(rejectMatch[1], data) as any;
+        return this.castResponse<T>(
+          this.mockRejectApprovalRequest(
+            rejectMatch[1],
+            payload as ApprovalActionInput,
+          ),
+        );
       }
 
       const cancelMatch = endpoint.match(
         /\/approval-requests\/([^/]+)\/cancel$/,
       );
       if (cancelMatch) {
-        return this.mockCancelApprovalRequest(cancelMatch[1], data) as any;
+        return this.castResponse<T>(
+          this.mockCancelApprovalRequest(
+            cancelMatch[1],
+            payload as ApprovalActionInput,
+          ),
+        );
       }
 
-      return this.mockCreateApprovalRequest(data) as any;
+      return this.castResponse<T>(
+        this.mockCreateApprovalRequest(payload as ApprovalRequestInput),
+      );
     }
 
     // ============================================
     // RESERVATIONS SERVICE ENDPOINTS
     // ============================================
 
+    if (endpoint.includes("/dashboard/kpis") && method === "GET") {
+      return this.castResponse<T>(this.mockGetDashboardKPIs());
+    }
+
+    if (endpoint.includes("/dashboard/overview") && method === "GET") {
+      return this.castResponse<T>(this.mockGetDashboardOverview());
+    }
+
+    if (endpoint.includes("/dashboard/occupancy") && method === "GET") {
+      return this.castResponse<T>(this.mockGetDashboardOccupancy());
+    }
+
+    if (endpoint.includes("/dashboard/trends") && method === "GET") {
+      return this.castResponse<T>(this.mockGetDashboardTrends());
+    }
+
+    if (endpoint.includes("/user-reports") && method === "GET") {
+      const queryString = endpoint.split("?")[1] || "";
+      const params = new URLSearchParams(queryString);
+      const userId = params.get("userId") || undefined;
+      return this.castResponse<T>(this.mockGetUserReportSummary(userId));
+    }
+
     if (endpoint.includes("/reservations") && method === "GET") {
       // Verificar si es un ID específico
       const idMatch = endpoint.match(/\/reservations\/([^/]+)$/);
       if (idMatch) {
-        return this.mockGetReservationById(idMatch[1]) as any;
+        return this.castResponse<T>(this.mockGetReservationById(idMatch[1]));
       }
-      return this.mockGetReservations() as any;
+
+      const queryString = endpoint.split("?")[1] || "";
+      const params = new URLSearchParams(queryString);
+      const status = params.get("status") || undefined;
+      const limit = Number.parseInt(params.get("limit") || "50", 10);
+
+      return this.castResponse<T>(
+        this.mockGetReservations({
+          status,
+          limit: Number.isFinite(limit) ? limit : 50,
+        }),
+      );
     }
 
     if (endpoint.includes("/reservations") && method === "POST") {
-      return this.mockCreateReservation(data) as any;
+      return this.castResponse<T>(
+        this.mockCreateReservation(payload as CreateReservationDto),
+      );
     }
 
     if (endpoint.includes("/reservations") && method === "PATCH") {
       const idMatch = endpoint.match(/\/reservations\/([^/]+)$/);
       if (idMatch) {
-        return this.mockUpdateReservation(idMatch[1], data) as any;
+        return this.castResponse<T>(
+          this.mockUpdateReservation(
+            idMatch[1],
+            payload as UpdateReservationDto,
+          ),
+        );
       }
     }
 
     if (endpoint.includes("/reservations") && method === "DELETE") {
       const idMatch = endpoint.match(/\/reservations\/([^/]+)$/);
       if (idMatch) {
-        return this.mockCancelReservation(idMatch[1]) as any;
+        return this.castResponse<T>(this.mockCancelReservation(idMatch[1]));
       }
     }
 
@@ -306,7 +492,7 @@ export class MockService {
   private static mockLogin(credentials: {
     email: string;
     password: string;
-  }): ApiResponse<any> {
+  }): ApiResponse<unknown> {
     const result = getMockLoginResponse(
       credentials.email,
       credentials.password,
@@ -335,7 +521,7 @@ export class MockService {
     };
   }
 
-  private static mockRegister(userData: any): ApiResponse<any> {
+  private static mockRegister(userData: RequestPayload): ApiResponse<unknown> {
     // Simular registro exitoso
     const newUser = {
       id: `user_${Date.now()}`,
@@ -363,7 +549,9 @@ export class MockService {
     };
   }
 
-  private static mockForgotPassword(data: { email: string }): ApiResponse<any> {
+  private static mockForgotPassword(data: {
+    email: string;
+  }): ApiResponse<unknown> {
     const { email } = data;
 
     // Validar email
@@ -417,7 +605,7 @@ export class MockService {
   private static mockResetPassword(data: {
     token: string;
     newPassword: string;
-  }): ApiResponse<any> {
+  }): ApiResponse<unknown> {
     const { token, newPassword } = data;
 
     // Validaciones
@@ -460,7 +648,7 @@ export class MockService {
     };
   }
 
-  private static mockGetCurrentUser(): ApiResponse<any> {
+  private static mockGetCurrentUser(): ApiResponse<unknown> {
     return {
       success: true,
       data: mockUsers[0], // Admin por defecto
@@ -468,7 +656,7 @@ export class MockService {
     };
   }
 
-  private static mockUpdateProfile(data: any): ApiResponse<any> {
+  private static mockUpdateProfile(data: RequestPayload): ApiResponse<unknown> {
     // Simular actualización de perfil exitosa
     const updatedUser = {
       ...mockUsers[0],
@@ -490,7 +678,7 @@ export class MockService {
   private static mockChangePassword(data: {
     currentPassword: string;
     newPassword: string;
-  }): ApiResponse<any> {
+  }): ApiResponse<unknown> {
     const { currentPassword, newPassword } = data;
 
     // Validaciones
@@ -529,7 +717,7 @@ export class MockService {
   // USERS ENDPOINTS
   // ============================================
 
-  private static mockGetUsers(): ApiResponse<any> {
+  private static mockGetUsers(): ApiResponse<unknown> {
     // Extender usuarios con roles como strings para UI de admin
     const usersExtended = mockUsers.map((user) => ({
       ...user,
@@ -557,7 +745,7 @@ export class MockService {
   // ROLES ENDPOINTS
   // ============================================
 
-  private static mockGetRoles(): ApiResponse<any> {
+  private static mockGetRoles(): ApiResponse<unknown> {
     // Extender roles con usersCount para UI de admin
     const rolesExtended = mockRoles.map((role, index) => ({
       ...role,
@@ -585,7 +773,7 @@ export class MockService {
   // PERMISSIONS ENDPOINTS
   // ============================================
 
-  private static mockGetPermissions(): ApiResponse<any> {
+  private static mockGetPermissions(): ApiResponse<unknown> {
     return {
       success: true,
       data: {
@@ -607,7 +795,7 @@ export class MockService {
   // AUDIT ENDPOINTS
   // ============================================
 
-  private static mockGetAuditLogs(): ApiResponse<any> {
+  private static mockGetAuditLogs(): ApiResponse<unknown> {
     // Usar logs de auditoría importados desde ./data/audit.mock.ts
     return {
       success: true,
@@ -633,7 +821,7 @@ export class MockService {
   private static mockGetResources(
     page: number = 1,
     limit: number = 20,
-  ): ApiResponse<any> {
+  ): ApiResponse<unknown> {
     const total = this.resourcesData.length;
     const totalPages = Math.ceil(total / limit);
     const startIndex = (page - 1) * limit;
@@ -658,8 +846,10 @@ export class MockService {
     };
   }
 
-  private static mockGetResourceById(id: string): ApiResponse<any> {
-    const resource = this.resourcesData.find((r: any) => r.id === id);
+  private static mockGetResourceById(id: string): ApiResponse<unknown> {
+    const resource = this.resourcesData.find(
+      (resourceItem) => resourceItem.id === id,
+    );
 
     if (!resource) {
       throw {
@@ -684,7 +874,9 @@ export class MockService {
     };
   }
 
-  private static mockCreateResource(data: any): ApiResponse<any> {
+  private static mockCreateResource(
+    data: CreateResourceDto,
+  ): ApiResponse<unknown> {
     const newResource = {
       id: `res_${Date.now()}`,
       ...data,
@@ -694,7 +886,7 @@ export class MockService {
       updatedAt: new Date().toISOString(),
     };
 
-    this.resourcesData.push(newResource);
+    this.resourcesData.push(newResource as Resource);
 
     return {
       success: true,
@@ -704,8 +896,13 @@ export class MockService {
     };
   }
 
-  private static mockUpdateResource(id: string, data: any): ApiResponse<any> {
-    const index = this.resourcesData.findIndex((r: any) => r.id === id);
+  private static mockUpdateResource(
+    id: string,
+    data: UpdateResourceDto,
+  ): ApiResponse<unknown> {
+    const index = this.resourcesData.findIndex(
+      (resourceItem) => resourceItem.id === id,
+    );
 
     if (index === -1) {
       throw {
@@ -736,8 +933,10 @@ export class MockService {
     };
   }
 
-  private static mockDeleteResource(id: string): ApiResponse<any> {
-    const index = this.resourcesData.findIndex((r: any) => r.id === id);
+  private static mockDeleteResource(id: string): ApiResponse<unknown> {
+    const index = this.resourcesData.findIndex(
+      (resourceItem) => resourceItem.id === id,
+    );
 
     if (index === -1) {
       throw {
@@ -764,7 +963,7 @@ export class MockService {
     };
   }
 
-  private static mockGetCategories(): ApiResponse<any> {
+  private static mockGetCategories(): ApiResponse<unknown> {
     return {
       success: true,
       data: {
@@ -783,7 +982,7 @@ export class MockService {
     };
   }
 
-  private static mockGetMaintenances(): ApiResponse<any> {
+  private static mockGetMaintenances(): ApiResponse<unknown> {
     return {
       success: true,
       data: {
@@ -806,7 +1005,7 @@ export class MockService {
   // ACADEMIC PROGRAMS ENDPOINTS
   // ============================================
 
-  private static mockGetAcademicPrograms(): ApiResponse<any> {
+  private static mockGetAcademicPrograms(): ApiResponse<unknown> {
     return {
       success: true,
       data: {
@@ -825,8 +1024,10 @@ export class MockService {
     };
   }
 
-  private static mockGetAcademicProgramById(id: string): ApiResponse<any> {
-    const program = this.academicProgramsData.find((p: any) => p.id === id);
+  private static mockGetAcademicProgramById(id: string): ApiResponse<unknown> {
+    const program = this.academicProgramsData.find(
+      (academicProgram) => academicProgram.id === id,
+    );
 
     if (!program) {
       throw {
@@ -848,12 +1049,15 @@ export class MockService {
     };
   }
 
-  private static mockCreateAcademicProgram(data: any): ApiResponse<any> {
-    const newProgram = {
+  private static mockCreateAcademicProgram(
+    data: CreateAcademicProgramDto,
+  ): ApiResponse<unknown> {
+    const newProgram: AcademicProgram = {
       id: `prog_${Date.now()}`,
       ...data,
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString(),
+      isActive: true,
     };
 
     this.academicProgramsData.push(newProgram);
@@ -868,9 +1072,11 @@ export class MockService {
 
   private static mockUpdateAcademicProgram(
     id: string,
-    data: any,
-  ): ApiResponse<any> {
-    const index = this.academicProgramsData.findIndex((p: any) => p.id === id);
+    data: UpdateAcademicProgramDto,
+  ): ApiResponse<unknown> {
+    const index = this.academicProgramsData.findIndex(
+      (academicProgram) => academicProgram.id === id,
+    );
 
     if (index === -1) {
       throw {
@@ -888,6 +1094,7 @@ export class MockService {
       ...this.academicProgramsData[index],
       ...data,
       updatedAt: new Date().toISOString(),
+      isActive: true,
     };
 
     return {
@@ -902,7 +1109,7 @@ export class MockService {
   // PROGRAM-RESOURCE ASSOCIATIONS
   // ============================================
 
-  private static mockGetProgramResourceAssociations(): ApiResponse<any> {
+  private static mockGetProgramResourceAssociations(): ApiResponse<unknown> {
     return {
       success: true,
       data: {
@@ -913,19 +1120,24 @@ export class MockService {
     };
   }
 
-  private static mockGetProgramResources(programId: string): ApiResponse<any> {
+  private static mockGetProgramResources(
+    programId: string,
+  ): ApiResponse<unknown> {
     const associations = this.programResourceAssociationsData.filter(
-      (a: any) => a.programId === programId,
+      (association) => association.programId === programId,
     );
 
-    const resources = associations
-      .map((assoc: any) => {
-        const resource = this.resourcesData.find(
-          (r: any) => r.id === assoc.resourceId,
-        );
-        return resource ? { ...resource, priority: assoc.priority } : null;
-      })
-      .filter(Boolean);
+    const resources = associations.flatMap((association) => {
+      const resource = this.resourcesData.find(
+        (resourceItem) => resourceItem.id === association.resourceId,
+      );
+
+      if (!resource) {
+        return [];
+      }
+
+      return [{ ...resource, priority: association.priority }];
+    });
 
     return {
       success: true,
@@ -937,8 +1149,10 @@ export class MockService {
     };
   }
 
-  private static mockAddResourceToProgram(data: any): ApiResponse<any> {
-    const newAssociation = {
+  private static mockAddResourceToProgram(
+    data: ProgramResourceAssociationInput,
+  ): ApiResponse<unknown> {
+    const newAssociation: ProgramResourceAssociation = {
       programId: data.programId,
       resourceId: data.resourceId,
       priority: data.priority || 3,
@@ -958,9 +1172,11 @@ export class MockService {
   private static mockRemoveResourceFromProgram(
     programId: string,
     resourceId: string,
-  ): ApiResponse<any> {
+  ): ApiResponse<unknown> {
     const index = this.programResourceAssociationsData.findIndex(
-      (a: any) => a.programId === programId && a.resourceId === resourceId,
+      (association) =>
+        association.programId === programId &&
+        association.resourceId === resourceId,
     );
 
     if (index === -1) {
@@ -989,7 +1205,7 @@ export class MockService {
   // PROGRAM-USER ASSOCIATIONS
   // ============================================
 
-  private static mockGetProgramUserAssociations(): ApiResponse<any> {
+  private static mockGetProgramUserAssociations(): ApiResponse<unknown> {
     return {
       success: true,
       data: {
@@ -1000,25 +1216,28 @@ export class MockService {
     };
   }
 
-  private static mockGetProgramUsers(programId: string): ApiResponse<any> {
+  private static mockGetProgramUsers(programId: string): ApiResponse<unknown> {
     const associations = this.programUserAssociationsData.filter(
-      (a: any) => a.programId === programId,
+      (association) => association.programId === programId,
     );
 
-    const users = associations
-      .map((assoc: any) => {
-        const user = this.resourceUsersData.find(
-          (u: any) => u.id === assoc.userId,
-        );
-        return user
-          ? {
-              ...user,
-              programRole: assoc.role,
-              enrollmentDate: assoc.enrollmentDate,
-            }
-          : null;
-      })
-      .filter(Boolean);
+    const users = associations.flatMap((association) => {
+      const user = this.resourceUsersData.find(
+        (resourceUser) => resourceUser.id === association.userId,
+      );
+
+      if (!user) {
+        return [];
+      }
+
+      return [
+        {
+          ...user,
+          programRole: association.role,
+          enrollmentDate: association.enrollmentDate,
+        },
+      ];
+    });
 
     return {
       success: true,
@@ -1030,8 +1249,10 @@ export class MockService {
     };
   }
 
-  private static mockAddUserToProgram(data: any): ApiResponse<any> {
-    const newAssociation = {
+  private static mockAddUserToProgram(
+    data: ProgramUserAssociationInput,
+  ): ApiResponse<unknown> {
+    const newAssociation: ProgramUserAssociation = {
       programId: data.programId,
       userId: data.userId,
       role: data.role || "STUDENT",
@@ -1051,9 +1272,10 @@ export class MockService {
   private static mockRemoveUserFromProgram(
     programId: string,
     userId: string,
-  ): ApiResponse<any> {
+  ): ApiResponse<unknown> {
     const index = this.programUserAssociationsData.findIndex(
-      (a: any) => a.programId === programId && a.userId === userId,
+      (association) =>
+        association.programId === programId && association.userId === userId,
     );
 
     if (index === -1) {
@@ -1082,7 +1304,7 @@ export class MockService {
   // STOCKPILE SERVICE ENDPOINTS
   // ============================================
 
-  private static mockGetApprovalRequests(): ApiResponse<any> {
+  private static mockGetApprovalRequests(): ApiResponse<unknown> {
     const items = mockApprovalRequests.map((request) => ({
       ...request,
       history: getApprovalHistory(request.id),
@@ -1106,7 +1328,7 @@ export class MockService {
     };
   }
 
-  private static mockGetApprovalStatistics(): ApiResponse<any> {
+  private static mockGetApprovalStatistics(): ApiResponse<unknown> {
     return {
       success: true,
       data: mockApprovalStats,
@@ -1115,7 +1337,7 @@ export class MockService {
     };
   }
 
-  private static mockGetApprovalRequestById(id: string): ApiResponse<any> {
+  private static mockGetApprovalRequestById(id: string): ApiResponse<unknown> {
     const request = getApprovalRequestById(id);
 
     if (!request) {
@@ -1144,10 +1366,12 @@ export class MockService {
     };
   }
 
-  private static mockCreateApprovalRequest(data: any): ApiResponse<any> {
+  private static mockCreateApprovalRequest(
+    data: ApprovalRequestInput,
+  ): ApiResponse<unknown> {
     const now = new Date().toISOString();
 
-    const newRequest = {
+    const newRequest: ApprovalRequest = {
       id: `apr_${Date.now()}`,
       reservationId: data?.reservationId || "res_unknown",
       userId: data?.userId || "user_1",
@@ -1171,7 +1395,7 @@ export class MockService {
       updatedAt: now,
     };
 
-    mockApprovalRequests.unshift(newRequest as any);
+    mockApprovalRequests.unshift(newRequest);
 
     return {
       success: true,
@@ -1183,8 +1407,8 @@ export class MockService {
 
   private static mockApproveApprovalRequest(
     id: string,
-    data: any,
-  ): ApiResponse<any> {
+    data: ApprovalActionInput,
+  ): ApiResponse<unknown> {
     const request = getApprovalRequestById(id);
 
     if (!request) {
@@ -1219,8 +1443,8 @@ export class MockService {
 
   private static mockRejectApprovalRequest(
     id: string,
-    data: any,
-  ): ApiResponse<any> {
+    data: ApprovalActionInput,
+  ): ApiResponse<unknown> {
     const request = getApprovalRequestById(id);
 
     if (!request) {
@@ -1255,8 +1479,8 @@ export class MockService {
 
   private static mockCancelApprovalRequest(
     id: string,
-    data: any,
-  ): ApiResponse<any> {
+    data: ApprovalActionInput,
+  ): ApiResponse<unknown> {
     const request = getApprovalRequestById(id);
 
     if (!request) {
@@ -1288,18 +1512,348 @@ export class MockService {
   }
 
   // ============================================
-  // RESERVATIONS SERVICE ENDPOINTS
+  // REPORTS SERVICE ENDPOINTS
   // ============================================
 
-  private static mockGetReservations(): ApiResponse<any> {
+  private static mockGetDashboardKPIs(): ApiResponse<unknown> {
+    const totalResources = this.resourcesData.length;
+    const maintenanceResources = this.resourcesData.filter((resource) =>
+      ["MAINTENANCE", "IN_MAINTENANCE"].includes(
+        String(resource.status || "").toUpperCase(),
+      ),
+    ).length;
+
+    const activeReservations = this.reservationsData.filter((reservation) =>
+      ["CONFIRMED", "PENDING", "IN_PROGRESS"].includes(
+        String(reservation.status || "").toUpperCase(),
+      ),
+    );
+
+    const usedResourceIds = new Set(
+      activeReservations
+        .map((reservation) => reservation.resourceId)
+        .filter((resourceId): resourceId is string => Boolean(resourceId)),
+    );
+
+    const resourcesInUse = usedResourceIds.size;
+    const availableResources = Math.max(
+      0,
+      totalResources - resourcesInUse - maintenanceResources,
+    );
+
+    const now = new Date();
+    const todayStart = new Date(
+      now.getFullYear(),
+      now.getMonth(),
+      now.getDate(),
+    );
+    const weekStart = new Date(todayStart);
+    weekStart.setDate(todayStart.getDate() - 7);
+    const monthStart = new Date(now.getFullYear(), now.getMonth(), 1);
+
+    const getReservationDate = (reservation: Reservation): Date | null => {
+      if (!reservation.startDate) {
+        return null;
+      }
+
+      const parsed = new Date(reservation.startDate);
+      return Number.isNaN(parsed.getTime()) ? null : parsed;
+    };
+
+    const todayReservations = this.reservationsData.filter((reservation) => {
+      const reservationDate = getReservationDate(reservation);
+      return reservationDate ? reservationDate >= todayStart : false;
+    }).length;
+
+    const weekReservations = this.reservationsData.filter((reservation) => {
+      const reservationDate = getReservationDate(reservation);
+      return reservationDate ? reservationDate >= weekStart : false;
+    }).length;
+
+    const monthReservations = this.reservationsData.filter((reservation) => {
+      const reservationDate = getReservationDate(reservation);
+      return reservationDate ? reservationDate >= monthStart : false;
+    }).length;
+
+    const usageMap = new Map<
+      string,
+      { resourceId: string; name: string; usageCount: number }
+    >();
+
+    this.reservationsData.forEach((reservation) => {
+      if (!reservation.resourceId) {
+        return;
+      }
+
+      const current = usageMap.get(reservation.resourceId);
+      const resourceName =
+        reservation.resourceName ||
+        this.resourcesData.find(
+          (resource) => resource.id === reservation.resourceId,
+        )?.name ||
+        "Recurso";
+
+      if (!current) {
+        usageMap.set(reservation.resourceId, {
+          resourceId: reservation.resourceId,
+          name: resourceName,
+          usageCount: 1,
+        });
+        return;
+      }
+
+      current.usageCount += 1;
+    });
+
+    const mostUsedResources = Array.from(usageMap.values())
+      .sort((a, b) => b.usageCount - a.usageCount)
+      .slice(0, 5)
+      .map((item) => ({
+        id: item.resourceId,
+        name: item.name,
+        usageCount: item.usageCount,
+      }));
+
+    const recentActivity = this.reservationsData
+      .slice()
+      .sort((a, b) => {
+        const dateA = new Date(a.updatedAt || a.createdAt || 0).getTime();
+        const dateB = new Date(b.updatedAt || b.createdAt || 0).getTime();
+        return dateB - dateA;
+      })
+      .slice(0, 5)
+      .map((reservation) => ({
+        id: reservation.id,
+        type: "reservation",
+        title: reservation.title || reservation.resourceName || "Reserva",
+        timestamp:
+          reservation.updatedAt ||
+          reservation.createdAt ||
+          new Date().toISOString(),
+        user: reservation.userName || reservation.userId || "Usuario",
+      }));
+
     return {
       success: true,
       data: {
-        items: this.reservationsData,
+        totalResources,
+        availableResources,
+        resourcesInUse,
+        resourcesInMaintenance: maintenanceResources,
+        todayReservations,
+        weekReservations,
+        monthReservations,
+        utilizationRate:
+          totalResources > 0
+            ? Number(((resourcesInUse / totalResources) * 100).toFixed(2))
+            : 0,
+        mostUsedResources,
+        recentActivity,
+      },
+      message: "Dashboard KPIs retrieved successfully",
+      timestamp: new Date().toISOString(),
+    };
+  }
+
+  private static mockGetDashboardOverview(): ApiResponse<unknown> {
+    const byCategory: Record<string, number> = {};
+    const byStatus: Record<string, number> = {};
+
+    this.resourcesData.forEach((resource) => {
+      const category =
+        resource.category?.name ||
+        this.categoriesData.find(
+          (categoryItem) => categoryItem.id === resource.categoryId,
+        )?.name ||
+        "Sin categoría";
+      byCategory[category] = (byCategory[category] || 0) + 1;
+
+      const status = String(resource.status || "UNKNOWN").toUpperCase();
+      byStatus[status] = (byStatus[status] || 0) + 1;
+    });
+
+    const usageMap = new Map<string, number>();
+    this.reservationsData.forEach((reservation) => {
+      if (!reservation.resourceId) {
+        return;
+      }
+
+      usageMap.set(
+        reservation.resourceId,
+        (usageMap.get(reservation.resourceId) || 0) + 1,
+      );
+    });
+
+    const maxUsage = Math.max(1, ...Array.from(usageMap.values()));
+    const utilizationByResource = Array.from(usageMap.entries()).map(
+      ([resourceId, count]) => ({
+        resourceId,
+        resourceName:
+          this.resourcesData.find((resource) => resource.id === resourceId)
+            ?.name || "Recurso",
+        utilizationRate: Number(((count / maxUsage) * 100).toFixed(2)),
+      }),
+    );
+
+    return {
+      success: true,
+      data: {
+        byCategory,
+        byStatus,
+        utilizationByResource,
+      },
+      message: "Dashboard overview retrieved successfully",
+      timestamp: new Date().toISOString(),
+    };
+  }
+
+  private static mockGetDashboardOccupancy(): ApiResponse<unknown> {
+    return {
+      success: true,
+      data: {
+        byStatus: this.reservationsData.reduce<Record<string, number>>(
+          (acc, reservation) => {
+            const status = String(
+              reservation.status || "UNKNOWN",
+            ).toUpperCase();
+            acc[status] = (acc[status] || 0) + 1;
+            return acc;
+          },
+          {},
+        ),
+        byProgram: {},
+        peakHours: [],
+        averageDuration: 0,
+      },
+      message: "Dashboard occupancy retrieved successfully",
+      timestamp: new Date().toISOString(),
+    };
+  }
+
+  private static mockGetDashboardTrends(): ApiResponse<unknown> {
+    return {
+      success: true,
+      data: {
+        items: [],
+      },
+      message: "Dashboard trends retrieved successfully",
+      timestamp: new Date().toISOString(),
+    };
+  }
+
+  private static mockGetUserReportSummary(
+    userId?: string,
+  ): ApiResponse<unknown> {
+    const userReservations = userId
+      ? this.reservationsData.filter(
+          (reservation) => reservation.userId === userId,
+        )
+      : this.reservationsData;
+
+    const totalReservations = userReservations.length;
+    const activeReservations = userReservations.filter((reservation) =>
+      ["CONFIRMED", "PENDING", "IN_PROGRESS"].includes(
+        String(reservation.status || "").toUpperCase(),
+      ),
+    ).length;
+    const canceledReservations = userReservations.filter(
+      (reservation) =>
+        String(reservation.status || "").toUpperCase() === "CANCELLED",
+    ).length;
+
+    const totalHours = userReservations.reduce((acc, reservation) => {
+      const start = reservation.startDate;
+      const end = reservation.endDate;
+
+      if (!start || !end) {
+        return acc;
+      }
+
+      const startDate = new Date(start);
+      const endDate = new Date(end);
+
+      if (
+        Number.isNaN(startDate.getTime()) ||
+        Number.isNaN(endDate.getTime()) ||
+        endDate <= startDate
+      ) {
+        return acc;
+      }
+
+      return acc + (endDate.getTime() - startDate.getTime()) / 3600000;
+    }, 0);
+
+    const favoriteResourceSet = new Set<string>();
+    userReservations.forEach((reservation) => {
+      if (reservation.resourceName) {
+        favoriteResourceSet.add(reservation.resourceName);
+      }
+    });
+
+    return {
+      success: true,
+      data: {
+        totalReservations,
+        activeReservations,
+        canceledReservations,
+        pendingApprovals: Math.max(
+          0,
+          activeReservations - canceledReservations,
+        ),
+        hoursBooked: Number(totalHours.toFixed(2)),
+        favoriteResources: Array.from(favoriteResourceSet).slice(0, 5),
+      },
+      message: "User report summary retrieved successfully",
+      timestamp: new Date().toISOString(),
+    };
+  }
+
+  // ============================================
+  // RESERVATIONS SERVICE ENDPOINTS
+  // ============================================
+
+  private static mockGetReservations(filters?: {
+    status?: string;
+    limit?: number;
+  }): ApiResponse<unknown> {
+    const normalizedStatus = filters?.status?.toLowerCase();
+    const now = new Date();
+
+    let items = [...this.reservationsData];
+
+    if (normalizedStatus) {
+      items = items.filter((reservation) => {
+        const status = String(reservation.status || "").toLowerCase();
+
+        if (normalizedStatus === "upcoming") {
+          const startDate = reservation.startDate
+            ? new Date(reservation.startDate)
+            : null;
+
+          return (
+            !!startDate &&
+            !Number.isNaN(startDate.getTime()) &&
+            startDate >= now &&
+            status !== "cancelled"
+          );
+        }
+
+        return status === normalizedStatus;
+      });
+    }
+
+    if (filters?.limit && filters.limit > 0) {
+      items = items.slice(0, filters.limit);
+    }
+
+    return {
+      success: true,
+      data: {
+        items,
         meta: {
-          total: this.reservationsData.length,
+          total: items.length,
           page: 1,
-          limit: 50,
+          limit: filters?.limit || 50,
           totalPages: 1,
           hasNextPage: false,
           hasPreviousPage: false,
@@ -1310,8 +1864,10 @@ export class MockService {
     };
   }
 
-  private static mockGetReservationById(id: string): ApiResponse<any> {
-    const reservation = this.reservationsData.find((r: any) => r.id === id);
+  private static mockGetReservationById(id: string): ApiResponse<unknown> {
+    const reservation = this.reservationsData.find(
+      (reservationItem) => reservationItem.id === id,
+    );
 
     if (!reservation) {
       throw {
@@ -1336,13 +1892,27 @@ export class MockService {
     };
   }
 
-  private static mockCreateReservation(data: any): ApiResponse<any> {
-    const newReservation = {
+  private static mockCreateReservation(
+    data: CreateReservationDto,
+  ): ApiResponse<unknown> {
+    const now = new Date().toISOString();
+    const newReservation: Reservation = {
       id: `rsv_${Date.now()}`,
-      ...data,
+      resourceId: data.resourceId,
+      title: data.title,
+      description: data.description,
+      startDate: data.startDate,
+      endDate: data.endDate,
+      recurrenceType: data.recurrenceType,
+      recurrenceEndDate: data.recurrenceEndDate,
+      attendees: data.attendees,
+      notes: data.notes,
+      userId: "user_1",
+      userName: "Usuario Mock",
+      userEmail: "mock@ufps.edu.co",
       status: "PENDING",
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
+      createdAt: now,
+      updatedAt: now,
     };
 
     this.reservationsData.push(newReservation);
@@ -1357,9 +1927,11 @@ export class MockService {
 
   private static mockUpdateReservation(
     id: string,
-    data: any,
-  ): ApiResponse<any> {
-    const index = this.reservationsData.findIndex((r: any) => r.id === id);
+    data: UpdateReservationDto,
+  ): ApiResponse<unknown> {
+    const index = this.reservationsData.findIndex(
+      (reservationItem) => reservationItem.id === id,
+    );
 
     if (index === -1) {
       throw {
@@ -1390,8 +1962,10 @@ export class MockService {
     };
   }
 
-  private static mockCancelReservation(id: string): ApiResponse<any> {
-    const index = this.reservationsData.findIndex((r: any) => r.id === id);
+  private static mockCancelReservation(id: string): ApiResponse<unknown> {
+    const index = this.reservationsData.findIndex(
+      (reservationItem) => reservationItem.id === id,
+    );
 
     if (index === -1) {
       throw {

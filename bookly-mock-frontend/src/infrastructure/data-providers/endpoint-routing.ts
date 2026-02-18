@@ -58,7 +58,9 @@ export function normalizeApiEndpoint(endpoint: string): string {
 
 export function extractControllerPrefix(endpoint: string): string {
   const normalized = normalizeApiEndpoint(endpoint);
-  const withoutVersion = normalized.replace(/^\/api\/v1\//, "");
+  const withoutVersion = normalized
+    .replace(/^\/api\/v1\//, "")
+    .split(/[?#]/)[0];
   const [first, second] = withoutVersion.split("/");
 
   if (first === "reports" && second === "export") {

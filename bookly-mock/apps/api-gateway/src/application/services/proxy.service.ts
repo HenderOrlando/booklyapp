@@ -80,6 +80,8 @@ export class ProxyService {
       "usage-reports": "reports",
       "demand-reports": "reports",
       "user-reports": "reports",
+      dashboard: "reports",
+      "audit-dashboard": "reports",
       feedback: "reports",
       evaluation: "reports",
       evaluations: "reports",

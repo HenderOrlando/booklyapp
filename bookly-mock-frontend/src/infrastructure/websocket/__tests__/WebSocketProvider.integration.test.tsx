@@ -1,9 +1,9 @@
+import { useDataMode } from "@/hooks/useDataMode";
+import { useWebSocket as useManagedWebSocket } from "@/hooks/useWebSocket";
 import {
   WebSocketProvider,
   useWebSocket,
 } from "@/infrastructure/websocket/WebSocketProvider";
-import { useDataMode } from "@/hooks/useDataMode";
-import { useWebSocket as useManagedWebSocket } from "@/hooks/useWebSocket";
 import { render } from "@testing-library/react";
 
 jest.mock("@/hooks/useDataMode", () => ({
@@ -38,7 +38,7 @@ describe("WebSocketProvider integration", () => {
     });
   });
 
-  it("connects and disconnects idempotently when wsEnabled toggles", () => {
+  it("propagates enable/disable state to useWebSocket when wsEnabled toggles", () => {
     (useDataMode as jest.Mock).mockReturnValue({ wsEnabled: false });
 
     const { rerender } = render(
@@ -49,6 +49,13 @@ describe("WebSocketProvider integration", () => {
 
     expect(connectMock).not.toHaveBeenCalled();
     expect(disconnectMock).not.toHaveBeenCalled();
+    expect(useManagedWebSocket).toHaveBeenLastCalledWith(
+      expect.objectContaining({
+        enabled: false,
+        autoConnect: false,
+        reconnect: false,
+      }),
+    );
 
     (useDataMode as jest.Mock).mockReturnValue({ wsEnabled: true });
     rerender(
@@ -57,7 +64,15 @@ describe("WebSocketProvider integration", () => {
       </WebSocketProvider>,
     );
 
-    expect(connectMock).toHaveBeenCalledTimes(1);
+    expect(connectMock).not.toHaveBeenCalled();
+    expect(disconnectMock).not.toHaveBeenCalled();
+    expect(useManagedWebSocket).toHaveBeenLastCalledWith(
+      expect.objectContaining({
+        enabled: true,
+        autoConnect: true,
+        reconnect: true,
+      }),
+    );
 
     (useDataMode as jest.Mock).mockReturnValue({ wsEnabled: false });
     rerender(
@@ -66,6 +81,14 @@ describe("WebSocketProvider integration", () => {
       </WebSocketProvider>,
     );
 
-    expect(disconnectMock).toHaveBeenCalledTimes(1);
+    expect(connectMock).not.toHaveBeenCalled();
+    expect(disconnectMock).not.toHaveBeenCalled();
+    expect(useManagedWebSocket).toHaveBeenLastCalledWith(
+      expect.objectContaining({
+        enabled: false,
+        autoConnect: false,
+        reconnect: false,
+      }),
+    );
   });
 });
