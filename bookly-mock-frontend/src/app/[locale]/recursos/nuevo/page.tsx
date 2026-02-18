@@ -661,40 +661,42 @@ export default function CreateResourcePage() {
                         No hay programas académicos disponibles
                       </div>
                     ) : (
-                      programs.map((program) => (
-                        <label
-                          key={program.id}
-                          className="flex items-start gap-3 p-4 bg-[var(--color-bg-primary)] rounded-lg cursor-pointer hover:bg-[var(--color-bg-secondary)] transition-colors"
-                        >
-                          <input
-                            type="checkbox"
-                            checked={selectedPrograms.includes(program.id)}
-                            onChange={() => handleProgramToggle(program.id)}
-                            className="rounded w-5 h-5 mt-0.5 flex-shrink-0"
-                          />
-                          <div className="flex-1 min-w-0">
-                            <div className="flex items-center gap-2">
-                              <span className="text-foreground font-medium">
-                                {program.name}
-                              </span>
-                              <span className="text-xs text-[var(--color-text-tertiary)] font-mono">
-                                {program.code}
-                              </span>
-                            </div>
-                            {program.description && (
-                              <p className="text-sm text-[var(--color-text-tertiary)] mt-1">
-                                {program.description}
-                              </p>
-                            )}
-                            <div className="flex items-center gap-4 mt-2 text-xs text-[var(--color-text-tertiary)]">
-                              <span>📚 {program.faculty}</span>
-                              {program.department && (
-                                <span>🏛️ {program.department}</span>
+                      <>
+                        {programs.map((program) => (
+                          <label
+                            key={program.id}
+                            className="flex items-start gap-3 p-4 bg-[var(--color-bg-primary)] rounded-lg cursor-pointer hover:bg-[var(--color-bg-secondary)] transition-colors"
+                          >
+                            <input
+                              type="checkbox"
+                              checked={selectedPrograms.includes(program.id)}
+                              onChange={() => handleProgramToggle(program.id)}
+                              className="rounded w-5 h-5 mt-0.5 flex-shrink-0"
+                            />
+                            <div className="flex-1 min-w-0">
+                              <div className="flex items-center gap-2">
+                                <span className="text-foreground font-medium">
+                                  {program.name}
+                                </span>
+                                <span className="text-xs text-[var(--color-text-tertiary)] font-mono">
+                                  {program.code}
+                                </span>
+                              </div>
+                              {program.description && (
+                                <p className="text-sm text-[var(--color-text-tertiary)] mt-1">
+                                  {program.description}
+                                </p>
                               )}
+                              <div className="flex items-center gap-4 mt-2 text-xs text-[var(--color-text-tertiary)]">
+                                <span>📚 {program.faculty}</span>
+                                {program.department && (
+                                  <span>🏛️ {program.department}</span>
+                                )}
+                              </div>
                             </div>
-                          </div>
-                        </label>
-                      ))
+                          </label>
+                        ))}
+                      </>
                     )}
                   </div>
 
