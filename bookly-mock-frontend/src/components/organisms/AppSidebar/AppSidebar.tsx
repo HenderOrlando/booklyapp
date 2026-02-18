@@ -669,19 +669,17 @@ export function AppSidebar({
       return [userRoleProp];
     }
 
-    if (!user?.roles || user.roles.length === 0) {
+    if (!user) {
+      return [];
+    }
+
+    if (!user.roles || user.roles.length === 0) {
       console.warn("[AppSidebar] Usuario sin roles asignados", { user });
       return [];
     }
 
     // Usar utilidad centralizada para normalizar roles
     const normalizedRoles = normalizeRoles(user.roles);
-
-    console.log(
-      "[AppSidebar] Roles originales:",
-      user.roles.map((r) => (typeof r === "string" ? r : r.name)),
-    );
-    console.log("[AppSidebar] Roles normalizados:", normalizedRoles);
 
     return normalizedRoles;
   }, [user, userRoleProp]);
@@ -719,9 +717,6 @@ export function AppSidebar({
 
       // Si el item tiene roles pero el usuario no tiene roles asignados, no mostrarlo
       if (!userRoles || userRoles.length === 0) {
-        console.log(
-          `[AppSidebar] Ocultando "${item.href}" - usuario sin roles`,
-        );
         return false;
       }
 
@@ -729,15 +724,6 @@ export function AppSidebar({
       const hasAccess = item.roles.some((requiredRole) =>
         userRoles.includes(requiredRole),
       );
-
-      if (!hasAccess) {
-        console.log(
-          `[AppSidebar] Ocultando "${item.href}" - requiere roles:`,
-          item.roles,
-          "usuario tiene:",
-          userRoles,
-        );
-      }
 
       return hasAccess;
     })

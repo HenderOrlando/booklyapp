@@ -91,9 +91,10 @@ export class WebSocketClient {
 
       const url = this.buildConnectionUrl();
 
-      this.socket = io(url, {
+      this.socket = io(`${url}${GATEWAY_WS_NAMESPACE}`, {
+        path: "/socket.io/",
         autoConnect: false,
-        transports: ["websocket"],
+        transports: ["websocket", "polling"],
         reconnection: false,
         auth: this.config.token ? { token: this.config.token } : undefined,
       });
@@ -256,7 +257,7 @@ export class WebSocketClient {
     this.emit(wsEvents.connection.connected, null);
   }
 
-  private handleError(error: Error): void {
+  private handleError(error: Error | { message?: string }): void {
     console.error("[WebSocket] Error de conexión:", error);
     this.setState("ERROR");
     this.emit(wsEvents.connection.error, {

@@ -10,9 +10,9 @@ import { Providers } from "../providers";
 const DataModeIndicator = dynamic(
   () =>
     import("@/components/molecules/DataModeIndicator").then(
-      (mod) => mod.DataModeIndicator
+      (mod) => mod.DataModeIndicator,
     ),
-  { ssr: false }
+  { ssr: false },
 );
 
 const inter = Inter({ subsets: ["latin"] });
@@ -41,7 +41,7 @@ export default async function LocaleLayout({
 
   return (
     <html lang={locale} suppressHydrationWarning>
-      <body className={inter.className}>
+      <body className={inter.className} suppressHydrationWarning>
         <NextIntlClientProvider messages={messages}>
           <Providers>
             {children}
