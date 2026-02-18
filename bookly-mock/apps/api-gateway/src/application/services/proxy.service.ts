@@ -159,6 +159,9 @@ export class ProxyService {
       "/auth/forgot-password",
       "/auth/reset-password",
       "/auth/me",
+      "/users/me/profile",
+      "/users/me/photo",
+      "/users/me/preferences",
       "/config",
       "/app-config",
     ];
