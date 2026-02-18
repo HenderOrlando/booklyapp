@@ -24,5 +24,6 @@
   "schedules": "Horarios",
   "notification_channels": "Canales de Notificación",
   "evaluations": "Evaluaciones",
-  "reassignment": "Reasignación"
+  "reassignment": "Reasignación",
+  "settings": "Configuraciones"
 }

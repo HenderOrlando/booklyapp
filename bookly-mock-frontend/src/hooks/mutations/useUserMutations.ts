@@ -19,6 +19,7 @@ import { UserPreferences } from "../../types/entities/user";
  * DTO para actualizar perfil de usuario
  */
 export type UpdateUserProfileDto = UpdateProfileDto;
+export type { ChangePasswordDto };
 
 // ============================================
 // CACHE KEYS

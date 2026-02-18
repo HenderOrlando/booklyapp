@@ -40,7 +40,8 @@ export const DEFAULT_APP_CONFIG: AppConfig = {
   storageProvider: "local",
 };
 
-export interface UpdateAppConfigPayload extends Partial<PublicAppConfig> {
+export interface UpdateAppConfigPayload
+  extends Omit<Partial<PublicAppConfig>, "features"> {
   features?: Partial<AppConfigFeatures>;
 }
 
@@ -61,7 +62,9 @@ function isRecord(value: unknown): value is Record<string, unknown> {
 }
 
 function normalizeString(value: unknown, fallback: string): string {
-  return typeof value === "string" && value.trim().length > 0 ? value : fallback;
+  return typeof value === "string" && value.trim().length > 0
+    ? value
+    : fallback;
 }
 
 function normalizeStringArray(value: unknown, fallback: string[]): string[] {
@@ -81,7 +84,10 @@ function normalizeBoolean(value: unknown, fallback: boolean): boolean {
   return typeof value === "boolean" ? value : fallback;
 }
 
-function normalizeThemeMode(value: unknown, fallback: AppThemeMode): AppThemeMode {
+function normalizeThemeMode(
+  value: unknown,
+  fallback: AppThemeMode,
+): AppThemeMode {
   if (value === "light" || value === "dark" || value === "system") {
     return value;
   }
@@ -113,7 +119,10 @@ function normalizeFeatures(
       value.enableNotifications,
       fallback.enableNotifications,
     ),
-    enableRealtime: normalizeBoolean(value.enableRealtime, fallback.enableRealtime),
+    enableRealtime: normalizeBoolean(
+      value.enableRealtime,
+      fallback.enableRealtime,
+    ),
   };
 }
 
@@ -134,30 +143,51 @@ function normalizePublicConfig(
       value.corporateAuthEnabled,
       fallback.corporateAuthEnabled,
     ),
-    allowedDomains: normalizeStringArray(value.allowedDomains, fallback.allowedDomains),
+    allowedDomains: normalizeStringArray(
+      value.allowedDomains,
+      fallback.allowedDomains,
+    ),
     autoRegisterOnSSO: normalizeBoolean(
       value.autoRegisterOnSSO,
       fallback.autoRegisterOnSSO,
     ),
     themeMode: normalizeThemeMode(value.themeMode, fallback.themeMode),
     primaryColor: normalizeString(value.primaryColor, fallback.primaryColor),
-    secondaryColor: normalizeString(value.secondaryColor, fallback.secondaryColor),
+    secondaryColor: normalizeString(
+      value.secondaryColor,
+      fallback.secondaryColor,
+    ),
     defaultLocale: normalizeString(value.defaultLocale, fallback.defaultLocale),
     supportedLocales: normalizeStringArray(
       value.supportedLocales,
       fallback.supportedLocales,
     ),
     appName: normalizeString(value.appName, fallback.appName),
-    logoLightUrl: typeof value.logoLightUrl === "string" ? value.logoLightUrl : fallback.logoLightUrl,
-    logoDarkUrl: typeof value.logoDarkUrl === "string" ? value.logoDarkUrl : fallback.logoDarkUrl,
-    faviconUrl: typeof value.faviconUrl === "string" ? value.faviconUrl : fallback.faviconUrl,
+    logoLightUrl:
+      typeof value.logoLightUrl === "string"
+        ? value.logoLightUrl
+        : fallback.logoLightUrl,
+    logoDarkUrl:
+      typeof value.logoDarkUrl === "string"
+        ? value.logoDarkUrl
+        : fallback.logoDarkUrl,
+    faviconUrl:
+      typeof value.faviconUrl === "string"
+        ? value.faviconUrl
+        : fallback.faviconUrl,
     timezone: normalizeString(value.timezone, fallback.timezone),
     features: normalizeFeatures(value.features, fallback.features),
-    maintenanceMode: normalizeBoolean(value.maintenanceMode, fallback.maintenanceMode),
+    maintenanceMode: normalizeBoolean(
+      value.maintenanceMode,
+      fallback.maintenanceMode,
+    ),
   };
 }
 
-function normalizeAppConfig(value: unknown, fallback: AppConfig = DEFAULT_APP_CONFIG): AppConfig {
+function normalizeAppConfig(
+  value: unknown,
+  fallback: AppConfig = DEFAULT_APP_CONFIG,
+): AppConfig {
   const normalizedPublic = normalizePublicConfig(value, fallback);
 
   if (!isRecord(value)) {
@@ -171,7 +201,10 @@ function normalizeAppConfig(value: unknown, fallback: AppConfig = DEFAULT_APP_CO
 
   return {
     ...normalizedPublic,
-    storageProvider: normalizeStorageProvider(value.storageProvider, fallback.storageProvider),
+    storageProvider: normalizeStorageProvider(
+      value.storageProvider,
+      fallback.storageProvider,
+    ),
     storageS3Config: isRecord(value.storageS3Config)
       ? (value.storageS3Config as AppConfigStorageS3)
       : fallback.storageS3Config,
@@ -181,7 +214,9 @@ function normalizeAppConfig(value: unknown, fallback: AppConfig = DEFAULT_APP_CO
   };
 }
 
-function buildUpdateConfigPayload(data: UpdateAppConfigPayload): UpdateAppConfigPayload {
+function buildUpdateConfigPayload(
+  data: UpdateAppConfigPayload,
+): UpdateAppConfigPayload {
   const payload: UpdateAppConfigPayload = {};
 
   if (data.registrationEnabled !== undefined) {
@@ -315,7 +350,10 @@ export class ConfigClient {
   static async updateStorageConfig(
     data: UpdateStorageConfigPayload,
   ): Promise<ApiResponse<StorageConfigResponse>> {
-    const response = await httpClient.put<unknown>(CONFIG_ENDPOINTS.STORAGE, data);
+    const response = await httpClient.put<unknown>(
+      CONFIG_ENDPOINTS.STORAGE,
+      data,
+    );
 
     if (!response.success || !response.data || !isRecord(response.data)) {
       return response as ApiResponse<StorageConfigResponse>;

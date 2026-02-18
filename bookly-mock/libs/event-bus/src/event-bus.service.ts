@@ -149,24 +149,27 @@ export class EventBusService
    */
   private toStoredEvent<T>(event: EventPayload<T>): any {
     // Extract aggregate info from event data or metadata
+    const metadata = (event as any).metadata || {};
+
     const aggregateId =
       (event as any).aggregateId ||
+      metadata.aggregateId ||
       (event.data as any)?.id ||
       (event.data as any)?.userId ||
       (event.data as any)?.resourceId ||
       "unknown";
 
     const aggregateType =
-      (event as any).aggregateType || this.inferAggregateType(event.eventType);
-
-    const metadata = (event as any).metadata || {};
+      (event as any).aggregateType ||
+      metadata.aggregateType ||
+      this.inferAggregateType(event.eventType);
 
     return {
       eventId: event.eventId || `${Date.now()}-${Math.random()}`,
       eventType: event.eventType,
       aggregateId,
       aggregateType,
-      version: (event as any).version || 1,
+      version: (event as any).version || metadata.version || 1,
       data: event,
       correlationId: metadata.correlationId || (event as any).correlationId,
       causationId: metadata.causationId || (event as any).causationId,

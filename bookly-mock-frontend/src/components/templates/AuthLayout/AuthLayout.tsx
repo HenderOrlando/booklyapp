@@ -1,5 +1,6 @@
 "use client";
 
+import { usePublicConfig } from "@/hooks/useAppConfig";
 import { cn } from "@/lib/utils";
 import * as React from "react";
 
@@ -32,6 +33,8 @@ export function AuthLayout({
   showLogo = true,
   className,
 }: AuthLayoutProps) {
+  const { data: publicConfig } = usePublicConfig();
+
   return (
     <div
       className={cn(
@@ -39,7 +42,7 @@ export function AuthLayout({
         "bg-gradient-to-br from-brand-primary-50 to-brand-secondary-50",
         "dark:from-slate-900 dark:to-slate-800",
         "p-4",
-        className
+        className,
       )}
     >
       <div className="w-full max-w-md">
@@ -62,7 +65,7 @@ export function AuthLayout({
               </svg>
             </div>
             <h1 className="text-3xl font-bold text-[var(--color-text-primary)] mb-2">
-              Bookly
+              {publicConfig?.appName ?? "Bookly"}
             </h1>
             <p className="text-[var(--color-text-secondary)]">
               Sistema de Reservas Institucionales
@@ -75,7 +78,7 @@ export function AuthLayout({
           className={cn(
             "bg-[var(--color-bg-surface)] rounded-lg shadow-lg",
             "border border-[var(--color-border-subtle)]",
-            "p-8"
+            "p-8",
           )}
         >
           {/* Título y descripción opcionales */}

@@ -51,7 +51,8 @@ const baseResource = {
     hasAirConditioning: true,
     hasWhiteboard: true,
     hasComputers: false,
-    characteristics: ["Sistema de sonido"],
+    characteristics: ["char_005"],
+    features: ["Sistema de sonido"],
   },
   programIds: [] as string[],
   status: "AVAILABLE",
@@ -82,6 +83,29 @@ const programsPayload = {
 const categoriesPayload = {
   items: [
     { id: "cat_001", name: "Salones", code: "CLASSROOM", isActive: true },
+  ],
+};
+
+const characteristicsPayload = {
+  items: [
+    {
+      id: "char_001",
+      code: "PROYECTOR",
+      name: "Proyector",
+      isActive: true,
+    },
+    {
+      id: "char_005",
+      code: "SISTEMA_SONIDO",
+      name: "Sistema de sonido",
+      isActive: true,
+    },
+    {
+      id: "char_006",
+      code: "VIDEOCONFERENCIA",
+      name: "Videoconferencia",
+      isActive: true,
+    },
   ],
 };
 
@@ -129,6 +153,13 @@ function setupGetMocks(overrides?: {
             },
           ],
         },
+      };
+    }
+
+    if (endpoint === "resources/characteristics") {
+      return {
+        success: true,
+        data: characteristicsPayload,
       };
     }
 
@@ -183,6 +214,15 @@ describe("EditResourcePage", () => {
     expect(payload.programIds).toEqual(["prog_001"]);
   });
 
+  it("renders action buttons only once at top section", async () => {
+    render(<EditResourcePage />);
+
+    await screen.findByTestId("resource-edit-form");
+
+    expect(screen.getAllByTestId("resource-edit-cancel-btn")).toHaveLength(1);
+    expect(screen.getAllByTestId("resource-edit-save-btn")).toHaveLength(1);
+  });
+
   it("keeps new characteristic in UI until save and persists it only when saving", async () => {
     const user = userEvent.setup();
 
@@ -195,6 +235,10 @@ describe("EditResourcePage", () => {
     const searchInput = await screen.findByTestId(
       "resource-characteristics-search-input",
     );
+
+    await waitFor(() => {
+      expect(getMock).toHaveBeenCalledWith("resources/characteristics");
+    });
 
     await user.type(searchInput, "Mesa interactiva");
 
@@ -217,10 +261,16 @@ describe("EditResourcePage", () => {
     const payload = patchMock.mock.calls[0][1];
 
     expect(payload.attributes.characteristics).toEqual(
-      expect.arrayContaining(["Mesa interactiva"]),
+      expect.arrayContaining([
+        "char_005",
+        expect.objectContaining({
+          name: "Mesa interactiva",
+        }),
+      ]),
     );
+
     expect(payload.attributes.features).toEqual(
-      expect.arrayContaining(["Mesa interactiva"]),
+      expect.arrayContaining(["Sistema de sonido", "Mesa interactiva"]),
     );
   });
 });

@@ -4,6 +4,7 @@
  */
 
 // React Query hooks
+export * from "./useAppConfig";
 export * from "./useReservations";
 export * from "./useResources";
 

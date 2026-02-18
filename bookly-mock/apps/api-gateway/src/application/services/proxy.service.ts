@@ -159,6 +159,8 @@ export class ProxyService {
       "/auth/forgot-password",
       "/auth/reset-password",
       "/auth/me",
+      "/config",
+      "/app-config",
     ];
     // Build the full path to forward: /{service}{path}
     // e.g., service="approval-requests", path="/123" → fullForwardPath="/approval-requests/123"

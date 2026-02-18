@@ -531,6 +531,52 @@ export class MockService {
       }
     }
 
+    // ============================================
+    // CONFIG ENDPOINTS
+    // ============================================
+
+    if (
+      (endpoint.includes("/config/public") ||
+        endpoint.includes("/app-config/public")) &&
+      method === "GET"
+    ) {
+      return this.castResponse<T>(this.mockGetPublicConfig());
+    }
+
+    if (
+      (endpoint.includes("/config/storage") ||
+        endpoint.includes("/app-config/storage")) &&
+      method === "GET"
+    ) {
+      return this.castResponse<T>(this.mockGetStorageConfig());
+    }
+
+    if (
+      (endpoint.includes("/config/storage") ||
+        endpoint.includes("/app-config/storage")) &&
+      method === "PUT"
+    ) {
+      return this.castResponse<T>(
+        this.mockUpdateStorageConfig(payload as RequestPayload),
+      );
+    }
+
+    if (
+      (endpoint.includes("/config") || endpoint.includes("/app-config")) &&
+      method === "GET"
+    ) {
+      return this.castResponse<T>(this.mockGetFullConfig());
+    }
+
+    if (
+      (endpoint.includes("/config") || endpoint.includes("/app-config")) &&
+      method === "PUT"
+    ) {
+      return this.castResponse<T>(
+        this.mockUpdateConfig(payload as RequestPayload),
+      );
+    }
+
     // Endpoint no implementado en mock
     throw new Error(`Mock no implementado para: ${method} ${endpoint}`);
   }
@@ -2647,6 +2693,151 @@ export class MockService {
       success: true,
       data: this.reservationsData[index],
       message: "Reservation cancelled successfully",
+      timestamp: new Date().toISOString(),
+    };
+  }
+
+  // ============================================
+  // CONFIG ENDPOINTS
+  // ============================================
+
+  private static appConfigData: Record<string, unknown> = {
+    registrationEnabled: true,
+    corporateAuthEnabled: true,
+    allowedDomains: ["ufps.edu.co"],
+    autoRegisterOnSSO: true,
+    themeMode: "system",
+    primaryColor: "#2563eb",
+    secondaryColor: "#14b8a6",
+    defaultLocale: "es",
+    supportedLocales: ["es", "en"],
+    appName: "Bookly UFPS",
+    logoLightUrl: "/images/bookly_imagotipo_light.png",
+    logoDarkUrl: "/images/bookly_logotipo_dark-vertical.png",
+    faviconUrl: "",
+    timezone: "America/Bogota",
+    features: {
+      enableNotifications: true,
+      enableRealtime: true,
+    },
+    maintenanceMode: false,
+    storageProvider: "local",
+    storageS3Config: undefined,
+    storageGcsConfig: undefined,
+  };
+
+  private static mockGetPublicConfig(): ApiResponse<unknown> {
+    const storageKeys = new Set([
+      "storageProvider",
+      "storageS3Config",
+      "storageGcsConfig",
+    ]);
+    const publicConfig = Object.fromEntries(
+      Object.entries(this.appConfigData).filter(
+        ([key]) => !storageKeys.has(key),
+      ),
+    );
+
+    return {
+      success: true,
+      data: publicConfig,
+      message: "Public configuration retrieved successfully",
+      timestamp: new Date().toISOString(),
+    };
+  }
+
+  private static mockGetFullConfig(): ApiResponse<unknown> {
+    return {
+      success: true,
+      data: { ...this.appConfigData },
+      message: "Configuration retrieved successfully",
+      timestamp: new Date().toISOString(),
+    };
+  }
+
+  private static mockUpdateConfig(
+    payload: RequestPayload,
+  ): ApiResponse<unknown> {
+    const allowedKeys = [
+      "registrationEnabled",
+      "corporateAuthEnabled",
+      "allowedDomains",
+      "autoRegisterOnSSO",
+      "themeMode",
+      "primaryColor",
+      "secondaryColor",
+      "defaultLocale",
+      "supportedLocales",
+      "appName",
+      "logoLightUrl",
+      "logoDarkUrl",
+      "faviconUrl",
+      "timezone",
+      "maintenanceMode",
+      "features",
+    ];
+
+    for (const key of allowedKeys) {
+      if (payload[key] !== undefined) {
+        if (
+          key === "features" &&
+          typeof payload[key] === "object" &&
+          payload[key] !== null
+        ) {
+          const currentFeatures =
+            (this.appConfigData.features as Record<string, unknown>) || {};
+          this.appConfigData.features = {
+            ...currentFeatures,
+            ...(payload[key] as Record<string, unknown>),
+          };
+        } else {
+          this.appConfigData[key] = payload[key];
+        }
+      }
+    }
+
+    return {
+      success: true,
+      data: { ...this.appConfigData },
+      message: "Configuration updated successfully",
+      timestamp: new Date().toISOString(),
+    };
+  }
+
+  private static mockGetStorageConfig(): ApiResponse<unknown> {
+    return {
+      success: true,
+      data: {
+        storageProvider: this.appConfigData.storageProvider,
+        storageS3Config: this.appConfigData.storageS3Config,
+        storageGcsConfig: this.appConfigData.storageGcsConfig,
+      },
+      message: "Storage configuration retrieved successfully",
+      timestamp: new Date().toISOString(),
+    };
+  }
+
+  private static mockUpdateStorageConfig(
+    payload: RequestPayload,
+  ): ApiResponse<unknown> {
+    if (payload.storageProvider !== undefined) {
+      this.appConfigData.storageProvider = payload.storageProvider;
+    }
+    if (payload.storageS3Config !== undefined) {
+      this.appConfigData.storageS3Config = payload.storageS3Config;
+    }
+    if (payload.storageGcsConfig !== undefined) {
+      this.appConfigData.storageGcsConfig = payload.storageGcsConfig;
+    }
+
+    return {
+      success: true,
+      data: {
+        storageProvider: this.appConfigData.storageProvider,
+        storageS3Config: this.appConfigData.storageS3Config,
+        storageGcsConfig: this.appConfigData.storageGcsConfig,
+      },
+      message: "Storage configuration updated successfully",
       timestamp: new Date().toISOString(),
     };
   }
