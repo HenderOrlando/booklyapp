@@ -43,7 +43,7 @@ export class CategoriesController {
     const command = new CreateCategoryCommand(
       createCategoryDto.code,
       createCategoryDto.name,
-      createCategoryDto.description,
+      createCategoryDto.description || createCategoryDto.name,
       createCategoryDto.type,
       createCategoryDto.color,
       createCategoryDto.icon,

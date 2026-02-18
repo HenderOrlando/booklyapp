@@ -456,10 +456,30 @@ export class ResourceService {
         return this.addCharacteristicToMaps(existingById, maps);
       }
 
-      const persistedById =
-        await this.referenceDataRepository.findById(candidateId);
-      if (persistedById && persistedById.group === this.CHARACTERISTICS_GROUP) {
-        return this.addCharacteristicToMaps(persistedById, maps);
+      try {
+        const persistedById =
+          await this.referenceDataRepository.findById(candidateId);
+        if (
+          persistedById &&
+          persistedById.group === this.CHARACTERISTICS_GROUP
+        ) {
+          return this.addCharacteristicToMaps(persistedById, maps);
+        }
+      } catch {
+        // Ignore invalid id formats and continue resolution by code/name
+      }
+
+      const hasNameOrCodeFallback =
+        typeof inputObject?.name === "string" ||
+        typeof inputObject?.code === "string";
+      const rawLooksLikeId =
+        typeof rawValue === "string" && this.isLikelyCharacteristicId(rawValue);
+
+      if (
+        !hasNameOrCodeFallback &&
+        (rawLooksLikeId || rawValue === undefined)
+      ) {
+        return null;
       }
     }
 

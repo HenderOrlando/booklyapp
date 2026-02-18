@@ -304,7 +304,7 @@ function resolveSelectedCharacteristics(
           : "",
     );
 
-    if (!fallbackName) {
+    if (!fallbackName || isLikelyCharacteristicIdentifier(fallbackName)) {
       return;
     }
 
