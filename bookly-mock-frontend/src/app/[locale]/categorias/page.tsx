@@ -239,6 +239,7 @@ export default function CategoriasPage() {
             variant="outline"
             size="sm"
             onClick={() => handleEdit(category)}
+            data-testid="edit-category-button"
           >
             Editar
           </Button>
@@ -246,6 +247,7 @@ export default function CategoriasPage() {
             variant="outline"
             size="sm"
             onClick={() => handleToggleStatus(category)}
+            data-testid="toggle-status-button"
           >
             {category.isActive ? "Desactivar" : "Activar"}
           </Button>
@@ -256,6 +258,7 @@ export default function CategoriasPage() {
               setCategoryToDelete(category);
               setShowDeleteModal(true);
             }}
+            data-testid="delete-category-button"
           >
             Eliminar
           </Button>
@@ -289,7 +292,9 @@ export default function CategoriasPage() {
               Gestión de categorías de recursos
             </p>
           </div>
-          <Button onClick={handleCreate}>Crear Categoría</Button>
+          <Button onClick={handleCreate} data-testid="create-category-button">
+            Crear Categoría
+          </Button>
         </div>
 
         {/* Estadísticas */}
@@ -447,12 +452,21 @@ export default function CategoriasPage() {
                       Limpiar Filtros
                     </Button>
                   ) : (
-                    <Button onClick={handleCreate}>Crear Categoría</Button>
+                    <Button
+                      onClick={handleCreate}
+                      data-testid="create-category-button-empty"
+                    >
+                      Crear Categoría
+                    </Button>
                   )
                 }
               />
             ) : (
-              <DataTable data={filteredCategories} columns={columns} />
+              <DataTable
+                data={filteredCategories}
+                columns={columns}
+                data-testid="categories-table"
+              />
             )}
           </CardContent>
         </Card>
@@ -479,6 +493,7 @@ export default function CategoriasPage() {
           confirmText="Eliminar"
           cancelText="Cancelar"
           variant="destructive"
+          data-testid="delete-category-modal"
         >
           {categoryToDelete && (
             <div className="space-y-2">

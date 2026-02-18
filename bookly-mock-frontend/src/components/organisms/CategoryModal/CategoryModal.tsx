@@ -137,6 +137,7 @@ export function CategoryModal({
   return (
     <div
       className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4"
+      data-testid="category-modal"
       onClick={(e) => {
         if (e.target === e.currentTarget) {
           onClose();
@@ -169,6 +170,7 @@ export function CategoryModal({
                 }
                 placeholder="Ej: Laboratorios de Cómputo"
                 className={errors.name ? "border-red-500" : ""}
+                data-testid="category-name-input"
               />
               {errors.name && (
                 <p className="text-xs text-red-500 mt-1">{errors.name}</p>
@@ -192,6 +194,7 @@ export function CategoryModal({
                     ? "border-red-500"
                     : "border-[var(--color-border-subtle)]"
                 }`}
+                data-testid="category-description-input"
               />
               <div className="flex items-center justify-between mt-1">
                 {errors.description && (
@@ -274,6 +277,7 @@ export function CategoryModal({
                       onChange={(e) => handleColorSelect(e.target.value)}
                       placeholder="#10b981"
                       className="flex-1"
+                      data-testid="category-color-input"
                     />
                   </div>
                 </div>
@@ -319,6 +323,7 @@ export function CategoryModal({
                 type="submit"
                 isLoading={loading}
                 loadingText={mode === "create" ? "Creando..." : "Guardando..."}
+                data-testid="save-category-button"
               >
                 {mode === "create" ? "Crear Categoría" : "Guardar Cambios"}
               </ButtonWithLoading>

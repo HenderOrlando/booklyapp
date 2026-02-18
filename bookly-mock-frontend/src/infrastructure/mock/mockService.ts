@@ -3,6 +3,10 @@
  * Se activa automáticamente cuando DATA_MODE=mock
  */
 
+import type {
+  CreateCategoryDto,
+  UpdateCategoryDto,
+} from "@/hooks/mutations/useCategoryMutations";
 import { isMockMode } from "@/lib/config";
 import { ApiResponse } from "@/types/api/response";
 import type { ApprovalRequest } from "@/types/entities/approval";
@@ -283,6 +287,28 @@ export class MockService {
 
     if (endpoint.includes("/categories") && method === "GET") {
       return this.castResponse<T>(this.mockGetCategories());
+    }
+
+    if (endpoint.includes("/categories") && method === "POST") {
+      return this.castResponse<T>(
+        this.mockCreateCategory(payload as CreateCategoryDto),
+      );
+    }
+
+    if (endpoint.includes("/categories") && method === "PUT") {
+      const idMatch = endpoint.match(/\/categories\/([^/?]+)$/);
+      if (idMatch) {
+        return this.castResponse<T>(
+          this.mockUpdateCategory(idMatch[1], payload as UpdateCategoryDto),
+        );
+      }
+    }
+
+    if (endpoint.includes("/categories") && method === "DELETE") {
+      const idMatch = endpoint.match(/\/categories\/([^/?]+)$/);
+      if (idMatch) {
+        return this.castResponse<T>(this.mockDeleteCategory(idMatch[1]));
+      }
     }
 
     if (endpoint.includes("/maintenances") && method === "GET") {
@@ -1229,6 +1255,89 @@ export class MockService {
         },
       },
       message: "Categories retrieved successfully",
+      timestamp: new Date().toISOString(),
+    };
+  }
+
+  private static mockCreateCategory(
+    data: CreateCategoryDto,
+  ): ApiResponse<unknown> {
+    const newCategory: Category = {
+      id: `cat_${Date.now()}`,
+      code: data.name.toUpperCase().replace(/\s+/g, "_"),
+      name: data.name,
+      description: data.description,
+      color: data.color || "#3b82f6",
+      icon: data.icon,
+      isActive: true,
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+    };
+
+    this.categoriesData.push(newCategory);
+
+    return {
+      success: true,
+      data: newCategory,
+      message: "Category created successfully",
+      timestamp: new Date().toISOString(),
+    };
+  }
+
+  private static mockUpdateCategory(
+    id: string,
+    data: UpdateCategoryDto,
+  ): ApiResponse<unknown> {
+    const categoryIndex = this.categoriesData.findIndex(
+      (category) => category.id === id,
+    );
+
+    if (categoryIndex === -1) {
+      return {
+        success: false,
+        data: null,
+        message: "Category not found",
+        timestamp: new Date().toISOString(),
+      };
+    }
+
+    const updatedCategory = {
+      ...this.categoriesData[categoryIndex],
+      ...data,
+      updatedAt: new Date().toISOString(),
+    };
+
+    this.categoriesData[categoryIndex] = updatedCategory;
+
+    return {
+      success: true,
+      data: updatedCategory,
+      message: "Category updated successfully",
+      timestamp: new Date().toISOString(),
+    };
+  }
+
+  private static mockDeleteCategory(id: string): ApiResponse<unknown> {
+    const categoryIndex = this.categoriesData.findIndex(
+      (category) => category.id === id,
+    );
+
+    if (categoryIndex === -1) {
+      return {
+        success: false,
+        data: null,
+        message: "Category not found",
+        timestamp: new Date().toISOString(),
+      };
+    }
+
+    const deletedCategory = this.categoriesData[categoryIndex];
+    this.categoriesData.splice(categoryIndex, 1);
+
+    return {
+      success: true,
+      data: deletedCategory,
+      message: "Category deleted successfully",
       timestamp: new Date().toISOString(),
     };
   }
