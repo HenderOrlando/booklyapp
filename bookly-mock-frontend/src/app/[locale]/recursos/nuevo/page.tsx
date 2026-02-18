@@ -160,15 +160,28 @@ function extractCategories(
 function extractPrograms(
   data: ProgramCollectionPayload | AcademicProgram[] | undefined,
 ): AcademicProgram[] {
-  if (Array.isArray(data)) {
-    return data;
-  }
+  const rawItems = Array.isArray(data)
+    ? data
+    : Array.isArray(data?.items)
+      ? data.items
+      : [];
 
-  if (data?.items && Array.isArray(data.items)) {
-    return data.items;
-  }
+  const normalized: AcademicProgram[] = [];
 
-  return [];
+  rawItems.forEach((item) => {
+    const id = String(item.id ?? item._id ?? item.code ?? "").trim();
+    if (!id) return;
+
+    normalized.push({
+      ...item,
+      id,
+    });
+  });
+
+  // Deduplicar por ID
+  return Array.from(new Map(normalized.map((p) => [p.id, p])).values()).sort(
+    (a, b) => a.name.localeCompare(b.name, "es"),
+  );
 }
 
 export default function CreateResourcePage() {
@@ -472,6 +485,10 @@ export default function CreateResourcePage() {
         }
         if (attributesPayload.isPortable === undefined) {
           attributesPayload.isPortable = true; // Valor por defecto seguro
+        }
+      } else if (effectiveType === ResourceType.CLASSROOM) {
+        if (attributesPayload.capacity === undefined) {
+          attributesPayload.capacity = formData.capacity || 1;
         }
       } else if (effectiveType === ResourceType.LABORATORY) {
         if (!attributesPayload.labType) {

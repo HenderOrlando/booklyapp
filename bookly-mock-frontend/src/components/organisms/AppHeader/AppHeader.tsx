@@ -1,37 +1,36 @@
-"use client";
-
 import { ThemeToggle } from "@/components/atoms/ThemeToggle";
 import { LogoutButton } from "@/components/molecules/LogoutButton";
 import { useCurrentUser } from "@/hooks/useCurrentUser";
+import { useTranslations } from "next-intl";
 
 /**
  * AppHeader - Header superior de la aplicación
  *
  * Header estandarizado que se usa en todas las páginas principales
- * Muestra el logo, título opcional y botón de logout
+ * Muestra el logo, organización, información del usuario y acciones
  */
 
 interface AppHeaderProps {
-  title?: string; // Título personalizado de la página (opcional)
-  showUser?: boolean; // Mostrar información del usuario
+  title?: string;
+  showUser?: boolean;
   className?: string;
 }
 
 export function AppHeader({
-  title = "Bookly",
+  title,
   showUser = true,
   className = "",
 }: AppHeaderProps) {
-  // React Query: Usuario actual (reemplaza Redux)
   const { data: user } = useCurrentUser();
+  const t = useTranslations("auth");
 
   return (
     <div className={`flex items-center justify-between flex-1 ${className}`}>
       {/* Logo y Título (Organización y Bookly) */}
       <div className="flex items-center gap-4">
         <div className="flex items-center gap-3">
-          {/* Logo SVG */}
-          <div className="bg-white/20 p-1 rounded-lg shadow-sm">
+          {/* Logo Shield SVG */}
+          <div className="bg-white/20 p-1.5 rounded-lg shadow-sm">
             <svg
               className="w-7 h-7 text-white"
               fill="currentColor"
@@ -43,10 +42,10 @@ export function AppHeader({
           </div>
 
           <div className="flex flex-col">
-            <span className="text-sm font-bold text-white leading-tight">
+            <span className="text-[11px] font-bold text-white/90 tracking-wider leading-tight uppercase">
               Universidad Francisco de Paula Santander
             </span>
-            <span className="text-[11px] font-medium text-white/80 leading-tight">
+            <span className="text-[16px] font-black text-white leading-tight tracking-tight">
               Bookly
             </span>
           </div>
@@ -57,7 +56,7 @@ export function AppHeader({
       <div className="flex items-center gap-6">
         {showUser && user && (
           <div className="hidden md:flex flex-col items-end leading-tight">
-            <span className="text-sm font-bold text-white">
+            <span className="text-[13px] font-bold text-white">
               {user.firstName} {user.lastName}
             </span>
             <span className="text-[11px] text-white/70 font-medium">
@@ -72,7 +71,7 @@ export function AppHeader({
             variant="link"
             className="text-[13px] font-semibold text-white hover:text-white/80 transition-colors p-0 h-auto no-underline hover:no-underline"
           >
-            Cerrar Sesión
+            {t("logout")}
           </LogoutButton>
         </div>
       </div>

@@ -728,6 +728,11 @@ export default function EditResourcePage() {
         if (attributesPayload.isPortable === undefined) {
           attributesPayload.isPortable = true; // Valor por defecto seguro
         }
+      } else if (effectiveType === ResourceType.CLASSROOM) {
+        if (attributesPayload.capacity === undefined) {
+          attributesPayload.capacity =
+            formData.capacity || resource?.capacity || 1;
+        }
       } else if (effectiveType === ResourceType.LABORATORY) {
         if (!attributesPayload.labType) {
           attributesPayload.labType = "computer";
