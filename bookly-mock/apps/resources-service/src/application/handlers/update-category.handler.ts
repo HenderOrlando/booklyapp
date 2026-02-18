@@ -14,18 +14,22 @@ export class UpdateCategoryHandler
   constructor(private readonly categoryService: CategoryService) {}
 
   async execute(command: UpdateCategoryCommand): Promise<CategoryEntity> {
-    return await this.categoryService.updateCategory(command.id, {
-      name: command.name,
-      description: command.description,
-      type: command.type,
-      color: command.color,
-      icon: command.icon,
-      isActive: command.isActive,
-      metadata: command.metadata,
+    const updateData: Partial<CategoryEntity> = {
       audit: {
-        createdBy: command.updatedBy, // Para actualizaciones, el usuario que actualiza es también el "creator" del cambio
+        createdBy: command.updatedBy,
         updatedBy: command.updatedBy,
       },
-    });
+    };
+
+    if (command.name !== undefined) updateData.name = command.name;
+    if (command.description !== undefined)
+      updateData.description = command.description;
+    if (command.type !== undefined) updateData.type = command.type;
+    if (command.color !== undefined) updateData.color = command.color;
+    if (command.icon !== undefined) updateData.icon = command.icon;
+    if (command.isActive !== undefined) updateData.isActive = command.isActive;
+    if (command.metadata !== undefined) updateData.metadata = command.metadata;
+
+    return await this.categoryService.updateCategory(command.id, updateData);
   }
 }
