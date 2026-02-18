@@ -100,8 +100,7 @@ export class Resource {
 
 export const ResourceSchema = SchemaFactory.createForClass(Resource);
 
-// Indexes
-ResourceSchema.index({ code: 1 }, { unique: true });
+// Indexes (code already has unique index from @Prop decorator)
 ResourceSchema.index({ type: 1 });
 ResourceSchema.index({ categoryId: 1 });
 ResourceSchema.index({ programIds: 1 });

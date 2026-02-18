@@ -18,7 +18,7 @@ export class AuditInfoSchema {
  */
 @Schema({ collection: "document_templates", timestamps: true })
 export class DocumentTemplate extends Document {
-  @Prop({ required: true, unique: true, index: true })
+  @Prop({ required: true, unique: true })
   name: string;
 
   @Prop({ required: true, index: true })
@@ -49,8 +49,7 @@ export class DocumentTemplate extends Document {
 export const DocumentTemplateSchema =
   SchemaFactory.createForClass(DocumentTemplate);
 
-// Indexes
-DocumentTemplateSchema.index({ name: 1 }, { unique: true });
+// Indexes (name already has unique index from @Prop decorator)
 DocumentTemplateSchema.index({ type: 1, isActive: 1 });
 DocumentTemplateSchema.index({ isActive: 1 });
 DocumentTemplateSchema.index({ createdAt: -1 });

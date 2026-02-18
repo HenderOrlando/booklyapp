@@ -53,8 +53,7 @@ export class Department {
 
 export const DepartmentSchema = SchemaFactory.createForClass(Department);
 
-// Indexes
-DepartmentSchema.index({ code: 1 }, { unique: true });
+// Indexes (code already has unique index from @Prop decorator)
 DepartmentSchema.index({ name: 1 });
 DepartmentSchema.index({ facultyId: 1 });
 DepartmentSchema.index({ ownerId: 1 });

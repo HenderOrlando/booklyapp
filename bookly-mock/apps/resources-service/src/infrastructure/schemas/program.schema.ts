@@ -74,8 +74,7 @@ export class Program {
 
 export const ProgramSchema = SchemaFactory.createForClass(Program);
 
-// Indexes
-ProgramSchema.index({ code: 1 }, { unique: true });
+// Indexes (code already has unique index from @Prop decorator)
 ProgramSchema.index({ name: 1 });
 ProgramSchema.index({ ownerId: 1 });
 ProgramSchema.index({ coordinatorId: 1 });

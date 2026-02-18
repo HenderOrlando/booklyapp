@@ -25,7 +25,7 @@ const ProviderConfigSchema = SchemaFactory.createForClass(ProviderConfig);
  */
 @Schema({ collection: "tenant_notification_configs", timestamps: true })
 export class TenantNotificationConfig extends Document {
-  @Prop({ required: true, unique: true, index: true })
+  @Prop({ required: true, unique: true })
   tenantId: string;
 
   @Prop({ type: ProviderConfigSchema })
@@ -48,10 +48,9 @@ export class TenantNotificationConfig extends Document {
 }
 
 export const TenantNotificationConfigSchema = SchemaFactory.createForClass(
-  TenantNotificationConfig
+  TenantNotificationConfig,
 );
 
-// Índices
-TenantNotificationConfigSchema.index({ tenantId: 1 }, { unique: true });
+// Indexes (tenantId already has unique index from @Prop decorator)
 TenantNotificationConfigSchema.index({ isActive: 1 });
 TenantNotificationConfigSchema.index({ createdAt: -1 });

@@ -27,7 +27,7 @@ export class ApprovalStepSchema {
  */
 @Schema({ collection: "approval_flows", timestamps: true })
 export class ApprovalFlow extends Document {
-  @Prop({ required: true, unique: true, index: true })
+  @Prop({ required: true, unique: true })
   name: string;
 
   @Prop({ required: true })
@@ -58,8 +58,7 @@ export class ApprovalFlow extends Document {
 
 export const ApprovalFlowSchema = SchemaFactory.createForClass(ApprovalFlow);
 
-// Indexes
-ApprovalFlowSchema.index({ name: 1 }, { unique: true });
+// Indexes (name already has unique index from @Prop decorator)
 ApprovalFlowSchema.index({ isActive: 1 });
 ApprovalFlowSchema.index({ resourceTypes: 1 });
 ApprovalFlowSchema.index({ createdAt: -1 });

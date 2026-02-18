@@ -17,6 +17,7 @@ export * from "./get-categories.handler";
 export * from "./get-import-job.handlers";
 export * from "./get-maintenances.handler";
 export * from "./get-resource-by-id.handler";
+export * from "./get-resource-characteristics.handler";
 export * from "./get-resources.handler";
 export * from "./search-resources-advanced.handler";
 
@@ -32,6 +33,7 @@ import {
 } from "./get-import-job.handlers";
 import { GetMaintenancesHandler } from "./get-maintenances.handler";
 import { GetResourceByIdHandler } from "./get-resource-by-id.handler";
+import { GetResourceCharacteristicsHandler } from "./get-resource-characteristics.handler";
 import { GetResourcesHandler } from "./get-resources.handler";
 import { ImportResourcesHandler } from "./import-resources.handler";
 import { RestoreResourceHandler } from "./restore-resource.handler";
@@ -69,6 +71,7 @@ export const QueryHandlers = [
   SearchResourcesAdvancedHandler,
   GetCategoriesHandler,
   GetMaintenancesHandler,
+  GetResourceCharacteristicsHandler,
   GetImportJobHandler,
   GetUserImportJobsHandler,
   GenerateImportTemplateHandler,

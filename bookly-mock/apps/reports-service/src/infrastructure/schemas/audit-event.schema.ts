@@ -10,7 +10,7 @@ export type AuditEventDocument = AuditEvent & Document;
  */
 @Schema({ timestamps: true, collection: "audit_events" })
 export class AuditEvent {
-  @Prop({ required: true, unique: true, index: true })
+  @Prop({ required: true, unique: true })
   eventId: string;
 
   @Prop({ required: true, index: true })

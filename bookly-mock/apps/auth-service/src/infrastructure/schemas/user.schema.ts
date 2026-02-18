@@ -142,9 +142,7 @@ export class User {
 
 export const UserSchema = SchemaFactory.createForClass(User);
 
-// Indexes
-UserSchema.index({ email: 1 }, { unique: true });
-UserSchema.index({ username: 1 }, { unique: true, sparse: true });
+// Indexes (email and username already have unique indexes from @Prop decorators)
 UserSchema.index({ roles: 1 });
 UserSchema.index({ roleIds: 1 });
 UserSchema.index({ isActive: 1 });
