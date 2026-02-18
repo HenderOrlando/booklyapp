@@ -42,10 +42,10 @@ export function AppHeader({
           </div>
 
           <div className="flex flex-col">
-            <span className="text-[11px] font-bold text-white/90 tracking-wider leading-tight uppercase">
+            <span className="text-[10px] font-bold text-white/80 tracking-wider leading-tight uppercase">
               Universidad Francisco de Paula Santander
             </span>
-            <span className="text-[16px] font-black text-white leading-tight tracking-tight">
+            <span className="text-[18px] font-black text-white leading-tight tracking-tight">
               Bookly
             </span>
           </div>
@@ -55,7 +55,7 @@ export function AppHeader({
       {/* Sección de Usuario, Theme y Logout */}
       <div className="flex items-center gap-6">
         {showUser && user && (
-          <div className="hidden md:flex flex-col items-end leading-tight">
+          <div className="hidden md:flex flex-col items-end leading-tight -space-y-0.5">
             <span className="text-[13px] font-bold text-white">
               {user.firstName} {user.lastName}
             </span>
@@ -69,7 +69,7 @@ export function AppHeader({
           <ThemeToggle />
           <LogoutButton
             variant="link"
-            className="text-[13px] font-semibold text-white hover:text-white/80 transition-colors p-0 h-auto no-underline hover:no-underline"
+            className="text-[13px] font-bold text-white hover:text-white/80 transition-colors p-0 h-auto no-underline hover:no-underline"
           >
             {t("logout")}
           </LogoutButton>

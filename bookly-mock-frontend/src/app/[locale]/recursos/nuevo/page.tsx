@@ -1,6 +1,7 @@
 "use client";
 
 import { Alert } from "@/components/atoms/Alert";
+import { Badge } from "@/components/atoms/Badge";
 import { Button } from "@/components/atoms/Button";
 import {
   Card,
@@ -27,6 +28,7 @@ import { AppHeader } from "@/components/organisms/AppHeader";
 import { AppSidebar } from "@/components/organisms/AppSidebar";
 import { MainLayout } from "@/components/templates/MainLayout";
 import { httpClient } from "@/infrastructure/http";
+import { cn } from "@/lib/utils";
 import {
   AcademicProgram,
   AvailabilityRules,
@@ -34,7 +36,7 @@ import {
   CreateResourceDto,
   ResourceType,
 } from "@/types/entities/resource";
-import { Plus, Tag, X } from "lucide-react";
+import { AlertCircle, Plus, Tag, X } from "lucide-react";
 import { useParams, useRouter } from "next/navigation";
 import * as React from "react";
 
@@ -50,7 +52,20 @@ interface CategoryCollectionPayload {
 }
 
 interface ProgramCollectionPayload {
-  items?: AcademicProgram[];
+  items?: ProgramApiItem[];
+}
+
+interface ProgramApiItem {
+  id?: string;
+  _id?: string;
+  code?: string;
+  name?: string;
+  description?: string;
+  faculty?: string;
+  department?: string;
+  isActive?: boolean;
+  createdAt?: string;
+  updatedAt?: string;
 }
 
 interface ResourceCharacteristicOption {
@@ -169,13 +184,15 @@ function extractPrograms(
   const normalized: AcademicProgram[] = [];
 
   rawItems.forEach((item) => {
-    const id = String(item.id ?? item._id ?? item.code ?? "").trim();
+    // Usar 'any' temporalmente para acceder a campos que pueden venir de la API pero no están en el tipo base
+    const rawItem = item as any;
+    const id = String(rawItem.id ?? rawItem._id ?? rawItem.code ?? "").trim();
     if (!id) return;
 
     normalized.push({
       ...item,
       id,
-    });
+    } as AcademicProgram);
   });
 
   // Deduplicar por ID
@@ -194,6 +211,11 @@ export default function CreateResourcePage() {
   const [selectedPrograms, setSelectedPrograms] = React.useState<string[]>([]);
   const [error, setError] = React.useState("");
   const [success, setSuccess] = React.useState(false);
+  const [activeTab, setActiveTab] = React.useState("basica");
+  const [formErrors, setFormErrors] = React.useState<Record<string, string>>(
+    {},
+  );
+  const [tabErrors, setTabErrors] = React.useState<Record<string, boolean>>({});
 
   const [characteristicsCatalog, setCharacteristicsCatalog] = React.useState<
     ResourceCharacteristicOption[]
@@ -325,7 +347,6 @@ export default function CreateResourcePage() {
     setSelectedPrograms([]);
     setFormData((prev) => ({ ...prev, programIds: [] }));
   };
-
   const handleSelectExistingCharacteristic = (
     characteristic: ResourceCharacteristicOption,
   ) => {
@@ -591,20 +612,93 @@ export default function CreateResourcePage() {
 
         {/* Formulario */}
         <form onSubmit={handleSubmit}>
-          <Tabs defaultValue="basica" className="w-full">
+          <Tabs
+            value={activeTab}
+            onValueChange={setActiveTab}
+            className="w-full"
+          >
             <TabsList className="grid w-full grid-cols-5 mb-6">
-              <TabsTrigger value="basica">Información Básica</TabsTrigger>
-              <TabsTrigger value="ubicacion">Ubicación</TabsTrigger>
-              <TabsTrigger value="caracteristicas">Características</TabsTrigger>
-              <TabsTrigger value="programas">Programas</TabsTrigger>
-              <TabsTrigger value="disponibilidad">Disponibilidad</TabsTrigger>
+              <TabsTrigger
+                value="basica"
+                className={cn(
+                  tabErrors.basica && "text-state-error-500 font-bold",
+                )}
+              >
+                <div className="flex items-center gap-2">
+                  Información Básica
+                  {tabErrors.basica && (
+                    <AlertCircle className="w-4 h-4 text-state-error-500" />
+                  )}
+                </div>
+              </TabsTrigger>
+              <TabsTrigger
+                value="ubicacion"
+                className={cn(
+                  tabErrors.ubicacion && "text-state-error-500 font-bold",
+                )}
+              >
+                <div className="flex items-center gap-2">
+                  Ubicación
+                  {tabErrors.ubicacion && (
+                    <AlertCircle className="w-4 h-4 text-state-error-500" />
+                  )}
+                </div>
+              </TabsTrigger>
+              <TabsTrigger
+                value="caracteristicas"
+                className={cn(
+                  tabErrors.caracteristicas && "text-state-error-500 font-bold",
+                )}
+              >
+                <div className="flex items-center gap-2">
+                  Características
+                  {tabErrors.caracteristicas && (
+                    <AlertCircle className="w-4 h-4 text-state-error-500" />
+                  )}
+                </div>
+              </TabsTrigger>
+              <TabsTrigger
+                value="programas"
+                className={cn(
+                  tabErrors.programas && "text-state-error-500 font-bold",
+                )}
+              >
+                <div className="flex items-center gap-2">
+                  Programas
+                  {tabErrors.programas && (
+                    <AlertCircle className="w-4 h-4 text-state-error-500" />
+                  )}
+                </div>
+              </TabsTrigger>
+              <TabsTrigger
+                value="disponibilidad"
+                className={cn(
+                  tabErrors.disponibilidad && "text-state-error-500 font-bold",
+                )}
+              >
+                <div className="flex items-center gap-2">
+                  Disponibilidad
+                  {tabErrors.disponibilidad && (
+                    <AlertCircle className="w-4 h-4 text-state-error-500" />
+                  )}
+                </div>
+              </TabsTrigger>
             </TabsList>
 
             {/* Tab 1: Información Básica */}
             <TabsContent value="basica">
-              <Card>
+              <Card
+                className={cn(tabErrors.basica && "border-state-error-500")}
+              >
                 <CardHeader>
-                  <CardTitle>Información Básica</CardTitle>
+                  <CardTitle className="flex items-center gap-2">
+                    Información Básica
+                    {tabErrors.basica && (
+                      <Badge variant="error" className="text-[10px] py-0">
+                        Incompleto
+                      </Badge>
+                    )}
+                  </CardTitle>
                   <CardDescription>
                     Datos principales del recurso
                   </CardDescription>
@@ -613,52 +707,64 @@ export default function CreateResourcePage() {
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
                       <label className="block text-sm font-medium text-[var(--color-text-primary)] mb-2">
-                        Código <span className="text-state-error-500">*</span>
+                        Código *
                       </label>
                       <Input
-                        placeholder="Ej: AULA-101"
-                        value={formData.code}
+                        value={formData.code || ""}
+                        className={cn(
+                          formErrors.code && "border-state-error-500",
+                        )}
                         onChange={(e) =>
                           handleInputChange("code", e.target.value)
                         }
-                        required
+                        placeholder="Ej: SALA-01"
                       />
+                      {formErrors.code && (
+                        <p className="text-[10px] text-state-error-500 mt-1">
+                          {formErrors.code}
+                        </p>
+                      )}
                     </div>
 
                     <div>
                       <label className="block text-sm font-medium text-[var(--color-text-primary)] mb-2">
-                        Nombre <span className="text-state-error-500">*</span>
+                        Nombre *
                       </label>
                       <Input
-                        placeholder="Ej: Aula 101"
-                        value={formData.name}
+                        value={formData.name || ""}
+                        className={cn(
+                          formErrors.name && "border-state-error-500",
+                        )}
                         onChange={(e) =>
                           handleInputChange("name", e.target.value)
                         }
-                        required
+                        placeholder="Ej: Sala de Juntas A"
                       />
+                      {formErrors.name && (
+                        <p className="text-[10px] text-state-error-500 mt-1">
+                          {formErrors.name}
+                        </p>
+                      )}
                     </div>
                   </div>
 
                   <div>
                     <label className="block text-sm font-medium text-[var(--color-text-primary)] mb-2">
-                      Descripción{" "}
-                      <span className="text-state-error-500">*</span>
+                      Descripción
                     </label>
                     <Input
-                      placeholder="Describe el recurso..."
-                      value={formData.description}
+                      value={formData.description || ""}
                       onChange={(e) =>
                         handleInputChange("description", e.target.value)
                       }
-                      required
+                      placeholder="Breve descripción del recurso..."
                     />
                   </div>
 
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
                       <label className="block text-sm font-medium text-[var(--color-text-primary)] mb-2">
-                        Tipo <span className="text-state-error-500">*</span>
+                        Tipo *
                       </label>
                       <Select
                         value={formData.type}
@@ -667,7 +773,7 @@ export default function CreateResourcePage() {
                         }
                       >
                         <SelectTrigger>
-                          <SelectValue placeholder="Selecciona el tipo" />
+                          <SelectValue />
                         </SelectTrigger>
                         <SelectContent>
                           <SelectItem value={ResourceType.CLASSROOM}>
@@ -700,8 +806,7 @@ export default function CreateResourcePage() {
 
                     <div>
                       <label className="block text-sm font-medium text-[var(--color-text-primary)] mb-2">
-                        Categoría{" "}
-                        <span className="text-state-error-500">*</span>
+                        Categoría *
                       </label>
                       <Select
                         value={formData.categoryId}
@@ -709,8 +814,12 @@ export default function CreateResourcePage() {
                           handleInputChange("categoryId", value)
                         }
                       >
-                        <SelectTrigger>
-                          <SelectValue placeholder="Selecciona la categoría" />
+                        <SelectTrigger
+                          className={cn(
+                            formErrors.categoryId && "border-state-error-500",
+                          )}
+                        >
+                          <SelectValue placeholder="Selecciona una categoría" />
                         </SelectTrigger>
                         <SelectContent>
                           {categories.map((category) => (
@@ -720,22 +829,25 @@ export default function CreateResourcePage() {
                           ))}
                         </SelectContent>
                       </Select>
+                      {formErrors.categoryId && (
+                        <p className="text-[10px] text-state-error-500 mt-1">
+                          {formErrors.categoryId}
+                        </p>
+                      )}
                     </div>
                   </div>
 
                   <div>
                     <label className="block text-sm font-medium text-[var(--color-text-primary)] mb-2">
-                      Capacidad <span className="text-state-error-500">*</span>
+                      Capacidad *
                     </label>
                     <Input
                       type="number"
                       min="1"
-                      placeholder="Ej: 40"
-                      value={formData.capacity}
+                      value={formData.capacity || 1}
                       onChange={(e) =>
                         handleInputChange("capacity", parseInt(e.target.value))
                       }
-                      required
                     />
                   </div>
                 </CardContent>
@@ -744,40 +856,43 @@ export default function CreateResourcePage() {
 
             {/* Tab 2: Ubicación */}
             <TabsContent value="ubicacion">
-              <Card>
+              <Card
+                className={cn(tabErrors.ubicacion && "border-state-error-500")}
+              >
                 <CardHeader>
-                  <CardTitle>Ubicación</CardTitle>
+                  <CardTitle className="flex items-center gap-2">
+                    Ubicación
+                    {tabErrors.ubicacion && (
+                      <Badge variant="error" className="text-[10px] py-0">
+                        Incompleto
+                      </Badge>
+                    )}
+                  </CardTitle>
                   <CardDescription>
-                    Información sobre dónde se encuentra el recurso
+                    Datos de ubicación del recurso
                   </CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-4">
-                  <div>
-                    <label className="block text-sm font-medium text-[var(--color-text-primary)] mb-2">
-                      Ubicación <span className="text-state-error-500">*</span>
-                    </label>
-                    <Input
-                      placeholder="Ej: Edificio A - Piso 1"
-                      value={formData.location}
-                      onChange={(e) =>
-                        handleInputChange("location", e.target.value)
-                      }
-                      required
-                    />
-                  </div>
-
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
                       <label className="block text-sm font-medium text-[var(--color-text-primary)] mb-2">
-                        Edificio
+                        Edificio *
                       </label>
                       <Input
-                        placeholder="Ej: Edificio A"
-                        value={formData.building}
+                        value={formData.building || ""}
+                        className={cn(
+                          formErrors.building && "border-state-error-500",
+                        )}
                         onChange={(e) =>
                           handleInputChange("building", e.target.value)
                         }
+                        placeholder="Ej: Edificio Fundadores"
                       />
+                      {formErrors.building && (
+                        <p className="text-[10px] text-state-error-500 mt-1">
+                          {formErrors.building}
+                        </p>
+                      )}
                     </div>
 
                     <div>
@@ -785,13 +900,34 @@ export default function CreateResourcePage() {
                         Piso
                       </label>
                       <Input
-                        placeholder="Ej: Piso 2"
-                        value={formData.floor}
+                        value={formData.floor || ""}
                         onChange={(e) =>
                           handleInputChange("floor", e.target.value)
                         }
+                        placeholder="Ej: 2do Piso"
                       />
                     </div>
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-[var(--color-text-primary)] mb-2">
+                      Ubicación Específica *
+                    </label>
+                    <Input
+                      value={formData.location || ""}
+                      className={cn(
+                        formErrors.location && "border-state-error-500",
+                      )}
+                      onChange={(e) =>
+                        handleInputChange("location", e.target.value)
+                      }
+                      placeholder="Ej: Costado Norte, al lado de la biblioteca"
+                    />
+                    {formErrors.location && (
+                      <p className="text-[10px] text-state-error-500 mt-1">
+                        {formErrors.location}
+                      </p>
+                    )}
                   </div>
                 </CardContent>
               </Card>

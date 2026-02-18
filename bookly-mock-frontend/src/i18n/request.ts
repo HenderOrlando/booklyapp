@@ -11,6 +11,7 @@ const isValidLocale = (value: string): value is AppLocale => {
 
 // Lista de namespaces que se cargarán dinámicamente
 const namespaces = [
+  "characteristics",
   "common",
   "errors",
   "navigation",
@@ -26,7 +27,6 @@ const namespaces = [
   "reports",
   "programs",
   "resource_detail",
-  "characteristics",
   "categories",
   "maintenance",
   "check_in",

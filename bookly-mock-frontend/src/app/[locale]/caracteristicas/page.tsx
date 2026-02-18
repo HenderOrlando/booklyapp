@@ -55,7 +55,6 @@ export default function CaracteristicasPage() {
   const deleteCharacteristic = useDeleteCharacteristic();
   const t = useTranslations("characteristics");
   const tCommon = useTranslations("common");
-  const tNav = useTranslations("navigation");
 
   const [filter, setFilter] = React.useState("");
   const [statusFilter, setStatusFilter] = React.useState<
@@ -103,7 +102,8 @@ export default function CaracteristicasPage() {
           name: data.name!,
           code: data.code!,
           description: data.description,
-          isActive: data.isActive,
+          icon: data.icon,
+          color: data.color,
         });
       } else if (selectedCharacteristic) {
         await updateCharacteristic.mutateAsync({
@@ -111,6 +111,8 @@ export default function CaracteristicasPage() {
           data: {
             name: data.name,
             description: data.description,
+            icon: data.icon,
+            color: data.color,
             isActive: data.isActive,
           },
         });
@@ -137,11 +139,19 @@ export default function CaracteristicasPage() {
       key: "name",
       header: t("table.name_code"),
       cell: (char: Characteristic) => (
-        <div>
-          <p className="font-medium text-foreground">{char.name}</p>
-          <p className="text-xs text-[var(--color-text-tertiary)] font-mono">
-            {char.code}
-          </p>
+        <div className="flex items-center gap-3">
+          {char.color && (
+            <div
+              className="w-3 h-3 rounded-full shrink-0"
+              style={{ backgroundColor: char.color }}
+            />
+          )}
+          <div>
+            <p className="font-medium text-foreground">{char.name}</p>
+            <p className="text-xs text-[var(--color-text-tertiary)] font-mono">
+              {char.code}
+            </p>
+          </div>
         </div>
       ),
     },

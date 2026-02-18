@@ -17,6 +17,8 @@ export interface Characteristic {
   code: string;
   name: string;
   description?: string;
+  color?: string;
+  icon?: string;
   isActive: boolean;
   metadata?: Record<string, unknown>;
   createdAt: string;
@@ -28,11 +30,23 @@ export interface CreateCharacteristicDto {
   code: string;
   name: string;
   description?: string;
-  isActive?: boolean;
+  color?: string;
+  icon?: string;
+  order?: number;
+  isDefault?: boolean;
+  metadata?: Record<string, unknown>;
 }
 
-export interface UpdateCharacteristicDto
-  extends Partial<CreateCharacteristicDto> {}
+export interface UpdateCharacteristicDto {
+  name?: string;
+  description?: string;
+  color?: string;
+  icon?: string;
+  order?: number;
+  isActive?: boolean;
+  isDefault?: boolean;
+  metadata?: Record<string, unknown>;
+}
 
 export class CharacteristicsClient {
   private static readonly GROUP = "resource_characteristic";
@@ -60,12 +74,23 @@ export class CharacteristicsClient {
    * Crea una nueva característica
    */
   static async create(
-    data: Omit<CreateCharacteristicDto, "group">,
+    data: Omit<CreateCharacteristicDto, "group" | "isActive">,
   ): Promise<ApiResponse<Characteristic>> {
+    // El backend no permite enviar isActive en la creación.
+    // Usamos esta forma para asegurar que no se incluya en el payload final
+    // sin generar errores de lint por variables no usadas.
     const payload: CreateCharacteristicDto = {
-      ...data,
+      name: data.name,
+      code: data.code,
+      description: data.description,
+      color: data.color,
+      icon: data.icon,
+      order: data.order,
+      isDefault: data.isDefault,
+      metadata: data.metadata,
       group: this.GROUP,
     };
+
     return httpClient.post<Characteristic>(
       RESOURCES_ENDPOINTS.REFERENCE_DATA,
       payload,

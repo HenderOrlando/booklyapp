@@ -21,12 +21,21 @@
     "name_label": "Nombre",
     "code_label": "Código",
     "description_label": "Descripción",
+    "icon_label": "Icono (nombre Lucide)",
+    "color_label": "Color (Hex)",
     "status_label": "Característica activa",
     "status_hint": "Las inactivas no se podrán asignar a nuevos recursos",
     "code_hint": "Identificador único interno. Solo letras, números y guiones bajos.",
     "save_button": "Guardar Cambios",
     "creating_button": "Creando...",
     "saving_button": "Guardando..."
+  },
+  "errors": {
+    "name_required": "El nombre es obligatorio",
+    "name_min_length": "El nombre debe tener al menos 2 caracteres",
+    "code_required": "El código es obligatorio",
+    "code_invalid_format": "El código solo debe contener mayúsculas, números y guiones bajos",
+    "description_max_length": "La descripción no puede superar 200 caracteres"
   },
   "delete_confirm": {
     "title": "Eliminar Característica",

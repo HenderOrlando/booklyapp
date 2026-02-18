@@ -45,11 +45,14 @@ export function CharacteristicModal({
     name: "",
     code: "",
     description: "",
+    icon: "",
+    color: "#3B82F6",
     isActive: true,
   });
 
   const [errors, setErrors] = React.useState<Record<string, string>>({});
   const t = useTranslations("characteristics");
+  const tCommon = useTranslations("common");
 
   React.useEffect(() => {
     if (isOpen) {
@@ -58,6 +61,8 @@ export function CharacteristicModal({
           name: characteristic.name,
           code: characteristic.code,
           description: characteristic.description,
+          icon: characteristic.icon || "",
+          color: characteristic.color || "#3B82F6",
           isActive: characteristic.isActive,
         });
       } else {
@@ -65,6 +70,8 @@ export function CharacteristicModal({
           name: "",
           code: "",
           description: "",
+          icon: "",
+          color: "#3B82F6",
           isActive: true,
         });
       }
@@ -88,20 +95,19 @@ export function CharacteristicModal({
     const newErrors: Record<string, string> = {};
 
     if (!formData.name?.trim()) {
-      newErrors.name = "El nombre es obligatorio";
+      newErrors.name = t("errors.name_required");
     } else if (formData.name.length < 2) {
-      newErrors.name = "El nombre debe tener al menos 2 caracteres";
+      newErrors.name = t("errors.name_min_length");
     }
 
     if (!formData.code?.trim()) {
-      newErrors.code = "El código es obligatorio";
+      newErrors.code = t("errors.code_required");
     } else if (!/^[A-Z0-9_]+$/.test(formData.code)) {
-      newErrors.code =
-        "El código solo debe contener mayúsculas, números y guiones bajos";
+      newErrors.code = t("errors.code_invalid_format");
     }
 
     if (formData.description && formData.description.length > 200) {
-      newErrors.description = "La descripción no puede superar 200 caracteres";
+      newErrors.description = t("errors.description_max_length");
     }
 
     setErrors(newErrors);
@@ -228,6 +234,50 @@ export function CharacteristicModal({
               </div>
             </div>
 
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {/* Icono */}
+              <div>
+                <label className="block text-sm font-medium text-[var(--color-text-primary)] mb-2">
+                  {t("modal.icon_label")}
+                </label>
+                <Input
+                  value={formData.icon || ""}
+                  onChange={(e) =>
+                    setFormData({ ...formData, icon: e.target.value })
+                  }
+                  placeholder="Ej: projector"
+                  data-testid="characteristic-icon-input"
+                />
+              </div>
+
+              {/* Color */}
+              <div>
+                <label className="block text-sm font-medium text-[var(--color-text-primary)] mb-2">
+                  {t("modal.color_label")}
+                </label>
+                <div className="flex gap-2">
+                  <Input
+                    type="color"
+                    value={formData.color || "#3B82F6"}
+                    onChange={(e) =>
+                      setFormData({ ...formData, color: e.target.value })
+                    }
+                    className="w-12 p-1 h-10"
+                    data-testid="characteristic-color-picker"
+                  />
+                  <Input
+                    value={formData.color || "#3B82F6"}
+                    onChange={(e) =>
+                      setFormData({ ...formData, color: e.target.value })
+                    }
+                    placeholder="#000000"
+                    className="flex-1"
+                    data-testid="characteristic-color-input"
+                  />
+                </div>
+              </div>
+            </div>
+
             {/* Estado */}
             <div>
               <label className="flex items-center gap-3 cursor-pointer">
@@ -258,7 +308,7 @@ export function CharacteristicModal({
                 onClick={onClose}
                 disabled={loading}
               >
-                {t("common.cancel", { defaultValue: "Cancelar" })}
+                {tCommon("cancel")}
               </Button>
               <ButtonWithLoading
                 type="submit"

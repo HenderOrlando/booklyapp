@@ -21,12 +21,21 @@
     "name_label": "Name",
     "code_label": "Code",
     "description_label": "Description",
-    "status_label": "Active characteristic",
+    "icon_label": "Icon (Lucide name)",
+    "color_label": "Color (Hex)",
+    "status_label": "Active",
     "status_hint": "Inactive ones cannot be assigned to new resources",
     "code_hint": "Unique internal identifier. Letters, numbers and underscores only.",
     "save_button": "Save Changes",
     "creating_button": "Creating...",
     "saving_button": "Saving..."
+  },
+  "errors": {
+    "name_required": "Name is required",
+    "name_min_length": "Name must be at least 2 characters",
+    "code_required": "Code is required",
+    "code_invalid_format": "Code must contain only uppercase letters, numbers, and underscores",
+    "description_max_length": "Description cannot exceed 200 characters"
   },
   "delete_confirm": {
     "title": "Delete Characteristic",

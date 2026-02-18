@@ -88,6 +88,7 @@ export class ProxyService {
       evaluation: "reports",
       evaluations: "reports",
       audit: "reports",
+      "reference-data": "resources",
       // also accept the service names directly
       stockpile: "stockpile",
       reports: "reports",
@@ -167,6 +168,7 @@ export class ProxyService {
       // Resources CRUD that require immediate persistence/response in UI flows
       "/categories",
       "/resources",
+      "/reference-data",
     ];
     // Build the full path to forward: /{service}{path}
     // e.g., service="approval-requests", path="/123" → fullForwardPath="/approval-requests/123"

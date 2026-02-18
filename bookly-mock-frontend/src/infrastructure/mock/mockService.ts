@@ -1478,9 +1478,7 @@ export class MockService {
 
     return {
       success: true,
-      data: {
-        items,
-      },
+      data: items,
       message: "Resource characteristics retrieved successfully",
       timestamp: new Date().toISOString(),
     };
