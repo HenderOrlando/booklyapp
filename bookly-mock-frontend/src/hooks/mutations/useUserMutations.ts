@@ -58,7 +58,16 @@ export function useUpdateUserProfile() {
 
   return useMutation({
     mutationFn: async (data: UpdateUserProfileDto) => {
-      return AuthClient.updateProfile(data);
+      const response = await AuthClient.updateProfile(data);
+
+      if (!response.success || !response.data) {
+        throw new Error(
+          response.message ||
+            "No se pudo confirmar la actualización del perfil",
+        );
+      }
+
+      return response.data;
     },
     onSuccess: () => {
       showSuccess(
@@ -167,7 +176,16 @@ export function useUpdateUserPreferences() {
 
   return useMutation({
     mutationFn: async (preferences: Partial<UserPreferences>) => {
-      return AuthClient.updatePreferences(preferences);
+      const response = await AuthClient.updatePreferences(preferences);
+
+      if (!response.success || !response.data) {
+        throw new Error(
+          response.message ||
+            "No se pudo confirmar la actualización de preferencias",
+        );
+      }
+
+      return response.data;
     },
     onSuccess: () => {
       showSuccess(
