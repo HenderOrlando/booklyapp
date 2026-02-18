@@ -49,7 +49,8 @@ export default function LoginPage() {
 
     try {
       await login(email, password, rememberMe);
-      // AuthContext redirige automáticamente al dashboard
+      // Force reload to ensure redirect logic in AuthProvider/AuthContext kicks in fresh
+      window.location.reload();
     } catch (error: unknown) {
       console.error("Login error:", error);
       setError(
