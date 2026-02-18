@@ -61,6 +61,34 @@ export class User {
   @Prop({ type: String, trim: true })
   phone?: string;
 
+  @Prop({
+    type: {
+      language: { type: String, default: "es" },
+      theme: {
+        type: String,
+        enum: ["light", "dark", "system"],
+        default: "system",
+      },
+      notifications: {
+        email: { type: Boolean, default: true },
+        push: { type: Boolean, default: true },
+        sms: { type: Boolean, default: false },
+      },
+      timezone: { type: String, default: "America/Bogota" },
+    },
+    _id: false,
+  })
+  preferences?: {
+    language: string;
+    theme: "light" | "dark" | "system";
+    notifications: {
+      email: boolean;
+      push: boolean;
+      sms: boolean;
+    };
+    timezone?: string;
+  };
+
   // Academic Program Relations
   @Prop({ type: String })
   programId?: string; // ObjectId del programa al que pertenece

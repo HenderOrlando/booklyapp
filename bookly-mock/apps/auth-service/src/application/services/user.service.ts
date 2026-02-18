@@ -3,6 +3,17 @@ import { IUserRepository } from "@auth/domain/repositories/user.repository.inter
 import { createLogger, PaginationMeta, PaginationQuery } from "@libs/common";
 import { Inject, Injectable, NotFoundException } from "@nestjs/common";
 
+const DEFAULT_USER_PREFERENCES = {
+  language: "es",
+  theme: "system" as const,
+  notifications: {
+    email: true,
+    push: true,
+    sms: false,
+  },
+  timezone: "America/Bogota",
+};
+
 /**
  * User Service
  * Servicio para gestión de usuarios
@@ -90,6 +101,16 @@ export class UserService {
       phone?: string;
       documentType?: string;
       documentNumber?: string;
+      preferences?: {
+        language?: string;
+        theme?: "light" | "dark" | "system";
+        timezone?: string;
+        notifications?: {
+          email?: boolean;
+          push?: boolean;
+          sms?: boolean;
+        };
+      };
     },
   ): Promise<UserEntity> {
     const user = await this.getUserById(userId);
@@ -112,6 +133,17 @@ export class UserService {
     }
     if (data.documentNumber !== undefined) {
       updateData.documentNumber = data.documentNumber;
+    }
+    if (data.preferences !== undefined) {
+      const currentPreferences = user.preferences ?? DEFAULT_USER_PREFERENCES;
+      updateData.preferences = {
+        ...currentPreferences,
+        ...data.preferences,
+        notifications: {
+          ...currentPreferences.notifications,
+          ...(data.preferences.notifications ?? {}),
+        },
+      };
     }
 
     if (Object.keys(updateData).length === 0) {

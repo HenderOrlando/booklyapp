@@ -1,5 +1,75 @@
 import { AuditInfo } from "@libs/common";
 
+export interface UserNotificationPreferences {
+  email: boolean;
+  push: boolean;
+  sms: boolean;
+}
+
+export interface UserPreferences {
+  language: string;
+  theme: "light" | "dark" | "system";
+  notifications: UserNotificationPreferences;
+  timezone?: string;
+}
+
+const DEFAULT_USER_PREFERENCES: UserPreferences = {
+  language: "es",
+  theme: "system",
+  notifications: {
+    email: true,
+    push: true,
+    sms: false,
+  },
+  timezone: "America/Bogota",
+};
+
+function normalizeUserPreferences(value: unknown): UserPreferences | undefined {
+  if (!value || typeof value !== "object") {
+    return undefined;
+  }
+
+  const source = value as Record<string, unknown>;
+  const sourceNotifications =
+    typeof source.notifications === "object" && source.notifications !== null
+      ? (source.notifications as Record<string, unknown>)
+      : {};
+
+  const themeCandidate = source.theme;
+  const normalizedTheme =
+    themeCandidate === "light" ||
+    themeCandidate === "dark" ||
+    themeCandidate === "system"
+      ? themeCandidate
+      : DEFAULT_USER_PREFERENCES.theme;
+
+  return {
+    language:
+      typeof source.language === "string" && source.language.length > 0
+        ? source.language
+        : DEFAULT_USER_PREFERENCES.language,
+    theme: normalizedTheme,
+    timezone:
+      typeof source.timezone === "string" && source.timezone.length > 0
+        ? source.timezone
+        : DEFAULT_USER_PREFERENCES.timezone,
+    notifications: {
+      email:
+        typeof sourceNotifications.email === "boolean"
+          ? sourceNotifications.email
+          : DEFAULT_USER_PREFERENCES.notifications.email,
+      push:
+        typeof sourceNotifications.push === "boolean"
+          ? sourceNotifications.push
+          : DEFAULT_USER_PREFERENCES.notifications.push,
+      sms:
+        typeof sourceNotifications.sms === "boolean"
+          ? sourceNotifications.sms
+          : DEFAULT_USER_PREFERENCES.notifications.sms,
+    },
+  };
+}
+
 /**
  * User Domain Entity
  * Representa un usuario del sistema con sus roles y permisos
@@ -35,6 +105,7 @@ export class UserEntity {
     public documentNumber?: string,
     public programId?: string,
     public coordinatedProgramId?: string,
+    public preferences?: UserPreferences,
   ) {}
 
   /**
@@ -277,6 +348,7 @@ export class UserEntity {
       documentNumber: this.documentNumber,
       programId: this.programId,
       coordinatedProgramId: this.coordinatedProgramId,
+      preferences: this.preferences,
     };
   }
 
@@ -314,6 +386,7 @@ export class UserEntity {
       data.documentNumber,
       data.programId,
       data.coordinatedProgramId,
+      normalizeUserPreferences(data.preferences),
     );
   }
 }

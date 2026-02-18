@@ -11,6 +11,16 @@ export class UpdateMyProfileCommand {
       phone?: string;
       documentType?: string;
       documentNumber?: string;
+      preferences?: {
+        language?: string;
+        theme?: "light" | "dark" | "system";
+        timezone?: string;
+        notifications?: {
+          email?: boolean;
+          push?: boolean;
+          sms?: boolean;
+        };
+      };
     },
   ) {}
 }

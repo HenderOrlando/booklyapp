@@ -58,7 +58,28 @@ interface MyProfileResponseDto {
     fechaCreacion: string | null;
     ultimaActualizacion: string | null;
   };
+  preferences: {
+    language: string;
+    theme: "light" | "dark" | "system";
+    timezone?: string;
+    notifications: {
+      email: boolean;
+      push: boolean;
+      sms: boolean;
+    };
+  };
 }
+
+const DEFAULT_USER_PREFERENCES: MyProfileResponseDto["preferences"] = {
+  language: "es",
+  theme: "system",
+  timezone: "America/Bogota",
+  notifications: {
+    email: true,
+    push: true,
+    sms: false,
+  },
+};
 
 /**
  * Users Controller
@@ -349,6 +370,14 @@ export class UsersController {
         ultimaActualizacion: user.updatedAt
           ? user.updatedAt.toISOString()
           : null,
+      },
+      preferences: {
+        ...DEFAULT_USER_PREFERENCES,
+        ...user.preferences,
+        notifications: {
+          ...DEFAULT_USER_PREFERENCES.notifications,
+          ...(user.preferences?.notifications ?? {}),
+        },
       },
     };
   }
