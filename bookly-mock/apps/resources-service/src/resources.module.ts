@@ -1,5 +1,9 @@
 import { JWT_SECRET } from "@libs/common/constants";
-import { DatabaseModule, ReferenceDataModule } from "@libs/database";
+import {
+  DatabaseModule,
+  ReferenceDataModule,
+  ReferenceDataRepository,
+} from "@libs/database";
 import { EventBusModule, EventBusService } from "@libs/event-bus";
 import { IdempotencyModule } from "@libs/idempotency";
 import { RedisModule, RedisService } from "@libs/redis";
@@ -248,12 +252,14 @@ const IMPORT_JOB_REPOSITORY = "IImportJobRepository";
         resourceRepository: ResourceRepository,
         eventBusService: any,
         attributeValidationService: AttributeValidationService,
+        referenceDataRepository: ReferenceDataRepository,
         redisService: any,
       ) => {
         return new ResourceService(
           resourceRepository,
           eventBusService,
           attributeValidationService,
+          referenceDataRepository,
           redisService,
         );
       },
@@ -261,6 +267,7 @@ const IMPORT_JOB_REPOSITORY = "IImportJobRepository";
         RESOURCE_REPOSITORY,
         EventBusService,
         AttributeValidationService,
+        ReferenceDataRepository,
         RedisService,
       ],
     },

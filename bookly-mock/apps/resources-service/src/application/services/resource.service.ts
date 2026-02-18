@@ -1,18 +1,14 @@
-import {
-  EventType,
-  ResourceStatus,
-  ResourceType,
-} from "@libs/common/enums";
-import { PaginationMeta, PaginationQuery } from "@libs/common";
-import { createLogger } from "@libs/common";
+import { createLogger, PaginationMeta, PaginationQuery } from "@libs/common";
+import { EventType, ResourceStatus, ResourceType } from "@libs/common/enums";
+import { ReferenceDataRepository } from "@libs/database";
 import { EventBusService } from "@libs/event-bus";
 import {
   ConflictException,
   Injectable,
   NotFoundException,
 } from "@nestjs/common";
-import { ResourceEntity } from '@resources/domain/entities/resource.entity';
-import { IResourceRepository } from '@resources/domain/repositories/resource.repository.interface';
+import { ResourceEntity } from "@resources/domain/entities/resource.entity";
+import { IResourceRepository } from "@resources/domain/repositories/resource.repository.interface";
 import { AvailabilityRulesUpdatedEvent } from "../events/availability-rules-updated.event";
 import { ResourceCategoryChangedEvent } from "../events/resource-category-changed.event";
 import { ResourceStatusChangedEvent } from "../events/resource-status-changed.event";
@@ -27,12 +23,15 @@ export class ResourceService {
   private readonly logger = createLogger("ResourceService");
   private readonly CACHE_TTL = 600; // 10 minutos para recursos
   private readonly CACHE_PREFIX = "resource";
+  private readonly CHARACTERISTICS_GROUP = "resource_characteristic";
+  private readonly DEFAULT_AUDIT_USER = "system";
 
   constructor(
     private readonly resourceRepository: IResourceRepository,
     private readonly eventBusService: EventBusService,
     private readonly attributeValidationService: AttributeValidationService,
-    private readonly redisService?: any // RedisService opcional para no romper tests
+    private readonly referenceDataRepository: ReferenceDataRepository,
+    private readonly redisService?: any, // RedisService opcional para no romper tests
   ) {}
 
   /**
@@ -44,16 +43,23 @@ export class ResourceService {
       const exists = await this.resourceRepository.existsByCode(data.code);
       if (exists) {
         throw new ConflictException(
-          `Resource with code ${data.code} already exists`
+          `Resource with code ${data.code} already exists`,
         );
       }
+    }
+
+    if (data.attributes) {
+      data.attributes = await this.resolveResourceCharacteristics(
+        data.attributes,
+        data.audit?.createdBy || this.DEFAULT_AUDIT_USER,
+      );
     }
 
     // Validar atributos JSON según el tipo de recurso
     if (data.attributes && data.type) {
       this.attributeValidationService.validateOrThrow(
         data.type,
-        data.attributes
+        data.attributes,
       );
     }
 
@@ -76,7 +82,7 @@ export class ResourceService {
       data.availabilityRules,
       undefined,
       undefined,
-      data.audit
+      data.audit,
     );
 
     const createdResource = await this.resourceRepository.create(resource);
@@ -119,7 +125,7 @@ export class ResourceService {
       try {
         const cached = await this.redisService.getCachedWithPrefix(
           "cache",
-          `${this.CACHE_PREFIX}:${id}`
+          `${this.CACHE_PREFIX}:${id}`,
         );
         if (cached) {
           this.logger.debug(`Resource ${id} found in cache`);
@@ -143,7 +149,7 @@ export class ResourceService {
           "cache",
           `${this.CACHE_PREFIX}:${id}`,
           resource,
-          this.CACHE_TTL
+          this.CACHE_TTL,
         );
       } catch (error) {
         this.logger.warn("Cache write error", error as Error);
@@ -177,9 +183,16 @@ export class ResourceService {
       isActive?: boolean;
       location?: string;
       building?: string;
-    }
+    },
   ): Promise<{ resources: ResourceEntity[]; meta: PaginationMeta }> {
     return await this.resourceRepository.findMany(query, filters);
+  }
+
+  async getResourceCharacteristics(onlyActive = true): Promise<any[]> {
+    return await this.referenceDataRepository.findByGroup(
+      this.CHARACTERISTICS_GROUP,
+      onlyActive,
+    );
   }
 
   /**
@@ -187,7 +200,7 @@ export class ResourceService {
    */
   async getResourcesByType(
     type: ResourceType,
-    query: PaginationQuery
+    query: PaginationQuery,
   ): Promise<{ resources: ResourceEntity[]; meta: PaginationMeta }> {
     return await this.resourceRepository.findByType(type, query);
   }
@@ -197,7 +210,7 @@ export class ResourceService {
    */
   async getResourcesByCategory(
     categoryId: string,
-    query: PaginationQuery
+    query: PaginationQuery,
   ): Promise<{ resources: ResourceEntity[]; meta: PaginationMeta }> {
     return await this.resourceRepository.findByCategory(categoryId, query);
   }
@@ -207,7 +220,7 @@ export class ResourceService {
    */
   async getResourcesByProgram(
     programId: string,
-    query: PaginationQuery
+    query: PaginationQuery,
   ): Promise<{ resources: ResourceEntity[]; meta: PaginationMeta }> {
     return await this.resourceRepository.findByProgram(programId, query);
   }
@@ -234,7 +247,7 @@ export class ResourceService {
    */
   async updateResource(
     id: string,
-    data: Partial<ResourceEntity>
+    data: Partial<ResourceEntity>,
   ): Promise<ResourceEntity> {
     // Verificar que el recurso existe
     const resource = await this.getResourceById(id);
@@ -244,7 +257,7 @@ export class ResourceService {
       try {
         await this.redisService.deleteCachedWithPrefix(
           "cache",
-          `${this.CACHE_PREFIX}:${id}`
+          `${this.CACHE_PREFIX}:${id}`,
         );
       } catch (error) {
         this.logger.warn("Cache invalidation error", error as Error);
@@ -256,9 +269,16 @@ export class ResourceService {
       const exists = await this.resourceRepository.existsByCode(data.code);
       if (exists) {
         throw new ConflictException(
-          `Resource with code ${data.code} already exists`
+          `Resource with code ${data.code} already exists`,
         );
       }
+    }
+
+    if (data.attributes) {
+      data.attributes = await this.resolveResourceCharacteristics(
+        data.attributes,
+        data.audit?.updatedBy || this.DEFAULT_AUDIT_USER,
+      );
     }
 
     // Validar atributos JSON si se están actualizando
@@ -266,7 +286,7 @@ export class ResourceService {
       const resourceType = data.type || resource.type;
       this.attributeValidationService.validateOrThrow(
         resourceType,
-        data.attributes
+        data.attributes,
       );
     }
 
@@ -279,7 +299,7 @@ export class ResourceService {
         resource.categoryId,
         data.categoryId,
         data.audit?.updatedBy || "system",
-        "Resource category changed"
+        "Resource category changed",
       );
     }
 
@@ -289,13 +309,253 @@ export class ResourceService {
         id,
         updatedResource.availabilityRules,
         data.audit?.updatedBy || "system",
-        "Resource availability rules updated"
+        "Resource availability rules updated",
       );
     }
 
     this.logger.info("Resource updated", { resourceId: id });
 
     return updatedResource;
+  }
+
+  private normalizeCharacteristicName(value: string): string {
+    return value.trim().replace(/\s+/g, " ");
+  }
+
+  private toCharacteristicCode(value: string): string {
+    return this.normalizeCharacteristicName(value)
+      .normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, "")
+      .replace(/[^a-zA-Z0-9]+/g, "_")
+      .replace(/^_+|_+$/g, "")
+      .toUpperCase();
+  }
+
+  private isLikelyCharacteristicId(value: string): boolean {
+    const normalized = value.trim();
+
+    if (!normalized) {
+      return false;
+    }
+
+    return (
+      /^[a-fA-F0-9]{24}$/.test(normalized) ||
+      /^char[_-][a-zA-Z0-9_-]+$/i.test(normalized)
+    );
+  }
+
+  private getCharacteristicInputs(
+    attributes: Record<string, any>,
+  ): Array<string | Record<string, any>> {
+    if (Array.isArray(attributes.characteristics)) {
+      return attributes.characteristics as Array<string | Record<string, any>>;
+    }
+
+    if (Array.isArray(attributes.features)) {
+      return (attributes.features as unknown[]).filter(
+        (item) => typeof item === "string",
+      ) as string[];
+    }
+
+    return [];
+  }
+
+  private addCharacteristicToMaps(
+    characteristic: any,
+    maps: {
+      byId: Map<string, any>;
+      byName: Map<string, any>;
+      byCode: Map<string, any>;
+    },
+  ): { id: string; name: string } {
+    const id = String(characteristic._id || characteristic.id);
+    const name = this.normalizeCharacteristicName(
+      String(characteristic.name || ""),
+    );
+    const code = String(characteristic.code || "").toUpperCase();
+
+    maps.byId.set(id, characteristic);
+    if (name) {
+      maps.byName.set(name.toLowerCase(), characteristic);
+    }
+    if (code) {
+      maps.byCode.set(code, characteristic);
+    }
+
+    return { id, name };
+  }
+
+  private async createCharacteristicReference(
+    characteristicName: string,
+    maps: {
+      byId: Map<string, any>;
+      byName: Map<string, any>;
+      byCode: Map<string, any>;
+    },
+    actorId: string,
+  ): Promise<{ id: string; name: string }> {
+    const normalizedName = this.normalizeCharacteristicName(characteristicName);
+
+    if (!normalizedName) {
+      throw new ConflictException("Characteristic name cannot be empty");
+    }
+
+    const existingByName = maps.byName.get(normalizedName.toLowerCase());
+    if (existingByName) {
+      return this.addCharacteristicToMaps(existingByName, maps);
+    }
+
+    const codeBase =
+      this.toCharacteristicCode(normalizedName) || `CHAR_${Date.now()}`;
+    let code = codeBase;
+    let suffix = 1;
+
+    while (
+      maps.byCode.has(code) ||
+      (await this.referenceDataRepository.findByGroupAndCode(
+        this.CHARACTERISTICS_GROUP,
+        code,
+      ))
+    ) {
+      code = `${codeBase}_${suffix++}`;
+    }
+
+    const created = await this.referenceDataRepository.create({
+      group: this.CHARACTERISTICS_GROUP,
+      code,
+      name: normalizedName,
+      createdBy: actorId || this.DEFAULT_AUDIT_USER,
+    });
+
+    return this.addCharacteristicToMaps(created, maps);
+  }
+
+  private async resolveSingleCharacteristic(
+    input: string | Record<string, any>,
+    maps: {
+      byId: Map<string, any>;
+      byName: Map<string, any>;
+      byCode: Map<string, any>;
+    },
+    actorId: string,
+  ): Promise<{ id: string; name: string } | null> {
+    const rawValue = typeof input === "string" ? input : undefined;
+    const inputObject =
+      typeof input === "object" && input !== null ? input : undefined;
+
+    const candidateId =
+      (typeof inputObject?.id === "string" && inputObject.id) ||
+      (typeof inputObject?._id === "string" && inputObject._id) ||
+      (typeof rawValue === "string" && this.isLikelyCharacteristicId(rawValue)
+        ? rawValue
+        : undefined);
+
+    if (candidateId) {
+      const existingById = maps.byId.get(candidateId);
+      if (existingById) {
+        return this.addCharacteristicToMaps(existingById, maps);
+      }
+
+      const persistedById =
+        await this.referenceDataRepository.findById(candidateId);
+      if (persistedById && persistedById.group === this.CHARACTERISTICS_GROUP) {
+        return this.addCharacteristicToMaps(persistedById, maps);
+      }
+    }
+
+    const candidateCode =
+      (typeof inputObject?.code === "string" &&
+        inputObject.code.trim().toUpperCase()) ||
+      (rawValue ? this.toCharacteristicCode(rawValue) : undefined);
+
+    if (candidateCode) {
+      const existingByCode = maps.byCode.get(candidateCode);
+      if (existingByCode) {
+        return this.addCharacteristicToMaps(existingByCode, maps);
+      }
+
+      const persistedByCode =
+        await this.referenceDataRepository.findByGroupAndCode(
+          this.CHARACTERISTICS_GROUP,
+          candidateCode,
+        );
+      if (persistedByCode) {
+        return this.addCharacteristicToMaps(persistedByCode, maps);
+      }
+    }
+
+    const candidateName =
+      (typeof inputObject?.name === "string" &&
+        this.normalizeCharacteristicName(inputObject.name)) ||
+      (typeof rawValue === "string"
+        ? this.normalizeCharacteristicName(rawValue)
+        : "");
+
+    if (!candidateName) {
+      return null;
+    }
+
+    const existingByName = maps.byName.get(candidateName.toLowerCase());
+    if (existingByName) {
+      return this.addCharacteristicToMaps(existingByName, maps);
+    }
+
+    return await this.createCharacteristicReference(
+      candidateName,
+      maps,
+      actorId,
+    );
+  }
+
+  private async resolveResourceCharacteristics(
+    attributes: Record<string, any>,
+    actorId: string,
+  ): Promise<Record<string, any>> {
+    const characteristicInputs = this.getCharacteristicInputs(attributes);
+
+    if (characteristicInputs.length === 0) {
+      return attributes;
+    }
+
+    const existingCharacteristics =
+      await this.referenceDataRepository.findByGroup(
+        this.CHARACTERISTICS_GROUP,
+        false,
+      );
+
+    const maps = {
+      byId: new Map<string, any>(),
+      byName: new Map<string, any>(),
+      byCode: new Map<string, any>(),
+    };
+
+    existingCharacteristics.forEach((characteristic) => {
+      this.addCharacteristicToMaps(characteristic, maps);
+    });
+
+    const resolved = await Promise.all(
+      characteristicInputs.map((input) =>
+        this.resolveSingleCharacteristic(
+          input,
+          maps,
+          actorId || this.DEFAULT_AUDIT_USER,
+        ),
+      ),
+    );
+
+    const uniqueCharacteristics = Array.from(
+      new Map(
+        resolved
+          .filter((item): item is { id: string; name: string } => Boolean(item))
+          .map((item) => [item.id, item]),
+      ).values(),
+    );
+
+    return {
+      ...attributes,
+      characteristics: uniqueCharacteristics.map((item) => item.id),
+      features: uniqueCharacteristics.map((item) => item.name),
+    };
   }
 
   /**
@@ -306,7 +566,7 @@ export class ResourceService {
     previousCategoryId: string,
     newCategoryId: string,
     updatedBy: string,
-    reason?: string
+    reason?: string,
   ): Promise<void> {
     try {
       const event = ResourceCategoryChangedEvent.create({
@@ -337,7 +597,7 @@ export class ResourceService {
       this.logger.error(
         "Error publishing resource category changed event",
         error as Error,
-        { resourceId }
+        { resourceId },
       );
       // No lanzar error para no afectar la actualización del recurso
     }
@@ -350,7 +610,7 @@ export class ResourceService {
     resourceId: string,
     rules: any,
     updatedBy: string,
-    reason?: string
+    reason?: string,
   ): Promise<void> {
     try {
       const event = AvailabilityRulesUpdatedEvent.create({
@@ -378,7 +638,7 @@ export class ResourceService {
       this.logger.error(
         "Error publishing availability rules updated event",
         error as Error,
-        { resourceId }
+        { resourceId },
       );
       // No lanzar error para no afectar la actualización del recurso
     }
@@ -392,7 +652,7 @@ export class ResourceService {
     previousStatus: ResourceStatus,
     newStatus: ResourceStatus,
     updatedBy: string,
-    reason?: string
+    reason?: string,
   ): Promise<void> {
     try {
       const event = ResourceStatusChangedEvent.create({
@@ -423,7 +683,7 @@ export class ResourceService {
       this.logger.error(
         "Error publishing resource status changed event",
         error as Error,
-        { resourceId }
+        { resourceId },
       );
       // No lanzar error para no afectar la actualización del recurso
     }
@@ -436,7 +696,7 @@ export class ResourceService {
     resourceId: string,
     previousStatus: ResourceStatus,
     deletedBy: string,
-    reason?: string
+    reason?: string,
   ): Promise<void> {
     try {
       // Usar el evento de cambio de estado, pero indicando que fue eliminado
@@ -466,7 +726,7 @@ export class ResourceService {
       this.logger.error(
         "Error publishing resource deleted event",
         error as Error,
-        { resourceId }
+        { resourceId },
       );
       // No lanzar error para no afectar la eliminación del recurso
     }
@@ -479,7 +739,7 @@ export class ResourceService {
     resourceId: string,
     previousStatus: ResourceStatus,
     restoredBy: string,
-    reason?: string
+    reason?: string,
   ): Promise<void> {
     try {
       // Usar el evento de cambio de estado, pero indicando que fue restaurado
@@ -509,7 +769,7 @@ export class ResourceService {
       this.logger.error(
         "Error publishing resource restored event",
         error as Error,
-        { resourceId }
+        { resourceId },
       );
       // No lanzar error para no afectar la restauración del recurso
     }
@@ -526,7 +786,7 @@ export class ResourceService {
       try {
         await this.redisService.deleteCachedWithPrefix(
           "cache",
-          `${this.CACHE_PREFIX}:${id}`
+          `${this.CACHE_PREFIX}:${id}`,
         );
       } catch (error) {
         this.logger.warn("Cache invalidation error", error as Error);
@@ -541,7 +801,7 @@ export class ResourceService {
         id,
         resource.status,
         deletedBy || "system",
-        "Resource deleted"
+        "Resource deleted",
       );
 
       this.logger.info("Resource deleted", { resourceId: id });
@@ -559,7 +819,7 @@ export class ResourceService {
 
     if (resource.isActive) {
       throw new ConflictException(
-        `Resource with ID ${id} is already active and not deleted`
+        `Resource with ID ${id} is already active and not deleted`,
       );
     }
 
@@ -571,7 +831,7 @@ export class ResourceService {
         id,
         resource.status,
         restoredBy || "system",
-        "Resource restored"
+        "Resource restored",
       );
 
       this.logger.info("Resource restored", { resourceId: id });
@@ -587,7 +847,7 @@ export class ResourceService {
     id: string,
     status: ResourceStatus,
     updatedBy?: string,
-    reason?: string
+    reason?: string,
   ): Promise<void> {
     // Verificar que el recurso existe
     const resource = await this.getResourceById(id);
@@ -601,7 +861,7 @@ export class ResourceService {
       previousStatus,
       status,
       updatedBy || "system",
-      reason
+      reason,
     );
 
     this.logger.info("Resource status updated", { resourceId: id, status });
@@ -657,7 +917,7 @@ export class ResourceService {
    */
   async getResourcesByLocation(
     location: string,
-    query: PaginationQuery
+    query: PaginationQuery,
   ): Promise<{ resources: ResourceEntity[]; meta: PaginationMeta }> {
     return await this.resourceRepository.findByLocation(location, query);
   }
