@@ -227,7 +227,11 @@ function AppConfigColorVariables({ children }: AppConfigColorVariablesProps) {
   if (isBootstrappingColors) {
     return (
       <>
-        <style id="app-config-color-variables">{runtimeStyles}</style>
+        <style
+          id="app-config-color-variables"
+          suppressHydrationWarning
+          dangerouslySetInnerHTML={{ __html: runtimeStyles }}
+        />
         <ColorBootstrapSplash />
       </>
     );
@@ -235,7 +239,11 @@ function AppConfigColorVariables({ children }: AppConfigColorVariablesProps) {
 
   return (
     <>
-      <style id="app-config-color-variables">{runtimeStyles}</style>
+      <style
+        id="app-config-color-variables"
+        suppressHydrationWarning
+        dangerouslySetInnerHTML={{ __html: runtimeStyles }}
+      />
       {children}
     </>
   );

@@ -21,10 +21,12 @@ interface ResourceFiltersSectionProps {
   filter: string;
   advancedFilters: AdvancedSearchFilters;
   showAdvancedSearch: boolean;
+  showUnavailable: boolean;
   categories: Category[];
   onFilterChange: (value: string) => void;
   onAdvancedFiltersChange: (filters: AdvancedSearchFilters) => void;
   onShowAdvancedSearchChange: (show: boolean) => void;
+  onShowUnavailableChange: (value: boolean) => void;
   onClearFilters: () => void;
 }
 
@@ -32,10 +34,12 @@ export function ResourceFiltersSection({
   filter,
   advancedFilters,
   showAdvancedSearch,
+  showUnavailable,
   categories,
   onFilterChange,
   onAdvancedFiltersChange,
   onShowAdvancedSearchChange,
+  onShowUnavailableChange,
   onClearFilters,
 }: ResourceFiltersSectionProps) {
   const t = useTranslations("resources");
@@ -44,15 +48,16 @@ export function ResourceFiltersSection({
   const hasActiveFilters = () => {
     return (
       filter !== "" ||
+      showUnavailable ||
       Object.keys(advancedFilters).some(
         (key) =>
           advancedFilters[key as keyof AdvancedSearchFilters] !== undefined &&
           advancedFilters[key as keyof AdvancedSearchFilters] !== "" &&
           (!Array.isArray(
-            advancedFilters[key as keyof AdvancedSearchFilters]
+            advancedFilters[key as keyof AdvancedSearchFilters],
           ) ||
             (advancedFilters[key as keyof AdvancedSearchFilters] as any[])
-              .length > 0)
+              .length > 0),
       )
     );
   };
@@ -87,7 +92,7 @@ export function ResourceFiltersSection({
 
     if (advancedFilters.categoryId) {
       const catName = categories.find(
-        (c: Category) => c.id === advancedFilters.categoryId
+        (c: Category) => c.id === advancedFilters.categoryId,
       )?.name;
       chips.push({
         key: "categoryId",
@@ -154,6 +159,21 @@ export function ResourceFiltersSection({
           onAdvancedSearch={() => onShowAdvancedSearchChange(true)}
           className="flex-1"
         />
+        <div className="flex items-center gap-2 px-3 py-1.5 rounded-full border border-[var(--color-border-subtle)] bg-[var(--color-bg-muted)]/30 hover:bg-[var(--color-bg-muted)]/50 transition-colors cursor-pointer group/toggle">
+          <input
+            type="checkbox"
+            id="showUnavailable"
+            checked={showUnavailable}
+            onChange={(e) => onShowUnavailableChange(e.target.checked)}
+            className="w-3.5 h-3.5 rounded border-[var(--color-border-subtle)] text-brand-primary-500 focus:ring-brand-primary-500 cursor-pointer"
+          />
+          <label
+            htmlFor="showUnavailable"
+            className="text-[11px] font-bold uppercase tracking-wider text-[var(--color-text-secondary)] group-hover/toggle:text-[var(--color-text-primary)] cursor-pointer select-none"
+          >
+            {t("show_unavailable")}
+          </label>
+        </div>
         {hasActiveFilters() && (
           <Button variant="outline" size="sm" onClick={onClearFilters}>
             {t("clear_filters")}

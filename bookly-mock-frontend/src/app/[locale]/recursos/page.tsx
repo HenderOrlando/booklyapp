@@ -1,25 +1,24 @@
 "use client";
 
 import { Button } from "@/components/atoms/Button";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/atoms/Card";
 import { LoadingSpinner } from "@/components/atoms/LoadingSpinner";
 import { ConfirmDialog } from "@/components/molecules/ConfirmDialog";
 import type { AdvancedSearchFilters } from "@/components/organisms/AdvancedSearchModal";
 import { AppHeader } from "@/components/organisms/AppHeader";
 import { AppSidebar } from "@/components/organisms/AppSidebar";
 import { MainLayout } from "@/components/templates/MainLayout";
-import { categoryKeys, useDeleteResource } from "@/hooks/mutations";
+import {
+  categoryKeys,
+  useDeleteResource,
+  useUpdateResource,
+} from "@/hooks/mutations";
 import { resourceKeys } from "@/hooks/useResources";
 import { useRouter } from "@/i18n/navigation";
 import { httpClient } from "@/infrastructure/http";
+import { cn } from "@/lib/utils";
 import type { Category, Resource } from "@/types/entities/resource";
 import { useQuery } from "@tanstack/react-query";
+import { List as ListIcon, Table as TableIcon } from "lucide-react";
 import { useTranslations } from "next-intl";
 import * as React from "react";
 import {
@@ -39,26 +38,44 @@ interface CategoryCollectionPayload {
 }
 
 function extractResources(
-  data: ResourceCollectionPayload | Resource[] | undefined,
+  data: ResourceCollectionPayload | Resource[] | any,
 ): Resource[] {
+  if (!data) {
+    console.warn("[extractResources] No data provided");
+    return [];
+  }
+
+  // Caso 1: Directly an array
   if (Array.isArray(data)) {
     return data;
   }
 
-  if (data?.resources && Array.isArray(data.resources)) {
-    return data.resources;
+  // Caso 2: Known keys
+  if (data?.resources && Array.isArray(data.resources)) return data.resources;
+  if (data?.items && Array.isArray(data.items)) return data.items;
+  if (data?.data && Array.isArray(data.data)) return data.data;
+
+  // Caso 3: Nested data (double wrapping)
+  if (data?.data && !Array.isArray(data.data)) {
+    return extractResources(data.data);
   }
 
-  if (data?.items && Array.isArray(data.items)) {
-    return data.items;
+  // Caso 4: Search for ANY array in the object (last resort)
+  const arrayKey = Object.keys(data).find((key) => Array.isArray(data[key]));
+  if (arrayKey) {
+    console.log(`[extractResources] Found array in unknown key: "${arrayKey}"`);
+    return data[arrayKey];
   }
 
+  console.warn("[extractResources] No array found in response structure", data);
   return [];
 }
 
 function extractCategories(
-  data: CategoryCollectionPayload | Category[] | undefined,
+  data: CategoryCollectionPayload | Category[] | any,
 ): Category[] {
+  if (!data) return [];
+
   if (Array.isArray(data)) {
     return data;
   }
@@ -69,6 +86,10 @@ function extractCategories(
 
   if (data?.items && Array.isArray(data.items)) {
     return data.items;
+  }
+
+  if (data?.data) {
+    return extractCategories(data.data);
   }
 
   return [];
@@ -92,11 +113,28 @@ export default function RecursosPage() {
   const { data: resources = [], isLoading: loading } = useQuery({
     queryKey: resourceKeys.lists(),
     queryFn: async () => {
-      const response = await httpClient.get<
-        ResourceCollectionPayload | Resource[]
-      >("resources");
+      try {
+        const response = await httpClient.get<
+          ResourceCollectionPayload | Resource[]
+        >("resources");
 
-      return extractResources(response.data);
+        console.log("[RecursosPage] API Response:", response);
+
+        if (!response.success) {
+          console.error("[RecursosPage] API Error:", response.message);
+          return [];
+        }
+
+        const extracted = extractResources(response.data);
+        console.log(
+          "[RecursosPage] Extracted resources count:",
+          extracted.length,
+        );
+        return extracted;
+      } catch (error) {
+        console.error("[RecursosPage] Fetch failed:", error);
+        return [];
+      }
     },
     staleTime: 1000 * 60 * 5,
   });
@@ -118,6 +156,7 @@ export default function RecursosPage() {
   // ============================================
 
   const deleteResource = useDeleteResource();
+  const updateResource = useUpdateResource();
 
   // ============================================
   // ESTADO LOCAL
@@ -127,6 +166,7 @@ export default function RecursosPage() {
   const [filter, setFilter] = React.useState("");
   const [advancedFilters, setAdvancedFilters] =
     React.useState<AdvancedSearchFilters>({});
+  const [showUnavailable, setShowUnavailable] = React.useState(false);
 
   // UI States
   const [useVirtualScrolling, setUseVirtualScrolling] = React.useState(true);
@@ -193,6 +233,15 @@ export default function RecursosPage() {
 
   // Filtrar recursos (combina filtro básico y avanzado)
   const filteredResources = resources.filter((resource: Resource) => {
+    // Filtrar por disponibilidad según el toggle
+    if (showUnavailable) {
+      // Si el check está ON, solo mostrar recursos UNAVAILABLE
+      if (resource.status !== "UNAVAILABLE") return false;
+    } else {
+      // Si el check está OFF (default), solo mostrar recursos disponibles (AVAILABLE, RESERVED, MAINTENANCE)
+      if (resource.status === "UNAVAILABLE") return false;
+    }
+
     // Aplicar filtro básico si está activo
     if (filter !== "") {
       const searchTerm = filter.toLowerCase();
@@ -220,6 +269,7 @@ export default function RecursosPage() {
   const handleClearFilters = () => {
     setFilter("");
     setAdvancedFilters({});
+    setShowUnavailable(false);
   };
 
   const handleDelete = () => {
@@ -245,6 +295,20 @@ export default function RecursosPage() {
     router.push(`/recursos/${resource.id}/editar`);
   };
 
+  const handleRestore = (resource: Resource) => {
+    updateResource.mutate(
+      {
+        id: resource.id,
+        data: { status: "AVAILABLE" as any },
+      },
+      {
+        onSuccess: () => {
+          // Ya se invalida en el hook, pero podemos forzar si es necesario
+        },
+      },
+    );
+  };
+
   const handleDeleteClick = (resource: Resource) => {
     setResourceToDelete(resource);
     setShowDeleteModal(true);
@@ -253,6 +317,17 @@ export default function RecursosPage() {
   // ============================================
   // RENDER
   // ============================================
+
+  // ============================================
+  // LOGGING STATE CHANGES
+  // ============================================
+  React.useEffect(() => {
+    console.log("[RecursosPage] Resources state changed:", {
+      count: resources.length,
+      isLoading: loading,
+      hasData: resources.length > 0,
+    });
+  }, [resources, loading]);
 
   const header = <AppHeader />;
   const sidebar = <AppSidebar />;
@@ -272,18 +347,21 @@ export default function RecursosPage() {
 
   return (
     <MainLayout header={header} sidebar={sidebar}>
-      <div className="space-y-6 pb-6">
+      <div className="space-y-6 pb-6 px-4 md:px-6">
         {/* Header */}
-        <div className="flex items-center justify-between">
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div>
-            <h2 className="text-3xl font-bold text-[var(--color-text-primary)]">
+            <h2 className="text-3xl font-black tracking-tight text-[var(--color-text-primary)]">
               {t("title")}
             </h2>
-            <p className="text-[var(--color-text-secondary)] mt-2">
+            <p className="text-[var(--color-text-secondary)] mt-1 font-medium">
               {t("management")}
             </p>
           </div>
-          <Button onClick={() => router.push("/recursos/nuevo")}>
+          <Button
+            onClick={() => router.push("/recursos/nuevo")}
+            className="bg-brand-primary-600 hover:bg-brand-primary-700 shadow-md hover:shadow-lg transition-all active:scale-95 rounded-xl px-6 font-bold"
+          >
             {t("create")}
           </Button>
         </div>
@@ -291,51 +369,78 @@ export default function RecursosPage() {
         {/* Stats Cards */}
         <ResourceStatsCards resources={resources} />
 
-        {/* Tabla de Recursos */}
-        <Card>
-          <CardHeader>
-            <div className="flex items-center justify-between mb-4">
-              <div>
-                <CardTitle>{t("list")}</CardTitle>
-                <CardDescription>
-                  {t("showing_count", {
-                    count: filteredResources.length,
-                    total: resources.length,
-                  })}
-                </CardDescription>
-              </div>
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => setUseVirtualScrolling(!useVirtualScrolling)}
-              >
-                {useVirtualScrolling ? t("view_table") : t("view_list")}
-              </Button>
+        <div className="space-y-4">
+          <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+            <div>
+              <h3 className="text-xl font-bold flex items-center gap-2 text-[var(--color-text-primary)]">
+                <ListIcon className="w-5 h-5 text-brand-primary-500" />
+                {t("list")}
+              </h3>
+              <p className="text-sm font-medium text-[var(--color-text-tertiary)]">
+                {t("showing_count", {
+                  count: filteredResources.length,
+                  total: resources.length,
+                })}
+              </p>
             </div>
 
-            {/* Filtros */}
-            <ResourceFiltersSection
-              filter={filter}
-              advancedFilters={advancedFilters}
-              showAdvancedSearch={showAdvancedSearch}
-              categories={categories}
-              onFilterChange={setFilter}
-              onAdvancedFiltersChange={setAdvancedFilters}
-              onShowAdvancedSearchChange={setShowAdvancedSearch}
-              onClearFilters={handleClearFilters}
-            />
-          </CardHeader>
+            <div className="flex items-center gap-2 bg-[var(--color-bg-muted)]/50 p-1 rounded-xl border border-[var(--color-border-subtle)]/50">
+              <Button
+                variant={!useVirtualScrolling ? "default" : "ghost"}
+                size="sm"
+                onClick={() => setUseVirtualScrolling(false)}
+                className={cn(
+                  "h-8 px-3 rounded-lg text-xs font-bold transition-all",
+                  !useVirtualScrolling
+                    ? "bg-white text-brand-primary-600 shadow-sm border-none hover:bg-white"
+                    : "text-[var(--color-text-tertiary)] hover:text-brand-primary-500",
+                )}
+              >
+                <TableIcon className="w-3.5 h-3.5 mr-1.5" />
+                {t("view_table")}
+              </Button>
+              <Button
+                variant={useVirtualScrolling ? "default" : "ghost"}
+                size="sm"
+                onClick={() => setUseVirtualScrolling(true)}
+                className={cn(
+                  "h-8 px-3 rounded-lg text-xs font-bold transition-all",
+                  useVirtualScrolling
+                    ? "bg-white text-brand-primary-600 shadow-sm border-none hover:bg-white"
+                    : "text-[var(--color-text-tertiary)] hover:text-brand-primary-500",
+                )}
+              >
+                <ListIcon className="w-3.5 h-3.5 mr-1.5" />
+                {t("view_list")}
+              </Button>
+            </div>
+          </div>
 
-          <CardContent>
+          {/* Filtros */}
+          <ResourceFiltersSection
+            filter={filter}
+            advancedFilters={advancedFilters}
+            showAdvancedSearch={showAdvancedSearch}
+            showUnavailable={showUnavailable}
+            categories={categories}
+            onFilterChange={setFilter}
+            onAdvancedFiltersChange={setAdvancedFilters}
+            onShowAdvancedSearchChange={setShowAdvancedSearch}
+            onShowUnavailableChange={setShowUnavailable}
+            onClearFilters={handleClearFilters}
+          />
+
+          <div className="pt-2">
             <ResourcesTable
               resources={filteredResources}
               useVirtualScrolling={useVirtualScrolling}
               onView={handleView}
               onEdit={handleEdit}
               onDelete={handleDeleteClick}
+              onRestore={handleRestore}
             />
-          </CardContent>
-        </Card>
+          </div>
+        </div>
 
         {/* Modal de confirmación para eliminar */}
         <ConfirmDialog

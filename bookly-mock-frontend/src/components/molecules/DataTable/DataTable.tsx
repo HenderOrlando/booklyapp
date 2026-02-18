@@ -22,7 +22,7 @@ import * as React from "react";
 
 interface Column<T> {
   key: string;
-  header: string;
+  header: React.ReactNode;
   cell: (item: T) => React.ReactNode;
   sortable?: boolean;
   className?: string;
@@ -89,7 +89,7 @@ export function DataTable<T>({
       <div
         className={cn(
           "rounded-md border border-[var(--color-border-subtle)]",
-          className
+          className,
         )}
       >
         <div className="flex flex-col items-center justify-center py-12 px-4">
@@ -132,7 +132,7 @@ export function DataTable<T>({
                       "text-[var(--color-text-secondary)]",
                       column.sortable &&
                         "cursor-pointer select-none hover:text-[var(--color-text-primary)]",
-                      column.className
+                      column.className,
                     )}
                     onClick={() => column.sortable && handleSort(column.key)}
                   >
@@ -144,7 +144,7 @@ export function DataTable<T>({
                             "h-4 w-4 transition-transform",
                             sortColumn === column.key &&
                               sortDirection === "desc" &&
-                              "rotate-180"
+                              "rotate-180",
                           )}
                           fill="none"
                           stroke="currentColor"
@@ -176,7 +176,7 @@ export function DataTable<T>({
                       key={column.key}
                       className={cn(
                         "px-6 py-4 whitespace-nowrap text-sm text-[var(--color-text-primary)]",
-                        column.className
+                        column.className,
                       )}
                     >
                       {column.cell(item)}
