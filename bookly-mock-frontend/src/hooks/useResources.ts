@@ -4,10 +4,12 @@
  * Gestiona recursos (salas, equipos, laboratorios) con cache y optimistic updates
  */
 
-import {
-  ResourcesClient,
-  type ResourceSearchFilters,
-} from "@/infrastructure/api";
+import type {
+  CreateResourceDto,
+  ResourceSearchFilters,
+  UpdateResourceDto,
+} from "@/infrastructure/api/resources-client";
+import { ResourcesClient } from "@/infrastructure/api/resources-client";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 /**
@@ -41,8 +43,11 @@ export function useResources() {
   return useQuery({
     queryKey: resourceKeys.lists(),
     queryFn: async () => {
+      console.log("[useResources] Fetching all resources...");
       const response = await ResourcesClient.getAll();
+      console.log("[useResources] Response received:", response);
       if (!response.success) {
+        console.error("[useResources] Error in response:", response.message);
         throw new Error(response.message || "Error al cargar recursos");
       }
       return response.data;
@@ -188,7 +193,7 @@ export function useCreateResource() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async (data: any) => {
+    mutationFn: async (data: CreateResourceDto) => {
       const response = await ResourcesClient.create(data);
       if (!response.success) {
         throw new Error(response.message || "Error al crear recurso");
@@ -214,7 +219,13 @@ export function useUpdateResource() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async ({ id, data }: { id: string; data: any }) => {
+    mutationFn: async ({
+      id,
+      data,
+    }: {
+      id: string;
+      data: UpdateResourceDto;
+    }) => {
       const response = await ResourcesClient.update(id, data);
       if (!response.success) {
         throw new Error(response.message || "Error al actualizar recurso");
@@ -224,7 +235,7 @@ export function useUpdateResource() {
     onSuccess: (updatedResource) => {
       queryClient.setQueryData(
         resourceKeys.detail(updatedResource.id),
-        updatedResource
+        updatedResource,
       );
       queryClient.invalidateQueries({ queryKey: resourceKeys.lists() });
     },
@@ -278,11 +289,16 @@ export function useCreateMaintenance() {
       data,
     }: {
       resourceId: string;
-      data: any;
+      data: {
+        type: string;
+        description: string;
+        scheduledDate: string;
+        estimatedDuration?: number;
+      };
     }) => {
       const response = await ResourcesClient.createMaintenance(
         resourceId,
-        data
+        data,
       );
       if (!response.success) {
         throw new Error(response.message || "Error al registrar mantenimiento");

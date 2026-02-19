@@ -7,18 +7,24 @@ import type { AdvancedSearchFilters } from "@/components/organisms/AdvancedSearc
 import { AppHeader } from "@/components/organisms/AppHeader";
 import { AppSidebar } from "@/components/organisms/AppSidebar";
 import { MainLayout } from "@/components/templates/MainLayout";
-import {
-  categoryKeys,
-  useDeleteResource,
-  useUpdateResource,
-} from "@/hooks/mutations";
-import { resourceKeys } from "@/hooks/useResources";
+import { useDeleteResource, useUpdateResource } from "@/hooks/mutations";
+import { useResourceCategories, useResources } from "@/hooks/useResources";
 import { useRouter } from "@/i18n/navigation";
-import { httpClient } from "@/infrastructure/http";
+import {
+  dataConfigStore,
+  getDataConfigSnapshot,
+} from "@/lib/data-config/store";
+import { extractArray } from "@/lib/data-utils";
 import { cn } from "@/lib/utils";
 import type { Category, Resource } from "@/types/entities/resource";
-import { useQuery } from "@tanstack/react-query";
-import { List as ListIcon, Table as TableIcon } from "lucide-react";
+import {
+  AlertCircle,
+  Database,
+  List as ListIcon,
+  RefreshCw,
+  Settings2,
+  Table as TableIcon,
+} from "lucide-react";
 import { useTranslations } from "next-intl";
 import * as React from "react";
 import {
@@ -37,70 +43,6 @@ interface CategoryCollectionPayload {
   items?: Category[];
 }
 
-function extractResources(
-  data: ResourceCollectionPayload | Resource[] | any,
-): Resource[] {
-  if (!data) {
-    console.warn("[extractResources] No data provided");
-    return [];
-  }
-
-  // Caso 1: Directly an array
-  if (Array.isArray(data)) {
-    return data;
-  }
-
-  // Caso 2: Known keys
-  if (data?.resources && Array.isArray(data.resources)) return data.resources;
-  if (data?.items && Array.isArray(data.items)) return data.items;
-  if (data?.data && Array.isArray(data.data)) return data.data;
-
-  // Caso 3: Nested data (double wrapping)
-  if (data?.data && !Array.isArray(data.data)) {
-    return extractResources(data.data);
-  }
-
-  // Caso 4: Search for ANY array in the object (last resort)
-  const arrayKey = Object.keys(data).find((key) => Array.isArray(data[key]));
-  if (arrayKey) {
-    console.log(`[extractResources] Found array in unknown key: "${arrayKey}"`);
-    return data[arrayKey];
-  }
-
-  console.warn("[extractResources] No array found in response structure", data);
-  return [];
-}
-
-function extractCategories(
-  data: CategoryCollectionPayload | Category[] | any,
-): Category[] {
-  if (!data) return [];
-
-  if (Array.isArray(data)) {
-    return data;
-  }
-
-  if (data?.categories && Array.isArray(data.categories)) {
-    return data.categories;
-  }
-
-  if (data?.items && Array.isArray(data.items)) {
-    return data.items;
-  }
-
-  if (data?.data) {
-    return extractCategories(data.data);
-  }
-
-  return [];
-}
-
-/**
- * Página de Recursos - Bookly
- *
- * Listado completo de recursos con acciones CRUD
- */
-
 export default function RecursosPage() {
   const router = useRouter();
   const t = useTranslations("resources");
@@ -110,46 +52,81 @@ export default function RecursosPage() {
   // HOOKS DE DATOS
   // ============================================
 
-  const { data: resources = [], isLoading: loading } = useQuery({
-    queryKey: resourceKeys.lists(),
-    queryFn: async () => {
-      try {
-        const response = await httpClient.get<
-          ResourceCollectionPayload | Resource[]
-        >("resources");
+  const {
+    data: resourcesData,
+    isLoading: loading,
+    error: resourcesError,
+    refetch: refetchResources,
+  } = useResources();
+  const { data: categoriesData, refetch: refetchCategories } =
+    useResourceCategories();
 
-        console.log("[RecursosPage] API Response:", response);
+  // Detección de posibles conflictos de puertos (Next.js vs API Gateway)
+  const [portConflict, setPortConflict] = React.useState(false);
 
-        if (!response.success) {
-          console.error("[RecursosPage] API Error:", response.message);
-          return [];
-        }
+  React.useEffect(() => {
+    if (typeof window !== "undefined") {
+      const isPort3000 =
+        window.location.port === "3000" ||
+        window.location.hostname === "localhost";
+      const apiGatewayIs3000 =
+        process.env.NEXT_PUBLIC_API_GATEWAY_URL?.includes(":3000");
 
-        const extracted = extractResources(response.data);
-        console.log(
-          "[RecursosPage] Extracted resources count:",
-          extracted.length,
+      if (isPort3000 && apiGatewayIs3000) {
+        console.warn(
+          "[RecursosPage] Posible conflicto de puertos detectado (Frontend y API Gateway en puerto 3000)",
         );
-        return extracted;
-      } catch (error) {
-        console.error("[RecursosPage] Fetch failed:", error);
-        return [];
+        setPortConflict(true);
       }
-    },
-    staleTime: 1000 * 60 * 5,
-  });
+    }
+  }, []);
 
-  const { data: categories = [] } = useQuery({
-    queryKey: categoryKeys.lists(),
-    queryFn: async () => {
-      const response = await httpClient.get<
-        CategoryCollectionPayload | Category[]
-      >("categories");
+  const handleResetConfig = () => {
+    console.log("[RecursosPage] Resetting configuration to defaults");
+    dataConfigStore.resetToEnv();
+    window.location.reload();
+  };
 
-      return extractCategories(response.data);
-    },
-    staleTime: 1000 * 60 * 5,
-  });
+  const handleRefresh = () => {
+    console.log("[RecursosPage] Refreshing data...");
+    refetchResources();
+    refetchCategories();
+  };
+
+  const configSnapshot = React.useMemo(() => getDataConfigSnapshot(), []);
+
+  const resources = React.useMemo(() => {
+    // Intentar extraer de 'items' (estándar PaginatedResponse) o 'resources'
+    let extracted = extractArray<Resource>(resourcesData, "items");
+
+    if (extracted.length === 0) {
+      extracted = extractArray<Resource>(resourcesData, "resources");
+    }
+
+    console.log("[RecursosPage] Resources extraction:", {
+      rawData: resourcesData,
+      extractedCount: extracted.length,
+      hasData: !!resourcesData,
+    });
+    return extracted;
+  }, [resourcesData]);
+
+  const categories = React.useMemo(() => {
+    let extracted = extractArray<Category>(categoriesData, "categories");
+    if (extracted.length === 0) {
+      extracted = extractArray<Category>(categoriesData, "items");
+    }
+    return extracted;
+  }, [categoriesData]);
+
+  // ============================================
+  // LOGGING ERRORS
+  // ============================================
+  React.useEffect(() => {
+    if (resourcesError) {
+      console.error("[RecursosPage] Resources fetch error:", resourcesError);
+    }
+  }, [resourcesError]);
 
   // ============================================
   // MUTATIONS
@@ -231,36 +208,46 @@ export default function RecursosPage() {
     return true;
   };
 
-  // Filtrar recursos (combina filtro básico y avanzado)
-  const filteredResources = resources.filter((resource: Resource) => {
-    // Filtrar por disponibilidad según el toggle
-    if (showUnavailable) {
-      // Si el check está ON, solo mostrar recursos UNAVAILABLE
-      if (resource.status !== "UNAVAILABLE") return false;
-    } else {
-      // Si el check está OFF (default), solo mostrar recursos disponibles (AVAILABLE, RESERVED, MAINTENANCE)
-      if (resource.status === "UNAVAILABLE") return false;
-    }
+  const filteredResources = React.useMemo(() => {
+    const filtered = resources.filter((resource: Resource) => {
+      // Filtrar por disponibilidad según el toggle
+      if (showUnavailable) {
+        // Si el check está ON, solo mostrar recursos UNAVAILABLE
+        if (resource.status !== "UNAVAILABLE") return false;
+      } else {
+        // Si el check está OFF (default), solo mostrar recursos disponibles (AVAILABLE, RESERVED, MAINTENANCE)
+        if (resource.status === "UNAVAILABLE") return false;
+      }
 
-    // Aplicar filtro básico si está activo
-    if (filter !== "") {
-      const searchTerm = filter.toLowerCase();
-      const matchesBasic =
-        resource.name.toLowerCase().includes(searchTerm) ||
-        resource.code.toLowerCase().includes(searchTerm) ||
-        resource.description.toLowerCase().includes(searchTerm) ||
-        resource.location.toLowerCase().includes(searchTerm) ||
-        resource.type.toLowerCase().includes(searchTerm);
-      if (!matchesBasic) return false;
-    }
+      // Aplicar filtro básico si está activo
+      if (filter !== "") {
+        const searchTerm = filter.toLowerCase();
+        const matchesBasic =
+          resource.name.toLowerCase().includes(searchTerm) ||
+          resource.code.toLowerCase().includes(searchTerm) ||
+          resource.description.toLowerCase().includes(searchTerm) ||
+          resource.location.toLowerCase().includes(searchTerm) ||
+          resource.type.toLowerCase().includes(searchTerm);
+        if (!matchesBasic) return false;
+      }
 
-    // Aplicar filtros avanzados si están activos
-    if (Object.keys(advancedFilters).length > 0) {
-      return applyAdvancedFilters(resource, advancedFilters);
-    }
+      // Aplicar filtros avanzados si están activos
+      if (Object.keys(advancedFilters).length > 0) {
+        return applyAdvancedFilters(resource, advancedFilters);
+      }
 
-    return true;
-  });
+      return true;
+    });
+
+    console.log("[RecursosPage] Filtering resources:", {
+      totalIn: resources.length,
+      filteredOut: resources.length - filtered.length,
+      totalOut: filtered.length,
+      showUnavailable,
+    });
+
+    return filtered;
+  }, [resources, showUnavailable, filter, advancedFilters]);
 
   // ============================================
   // HANDLERS
@@ -332,6 +319,32 @@ export default function RecursosPage() {
   const header = <AppHeader />;
   const sidebar = <AppSidebar />;
 
+  if (resourcesError) {
+    return (
+      <MainLayout header={header} sidebar={sidebar}>
+        <div className="flex flex-col items-center justify-center min-h-[60vh] space-y-4">
+          <div className="w-16 h-16 bg-red-100 text-red-600 rounded-full flex items-center justify-center">
+            <TableIcon size={32} />
+          </div>
+          <h2 className="text-2xl font-bold text-gray-900">
+            {t("error_loading")}
+          </h2>
+          <p className="text-[var(--color-text-tertiary)] max-w-md text-center">
+            {resourcesError instanceof Error
+              ? resourcesError.message
+              : String(resourcesError)}
+          </p>
+          <Button
+            onClick={() => window.location.reload()}
+            className="bg-brand-primary-600"
+          >
+            {tCommon("retry")}
+          </Button>
+        </div>
+      </MainLayout>
+    );
+  }
+
   if (loading) {
     return (
       <MainLayout header={header} sidebar={sidebar}>
@@ -358,13 +371,49 @@ export default function RecursosPage() {
               {t("management")}
             </p>
           </div>
-          <Button
-            onClick={() => router.push("/recursos/nuevo")}
-            className="bg-brand-primary-600 hover:bg-brand-primary-700 shadow-md hover:shadow-lg transition-all active:scale-95 rounded-xl px-6 font-bold"
-          >
-            {t("create")}
-          </Button>
+          <div className="flex items-center gap-3">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={handleRefresh}
+              className="h-9 w-9 p-0 rounded-xl border-[var(--color-border-subtle)] text-[var(--color-text-tertiary)] hover:text-brand-primary-600 hover:border-brand-primary-200 transition-all"
+              title="Refrescar datos"
+            >
+              <RefreshCw size={16} className={cn(loading && "animate-spin")} />
+            </Button>
+            <Button
+              onClick={() => router.push("/recursos/nuevo")}
+              className="bg-brand-primary-600 hover:bg-brand-primary-700 shadow-md hover:shadow-lg transition-all active:scale-95 rounded-xl px-6 font-bold"
+            >
+              {t("create")}
+            </Button>
+          </div>
         </div>
+
+        {/* Alerta de Conflicto de Puertos */}
+        {portConflict && process.env.NODE_ENV === "development" && (
+          <div className="p-4 bg-orange-50 border border-orange-200 rounded-xl flex items-start gap-3">
+            <AlertCircle
+              className="text-orange-600 shrink-0 mt-0.5"
+              size={18}
+            />
+            <div>
+              <h4 className="text-sm font-bold text-orange-800">
+                Posible Conflicto de Configuración
+              </h4>
+              <p className="text-xs text-orange-700 mt-1">
+                El Frontend y el API Gateway parecen estar usando el mismo
+                puerto (3000). Si no ves datos, verifica que el API Gateway esté
+                corriendo en un puerto diferente o usa
+                <code className="mx-1 px-1 bg-orange-100 rounded">
+                  NEXT_PUBLIC_USE_DIRECT_SERVICES=true
+                </code>
+                en tu archivo{" "}
+                <code className="px-1 bg-orange-100 rounded">.env.local</code>.
+              </p>
+            </div>
+          </div>
+        )}
 
         {/* Stats Cards */}
         <ResourceStatsCards resources={resources} />
@@ -440,6 +489,117 @@ export default function RecursosPage() {
               onRestore={handleRestore}
             />
           </div>
+
+          {/* Panel de Debug Temporal (solo si no hay datos) */}
+          {process.env.NODE_ENV === "development" &&
+            resources.length === 0 &&
+            !loading && (
+              <div className="mt-8 p-5 bg-slate-900 border border-slate-800 rounded-2xl shadow-xl text-slate-300">
+                <div className="flex items-center justify-between mb-4 border-b border-slate-800 pb-3">
+                  <h4 className="text-sm font-bold text-slate-100 flex items-center gap-2">
+                    <Database size={16} className="text-blue-400" />
+                    DEBUG: Diagnóstico de Datos
+                  </h4>
+                  <div className="flex items-center gap-2">
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={handleRefresh}
+                      className="h-8 text-xs text-slate-400 hover:text-white hover:bg-slate-800"
+                    >
+                      <RefreshCw size={12} className="mr-1.5" />
+                      Reintentar
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={handleResetConfig}
+                      className="h-8 text-xs text-orange-400 hover:text-orange-300 hover:bg-orange-900/20"
+                    >
+                      <Settings2 size={12} className="mr-1.5" />
+                      Resetear Config
+                    </Button>
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4 text-[11px]">
+                  <div className="space-y-1">
+                    <p className="text-slate-500 uppercase font-bold tracking-wider">
+                      Configuración Activa
+                    </p>
+                    <div className="flex flex-col gap-1">
+                      <p>
+                        Modo:{" "}
+                        <span
+                          className={cn(
+                            "font-mono font-bold",
+                            configSnapshot.dataMode === "SERVER"
+                              ? "text-green-400"
+                              : "text-yellow-400",
+                          )}
+                        >
+                          {configSnapshot.dataMode}
+                        </span>
+                      </p>
+                      <p>
+                        Ruteo:{" "}
+                        <span className="font-mono text-blue-400 font-bold">
+                          {configSnapshot.routingMode}
+                        </span>
+                      </p>
+                      <p>
+                        Direct Services:{" "}
+                        <span className="font-mono text-purple-400 font-bold">
+                          {String(configSnapshot.useDirectServices)}
+                        </span>
+                      </p>
+                    </div>
+                  </div>
+                  <div className="space-y-1">
+                    <p className="text-slate-500 uppercase font-bold tracking-wider">
+                      Estado de Carga
+                    </p>
+                    <div className="flex flex-col gap-1">
+                      <p>
+                        Fetching:{" "}
+                        <span className="font-mono text-white font-bold">
+                          {String(loading)}
+                        </span>
+                      </p>
+                      <p>
+                        Error:{" "}
+                        <span className="font-mono text-red-400 font-bold">
+                          {resourcesError ? "SÍ" : "NO"}
+                        </span>
+                      </p>
+                      <p>
+                        Raw Data:{" "}
+                        <span className="font-mono text-white font-bold">
+                          {resourcesData ? "Presente" : "Nulo/Undefined"}
+                        </span>
+                      </p>
+                    </div>
+                  </div>
+                </div>
+
+                <p className="text-[10px] text-slate-500 mb-2 uppercase font-bold tracking-wider">
+                  JSON de Respuesta:
+                </p>
+                <pre className="text-[10px] overflow-auto max-h-60 p-3 bg-black/50 rounded-xl border border-slate-800 font-mono text-blue-300">
+                  {resourcesData
+                    ? JSON.stringify(resourcesData, null, 2)
+                    : "// No hay datos recibidos"}
+                </pre>
+
+                {resourcesData && resources.length === 0 && (
+                  <div className="mt-3 p-2 bg-blue-900/20 border border-blue-800/50 rounded-lg text-[10px] text-blue-300 italic">
+                    💡 Los datos existen pero el extractor no encontró un array.
+                    Verifica si la clave que contiene el array es diferente a
+                    'items' o 'resources'.
+                  </div>
+                )}
+              </div>
+            )}
         </div>
 
         {/* Modal de confirmación para eliminar */}

@@ -224,6 +224,18 @@ export default function CreateResourcePage() {
     CharacteristicTag[]
   >([]);
   const [characteristicQuery, setCharacteristicQuery] = React.useState("");
+  const [programQuery, setProgramQuery] = React.useState("");
+
+  const filteredPrograms = React.useMemo(() => {
+    const query = programQuery.toLowerCase().trim();
+    if (!query) return programs;
+    return programs.filter(
+      (p) =>
+        p.name.toLowerCase().includes(query) ||
+        p.code?.toLowerCase().includes(query) ||
+        p.faculty?.toLowerCase().includes(query),
+    );
+  }, [programs, programQuery]);
 
   const selectedCharacteristicKeys = React.useMemo(
     () => new Set(selectedCharacteristics.map((item) => item.normalizedName)),
@@ -458,18 +470,69 @@ export default function CreateResourcePage() {
     }
   };
 
+  const validateForm = () => {
+    const errors: Record<string, string> = {};
+    const tabsWithErrors: Record<string, boolean> = {
+      basica: false,
+      ubicacion: false,
+      caracteristicas: false,
+      programas: false,
+      disponibilidad: false,
+    };
+
+    // Validación Tab: Información Básica
+    if (!formData.code?.trim()) {
+      errors.code = "El código es obligatorio";
+      tabsWithErrors.basica = true;
+    }
+    if (!formData.name?.trim()) {
+      errors.name = "El nombre es obligatorio";
+      tabsWithErrors.basica = true;
+    }
+    if (!formData.categoryId) {
+      errors.categoryId = "La categoría es obligatoria";
+      tabsWithErrors.basica = true;
+    }
+
+    // Validación Tab: Ubicación
+    if (!formData.building?.trim()) {
+      errors.building = "El edificio es obligatorio";
+      tabsWithErrors.ubicacion = true;
+    }
+    if (!formData.location?.trim()) {
+      errors.location = "La ubicación específica es obligatoria";
+      tabsWithErrors.ubicacion = true;
+    }
+
+    setFormErrors(errors);
+    setTabErrors(tabsWithErrors);
+
+    // Si hay errores, retornar la primera pestaña que los tenga
+    if (Object.keys(errors).length > 0) {
+      if (tabsWithErrors.basica) return "basica";
+      if (tabsWithErrors.ubicacion) return "ubicacion";
+      if (tabsWithErrors.caracteristicas) return "caracteristicas";
+      if (tabsWithErrors.programas) return "programas";
+      if (tabsWithErrors.disponibilidad) return "disponibilidad";
+    }
+
+    return null;
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setLoading(true);
     setError("");
     setSuccess(false);
 
-    try {
-      // Validaciones básicas
-      if (!formData.code || !formData.name || !formData.categoryId) {
-        throw new Error("Por favor completa todos los campos obligatorios");
-      }
+    const firstTabWithError = validateForm();
+    if (firstTabWithError) {
+      setActiveTab(firstTabWithError);
+      setError("Por favor completa los campos obligatorios marcados en rojo.");
+      return;
+    }
 
+    setLoading(true);
+    try {
       const characteristicNames = Array.from(
         new Map(
           selectedCharacteristics
@@ -585,21 +648,35 @@ export default function CreateResourcePage() {
     <MainLayout header={header} sidebar={sidebar}>
       <div className="max-w-4xl mx-auto space-y-6 pb-6">
         {/* Header */}
-        <div className="flex items-center justify-between">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-[var(--color-bg-primary)] p-6 rounded-xl border border-[var(--color-border-subtle)] shadow-sm">
           <div>
-            <h2 className="text-3xl font-bold text-[var(--color-text-primary)]">
+            <h2 className="text-2xl font-bold text-[var(--color-text-primary)]">
               Crear Nuevo Recurso
             </h2>
-            <p className="text-[var(--color-text-secondary)] mt-2">
+            <p className="text-sm text-[var(--color-text-tertiary)] mt-1">
               Completa el formulario para agregar un nuevo recurso al sistema
+              institucional
             </p>
           </div>
-          <Button
-            variant="outline"
-            onClick={() => router.push(`/${locale}/recursos`)}
-          >
-            Cancelar
-          </Button>
+          <div className="flex items-center gap-3">
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => router.push(`/${locale}/recursos`)}
+              disabled={loading}
+              className="min-w-[100px]"
+            >
+              Cancelar
+            </Button>
+            <Button
+              type="submit"
+              form="create-resource-form"
+              disabled={loading}
+              className="min-w-[120px] bg-[var(--color-action-primary)] hover:opacity-90"
+            >
+              {loading ? "Creando..." : "Crear Recurso"}
+            </Button>
+          </div>
         </div>
 
         {/* Alertas */}
@@ -611,75 +688,90 @@ export default function CreateResourcePage() {
         )}
 
         {/* Formulario */}
-        <form onSubmit={handleSubmit}>
+        <form id="create-resource-form" onSubmit={handleSubmit}>
           <Tabs
             value={activeTab}
             onValueChange={setActiveTab}
             className="w-full"
           >
-            <TabsList className="grid w-full grid-cols-5 mb-6">
+            <TabsList className="flex flex-wrap md:grid w-full md:grid-cols-5 h-auto mb-8 bg-[var(--color-bg-tertiary)]/20 p-1 rounded-xl border border-[var(--color-border-subtle)]">
               <TabsTrigger
                 value="basica"
                 className={cn(
-                  tabErrors.basica && "text-state-error-500 font-bold",
+                  "flex-1 py-3 px-4 transition-all duration-200",
+                  tabErrors.basica &&
+                    "text-state-error-600 bg-state-error-50/50",
                 )}
               >
-                <div className="flex items-center gap-2">
-                  Información Básica
+                <div className="flex items-center justify-center gap-2">
+                  <span className="hidden sm:inline">1.</span>
+                  <span>Básica</span>
                   {tabErrors.basica && (
-                    <AlertCircle className="w-4 h-4 text-state-error-500" />
+                    <AlertCircle className="w-3.5 h-3.5 text-state-error-500 animate-pulse" />
                   )}
                 </div>
               </TabsTrigger>
               <TabsTrigger
                 value="ubicacion"
                 className={cn(
-                  tabErrors.ubicacion && "text-state-error-500 font-bold",
+                  "flex-1 py-3 px-4 transition-all duration-200",
+                  tabErrors.ubicacion &&
+                    "text-state-error-600 bg-state-error-50/50",
                 )}
               >
-                <div className="flex items-center gap-2">
-                  Ubicación
+                <div className="flex items-center justify-center gap-2">
+                  <span className="hidden sm:inline">2.</span>
+                  <span>Ubicación</span>
                   {tabErrors.ubicacion && (
-                    <AlertCircle className="w-4 h-4 text-state-error-500" />
+                    <AlertCircle className="w-3.5 h-3.5 text-state-error-500 animate-pulse" />
                   )}
                 </div>
               </TabsTrigger>
               <TabsTrigger
                 value="caracteristicas"
                 className={cn(
-                  tabErrors.caracteristicas && "text-state-error-500 font-bold",
+                  "flex-1 py-3 px-4 transition-all duration-200",
+                  tabErrors.caracteristicas &&
+                    "text-state-error-600 bg-state-error-50/50",
                 )}
               >
-                <div className="flex items-center gap-2">
-                  Características
+                <div className="flex items-center justify-center gap-2">
+                  <span className="hidden sm:inline">3.</span>
+                  <span>Características</span>
                   {tabErrors.caracteristicas && (
-                    <AlertCircle className="w-4 h-4 text-state-error-500" />
+                    <AlertCircle className="w-3.5 h-3.5 text-state-error-500 animate-pulse" />
                   )}
                 </div>
               </TabsTrigger>
               <TabsTrigger
                 value="programas"
                 className={cn(
-                  tabErrors.programas && "text-state-error-500 font-bold",
+                  "flex-1 py-3 px-4 transition-all duration-200",
+                  tabErrors.programas &&
+                    "text-state-error-600 bg-state-error-50/50",
                 )}
               >
-                <div className="flex items-center gap-2">
-                  Programas
+                <div className="flex items-center justify-center gap-2">
+                  <span className="hidden sm:inline">4.</span>
+                  <span>Programas</span>
                   {tabErrors.programas && (
-                    <AlertCircle className="w-4 h-4 text-state-error-500" />
+                    <AlertCircle className="w-3.5 h-3.5 text-state-error-500 animate-pulse" />
                   )}
                 </div>
               </TabsTrigger>
               <TabsTrigger
                 value="disponibilidad"
                 className={cn(
-                  tabErrors.disponibilidad && "text-state-error-500 font-bold",
+                  "flex-1 py-3 px-4 transition-all duration-200",
+                  tabErrors.disponibilidad &&
+                    "text-state-error-600 bg-state-error-50/50",
                 )}
               >
-                <div className="flex items-center gap-2">
-                  Disponibilidad
+                <div className="flex items-center justify-center gap-2">
+                  <span className="hidden sm:inline">5.</span>
+                  <span>Disponibilidad</span>
                   {tabErrors.disponibilidad && (
-                    <AlertCircle className="w-4 h-4 text-state-error-500" />
+                    <AlertCircle className="w-3.5 h-3.5 text-state-error-500 animate-pulse" />
                   )}
                 </div>
               </TabsTrigger>
@@ -703,16 +795,20 @@ export default function CreateResourcePage() {
                     Datos principales del recurso
                   </CardDescription>
                 </CardHeader>
-                <CardContent className="space-y-4">
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div>
-                      <label className="block text-sm font-medium text-[var(--color-text-primary)] mb-2">
-                        Código *
+                <CardContent className="space-y-6">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div className="space-y-2">
+                      <label className="text-sm font-semibold text-[var(--color-text-primary)]">
+                        Código del Recurso{" "}
+                        <span className="text-state-error-500">*</span>
                       </label>
                       <Input
                         value={formData.code || ""}
                         className={cn(
-                          formErrors.code && "border-state-error-500",
+                          "h-11 transition-all",
+                          formErrors.code
+                            ? "border-state-error-500 bg-state-error-50"
+                            : "focus:border-[var(--color-border-focus)]",
                         )}
                         onChange={(e) =>
                           handleInputChange("code", e.target.value)
@@ -720,20 +816,24 @@ export default function CreateResourcePage() {
                         placeholder="Ej: SALA-01"
                       />
                       {formErrors.code && (
-                        <p className="text-[10px] text-state-error-500 mt-1">
-                          {formErrors.code}
+                        <p className="text-[11px] font-medium text-state-error-600 flex items-center gap-1">
+                          <AlertCircle className="w-3 h-3" /> {formErrors.code}
                         </p>
                       )}
                     </div>
 
-                    <div>
-                      <label className="block text-sm font-medium text-[var(--color-text-primary)] mb-2">
-                        Nombre *
+                    <div className="space-y-2">
+                      <label className="text-sm font-semibold text-[var(--color-text-primary)]">
+                        Nombre del Recurso{" "}
+                        <span className="text-state-error-500">*</span>
                       </label>
                       <Input
                         value={formData.name || ""}
                         className={cn(
-                          formErrors.name && "border-state-error-500",
+                          "h-11 transition-all",
+                          formErrors.name
+                            ? "border-state-error-500 bg-state-error-50"
+                            : "focus:border-[var(--color-border-focus)]",
                         )}
                         onChange={(e) =>
                           handleInputChange("name", e.target.value)
@@ -741,30 +841,33 @@ export default function CreateResourcePage() {
                         placeholder="Ej: Sala de Juntas A"
                       />
                       {formErrors.name && (
-                        <p className="text-[10px] text-state-error-500 mt-1">
-                          {formErrors.name}
+                        <p className="text-[11px] font-medium text-state-error-600 flex items-center gap-1">
+                          <AlertCircle className="w-3 h-3" /> {formErrors.name}
                         </p>
                       )}
                     </div>
                   </div>
 
-                  <div>
-                    <label className="block text-sm font-medium text-[var(--color-text-primary)] mb-2">
+                  <div className="space-y-2">
+                    <label className="text-sm font-semibold text-[var(--color-text-primary)]">
                       Descripción
                     </label>
-                    <Input
+                    <textarea
                       value={formData.description || ""}
                       onChange={(e) =>
                         handleInputChange("description", e.target.value)
                       }
-                      placeholder="Breve descripción del recurso..."
+                      rows={3}
+                      className="w-full rounded-md border border-[var(--color-border-subtle)] bg-[var(--color-bg-primary)] px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 transition-all focus:border-[var(--color-border-focus)]"
+                      placeholder="Describe brevemente el recurso, su propósito y cualquier detalle relevante para los usuarios..."
                     />
                   </div>
 
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div>
-                      <label className="block text-sm font-medium text-[var(--color-text-primary)] mb-2">
-                        Tipo *
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div className="space-y-2">
+                      <label className="text-sm font-semibold text-[var(--color-text-primary)]">
+                        Tipo de Recurso{" "}
+                        <span className="text-state-error-500">*</span>
                       </label>
                       <Select
                         value={formData.type}
@@ -772,7 +875,7 @@ export default function CreateResourcePage() {
                           handleInputChange("type", value as ResourceType)
                         }
                       >
-                        <SelectTrigger>
+                        <SelectTrigger className="h-11">
                           <SelectValue />
                         </SelectTrigger>
                         <SelectContent>
@@ -804,9 +907,10 @@ export default function CreateResourcePage() {
                       </Select>
                     </div>
 
-                    <div>
-                      <label className="block text-sm font-medium text-[var(--color-text-primary)] mb-2">
-                        Categoría *
+                    <div className="space-y-2">
+                      <label className="text-sm font-semibold text-[var(--color-text-primary)]">
+                        Categoría{" "}
+                        <span className="text-state-error-500">*</span>
                       </label>
                       <Select
                         value={formData.categoryId}
@@ -816,10 +920,13 @@ export default function CreateResourcePage() {
                       >
                         <SelectTrigger
                           className={cn(
-                            formErrors.categoryId && "border-state-error-500",
+                            "h-11 transition-all",
+                            formErrors.categoryId
+                              ? "border-state-error-500 bg-state-error-50"
+                              : "focus:border-[var(--color-border-focus)]",
                           )}
                         >
-                          <SelectValue placeholder="Selecciona una categoría" />
+                          <SelectValue placeholder="Selecciona..." />
                         </SelectTrigger>
                         <SelectContent>
                           {categories.map((category) => (
@@ -830,25 +937,36 @@ export default function CreateResourcePage() {
                         </SelectContent>
                       </Select>
                       {formErrors.categoryId && (
-                        <p className="text-[10px] text-state-error-500 mt-1">
+                        <p className="text-[11px] font-medium text-state-error-600 flex items-center gap-1">
+                          <AlertCircle className="w-3 h-3" />{" "}
                           {formErrors.categoryId}
                         </p>
                       )}
                     </div>
-                  </div>
 
-                  <div>
-                    <label className="block text-sm font-medium text-[var(--color-text-primary)] mb-2">
-                      Capacidad *
-                    </label>
-                    <Input
-                      type="number"
-                      min="1"
-                      value={formData.capacity || 1}
-                      onChange={(e) =>
-                        handleInputChange("capacity", parseInt(e.target.value))
-                      }
-                    />
+                    <div className="space-y-2">
+                      <label className="text-sm font-semibold text-[var(--color-text-primary)]">
+                        Capacidad{" "}
+                        <span className="text-state-error-500">*</span>
+                      </label>
+                      <div className="relative">
+                        <Input
+                          type="number"
+                          min="1"
+                          value={formData.capacity || 1}
+                          onChange={(e) =>
+                            handleInputChange(
+                              "capacity",
+                              parseInt(e.target.value),
+                            )
+                          }
+                          className="h-11 pr-12"
+                        />
+                        <span className="absolute right-3 top-1/2 -translate-y-1/2 text-[10px] font-bold text-[var(--color-text-tertiary)] uppercase">
+                          Pers.
+                        </span>
+                      </div>
+                    </div>
                   </div>
                 </CardContent>
               </Card>
@@ -872,16 +990,19 @@ export default function CreateResourcePage() {
                     Datos de ubicación del recurso
                   </CardDescription>
                 </CardHeader>
-                <CardContent className="space-y-4">
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div>
-                      <label className="block text-sm font-medium text-[var(--color-text-primary)] mb-2">
-                        Edificio *
+                <CardContent className="space-y-6">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div className="space-y-2">
+                      <label className="text-sm font-semibold text-[var(--color-text-primary)]">
+                        Edificio <span className="text-state-error-500">*</span>
                       </label>
                       <Input
                         value={formData.building || ""}
                         className={cn(
-                          formErrors.building && "border-state-error-500",
+                          "h-11 transition-all",
+                          formErrors.building
+                            ? "border-state-error-500 bg-state-error-50"
+                            : "focus:border-[var(--color-border-focus)]",
                         )}
                         onChange={(e) =>
                           handleInputChange("building", e.target.value)
@@ -889,18 +1010,20 @@ export default function CreateResourcePage() {
                         placeholder="Ej: Edificio Fundadores"
                       />
                       {formErrors.building && (
-                        <p className="text-[10px] text-state-error-500 mt-1">
+                        <p className="text-[11px] font-medium text-state-error-600 flex items-center gap-1">
+                          <AlertCircle className="w-3 h-3" />{" "}
                           {formErrors.building}
                         </p>
                       )}
                     </div>
 
-                    <div>
-                      <label className="block text-sm font-medium text-[var(--color-text-primary)] mb-2">
-                        Piso
+                    <div className="space-y-2">
+                      <label className="text-sm font-semibold text-[var(--color-text-primary)]">
+                        Piso / Nivel
                       </label>
                       <Input
                         value={formData.floor || ""}
+                        className="h-11 focus:border-[var(--color-border-focus)]"
                         onChange={(e) =>
                           handleInputChange("floor", e.target.value)
                         }
@@ -909,14 +1032,18 @@ export default function CreateResourcePage() {
                     </div>
                   </div>
 
-                  <div>
-                    <label className="block text-sm font-medium text-[var(--color-text-primary)] mb-2">
-                      Ubicación Específica *
+                  <div className="space-y-2">
+                    <label className="text-sm font-semibold text-[var(--color-text-primary)]">
+                      Ubicación Específica / Referencia{" "}
+                      <span className="text-state-error-500">*</span>
                     </label>
                     <Input
                       value={formData.location || ""}
                       className={cn(
-                        formErrors.location && "border-state-error-500",
+                        "h-11 transition-all",
+                        formErrors.location
+                          ? "border-state-error-500 bg-state-error-50"
+                          : "focus:border-[var(--color-border-focus)]",
                       )}
                       onChange={(e) =>
                         handleInputChange("location", e.target.value)
@@ -924,10 +1051,15 @@ export default function CreateResourcePage() {
                       placeholder="Ej: Costado Norte, al lado de la biblioteca"
                     />
                     {formErrors.location && (
-                      <p className="text-[10px] text-state-error-500 mt-1">
+                      <p className="text-[11px] font-medium text-state-error-600 flex items-center gap-1">
+                        <AlertCircle className="w-3 h-3" />{" "}
                         {formErrors.location}
                       </p>
                     )}
+                    <p className="text-[11px] text-[var(--color-text-tertiary)] italic">
+                      Proporciona detalles que ayuden a los usuarios a encontrar
+                      el recurso fácilmente.
+                    </p>
                   </div>
                 </CardContent>
               </Card>
@@ -942,29 +1074,42 @@ export default function CreateResourcePage() {
                     Selecciona las características del recurso
                   </CardDescription>
                 </CardHeader>
-                <CardContent className="space-y-4">
-                  <div>
-                    <p className="text-sm font-medium text-[var(--color-text-primary)] mb-2">
-                      Seleccionadas ({selectedCharacteristics.length})
-                    </p>
+                <CardContent className="space-y-6">
+                  <div className="space-y-3">
+                    <div className="flex items-center justify-between">
+                      <label className="text-sm font-semibold text-[var(--color-text-primary)]">
+                        Características Seleccionadas
+                      </label>
+                      <Badge
+                        variant="secondary"
+                        className="bg-[var(--color-bg-tertiary)] text-[var(--color-text-secondary)] border-none"
+                      >
+                        {selectedCharacteristics.length} seleccionadas
+                      </Badge>
+                    </div>
+
                     {selectedCharacteristics.length === 0 ? (
-                      <p className="text-sm text-[var(--color-text-tertiary)] p-4 rounded-lg border border-dashed border-[var(--color-border-subtle)]">
-                        No hay características seleccionadas.
-                      </p>
+                      <div className="flex flex-col items-center justify-center py-8 rounded-xl border-2 border-dashed border-[var(--color-border-subtle)] bg-[var(--color-bg-secondary)]/30 text-center">
+                        <Tag className="w-8 h-8 text-[var(--color-text-tertiary)] mb-2 opacity-20" />
+                        <p className="text-sm text-[var(--color-text-tertiary)] max-w-[200px]">
+                          No has seleccionado características para este recurso.
+                        </p>
+                      </div>
                     ) : (
                       <div
-                        className="flex flex-wrap gap-2"
+                        className="flex flex-wrap gap-2 p-3 rounded-xl border border-[var(--color-border-subtle)] bg-[var(--color-bg-primary)] shadow-sm min-h-[58px]"
                         data-testid="resource-characteristics-selected"
                       >
                         {selectedCharacteristics.map((characteristic) => (
-                          <span
+                          <div
                             key={characteristic.normalizedName}
                             data-testid={`resource-characteristic-chip-${characteristic.isNew ? "new-" : ""}${toCharacteristicTestId(characteristic.name)}`}
-                            className={`inline-flex items-center gap-1.5 rounded-full border px-3 py-1 text-xs ${
+                            className={cn(
+                              "inline-flex items-center gap-2 rounded-lg border px-3 py-1.5 text-xs font-medium transition-all animate-in fade-in zoom-in duration-200",
                               characteristic.isNew
-                                ? "border-[var(--color-border-focus)] bg-[var(--color-bg-secondary)] text-[var(--color-text-primary)]"
-                                : "border-[var(--color-border-subtle)] bg-[var(--color-bg-primary)] text-[var(--color-text-primary)]"
-                            }`}
+                                ? "border-blue-200 bg-blue-50 text-blue-700 shadow-sm"
+                                : "border-[var(--color-border-subtle)] bg-[var(--color-bg-secondary)] text-[var(--color-text-primary)]",
+                            )}
                           >
                             {characteristic.isNew ? (
                               <Plus className="h-3.5 w-3.5" />
@@ -973,14 +1118,12 @@ export default function CreateResourcePage() {
                             )}
                             <span>{characteristic.name}</span>
                             {characteristic.isNew && (
-                              <span className="rounded-full bg-[var(--color-bg-tertiary)] px-1.5 py-0.5 text-[10px] font-medium">
-                                Nueva
-                              </span>
+                              <span className="flex h-1.5 w-1.5 rounded-full bg-blue-500 animate-pulse" />
                             )}
                             <button
                               type="button"
                               data-testid={`resource-characteristic-remove-${toCharacteristicTestId(characteristic.name)}`}
-                              className="rounded p-0.5 text-[var(--color-text-tertiary)] hover:text-[var(--color-text-primary)]"
+                              className="ml-1 rounded-md p-0.5 hover:bg-black/5 transition-colors"
                               onClick={() =>
                                 handleRemoveCharacteristic(
                                   characteristic.normalizedName,
@@ -990,61 +1133,94 @@ export default function CreateResourcePage() {
                             >
                               <X className="h-3.5 w-3.5" />
                             </button>
-                          </span>
+                          </div>
                         ))}
                       </div>
                     )}
                   </div>
 
-                  <div className="space-y-2">
-                    <Input
-                      data-testid="resource-characteristics-search-input"
-                      placeholder="Buscar o crear característica..."
-                      value={characteristicQuery}
-                      onChange={(e) => setCharacteristicQuery(e.target.value)}
-                    />
+                  <div className="space-y-3 pt-2">
+                    <label className="text-sm font-semibold text-[var(--color-text-primary)]">
+                      Buscar o Agregar Características
+                    </label>
+                    <div className="relative group">
+                      <div className="absolute left-3 top-1/2 -translate-y-1/2 text-[var(--color-text-tertiary)] group-focus-within:text-[var(--color-action-primary)] transition-colors">
+                        <Plus className="w-4 h-4" />
+                      </div>
+                      <Input
+                        data-testid="resource-characteristics-search-input"
+                        placeholder="Escribe para buscar o crear una característica nueva..."
+                        value={characteristicQuery}
+                        onChange={(e) => setCharacteristicQuery(e.target.value)}
+                        className="h-11 pl-10 focus:border-[var(--color-border-focus)] transition-all"
+                      />
+                    </div>
 
                     <div
-                      className="max-h-[280px] overflow-y-auto space-y-2 rounded-lg border border-[var(--color-border-subtle)] p-2"
+                      className="max-h-[220px] overflow-y-auto rounded-xl border border-[var(--color-border-subtle)] bg-[var(--color-bg-primary)] p-1.5 shadow-inner custom-scrollbar"
                       data-testid="resource-characteristics-options"
                     >
-                      {filteredCharacteristics.map((characteristic) => (
-                        <button
-                          key={String(characteristic.id)}
-                          type="button"
-                          data-testid={`resource-characteristic-option-${toCharacteristicTestId(String(characteristic.name))}`}
-                          onClick={() =>
-                            handleSelectExistingCharacteristic(characteristic)
-                          }
-                          className="w-full text-left px-3 py-2 rounded-md hover:bg-[var(--color-bg-secondary)] text-sm text-[var(--color-text-primary)]"
-                        >
-                          {characteristic.name}
-                        </button>
-                      ))}
+                      {filteredCharacteristics.length > 0 && (
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-1 mb-1">
+                          {filteredCharacteristics.map((characteristic) => (
+                            <button
+                              key={String(characteristic.id)}
+                              type="button"
+                              data-testid={`resource-characteristic-option-${toCharacteristicTestId(String(characteristic.name))}`}
+                              onClick={() =>
+                                handleSelectExistingCharacteristic(
+                                  characteristic,
+                                )
+                              }
+                              className="flex items-center gap-2 w-full text-left px-3 py-2.5 rounded-lg hover:bg-[var(--color-bg-secondary)] text-sm text-[var(--color-text-primary)] transition-colors group"
+                            >
+                              <Tag className="w-3.5 h-3.5 text-[var(--color-text-tertiary)] group-hover:text-[var(--color-action-primary)]" />
+                              <span className="truncate">
+                                {characteristic.name}
+                              </span>
+                            </button>
+                          ))}
+                        </div>
+                      )}
 
                       {canCreateCharacteristic && (
                         <button
                           type="button"
                           data-testid="resource-characteristic-create-option"
                           onClick={handleCreateCharacteristic}
-                          className="w-full text-left px-3 py-2 rounded-md border border-[var(--color-border-focus)] bg-[var(--color-bg-primary)] text-sm text-[var(--color-text-primary)]"
+                          className="flex items-center gap-3 w-full text-left px-3 py-3 rounded-lg border border-blue-200 bg-blue-50/50 hover:bg-blue-50 text-sm text-blue-700 transition-all font-medium group"
                         >
-                          Crear &quot;{normalizedCharacteristicQuery}&quot;
+                          <div className="flex h-6 w-6 items-center justify-center rounded-full bg-blue-100 group-hover:bg-blue-200 transition-colors">
+                            <Plus className="w-3.5 h-3.5" />
+                          </div>
+                          <span>
+                            Crear nueva característica:{" "}
+                            <strong className="font-bold underline underline-offset-2">
+                              "{normalizedCharacteristicQuery}"
+                            </strong>
+                          </span>
                         </button>
                       )}
 
                       {!canCreateCharacteristic &&
                         filteredCharacteristics.length === 0 && (
-                          <p className="px-3 py-2 text-sm text-[var(--color-text-tertiary)]">
-                            No hay coincidencias disponibles.
-                          </p>
+                          <div className="flex flex-col items-center justify-center py-6 text-center">
+                            <p className="text-sm text-[var(--color-text-tertiary)]">
+                              {characteristicQuery.trim()
+                                ? "No se encontraron coincidencias."
+                                : "Comienza a escribir para ver sugerencias."}
+                            </p>
+                          </div>
                         )}
                     </div>
 
-                    <p className="text-xs text-[var(--color-text-tertiary)]">
-                      Las características nuevas se crean solo al guardar el
-                      recurso.
-                    </p>
+                    <div className="flex items-center gap-2 p-3 bg-[var(--color-bg-tertiary)]/50 rounded-lg">
+                      <AlertCircle className="w-4 h-4 text-[var(--color-text-tertiary)]" />
+                      <p className="text-[11px] text-[var(--color-text-tertiary)] leading-tight">
+                        Las características nuevas se guardarán automáticamente
+                        en el catálogo institucional al crear este recurso.
+                      </p>
+                    </div>
                   </div>
                 </CardContent>
               </Card>
@@ -1060,85 +1236,124 @@ export default function CreateResourcePage() {
                   </CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-4">
-                  {/* Estadística */}
-                  <div className="flex items-center justify-between p-4 bg-[var(--color-bg-primary)] rounded-lg">
-                    <div>
-                      <div className="text-sm text-[var(--color-text-tertiary)]">
-                        Programas seleccionados
-                      </div>
-                      <div className="text-2xl font-bold text-foreground">
-                        {selectedPrograms.length} / {programs.length}
-                      </div>
+                  {/* Filtro y Estadística */}
+                  <div className="flex flex-col md:flex-row gap-4 p-4 bg-[var(--color-bg-primary)] rounded-lg border border-[var(--color-border-subtle)]">
+                    <div className="flex-1">
+                      <Input
+                        placeholder="Buscar programa por nombre, código o facultad..."
+                        value={programQuery}
+                        onChange={(e) => setProgramQuery(e.target.value)}
+                        className="w-full"
+                      />
                     </div>
-                    <div className="flex gap-2">
-                      <Button
-                        type="button"
-                        variant="outline"
-                        size="sm"
-                        onClick={handleClearProgramSelection}
-                        data-testid="resource-program-clear-selection"
-                      >
-                        Limpiar selección
-                      </Button>
-                      <Button
-                        type="button"
-                        variant="outline"
-                        size="sm"
-                        onClick={handleSelectAllPrograms}
-                      >
-                        {selectedPrograms.length === programs.length
-                          ? "Deseleccionar Todos"
-                          : "Seleccionar Todos"}
-                      </Button>
+                    <div className="flex items-center justify-between md:justify-end gap-6">
+                      <div>
+                        <div className="text-[10px] uppercase tracking-wider text-[var(--color-text-tertiary)] font-bold">
+                          Seleccionados
+                        </div>
+                        <div className="text-xl font-bold text-[var(--color-text-primary)]">
+                          {selectedPrograms.length}{" "}
+                          <span className="text-sm font-normal text-[var(--color-text-tertiary)]">
+                            / {programs.length}
+                          </span>
+                        </div>
+                      </div>
+                      <div className="flex gap-2">
+                        <Button
+                          type="button"
+                          variant="outline"
+                          size="sm"
+                          onClick={handleClearProgramSelection}
+                          data-testid="resource-program-clear-selection"
+                          className="h-8 text-xs"
+                        >
+                          Limpiar
+                        </Button>
+                        <Button
+                          type="button"
+                          variant="outline"
+                          size="sm"
+                          onClick={handleSelectAllPrograms}
+                          className="h-8 text-xs"
+                        >
+                          {selectedPrograms.length === programs.length
+                            ? "Deseleccionar"
+                            : "Todos"}
+                        </Button>
+                      </div>
                     </div>
                   </div>
 
                   {/* Mensaje informativo */}
-                  <Alert variant="default">
-                    <div className="text-sm">
+                  <div className="flex items-start gap-3 p-3 bg-blue-500/10 border border-blue-500/20 rounded-lg">
+                    <AlertCircle className="w-4 h-4 text-blue-500 mt-0.5" />
+                    <p className="text-xs text-blue-700">
                       <strong>Nota:</strong> Si no seleccionas ningún programa,
                       el recurso estará disponible para todos los programas
-                      académicos.
-                    </div>
-                  </Alert>
+                      académicos de la institución.
+                    </p>
+                  </div>
 
                   {/* Lista de programas */}
-                  <div className="space-y-3">
-                    {programs.length === 0 ? (
-                      <div className="text-center py-8 text-[var(--color-text-tertiary)]">
-                        No hay programas académicos disponibles
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3 max-h-[400px] overflow-y-auto pr-2 custom-scrollbar">
+                    {filteredPrograms.length === 0 ? (
+                      <div className="col-span-full text-center py-12 border border-dashed border-[var(--color-border-subtle)] rounded-xl">
+                        <p className="text-[var(--color-text-tertiary)]">
+                          No se encontraron programas que coincidan con la
+                          búsqueda
+                        </p>
                       </div>
                     ) : (
                       <>
-                        {programs.map((program) => (
+                        {filteredPrograms.map((program) => (
                           <label
                             key={program.id}
-                            className="flex items-start gap-3 p-4 bg-[var(--color-bg-primary)] rounded-lg cursor-pointer hover:bg-[var(--color-bg-secondary)] transition-colors"
+                            className={cn(
+                              "flex items-start gap-3 p-3 rounded-xl border transition-all cursor-pointer group",
+                              selectedPrograms.includes(program.id)
+                                ? "bg-[var(--color-bg-secondary)] border-[var(--color-border-focus)] shadow-sm"
+                                : "bg-[var(--color-bg-primary)] border-[var(--color-border-subtle)] hover:border-[var(--color-border-focus)]",
+                            )}
                           >
-                            <input
-                              type="checkbox"
-                              checked={selectedPrograms.includes(program.id)}
-                              onChange={() => handleProgramToggle(program.id)}
-                              className="rounded w-5 h-5 mt-0.5 flex-shrink-0"
-                            />
+                            <div className="relative flex items-center justify-center mt-0.5">
+                              <input
+                                type="checkbox"
+                                checked={selectedPrograms.includes(program.id)}
+                                onChange={() => handleProgramToggle(program.id)}
+                                className="peer h-5 w-5 cursor-pointer appearance-none rounded border border-[var(--color-border-subtle)] checked:bg-[var(--color-action-primary)] checked:border-[var(--color-action-primary)] transition-all"
+                              />
+                              <svg
+                                className="absolute h-3.5 w-3.5 text-white opacity-0 peer-checked:opacity-100 pointer-events-none"
+                                xmlns="http://www.w3.org/2000/svg"
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                stroke="currentColor"
+                                strokeWidth="4"
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                              >
+                                <polyline points="20 6 9 17 4 12" />
+                              </svg>
+                            </div>
                             <div className="flex-1 min-w-0">
-                              <div className="flex items-center gap-2">
-                                <span className="text-foreground font-medium">
+                              <div className="flex items-center justify-between gap-2">
+                                <span className="text-sm font-semibold text-[var(--color-text-primary)] truncate">
                                   {program.name}
                                 </span>
-                                <span className="text-xs text-[var(--color-text-tertiary)] font-mono">
+                                <span className="text-[10px] font-mono bg-[var(--color-bg-tertiary)] px-1.5 py-0.5 rounded text-[var(--color-text-secondary)]">
                                   {program.code}
                                 </span>
                               </div>
-                              {program.description && (
-                                <p className="text-sm text-[var(--color-text-tertiary)] mt-1">
-                                  {program.description}
-                                </p>
-                              )}
-                              <div className="flex items-center gap-4 mt-2 text-xs text-[var(--color-text-tertiary)]">
-                                <span>📚 {program.faculty}</span>
+                              <div className="flex flex-wrap items-center gap-x-3 gap-y-1 mt-1">
+                                <span className="text-[10px] text-[var(--color-text-tertiary)] flex items-center gap-1">
+                                  <span className="w-1.5 h-1.5 rounded-full bg-blue-400"></span>
+                                  {program.faculty}
+                                </span>
                                 {program.department && (
-                                  <span>🏛️ {program.department}</span>
+                                  <span className="text-[10px] text-[var(--color-text-tertiary)] flex items-center gap-1">
+                                    <span className="w-1.5 h-1.5 rounded-full bg-gray-400"></span>
+                                    {program.department}
+                                  </span>
                                 )}
                               </div>
                             </div>
@@ -1147,37 +1362,6 @@ export default function CreateResourcePage() {
                       </>
                     )}
                   </div>
-
-                  {/* Programas seleccionados */}
-                  {selectedPrograms.length > 0 && (
-                    <div className="p-4 bg-brand-primary-900/20 border border-blue-800 rounded-lg">
-                      <div className="text-sm font-medium text-brand-primary-300 mb-2">
-                        Resumen de selección:
-                      </div>
-                      <div className="flex flex-wrap gap-2">
-                        {selectedPrograms.map((programId) => {
-                          const program = programs.find(
-                            (p) => p.id === programId,
-                          );
-                          return program ? (
-                            <span
-                              key={programId}
-                              className="inline-flex items-center gap-1 px-3 py-1 bg-brand-primary-900 text-blue-200 rounded-full text-xs"
-                            >
-                              {program.code}
-                              <button
-                                type="button"
-                                onClick={() => handleProgramToggle(programId)}
-                                className="hover:text-state-error-300 ml-1"
-                              >
-                                ×
-                              </button>
-                            </span>
-                          ) : null;
-                        })}
-                      </div>
-                    </div>
-                  )}
                 </CardContent>
               </Card>
             </TabsContent>
@@ -1191,141 +1375,191 @@ export default function CreateResourcePage() {
                     Configura cómo se puede reservar este recurso
                   </CardDescription>
                 </CardHeader>
-                <CardContent className="space-y-4">
-                  <div>
-                    <label className="flex items-center gap-3 p-3 bg-[var(--color-bg-primary)] rounded-lg cursor-pointer hover:bg-[var(--color-bg-secondary)]">
-                      <input
-                        type="checkbox"
-                        checked={
-                          formData.availabilityRules?.requiresApproval || false
-                        }
-                        onChange={(e) =>
-                          handleAvailabilityRuleChange(
-                            "requiresApproval",
-                            e.target.checked,
-                          )
-                        }
-                        className="rounded w-4 h-4"
-                      />
+                <CardContent className="space-y-6">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <label className="flex items-start gap-4 p-4 rounded-xl border border-[var(--color-border-subtle)] bg-[var(--color-bg-primary)] hover:bg-[var(--color-bg-secondary)] transition-all cursor-pointer group">
+                      <div className="relative flex items-center justify-center mt-1">
+                        <input
+                          type="checkbox"
+                          checked={
+                            formData.availabilityRules?.requiresApproval ||
+                            false
+                          }
+                          onChange={(e) =>
+                            handleAvailabilityRuleChange(
+                              "requiresApproval",
+                              e.target.checked,
+                            )
+                          }
+                          className="peer h-5 w-5 cursor-pointer appearance-none rounded border border-[var(--color-border-subtle)] checked:bg-[var(--color-action-primary)] checked:border-[var(--color-action-primary)] transition-all"
+                        />
+                        <svg
+                          className="absolute h-3.5 w-3.5 text-white opacity-0 peer-checked:opacity-100 pointer-events-none"
+                          xmlns="http://www.w3.org/2000/svg"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          stroke="currentColor"
+                          strokeWidth="4"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                        >
+                          <polyline points="20 6 9 17 4 12" />
+                        </svg>
+                      </div>
                       <div className="flex-1">
-                        <div className="text-foreground text-sm font-medium">
+                        <div className="text-sm font-semibold text-[var(--color-text-primary)] group-hover:text-[var(--color-action-primary)] transition-colors">
                           Requiere Aprobación
                         </div>
-                        <div className="text-xs text-[var(--color-text-tertiary)]">
-                          Las reservas deben ser aprobadas por un administrador
+                        <div className="text-xs text-[var(--color-text-tertiary)] mt-0.5">
+                          Las solicitudes de reserva deberán ser validadas por
+                          un administrador antes de confirmarse.
                         </div>
                       </div>
                     </label>
-                  </div>
 
-                  <div>
-                    <label className="flex items-center gap-3 p-3 bg-[var(--color-bg-primary)] rounded-lg cursor-pointer hover:bg-[var(--color-bg-secondary)]">
-                      <input
-                        type="checkbox"
-                        checked={
-                          formData.availabilityRules?.allowRecurring || false
-                        }
-                        onChange={(e) =>
-                          handleAvailabilityRuleChange(
-                            "allowRecurring",
-                            e.target.checked,
-                          )
-                        }
-                        className="rounded w-4 h-4"
-                      />
+                    <label className="flex items-start gap-4 p-4 rounded-xl border border-[var(--color-border-subtle)] bg-[var(--color-bg-primary)] hover:bg-[var(--color-bg-secondary)] transition-all cursor-pointer group">
+                      <div className="relative flex items-center justify-center mt-1">
+                        <input
+                          type="checkbox"
+                          checked={
+                            formData.availabilityRules?.allowRecurring || false
+                          }
+                          onChange={(e) =>
+                            handleAvailabilityRuleChange(
+                              "allowRecurring",
+                              e.target.checked,
+                            )
+                          }
+                          className="peer h-5 w-5 cursor-pointer appearance-none rounded border border-[var(--color-border-subtle)] checked:bg-[var(--color-action-primary)] checked:border-[var(--color-action-primary)] transition-all"
+                        />
+                        <svg
+                          className="absolute h-3.5 w-3.5 text-white opacity-0 peer-checked:opacity-100 pointer-events-none"
+                          xmlns="http://www.w3.org/2000/svg"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          stroke="currentColor"
+                          strokeWidth="4"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                        >
+                          <polyline points="20 6 9 17 4 12" />
+                        </svg>
+                      </div>
                       <div className="flex-1">
-                        <div className="text-foreground text-sm font-medium">
+                        <div className="text-sm font-semibold text-[var(--color-text-primary)] group-hover:text-[var(--color-action-primary)] transition-colors">
                           Permitir Reservas Recurrentes
                         </div>
-                        <div className="text-xs text-[var(--color-text-tertiary)]">
-                          Los usuarios pueden crear reservas repetitivas
+                        <div className="text-xs text-[var(--color-text-tertiary)] mt-0.5">
+                          Habilita la opción para que los usuarios programen
+                          reservas periódicas (diarias, semanales, etc).
                         </div>
                       </div>
                     </label>
                   </div>
 
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div>
-                      <label className="block text-sm font-medium text-[var(--color-text-primary)] mb-2">
-                        Días Máximos de Anticipación
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-6 pt-2">
+                    <div className="space-y-2">
+                      <label className="text-sm font-semibold text-[var(--color-text-primary)]">
+                        Anticipación Máxima
                       </label>
-                      <Input
-                        type="number"
-                        min="1"
-                        value={
-                          formData.availabilityRules?.maxAdvanceBookingDays ||
-                          30
-                        }
-                        onChange={(e) =>
-                          handleAvailabilityRuleChange(
-                            "maxAdvanceBookingDays",
-                            parseInt(e.target.value),
-                          )
-                        }
-                      />
+                      <div className="relative">
+                        <Input
+                          type="number"
+                          min="1"
+                          value={
+                            formData.availabilityRules?.maxAdvanceBookingDays ||
+                            30
+                          }
+                          onChange={(e) =>
+                            handleAvailabilityRuleChange(
+                              "maxAdvanceBookingDays",
+                              parseInt(e.target.value),
+                            )
+                          }
+                          className="h-11 pr-12"
+                        />
+                        <span className="absolute right-3 top-1/2 -translate-y-1/2 text-[10px] font-bold text-[var(--color-text-tertiary)] uppercase">
+                          Días
+                        </span>
+                      </div>
                     </div>
 
-                    <div>
-                      <label className="block text-sm font-medium text-[var(--color-text-primary)] mb-2">
-                        Duración Mínima (minutos)
+                    <div className="space-y-2">
+                      <label className="text-sm font-semibold text-[var(--color-text-primary)]">
+                        Duración Mínima
                       </label>
-                      <Input
-                        type="number"
-                        min="15"
-                        step="15"
-                        value={
-                          formData.availabilityRules
-                            ?.minBookingDurationMinutes || 60
-                        }
-                        onChange={(e) =>
-                          handleAvailabilityRuleChange(
-                            "minBookingDurationMinutes",
-                            parseInt(e.target.value),
-                          )
-                        }
-                      />
+                      <div className="relative">
+                        <Input
+                          type="number"
+                          min="15"
+                          step="15"
+                          value={
+                            formData.availabilityRules
+                              ?.minBookingDurationMinutes || 60
+                          }
+                          onChange={(e) =>
+                            handleAvailabilityRuleChange(
+                              "minBookingDurationMinutes",
+                              parseInt(e.target.value),
+                            )
+                          }
+                          className="h-11 pr-12"
+                        />
+                        <span className="absolute right-3 top-1/2 -translate-y-1/2 text-[10px] font-bold text-[var(--color-text-tertiary)] uppercase">
+                          Min.
+                        </span>
+                      </div>
+                    </div>
+
+                    <div className="space-y-2">
+                      <label className="text-sm font-semibold text-[var(--color-text-primary)]">
+                        Duración Máxima
+                      </label>
+                      <div className="relative">
+                        <Input
+                          type="number"
+                          min="15"
+                          step="15"
+                          value={
+                            formData.availabilityRules
+                              ?.maxBookingDurationMinutes || 240
+                          }
+                          onChange={(e) =>
+                            handleAvailabilityRuleChange(
+                              "maxBookingDurationMinutes",
+                              parseInt(e.target.value),
+                            )
+                          }
+                          className="h-11 pr-12"
+                        />
+                        <span className="absolute right-3 top-1/2 -translate-y-1/2 text-[10px] font-bold text-[var(--color-text-tertiary)] uppercase">
+                          Min.
+                        </span>
+                      </div>
                     </div>
                   </div>
 
-                  <div>
-                    <label className="block text-sm font-medium text-[var(--color-text-primary)] mb-2">
-                      Duración Máxima (minutos)
-                    </label>
-                    <Input
-                      type="number"
-                      min="15"
-                      step="15"
-                      value={
-                        formData.availabilityRules?.maxBookingDurationMinutes ||
-                        240
-                      }
-                      onChange={(e) =>
-                        handleAvailabilityRuleChange(
-                          "maxBookingDurationMinutes",
-                          parseInt(e.target.value),
-                        )
-                      }
-                    />
+                  <div className="flex items-center gap-3 p-4 bg-[var(--color-bg-tertiary)]/30 rounded-xl border border-[var(--color-border-subtle)]">
+                    <div className="flex h-10 w-10 items-center justify-center rounded-full bg-blue-100 text-blue-600 shrink-0">
+                      <AlertCircle className="w-5 h-5" />
+                    </div>
+                    <div>
+                      <h4 className="text-sm font-bold text-[var(--color-text-primary)]">
+                        Información de Disponibilidad
+                      </h4>
+                      <p className="text-xs text-[var(--color-text-tertiary)]">
+                        Estas reglas definen los límites técnicos para las
+                        reservas. Puedes ajustarlas en cualquier momento desde
+                        la configuración del recurso.
+                      </p>
+                    </div>
                   </div>
                 </CardContent>
               </Card>
             </TabsContent>
           </Tabs>
 
-          {/* Botones de Acción */}
-          <div className="flex items-center justify-end gap-3 mt-6">
-            <Button
-              type="button"
-              variant="outline"
-              onClick={() => router.push(`/${locale}/recursos`)}
-              disabled={loading}
-            >
-              Cancelar
-            </Button>
-            <Button type="submit" disabled={loading}>
-              {loading ? "Creando..." : "Crear Recurso"}
-            </Button>
-          </div>
+          {/* Botones de Acción Inferiores (Opcional, eliminados para limpieza ya que están arriba) */}
         </form>
       </div>
     </MainLayout>
