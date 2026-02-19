@@ -1,8 +1,6 @@
 "use client";
 
 import { ReportFilters } from "@/components/molecules/ReportFilters";
-import { AppHeader } from "@/components/organisms/AppHeader";
-import { AppSidebar } from "@/components/organisms/AppSidebar/AppSidebar";
 import { DashboardGrid } from "@/components/organisms/DashboardGrid";
 import { MainLayout } from "@/components/templates/MainLayout";
 import { useReportDashboard } from "@/hooks/useReportData";
@@ -17,7 +15,7 @@ export default function ReportesPage() {
   const dashboardData = serverDashboard || mockDashboardData;
 
   return (
-    <MainLayout header={<AppHeader />} sidebar={<AppSidebar />}>
+    <MainLayout>
       <div className="space-y-6">
         <div className="flex items-center justify-between">
           <div>

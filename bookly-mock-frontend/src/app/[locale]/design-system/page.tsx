@@ -75,65 +75,9 @@ type DemoResourceRow = {
 export default function DesignSystemPage() {
   const [selectedDate, setSelectedDate] = React.useState<Date>();
   const [currentPage, setCurrentPage] = React.useState(1);
-  const header = (
-    <div className="flex items-center justify-between flex-1">
-      <div className="flex items-center gap-4">
-        <h1 className="text-2xl font-bold">Bookly</h1>
-        <span className="text-sm">Design System</span>
-      </div>
-      <Button
-        variant="ghost"
-        size="sm"
-        className="text-[var(--color-text-inverse)] hover:bg-[var(--color-action-ghost-hover)]"
-      >
-        Cerrar Sesión
-      </Button>
-    </div>
-  );
-
-  const sidebar = (
-    <nav className="space-y-2">
-      <a
-        href="/design-system"
-        className="block rounded-md bg-[var(--color-action-primary)] px-4 py-2 text-[var(--color-text-inverse)]"
-      >
-        Design System
-      </a>
-      <a
-        href="/"
-        className="block rounded-md px-4 py-2 text-[var(--color-text-secondary)] hover:bg-[var(--color-action-ghost-hover)]"
-      >
-        Dashboard
-      </a>
-      <a
-        href="/recursos"
-        className="block rounded-md px-4 py-2 text-[var(--color-text-secondary)] hover:bg-[var(--color-action-ghost-hover)]"
-      >
-        Recursos
-      </a>
-      <a
-        href="/reservas"
-        className="block rounded-md px-4 py-2 text-[var(--color-text-secondary)] hover:bg-[var(--color-action-ghost-hover)]"
-      >
-        Reservas
-      </a>
-      <a
-        href="/aprobaciones"
-        className="block rounded-md px-4 py-2 text-[var(--color-text-secondary)] hover:bg-[var(--color-action-ghost-hover)]"
-      >
-        Aprobaciones
-      </a>
-      <a
-        href="/reportes"
-        className="block rounded-md px-4 py-2 text-[var(--color-text-secondary)] hover:bg-[var(--color-action-ghost-hover)]"
-      >
-        Reportes
-      </a>
-    </nav>
-  );
 
   return (
-    <MainLayout header={header} sidebar={sidebar}>
+    <MainLayout>
       <div className="space-y-8">
         {/* Header */}
         <div>

@@ -1,5 +1,6 @@
 "use client";
 
+import { Alert, AlertDescription, AlertTitle } from "@/components/atoms/Alert";
 import { Badge } from "@/components/atoms/Badge";
 import { Button } from "@/components/atoms/Button";
 import {
@@ -9,24 +10,20 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/atoms/Card";
-import { Input } from "@/components/atoms/Input";
-import { Alert, AlertDescription, AlertTitle } from "@/components/atoms/Alert";
 import { AppHeader } from "@/components/organisms/AppHeader";
 import { AppSidebar } from "@/components/organisms/AppSidebar";
 import { MainLayout } from "@/components/templates/MainLayout";
 import { httpClient } from "@/infrastructure/http";
 import { cn } from "@/lib/utils";
 import {
+  ArrowDown,
+  ChevronRight,
+  Clock,
+  Edit,
   GitBranch,
   Plus,
-  ChevronRight,
   Shield,
-  Users,
-  Clock,
-  CheckCircle2,
-  Edit,
   Trash2,
-  ArrowDown,
   Zap,
 } from "lucide-react";
 import { useTranslations } from "next-intl";
@@ -219,7 +216,7 @@ export default function FlujosAprobacionPage() {
               },
               isActive: f.isActive ?? true,
               createdAt: f.createdAt,
-            }))
+            })),
           );
         } else {
           setFlows(mockFlows);
@@ -243,7 +240,7 @@ export default function FlujosAprobacionPage() {
   const sidebar = <AppSidebar />;
 
   return (
-    <MainLayout header={header} sidebar={sidebar}>
+    <MainLayout>
       <div className="space-y-6 pb-6">
         {/* Header */}
         <div className="flex items-center justify-between">
@@ -331,7 +328,10 @@ export default function FlujosAprobacionPage() {
                 flow.autoApproveConditions.roleWhitelist.length > 0;
 
               return (
-                <Card key={flow.id} className={cn(!flow.isActive && "opacity-60")}>
+                <Card
+                  key={flow.id}
+                  className={cn(!flow.isActive && "opacity-60")}
+                >
                   <CardHeader
                     className="cursor-pointer"
                     onClick={() => toggleExpand(flow.id)}
@@ -344,8 +344,8 @@ export default function FlujosAprobacionPage() {
                             hasAutoApprove && flow.steps.length === 0
                               ? "bg-state-success-100"
                               : flow.steps.length >= 2
-                              ? "bg-state-warning-100"
-                              : "bg-brand-primary-100"
+                                ? "bg-state-warning-100"
+                                : "bg-brand-primary-100",
                           )}
                         >
                           {hasAutoApprove && flow.steps.length === 0 ? (
@@ -356,7 +356,7 @@ export default function FlujosAprobacionPage() {
                                 "h-5 w-5",
                                 flow.steps.length >= 2
                                   ? "text-state-warning-600"
-                                  : "text-brand-primary-600"
+                                  : "text-brand-primary-600",
                               )}
                             />
                           )}
@@ -380,7 +380,7 @@ export default function FlujosAprobacionPage() {
                         <ChevronRight
                           className={cn(
                             "h-4 w-4 transition-transform",
-                            isExpanded && "rotate-90"
+                            isExpanded && "rotate-90",
                           )}
                         />
                       </div>
@@ -417,15 +417,21 @@ export default function FlujosAprobacionPage() {
                                 .map((r) => roleLabels[r] || r)
                                 .join(", ")}
                             </div>
-                            {flow.autoApproveConditions.maxDurationMinutes > 0 && (
+                            {flow.autoApproveConditions.maxDurationMinutes >
+                              0 && (
                               <div>
-                                <span className="font-medium">Duración máx:</span>{" "}
-                                {flow.autoApproveConditions.maxDurationMinutes} min
+                                <span className="font-medium">
+                                  Duración máx:
+                                </span>{" "}
+                                {flow.autoApproveConditions.maxDurationMinutes}{" "}
+                                min
                               </div>
                             )}
                             {flow.autoApproveConditions.maxAdvanceDays > 0 && (
                               <div>
-                                <span className="font-medium">Anticipación máx:</span>{" "}
+                                <span className="font-medium">
+                                  Anticipación máx:
+                                </span>{" "}
                                 {flow.autoApproveConditions.maxAdvanceDays} días
                               </div>
                             )}

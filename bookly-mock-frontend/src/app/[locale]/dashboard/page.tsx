@@ -15,7 +15,6 @@ import {
   CardTitle,
 } from "@/components/atoms/Card";
 import { AppHeader } from "@/components/organisms/AppHeader";
-import { AppSidebar } from "@/components/organisms/AppSidebar";
 import {
   DashboardLayout,
   KPICard,
@@ -193,10 +192,8 @@ export default function DashboardPage() {
 
   // Usar componentes compartidos de Header y Sidebar
   const header = <AppHeader title={t("title")} />;
-  const sidebar = <AppSidebar />;
-
   return (
-    <MainLayout header={header} sidebar={sidebar}>
+    <MainLayout>
       <DashboardLayout
         kpis={
           <>

@@ -303,14 +303,14 @@ export default function CategoriasPage() {
   // Loading state
   if (loading) {
     return (
-      <MainLayout header={header} sidebar={sidebar}>
+      <MainLayout>
         <LoadingSpinner fullScreen text="Cargando categorías..." />
       </MainLayout>
     );
   }
 
   return (
-    <MainLayout header={header} sidebar={sidebar}>
+    <MainLayout>
       <div className="space-y-6 pb-6">
         {/* Header */}
         <div className="flex items-center justify-between">

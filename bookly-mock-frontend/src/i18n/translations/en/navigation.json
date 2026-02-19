@@ -26,5 +26,11 @@
   "notification_channels": "Notification Channels",
   "evaluations": "Evaluations",
   "reassignment": "Reassignment",
-  "settings": "Settings"
+  "settings": "Settings",
+  "section_main": "Main",
+  "section_resources": "Resource Management",
+  "section_reservations": "Reservations & Calendar",
+  "section_operations": "Operations",
+  "section_admin": "Administration",
+  "back_to_dashboard": "Back to Dashboard"
 }

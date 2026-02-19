@@ -257,14 +257,14 @@ export default function MantenimientosPage() {
 
   if (loading) {
     return (
-      <MainLayout header={header} sidebar={sidebar}>
+      <MainLayout>
         <LoadingSpinner fullScreen text="Cargando mantenimientos..." />
       </MainLayout>
     );
   }
 
   return (
-    <MainLayout header={header} sidebar={sidebar}>
+    <MainLayout>
       <div className="space-y-6 pb-6">
         <div className="flex items-center justify-between">
           <div>

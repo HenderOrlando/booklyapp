@@ -164,7 +164,7 @@ export default function ListaEsperaPage() {
           console.error("Error al notificar:", error);
           alert("Error al enviar notificación");
         },
-      }
+      },
     );
   };
 
@@ -198,7 +198,7 @@ export default function ListaEsperaPage() {
   const sidebar = <AppSidebar />;
 
   return (
-    <MainLayout header={header} sidebar={sidebar}>
+    <MainLayout>
       <div className="space-y-6">
         {/* Descripción */}
         <div className="bg-purple-900/20 border border-purple-800 rounded-lg p-4">

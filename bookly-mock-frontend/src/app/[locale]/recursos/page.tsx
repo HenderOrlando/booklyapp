@@ -4,11 +4,14 @@ import { Button } from "@/components/atoms/Button";
 import { LoadingSpinner } from "@/components/atoms/LoadingSpinner";
 import { ConfirmDialog } from "@/components/molecules/ConfirmDialog";
 import type { AdvancedSearchFilters } from "@/components/organisms/AdvancedSearchModal";
-import { AppHeader } from "@/components/organisms/AppHeader";
-import { AppSidebar } from "@/components/organisms/AppSidebar";
 import { MainLayout } from "@/components/templates/MainLayout";
 import { useDeleteResource, useUpdateResource } from "@/hooks/mutations";
-import { useResourceCategories, useResources } from "@/hooks/useResources";
+import {
+  useAcademicPrograms,
+  useResourceCategories,
+  useResourceCharacteristics,
+  useResources,
+} from "@/hooks/useResources";
 import { useRouter } from "@/i18n/navigation";
 import {
   dataConfigStore,
@@ -16,7 +19,12 @@ import {
 } from "@/lib/data-config/store";
 import { extractArray } from "@/lib/data-utils";
 import { cn } from "@/lib/utils";
-import type { Category, Resource } from "@/types/entities/resource";
+import type {
+  AcademicProgram,
+  Category,
+  Resource,
+} from "@/types/entities/resource";
+import { ResourceType } from "@/types/entities/resource";
 import {
   AlertCircle,
   Database,
@@ -33,20 +41,26 @@ import {
   ResourcesTable,
 } from "./components";
 
-interface ResourceCollectionPayload {
-  resources?: Resource[];
-  items?: Resource[];
-}
-
-interface CategoryCollectionPayload {
-  categories?: Category[];
-  items?: Category[];
-}
-
 export default function RecursosPage() {
   const router = useRouter();
   const t = useTranslations("resources");
   const tCommon = useTranslations("common");
+
+  const RESOURCE_TYPE_LABELS: Record<string, string> = React.useMemo(
+    () => ({
+      [ResourceType.CLASSROOM]: t("type_labels.CLASSROOM"),
+      [ResourceType.LABORATORY]: t("type_labels.LABORATORY"),
+      [ResourceType.AUDITORIUM]: t("type_labels.AUDITORIUM"),
+      [ResourceType.MULTIMEDIA_EQUIPMENT]: t(
+        "type_labels.MULTIMEDIA_EQUIPMENT",
+      ),
+      [ResourceType.SPORTS_FACILITY]: t("type_labels.SPORTS_FACILITY"),
+      [ResourceType.MEETING_ROOM]: t("type_labels.MEETING_ROOM"),
+      [ResourceType.VEHICLE]: t("type_labels.VEHICLE"),
+      [ResourceType.OTHER]: t("type_labels.OTHER"),
+    }),
+    [t],
+  );
 
   // ============================================
   // HOOKS DE DATOS
@@ -60,21 +74,31 @@ export default function RecursosPage() {
   } = useResources();
   const { data: categoriesData, refetch: refetchCategories } =
     useResourceCategories();
+  const { data: characteristicsData, refetch: refetchCharacteristics } =
+    useResourceCharacteristics();
+  const { data: programsData, refetch: refetchPrograms } =
+    useAcademicPrograms();
 
   // Detección de posibles conflictos de puertos (Next.js vs API Gateway)
   const [portConflict, setPortConflict] = React.useState(false);
 
   React.useEffect(() => {
     if (typeof window !== "undefined") {
-      const isPort3000 =
-        window.location.port === "3000" ||
-        window.location.hostname === "localhost";
-      const apiGatewayIs3000 =
-        process.env.NEXT_PUBLIC_API_GATEWAY_URL?.includes(":3000");
+      const currentPort =
+        window.location.port ||
+        (window.location.protocol === "https:" ? "443" : "80");
+      const isLocalhost =
+        window.location.hostname === "localhost" ||
+        window.location.hostname === "127.0.0.1";
 
-      if (isPort3000 && apiGatewayIs3000) {
+      const apiGatewayUrl = process.env.NEXT_PUBLIC_API_GATEWAY_URL || "";
+      const apiGatewayPort =
+        apiGatewayUrl.match(/:(\d+)/)?.[1] ||
+        (apiGatewayUrl.startsWith("https") ? "443" : "80");
+
+      if (isLocalhost && currentPort === apiGatewayPort) {
         console.warn(
-          "[RecursosPage] Posible conflicto de puertos detectado (Frontend y API Gateway en puerto 3000)",
+          `[RecursosPage] Conflicto de puertos detectado: Frontend y API Gateway ambos en el puerto ${currentPort}`,
         );
         setPortConflict(true);
       }
@@ -91,6 +115,8 @@ export default function RecursosPage() {
     console.log("[RecursosPage] Refreshing data...");
     refetchResources();
     refetchCategories();
+    refetchCharacteristics();
+    refetchPrograms();
   };
 
   const configSnapshot = React.useMemo(() => getDataConfigSnapshot(), []);
@@ -118,6 +144,17 @@ export default function RecursosPage() {
     }
     return extracted;
   }, [categoriesData]);
+
+  const characteristics = React.useMemo(() => {
+    return extractArray<{ id: string; name: string; icon?: string }>(
+      characteristicsData,
+      "items",
+    );
+  }, [characteristicsData]);
+
+  const allPrograms = React.useMemo(() => {
+    return extractArray<AcademicProgram>(programsData, "items");
+  }, [programsData]);
 
   // ============================================
   // LOGGING ERRORS
@@ -164,11 +201,11 @@ export default function RecursosPage() {
     if (filters.text) {
       const searchTerm = filters.text.toLowerCase();
       const matchesText =
-        resource.name.toLowerCase().includes(searchTerm) ||
-        resource.code.toLowerCase().includes(searchTerm) ||
-        resource.description.toLowerCase().includes(searchTerm) ||
-        resource.location.toLowerCase().includes(searchTerm) ||
-        resource.type.toLowerCase().includes(searchTerm);
+        (resource.name || "").toLowerCase().includes(searchTerm) ||
+        (resource.code || "").toLowerCase().includes(searchTerm) ||
+        (resource.description || "").toLowerCase().includes(searchTerm) ||
+        (resource.location || "").toLowerCase().includes(searchTerm) ||
+        (resource.type || "").toLowerCase().includes(searchTerm);
       if (!matchesText) return false;
     }
 
@@ -188,14 +225,41 @@ export default function RecursosPage() {
     }
 
     // Filtro por capacidad
-    if (filters.minCapacity && resource.capacity < filters.minCapacity) {
+    if (filters.minCapacity && (resource.capacity || 0) < filters.minCapacity) {
       return false;
     }
-    if (filters.maxCapacity && resource.capacity > filters.maxCapacity) {
+    if (filters.maxCapacity && (resource.capacity || 0) > filters.maxCapacity) {
       return false;
     }
 
-    // Filtro por características
+    // Filtro por características dinámicas
+    if (filters.characteristicIds && filters.characteristicIds.length > 0) {
+      const resourceChars = (resource.attributes?.characteristics || []) as (
+        | string
+        | { id: string }
+      )[];
+      const resourceCharIds = resourceChars.map((c) =>
+        typeof c === "string" ? c : c.id,
+      );
+
+      // Debe tener TODAS las características seleccionadas
+      const hasAllChars = filters.characteristicIds.every((id) =>
+        resourceCharIds.includes(id),
+      );
+      if (!hasAllChars) return false;
+    }
+
+    // Filtro por programas académicos
+    if (filters.programIds && filters.programIds.length > 0) {
+      const resourceProgramIds = resource.programIds || [];
+      // Debe estar disponible para AL MENOS UNO de los programas seleccionados
+      const matchesProgram = filters.programIds.some((id) =>
+        resourceProgramIds.includes(id),
+      );
+      if (!matchesProgram) return false;
+    }
+
+    // Filtro por características legacy (booleanos)
     if (filters.hasProjector && !resource.attributes?.hasProjector)
       return false;
     if (filters.hasAirConditioning && !resource.attributes?.hasAirConditioning)
@@ -210,6 +274,9 @@ export default function RecursosPage() {
 
   const filteredResources = React.useMemo(() => {
     const filtered = resources.filter((resource: Resource) => {
+      // Validar objeto resource
+      if (!resource) return false;
+
       // Filtrar por disponibilidad según el toggle
       if (showUnavailable) {
         // Si el check está ON, solo mostrar recursos UNAVAILABLE
@@ -222,12 +289,16 @@ export default function RecursosPage() {
       // Aplicar filtro básico si está activo
       if (filter !== "") {
         const searchTerm = filter.toLowerCase();
+        const typeLabel = (
+          RESOURCE_TYPE_LABELS[resource.type] || ""
+        ).toLowerCase();
         const matchesBasic =
-          resource.name.toLowerCase().includes(searchTerm) ||
-          resource.code.toLowerCase().includes(searchTerm) ||
-          resource.description.toLowerCase().includes(searchTerm) ||
-          resource.location.toLowerCase().includes(searchTerm) ||
-          resource.type.toLowerCase().includes(searchTerm);
+          (resource.name || "").toLowerCase().includes(searchTerm) ||
+          (resource.code || "").toLowerCase().includes(searchTerm) ||
+          (resource.description || "").toLowerCase().includes(searchTerm) ||
+          (resource.location || "").toLowerCase().includes(searchTerm) ||
+          (resource.type || "").toLowerCase().includes(searchTerm) ||
+          typeLabel.includes(searchTerm);
         if (!matchesBasic) return false;
       }
 
@@ -247,7 +318,13 @@ export default function RecursosPage() {
     });
 
     return filtered;
-  }, [resources, showUnavailable, filter, advancedFilters]);
+  }, [
+    resources,
+    showUnavailable,
+    filter,
+    advancedFilters,
+    RESOURCE_TYPE_LABELS,
+  ]);
 
   // ============================================
   // HANDLERS
@@ -286,7 +363,7 @@ export default function RecursosPage() {
     updateResource.mutate(
       {
         id: resource.id,
-        data: { status: "AVAILABLE" as any },
+        data: { status: "AVAILABLE" as unknown as Resource["status"] },
       },
       {
         onSuccess: () => {
@@ -316,12 +393,9 @@ export default function RecursosPage() {
     });
   }, [resources, loading]);
 
-  const header = <AppHeader />;
-  const sidebar = <AppSidebar />;
-
   if (resourcesError) {
     return (
-      <MainLayout header={header} sidebar={sidebar}>
+      <MainLayout>
         <div className="flex flex-col items-center justify-center min-h-[60vh] space-y-4">
           <div className="w-16 h-16 bg-red-100 text-red-600 rounded-full flex items-center justify-center">
             <TableIcon size={32} />
@@ -347,7 +421,7 @@ export default function RecursosPage() {
 
   if (loading) {
     return (
-      <MainLayout header={header} sidebar={sidebar}>
+      <MainLayout>
         <div className="flex flex-col items-center justify-center min-h-[60vh]">
           <LoadingSpinner size="lg" />
           <p className="text-[var(--color-text-tertiary)] mt-4">
@@ -359,7 +433,7 @@ export default function RecursosPage() {
   }
 
   return (
-    <MainLayout header={header} sidebar={sidebar}>
+    <MainLayout>
       <div className="space-y-6 pb-6 px-4 md:px-6">
         {/* Header */}
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
@@ -472,6 +546,8 @@ export default function RecursosPage() {
             showAdvancedSearch={showAdvancedSearch}
             showUnavailable={showUnavailable}
             categories={categories}
+            characteristics={characteristics}
+            programs={allPrograms}
             onFilterChange={setFilter}
             onAdvancedFiltersChange={setAdvancedFilters}
             onShowAdvancedSearchChange={setShowAdvancedSearch}
@@ -595,7 +671,7 @@ export default function RecursosPage() {
                   <div className="mt-3 p-2 bg-blue-900/20 border border-blue-800/50 rounded-lg text-[10px] text-blue-300 italic">
                     💡 Los datos existen pero el extractor no encontró un array.
                     Verifica si la clave que contiene el array es diferente a
-                    'items' o 'resources'.
+                    &apos;items&apos; o &apos;resources&apos;.
                   </div>
                 )}
               </div>

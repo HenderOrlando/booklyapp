@@ -4,8 +4,6 @@ import { ApprovalStatusBadge } from "@/components/atoms/ApprovalStatusBadge";
 import { Badge } from "@/components/atoms/Badge";
 import { Button } from "@/components/atoms/Button";
 import { ApprovalTimeline } from "@/components/molecules/ApprovalTimeline";
-import { AppHeader } from "@/components/organisms/AppHeader";
-import { AppSidebar } from "@/components/organisms/AppSidebar";
 import { MainLayout } from "@/components/templates/MainLayout";
 import type { ApprovalRequest } from "@/types/entities/approval";
 import { useQuery } from "@tanstack/react-query";
@@ -185,7 +183,7 @@ export default function HistorialAprobacionesPage() {
   };
 
   return (
-    <MainLayout header={<AppHeader />} sidebar={<AppSidebar />}>
+    <MainLayout>
       <div className="space-y-6">
         {/* Header */}
         <div className="flex items-start justify-between">

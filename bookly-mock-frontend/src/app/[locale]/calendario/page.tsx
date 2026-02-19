@@ -243,35 +243,14 @@ export default function CalendarioPage() {
 
     // Cerrar modal de confirmación
     setEventToReschedule(null);
-    setRescheduleConflicts([]);
-  };
-
-  // Handler para cancelar reasignación
-  const handleCancelReschedule = () => {
-    setEventToReschedule(null);
-    setRescheduleConflicts([]);
-  };
-
-  return (
-    <MainLayout header={header} sidebar={sidebar}>
-      <div className="space-y-6">
-        {/* Header con botón */}
-        <div className="flex items-center justify-between">
           <div>
-            <h2 className="text-3xl font-bold text-foreground">{t("title")}</h2>
-            <p className="text-[var(--color-text-tertiary)] mt-1">
-              {t("description")}
+            <h3 className="font-semibold text-brand-primary-300 mb-1">
+              {t("view_title")}
+            </h3>
+            <p className="text-sm text-[var(--color-text-secondary)]">
+              {t("view_desc")}
             </p>
           </div>
-          <Button onClick={() => handleOpenModal()}>
-            <svg
-              className="w-5 h-5 mr-2"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
                 strokeLinejoin="round"
                 strokeWidth={2}
                 d="M12 4v16m8-8H4"
