@@ -301,7 +301,7 @@ export class ResourcesController {
     @Query("type") type?: ResourceType,
     @Query("categoryId") categoryId?: string,
     @Query("programId") programId?: string,
-    @Query("status") status?: ResourceStatus,
+    @Query("status") status?: string,
     @Query("isActive") isActive?: string,
     @Query("location") location?: string,
     @Query("building") building?: string,
@@ -309,6 +309,18 @@ export class ResourcesController {
     @Query("maxCapacity") maxCapacity?: number,
     @Query("search") search?: string,
   ) {
+    // Manejar múltiples estados (pueden venir como array o string separado por comas)
+    let statuses: ResourceStatus[] | undefined;
+    if (status) {
+      if (Array.isArray(status)) {
+        statuses = status as ResourceStatus[];
+      } else if (status.includes(",")) {
+        statuses = status.split(",") as ResourceStatus[];
+      } else {
+        statuses = [status as ResourceStatus];
+      }
+    }
+
     const query = new GetResourcesQuery(
       {
         page: page ? Number(page) : 1,
@@ -320,7 +332,7 @@ export class ResourcesController {
         type,
         categoryId,
         programId,
-        status,
+        status: statuses,
         isActive:
           isActive === "true" ? true : isActive === "false" ? false : undefined,
         location,

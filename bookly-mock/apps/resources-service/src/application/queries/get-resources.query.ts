@@ -1,5 +1,5 @@
-import { ResourceStatus, ResourceType } from "@libs/common/enums";
 import { PaginationQuery } from "@libs/common";
+import { ResourceStatus, ResourceType } from "@libs/common/enums";
 
 /**
  * Get Resources Query
@@ -12,13 +12,13 @@ export class GetResourcesQuery {
       type?: ResourceType;
       categoryId?: string;
       programId?: string;
-      status?: ResourceStatus;
+      status?: ResourceStatus | ResourceStatus[];
       isActive?: boolean;
       location?: string;
       building?: string;
       minCapacity?: number;
       maxCapacity?: number;
       search?: string;
-    }
+    },
   ) {}
 }

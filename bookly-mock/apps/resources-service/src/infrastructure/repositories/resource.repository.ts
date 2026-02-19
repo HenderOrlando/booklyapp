@@ -1,11 +1,10 @@
+import { createLogger, PaginationMeta, PaginationQuery } from "@libs/common";
 import { ResourceStatus, ResourceType } from "@libs/common/enums";
-import { PaginationMeta, PaginationQuery } from "@libs/common";
-import { createLogger } from "@libs/common";
 import { Injectable } from "@nestjs/common";
 import { InjectModel } from "@nestjs/mongoose";
+import { ResourceEntity } from "@resources/domain/entities/resource.entity";
+import { IResourceRepository } from "@resources/domain/repositories/resource.repository.interface";
 import { Model } from "mongoose";
-import { ResourceEntity } from '@resources/domain/entities/resource.entity';
-import { IResourceRepository } from '@resources/domain/repositories/resource.repository.interface';
 import { Resource, ResourceDocument } from "../schemas/resource.schema";
 
 /**
@@ -18,7 +17,7 @@ export class ResourceRepository implements IResourceRepository {
 
   constructor(
     @InjectModel(Resource.name)
-    private readonly resourceModel: Model<ResourceDocument>
+    private readonly resourceModel: Model<ResourceDocument>,
   ) {}
 
   async create(resource: ResourceEntity): Promise<ResourceEntity> {
@@ -58,7 +57,7 @@ export class ResourceRepository implements IResourceRepository {
       minCapacity?: number;
       maxCapacity?: number;
       search?: string;
-    }
+    },
   ): Promise<{ resources: ResourceEntity[]; meta: PaginationMeta }> {
     const {
       page = 1,
@@ -72,7 +71,13 @@ export class ResourceRepository implements IResourceRepository {
     if (filters?.type) mongoFilters.type = filters.type;
     if (filters?.categoryId) mongoFilters.categoryId = filters.categoryId;
     if (filters?.programId) mongoFilters.programIds = filters.programId;
-    if (filters?.status) mongoFilters.status = filters.status;
+    if (filters?.status) {
+      if (Array.isArray(filters.status)) {
+        mongoFilters.status = { $in: filters.status };
+      } else {
+        mongoFilters.status = filters.status;
+      }
+    }
     if (filters?.isActive !== undefined)
       mongoFilters.isActive = filters.isActive;
     if (filters?.location)
@@ -117,7 +122,7 @@ export class ResourceRepository implements IResourceRepository {
 
     return {
       resources: resources.map((resource) =>
-        ResourceEntity.fromObject(resource.toObject())
+        ResourceEntity.fromObject(resource.toObject()),
       ),
       meta: {
         total,
@@ -130,7 +135,7 @@ export class ResourceRepository implements IResourceRepository {
 
   async findByType(
     type: ResourceType,
-    query: PaginationQuery
+    query: PaginationQuery,
   ): Promise<{ resources: ResourceEntity[]; meta: PaginationMeta }> {
     const {
       page = 1,
@@ -154,7 +159,7 @@ export class ResourceRepository implements IResourceRepository {
 
     return {
       resources: resources.map((resource) =>
-        ResourceEntity.fromObject(resource.toObject())
+        ResourceEntity.fromObject(resource.toObject()),
       ),
       meta: {
         total,
@@ -167,7 +172,7 @@ export class ResourceRepository implements IResourceRepository {
 
   async findByCategory(
     categoryId: string,
-    query: PaginationQuery
+    query: PaginationQuery,
   ): Promise<{ resources: ResourceEntity[]; meta: PaginationMeta }> {
     const {
       page = 1,
@@ -191,7 +196,7 @@ export class ResourceRepository implements IResourceRepository {
 
     return {
       resources: resources.map((resource) =>
-        ResourceEntity.fromObject(resource.toObject())
+        ResourceEntity.fromObject(resource.toObject()),
       ),
       meta: {
         total,
@@ -204,7 +209,7 @@ export class ResourceRepository implements IResourceRepository {
 
   async findByProgram(
     programId: string,
-    query: PaginationQuery
+    query: PaginationQuery,
   ): Promise<{ resources: ResourceEntity[]; meta: PaginationMeta }> {
     const {
       page = 1,
@@ -228,7 +233,7 @@ export class ResourceRepository implements IResourceRepository {
 
     return {
       resources: resources.map((resource) =>
-        ResourceEntity.fromObject(resource.toObject())
+        ResourceEntity.fromObject(resource.toObject()),
       ),
       meta: {
         total,
@@ -273,7 +278,7 @@ export class ResourceRepository implements IResourceRepository {
 
     return {
       resources: resources.map((resource) =>
-        ResourceEntity.fromObject(resource.toObject())
+        ResourceEntity.fromObject(resource.toObject()),
       ),
       meta: {
         total,
@@ -294,13 +299,13 @@ export class ResourceRepository implements IResourceRepository {
       .exec();
 
     return resources.map((resource) =>
-      ResourceEntity.fromObject(resource.toObject())
+      ResourceEntity.fromObject(resource.toObject()),
     );
   }
 
   async update(
     id: string,
-    data: Partial<ResourceEntity>
+    data: Partial<ResourceEntity>,
   ): Promise<ResourceEntity> {
     const updatedResource = await this.resourceModel
       .findByIdAndUpdate(id, { $set: data }, { new: true })
@@ -326,7 +331,7 @@ export class ResourceRepository implements IResourceRepository {
             deletedAt: new Date(),
           },
         },
-        { new: true }
+        { new: true },
       )
       .exec();
 
@@ -351,7 +356,7 @@ export class ResourceRepository implements IResourceRepository {
             "audit.deletedBy": 1,
           },
         },
-        { new: true }
+        { new: true },
       )
       .exec();
 
@@ -376,7 +381,13 @@ export class ResourceRepository implements IResourceRepository {
     const mongoFilters: any = {};
     if (filters?.isActive !== undefined)
       mongoFilters.isActive = filters.isActive;
-    if (filters?.status) mongoFilters.status = filters.status;
+    if (filters?.status) {
+      if (Array.isArray(filters.status)) {
+        mongoFilters.status = { $in: filters.status };
+      } else {
+        mongoFilters.status = filters.status;
+      }
+    }
 
     return await this.resourceModel.countDocuments(mongoFilters).exec();
   }
@@ -389,7 +400,7 @@ export class ResourceRepository implements IResourceRepository {
 
   async findByLocation(
     location: string,
-    query: PaginationQuery
+    query: PaginationQuery,
   ): Promise<{ resources: ResourceEntity[]; meta: PaginationMeta }> {
     const {
       page = 1,
@@ -415,7 +426,7 @@ export class ResourceRepository implements IResourceRepository {
 
     return {
       resources: resources.map((resource) =>
-        ResourceEntity.fromObject(resource.toObject())
+        ResourceEntity.fromObject(resource.toObject()),
       ),
       meta: {
         total,
@@ -524,7 +535,7 @@ export class ResourceRepository implements IResourceRepository {
 
     return {
       resources: resources.map((resource) =>
-        ResourceEntity.fromObject(resource.toObject())
+        ResourceEntity.fromObject(resource.toObject()),
       ),
       meta: {
         total,

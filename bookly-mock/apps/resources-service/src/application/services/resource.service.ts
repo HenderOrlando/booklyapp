@@ -179,7 +179,7 @@ export class ResourceService {
       type?: ResourceType;
       categoryId?: string;
       programId?: string;
-      status?: ResourceStatus;
+      status?: ResourceStatus | ResourceStatus[];
       isActive?: boolean;
       location?: string;
       building?: string;

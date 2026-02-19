@@ -1,5 +1,5 @@
-import { ResourceStatus, ResourceType } from "@libs/common/enums";
 import { PaginationMeta, PaginationQuery } from "@libs/common";
+import { ResourceStatus, ResourceType } from "@libs/common/enums";
 import { ResourceEntity } from "../entities/resource.entity";
 
 /**
@@ -31,14 +31,14 @@ export interface IResourceRepository {
       type?: ResourceType;
       categoryId?: string;
       programId?: string;
-      status?: ResourceStatus;
+      status?: ResourceStatus | ResourceStatus[];
       isActive?: boolean;
       location?: string;
       building?: string;
       minCapacity?: number;
       maxCapacity?: number;
       search?: string;
-    }
+    },
   ): Promise<{
     resources: ResourceEntity[];
     meta: PaginationMeta;
@@ -49,7 +49,7 @@ export interface IResourceRepository {
    */
   findByType(
     type: ResourceType,
-    query: PaginationQuery
+    query: PaginationQuery,
   ): Promise<{
     resources: ResourceEntity[];
     meta: PaginationMeta;
@@ -60,7 +60,7 @@ export interface IResourceRepository {
    */
   findByCategory(
     categoryId: string,
-    query: PaginationQuery
+    query: PaginationQuery,
   ): Promise<{
     resources: ResourceEntity[];
     meta: PaginationMeta;
@@ -71,7 +71,7 @@ export interface IResourceRepository {
    */
   findByProgram(
     programId: string,
-    query: PaginationQuery
+    query: PaginationQuery,
   ): Promise<{
     resources: ResourceEntity[];
     meta: PaginationMeta;
@@ -128,7 +128,7 @@ export interface IResourceRepository {
    */
   findByLocation(
     location: string,
-    query: PaginationQuery
+    query: PaginationQuery,
   ): Promise<{
     resources: ResourceEntity[];
     meta: PaginationMeta;
