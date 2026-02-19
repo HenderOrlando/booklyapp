@@ -31,7 +31,7 @@ export function AppHeader({
       <div className="flex items-center gap-4">
         <div className="flex items-center gap-3">
           {/* DSI Logo White version */}
-          <div className="relative w-20 h-20 transition-all duration-300">
+          <div className="relative w-24 h-24 transition-all duration-300">
             <Image
               src="/images/logo_dsi_white.png"
               alt="DSI UFPS"
@@ -42,7 +42,7 @@ export function AppHeader({
           </div>
 
           <div className="flex flex-col">
-            <span className="text-[24px] font-black text-white leading-tight tracking-tight">
+            <span className="text-[28px] font-black text-white leading-tight tracking-tight">
               Bookly
             </span>
           </div>

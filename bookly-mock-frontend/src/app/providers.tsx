@@ -137,9 +137,9 @@ function ColorBootstrapSplash() {
         <div className="absolute -bottom-20 -right-16 h-72 w-72 rounded-full bg-[var(--color-action-secondary)] opacity-20 blur-3xl animate-pulse" />
       </div>
 
-      <div className="relative flex w-[420px] max-w-[90vw] flex-col items-center gap-8 rounded-2xl border border-[var(--color-border-subtle)] bg-[var(--color-bg-surface)] px-10 py-12 shadow-xl">
+      <div className="relative flex w-[480px] max-w-[90vw] flex-col items-center gap-8 rounded-2xl border border-[var(--color-border-subtle)] bg-[var(--color-bg-surface)] px-12 py-14 shadow-xl">
         {/* Logo Institucional */}
-        <div className="relative w-64 h-20 mb-2">
+        <div className="relative w-80 h-24 mb-2">
           {/* Logo a color para modo claro */}
           <div className="dark:hidden block relative w-full h-full">
             <Image
