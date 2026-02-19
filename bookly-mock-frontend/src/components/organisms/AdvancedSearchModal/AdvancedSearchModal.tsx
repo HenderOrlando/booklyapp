@@ -10,13 +10,6 @@ import {
   CardTitle,
 } from "@/components/atoms/Card";
 import { Input } from "@/components/atoms/Input";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/atoms/Select";
 import { useResourceTypes } from "@/hooks/useResources";
 import {
   AcademicProgram,
@@ -80,6 +73,7 @@ export function AdvancedSearchModal({
   const [typeQuery, setTypeQuery] = React.useState("");
   const [characteristicQuery, setCharacteristicQuery] = React.useState("");
   const [programQuery, setProgramQuery] = React.useState("");
+  const [categoryQuery, setCategoryQuery] = React.useState("");
 
   const resourceTypes = React.useMemo(() => {
     const types = (resourceTypesData || []).map((rt) => ({
@@ -120,6 +114,16 @@ export function AdvancedSearchModal({
         )
         .slice(0, 6),
     [programs, programQuery],
+  );
+
+  const filteredCategories = React.useMemo(
+    () =>
+      categories
+        .filter((cat) =>
+          cat.name.toLowerCase().includes(categoryQuery.toLowerCase()),
+        )
+        .slice(0, 6),
+    [categories, categoryQuery],
   );
 
   // Solo actualizar cuando se abre el modal
@@ -174,11 +178,19 @@ export function AdvancedSearchModal({
     setFilters({ ...filters, programIds: newIds });
   };
 
+  const handleCategoryToggle = (id: string) => {
+    setFilters({
+      ...filters,
+      categoryId: filters.categoryId === id ? undefined : id,
+    });
+  };
+
   const handleClear = () => {
     setFilters({});
     setTypeQuery("");
     setCharacteristicQuery("");
     setProgramQuery("");
+    setCategoryQuery("");
   };
 
   const handleSearch = () => {
@@ -335,27 +347,46 @@ export function AdvancedSearchModal({
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {/* Categoría */}
-            <div className="space-y-2">
-              <label className="text-[11px] font-bold uppercase tracking-wider text-[var(--color-text-tertiary)]">
-                Categoría
-              </label>
-              <Select
-                value={filters.categoryId}
-                onValueChange={(value) =>
-                  setFilters({ ...filters, categoryId: value })
-                }
-              >
-                <SelectTrigger className="bg-[var(--color-bg-muted)]/30 border-[var(--color-border-subtle)] rounded-xl">
-                  <SelectValue placeholder="Todas las categorías" />
-                </SelectTrigger>
-                <SelectContent className="rounded-xl">
-                  {categories.map((category) => (
-                    <SelectItem key={category.id} value={category.id}>
-                      {category.name}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+            <div className="space-y-3">
+              <div className="flex items-center justify-between">
+                <label className="text-[11px] font-bold uppercase tracking-wider text-[var(--color-text-tertiary)] flex items-center gap-2">
+                  <Layers size={14} />
+                  Categoría
+                </label>
+                <div className="relative w-32">
+                  <Search
+                    size={10}
+                    className="absolute left-2 top-1/2 -translate-y-1/2 text-[var(--color-text-tertiary)]"
+                  />
+                  <Input
+                    placeholder="Filtrar..."
+                    value={categoryQuery}
+                    onChange={(e) => setCategoryQuery(e.target.value)}
+                    className="h-6 pl-6 text-[10px] bg-[var(--color-bg-muted)]/20 border border-[var(--color-border-subtle)] rounded-lg focus:ring-brand-primary-500"
+                  />
+                </div>
+              </div>
+              <div className="flex flex-wrap gap-2">
+                {filteredCategories.map((category) => (
+                  <button
+                    key={category.id}
+                    type="button"
+                    onClick={() => handleCategoryToggle(category.id)}
+                    className={`px-3 py-1.5 rounded-full border text-[10px] font-bold transition-all ${
+                      filters.categoryId === category.id
+                        ? "border-brand-primary-500 bg-brand-primary-500 text-white shadow-sm"
+                        : "border-[var(--color-border-subtle)] bg-[var(--color-bg-surface)] text-[var(--color-text-secondary)] hover:border-brand-primary-200"
+                    }`}
+                  >
+                    {category.name}
+                  </button>
+                ))}
+                {filteredCategories.length === 0 && (
+                  <p className="text-[10px] text-[var(--color-text-tertiary)] italic">
+                    No hay coincidencias
+                  </p>
+                )}
+              </div>
             </div>
 
             {/* Rango de Capacidad */}

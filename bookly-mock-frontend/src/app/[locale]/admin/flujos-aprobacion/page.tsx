@@ -199,9 +199,12 @@ export default function FlujosAprobacionPage() {
   React.useEffect(() => {
     const fetchFlows = async () => {
       try {
-        const res = await httpClient.get("approval-flows");
-        if (res?.success && Array.isArray(res.data?.data || res.data)) {
-          const data = res.data?.data || res.data;
+        const res = (await httpClient.get("approval-flows")) as any;
+        if (
+          res?.success &&
+          Array.isArray(res.data?.items || res.data?.data || res.data)
+        ) {
+          const data = res.data?.items || res.data?.data || res.data;
           setFlows(
             data.map((f: any) => ({
               id: f.id || f._id,

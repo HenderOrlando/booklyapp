@@ -32,6 +32,7 @@ const TRANSLATION_KEYS: Record<string, string> = {
   "/admin/horarios": "navigation.schedules",
   "/admin/canales-notificacion": "navigation.notification_channels",
   "/admin/evaluaciones": "navigation.evaluations",
+  "/admin/configuraciones": "navigation.settings",
   "/reservas/reasignacion": "navigation.reassignment",
   "/design-system": "navigation.design_system",
   "/reportes/recursos": "reports_section.resources",

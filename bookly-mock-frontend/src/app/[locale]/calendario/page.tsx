@@ -2,8 +2,6 @@
 
 import { Button } from "@/components/atoms/Button";
 import { RescheduleConfirmModal } from "@/components/molecules/RescheduleConfirmModal";
-import { AppHeader } from "@/components/organisms/AppHeader";
-import { AppSidebar } from "@/components/organisms/AppSidebar";
 import { CalendarView } from "@/components/organisms/CalendarView";
 import { ReservationModal } from "@/components/organisms/ReservationModal";
 import { ResourceFilterPanel } from "@/components/organisms/ResourceFilterPanel";
@@ -77,9 +75,6 @@ export default function CalendarioPage() {
   const { data: reservationsData } = useReservations();
   const allResources = resourcesData?.items || [];
 
-  const header = <AppHeader title={t("title")} />;
-  const sidebar = <AppSidebar />;
-
   // Handlers del modal
   const handleOpenModal = (date?: Date) => {
     if (date) {
@@ -100,7 +95,6 @@ export default function CalendarioPage() {
     createReservation.mutate(data, {
       onSuccess: () => {
         handleCloseModal();
-        // El calendario se actualizará automáticamente gracias a React Query
       },
       onError: (error) => {
         console.error("Error al crear reserva:", error);
@@ -136,7 +130,6 @@ export default function CalendarioPage() {
 
   const handleDayDrop = (date: Date) => {
     if (draggedResource) {
-      // Abrir modal con fecha y recurso pre-seleccionados
       setSelectedDate(date.toISOString().split("T")[0]);
       setInitialResourceId(draggedResource.id);
       setIsModalOpen(true);
@@ -146,7 +139,6 @@ export default function CalendarioPage() {
 
   // Handler para drag & drop de eventos (reasignación)
   const handleEventDrop = async (event: CalendarEvent, newDate: Date) => {
-    // Calcular nuevas fechas manteniendo la hora
     const newStart = new Date(newDate);
     newStart.setHours(event.start.getHours(), event.start.getMinutes(), 0, 0);
 
@@ -162,17 +154,14 @@ export default function CalendarioPage() {
     );
 
     if (conflicts.length > 0) {
-      // Hay conflictos, mostrar modal de confirmación
       setEventToReschedule({ event, newDate });
       setRescheduleConflicts(conflicts);
       return;
     }
 
-    // Sin conflictos, actualizar directamente
     await performReschedule(event.id, newStart, newEnd);
   };
 
-  // Función auxiliar para validar conflictos
   const checkConflicts = (
     resourceId: string,
     startDate: string,
@@ -196,7 +185,6 @@ export default function CalendarioPage() {
       const resStart = new Date(r.startDate);
       const resEnd = new Date(r.endDate);
 
-      // Verificar solapamiento
       return (
         (start >= resStart && start < resEnd) ||
         (end > resStart && end <= resEnd) ||
@@ -205,7 +193,6 @@ export default function CalendarioPage() {
     });
   };
 
-  // Función para ejecutar la reasignación
   const performReschedule = async (
     eventId: string,
     newStart: Date,
@@ -219,14 +206,12 @@ export default function CalendarioPage() {
           endDate: newEnd.toISOString(),
         },
       });
-      // React Query invalidará automáticamente el cache
     } catch (error) {
       console.error("Error al reasignar evento:", error);
       alert(t("reschedule_error"));
     }
   };
 
-  // Handler para confirmar reasignación con conflictos
   const handleConfirmReschedule = async (force: boolean) => {
     if (!eventToReschedule) return;
 
@@ -241,26 +226,31 @@ export default function CalendarioPage() {
       await performReschedule(event.id, newStart, newEnd);
     }
 
-    // Cerrar modal de confirmación
     setEventToReschedule(null);
+  };
+
+  const handleCancelReschedule = () => {
+    setEventToReschedule(null);
+    setRescheduleConflicts([]);
+  };
+
+  return (
+    <MainLayout>
+      <div className="space-y-6">
+        <div className="flex items-center justify-between">
           <div>
-            <h3 className="font-semibold text-brand-primary-300 mb-1">
-              {t("view_title")}
-            </h3>
-            <p className="text-sm text-[var(--color-text-secondary)]">
-              {t("view_desc")}
+            <h1 className="text-3xl font-bold text-[var(--color-text-primary)]">
+              {t("title")}
+            </h1>
+            <p className="text-[var(--color-text-secondary)] mt-1">
+              {t("description")}
             </p>
           </div>
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M12 4v16m8-8H4"
-              />
-            </svg>
-            {t("new_reservation")}
+          <Button onClick={() => handleOpenModal()}>
+            {t("create_reservation")}
           </Button>
         </div>
 
-        {/* Descripción */}
         <div className="bg-brand-primary-900/20 border border-blue-800 rounded-lg p-4">
           <div className="flex items-start gap-3">
             <svg
@@ -287,11 +277,9 @@ export default function CalendarioPage() {
           </div>
         </div>
 
-        {/* Layout de 2 columnas: Panel + Calendario */}
         <div className="flex gap-6 relative">
-          {/* Panel lateral de recursos */}
           <div
-            className={`transition-all duration-300 ${
+            className={`transition-all duration-300 \${
               isPanelOpen ? "w-80" : "w-0"
             } overflow-hidden flex-shrink-0`}
           >
@@ -308,7 +296,6 @@ export default function CalendarioPage() {
             )}
           </div>
 
-          {/* Botón toggle del panel */}
           <button
             onClick={() => setIsPanelOpen(!isPanelOpen)}
             className="absolute left-0 top-4 z-10 bg-[var(--color-bg-primary)] hover:bg-[var(--color-bg-tertiary)] text-foreground p-2 rounded-r-lg border-l-0 border border-[var(--color-border-strong)] transition-all shadow-lg"
@@ -322,11 +309,10 @@ export default function CalendarioPage() {
             )}
           </button>
 
-          {/* Calendario principal */}
           <div className="flex-1 min-w-0">
             <CalendarView
               onEventClick={(reservation) =>
-                router.push(`/reservas/${reservation.id}`)
+                router.push(\`/reservas/\${reservation.id}\`)
               }
               onDateClick={handleOpenModal}
               onDayDrop={handleDayDrop}
@@ -341,7 +327,6 @@ export default function CalendarioPage() {
           </div>
         </div>
 
-        {/* Modal de Nueva Reserva - Inline */}
         <ReservationModal
           isOpen={isModalOpen}
           onClose={handleCloseModal}
@@ -353,7 +338,6 @@ export default function CalendarioPage() {
           initialResourceId={initialResourceId}
         />
 
-        {/* Modal de confirmación de reasignación */}
         <RescheduleConfirmModal
           isOpen={eventToReschedule !== null}
           event={eventToReschedule?.event || null}
@@ -363,7 +347,6 @@ export default function CalendarioPage() {
           onCancel={handleCancelReschedule}
         />
 
-        {/* Leyenda de colores - Actualizada para coincidir con calendario */}
         <div className="bg-[var(--color-bg-primary)] rounded-lg p-4">
           <h3 className="font-semibold text-foreground mb-3">{t("legend")}</h3>
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3">
@@ -386,7 +369,7 @@ export default function CalendarioPage() {
               </span>
             </div>
             <div className="flex items-center gap-2">
-              <div className="w-4 h-4 rounded bg-[var(--color-bg-secondary)]0"></div>
+              <div className="w-4 h-4 rounded bg-[var(--color-bg-secondary)]"></div>
               <span className="text-sm text-[var(--color-text-secondary)]">
                 {tReservations("statuses.COMPLETED")}
               </span>

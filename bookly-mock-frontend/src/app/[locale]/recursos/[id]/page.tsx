@@ -404,10 +404,9 @@ export default function RecursoDetailPage() {
     </div>
   ) : null;
 
-  // Loading state
   if (loading) {
     return (
-      <MainLayout header={header} sidebar={sidebar}>
+      <MainLayout>
         <LoadingSpinner />
       </MainLayout>
     );
@@ -416,14 +415,15 @@ export default function RecursoDetailPage() {
   // Error or not found state
   if (error || !resource) {
     return (
-      <MainLayout header={header} sidebar={sidebar}>
+      <MainLayout>
         <div className="max-w-2xl mx-auto mt-12">
           <Alert variant="error">{error || t("not_found")}</Alert>
           <Button
+            variant="outline"
             className="mt-4"
-            onClick={() => router.push(`/${locale}/recursos`)}
+            onClick={() => router.push("/recursos")}
           >
-            {t("back_list")}
+            {t("back_to_list")}
           </Button>
         </div>
       </MainLayout>
@@ -431,7 +431,7 @@ export default function RecursoDetailPage() {
   }
 
   return (
-    <MainLayout header={header} sidebar={sidebar}>
+    <MainLayout>
       {/* Modal de Confirmación de Eliminación */}
       <ConfirmDialog
         open={showDeleteModal}
