@@ -33,7 +33,7 @@ export function AppHeader({
           {/* DSI Logo White version */}
           <div className="relative w-10 h-10 transition-all duration-300">
             <Image
-              src="/images/DEPARTAMENTO-DE-SISTEMAS-E-INFORMÁTICA---BLANCO.png"
+              src="/images/logo_dsi_white.png"
               alt="DSI UFPS"
               fill
               className="object-contain"

@@ -10,7 +10,7 @@ import { EmptyState } from "@/components/atoms/EmptyState";
 import { StatusBadge } from "@/components/atoms/StatusBadge";
 import { DataTable } from "@/components/molecules/DataTable";
 import { VirtualizedList } from "@/components/organisms/VirtualizedList";
-import type { Resource } from "@/types/entities/resource";
+import { Resource, ResourceType } from "@/types/entities/resource";
 import {
   Edit2,
   Eye,
@@ -42,7 +42,16 @@ export function ResourcesTable({
   const t = useTranslations("resources");
   const tCommon = useTranslations("common");
 
-  // Columnas de la tabla
+  const RESOURCE_TYPE_LABELS: Record<string, string> = {
+    [ResourceType.CLASSROOM]: t("type_labels.CLASSROOM"),
+    [ResourceType.LABORATORY]: t("type_labels.LABORATORY"),
+    [ResourceType.AUDITORIUM]: t("type_labels.AUDITORIUM"),
+    [ResourceType.MULTIMEDIA_EQUIPMENT]: t("type_labels.MULTIMEDIA_EQUIPMENT"),
+    [ResourceType.SPORTS_FACILITY]: t("type_labels.SPORTS_FACILITY"),
+    [ResourceType.MEETING_ROOM]: t("type_labels.MEETING_ROOM"),
+    [ResourceType.VEHICLE]: t("type_labels.VEHICLE"),
+    [ResourceType.OTHER]: t("type_labels.OTHER"),
+  };
   const columns = [
     {
       key: "code",
@@ -60,7 +69,9 @@ export function ResourcesTable({
       key: "type",
       header: t("type"),
       cell: (resource: Resource) => (
-        <Badge variant="outline">{resource.type}</Badge>
+        <Badge variant="outline">
+          {RESOURCE_TYPE_LABELS[resource.type] || resource.type}
+        </Badge>
       ),
     },
     {
@@ -160,7 +171,7 @@ export function ResourcesTable({
               variant="secondary"
               className="text-[10px] uppercase tracking-wider font-bold bg-brand-primary-50 text-brand-primary-700 border-brand-primary-100"
             >
-              {resource.type}
+              {RESOURCE_TYPE_LABELS[resource.type] || resource.type}
             </Badge>
             <StatusBadge type="resource" status={resource.status} />
           </div>

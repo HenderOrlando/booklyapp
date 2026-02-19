@@ -10,6 +10,7 @@
   "available": "Disponible",
   "occupied": "Ocupado",
   "maintenance": "Mantenimiento",
+  "unavailable": "No Disponible",
   "code": "Código",
   "location": "Ubicación",
   "description": "Descripción",
@@ -70,5 +71,15 @@
     "total_capacity": "Capacidad Total",
     "people": "personas",
     "reserved": "reservados"
+  },
+  "type_labels": {
+    "CLASSROOM": "Aula/Salón",
+    "LABORATORY": "Laboratorio",
+    "AUDITORIUM": "Auditorio",
+    "MULTIMEDIA_EQUIPMENT": "Equipo Multimedial",
+    "SPORTS_FACILITY": "Instalación Deportiva",
+    "MEETING_ROOM": "Sala de Juntas",
+    "VEHICLE": "Vehículo",
+    "OTHER": "Otro"
   }
 }

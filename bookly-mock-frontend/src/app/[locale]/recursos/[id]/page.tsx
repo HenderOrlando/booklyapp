@@ -10,6 +10,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/atoms/Card";
+import { Input } from "@/components/atoms/Input";
 import { LoadingSpinner } from "@/components/atoms/LoadingSpinner";
 import { StatusBadge } from "@/components/atoms/StatusBadge";
 import { ConfirmDialog } from "@/components/molecules/ConfirmDialog";
@@ -22,6 +23,7 @@ import { MainLayout } from "@/components/templates/MainLayout";
 import { useResource } from "@/hooks/useResources";
 import { httpClient } from "@/infrastructure/http";
 import { AcademicProgram } from "@/types/entities/resource";
+import { Search, Tag, Users } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { useParams, useRouter } from "next/navigation";
 import * as React from "react";
@@ -248,6 +250,8 @@ export default function RecursoDetailPage() {
 
   const [selectedDate, setSelectedDate] = React.useState<Date>();
   const [showDeleteModal, setShowDeleteModal] = React.useState(false);
+  const [charFilter, setCharFilter] = React.useState("");
+  const [progFilter, setProgFilter] = React.useState("");
   const error = queryError ? String(queryError) : "";
 
   // Estados para programas académicos
@@ -326,6 +330,24 @@ export default function RecursoDetailPage() {
     [characteristicsCatalog, resource],
   );
 
+  const filteredCharacteristics = React.useMemo(() => {
+    const query = charFilter.toLowerCase().trim();
+    if (!query) return resourceCharacteristicNames;
+    return resourceCharacteristicNames.filter((name) =>
+      name.toLowerCase().includes(query),
+    );
+  }, [resourceCharacteristicNames, charFilter]);
+
+  const filteredPrograms = React.useMemo(() => {
+    const query = progFilter.toLowerCase().trim();
+    if (!query) return resourcePrograms;
+    return resourcePrograms.filter(
+      (p) =>
+        p.name.toLowerCase().includes(query) ||
+        p.code.toLowerCase().includes(query),
+    );
+  }, [resourcePrograms, progFilter]);
+
   // Eliminar recurso
   const handleDelete = async () => {
     if (!resource) return;
@@ -342,6 +364,11 @@ export default function RecursoDetailPage() {
   const header = <AppHeader title={t("title")} />;
   const sidebar = <AppSidebar />;
 
+  const resourceTypeLabel = React.useMemo(() => {
+    if (!resource) return "";
+    return t(`type_labels.${resource.type}`, { defaultValue: resource.type });
+  }, [resource, t]);
+
   const sidebarContent = resource ? (
     <div className="space-y-4">
       {/* Info Rápida */}
@@ -354,7 +381,7 @@ export default function RecursoDetailPage() {
             label={t("status")}
             value={<StatusBadge type="resource" status={resource.status} />}
           />
-          <InfoField label={t("type")} value={resource.type} />
+          <InfoField label={t("type")} value={resourceTypeLabel} />
           <InfoField
             label={t("capacity")}
             value={`${resource.capacity} ${t("people")}`}
@@ -466,7 +493,7 @@ export default function RecursoDetailPage() {
                         {t("type")}
                       </p>
                       <p className="text-sm text-[var(--color-text-primary)]">
-                        {resource.type}
+                        {resourceTypeLabel}
                       </p>
                     </div>
                     <div>
@@ -597,25 +624,58 @@ export default function RecursoDetailPage() {
             content: (
               <Card>
                 <CardHeader>
-                  <CardTitle>{t("features_title")}</CardTitle>
-                  <CardDescription>{t("features_desc")}</CardDescription>
+                  <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                    <div>
+                      <CardTitle>{t("features_title")}</CardTitle>
+                      <CardDescription>{t("features_desc")}</CardDescription>
+                    </div>
+                    <div className="relative w-full md:w-64">
+                      <Search
+                        size={14}
+                        className="absolute left-3 top-1/2 -translate-y-1/2 text-[var(--color-text-tertiary)]"
+                      />
+                      <Input
+                        placeholder="Filtrar características..."
+                        value={charFilter}
+                        onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                          setCharFilter(e.target.value)
+                        }
+                        className="pl-9 h-9 text-sm rounded-xl"
+                      />
+                    </div>
+                  </div>
                 </CardHeader>
                 <CardContent>
-                  {resourceCharacteristicNames.length === 0 ? (
-                    <p className="text-center text-[var(--color-text-secondary)] py-8">
-                      {t("no_features")}
-                    </p>
+                  {filteredCharacteristics.length === 0 ? (
+                    <div className="flex flex-col items-center justify-center py-12 text-center">
+                      <Tag
+                        size={40}
+                        className="text-[var(--color-text-tertiary)] mb-4 opacity-20"
+                      />
+                      <p className="text-[var(--color-text-secondary)]">
+                        {charFilter.trim()
+                          ? "No se encontraron características que coincidan."
+                          : t("no_features")}
+                      </p>
+                    </div>
                   ) : (
                     <div className="grid gap-3 md:grid-cols-2">
-                      {resourceCharacteristicNames.map((name) => (
+                      {filteredCharacteristics.map((name) => (
                         <div
                           key={name}
-                          className="flex items-center justify-between rounded-lg border border-[var(--color-border-subtle)] bg-state-success-500/10 p-4"
+                          className="flex items-center justify-between rounded-xl border border-[var(--color-border-subtle)] bg-state-success-500/5 p-4 hover:bg-state-success-500/10 transition-colors group"
                         >
-                          <p className="font-medium text-[var(--color-text-primary)]">
+                          <p className="font-medium text-[var(--color-text-primary)] group-hover:text-state-success-700 transition-colors">
                             {name}
                           </p>
-                          <Badge variant="success">✓</Badge>
+                          <div className="flex h-6 w-6 items-center justify-center rounded-full bg-state-success-100 text-state-success-600">
+                            <Badge
+                              variant="success"
+                              className="p-0 border-none bg-transparent"
+                            >
+                              ✓
+                            </Badge>
+                          </div>
                         </div>
                       ))}
                     </div>
@@ -791,41 +851,74 @@ export default function RecursoDetailPage() {
             label: t("tabs.programs"),
             content: (
               <div className="space-y-4">
-                <div className="flex items-center justify-between mb-4">
-                  <h3 className="text-xl font-semibold text-foreground">
+                <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-2">
+                  <h3 className="text-xl font-bold text-foreground flex items-center gap-2">
+                    <Users size={20} className="text-brand-primary-500" />
                     {t("programs_title_prefix")} ({resourcePrograms.length})
                   </h3>
+                  <div className="relative w-full md:w-64">
+                    <Search
+                      size={14}
+                      className="absolute left-3 top-1/2 -translate-y-1/2 text-[var(--color-text-tertiary)]"
+                    />
+                    <Input
+                      placeholder="Buscar por código o nombre..."
+                      value={progFilter}
+                      onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                        setProgFilter(e.target.value)
+                      }
+                      className="pl-9 h-9 text-sm rounded-xl"
+                    />
+                  </div>
                 </div>
-                {resourcePrograms.length === 0 ? (
-                  <p className="text-center text-[var(--color-text-tertiary)] py-8">
-                    {t("no_programs")}
-                  </p>
+                {filteredPrograms.length === 0 ? (
+                  <div className="flex flex-col items-center justify-center py-12 text-center bg-[var(--color-bg-primary)]/30 rounded-2xl border border-dashed border-[var(--color-border-subtle)]">
+                    <Users
+                      size={40}
+                      className="text-[var(--color-text-tertiary)] mb-4 opacity-20"
+                    />
+                    <p className="text-[var(--color-text-secondary)]">
+                      {progFilter.trim()
+                        ? "No se encontraron programas que coincidan."
+                        : t("no_programs")}
+                    </p>
+                  </div>
                 ) : (
-                  <div className="space-y-2">
-                    {resourcePrograms.map((program) => (
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                    {filteredPrograms.map((program) => (
                       <div
                         key={program.id}
-                        className="flex items-center justify-between p-4 bg-[var(--color-bg-primary)]/50 rounded-lg"
+                        className="flex items-center justify-between p-4 bg-[var(--color-bg-primary)]/50 rounded-xl border border-[var(--color-border-subtle)] hover:border-brand-primary-200 hover:bg-[var(--color-bg-primary)] transition-all group"
                       >
-                        <div className="flex-1">
-                          <p className="font-medium text-foreground">
+                        <div className="flex-1 min-w-0">
+                          <p className="font-bold text-foreground truncate group-hover:text-brand-primary-600 transition-colors">
                             {program.name}
                           </p>
-                          <p className="text-sm text-[var(--color-text-tertiary)]">
-                            {program.code} - {program.faculty}
+                          <p className="text-xs font-medium text-[var(--color-text-tertiary)] mt-0.5">
+                            <span className="text-brand-primary-600 uppercase">
+                              {program.code}
+                            </span>{" "}
+                            • {program.faculty}
                           </p>
                         </div>
-                        <div className="flex gap-2">
+                        <div className="flex items-center gap-2 ml-4">
                           <Button
-                            variant="outline"
+                            variant="ghost"
                             size="sm"
+                            className="h-8 w-8 p-0 rounded-full hover:bg-brand-primary-50 hover:text-brand-primary-600"
                             onClick={() =>
                               router.push(`/${locale}/programas/${program.id}`)
                             }
+                            title={t("view_detail")}
                           >
-                            {t("view_detail")}
+                            <Search size={14} />
                           </Button>
-                          <Badge variant="success">{t("associated")}</Badge>
+                          <Badge
+                            variant="success"
+                            className="bg-state-success-500/10 text-state-success-700 border-state-success-200 rounded-lg"
+                          >
+                            {t("associated")}
+                          </Badge>
                         </div>
                       </div>
                     ))}

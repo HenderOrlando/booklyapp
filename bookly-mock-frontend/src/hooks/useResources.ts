@@ -25,6 +25,8 @@ export const resourceKeys = {
   categories: ["resources", "categories"] as const,
   programs: ["resources", "programs"] as const,
   maintenance: (id: string) => ["resources", id, "maintenance"] as const,
+  characteristics: ["resources", "characteristics"] as const,
+  types: ["resources", "types"] as const,
 };
 
 // ============================================
@@ -149,6 +151,54 @@ export function useAcademicPrograms() {
       return response.data;
     },
     staleTime: 1000 * 60 * 30, // 30 minutos
+  });
+}
+
+/**
+ * Hook para obtener el catálogo de características de recursos
+ *
+ * @example
+ * ```typescript
+ * const { data: characteristics } = useResourceCharacteristics();
+ * ```
+ */
+export function useResourceCharacteristics() {
+  return useQuery({
+    queryKey: resourceKeys.characteristics,
+    queryFn: async () => {
+      const response = await ResourcesClient.getCharacteristics();
+      if (!response.success) {
+        throw new Error(
+          response.message || "Error al cargar catálogo de características",
+        );
+      }
+      return response.data;
+    },
+    staleTime: 1000 * 60 * 30, // 30 minutos
+  });
+}
+
+/**
+ * Hook para obtener los tipos de recursos desde datos de referencia
+ *
+ * @example
+ * ```typescript
+ * const { data: resourceTypes } = useResourceTypes();
+ * ```
+ */
+export function useResourceTypes() {
+  return useQuery({
+    queryKey: resourceKeys.types,
+    queryFn: async () => {
+      const response = await ResourcesClient.getResourceTypes();
+      if (!response.success) {
+        throw new Error(
+          response.message || "Error al cargar tipos de recursos",
+        );
+      }
+      return response.data;
+    },
+    staleTime: 1000 * 60 * 60, // 1 hora (tipos de recursos son muy estáticos)
   });
 }
 

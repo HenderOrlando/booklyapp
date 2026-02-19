@@ -10,6 +10,7 @@ import { QueryProvider } from "@/providers/QueryProvider";
 import { store } from "@/store/store";
 import { ThemeProvider } from "next-themes";
 import dynamic from "next/dynamic";
+import Image from "next/image";
 import * as React from "react";
 import { Provider as ReduxProvider } from "react-redux";
 
@@ -136,7 +137,31 @@ function ColorBootstrapSplash() {
         <div className="absolute -bottom-20 -right-16 h-72 w-72 rounded-full bg-[var(--color-action-secondary)] opacity-20 blur-3xl animate-pulse" />
       </div>
 
-      <div className="relative flex w-[340px] max-w-[90vw] flex-col items-center gap-5 rounded-2xl border border-[var(--color-border-subtle)] bg-[var(--color-bg-surface)] px-8 py-8 shadow-xl">
+      <div className="relative flex w-[380px] max-w-[90vw] flex-col items-center gap-6 rounded-2xl border border-[var(--color-border-subtle)] bg-[var(--color-bg-surface)] px-8 py-10 shadow-xl">
+        {/* Logo Institucional */}
+        <div className="relative w-48 h-14 mb-2">
+          {/* Logo a color para modo claro */}
+          <div className="dark:hidden block relative w-full h-full">
+            <Image
+              src="/images/logo_dsi_color.png"
+              alt="DSI UFPS"
+              fill
+              className="object-contain"
+              priority
+            />
+          </div>
+          {/* Logo blanco para modo oscuro */}
+          <div className="hidden dark:block relative w-full h-full">
+            <Image
+              src="/images/logo_dsi_white.png"
+              alt="DSI UFPS"
+              fill
+              className="object-contain"
+              priority
+            />
+          </div>
+        </div>
+
         <div className="flex items-center gap-2">
           <span className="h-3 w-3 rounded-full bg-[var(--color-action-primary)] animate-bounce [animation-delay:-0.2s]" />
           <span className="h-3 w-3 rounded-full bg-[var(--color-action-secondary)] animate-bounce" />

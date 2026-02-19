@@ -17,23 +17,14 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/atoms/Select";
+import { useResourceTypes } from "@/hooks/useResources";
 import {
+  AcademicProgram,
   ResourceStatus,
   ResourceType,
   type Category,
 } from "@/types/entities/resource";
-import {
-  Activity,
-  Clipboard,
-  Filter,
-  Laptop,
-  Layers,
-  Monitor,
-  Search,
-  Snowflake,
-  Users,
-  X,
-} from "lucide-react";
+import { Activity, Filter, Layers, Search, Tag, Users, X } from "lucide-react";
 import * as React from "react";
 
 /**
@@ -55,6 +46,9 @@ export interface AdvancedSearchFilters {
   categoryId?: string;
   minCapacity?: number;
   maxCapacity?: number;
+  characteristicIds?: string[];
+  programIds?: string[];
+  // Campos legacy para compatibilidad si es necesario
   hasProjector?: boolean;
   hasAirConditioning?: boolean;
   hasWhiteboard?: boolean;
@@ -66,6 +60,8 @@ interface AdvancedSearchModalProps {
   onClose: () => void;
   onSearch: (filters: AdvancedSearchFilters) => void;
   categories: Category[];
+  characteristics: { id: string; name: string; icon?: string }[];
+  programs: AcademicProgram[];
   initialFilters?: AdvancedSearchFilters;
 }
 
@@ -74,10 +70,57 @@ export function AdvancedSearchModal({
   onClose,
   onSearch,
   categories,
+  characteristics: characteristicsCatalog,
+  programs,
   initialFilters = {},
 }: AdvancedSearchModalProps) {
+  const { data: resourceTypesData } = useResourceTypes();
   const [filters, setFilters] =
     React.useState<AdvancedSearchFilters>(initialFilters);
+  const [typeQuery, setTypeQuery] = React.useState("");
+  const [characteristicQuery, setCharacteristicQuery] = React.useState("");
+  const [programQuery, setProgramQuery] = React.useState("");
+
+  const resourceTypes = React.useMemo(() => {
+    const types = (resourceTypesData || []).map((rt) => ({
+      type: rt.code as ResourceType,
+      label: rt.name,
+      icon: rt.icon || "📦",
+    }));
+    return types;
+  }, [resourceTypesData]);
+
+  const filteredTypes = React.useMemo(
+    () =>
+      resourceTypes
+        .filter((rt) =>
+          rt.label.toLowerCase().includes(typeQuery.toLowerCase()),
+        )
+        .slice(0, 6),
+    [resourceTypes, typeQuery],
+  );
+
+  const filteredCharacteristics = React.useMemo(
+    () =>
+      characteristicsCatalog
+        .filter((char) =>
+          char.name.toLowerCase().includes(characteristicQuery.toLowerCase()),
+        )
+        .slice(0, 6),
+    [characteristicsCatalog, characteristicQuery],
+  );
+
+  const filteredPrograms = React.useMemo(
+    () =>
+      programs
+        .filter(
+          (p) =>
+            p.name.toLowerCase().includes(programQuery.toLowerCase()) ||
+            p.code.toLowerCase().includes(programQuery.toLowerCase()),
+        )
+        .slice(0, 6),
+    [programs, programQuery],
+  );
 
   // Solo actualizar cuando se abre el modal
   React.useEffect(() => {
@@ -115,8 +158,27 @@ export function AdvancedSearchModal({
     setFilters({ ...filters, statuses: newStatuses });
   };
 
+  const handleCharacteristicToggle = (id: string) => {
+    const currentIds = filters.characteristicIds || [];
+    const newIds = currentIds.includes(id)
+      ? currentIds.filter((cid) => cid !== id)
+      : [...currentIds, id];
+    setFilters({ ...filters, characteristicIds: newIds });
+  };
+
+  const handleProgramToggle = (id: string) => {
+    const currentIds = filters.programIds || [];
+    const newIds = currentIds.includes(id)
+      ? currentIds.filter((pid) => pid !== id)
+      : [...currentIds, id];
+    setFilters({ ...filters, programIds: newIds });
+  };
+
   const handleClear = () => {
     setFilters({});
+    setTypeQuery("");
+    setCharacteristicQuery("");
+    setProgramQuery("");
   };
 
   const handleSearch = () => {
@@ -131,13 +193,8 @@ export function AdvancedSearchModal({
     if (filters.statuses?.length) count++;
     if (filters.categoryId) count++;
     if (filters.minCapacity || filters.maxCapacity) count++;
-    if (
-      filters.hasProjector ||
-      filters.hasAirConditioning ||
-      filters.hasWhiteboard ||
-      filters.hasComputers
-    )
-      count++;
+    if (filters.characteristicIds?.length) count++;
+    if (filters.programIds?.length) count++;
     return count;
   };
 
@@ -207,12 +264,26 @@ export function AdvancedSearchModal({
 
           {/* Tipos de Recurso */}
           <div className="space-y-3">
-            <label className="text-[11px] font-bold uppercase tracking-wider text-[var(--color-text-tertiary)] flex items-center gap-2">
-              <Layers size={14} />
-              Tipos de Recurso
-            </label>
+            <div className="flex items-center justify-between">
+              <label className="text-[11px] font-bold uppercase tracking-wider text-[var(--color-text-tertiary)] flex items-center gap-2">
+                <Layers size={14} />
+                Tipos de Recurso
+              </label>
+              <div className="relative w-48">
+                <Search
+                  size={12}
+                  className="absolute left-2.5 top-1/2 -translate-y-1/2 text-[var(--color-text-tertiary)]"
+                />
+                <Input
+                  placeholder="Filtrar tipos..."
+                  value={typeQuery}
+                  onChange={(e) => setTypeQuery(e.target.value)}
+                  className="h-7 pl-8 text-[10px] bg-[var(--color-bg-muted)]/20 border-[var(--color-border-subtle)] rounded-lg focus:ring-brand-primary-500"
+                />
+              </div>
+            </div>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
-              {Object.values(ResourceType).map((type) => (
+              {filteredTypes.map(({ type, label, icon }) => (
                 <button
                   key={type}
                   type="button"
@@ -223,26 +294,15 @@ export function AdvancedSearchModal({
                       : "border-[var(--color-border-subtle)] bg-[var(--color-bg-surface)] text-[var(--color-text-secondary)] hover:border-brand-primary-200 hover:bg-brand-primary-50/30"
                   }`}
                 >
-                  <span className="text-lg">
-                    {type === ResourceType.CLASSROOM && "🏫"}
-                    {type === ResourceType.LABORATORY && "🧪"}
-                    {type === ResourceType.AUDITORIUM && "🎭"}
-                    {type === ResourceType.MULTIMEDIA_EQUIPMENT && "🎥"}
-                    {type === ResourceType.SPORTS_FACILITY && "🏀"}
-                    {type === ResourceType.MEETING_ROOM && "🤝"}
-                    {type === ResourceType.VEHICLE && "🚗"}
-                    {type === ResourceType.OTHER && "📦"}
-                  </span>
-                  {type === ResourceType.CLASSROOM && "Aula"}
-                  {type === ResourceType.LABORATORY && "Lab"}
-                  {type === ResourceType.AUDITORIUM && "Auditorio"}
-                  {type === ResourceType.MULTIMEDIA_EQUIPMENT && "Equipo"}
-                  {type === ResourceType.SPORTS_FACILITY && "Deporte"}
-                  {type === ResourceType.MEETING_ROOM && "Reunión"}
-                  {type === ResourceType.VEHICLE && "Vehículo"}
-                  {type === ResourceType.OTHER && "Otro"}
+                  <span className="text-lg">{icon}</span>
+                  {label}
                 </button>
               ))}
+              {filteredTypes.length === 0 && (
+                <p className="col-span-full text-center py-4 text-xs text-[var(--color-text-tertiary)] italic">
+                  No se encontraron tipos de recurso
+                </p>
+              )}
             </div>
           </div>
 
@@ -341,36 +401,30 @@ export function AdvancedSearchModal({
 
           {/* Características */}
           <div className="space-y-3">
-            <label className="text-[11px] font-bold uppercase tracking-wider text-[var(--color-text-tertiary)]">
-              Características Requeridas
-            </label>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
-              {[
-                {
-                  key: "hasProjector",
-                  label: "Proyector",
-                  icon: <Monitor size={16} />,
-                },
-                {
-                  key: "hasAirConditioning",
-                  label: "Aire Acondicionado",
-                  icon: <Snowflake size={16} />,
-                },
-                {
-                  key: "hasWhiteboard",
-                  label: "Tablero/Pizarra",
-                  icon: <Clipboard size={16} />,
-                },
-                {
-                  key: "hasComputers",
-                  label: "Computadores",
-                  icon: <Laptop size={16} />,
-                },
-              ].map((attr) => (
+            <div className="flex items-center justify-between">
+              <label className="text-[11px] font-bold uppercase tracking-wider text-[var(--color-text-tertiary)] flex items-center gap-2">
+                <Tag size={14} />
+                Características Específicas
+              </label>
+              <div className="relative w-48">
+                <Search
+                  size={12}
+                  className="absolute left-2.5 top-1/2 -translate-y-1/2 text-[var(--color-text-tertiary)]"
+                />
+                <Input
+                  placeholder="Filtrar características..."
+                  value={characteristicQuery}
+                  onChange={(e) => setCharacteristicQuery(e.target.value)}
+                  className="h-7 pl-8 text-[10px] bg-[var(--color-bg-muted)]/20 border-[var(--color-border-subtle)] rounded-lg focus:ring-brand-primary-500"
+                />
+              </div>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2 max-h-[150px] overflow-y-auto pr-2 custom-scrollbar">
+              {filteredCharacteristics.map((char) => (
                 <label
-                  key={attr.key}
-                  className={`flex items-center gap-3 p-3 rounded-xl border cursor-pointer transition-all ${
-                    filters[attr.key as keyof AdvancedSearchFilters]
+                  key={char.id}
+                  className={`flex items-center gap-3 p-2.5 rounded-xl border cursor-pointer transition-all ${
+                    filters.characteristicIds?.includes(char.id)
                       ? "border-brand-primary-500 bg-brand-primary-50 text-brand-primary-700 shadow-sm"
                       : "border-[var(--color-border-subtle)] bg-[var(--color-bg-surface)] hover:border-brand-primary-200"
                   }`}
@@ -378,19 +432,82 @@ export function AdvancedSearchModal({
                   <input
                     type="checkbox"
                     checked={
-                      (filters[
-                        attr.key as keyof AdvancedSearchFilters
-                      ] as boolean) || false
+                      filters.characteristicIds?.includes(char.id) || false
                     }
-                    onChange={(e) =>
-                      setFilters({ ...filters, [attr.key]: e.target.checked })
-                    }
+                    onChange={() => handleCharacteristicToggle(char.id)}
                     className="rounded w-4 h-4 text-brand-primary-500 focus:ring-brand-primary-500"
                   />
-                  <span className="text-brand-primary-500">{attr.icon}</span>
-                  <span className="text-sm font-medium">{attr.label}</span>
+                  <div className="flex items-center gap-2 truncate">
+                    {char.icon ? (
+                      <span className="text-lg">{char.icon}</span>
+                    ) : (
+                      <Tag size={14} className="text-brand-primary-500" />
+                    )}
+                    <span className="text-xs font-medium truncate">
+                      {char.name}
+                    </span>
+                  </div>
                 </label>
               ))}
+              {filteredCharacteristics.length === 0 && (
+                <p className="col-span-full text-center py-4 text-xs text-[var(--color-text-tertiary)] italic">
+                  No se encontraron características
+                </p>
+              )}
+            </div>
+          </div>
+
+          {/* Programas Académicos */}
+          <div className="space-y-3">
+            <div className="flex items-center justify-between">
+              <label className="text-[11px] font-bold uppercase tracking-wider text-[var(--color-text-tertiary)] flex items-center gap-2">
+                <Users size={14} />
+                Programas Académicos
+              </label>
+              <div className="relative w-48">
+                <Search
+                  size={12}
+                  className="absolute left-2.5 top-1/2 -translate-y-1/2 text-[var(--color-text-tertiary)]"
+                />
+                <Input
+                  placeholder="Filtrar programas..."
+                  value={programQuery}
+                  onChange={(e) => setProgramQuery(e.target.value)}
+                  className="h-7 pl-8 text-[10px] bg-[var(--color-bg-muted)]/20 border-[var(--color-border-subtle)] rounded-lg focus:ring-brand-primary-500"
+                />
+              </div>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-2 max-h-[150px] overflow-y-auto pr-2 custom-scrollbar">
+              {filteredPrograms.map((program) => (
+                <label
+                  key={program.id}
+                  className={`flex items-center gap-3 p-2.5 rounded-xl border cursor-pointer transition-all ${
+                    filters.programIds?.includes(program.id)
+                      ? "border-brand-primary-500 bg-brand-primary-50 text-brand-primary-700 shadow-sm"
+                      : "border-[var(--color-border-subtle)] bg-[var(--color-bg-surface)] hover:border-brand-primary-200"
+                  }`}
+                >
+                  <input
+                    type="checkbox"
+                    checked={filters.programIds?.includes(program.id) || false}
+                    onChange={() => handleProgramToggle(program.id)}
+                    className="rounded w-4 h-4 text-brand-primary-500 focus:ring-brand-primary-500"
+                  />
+                  <div className="flex flex-col min-w-0">
+                    <span className="text-[10px] font-bold text-brand-primary-600 uppercase">
+                      {program.code}
+                    </span>
+                    <span className="text-xs font-medium truncate">
+                      {program.name}
+                    </span>
+                  </div>
+                </label>
+              ))}
+              {filteredPrograms.length === 0 && (
+                <p className="col-span-full text-center py-4 text-xs text-[var(--color-text-tertiary)] italic">
+                  No se encontraron programas
+                </p>
+              )}
             </div>
           </div>
 

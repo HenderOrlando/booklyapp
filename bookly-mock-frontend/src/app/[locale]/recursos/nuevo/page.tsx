@@ -27,7 +27,15 @@ import {
 import { AppHeader } from "@/components/organisms/AppHeader";
 import { AppSidebar } from "@/components/organisms/AppSidebar";
 import { MainLayout } from "@/components/templates/MainLayout";
+import {
+  useAcademicPrograms,
+  useResourceCategories,
+  useResourceCharacteristics,
+  useResourceTypes,
+} from "@/hooks/useResources";
+import { useRouter } from "@/i18n/navigation";
 import { httpClient } from "@/infrastructure/http";
+import { extractArray } from "@/lib/data-utils";
 import { cn } from "@/lib/utils";
 import {
   AcademicProgram,
@@ -36,20 +44,9 @@ import {
   CreateResourceDto,
   ResourceType,
 } from "@/types/entities/resource";
-import { AlertCircle, Plus, Tag, X } from "lucide-react";
-import { useParams, useRouter } from "next/navigation";
+import { AlertCircle, Plus, Search, Tag, X } from "lucide-react";
+import { useParams } from "next/navigation";
 import * as React from "react";
-
-/**
- * Página de Crear Recurso - Bookly
- *
- * Formulario completo para crear un nuevo recurso en el sistema
- */
-
-interface CategoryCollectionPayload {
-  items?: Category[];
-  categories?: Category[];
-}
 
 interface ProgramCollectionPayload {
   items?: ProgramApiItem[];
@@ -154,24 +151,6 @@ function extractCharacteristicOptions(
   );
 }
 
-function extractCategories(
-  data: CategoryCollectionPayload | Category[] | undefined,
-): Category[] {
-  if (Array.isArray(data)) {
-    return data;
-  }
-
-  if (data?.categories && Array.isArray(data.categories)) {
-    return data.categories;
-  }
-
-  if (data?.items && Array.isArray(data.items)) {
-    return data.items;
-  }
-
-  return [];
-}
-
 function extractPrograms(
   data: ProgramCollectionPayload | AcademicProgram[] | undefined,
 ): AcademicProgram[] {
@@ -184,8 +163,7 @@ function extractPrograms(
   const normalized: AcademicProgram[] = [];
 
   rawItems.forEach((item) => {
-    // Usar 'any' temporalmente para acceder a campos que pueden venir de la API pero no están en el tipo base
-    const rawItem = item as any;
+    const rawItem = item as Record<string, unknown>;
     const id = String(rawItem.id ?? rawItem._id ?? rawItem.code ?? "").trim();
     if (!id) return;
 
@@ -195,7 +173,6 @@ function extractPrograms(
     } as AcademicProgram);
   });
 
-  // Deduplicar por ID
   return Array.from(new Map(normalized.map((p) => [p.id, p])).values()).sort(
     (a, b) => a.name.localeCompare(b.name, "es"),
   );
@@ -206,8 +183,37 @@ export default function CreateResourcePage() {
   const router = useRouter();
   const locale = (params.locale as string) || "es";
   const [loading, setLoading] = React.useState(false);
-  const [categories, setCategories] = React.useState<Category[]>([]);
-  const [programs, setPrograms] = React.useState<AcademicProgram[]>([]);
+
+  // Hooks de datos dinámicos
+  const { data: resourceTypesData } = useResourceTypes();
+  const resourceTypes = React.useMemo(() => {
+    return (resourceTypesData || []).map((rt) => ({
+      id: rt.code as ResourceType,
+      label: rt.name,
+      icon: rt.icon || "📦",
+    }));
+  }, [resourceTypesData]);
+
+  const { data: categoriesData } = useResourceCategories();
+  const categories = React.useMemo(() => {
+    let extracted = extractArray<Category>(categoriesData, "categories");
+    if (extracted.length === 0) {
+      extracted = extractArray<Category>(categoriesData, "items");
+    }
+    return extracted;
+  }, [categoriesData]);
+
+  const { data: programsData } = useAcademicPrograms();
+  const programs = React.useMemo(
+    () => extractPrograms(programsData),
+    [programsData],
+  );
+
+  const { data: characteristicsData } = useResourceCharacteristics();
+  const characteristicsCatalog = React.useMemo(() => {
+    return extractCharacteristicOptions(characteristicsData);
+  }, [characteristicsData]);
+
   const [selectedPrograms, setSelectedPrograms] = React.useState<string[]>([]);
   const [error, setError] = React.useState("");
   const [success, setSuccess] = React.useState(false);
@@ -217,24 +223,32 @@ export default function CreateResourcePage() {
   );
   const [tabErrors, setTabErrors] = React.useState<Record<string, boolean>>({});
 
-  const [characteristicsCatalog, setCharacteristicsCatalog] = React.useState<
-    ResourceCharacteristicOption[]
-  >([]);
   const [selectedCharacteristics, setSelectedCharacteristics] = React.useState<
     CharacteristicTag[]
   >([]);
   const [characteristicQuery, setCharacteristicQuery] = React.useState("");
   const [programQuery, setProgramQuery] = React.useState("");
+  const [typeQuery, setTypeQuery] = React.useState("");
+
+  const filteredTypes = React.useMemo(() => {
+    const query = typeQuery.toLowerCase().trim();
+    const options = !query
+      ? resourceTypes
+      : resourceTypes.filter((t) => t.label.toLowerCase().includes(query));
+    return options.slice(0, 6);
+  }, [typeQuery, resourceTypes]);
 
   const filteredPrograms = React.useMemo(() => {
     const query = programQuery.toLowerCase().trim();
-    if (!query) return programs;
-    return programs.filter(
-      (p) =>
-        p.name.toLowerCase().includes(query) ||
-        p.code?.toLowerCase().includes(query) ||
-        p.faculty?.toLowerCase().includes(query),
-    );
+    const options = !query
+      ? programs
+      : programs.filter(
+          (p) =>
+            p.name.toLowerCase().includes(query) ||
+            p.code?.toLowerCase().includes(query) ||
+            p.faculty?.toLowerCase().includes(query),
+        );
+    return options.slice(0, 6);
   }, [programs, programQuery]);
 
   const selectedCharacteristicKeys = React.useMemo(
@@ -262,7 +276,7 @@ export default function CreateResourcePage() {
       return normalizedName.includes(normalizedQuery);
     });
 
-    return normalizedQuery ? options : options.slice(0, 8);
+    return options.slice(0, 6);
   }, [
     characteristicsCatalog,
     normalizedCharacteristicQuery,
@@ -313,52 +327,11 @@ export default function CreateResourcePage() {
     },
   });
 
-  // Atributos dinámicos según tipo de recurso
-  // (Eliminados: hasProjector, hasAirConditioning, hasWhiteboard, hasComputers ya que se manejan vía selectedCharacteristics)
-
-  // Cargar categorías y programas
-  React.useEffect(() => {
-    const fetchData = async () => {
-      try {
-        // Cargar categorías
-        const categoriesResponse = await httpClient.get<
-          CategoryCollectionPayload | Category[]
-        >("categories");
-        if (categoriesResponse.success && categoriesResponse.data) {
-          setCategories(extractCategories(categoriesResponse.data));
-        }
-
-        // Cargar programas académicos
-        const programsResponse = await httpClient.get<
-          ProgramCollectionPayload | AcademicProgram[]
-        >("programs");
-        if (programsResponse.success && programsResponse.data) {
-          setPrograms(extractPrograms(programsResponse.data));
-        }
-
-        // Cargar catálogo de características
-        const characteristicsResponse = await httpClient.get<
-          | ResourceCharacteristicsCollectionPayload
-          | ResourceCharacteristicOption[]
-        >("resources/characteristics");
-
-        if (characteristicsResponse.success && characteristicsResponse.data) {
-          setCharacteristicsCatalog(
-            extractCharacteristicOptions(characteristicsResponse.data),
-          );
-        }
-      } catch (err) {
-        console.error("Error al cargar datos:", err);
-      }
-    };
-
-    fetchData();
-  }, []);
-
   const handleClearProgramSelection = () => {
     setSelectedPrograms([]);
     setFormData((prev) => ({ ...prev, programIds: [] }));
   };
+
   const handleSelectExistingCharacteristic = (
     characteristic: ResourceCharacteristicOption,
   ) => {
@@ -447,7 +420,6 @@ export default function CreateResourcePage() {
         ? prev.filter((id) => id !== programId)
         : [...prev, programId];
 
-      // Actualizar formData.programIds
       setFormData((prevData) => ({
         ...prevData,
         programIds: newSelection,
@@ -459,11 +431,9 @@ export default function CreateResourcePage() {
 
   const handleSelectAllPrograms = () => {
     if (selectedPrograms.length === programs.length) {
-      // Deseleccionar todos
       setSelectedPrograms([]);
       setFormData((prev) => ({ ...prev, programIds: [] }));
     } else {
-      // Seleccionar todos
       const allIds = programs.map((p) => p.id);
       setSelectedPrograms(allIds);
       setFormData((prev) => ({ ...prev, programIds: allIds }));
@@ -480,7 +450,6 @@ export default function CreateResourcePage() {
       disponibilidad: false,
     };
 
-    // Validación Tab: Información Básica
     if (!formData.code?.trim()) {
       errors.code = "El código es obligatorio";
       tabsWithErrors.basica = true;
@@ -494,7 +463,6 @@ export default function CreateResourcePage() {
       tabsWithErrors.basica = true;
     }
 
-    // Validación Tab: Ubicación
     if (!formData.building?.trim()) {
       errors.building = "El edificio es obligatorio";
       tabsWithErrors.ubicacion = true;
@@ -507,7 +475,6 @@ export default function CreateResourcePage() {
     setFormErrors(errors);
     setTabErrors(tabsWithErrors);
 
-    // Si hay errores, retornar la primera pestaña que los tenga
     if (Object.keys(errors).length > 0) {
       if (tabsWithErrors.basica) return "basica";
       if (tabsWithErrors.ubicacion) return "ubicacion";
@@ -547,11 +514,7 @@ export default function CreateResourcePage() {
       );
 
       const characteristicValues = selectedCharacteristics.map((item) =>
-        item.id
-          ? item.id
-          : {
-              name: item.name,
-            },
+        item.id ? item.id : { name: item.name },
       );
 
       const attributesPayload: Record<string, unknown> = {
@@ -560,15 +523,14 @@ export default function CreateResourcePage() {
         features: characteristicNames,
       };
 
-      // Inyectar atributos requeridos por el backend según el tipo de recurso para evitar 400 Bad Request
       const effectiveType = formData.type;
 
       if (effectiveType === ResourceType.MULTIMEDIA_EQUIPMENT) {
         if (!attributesPayload.equipmentType) {
-          attributesPayload.equipmentType = "laptop"; // Valor por defecto seguro
+          attributesPayload.equipmentType = "laptop";
         }
         if (attributesPayload.isPortable === undefined) {
-          attributesPayload.isPortable = true; // Valor por defecto seguro
+          attributesPayload.isPortable = true;
         }
       } else if (effectiveType === ResourceType.CLASSROOM) {
         if (attributesPayload.capacity === undefined) {
@@ -627,7 +589,6 @@ export default function CreateResourcePage() {
 
       if (response.success) {
         setSuccess(true);
-        // Redirigir al listado después de 2 segundos
         setTimeout(() => {
           router.push(`/${locale}/recursos`);
         }, 2000);
@@ -647,7 +608,6 @@ export default function CreateResourcePage() {
   return (
     <MainLayout header={header} sidebar={sidebar}>
       <div className="max-w-4xl mx-auto space-y-6 pb-6">
-        {/* Header */}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-[var(--color-bg-primary)] p-6 rounded-xl border border-[var(--color-border-subtle)] shadow-sm">
           <div>
             <h2 className="text-2xl font-bold text-[var(--color-text-primary)]">
@@ -679,7 +639,6 @@ export default function CreateResourcePage() {
           </div>
         </div>
 
-        {/* Alertas */}
         {error && <Alert variant="error">{error}</Alert>}
         {success && (
           <Alert variant="success">
@@ -687,7 +646,6 @@ export default function CreateResourcePage() {
           </Alert>
         )}
 
-        {/* Formulario */}
         <form id="create-resource-form" onSubmit={handleSubmit}>
           <Tabs
             value={activeTab}
@@ -777,7 +735,6 @@ export default function CreateResourcePage() {
               </TabsTrigger>
             </TabsList>
 
-            {/* Tab 1: Información Básica */}
             <TabsContent value="basica">
               <Card
                 className={cn(tabErrors.basica && "border-state-error-500")}
@@ -863,93 +820,90 @@ export default function CreateResourcePage() {
                     />
                   </div>
 
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                    <div className="space-y-2">
-                      <label className="text-sm font-semibold text-[var(--color-text-primary)]">
-                        Tipo de Recurso{" "}
-                        <span className="text-state-error-500">*</span>
-                      </label>
-                      <Select
-                        value={formData.type}
-                        onValueChange={(value) =>
-                          handleInputChange("type", value as ResourceType)
-                        }
-                      >
-                        <SelectTrigger className="h-11">
-                          <SelectValue />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value={ResourceType.CLASSROOM}>
-                            Aula/Salón
-                          </SelectItem>
-                          <SelectItem value={ResourceType.LABORATORY}>
-                            Laboratorio
-                          </SelectItem>
-                          <SelectItem value={ResourceType.AUDITORIUM}>
-                            Auditorio
-                          </SelectItem>
-                          <SelectItem value={ResourceType.MULTIMEDIA_EQUIPMENT}>
-                            Equipo Multimedial
-                          </SelectItem>
-                          <SelectItem value={ResourceType.SPORTS_FACILITY}>
-                            Instalación Deportiva
-                          </SelectItem>
-                          <SelectItem value={ResourceType.MEETING_ROOM}>
-                            Sala de Juntas
-                          </SelectItem>
-                          <SelectItem value={ResourceType.VEHICLE}>
-                            Vehículo
-                          </SelectItem>
-                          <SelectItem value={ResourceType.OTHER}>
-                            Otro
-                          </SelectItem>
-                        </SelectContent>
-                      </Select>
+                  <div className="space-y-4">
+                    <div className="space-y-3">
+                      <div className="flex items-center justify-between">
+                        <label className="block text-sm font-medium text-[var(--color-text-primary)]">
+                          Tipo de Recurso *
+                        </label>
+                        <div className="relative w-48">
+                          <Search
+                            size={12}
+                            className="absolute left-2.5 top-1/2 -translate-y-1/2 text-[var(--color-text-tertiary)]"
+                          />
+                          <Input
+                            placeholder="Filtrar tipos..."
+                            value={typeQuery}
+                            onChange={(e) => setTypeQuery(e.target.value)}
+                            className="h-8 pl-8 text-xs bg-[var(--color-bg-muted)]/20 border-[var(--color-border-subtle)] rounded-lg focus:ring-brand-primary-500"
+                          />
+                        </div>
+                      </div>
+
+                      <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+                        {filteredTypes.map(({ id, label, icon }) => (
+                          <button
+                            key={id}
+                            type="button"
+                            onClick={() => handleInputChange("type", id)}
+                            className={cn(
+                              "flex flex-col items-center gap-2 p-3 rounded-xl border text-xs font-semibold transition-colors",
+                              formData.type === id
+                                ? "border-brand-primary-500 bg-brand-primary-50 text-brand-primary-700 shadow-sm"
+                                : "border-[var(--color-border-subtle)] bg-[var(--color-bg-surface)] text-[var(--color-text-secondary)] hover:border-brand-primary-200 hover:bg-brand-primary-50/30",
+                            )}
+                          >
+                            <span className="text-xl">{icon}</span>
+                            <span className="text-center line-clamp-1">
+                              {label}
+                            </span>
+                          </button>
+                        ))}
+                        {filteredTypes.length === 0 && (
+                          <div className="col-span-full py-4 text-center text-xs text-[var(--color-text-tertiary)] italic">
+                            No se encontraron tipos de recurso que coincidan.
+                          </div>
+                        )}
+                      </div>
                     </div>
 
-                    <div className="space-y-2">
-                      <label className="text-sm font-semibold text-[var(--color-text-primary)]">
-                        Categoría{" "}
-                        <span className="text-state-error-500">*</span>
-                      </label>
-                      <Select
-                        value={formData.categoryId}
-                        onValueChange={(value) =>
-                          handleInputChange("categoryId", value)
-                        }
-                      >
-                        <SelectTrigger
-                          className={cn(
-                            "h-11 transition-all",
-                            formErrors.categoryId
-                              ? "border-state-error-500 bg-state-error-50"
-                              : "focus:border-[var(--color-border-focus)]",
-                          )}
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div>
+                        <label className="block text-sm font-medium text-[var(--color-text-primary)] mb-2">
+                          Categoría *
+                        </label>
+                        <Select
+                          value={formData.categoryId}
+                          onValueChange={(value) =>
+                            handleInputChange("categoryId", value)
+                          }
                         >
-                          <SelectValue placeholder="Selecciona..." />
-                        </SelectTrigger>
-                        <SelectContent>
-                          {categories.map((category) => (
-                            <SelectItem key={category.id} value={category.id}>
-                              {category.name}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                      {formErrors.categoryId && (
-                        <p className="text-[11px] font-medium text-state-error-600 flex items-center gap-1">
-                          <AlertCircle className="w-3 h-3" />{" "}
-                          {formErrors.categoryId}
-                        </p>
-                      )}
-                    </div>
+                          <SelectTrigger
+                            className={cn(
+                              formErrors.categoryId && "border-state-error-500",
+                            )}
+                          >
+                            <SelectValue placeholder="Selecciona una categoría" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {categories.map((category) => (
+                              <SelectItem key={category.id} value={category.id}>
+                                {category.name}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                        {formErrors.categoryId && (
+                          <p className="text-[10px] text-state-error-500 mt-1">
+                            {formErrors.categoryId}
+                          </p>
+                        )}
+                      </div>
 
-                    <div className="space-y-2">
-                      <label className="text-sm font-semibold text-[var(--color-text-primary)]">
-                        Capacidad{" "}
-                        <span className="text-state-error-500">*</span>
-                      </label>
-                      <div className="relative">
+                      <div>
+                        <label className="block text-sm font-medium text-[var(--color-text-primary)] mb-2">
+                          Capacidad *
+                        </label>
                         <Input
                           type="number"
                           min="1"
@@ -960,11 +914,7 @@ export default function CreateResourcePage() {
                               parseInt(e.target.value),
                             )
                           }
-                          className="h-11 pr-12"
                         />
-                        <span className="absolute right-3 top-1/2 -translate-y-1/2 text-[10px] font-bold text-[var(--color-text-tertiary)] uppercase">
-                          Pers.
-                        </span>
                       </div>
                     </div>
                   </div>
@@ -972,7 +922,6 @@ export default function CreateResourcePage() {
               </Card>
             </TabsContent>
 
-            {/* Tab 2: Ubicación */}
             <TabsContent value="ubicacion">
               <Card
                 className={cn(tabErrors.ubicacion && "border-state-error-500")}
@@ -1007,19 +956,18 @@ export default function CreateResourcePage() {
                         onChange={(e) =>
                           handleInputChange("building", e.target.value)
                         }
-                        placeholder="Ej: Edificio Fundadores"
+                        placeholder="Ej: Edificio Administrativo"
                       />
                       {formErrors.building && (
                         <p className="text-[11px] font-medium text-state-error-600 flex items-center gap-1">
-                          <AlertCircle className="w-3 h-3" />{" "}
-                          {formErrors.building}
+                          <AlertCircle className="w-3 h-3" /> {formErrors.building}
                         </p>
                       )}
                     </div>
 
                     <div className="space-y-2">
                       <label className="text-sm font-semibold text-[var(--color-text-primary)]">
-                        Piso / Nivel
+                        Piso
                       </label>
                       <Input
                         value={formData.floor || ""}
@@ -1065,7 +1013,6 @@ export default function CreateResourcePage() {
               </Card>
             </TabsContent>
 
-            {/* Tab 3: Características y Equipamiento */}
             <TabsContent value="caracteristicas">
               <Card>
                 <CardHeader>
@@ -1196,7 +1143,7 @@ export default function CreateResourcePage() {
                           <span>
                             Crear nueva característica:{" "}
                             <strong className="font-bold underline underline-offset-2">
-                              "{normalizedCharacteristicQuery}"
+                              &quot;{normalizedCharacteristicQuery}&quot;
                             </strong>
                           </span>
                         </button>
@@ -1226,7 +1173,6 @@ export default function CreateResourcePage() {
               </Card>
             </TabsContent>
 
-            {/* Tab 4: Programas Académicos */}
             <TabsContent value="programas">
               <Card>
                 <CardHeader>
@@ -1236,7 +1182,6 @@ export default function CreateResourcePage() {
                   </CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-4">
-                  {/* Filtro y Estadística */}
                   <div className="flex flex-col md:flex-row gap-4 p-4 bg-[var(--color-bg-primary)] rounded-lg border border-[var(--color-border-subtle)]">
                     <div className="flex-1">
                       <Input
@@ -1284,7 +1229,6 @@ export default function CreateResourcePage() {
                     </div>
                   </div>
 
-                  {/* Mensaje informativo */}
                   <div className="flex items-start gap-3 p-3 bg-blue-500/10 border border-blue-500/20 rounded-lg">
                     <AlertCircle className="w-4 h-4 text-blue-500 mt-0.5" />
                     <p className="text-xs text-blue-700">
@@ -1294,7 +1238,6 @@ export default function CreateResourcePage() {
                     </p>
                   </div>
 
-                  {/* Lista de programas */}
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-3 max-h-[400px] overflow-y-auto pr-2 custom-scrollbar">
                     {filteredPrograms.length === 0 ? (
                       <div className="col-span-full text-center py-12 border border-dashed border-[var(--color-border-subtle)] rounded-xl">
@@ -1366,7 +1309,6 @@ export default function CreateResourcePage() {
               </Card>
             </TabsContent>
 
-            {/* Tab 5: Reglas de Disponibilidad */}
             <TabsContent value="disponibilidad">
               <Card>
                 <CardHeader>
@@ -1548,7 +1490,7 @@ export default function CreateResourcePage() {
                         Información de Disponibilidad
                       </h4>
                       <p className="text-xs text-[var(--color-text-tertiary)]">
-                        Estas reglas definen los límites técnicos para las
+                        Estas reglas define los límites técnicos para las
                         reservas. Puedes ajustarlas en cualquier momento desde
                         la configuración del recurso.
                       </p>

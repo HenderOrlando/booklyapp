@@ -1,4 +1,5 @@
 import type { VariantProps } from "class-variance-authority";
+import { useTranslations } from "next-intl";
 import React from "react";
 import { Badge, badgeVariants } from "../Badge";
 
@@ -66,125 +67,106 @@ interface StatusConfig {
  * Configuración de estados para recursos
  */
 // Tokens del design system: usar state.success, state.warning, state.error
-const resourceStatusMap: Record<ResourceStatus, StatusConfig> = {
-  AVAILABLE: { text: "Disponible", variant: "success" }, // state.success
-  RESERVED: { text: "Reservado", variant: "secondary" }, // action.secondary
-  MAINTENANCE: { text: "Mantenimiento", variant: "warning" }, // state.warning
-  UNAVAILABLE: { text: "No Disponible", variant: "error" }, // state.error
-};
-
-/**
- * Configuración de estados para mantenimientos
- */
-// Estados de mantenimiento usando tokens semánticos
-const maintenanceStatusMap: Record<MaintenanceStatus, StatusConfig> = {
-  SCHEDULED: { text: "Programado", variant: "secondary" }, // action.secondary
-  IN_PROGRESS: { text: "En Progreso", variant: "warning" }, // state.warning
-  COMPLETED: { text: "Completado", variant: "success" }, // state.success
-  CANCELLED: { text: "Cancelado", variant: "error" }, // state.error
-};
-
-/**
- * Configuración de tipos de mantenimiento
- */
-const maintenanceTypeMap: Record<MaintenanceType, StatusConfig> = {
-  PREVENTIVE: { text: "Preventivo", variant: "secondary" },
-  CORRECTIVE: { text: "Correctivo", variant: "warning" },
-  EMERGENCY: { text: "Emergencia", variant: "error" },
-};
-
-/**
- * Configuración de estados para categorías
- */
-const categoryStatusMap: Record<CategoryStatus, StatusConfig> = {
-  ACTIVE: { text: "Activa", variant: "success" },
-  INACTIVE: { text: "Inactiva", variant: "secondary" },
-};
-
-/**
- * Configuración de estados de aprobación
- */
-const approvalStatusMap: Record<ApprovalStatus, StatusConfig> = {
-  PENDING: { text: "Pendiente", variant: "warning" },
-  APPROVED: { text: "Aprobado", variant: "success" },
-  REJECTED: { text: "Rechazado", variant: "error" },
-};
-
-/**
- * Obtiene la configuración de estado según el tipo
- */
-function getStatusConfig(
-  type: StatusBadgeProps["type"],
-  status: string
-): StatusConfig {
-  switch (type) {
-    case "resource":
-      return (
-        resourceStatusMap[status as ResourceStatus] || {
-          text: status,
-          variant: "secondary",
-        }
-      );
-    case "maintenance":
-      return (
-        maintenanceStatusMap[status as MaintenanceStatus] || {
-          text: status,
-          variant: "secondary",
-        }
-      );
-    case "maintenanceType":
-      return (
-        maintenanceTypeMap[status as MaintenanceType] || {
-          text: status,
-          variant: "secondary",
-        }
-      );
-    case "category":
-      return (
-        categoryStatusMap[status as CategoryStatus] || {
-          text: status,
-          variant: "secondary",
-        }
-      );
-    case "approval":
-      return (
-        approvalStatusMap[status as ApprovalStatus] || {
-          text: status,
-          variant: "secondary",
-        }
-      );
-    case "reservation":
-      const reservationMap: Record<ReservationStatus, StatusConfig> = {
-        PENDING: { text: "Pendiente", variant: "warning" },
-        CONFIRMED: { text: "Confirmada", variant: "success" },
-        IN_PROGRESS: { text: "En Progreso", variant: "default" },
-        COMPLETED: { text: "Completada", variant: "success" },
-        CANCELLED: { text: "Cancelada", variant: "secondary" },
-        REJECTED: { text: "Rechazada", variant: "error" },
-      };
-      return (
-        reservationMap[status as ReservationStatus] || {
-          text: status,
-          variant: "secondary",
-        }
-      );
-    default:
-      // Por defecto, intenta resource
-      return (
-        resourceStatusMap[status as ResourceStatus] || {
-          text: status,
-          variant: "secondary",
-        }
-      );
-  }
-}
-
 export const StatusBadge = React.memo(function StatusBadge({
   type = "resource",
   status,
   className,
   customText,
 }: StatusBadgeProps) {
+  const t = useTranslations("resources");
+
+  const resourceStatusMap: Record<ResourceStatus, StatusConfig> = {
+    AVAILABLE: { text: t("available"), variant: "success" },
+    RESERVED: { text: t("occupied"), variant: "secondary" },
+    MAINTENANCE: { text: t("maintenance"), variant: "warning" },
+    UNAVAILABLE: { text: t("unavailable"), variant: "error" },
+  };
+
+  const getStatusConfig = (
+    type: StatusBadgeProps["type"],
+    status: string,
+  ): StatusConfig => {
+    switch (type) {
+      case "resource":
+        return (
+          resourceStatusMap[status as ResourceStatus] || {
+            text: status,
+            variant: "secondary",
+          }
+        );
+      case "maintenance":
+        const maintenanceStatusMap: Record<MaintenanceStatus, StatusConfig> = {
+          SCHEDULED: { text: "Programado", variant: "secondary" },
+          IN_PROGRESS: { text: "En Progreso", variant: "warning" },
+          COMPLETED: { text: "Completado", variant: "success" },
+          CANCELLED: { text: "Cancelado", variant: "error" },
+        };
+        return (
+          maintenanceStatusMap[status as MaintenanceStatus] || {
+            text: status,
+            variant: "secondary",
+          }
+        );
+      case "maintenanceType":
+        const maintenanceTypeMap: Record<MaintenanceType, StatusConfig> = {
+          PREVENTIVE: { text: "Preventivo", variant: "secondary" },
+          CORRECTIVE: { text: "Correctivo", variant: "warning" },
+          EMERGENCY: { text: "Emergencia", variant: "error" },
+        };
+        return (
+          maintenanceTypeMap[status as MaintenanceType] || {
+            text: status,
+            variant: "secondary",
+          }
+        );
+      case "category":
+        const categoryStatusMap: Record<CategoryStatus, StatusConfig> = {
+          ACTIVE: { text: "Activa", variant: "success" },
+          INACTIVE: { text: "Inactiva", variant: "secondary" },
+        };
+        return (
+          categoryStatusMap[status as CategoryStatus] || {
+            text: status,
+            variant: "secondary",
+          }
+        );
+      case "approval":
+        const approvalStatusMap: Record<ApprovalStatus, StatusConfig> = {
+          PENDING: { text: "Pendiente", variant: "warning" },
+          APPROVED: { text: "Aprobado", variant: "success" },
+          REJECTED: { text: "Rechazado", variant: "error" },
+        };
+        return (
+          approvalStatusMap[status as ApprovalStatus] || {
+            text: status,
+            variant: "secondary",
+          }
+        );
+      case "reservation":
+        const reservationMap: Record<ReservationStatus, StatusConfig> = {
+          PENDING: { text: "Pendiente", variant: "warning" },
+          CONFIRMED: { text: "Confirmada", variant: "success" },
+          IN_PROGRESS: { text: "En Progreso", variant: "default" },
+          COMPLETED: { text: "Completada", variant: "success" },
+          CANCELLED: { text: "Cancelada", variant: "secondary" },
+          REJECTED: { text: "Rechazada", variant: "error" },
+        };
+        return (
+          reservationMap[status as ReservationStatus] || {
+            text: status,
+            variant: "secondary",
+          }
+        );
+      default:
+        return (
+          resourceStatusMap[status as ResourceStatus] || {
+            text: status,
+            variant: "secondary",
+          }
+        );
+    }
+  };
+
   const config = getStatusConfig(type, status);
 
   return (

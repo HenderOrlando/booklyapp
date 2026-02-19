@@ -40,6 +40,21 @@ export function ResourceStatsCards({ resources }: ResourceStatsCardsProps) {
     // Tipos de recursos
     const resourceTypes = new Set(resources.map((r) => r.type));
 
+    const typeLabels: Record<string, string> = {
+      CLASSROOM: t("type_labels.CLASSROOM"),
+      LABORATORY: t("type_labels.LABORATORY"),
+      AUDITORIUM: t("type_labels.AUDITORIUM"),
+      MULTIMEDIA_EQUIPMENT: t("type_labels.MULTIMEDIA_EQUIPMENT"),
+      SPORTS_FACILITY: t("type_labels.SPORTS_FACILITY"),
+      MEETING_ROOM: t("type_labels.MEETING_ROOM"),
+      VEHICLE: t("type_labels.VEHICLE"),
+      OTHER: t("type_labels.OTHER"),
+    };
+
+    const typeCountText = Array.from(resourceTypes)
+      .map((type) => typeLabels[type] || type)
+      .join(", ");
+
     return {
       total: totalResources,
       available: availableResources,
@@ -47,8 +62,9 @@ export function ResourceStatsCards({ resources }: ResourceStatsCardsProps) {
       reserved: reservedResources,
       totalCapacity,
       uniqueTypes: resourceTypes.size,
+      typeCountText,
     };
-  }, [resources]);
+  }, [resources, t]);
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
@@ -63,7 +79,10 @@ export function ResourceStatsCards({ resources }: ResourceStatsCardsProps) {
               <h3 className="text-3xl font-black text-blue-900 leading-none">
                 {stats.total}
               </h3>
-              <p className="text-[11px] font-medium text-blue-600/70 mt-2 flex items-center gap-1">
+              <p
+                className="text-[11px] font-medium text-blue-600/70 mt-2 flex items-center gap-1"
+                title={stats.typeCountText}
+              >
                 <span className="w-1 h-1 rounded-full bg-blue-400" />
                 {stats.uniqueTypes} {t("types") || "tipos"}
               </p>

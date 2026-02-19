@@ -27,7 +27,16 @@ import {
 import { AppHeader } from "@/components/organisms/AppHeader";
 import { AppSidebar } from "@/components/organisms/AppSidebar";
 import { MainLayout } from "@/components/templates/MainLayout";
+import {
+  useAcademicPrograms,
+  useResourceCategories,
+  useResourceCharacteristics,
+  useResourceTypes,
+} from "@/hooks/useResources";
+import { useRouter } from "@/i18n/navigation";
 import { httpClient } from "@/infrastructure/http";
+import { extractArray } from "@/lib/data-utils";
+import { cn } from "@/lib/utils";
 import {
   AcademicProgram,
   AvailabilityRules,
@@ -36,20 +45,9 @@ import {
   ResourceType,
   UpdateResourceDto,
 } from "@/types/entities/resource";
-import { Plus, Tag, X } from "lucide-react";
-import { useParams, useRouter } from "next/navigation";
+import { Plus, Search, Tag, X } from "lucide-react";
+import { useParams } from "next/navigation";
 import * as React from "react";
-
-/**
- * Página de Editar Recurso - Bookly
- *
- * Formulario completo para editar un recurso existente
- */
-
-interface CategoryCollectionPayload {
-  items?: Category[];
-  categories?: Category[];
-}
 
 interface ProgramCollectionPayload {
   items?: ProgramApiItem[];
@@ -114,68 +112,6 @@ function toCharacteristicKey(value: string): string {
   return normalizeCharacteristicName(value).toLowerCase();
 }
 
-function toCharacteristicTestId(value: string): string {
-  return toCharacteristicKey(value).replace(/[^a-z0-9]+/g, "-");
-}
-
-function isStringArray(value: unknown): value is string[] {
-  return (
-    Array.isArray(value) && value.every((item) => typeof item === "string")
-  );
-}
-
-function isLikelyCharacteristicIdentifier(value: string): boolean {
-  const normalized = value.trim();
-
-  if (!normalized) {
-    return false;
-  }
-
-  return (
-    /^[a-fA-F0-9]{24}$/.test(normalized) ||
-    /^char[_-][a-zA-Z0-9_-]+$/i.test(normalized)
-  );
-}
-
-function extractCharacteristicNamesFromAttributes(
-  attributes: Record<string, unknown> | undefined,
-): string[] {
-  const characteristicCandidates: string[] = [];
-
-  const characteristicsValue = attributes?.characteristics;
-  if (isStringArray(characteristicsValue)) {
-    characteristicCandidates.push(...characteristicsValue);
-  }
-
-  const featuresValue = attributes?.features;
-  if (isStringArray(featuresValue)) {
-    characteristicCandidates.push(...featuresValue);
-  }
-
-  return Array.from(
-    new Map(
-      characteristicCandidates
-        .map((name) => normalizeCharacteristicName(name))
-        .filter(
-          (name) => Boolean(name) && !isLikelyCharacteristicIdentifier(name),
-        )
-        .map((name) => [toCharacteristicKey(name), name]),
-    ).values(),
-  );
-}
-
-function mapBooleanAttributesToCharacteristics(
-  attributes: Record<string, unknown> | undefined,
-): string[] {
-  if (!attributes) {
-    return [];
-  }
-
-  return Object.entries(BOOLEAN_ATTRIBUTE_TO_CHARACTERISTIC)
-    .filter(([attribute]) => attributes[attribute] === true)
-    .map(([, characteristic]) => characteristic);
-}
-
 function extractCharacteristicOptions(
   data:
     | ResourceCharacteristicsCollectionPayload
@@ -212,25 +148,81 @@ function extractCharacteristicOptions(
   );
 }
 
+function extractPrograms(
+  data: ProgramCollectionPayload | AcademicProgram[] | undefined,
+): AcademicProgram[] {
+  const rawItems = Array.isArray(data)
+    ? data
+    : Array.isArray(data?.items)
+      ? data.items
+      : [];
+
+  const normalized: AcademicProgram[] = [];
+
+  rawItems.forEach((item) => {
+    const rawItem = item as Record<string, unknown>;
+    const id = String(rawItem.id ?? rawItem._id ?? rawItem.code ?? "").trim();
+    if (!id) return;
+
+    normalized.push({
+      ...item,
+      id,
+    } as AcademicProgram);
+  });
+
+  return Array.from(new Map(normalized.map((p) => [p.id, p])).values()).sort(
+    (a, b) => a.name.localeCompare(b.name, "es"),
+  );
+}
+
+interface CharacteristicValue {
+  id?: string;
+  name?: string;
+}
+
+function extractCharacteristicNamesFromAttributes(
+  attributes: Record<string, unknown> | undefined,
+): string[] {
+  if (!attributes) return [];
+  const characteristicCandidates: string[] = [];
+
+  const characteristicsValue = attributes?.characteristics;
+  if (Array.isArray(characteristicsValue)) {
+    characteristicsValue.forEach((item) => {
+      if (typeof item === "string") characteristicCandidates.push(item);
+      else if (
+        typeof item === "object" &&
+        item !== null &&
+        (item as CharacteristicValue).name
+      )
+        characteristicCandidates.push(
+          (item as CharacteristicValue).name as string,
+        );
+    });
+  }
+
+  const featuresValue = attributes?.features;
+  if (Array.isArray(featuresValue)) {
+    featuresValue.forEach((item) => {
+      if (typeof item === "string") characteristicCandidates.push(item);
+    });
+  }
+
+  return Array.from(
+    new Map(
+      characteristicCandidates
+        .map((name) => normalizeCharacteristicName(name))
+        .filter(Boolean)
+        .map((name) => [toCharacteristicKey(name), name]),
+    ).values(),
+  );
+}
+
 function resolveSelectedCharacteristics(
   attributes: Record<string, unknown> | undefined,
   characteristicsCatalog: ResourceCharacteristicOption[],
 ): CharacteristicTag[] {
-  if (!attributes) {
-    return [];
-  }
-
-  const catalogById = new Map(
-    characteristicsCatalog
-      .filter((item) => item.id && item.name)
-      .map((item) => [String(item.id), item]),
-  );
-
-  const catalogByCode = new Map(
-    characteristicsCatalog
-      .filter((item) => item.code && item.name)
-      .map((item) => [String(item.code).toUpperCase(), item]),
-  );
+  if (!attributes) return [];
 
   const catalogByName = new Map(
     characteristicsCatalog
@@ -240,182 +232,32 @@ function resolveSelectedCharacteristics(
 
   const tags = new Map<string, CharacteristicTag>();
 
-  const addTag = (tag: CharacteristicTag) => {
-    const existing = tags.get(tag.normalizedName);
-    if (!existing || (!existing.id && tag.id)) {
-      tags.set(tag.normalizedName, tag);
-    }
-  };
+  const characteristicNames =
+    extractCharacteristicNamesFromAttributes(attributes);
 
-  const rawCharacteristics = attributes.characteristics;
-  const normalizedCharacteristics = Array.isArray(rawCharacteristics)
-    ? rawCharacteristics
-    : [];
+  Object.entries(BOOLEAN_ATTRIBUTE_TO_CHARACTERISTIC).forEach(
+    ([attr, name]) => {
+      if (attributes[attr] === true) {
+        characteristicNames.push(name);
+      }
+    },
+  );
 
-  normalizedCharacteristics.forEach((item) => {
-    const rawId =
-      typeof item === "object" && item !== null
-        ? ((item as { id?: string; _id?: string }).id ??
-          (item as { _id?: string })._id)
-        : typeof item === "string"
-          ? item
-          : undefined;
+  characteristicNames.forEach((name) => {
+    const key = toCharacteristicKey(name);
+    const catalogItem = catalogByName.get(key);
 
-    const rawName =
-      typeof item === "object" && item !== null
-        ? (item as { name?: string }).name
-        : undefined;
-
-    const rawCode =
-      typeof item === "object" && item !== null
-        ? (item as { code?: string }).code
-        : undefined;
-
-    const byId = rawId ? catalogById.get(String(rawId)) : undefined;
-    const byCode = rawCode
-      ? catalogByCode.get(String(rawCode).toUpperCase())
-      : undefined;
-    const byName = rawName
-      ? catalogByName.get(toCharacteristicKey(String(rawName)))
-      : undefined;
-    const byStringName =
-      typeof item === "string"
-        ? catalogByName.get(toCharacteristicKey(item))
-        : undefined;
-
-    const catalogItem = byId ?? byCode ?? byName ?? byStringName;
-
-    if (catalogItem?.name) {
-      const normalizedName = toCharacteristicKey(String(catalogItem.name));
-      addTag({
-        id: String(catalogItem.id),
-        name: String(catalogItem.name),
-        normalizedName,
-        isNew: false,
-      });
-      return;
-    }
-
-    const fallbackName = normalizeCharacteristicName(
-      typeof rawName === "string"
-        ? rawName
-        : typeof item === "string"
-          ? item
-          : "",
-    );
-
-    if (!fallbackName || isLikelyCharacteristicIdentifier(fallbackName)) {
-      return;
-    }
-
-    addTag({
-      name: fallbackName,
-      normalizedName: toCharacteristicKey(fallbackName),
-      isNew: false,
-    });
-  });
-
-  [
-    ...extractCharacteristicNamesFromAttributes(attributes),
-    ...mapBooleanAttributesToCharacteristics(attributes),
-  ].forEach((name) => {
-    const normalizedName = normalizeCharacteristicName(name);
-
-    if (!normalizedName) {
-      return;
-    }
-
-    const catalogItem = catalogByName.get(toCharacteristicKey(normalizedName));
-
-    if (catalogItem?.name) {
-      addTag({
-        id: String(catalogItem.id),
-        name: String(catalogItem.name),
-        normalizedName: toCharacteristicKey(String(catalogItem.name)),
-        isNew: false,
-      });
-      return;
-    }
-
-    addTag({
-      name: normalizedName,
-      normalizedName: toCharacteristicKey(normalizedName),
-      isNew: false,
+    tags.set(key, {
+      id: catalogItem?.id,
+      name: catalogItem?.name || name,
+      normalizedName: key,
+      isNew: !catalogItem,
     });
   });
 
   return Array.from(tags.values()).sort((a, b) =>
     a.name.localeCompare(b.name, "es"),
   );
-}
-
-function normalizeProgram(
-  program: ProgramApiItem,
-  index: number,
-): AcademicProgram | null {
-  const rawId =
-    program.id ??
-    (typeof program._id === "string" ? program._id : undefined) ??
-    program.code;
-
-  if (!rawId) {
-    return null;
-  }
-
-  const programId = String(rawId);
-  const programCode = normalizeCharacteristicName(program.code ?? programId);
-
-  return {
-    id: programId,
-    code: programCode,
-    name: normalizeCharacteristicName(program.name ?? `Programa ${index + 1}`),
-    description: program.description,
-    faculty: normalizeCharacteristicName(program.faculty ?? "Sin facultad"),
-    department: program.department,
-    isActive: program.isActive ?? true,
-    createdAt: program.createdAt ?? "",
-    updatedAt: program.updatedAt ?? "",
-  };
-}
-
-function extractCategories(
-  data: CategoryCollectionPayload | Category[] | undefined,
-): Category[] {
-  if (Array.isArray(data)) {
-    return data;
-  }
-
-  if (data?.categories && Array.isArray(data.categories)) {
-    return data.categories;
-  }
-
-  if (data?.items && Array.isArray(data.items)) {
-    return data.items;
-  }
-
-  return [];
-}
-
-function extractPrograms(
-  data: ProgramCollectionPayload | AcademicProgram[] | undefined,
-): AcademicProgram[] {
-  const rawPrograms = Array.isArray(data)
-    ? (data as ProgramApiItem[])
-    : (data?.items ?? []);
-
-  const seenProgramIds = new Set<string>();
-
-  return rawPrograms
-    .map((program, index) => normalizeProgram(program, index))
-    .filter((program): program is AcademicProgram => Boolean(program))
-    .filter((program) => {
-      if (seenProgramIds.has(program.id)) {
-        return false;
-      }
-
-      seenProgramIds.add(program.id);
-      return true;
-    });
 }
 
 export default function EditResourcePage() {
@@ -426,27 +268,72 @@ export default function EditResourcePage() {
 
   const [loading, setLoading] = React.useState(true);
   const [saving, setSaving] = React.useState(false);
-  const [categories, setCategories] = React.useState<Category[]>([]);
+
+  // Hooks de datos dinámicos
+  const { data: resourceTypesData } = useResourceTypes();
+  const resourceTypes = React.useMemo(() => {
+    return (resourceTypesData || []).map((rt) => ({
+      id: rt.code as ResourceType,
+      label: rt.name,
+      icon: rt.icon || "📦",
+    }));
+  }, [resourceTypesData]);
+
+  const { data: categoriesData } = useResourceCategories();
+  const categories = React.useMemo(() => {
+    let extracted = extractArray<Category>(categoriesData, "categories");
+    if (extracted.length === 0) {
+      extracted = extractArray<Category>(categoriesData, "items");
+    }
+    return extracted;
+  }, [categoriesData]);
+
+  const { data: programsData } = useAcademicPrograms();
+  const programsList = React.useMemo(
+    () => extractPrograms(programsData),
+    [programsData],
+  );
+
+  const { data: characteristicsData } = useResourceCharacteristics();
+  const characteristicsCatalog = React.useMemo(() => {
+    return extractCharacteristicOptions(characteristicsData);
+  }, [characteristicsData]);
+
   const [resource, setResource] = React.useState<Resource | null>(null);
   const [error, setError] = React.useState("");
   const [success, setSuccess] = React.useState(false);
 
   // Estados del formulario
   const [formData, setFormData] = React.useState<UpdateResourceDto>({});
-
-  // Estados para programas académicos
-  const [allPrograms, setAllPrograms] = React.useState<AcademicProgram[]>([]);
-  const [selectedProgramIds, setSelectedProgramIds] = React.useState<
-    Set<string>
-  >(new Set());
-  const [programFilter, setProgramFilter] = React.useState("");
-  const [characteristicsCatalog, setCharacteristicsCatalog] = React.useState<
-    ResourceCharacteristicOption[]
-  >([]);
+  const [selectedPrograms, setSelectedPrograms] = React.useState<string[]>([]);
   const [selectedCharacteristics, setSelectedCharacteristics] = React.useState<
     CharacteristicTag[]
   >([]);
+
   const [characteristicQuery, setCharacteristicQuery] = React.useState("");
+  const [programQuery, setProgramQuery] = React.useState("");
+  const [typeQuery, setTypeQuery] = React.useState("");
+
+  const filteredTypes = React.useMemo(() => {
+    const query = typeQuery.toLowerCase().trim();
+    const options = !query
+      ? resourceTypes
+      : resourceTypes.filter((t) => t.label.toLowerCase().includes(query));
+    return options.slice(0, 6);
+  }, [typeQuery, resourceTypes]);
+
+  const filteredPrograms = React.useMemo(() => {
+    const query = programQuery.toLowerCase().trim();
+    const options = !query
+      ? programsList
+      : programsList.filter(
+          (p) =>
+            p.name.toLowerCase().includes(query) ||
+            p.code?.toLowerCase().includes(query) ||
+            p.faculty?.toLowerCase().includes(query),
+        );
+    return options.slice(0, 6);
+  }, [programsList, programQuery]);
 
   const selectedCharacteristicKeys = React.useMemo(
     () => new Set(selectedCharacteristics.map((item) => item.normalizedName)),
@@ -473,7 +360,7 @@ export default function EditResourcePage() {
       return normalizedName.includes(normalizedQuery);
     });
 
-    return normalizedQuery ? options : options.slice(0, 8);
+    return options.slice(0, 6);
   }, [
     characteristicsCatalog,
     normalizedCharacteristicQuery,
@@ -501,50 +388,32 @@ export default function EditResourcePage() {
     selectedCharacteristicKeys,
   ]);
 
-  // Cargar recurso, categorías y programas
+  // Cargar recurso
   React.useEffect(() => {
-    const fetchData = async () => {
+    const fetchResourceData = async () => {
       try {
-        const [
-          resourceResponse,
-          categoriesResponse,
-          programsResponse,
-          characteristicsResponse,
-        ] = await Promise.all([
-          httpClient.get<Resource>(`resources/${resourceId}`),
-          httpClient.get<CategoryCollectionPayload | Category[]>("categories"),
-          httpClient.get<ProgramCollectionPayload | AcademicProgram[]>(
-            "programs",
-          ),
-          httpClient.get<
-            | ResourceCharacteristicsCollectionPayload
-            | ResourceCharacteristicOption[]
-          >("resources/characteristics"),
-        ]);
+        const response = await httpClient.get<Resource>(
+          `resources/${resourceId}`,
+        );
 
-        const resolvedCharacteristicsCatalog =
-          characteristicsResponse.success && characteristicsResponse.data
-            ? extractCharacteristicOptions(characteristicsResponse.data)
-            : [];
-
-        setCharacteristicsCatalog(resolvedCharacteristicsCatalog);
-
-        if (resourceResponse.success && resourceResponse.data) {
-          const resourceData = resourceResponse.data;
+        if (response.success && response.data) {
+          const resourceData = response.data;
           setResource(resourceData);
-          setSelectedProgramIds(
-            new Set((resourceData.programIds || []).map((id) => String(id))),
+          setSelectedPrograms(
+            (resourceData.programIds || []).map((id) => String(id)),
           );
 
           const resourceAttributes =
             (resourceData.attributes as Record<string, unknown>) || {};
 
-          setSelectedCharacteristics(
-            resolveSelectedCharacteristics(
-              resourceAttributes,
-              resolvedCharacteristicsCatalog,
-            ),
-          );
+          if (characteristicsCatalog.length > 0) {
+            setSelectedCharacteristics(
+              resolveSelectedCharacteristics(
+                resourceAttributes,
+                characteristicsCatalog,
+              ),
+            );
+          }
 
           setFormData({
             code: resourceData.code,
@@ -561,14 +430,6 @@ export default function EditResourcePage() {
             availabilityRules: resourceData.availabilityRules,
           });
         }
-
-        if (categoriesResponse.success && categoriesResponse.data) {
-          setCategories(extractCategories(categoriesResponse.data));
-        }
-
-        if (programsResponse.success && programsResponse.data) {
-          setAllPrograms(extractPrograms(programsResponse.data));
-        }
       } catch (err) {
         setError("Error al cargar el recurso");
         console.error(err);
@@ -577,30 +438,25 @@ export default function EditResourcePage() {
       }
     };
 
-    fetchData();
-  }, [resourceId]);
-
-  // Toggle selección de programa
-  const handleToggleProgram = (programId: string) => {
-    if (!programId) {
-      return;
+    if (resourceId && characteristicsCatalog.length > 0) {
+      fetchResourceData();
     }
-
-    setSelectedProgramIds((previousSelection) => {
-      const newSelection = new Set(previousSelection);
-
-      if (newSelection.has(programId)) {
-        newSelection.delete(programId);
-      } else {
-        newSelection.add(programId);
-      }
-
-      return newSelection;
-    });
-  };
+  }, [resourceId, characteristicsCatalog]);
 
   const handleClearProgramSelection = () => {
-    setSelectedProgramIds(new Set());
+    setSelectedPrograms([]);
+    setFormData((prev) => ({ ...prev, programIds: [] }));
+  };
+
+  const handleSelectAllPrograms = () => {
+    if (selectedPrograms.length === programsList.length) {
+      setSelectedPrograms([]);
+      setFormData((prev) => ({ ...prev, programIds: [] }));
+    } else {
+      const allIds = programsList.map((p) => p.id);
+      setSelectedPrograms(allIds);
+      setFormData((prev) => ({ ...prev, programIds: allIds }));
+    }
   };
 
   const handleSelectExistingCharacteristic = (
@@ -684,6 +540,22 @@ export default function EditResourcePage() {
     }));
   };
 
+  const handleProgramToggle = (programId: string) => {
+    setSelectedPrograms((prev) => {
+      const isSelected = prev.includes(programId);
+      const newSelection = isSelected
+        ? prev.filter((id) => id !== programId)
+        : [...prev, programId];
+
+      setFormData((prevData) => ({
+        ...prevData,
+        programIds: newSelection,
+      }));
+
+      return newSelection;
+    });
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setSaving(true);
@@ -705,11 +577,7 @@ export default function EditResourcePage() {
       );
 
       const characteristicValues = selectedCharacteristics.map((item) =>
-        item.id
-          ? item.id
-          : {
-              name: item.name,
-            },
+        item.id ? item.id : { name: item.name },
       );
 
       const attributesPayload: Record<string, unknown> = {
@@ -718,45 +586,34 @@ export default function EditResourcePage() {
         features: characteristicNames,
       };
 
-      // Inyectar atributos requeridos por el backend según el tipo de recurso para evitar 400 Bad Request
       const effectiveType = formData.type || resource?.type;
 
       if (effectiveType === ResourceType.MULTIMEDIA_EQUIPMENT) {
-        if (!attributesPayload.equipmentType) {
-          attributesPayload.equipmentType = "laptop"; // Valor por defecto seguro
-        }
-        if (attributesPayload.isPortable === undefined) {
-          attributesPayload.isPortable = true; // Valor por defecto seguro
-        }
+        if (!attributesPayload.equipmentType)
+          attributesPayload.equipmentType = "laptop";
+        if (attributesPayload.isPortable === undefined)
+          attributesPayload.isPortable = true;
       } else if (effectiveType === ResourceType.CLASSROOM) {
-        if (attributesPayload.capacity === undefined) {
+        if (attributesPayload.capacity === undefined)
           attributesPayload.capacity =
             formData.capacity || resource?.capacity || 1;
-        }
       } else if (effectiveType === ResourceType.LABORATORY) {
-        if (!attributesPayload.labType) {
-          attributesPayload.labType = "computer";
-        }
-        if (attributesPayload.capacity === undefined) {
+        if (!attributesPayload.labType) attributesPayload.labType = "computer";
+        if (attributesPayload.capacity === undefined)
           attributesPayload.capacity =
             formData.capacity || resource?.capacity || 1;
-        }
       } else if (effectiveType === ResourceType.SPORTS_FACILITY) {
-        if (!attributesPayload.sportType) {
+        if (!attributesPayload.sportType)
           attributesPayload.sportType = "soccer";
-        }
-        if (attributesPayload.isIndoor === undefined) {
+        if (attributesPayload.isIndoor === undefined)
           attributesPayload.isIndoor = true;
-        }
       } else if (effectiveType === ResourceType.MEETING_ROOM) {
-        if (attributesPayload.capacity === undefined) {
+        if (attributesPayload.capacity === undefined)
           attributesPayload.capacity =
             formData.capacity || resource?.capacity || 2;
-        }
       } else if (effectiveType === ResourceType.AUDITORIUM) {
-        if (attributesPayload.hasSoundSystem === undefined) {
+        if (attributesPayload.hasSoundSystem === undefined)
           attributesPayload.hasSoundSystem = true;
-        }
       }
 
       Object.entries(BOOLEAN_ATTRIBUTE_TO_CHARACTERISTIC).forEach(
@@ -770,7 +627,7 @@ export default function EditResourcePage() {
       const dataToSend: UpdateResourceRequestPayload = {
         ...formData,
         attributes: attributesPayload,
-        programIds: Array.from(selectedProgramIds).filter(Boolean),
+        programIds: selectedPrograms,
         availabilityRules: formData.availabilityRules
           ? {
               requiresApproval: formData.availabilityRules.requiresApproval,
@@ -834,7 +691,6 @@ export default function EditResourcePage() {
   return (
     <MainLayout header={header} sidebar={sidebar}>
       <div className="max-w-4xl mx-auto space-y-6 pb-6">
-        {/* Header */}
         <div className="flex items-center justify-between">
           <div>
             <h2 className="text-3xl font-bold text-[var(--color-text-primary)]">
@@ -846,14 +702,12 @@ export default function EditResourcePage() {
           </div>
           <Button
             variant="outline"
-            data-testid="resource-edit-cancel-btn"
             onClick={() => router.push(`/${locale}/recursos/${resourceId}`)}
           >
             Cancelar
           </Button>
         </div>
 
-        {/* Alertas */}
         {error && <Alert variant="error">{error}</Alert>}
         {success && (
           <Alert variant="success">
@@ -861,7 +715,6 @@ export default function EditResourcePage() {
           </Alert>
         )}
 
-        {/* Formulario */}
         <form onSubmit={handleSubmit} data-testid="resource-edit-form">
           <Tabs defaultValue="basica" className="w-full">
             <TabsList className="grid w-full grid-cols-5 mb-6">
@@ -870,11 +723,10 @@ export default function EditResourcePage() {
               <TabsTrigger value="caracteristicas">Características</TabsTrigger>
               <TabsTrigger value="disponibilidad">Disponibilidad</TabsTrigger>
               <TabsTrigger value="programas">
-                Programas ({selectedProgramIds.size})
+                Programas ({selectedPrograms.length})
               </TabsTrigger>
             </TabsList>
 
-            {/* Tab 1: Información Básica */}
             <TabsContent value="basica">
               <Card>
                 <CardHeader>
@@ -896,7 +748,6 @@ export default function EditResourcePage() {
                         }
                       />
                     </div>
-
                     <div>
                       <label className="block text-sm font-medium text-[var(--color-text-primary)] mb-2">
                         Nombre
@@ -909,7 +760,6 @@ export default function EditResourcePage() {
                       />
                     </div>
                   </div>
-
                   <div>
                     <label className="block text-sm font-medium text-[var(--color-text-primary)] mb-2">
                       Descripción
@@ -921,92 +771,91 @@ export default function EditResourcePage() {
                       }
                     />
                   </div>
-
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div>
-                      <label className="block text-sm font-medium text-[var(--color-text-primary)] mb-2">
-                        Tipo
-                      </label>
-                      <Select
-                        value={formData.type}
-                        onValueChange={(value) =>
-                          handleInputChange("type", value as ResourceType)
-                        }
-                      >
-                        <SelectTrigger>
-                          <SelectValue />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value={ResourceType.CLASSROOM}>
-                            Aula/Salón
-                          </SelectItem>
-                          <SelectItem value={ResourceType.LABORATORY}>
-                            Laboratorio
-                          </SelectItem>
-                          <SelectItem value={ResourceType.AUDITORIUM}>
-                            Auditorio
-                          </SelectItem>
-                          <SelectItem value={ResourceType.MULTIMEDIA_EQUIPMENT}>
-                            Equipo Multimedial
-                          </SelectItem>
-                          <SelectItem value={ResourceType.SPORTS_FACILITY}>
-                            Instalación Deportiva
-                          </SelectItem>
-                          <SelectItem value={ResourceType.MEETING_ROOM}>
-                            Sala de Juntas
-                          </SelectItem>
-                          <SelectItem value={ResourceType.VEHICLE}>
-                            Vehículo
-                          </SelectItem>
-                          <SelectItem value={ResourceType.OTHER}>
-                            Otro
-                          </SelectItem>
-                        </SelectContent>
-                      </Select>
+                  <div className="space-y-4">
+                    <div className="space-y-3">
+                      <div className="flex items-center justify-between">
+                        <label className="block text-sm font-medium text-[var(--color-text-primary)]">
+                          Tipo de Recurso *
+                        </label>
+                        <div className="relative w-48">
+                          <Search
+                            size={12}
+                            className="absolute left-2.5 top-1/2 -translate-y-1/2 text-[var(--color-text-tertiary)]"
+                          />
+                          <Input
+                            placeholder="Filtrar tipos..."
+                            value={typeQuery}
+                            onChange={(e) => setTypeQuery(e.target.value)}
+                            className="h-8 pl-8 text-xs bg-[var(--color-bg-muted)]/20 border-[var(--color-border-subtle)] rounded-lg focus:ring-brand-primary-500"
+                          />
+                        </div>
+                      </div>
+                      <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+                        {filteredTypes.map(({ id, label, icon }) => (
+                          <button
+                            key={id}
+                            type="button"
+                            onClick={() => handleInputChange("type", id)}
+                            className={cn(
+                              "flex flex-col items-center gap-2 p-3 rounded-xl border text-xs font-semibold transition-colors",
+                              (formData.type || resource.type) === id
+                                ? "border-brand-primary-500 bg-brand-primary-50 text-brand-primary-700 shadow-sm"
+                                : "border-[var(--color-border-subtle)] bg-[var(--color-bg-surface)] text-[var(--color-text-secondary)] hover:border-brand-primary-200 hover:bg-brand-primary-50/30",
+                            )}
+                          >
+                            <span className="text-xl">{icon}</span>
+                            <span className="text-center line-clamp-1">
+                              {label}
+                            </span>
+                          </button>
+                        ))}
+                      </div>
                     </div>
-
-                    <div>
-                      <label className="block text-sm font-medium text-[var(--color-text-primary)] mb-2">
-                        Categoría
-                      </label>
-                      <Select
-                        value={formData.categoryId}
-                        onValueChange={(value) =>
-                          handleInputChange("categoryId", value)
-                        }
-                      >
-                        <SelectTrigger>
-                          <SelectValue />
-                        </SelectTrigger>
-                        <SelectContent>
-                          {categories.map((category) => (
-                            <SelectItem key={category.id} value={category.id}>
-                              {category.name}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div>
+                        <label className="block text-sm font-medium text-[var(--color-text-primary)] mb-2">
+                          Categoría
+                        </label>
+                        <Select
+                          value={formData.categoryId || ""}
+                          onValueChange={(v) =>
+                            handleInputChange("categoryId", v)
+                          }
+                        >
+                          <SelectTrigger>
+                            <SelectValue />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {categories.map((c) => (
+                              <SelectItem key={c.id} value={c.id}>
+                                {c.name}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-[var(--color-text-primary)] mb-2">
+                          Capacidad
+                        </label>
+                        <Input
+                          type="number"
+                          min="1"
+                          value={formData.capacity || 1}
+                          onChange={(e) =>
+                            handleInputChange(
+                              "capacity",
+                              parseInt(e.target.value),
+                            )
+                          }
+                        />
+                      </div>
                     </div>
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-medium text-[var(--color-text-primary)] mb-2">
-                      Capacidad
-                    </label>
-                    <Input
-                      type="number"
-                      min="1"
-                      value={formData.capacity || 1}
-                      onChange={(e) =>
-                        handleInputChange("capacity", parseInt(e.target.value))
-                      }
-                    />
                   </div>
                 </CardContent>
               </Card>
             </TabsContent>
 
-            {/* Tab 2: Ubicación */}
             <TabsContent value="ubicacion">
               <Card>
                 <CardHeader>
@@ -1024,7 +873,6 @@ export default function EditResourcePage() {
                       }
                     />
                   </div>
-
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
                       <label className="block text-sm font-medium text-[var(--color-text-primary)] mb-2">
@@ -1037,7 +885,6 @@ export default function EditResourcePage() {
                         }
                       />
                     </div>
-
                     <div>
                       <label className="block text-sm font-medium text-[var(--color-text-primary)] mb-2">
                         Piso
@@ -1054,7 +901,6 @@ export default function EditResourcePage() {
               </Card>
             </TabsContent>
 
-            {/* Tab 3: Características */}
             <TabsContent value="caracteristicas">
               <Card>
                 <CardHeader>
@@ -1065,165 +911,118 @@ export default function EditResourcePage() {
                     <p className="text-sm font-medium text-[var(--color-text-primary)] mb-2">
                       Seleccionadas ({selectedCharacteristics.length})
                     </p>
-                    {selectedCharacteristics.length === 0 ? (
-                      <p className="text-sm text-[var(--color-text-tertiary)] p-4 rounded-lg border border-dashed border-[var(--color-border-subtle)]">
-                        No hay características seleccionadas.
-                      </p>
-                    ) : (
-                      <div
-                        className="flex flex-wrap gap-2"
-                        data-testid="resource-characteristics-selected"
-                      >
-                        {selectedCharacteristics.map((characteristic) => (
-                          <span
-                            key={characteristic.normalizedName}
-                            data-testid={`resource-characteristic-chip-${characteristic.isNew ? "new-" : ""}${toCharacteristicTestId(characteristic.name)}`}
-                            className={`inline-flex items-center gap-1.5 rounded-full border px-3 py-1 text-xs ${
-                              characteristic.isNew
-                                ? "border-[var(--color-border-focus)] bg-[var(--color-bg-secondary)] text-[var(--color-text-primary)]"
-                                : "border-[var(--color-border-subtle)] bg-[var(--color-bg-primary)] text-[var(--color-text-primary)]"
-                            }`}
+                    <div
+                      className="flex flex-wrap gap-2"
+                      data-testid="resource-characteristics-selected"
+                    >
+                      {selectedCharacteristics.map((c) => (
+                        <span
+                          key={c.normalizedName}
+                          className="inline-flex items-center gap-1.5 rounded-full border px-3 py-1 text-xs border-[var(--color-border-subtle)] bg-[var(--color-bg-primary)] text-[var(--color-text-primary)]"
+                        >
+                          {c.isNew ? (
+                            <Plus className="h-3.5 w-3.5" />
+                          ) : (
+                            <Tag className="h-3.5 w-3.5" />
+                          )}
+                          <span>{c.name}</span>
+                          <button
+                            type="button"
+                            onClick={() =>
+                              handleRemoveCharacteristic(c.normalizedName)
+                            }
+                            className="rounded p-0.5 text-[var(--color-text-tertiary)] hover:text-[var(--color-text-primary)]"
                           >
-                            {characteristic.isNew ? (
-                              <Plus className="h-3.5 w-3.5" />
-                            ) : (
-                              <Tag className="h-3.5 w-3.5" />
-                            )}
-                            <span>{characteristic.name}</span>
-                            {characteristic.isNew && (
-                              <span className="rounded-full bg-[var(--color-bg-tertiary)] px-1.5 py-0.5 text-[10px] font-medium">
-                                Nueva
-                              </span>
-                            )}
-                            <button
-                              type="button"
-                              data-testid={`resource-characteristic-remove-${toCharacteristicTestId(characteristic.name)}`}
-                              className="rounded p-0.5 text-[var(--color-text-tertiary)] hover:text-[var(--color-text-primary)]"
-                              onClick={() =>
-                                handleRemoveCharacteristic(
-                                  characteristic.normalizedName,
-                                )
-                              }
-                              aria-label={`Eliminar característica ${characteristic.name}`}
-                            >
-                              <X className="h-3.5 w-3.5" />
-                            </button>
-                          </span>
-                        ))}
-                      </div>
-                    )}
+                            <X className="h-3.5 w-3.5" />
+                          </button>
+                        </span>
+                      ))}
+                    </div>
                   </div>
-
                   <div className="space-y-2">
                     <Input
-                      data-testid="resource-characteristics-search-input"
                       placeholder="Buscar o crear característica..."
                       value={characteristicQuery}
                       onChange={(e) => setCharacteristicQuery(e.target.value)}
                     />
-
                     <div
                       className="max-h-[280px] overflow-y-auto space-y-2 rounded-lg border border-[var(--color-border-subtle)] p-2"
                       data-testid="resource-characteristics-options"
                     >
-                      {filteredCharacteristics.map((characteristic) => (
+                      {filteredCharacteristics.map((c) => (
                         <button
-                          key={String(characteristic.id)}
+                          key={String(c.id)}
                           type="button"
-                          data-testid={`resource-characteristic-option-${toCharacteristicTestId(String(characteristic.name))}`}
                           onClick={() =>
-                            handleSelectExistingCharacteristic(characteristic)
+                            handleSelectExistingCharacteristic(
+                              c as ResourceCharacteristicOption,
+                            )
                           }
                           className="w-full text-left px-3 py-2 rounded-md hover:bg-[var(--color-bg-secondary)] text-sm text-[var(--color-text-primary)]"
                         >
-                          {characteristic.name}
+                          {c.name}
                         </button>
                       ))}
-
                       {canCreateCharacteristic && (
                         <button
                           type="button"
-                          data-testid="resource-characteristic-create-option"
                           onClick={handleCreateCharacteristic}
                           className="w-full text-left px-3 py-2 rounded-md border border-[var(--color-border-focus)] bg-[var(--color-bg-primary)] text-sm text-[var(--color-text-primary)]"
                         >
                           Crear &quot;{normalizedCharacteristicQuery}&quot;
                         </button>
                       )}
-
-                      {!canCreateCharacteristic &&
-                        filteredCharacteristics.length === 0 && (
-                          <p className="px-3 py-2 text-sm text-[var(--color-text-tertiary)]">
-                            No hay coincidencias disponibles.
-                          </p>
-                        )}
                     </div>
-
-                    <p className="text-xs text-[var(--color-text-tertiary)]">
-                      Las características nuevas se crean solo al guardar el
-                      recurso.
-                    </p>
                   </div>
                 </CardContent>
               </Card>
             </TabsContent>
 
-            {/* Tab 4: Disponibilidad */}
             <TabsContent value="disponibilidad">
               <Card>
                 <CardHeader>
                   <CardTitle>Reglas de Disponibilidad</CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-4">
-                  <div>
-                    <label className="flex items-center gap-3 p-3 bg-[var(--color-bg-primary)] rounded-lg cursor-pointer hover:bg-[var(--color-bg-secondary)]">
-                      <input
-                        type="checkbox"
-                        checked={
-                          formData.availabilityRules?.requiresApproval || false
-                        }
-                        onChange={(e) =>
-                          handleAvailabilityRuleChange(
-                            "requiresApproval",
-                            e.target.checked,
-                          )
-                        }
-                        className="rounded w-4 h-4"
-                      />
-                      <div className="flex-1">
-                        <div className="text-foreground text-sm font-medium">
-                          Requiere Aprobación
-                        </div>
-                      </div>
-                    </label>
-                  </div>
-
-                  <div>
-                    <label className="flex items-center gap-3 p-3 bg-[var(--color-bg-primary)] rounded-lg cursor-pointer hover:bg-[var(--color-bg-secondary)]">
-                      <input
-                        type="checkbox"
-                        checked={
-                          formData.availabilityRules?.allowRecurring || false
-                        }
-                        onChange={(e) =>
-                          handleAvailabilityRuleChange(
-                            "allowRecurring",
-                            e.target.checked,
-                          )
-                        }
-                        className="rounded w-4 h-4"
-                      />
-                      <div className="flex-1">
-                        <div className="text-foreground text-sm font-medium">
-                          Permitir Reservas Recurrentes
-                        </div>
-                      </div>
-                    </label>
-                  </div>
-
+                  <label className="flex items-center gap-3 p-3 bg-[var(--color-bg-primary)] rounded-lg cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={
+                        formData.availabilityRules?.requiresApproval || false
+                      }
+                      onChange={(e) =>
+                        handleAvailabilityRuleChange(
+                          "requiresApproval",
+                          e.target.checked,
+                        )
+                      }
+                      className="rounded w-4 h-4"
+                    />
+                    <span className="text-sm font-medium">
+                      Requiere Aprobación
+                    </span>
+                  </label>
+                  <label className="flex items-center gap-3 p-3 bg-[var(--color-bg-primary)] rounded-lg cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={
+                        formData.availabilityRules?.allowRecurring || false
+                      }
+                      onChange={(e) =>
+                        handleAvailabilityRuleChange(
+                          "allowRecurring",
+                          e.target.checked,
+                        )
+                      }
+                      className="rounded w-4 h-4"
+                    />
+                    <span className="text-sm font-medium">
+                      Permitir Reservas Recurrentes
+                    </span>
+                  </label>
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                     <div>
-                      <label className="block text-sm font-medium text-[var(--color-text-primary)] mb-2">
+                      <label className="block text-sm font-medium mb-2">
                         Días Anticipación
                       </label>
                       <Input
@@ -1241,9 +1040,8 @@ export default function EditResourcePage() {
                         }
                       />
                     </div>
-
                     <div>
-                      <label className="block text-sm font-medium text-[var(--color-text-primary)] mb-2">
+                      <label className="block text-sm font-medium mb-2">
                         Duración Mín. (min)
                       </label>
                       <Input
@@ -1262,9 +1060,8 @@ export default function EditResourcePage() {
                         }
                       />
                     </div>
-
                     <div>
-                      <label className="block text-sm font-medium text-[var(--color-text-primary)] mb-2">
+                      <label className="block text-sm font-medium mb-2">
                         Duración Máx. (min)
                       </label>
                       <Input
@@ -1288,101 +1085,73 @@ export default function EditResourcePage() {
               </Card>
             </TabsContent>
 
-            {/* Tab 5: Programas Académicos */}
             <TabsContent value="programas">
               <Card>
                 <CardHeader>
                   <CardTitle>Programas Académicos</CardTitle>
-                  <CardDescription>
-                    Selecciona los programas académicos que podrán usar este
-                    recurso
-                  </CardDescription>
                 </CardHeader>
-                <CardContent>
-                  <div className="space-y-4">
-                    <div className="flex items-center justify-between">
-                      <p
-                        className="text-sm text-[var(--color-text-tertiary)]"
-                        data-testid="resource-program-selected-count"
-                      >
-                        {selectedProgramIds.size} programa(s) seleccionado(s)
-                      </p>
+                <CardContent className="space-y-4">
+                  <div className="flex items-center justify-between">
+                    <p className="text-sm text-[var(--color-text-tertiary)]">
+                      {selectedPrograms.length} programas seleccionados
+                    </p>
+                    <div className="flex gap-2">
                       <Button
                         type="button"
                         variant="outline"
                         size="sm"
                         onClick={handleClearProgramSelection}
-                        data-testid="resource-program-clear-selection"
                       >
-                        Limpiar selección
+                        Limpiar
+                      </Button>
+                      <Button
+                        type="button"
+                        variant="outline"
+                        size="sm"
+                        onClick={handleSelectAllPrograms}
+                      >
+                        {selectedPrograms.length === programsList.length
+                          ? "Deseleccionar"
+                          : "Todos"}
                       </Button>
                     </div>
-
-                    <Input
-                      data-testid="resource-program-search-input"
-                      placeholder="Buscar por código o nombre..."
-                      value={programFilter}
-                      onChange={(e) => setProgramFilter(e.target.value)}
-                    />
-
-                    <div className="space-y-2 max-h-[400px] overflow-y-auto">
-                      {allPrograms
-                        .filter((p) =>
-                          programFilter
-                            ? p.name
-                                .toLowerCase()
-                                .includes(programFilter.toLowerCase()) ||
-                              p.code
-                                .toLowerCase()
-                                .includes(programFilter.toLowerCase())
-                            : true,
-                        )
-                        .map((program) => (
-                          <label
-                            key={program.id}
-                            data-testid={`resource-program-option-${program.id}`}
-                            className="flex items-center justify-between p-4 bg-[var(--color-bg-primary)]/50 rounded-lg cursor-pointer hover:bg-[var(--color-bg-primary)]"
-                          >
-                            <div className="flex items-center gap-3">
-                              <input
-                                data-testid={`resource-program-checkbox-${program.id}`}
-                                type="checkbox"
-                                checked={selectedProgramIds.has(program.id)}
-                                onChange={() => handleToggleProgram(program.id)}
-                                className="w-5 h-5 rounded border-[var(--color-border-strong)] bg-[var(--color-bg-tertiary)] text-brand-primary-500 focus:ring-brand-primary-500 focus:ring-offset-gray-900"
-                              />
-                              <div>
-                                <p className="font-medium text-foreground">
-                                  {program.name}
-                                </p>
-                                <p className="text-sm text-[var(--color-text-tertiary)]">
-                                  {program.code} -{" "}
-                                  {program.faculty || "Sin facultad"}
-                                </p>
-                              </div>
-                            </div>
-                            {selectedProgramIds.has(program.id) && (
-                              <Badge variant="success">Seleccionado</Badge>
-                            )}
-                          </label>
-                        ))}
-                    </div>
-
-                    <div className="flex items-center justify-between pt-4 border-t border-[var(--color-border-strong)]">
-                      <p
-                        className="text-sm text-[var(--color-text-tertiary)]"
-                        data-testid="resource-program-selected-count-footer"
+                  </div>
+                  <Input
+                    placeholder="Buscar por código o nombre..."
+                    value={programQuery}
+                    onChange={(e) => setProgramQuery(e.target.value)}
+                  />
+                  <div className="space-y-2 max-h-[400px] overflow-y-auto">
+                    {filteredPrograms.map((p) => (
+                      <label
+                        key={p.id}
+                        className="flex items-center justify-between p-4 bg-[var(--color-bg-primary)]/50 rounded-lg cursor-pointer hover:bg-[var(--color-bg-primary)]"
                       >
-                        {selectedProgramIds.size} programa(s) seleccionado(s)
-                      </p>
-                    </div>
+                        <div className="flex items-center gap-3">
+                          <input
+                            type="checkbox"
+                            checked={selectedPrograms.includes(p.id)}
+                            onChange={() => handleProgramToggle(p.id)}
+                            className="w-5 h-5 rounded"
+                          />
+                          <div>
+                            <p className="font-medium">{p.name}</p>
+                            <p className="text-sm text-[var(--color-text-tertiary)]">
+                              {p.code}
+                            </p>
+                          </div>
+                        </div>
+                        {selectedPrograms.includes(p.id) && (
+                          <Badge variant="success">Seleccionado</Badge>
+                        )}
+                      </label>
+                    ))}
                   </div>
                 </CardContent>
               </Card>
             </TabsContent>
           </Tabs>
 
-          {/* Botones */}
           <div className="flex items-center justify-end gap-3 mt-6">
             <Button
               type="button"
@@ -1392,11 +1161,7 @@ export default function EditResourcePage() {
             >
               Cancelar
             </Button>
-            <Button
-              type="submit"
-              disabled={saving}
-              data-testid="resource-edit-save-btn"
-            >
+            <Button type="submit" disabled={saving}>
               {saving ? "Guardando..." : "Guardar Cambios"}
             </Button>
           </div>

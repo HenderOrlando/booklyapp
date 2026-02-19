@@ -55,7 +55,7 @@ export function AuthLayout({
                 {/* Logo a color para modo claro */}
                 <div className="dark:hidden block relative w-full h-full">
                   <Image
-                    src="/images/DEPARTAMENTO-DE-SISTEMAS-E-INFORMÁTICA.png"
+                    src="/images/logo_dsi_color.png"
                     alt="Departamento de Sistemas e Informática - UFPS"
                     fill
                     className="object-contain"
@@ -65,7 +65,7 @@ export function AuthLayout({
                 {/* Logo blanco para modo oscuro */}
                 <div className="hidden dark:block relative w-full h-full">
                   <Image
-                    src="/images/DEPARTAMENTO-DE-SISTEMAS-E-INFORMÁTICA---BLANCO.png"
+                    src="/images/logo_dsi_white.png"
                     alt="Departamento de Sistemas e Informática - UFPS"
                     fill
                     className="object-contain"

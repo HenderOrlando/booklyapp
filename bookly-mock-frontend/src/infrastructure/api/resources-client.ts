@@ -39,7 +39,7 @@ export interface CreateResourceDto {
   location: string;
   floor?: string;
   building?: string;
-  attributes?: Record<string, any>;
+  attributes?: Record<string, unknown>;
   programIds?: string[];
   status?: ResourceStatus;
   imageUrl?: string;
@@ -125,7 +125,7 @@ export class ResourcesClient {
     });
 
     return httpClient.get<PaginatedResponse<Resource>>(
-      buildUrl(RESOURCES_ENDPOINTS.BASE, filters as Record<string, any>),
+      buildUrl(RESOURCES_ENDPOINTS.BASE, filters as Record<string, unknown>),
     );
   }
 
@@ -187,7 +187,12 @@ export class ResourcesClient {
       errors: string[];
     }>
   > {
-    return httpClient.post<any>(`${RESOURCES_ENDPOINTS.BASE}/import`, {
+    return httpClient.post<{
+      successCount: number;
+      updatedCount: number;
+      errorCount: number;
+      errors: string[];
+    }>(`${RESOURCES_ENDPOINTS.BASE}/import`, {
       csvContent,
       mode,
       skipErrors,
@@ -259,9 +264,19 @@ export class ResourcesClient {
       };
     }>
   > {
-    return httpClient.get<any>(
-      `${RESOURCES_ENDPOINTS.BY_ID(id)}/availability-rules`,
-    );
+    return httpClient.get<{
+      resourceId: string;
+      requiresApproval: boolean;
+      maxAdvanceBookingDays: number;
+      minBookingDurationMinutes: number;
+      maxBookingDurationMinutes: number;
+      allowRecurring: boolean;
+      customRules: {
+        businessHoursOnly: boolean;
+        weekdaysOnly: boolean;
+        maxConcurrentBookings: number;
+      };
+    }>(`${RESOURCES_ENDPOINTS.BY_ID(id)}/availability-rules`);
   }
 
   /**
@@ -278,7 +293,27 @@ export class ResourcesClient {
       color: string;
     }>
   > {
-    return httpClient.get<any>(`${RESOURCES_ENDPOINTS.BY_ID(id)}/category`);
+    return httpClient.get<{
+      id: string;
+      name: string;
+      code: string;
+      color: string;
+    }>(`${RESOURCES_ENDPOINTS.BY_ID(id)}/category`);
+  }
+
+  /**
+   * Obtiene los tipos de recursos disponibles desde datos de referencia
+   *
+   * @returns Lista de tipos de recursos
+   */
+  static async getResourceTypes(): Promise<
+    ApiResponse<
+      Array<{ id: string; code: string; name: string; icon?: string }>
+    >
+  > {
+    return httpClient.get<
+      Array<{ id: string; code: string; name: string; icon?: string }>
+    >(`${RESOURCES_ENDPOINTS.REFERENCE_DATA}?group=resource_type&active=true`);
   }
 
   // ============================================
@@ -363,6 +398,19 @@ export class ResourcesClient {
     return httpClient.get<PaginatedResponse<AcademicProgram>>(
       RESOURCES_ENDPOINTS.PROGRAMS,
     );
+  }
+
+  /**
+   * Obtiene el catálogo de características de recursos
+   *
+   * @returns Lista de características disponibles
+   */
+  static async getCharacteristics(): Promise<
+    ApiResponse<PaginatedResponse<{ id: string; name: string; icon?: string }>>
+  > {
+    return httpClient.get<
+      PaginatedResponse<{ id: string; name: string; icon?: string }>
+    >(`${RESOURCES_ENDPOINTS.BASE}/characteristics`);
   }
 
   // ============================================
