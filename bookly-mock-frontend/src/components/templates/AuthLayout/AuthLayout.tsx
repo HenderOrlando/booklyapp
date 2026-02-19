@@ -2,6 +2,7 @@
 
 import { usePublicConfig } from "@/hooks/useAppConfig";
 import { cn } from "@/lib/utils";
+import Image from "next/image";
 import * as React from "react";
 
 /**
@@ -49,20 +50,29 @@ export function AuthLayout({
         {/* Logo y Branding */}
         {showLogo && (
           <div className="text-center mb-8">
-            <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-brand-primary-500 text-white mb-4">
-              <svg
-                className="w-10 h-10"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
-                />
-              </svg>
+            <div className="flex items-center justify-center mb-6">
+              <div className="relative w-48 h-16 transition-all duration-300">
+                {/* Logo a color para modo claro */}
+                <div className="dark:hidden block relative w-full h-full">
+                  <Image
+                    src="/images/DEPARTAMENTO-DE-SISTEMAS-E-INFORMÁTICA.png"
+                    alt="Departamento de Sistemas e Informática - UFPS"
+                    fill
+                    className="object-contain"
+                    priority
+                  />
+                </div>
+                {/* Logo blanco para modo oscuro */}
+                <div className="hidden dark:block relative w-full h-full">
+                  <Image
+                    src="/images/DEPARTAMENTO-DE-SISTEMAS-E-INFORMÁTICA---BLANCO.png"
+                    alt="Departamento de Sistemas e Informática - UFPS"
+                    fill
+                    className="object-contain"
+                    priority
+                  />
+                </div>
+              </div>
             </div>
             <h1 className="text-3xl font-bold text-[var(--color-text-primary)] mb-2">
               {publicConfig?.appName ?? "Bookly"}

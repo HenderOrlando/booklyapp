@@ -2,6 +2,7 @@ import { ThemeToggle } from "@/components/atoms/ThemeToggle";
 import { LogoutButton } from "@/components/molecules/LogoutButton";
 import { useCurrentUser } from "@/hooks/useCurrentUser";
 import { useTranslations } from "next-intl";
+import Image from "next/image";
 
 /**
  * AppHeader - Header superior de la aplicación
@@ -29,16 +30,15 @@ export function AppHeader({
       {/* Logo y Título (Organización y Bookly) */}
       <div className="flex items-center gap-4">
         <div className="flex items-center gap-3">
-          {/* Logo Shield SVG */}
-          <div className="bg-white/20 p-1.5 rounded-lg shadow-sm">
-            <svg
-              className="w-7 h-7 text-white"
-              fill="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path d="M12 2L2 7v10c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V7l-10-5zm0 18c-3.84-1.19-7-5.14-7-9V8.37l7-3.5 7 3.5V11c0 3.86-3.16 7.81-7 9z" />
-              <path d="M9 11l-1.5 1.5L10 15l6-6-1.5-1.5L10 12l-1-1z" />
-            </svg>
+          {/* DSI Logo White version */}
+          <div className="relative w-10 h-10 transition-all duration-300">
+            <Image
+              src="/images/DEPARTAMENTO-DE-SISTEMAS-E-INFORMÁTICA---BLANCO.png"
+              alt="DSI UFPS"
+              fill
+              className="object-contain"
+              priority
+            />
           </div>
 
           <div className="flex flex-col">

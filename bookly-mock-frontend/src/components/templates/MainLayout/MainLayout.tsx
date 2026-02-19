@@ -1,5 +1,7 @@
 "use client";
 
+import { AppHeader } from "@/components/organisms/AppHeader";
+import { AppSidebar } from "@/components/organisms/AppSidebar";
 import { cn } from "@/lib/utils";
 import * as React from "react";
 
@@ -7,8 +9,8 @@ import * as React from "react";
  * MainLayout - Bookly Design System
  *
  * Layout principal de la aplicación tipo dashboard:
- * - Header superior
- * - Sidebar lateral (colapsable en mobile)
+ * - Header superior (por defecto AppHeader)
+ * - Sidebar lateral (por defecto AppSidebar, colapsable en mobile)
  * - Área de contenido principal
  *
  * Fondos según tokens:
@@ -27,8 +29,8 @@ interface MainLayoutProps {
 
 export function MainLayout({
   children,
-  header,
-  sidebar,
+  header = <AppHeader />,
+  sidebar = <AppSidebar />,
   className,
 }: MainLayoutProps) {
   const [sidebarOpen, setSidebarOpen] = React.useState(true);
