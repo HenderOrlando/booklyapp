@@ -65,10 +65,12 @@ export default function AuditoriaPage() {
   React.useEffect(() => {
     const fetchLogs = async () => {
       try {
-        const response = await httpClient.get("audit/logs");
+        const response = (await httpClient.get("audit/logs")) as any;
 
         if (response.success && response.data) {
-          setLogs(response.data.items || []);
+          const data =
+            response.data?.items || response.data?.data || response.data;
+          setLogs(Array.isArray(data) ? data : []);
         }
       } catch (err: any) {
         console.error("Error al cargar logs:", err);
@@ -234,7 +236,7 @@ export default function AuditoriaPage() {
 
   if (loading) {
     return (
-      <MainLayout header={header} sidebar={sidebar}>
+      <MainLayout>
         <div className="flex items-center justify-center h-96">
           <div className="text-center">
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-brand-primary-500 mx-auto mb-4"></div>
@@ -246,7 +248,7 @@ export default function AuditoriaPage() {
   }
 
   return (
-    <MainLayout header={header} sidebar={sidebar}>
+    <MainLayout>
       <div className="space-y-6 pb-6">
         {/* Header */}
         <div>

@@ -1,7 +1,5 @@
 "use client";
 
-import { AppHeader } from "@/components/organisms/AppHeader";
-import { AppSidebar } from "@/components/organisms/AppSidebar/AppSidebar";
 import { TemplateEditor } from "@/components/organisms/TemplateEditor";
 import { MainLayout } from "@/components/templates/MainLayout";
 import { httpClient } from "@/infrastructure/http/httpClient";
@@ -14,12 +12,22 @@ import * as React from "react";
 
 export default function TemplatesPage() {
   const t = useTranslations("admin.templates");
+  const fetchTemplates = React.useCallback(async () => {
+    try {
+      const response = (await httpClient.get("document-templates")) as any;
+      if (response.success) {
+        const data =
+          response.data?.items || response.data?.data || response.data;
+        return Array.isArray(data) ? data : [];
+      }
+    } catch (error) {
+      console.error("Error fetching templates:", error);
+    }
+  }, []);
+
   const { data: serverTemplates } = useQuery({
     queryKey: ["templates"],
-    queryFn: async () => {
-      const response = await httpClient.get("documents/templates");
-      return response.data?.items || response.data || [];
-    },
+    queryFn: fetchTemplates,
     staleTime: 1000 * 60 * 10,
   });
   const [templates, setTemplates] = React.useState<Template[]>(mockTemplates);
@@ -88,7 +96,7 @@ export default function TemplatesPage() {
   };
 
   return (
-    <MainLayout header={<AppHeader />} sidebar={<AppSidebar />}>
+    <MainLayout>
       <div className="space-y-6">
         {/* Header */}
         <div className="flex items-center justify-between">

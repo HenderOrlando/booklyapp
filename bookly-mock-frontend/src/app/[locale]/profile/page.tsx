@@ -276,7 +276,7 @@ export default function ProfilePage() {
   // Mostrar loading
   if (loading) {
     return (
-      <MainLayout header={header} sidebar={sidebar}>
+      <MainLayout>
         <div className="flex items-center justify-center h-96">
           <div className="text-center">
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-brand-primary-500 mx-auto mb-4"></div>
@@ -290,7 +290,7 @@ export default function ProfilePage() {
   // Mostrar error si no se pudo cargar el usuario
   if (error || !user) {
     return (
-      <MainLayout header={header} sidebar={sidebar}>
+      <MainLayout>
         <div className="flex items-center justify-center h-96">
           <Card className="max-w-md">
             <CardHeader>
@@ -326,7 +326,7 @@ export default function ProfilePage() {
   }
 
   return (
-    <MainLayout header={header} sidebar={sidebar}>
+    <MainLayout>
       <div className="space-y-6">
         <div>
           <h2 className="text-3xl font-bold text-[var(--color-text-primary)]">

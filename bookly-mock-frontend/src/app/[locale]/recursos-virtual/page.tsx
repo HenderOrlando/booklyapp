@@ -96,7 +96,7 @@ export default function RecursosVirtualPage() {
   );
 
   return (
-    <MainLayout header={header} sidebar={sidebar}>
+    <MainLayout>
       <div className="space-y-6">
         {/* Información y controles */}
         <Card>

@@ -2,9 +2,7 @@
 
 import { ApprovalCard } from "@/components/molecules/ApprovalCard";
 import { LoadingState } from "@/components/molecules/LoadingState";
-import { AppHeader } from "@/components/organisms/AppHeader";
 import { ApprovalModal } from "@/components/organisms/ApprovalModal";
-import { AppSidebar } from "@/components/organisms/AppSidebar/AppSidebar";
 import { MainLayout } from "@/components/templates/MainLayout";
 import { useApprovalActions } from "@/hooks/useApprovalActions";
 import {
@@ -70,7 +68,7 @@ export default function AprobacionesPage() {
       (req) =>
         req.userName?.toLowerCase().includes(query) ||
         req.resourceName?.toLowerCase().includes(query) ||
-        req.purpose?.toLowerCase().includes(query)
+        req.purpose?.toLowerCase().includes(query),
     );
   }, [requests, searchQuery]);
 
@@ -119,7 +117,7 @@ export default function AprobacionesPage() {
         },
         {
           onSuccess: () => handleCloseModal(),
-        }
+        },
       );
     }
   };
@@ -134,7 +132,7 @@ export default function AprobacionesPage() {
         },
         {
           onSuccess: () => handleCloseModal(),
-        }
+        },
       );
     }
   };
@@ -142,7 +140,7 @@ export default function AprobacionesPage() {
   const handleModalComment = (commentText: string) => {
     // Comentarios ahora se manejan como parte de aprobar/rechazar
     console.warn(
-      "handleModalComment deprecated - use approve/reject with comment"
+      "handleModalComment deprecated - use approve/reject with comment",
     );
   };
 
@@ -162,7 +160,7 @@ export default function AprobacionesPage() {
 
   const handleShare = async (
     requestId: string,
-    medium: "email" | "sms" | "whatsapp"
+    medium: "email" | "sms" | "whatsapp",
   ) => {
     // Simulación de compartir usando el hook de generación por ahora
     // En el futuro usar useShareReport o similar
@@ -177,15 +175,15 @@ export default function AprobacionesPage() {
         onSuccess: () => {
           showSuccess(
             t("share_success_title"),
-            t("share_success_desc", { medium })
+            t("share_success_desc", { medium }),
           );
         },
-      }
+      },
     );
   };
 
   return (
-    <MainLayout header={<AppHeader />} sidebar={<AppSidebar />}>
+    <MainLayout>
       <div className="space-y-6">
         {/* Header */}
         <div>

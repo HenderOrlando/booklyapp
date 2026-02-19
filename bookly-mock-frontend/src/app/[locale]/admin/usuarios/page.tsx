@@ -3,7 +3,6 @@
 import { Alert, AlertDescription } from "@/components/atoms/Alert";
 import { Button } from "@/components/atoms/Button";
 import { AppHeader } from "@/components/organisms/AppHeader";
-import { AppSidebar } from "@/components/organisms/AppSidebar";
 import { MainLayout } from "@/components/templates/MainLayout";
 import { useRoles } from "@/hooks/useRoles";
 import { useToast } from "@/hooks/useToast";
@@ -287,10 +286,8 @@ export default function UsersAdminPage() {
   const loading = loadingUsers || loadingRoles;
 
   const header = <AppHeader />;
-  const sidebar = <AppSidebar />;
-
   return (
-    <MainLayout header={header} sidebar={sidebar}>
+    <MainLayout>
       <div className="space-y-6">
         {/* Header */}
         <div className="flex items-center justify-between">

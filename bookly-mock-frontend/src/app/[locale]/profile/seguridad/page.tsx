@@ -9,8 +9,6 @@ import { Badge } from "@/components/atoms/Badge/Badge";
 import { Button } from "@/components/atoms/Button/Button";
 import { Card } from "@/components/atoms/Card/Card";
 import { Input } from "@/components/atoms/Input/Input";
-import { AppHeader } from "@/components/organisms/AppHeader";
-import { AppSidebar } from "@/components/organisms/AppSidebar/AppSidebar";
 import { MainLayout } from "@/components/templates/MainLayout";
 import { cn } from "@/lib/utils";
 import {
@@ -85,7 +83,7 @@ export default function SeguridadPage() {
   };
 
   return (
-    <MainLayout header={<AppHeader />} sidebar={<AppSidebar />}>
+    <MainLayout>
       <div className="mx-auto max-w-2xl space-y-6">
         <div>
           <h1 className="text-2xl font-bold text-[var(--color-text-primary)]">
@@ -103,7 +101,9 @@ export default function SeguridadPage() {
               <div
                 className={cn(
                   "rounded-lg p-2",
-                  step === "enabled" ? "bg-state-success-100" : "bg-[var(--color-bg-tertiary)]",
+                  step === "enabled"
+                    ? "bg-state-success-100"
+                    : "bg-[var(--color-bg-tertiary)]",
                 )}
               >
                 <Shield

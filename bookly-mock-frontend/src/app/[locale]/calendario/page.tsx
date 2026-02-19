@@ -279,7 +279,7 @@ export default function CalendarioPage() {
 
         <div className="flex gap-6 relative">
           <div
-            className={`transition-all duration-300 \${
+            className={`transition-all duration-300 ${
               isPanelOpen ? "w-80" : "w-0"
             } overflow-hidden flex-shrink-0`}
           >
@@ -312,7 +312,7 @@ export default function CalendarioPage() {
           <div className="flex-1 min-w-0">
             <CalendarView
               onEventClick={(reservation) =>
-                router.push(\`/reservas/\${reservation.id}\`)
+                router.push(`/reservas/${reservation.id}`)
               }
               onDateClick={handleOpenModal}
               onDayDrop={handleDayDrop}

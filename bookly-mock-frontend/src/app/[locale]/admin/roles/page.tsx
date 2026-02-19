@@ -417,11 +417,13 @@ export default function RolesAdminPage() {
 
   if (loading) {
     return (
-      <MainLayout header={header} sidebar={sidebar}>
+      <MainLayout>
         <div className="flex items-center justify-center h-96">
           <div className="text-center">
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-brand-primary-500 mx-auto mb-4"></div>
-            <p className="text-[var(--color-text-secondary)]">{t("loading")}</p>
+            <p className="text-[var(--color-text-secondary)]">
+              Cargando roles...
+            </p>
           </div>
         </div>
       </MainLayout>
@@ -429,7 +431,7 @@ export default function RolesAdminPage() {
   }
 
   return (
-    <MainLayout header={header} sidebar={sidebar}>
+    <MainLayout>
       <div className="space-y-6 pb-6">
         {/* Header */}
         <div>
