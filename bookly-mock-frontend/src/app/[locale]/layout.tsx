@@ -1,19 +1,9 @@
 import type { Metadata } from "next";
 import { NextIntlClientProvider } from "next-intl";
 import { getMessages } from "next-intl/server";
-import dynamic from "next/dynamic";
 import { Inter } from "next/font/google";
 import "../globals.css";
 import { Providers } from "../providers";
-
-// Importar DataModeIndicator solo en el cliente (evita SSR)
-const DataModeIndicator = dynamic(
-  () =>
-    import("@/components/molecules/DataModeIndicator").then(
-      (mod) => mod.DataModeIndicator,
-    ),
-  { ssr: false },
-);
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -43,10 +33,7 @@ export default async function LocaleLayout({
     <html lang={locale} suppressHydrationWarning>
       <body className={inter.className} suppressHydrationWarning>
         <NextIntlClientProvider messages={messages}>
-          <Providers>
-            {children}
-            <DataModeIndicator />
-          </Providers>
+          <Providers>{children}</Providers>
         </NextIntlClientProvider>
       </body>
     </html>

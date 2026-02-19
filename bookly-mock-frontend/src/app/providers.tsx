@@ -9,8 +9,17 @@ import { WebSocketProvider } from "@/infrastructure/websocket/WebSocketProvider"
 import { QueryProvider } from "@/providers/QueryProvider";
 import { store } from "@/store/store";
 import { ThemeProvider } from "next-themes";
+import dynamic from "next/dynamic";
 import * as React from "react";
 import { Provider as ReduxProvider } from "react-redux";
+
+const DataModeIndicator = dynamic(
+  () =>
+    import("@/components/molecules/DataModeIndicator").then(
+      (mod) => mod.DataModeIndicator,
+    ),
+  { ssr: false },
+);
 
 interface ProvidersProps {
   children: React.ReactNode;
@@ -264,6 +273,7 @@ export function Providers({ children }: ProvidersProps) {
               <WebSocketProvider>
                 <WebSocketToastBridge />
                 {children}
+                <DataModeIndicator />
                 <ToastContainer />
               </WebSocketProvider>
             </AuthProvider>
