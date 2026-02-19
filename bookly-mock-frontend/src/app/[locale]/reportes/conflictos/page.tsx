@@ -5,24 +5,14 @@ import { Button } from "@/components/atoms/Button";
 import {
   Card,
   CardContent,
-  CardDescription,
   CardHeader,
   CardTitle,
 } from "@/components/atoms/Card";
 import { Input } from "@/components/atoms/Input";
 import { AppHeader } from "@/components/organisms/AppHeader";
-import { AppSidebar } from "@/components/organisms/AppSidebar";
 import { MainLayout } from "@/components/templates/MainLayout";
-import { httpClient } from "@/infrastructure/http";
 import { cn } from "@/lib/utils";
-import {
-  AlertTriangle,
-  Download,
-  Clock,
-  Calendar,
-  Users,
-  Zap,
-} from "lucide-react";
+import { AlertTriangle, Calendar, Clock, Download } from "lucide-react";
 import { useTranslations } from "next-intl";
 import * as React from "react";
 
@@ -112,7 +102,10 @@ const resolutionLabels: Record<string, string> = {
   cancelled: "Cancelado",
 };
 
-const resolutionVariant: Record<string, "success" | "warning" | "error" | "default"> = {
+const resolutionVariant: Record<
+  string,
+  "success" | "warning" | "error" | "default"
+> = {
   auto_resolved: "success",
   manual_resolved: "success",
   pending: "error",
@@ -150,20 +143,21 @@ export default function ConflictosPage() {
     (c) =>
       !searchTerm ||
       c.resourceName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      c.reservation1.userName.toLowerCase().includes(searchTerm.toLowerCase())
+      c.reservation1.userName.toLowerCase().includes(searchTerm.toLowerCase()),
   );
 
-  const pendingCount = conflicts.filter((c) => c.resolution === "pending").length;
+  const pendingCount = conflicts.filter(
+    (c) => c.resolution === "pending",
+  ).length;
   const resolvedCount = conflicts.filter(
-    (c) => c.resolution === "auto_resolved" || c.resolution === "manual_resolved"
+    (c) =>
+      c.resolution === "auto_resolved" || c.resolution === "manual_resolved",
   ).length;
   const highSeverity = conflicts.filter((c) => c.severity === "high").length;
 
   const header = <AppHeader title="Conflictos de Disponibilidad" />;
-  const sidebar = <AppSidebar />;
-
   return (
-    <MainLayout header={header} sidebar={sidebar}>
+    <MainLayout>
       <div className="space-y-6 pb-6">
         <div className="flex items-center justify-between">
           <div>
@@ -261,7 +255,7 @@ export default function ConflictosPage() {
                         <div
                           className={cn(
                             "mt-1 h-2.5 w-2.5 shrink-0 rounded-full",
-                            severityColors[conflict.severity]
+                            severityColors[conflict.severity],
                           )}
                         />
                         <div>
@@ -272,7 +266,9 @@ export default function ConflictosPage() {
                             <Badge variant="default">
                               {conflictTypeLabels[conflict.conflictType]}
                             </Badge>
-                            <Badge variant={resolutionVariant[conflict.resolution]}>
+                            <Badge
+                              variant={resolutionVariant[conflict.resolution]}
+                            >
                               {resolutionLabels[conflict.resolution]}
                             </Badge>
                           </div>
@@ -290,12 +286,16 @@ export default function ConflictosPage() {
 
                           <div className="mt-2 space-y-1 text-sm text-[var(--color-text-secondary)]">
                             <p>
-                              <span className="font-medium">{conflict.reservation1.userName}:</span>{" "}
+                              <span className="font-medium">
+                                {conflict.reservation1.userName}:
+                              </span>{" "}
                               {conflict.reservation1.purpose}
                             </p>
                             {conflict.reservation2 && (
                               <p>
-                                <span className="font-medium">{conflict.reservation2.userName}:</span>{" "}
+                                <span className="font-medium">
+                                  {conflict.reservation2.userName}:
+                                </span>{" "}
                                 {conflict.reservation2.purpose}
                               </p>
                             )}

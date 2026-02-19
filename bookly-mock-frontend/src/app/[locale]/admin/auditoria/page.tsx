@@ -65,7 +65,7 @@ export default function AuditoriaPage() {
   React.useEffect(() => {
     const fetchLogs = async () => {
       try {
-        const response = (await httpClient.get("audit/logs")) as any;
+        const response: any = await httpClient.get("audit/logs");
 
         if (response.success && response.data) {
           const data =

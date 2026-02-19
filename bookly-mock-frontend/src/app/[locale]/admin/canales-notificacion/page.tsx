@@ -3,8 +3,6 @@
 import { Badge } from "@/components/atoms/Badge/Badge";
 import { Button } from "@/components/atoms/Button/Button";
 import { Card } from "@/components/atoms/Card/Card";
-import { AppHeader } from "@/components/organisms/AppHeader";
-import { AppSidebar } from "@/components/organisms/AppSidebar/AppSidebar";
 import { MainLayout } from "@/components/templates/MainLayout";
 import {
   useNotificationChannels,
@@ -157,7 +155,7 @@ export default function CanalesNotificacionPage() {
   };
 
   return (
-    <MainLayout header={<AppHeader />} sidebar={<AppSidebar />}>
+    <MainLayout>
       <div className="space-y-6">
         <div>
           <h1 className="text-2xl font-bold text-[var(--color-text-primary)]">

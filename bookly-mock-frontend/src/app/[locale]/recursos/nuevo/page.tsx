@@ -24,8 +24,6 @@ import {
   TabsList,
   TabsTrigger,
 } from "@/components/atoms/Tabs/Tabs";
-import { AppHeader } from "@/components/organisms/AppHeader";
-import { AppSidebar } from "@/components/organisms/AppSidebar";
 import { MainLayout } from "@/components/templates/MainLayout";
 import {
   useAcademicPrograms,
@@ -602,11 +600,8 @@ export default function CreateResourcePage() {
     }
   };
 
-  const header = <AppHeader title="Crear Nuevo Recurso" />;
-  const sidebar = <AppSidebar />;
-
   return (
-    <MainLayout header={header} sidebar={sidebar}>
+    <MainLayout>
       <div className="max-w-4xl mx-auto space-y-6 pb-6">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-[var(--color-bg-primary)] p-6 rounded-xl border border-[var(--color-border-subtle)] shadow-sm">
           <div>
@@ -960,7 +955,8 @@ export default function CreateResourcePage() {
                       />
                       {formErrors.building && (
                         <p className="text-[11px] font-medium text-state-error-600 flex items-center gap-1">
-                          <AlertCircle className="w-3 h-3" /> {formErrors.building}
+                          <AlertCircle className="w-3 h-3" />{" "}
+                          {formErrors.building}
                         </p>
                       )}
                     </div>

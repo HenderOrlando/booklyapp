@@ -11,7 +11,6 @@ import {
   CardTitle,
 } from "@/components/atoms/Card";
 import { AppHeader } from "@/components/organisms/AppHeader";
-import { AppSidebar } from "@/components/organisms/AppSidebar";
 import { MainLayout } from "@/components/templates/MainLayout";
 import { httpClient } from "@/infrastructure/http";
 import { cn } from "@/lib/utils";
@@ -165,10 +164,8 @@ export default function ReasignacionPage() {
   const pendingSuggestions = suggestions.filter((s) => s.status === "pending");
 
   const header = <AppHeader title="Reasignación de Reservas" />;
-  const sidebar = <AppSidebar />;
-
   return (
-    <MainLayout header={header} sidebar={sidebar}>
+    <MainLayout>
       <div className="space-y-6 pb-6">
         <div>
           <h2 className="text-3xl font-bold text-[var(--color-text-primary)]">

@@ -1,23 +1,24 @@
 "use client";
 
-import { AppHeader } from "@/components/organisms/AppHeader";
-import { AppSidebar } from "@/components/organisms/AppSidebar/AppSidebar";
 import { ExportPanel } from "@/components/organisms/ExportPanel";
 import { UserActivityTable } from "@/components/organisms/UserActivityTable";
 import { MainLayout } from "@/components/templates/MainLayout";
 import { useReportByUser } from "@/hooks/useReportData";
 import { useReportExport } from "@/hooks/useReportExport";
+import { useRouter } from "@/i18n/navigation";
 import { mockUserReports } from "@/infrastructure/mock/data";
+import type { UserReport } from "@/types/entities/report";
 import { useTranslations } from "next-intl";
-import { useRouter } from "next/navigation";
 
 export default function ReportesUsuariosPage() {
   const t = useTranslations("reports");
   const router = useRouter();
   const { exportReport } = useReportExport();
   const { data: serverData } = useReportByUser();
-  const userData =
-    serverData && serverData.length > 0 ? serverData : mockUserReports;
+  const userData: UserReport[] =
+    Array.isArray(serverData) && serverData.length > 0
+      ? (serverData as UserReport[])
+      : (mockUserReports as UserReport[]);
 
   const handleUserClick = (userId: string) => {
     router.push(`/reportes/usuarios/${userId}`);
@@ -28,7 +29,7 @@ export default function ReportesUsuariosPage() {
   };
 
   return (
-    <MainLayout header={<AppHeader />} sidebar={<AppSidebar />}>
+    <MainLayout>
       <div className="space-y-6">
         <div className="flex items-center justify-between">
           <div>

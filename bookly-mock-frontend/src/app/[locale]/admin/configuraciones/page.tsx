@@ -291,7 +291,7 @@ export default function ConfiguracionesPage() {
 
   if (isLoading) {
     return (
-      <MainLayout header={header} sidebar={sidebar}>
+      <MainLayout>
         <div className="flex items-center justify-center h-64">
           <Loader2 className="h-8 w-8 animate-spin text-[var(--color-text-secondary)]" />
         </div>
@@ -300,7 +300,7 @@ export default function ConfiguracionesPage() {
   }
 
   return (
-    <MainLayout header={header} sidebar={sidebar}>
+    <MainLayout>
       <div className="space-y-6 pb-6">
         {/* Page Header */}
         <div className="flex items-center justify-between">

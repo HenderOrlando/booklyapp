@@ -4,8 +4,6 @@ import { ExportButton } from "@/components/atoms/ExportButton";
 import { AreaChartCard } from "@/components/molecules/AreaChartCard";
 import { ReportFilters } from "@/components/molecules/ReportFilters";
 import { ScatterChartCard } from "@/components/molecules/ScatterChartCard";
-import { AppHeader } from "@/components/organisms/AppHeader";
-import { AppSidebar } from "@/components/organisms/AppSidebar/AppSidebar";
 import { PeriodComparison } from "@/components/organisms/PeriodComparison";
 import { SavedFiltersPanel } from "@/components/organisms/SavedFiltersPanel";
 import { MainLayout } from "@/components/templates/MainLayout";
@@ -67,7 +65,7 @@ export default function ReportesAvanzadoPage() {
   };
 
   return (
-    <MainLayout header={<AppHeader />} sidebar={<AppSidebar />}>
+    <MainLayout>
       <div className="space-y-6">
         {/* Header */}
         <div className="flex items-center justify-between">

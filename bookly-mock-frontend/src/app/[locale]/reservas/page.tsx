@@ -69,7 +69,7 @@ export default function ReservasPage() {
   // Estados locales
   const [filter, setFilter] = useState("");
   const [statusFilter, setStatusFilter] = useState<ReservationStatus | "all">(
-    "all"
+    "all",
   );
   const [useVirtualScrolling, setUseVirtualScrolling] = useState(true);
   const [editingReservation, setEditingReservation] =
@@ -116,7 +116,7 @@ export default function ReservasPage() {
         onError: (error) => {
           console.error("Error al actualizar reserva:", error);
         },
-      }
+      },
     );
   };
 
@@ -152,17 +152,19 @@ export default function ReservasPage() {
 
   if (loading) {
     return (
-      <MainLayout header={header} sidebar={sidebar}>
+      <MainLayout>
         <div className="flex flex-col items-center justify-center min-h-[60vh]">
           <LoadingSpinner size="lg" />
-          <p className="mt-4 text-[var(--color-text-tertiary)]">{tCommon("loading")}</p>
+          <p className="mt-4 text-[var(--color-text-tertiary)]">
+            {tCommon("loading")}
+          </p>
         </div>
       </MainLayout>
     );
   }
 
   return (
-    <MainLayout header={header} sidebar={sidebar}>
+    <MainLayout>
       {/* Header de página */}
       <div className="space-y-6">
         <div className="flex items-center justify-between">

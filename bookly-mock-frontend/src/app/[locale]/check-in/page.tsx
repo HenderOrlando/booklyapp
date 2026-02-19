@@ -3,8 +3,6 @@
 import { Badge } from "@/components/atoms/Badge";
 import { QRCodeDisplay } from "@/components/atoms/QRCodeDisplay";
 import { CheckInOutPanel } from "@/components/molecules/CheckInOutPanel";
-import { AppHeader } from "@/components/organisms/AppHeader";
-import { AppSidebar } from "@/components/organisms/AppSidebar";
 import { MainLayout } from "@/components/templates/MainLayout";
 import {
   useCheckIn,
@@ -83,23 +81,23 @@ export default function CheckInPage() {
         onSuccess: () => {
           showSuccess(
             "Check-in exitoso",
-            "Has realizado check-in correctamente"
+            "Has realizado check-in correctamente",
           );
         },
         onError: (error: any) => {
           showError(
             "Error en check-in",
-            error?.response?.data?.message || "No se pudo realizar el check-in"
+            error?.response?.data?.message || "No se pudo realizar el check-in",
           );
         },
-      }
+      },
     );
   };
 
   const handleCheckOut = (reservationId: string) => {
     const checkInRecord = checkInHistory?.find(
       (item: CheckInOut) =>
-        item.reservationId === reservationId && item.checkInTime
+        item.reservationId === reservationId && item.checkInTime,
     );
 
     if (!checkInRecord?.id) {
@@ -117,28 +115,29 @@ export default function CheckInPage() {
         onSuccess: () => {
           showSuccess(
             "Check-out exitoso",
-            "Has realizado check-out correctamente"
+            "Has realizado check-out correctamente",
           );
         },
         onError: (error: any) => {
           showError(
             "Error en check-out",
-            error?.response?.data?.message || "No se pudo realizar el check-out"
+            error?.response?.data?.message ||
+              "No se pudo realizar el check-out",
           );
         },
-      }
+      },
     );
   };
 
   const activeReservation = userReservations?.find(
-    (r: any) => r.status === "CHECKED_IN"
+    (r: any) => r.status === "CHECKED_IN",
   );
   const upcomingReservations = userReservations?.filter(
-    (r: any) => r.status === "APPROVED"
+    (r: any) => r.status === "APPROVED",
   );
 
   return (
-    <MainLayout header={<AppHeader />} sidebar={<AppSidebar />}>
+    <MainLayout>
       <div className="space-y-6">
         {/* Header */}
         <div>
@@ -208,7 +207,7 @@ export default function CheckInPage() {
                     {
                       hour: "2-digit",
                       minute: "2-digit",
-                    }
+                    },
                   )}{" "}
                   -{" "}
                   {new Date(activeReservation.endTime).toLocaleTimeString(
@@ -216,7 +215,7 @@ export default function CheckInPage() {
                     {
                       hour: "2-digit",
                       minute: "2-digit",
-                    }
+                    },
                   )}
                 </span>
               </div>
@@ -229,7 +228,7 @@ export default function CheckInPage() {
                       weekday: "long",
                       day: "numeric",
                       month: "long",
-                    }
+                    },
                   )}
                 </span>
               </div>
@@ -275,7 +274,7 @@ export default function CheckInPage() {
                 const now = new Date();
                 const start = new Date(reservation.startTime);
                 const minutesUntilStart = Math.floor(
-                  (start.getTime() - now.getTime()) / (1000 * 60)
+                  (start.getTime() - now.getTime()) / (1000 * 60),
                 );
                 const canCheckInNow =
                   minutesUntilStart <= 15 && minutesUntilStart >= -5;
@@ -311,7 +310,7 @@ export default function CheckInPage() {
                           {
                             hour: "2-digit",
                             minute: "2-digit",
-                          }
+                          },
                         )}{" "}
                         -{" "}
                         {new Date(reservation.endTime).toLocaleTimeString(
@@ -319,7 +318,7 @@ export default function CheckInPage() {
                           {
                             hour: "2-digit",
                             minute: "2-digit",
-                          }
+                          },
                         )}
                       </div>
                       <div className="flex items-center gap-2 text-[var(--color-text-secondary)] dark:text-[var(--color-text-secondary)]">
@@ -329,7 +328,7 @@ export default function CheckInPage() {
                           {
                             day: "numeric",
                             month: "long",
-                          }
+                          },
                         )}
                       </div>
                     </div>

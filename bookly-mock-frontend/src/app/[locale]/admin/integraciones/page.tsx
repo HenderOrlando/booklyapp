@@ -11,7 +11,6 @@ import {
   CardTitle,
 } from "@/components/atoms/Card";
 import { AppHeader } from "@/components/organisms/AppHeader";
-import { AppSidebar } from "@/components/organisms/AppSidebar";
 import { MainLayout } from "@/components/templates/MainLayout";
 import { cn } from "@/lib/utils";
 import { Calendar, Link2, Mail, RefreshCw, Shield, Unlink } from "lucide-react";
@@ -174,10 +173,8 @@ export default function IntegracionesPage() {
   };
 
   const header = <AppHeader title="Integraciones" />;
-  const sidebar = <AppSidebar />;
-
   return (
-    <MainLayout header={header} sidebar={sidebar}>
+    <MainLayout>
       <div className="space-y-6 pb-6">
         {/* Header */}
         <div>

@@ -3,8 +3,6 @@
 import { Badge } from "@/components/atoms/Badge/Badge";
 import { Button } from "@/components/atoms/Button/Button";
 import { Card } from "@/components/atoms/Card/Card";
-import { AppHeader } from "@/components/organisms/AppHeader";
-import { AppSidebar } from "@/components/organisms/AppSidebar/AppSidebar";
 import { MainLayout } from "@/components/templates/MainLayout";
 import { useEvaluations } from "@/hooks/useEvaluations";
 import { cn } from "@/lib/utils";
@@ -123,7 +121,7 @@ export default function EvaluacionesPage() {
   );
 
   return (
-    <MainLayout header={<AppHeader />} sidebar={<AppSidebar />}>
+    <MainLayout>
       <div className="space-y-6">
         <div className="flex items-center justify-between">
           <div>

@@ -1,8 +1,6 @@
 "use client";
 
 import { ReportFilters } from "@/components/molecules/ReportFilters";
-import { AppHeader } from "@/components/organisms/AppHeader";
-import { AppSidebar } from "@/components/organisms/AppSidebar/AppSidebar";
 import { ExportPanel } from "@/components/organisms/ExportPanel";
 import { ResourceUtilizationChart } from "@/components/organisms/ResourceUtilizationChart";
 import { MainLayout } from "@/components/templates/MainLayout";
@@ -10,6 +8,7 @@ import { useReportByResource } from "@/hooks/useReportData";
 import { useReportExport } from "@/hooks/useReportExport";
 import { useReportFilters } from "@/hooks/useReportFilters";
 import { mockResourceUtilization } from "@/infrastructure/mock/data";
+import type { ResourceUtilization } from "@/types/entities/report";
 import { useTranslations } from "next-intl";
 
 export default function ReportesRecursosPage() {
@@ -17,15 +16,18 @@ export default function ReportesRecursosPage() {
   const { filters, setFilters } = useReportFilters();
   const { exportReport } = useReportExport();
   const { data: serverData } = useReportByResource();
-  const resourceData =
-    serverData && serverData.length > 0 ? serverData : mockResourceUtilization;
+  const resourceData: ResourceUtilization[] =
+    (serverData as ResourceUtilization[]) &&
+    (serverData as ResourceUtilization[]).length > 0
+      ? (serverData as ResourceUtilization[])
+      : mockResourceUtilization;
 
   const handleExport = (format: "csv" | "excel" | "pdf", options: any) => {
     exportReport({ format, data: resourceData, filename: "recursos" });
   };
 
   return (
-    <MainLayout header={<AppHeader />} sidebar={<AppSidebar />}>
+    <MainLayout>
       <div className="space-y-6">
         <div className="flex items-center justify-between">
           <div>

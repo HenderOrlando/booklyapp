@@ -3,8 +3,6 @@
 import { Badge } from "@/components/atoms/Badge/Badge";
 import { Button } from "@/components/atoms/Button/Button";
 import { Card } from "@/components/atoms/Card/Card";
-import { AppHeader } from "@/components/organisms/AppHeader";
-import { AppSidebar } from "@/components/organisms/AppSidebar/AppSidebar";
 import { MainLayout } from "@/components/templates/MainLayout";
 import { useComplianceReport } from "@/hooks/useReportData";
 import { cn } from "@/lib/utils";
@@ -86,7 +84,7 @@ export default function CumplimientoPage() {
   ).toFixed(1);
 
   return (
-    <MainLayout header={<AppHeader />} sidebar={<AppSidebar />}>
+    <MainLayout>
       <div className="space-y-6">
         {/* Header */}
         <div className="flex items-center justify-between">

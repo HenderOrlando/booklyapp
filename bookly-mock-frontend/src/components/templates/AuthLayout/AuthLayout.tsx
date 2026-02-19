@@ -50,8 +50,8 @@ export function AuthLayout({
         {/* Logo y Branding */}
         {showLogo && (
           <div className="text-center mb-8">
-            <div className="flex items-center justify-center mb-6">
-              <div className="relative w-48 h-16 transition-all duration-300">
+            <div className="flex items-center justify-center mb-8">
+              <div className="relative w-64 h-20 transition-all duration-300">
                 {/* Logo a color para modo claro */}
                 <div className="dark:hidden block relative w-full h-full">
                   <Image

@@ -69,16 +69,24 @@ export default function RolesAdminPage() {
     const fetchData = async () => {
       try {
         const [rolesResponse, usersResponse] = await Promise.all([
-          httpClient.get("roles"),
-          httpClient.get("users"),
+          httpClient.get("roles") as Promise<any>,
+          httpClient.get("users") as Promise<any>,
         ]);
 
         if (rolesResponse.success && rolesResponse.data) {
-          setRoles(rolesResponse.data.items || []);
+          const rolesData =
+            rolesResponse.data?.items ||
+            rolesResponse.data?.data ||
+            rolesResponse.data;
+          setRoles(Array.isArray(rolesData) ? rolesData : []);
         }
 
         if (usersResponse.success && usersResponse.data) {
-          setUsers(usersResponse.data.items || []);
+          const usersData =
+            usersResponse.data?.items ||
+            usersResponse.data?.data ||
+            usersResponse.data;
+          setUsers(Array.isArray(usersData) ? usersData : []);
         }
       } catch (err: any) {
         setError(err?.message || "Error al cargar datos");
@@ -101,7 +109,9 @@ export default function RolesAdminPage() {
       cell: (role: Role) => (
         <div>
           <div className="font-medium text-white">{role.name}</div>
-          <div className="text-sm text-[var(--color-text-tertiary)]">{role.description}</div>
+          <div className="text-sm text-[var(--color-text-tertiary)]">
+            {role.description}
+          </div>
         </div>
       ),
     },
@@ -165,7 +175,9 @@ export default function RolesAdminPage() {
           <div className="font-medium text-white">
             {user.firstName} {user.lastName}
           </div>
-          <div className="text-sm text-[var(--color-text-tertiary)]">{user.email}</div>
+          <div className="text-sm text-[var(--color-text-tertiary)]">
+            {user.email}
+          </div>
         </div>
       ),
     },
@@ -201,7 +213,7 @@ export default function RolesAdminPage() {
 
   if (loading) {
     return (
-      <MainLayout header={header} sidebar={sidebar}>
+      <MainLayout>
         <div className="flex items-center justify-center h-96">
           <div className="text-center">
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-brand-primary-500 mx-auto mb-4"></div>
@@ -215,7 +227,7 @@ export default function RolesAdminPage() {
   }
 
   return (
-    <MainLayout header={header} sidebar={sidebar}>
+    <MainLayout>
       <div className="space-y-6">
         {/* Header */}
         <div>
@@ -359,7 +371,7 @@ export default function RolesAdminPage() {
                           defaultChecked={selectedRole?.permissions.some(
                             (p) =>
                               `${p.action}_${p.resource}` === perm ||
-                              p.resource === perm.split("_")[1]
+                              p.resource === perm.split("_")[1],
                           )}
                           className="rounded"
                         />

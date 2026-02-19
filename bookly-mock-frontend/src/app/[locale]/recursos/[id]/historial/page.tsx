@@ -5,7 +5,6 @@ import { Button } from "@/components/atoms/Button";
 import {
   Card,
   CardContent,
-  CardDescription,
   CardHeader,
   CardTitle,
 } from "@/components/atoms/Card";
@@ -22,18 +21,9 @@ import { AppSidebar } from "@/components/organisms/AppSidebar";
 import { MainLayout } from "@/components/templates/MainLayout";
 import { httpClient } from "@/infrastructure/http";
 import { cn } from "@/lib/utils";
-import {
-  History,
-  ArrowLeft,
-  Download,
-  Clock,
-  User,
-  Calendar,
-  Filter,
-  ChevronRight,
-} from "lucide-react";
-import { useParams, useRouter } from "next/navigation";
+import { ArrowLeft, Calendar, Clock, Download, History } from "lucide-react";
 import { useTranslations } from "next-intl";
+import { useParams, useRouter } from "next/navigation";
 import * as React from "react";
 
 /**
@@ -142,7 +132,10 @@ const typeLabels: Record<string, string> = {
   maintenance: "Mantenimiento",
 };
 
-const typeBadgeVariant: Record<string, "success" | "error" | "warning" | "primary" | "default"> = {
+const typeBadgeVariant: Record<
+  string,
+  "success" | "error" | "warning" | "primary" | "default"
+> = {
   reservation: "success",
   cancellation: "warning",
   no_show: "error",
@@ -165,7 +158,6 @@ export default function RecursoHistorialPage() {
   React.useEffect(() => {
     const fetchHistory = async () => {
       try {
-        // Intentar cargar del backend
         const [historyRes, resourceRes] = await Promise.allSettled([
           httpClient.get(`history/search?entityId=${resourceId}&limit=50`),
           httpClient.get(`resources/${resourceId}`),
@@ -173,15 +165,19 @@ export default function RecursoHistorialPage() {
 
         if (
           historyRes.status === "fulfilled" &&
-          historyRes.value?.success &&
-          historyRes.value?.data?.records?.length > 0
+          (historyRes.value as any)?.success &&
+          (historyRes.value as any)?.data?.records
         ) {
-          // Map backend response to our interface
-          const records = historyRes.value.data.records.map((r: any) => ({
+          const records = (historyRes.value as any).data.records.map((r: any) => ({
             id: r.id || r._id,
-            type: r.action === "MAINTENANCE" ? "maintenance" :
-                  r.afterData?.status === "CANCELLED" ? "cancellation" :
-                  r.afterData?.status === "NO_SHOW" ? "no_show" : "reservation",
+            type:
+              r.action === "MAINTENANCE"
+                ? "maintenance"
+                : r.afterData?.status === "CANCELLED"
+                  ? "cancellation"
+                  : r.afterData?.status === "NO_SHOW"
+                    ? "no_show"
+                    : "reservation",
             userName: r.userId || "Unknown",
             userEmail: "",
             startDate: r.afterData?.startDate || r.timestamp,
@@ -193,16 +189,15 @@ export default function RecursoHistorialPage() {
           }));
           setHistory(records);
         } else {
-          // Usar mock data
           setHistory(mockHistory);
         }
 
         if (
           resourceRes.status === "fulfilled" &&
-          resourceRes.value?.success &&
-          resourceRes.value?.data
+          (resourceRes.value as any)?.success &&
+          (resourceRes.value as any)?.data
         ) {
-          setResourceName(resourceRes.value.data.name || "Recurso");
+          setResourceName((resourceRes.value as any).data.name || "Recurso");
         }
       } catch {
         setHistory(mockHistory);
@@ -215,7 +210,8 @@ export default function RecursoHistorialPage() {
   }, [resourceId]);
 
   const filteredHistory = history.filter((entry) => {
-    const matchesType = !filterType || filterType === "all" || entry.type === filterType;
+    const matchesType =
+      !filterType || filterType === "all" || entry.type === filterType;
     const matchesSearch =
       !searchTerm ||
       entry.userName.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -224,21 +220,26 @@ export default function RecursoHistorialPage() {
   });
 
   // Stats
-  const totalReservations = history.filter((h) => h.type === "reservation").length;
-  const totalCancellations = history.filter((h) => h.type === "cancellation").length;
+  const totalReservations = history.filter(
+    (h) => h.type === "reservation",
+  ).length;
+  const totalCancellations = history.filter(
+    (h) => h.type === "cancellation",
+  ).length;
   const totalNoShows = history.filter((h) => h.type === "no_show").length;
-  const totalMaintenance = history.filter((h) => h.type === "maintenance").length;
-
-  const header = <AppHeader title={`Historial — ${resourceName}`} />;
-  const sidebar = <AppSidebar />;
+  const totalMaintenance = history.filter(
+    (h) => h.type === "maintenance",
+  ).length;
 
   if (loading) {
     return (
-      <MainLayout header={header} sidebar={sidebar}>
+      <MainLayout>
         <div className="flex items-center justify-center h-96">
           <div className="text-center">
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-brand-primary-500 mx-auto mb-4" />
-            <p className="text-[var(--color-text-secondary)]">Cargando historial...</p>
+            <p className="text-[var(--color-text-secondary)]">
+              Cargando historial...
+            </p>
           </div>
         </div>
       </MainLayout>
@@ -246,7 +247,7 @@ export default function RecursoHistorialPage() {
   }
 
   return (
-    <MainLayout header={header} sidebar={sidebar}>
+    <MainLayout>
       <div className="space-y-6 pb-6">
         {/* Header */}
         <div className="flex items-center justify-between">
@@ -326,10 +327,7 @@ export default function RecursoHistorialPage() {
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
               />
-              <Select
-                value={filterType}
-                onValueChange={setFilterType}
-              >
+              <Select value={filterType} onValueChange={setFilterType}>
                 <SelectTrigger>
                   <SelectValue placeholder="Filtrar por tipo" />
                 </SelectTrigger>
@@ -381,7 +379,8 @@ export default function RecursoHistorialPage() {
                         entry.type === "reservation" && "bg-state-success-500",
                         entry.type === "cancellation" && "bg-state-warning-500",
                         entry.type === "no_show" && "bg-state-error-500",
-                        entry.type === "maintenance" && "bg-brand-secondary-500"
+                        entry.type === "maintenance" &&
+                          "bg-brand-secondary-500",
                       )}
                     />
 
@@ -394,11 +393,12 @@ export default function RecursoHistorialPage() {
                         <span className="text-sm font-medium text-[var(--color-text-primary)]">
                           {entry.userName}
                         </span>
-                        {entry.attendees !== undefined && entry.attendees > 0 && (
-                          <span className="text-xs text-[var(--color-text-tertiary)]">
-                            ({entry.attendees} asistentes)
-                          </span>
-                        )}
+                        {entry.attendees !== undefined &&
+                          entry.attendees > 0 && (
+                            <span className="text-xs text-[var(--color-text-tertiary)]">
+                              ({entry.attendees} asistentes)
+                            </span>
+                          )}
                       </div>
 
                       {entry.purpose && (
@@ -410,18 +410,24 @@ export default function RecursoHistorialPage() {
                       <div className="mt-1.5 flex items-center gap-4 text-xs text-[var(--color-text-tertiary)]">
                         <span className="flex items-center gap-1">
                           <Calendar className="h-3 w-3" />
-                          {new Date(entry.startDate).toLocaleDateString("es-ES", {
-                            day: "2-digit",
-                            month: "short",
-                            year: "numeric",
-                          })}
+                          {new Date(entry.startDate).toLocaleDateString(
+                            "es-ES",
+                            {
+                              day: "2-digit",
+                              month: "short",
+                              year: "numeric",
+                            },
+                          )}
                         </span>
                         <span className="flex items-center gap-1">
                           <Clock className="h-3 w-3" />
-                          {new Date(entry.startDate).toLocaleTimeString("es-ES", {
-                            hour: "2-digit",
-                            minute: "2-digit",
-                          })}
+                          {new Date(entry.startDate).toLocaleTimeString(
+                            "es-ES",
+                            {
+                              hour: "2-digit",
+                              minute: "2-digit",
+                            },
+                          )}
                           {" — "}
                           {new Date(entry.endDate).toLocaleTimeString("es-ES", {
                             hour: "2-digit",

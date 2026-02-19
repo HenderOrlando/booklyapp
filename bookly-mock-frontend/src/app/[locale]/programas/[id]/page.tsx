@@ -215,7 +215,7 @@ export default function ProgramaDetallePage({
 
   if (loading) {
     return (
-      <MainLayout header={header} sidebar={sidebar}>
+      <MainLayout>
         <div className="flex items-center justify-center h-96">
           <div className="text-center">
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-brand-primary-500 mx-auto mb-4"></div>
@@ -230,7 +230,7 @@ export default function ProgramaDetallePage({
 
   if (!program) {
     return (
-      <MainLayout header={header} sidebar={sidebar}>
+      <MainLayout>
         <Card>
           <CardContent className="py-12 text-center">
             <p className="text-foreground">{t("not_found")}</p>
@@ -244,7 +244,7 @@ export default function ProgramaDetallePage({
   }
 
   return (
-    <MainLayout header={header} sidebar={sidebar}>
+    <MainLayout>
       <div className="space-y-6 pb-6">
         {/* Header */}
         <div className="flex items-center justify-between">

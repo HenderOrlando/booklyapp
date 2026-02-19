@@ -1,8 +1,7 @@
 "use client";
 
+import { Button } from "@/components/atoms/Button";
 import { LoadingState } from "@/components/molecules/LoadingState";
-import { AppHeader } from "@/components/organisms/AppHeader";
-import { AppSidebar } from "@/components/organisms/AppSidebar/AppSidebar";
 import { MainLayout } from "@/components/templates/MainLayout";
 import { useApprovalActions } from "@/hooks/useApprovalActions";
 import { useApprovalRequest } from "@/hooks/useApprovalRequests";
@@ -133,7 +132,7 @@ export default function ApprovalDetailPage() {
 
   if (isLoading) {
     return (
-      <MainLayout header={<AppHeader />} sidebar={<AppSidebar />}>
+      <MainLayout>
         <div className="py-12">
           <LoadingState message={t("loading_detail")} />
         </div>
@@ -143,22 +142,19 @@ export default function ApprovalDetailPage() {
 
   if (error || !request) {
     return (
-      <MainLayout header={<AppHeader />} sidebar={<AppSidebar />}>
+      <MainLayout>
         <div className="max-w-4xl mx-auto py-12">
           <div className="bg-state-error-50 dark:bg-state-error-900/20 border border-red-200 dark:border-red-800 rounded-lg p-6 text-center">
             <AlertCircle className="h-12 w-12 text-state-error-600 dark:text-state-error-400 mx-auto mb-4" />
-            <h2 className="text-xl font-semibold text-red-900 dark:text-red-100 mb-2">
+            <h2 className="text-xl font-bold text-foreground mb-2">
               {t("error_loading")}
             </h2>
-            <p className="text-state-error-700 dark:text-state-error-300 mb-4">
-              {error?.message || t("request_not_found")}
+            <p className="text-[var(--color-text-secondary)] mb-6">
+              {error instanceof Error ? error.message : error || t("not_found")}
             </p>
-            <button
-              onClick={() => router.push("/aprobaciones")}
-              className="px-4 py-2 bg-state-error-600 text-foreground rounded-lg hover:bg-state-error-700"
-            >
+            <Button onClick={() => router.push("/aprobaciones")}>
               {t("back_to_list")}
-            </button>
+            </Button>
           </div>
         </div>
       </MainLayout>
@@ -166,7 +162,7 @@ export default function ApprovalDetailPage() {
   }
 
   return (
-    <MainLayout header={<AppHeader />} sidebar={<AppSidebar />}>
+    <MainLayout>
       <div className="max-w-5xl mx-auto space-y-6">
         {/* Header */}
         <div className="flex items-center gap-4">
