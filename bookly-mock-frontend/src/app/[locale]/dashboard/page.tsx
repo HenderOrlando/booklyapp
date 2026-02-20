@@ -297,96 +297,36 @@ export default function DashboardPage() {
           </>
         }
       >
-        {/* Analytics Avanzados */}
-        <div className="space-y-6">
-          {/* Métricas en Grid */}
-          <MetricsGrid columns={4} gap="md">
-            <MetricCard
-              title="Reservas Activas"
-              value={metrics?.activeReservations || 0}
-              subtitle={`Del total de ${metrics?.totalReservations || 0} este mes`}
-              trend={{
-                value: Math.abs(metrics?.delta.activeReservationsPct || 0),
-                isPositive: (metrics?.delta.activeReservationsPct || 0) >= 0,
-                label: "vs semana anterior",
-              }}
-              icon={<span className="text-2xl">📅</span>}
-              color="blue"
-              loading={loadingMetrics}
+        {/* Grid de Gráficos y Actividad */}
+        <div className="grid gap-6 lg:grid-cols-3">
+          {/* Gráfico de Tendencia */}
+          <div className="lg:col-span-2">
+            <TrendChart
+              title={t("trend_title", { fallback: "Tendencia de Reservas (Últimos 30 días)" })}
+              data={trendData}
+              color="var(--color-action-primary)"
+              height={300}
+              showGrid
             />
-            <MetricCard
-              title="Recursos Disponibles"
-              value={metrics?.availableResources || 0}
-              subtitle={`De ${metrics?.totalResources || 0} totales`}
-              icon={<span className="text-2xl">🏢</span>}
-              color="green"
-              loading={loadingMetrics}
-            />
-            <MetricCard
-              title="Aprobaciones Pendientes"
-              value={metrics?.pendingApprovals || 0}
-              subtitle="Requieren atención"
-              trend={{
-                value: Math.abs(metrics?.delta.pendingApprovalsPct || 0),
-                isPositive: (metrics?.delta.pendingApprovalsPct || 0) <= 0,
-                label: "vs semana anterior",
-              }}
-              icon={<span className="text-2xl">⏰</span>}
-              color="orange"
-              loading={loadingMetrics}
-            />
-            <MetricCard
-              title="Tasa de Uso"
-              value={`${Math.round(metrics?.utilizationRate || 0)}%`}
-              subtitle="Promedio mensual"
-              trend={{
-                value: Math.abs(metrics?.delta.utilizationRatePct || 0),
-                isPositive: (metrics?.delta.utilizationRatePct || 0) >= 0,
-              }}
-              icon={<span className="text-2xl">📊</span>}
-              color="purple"
-              loading={loadingMetrics}
-            />
-          </MetricsGrid>
+          </div>
 
-          {/* Estadísticas Rápidas */}
-          <QuickStats
-            title="Resumen de Reservas"
-            stats={quickStatsData}
-            columns={4}
-          />
-
-          {/* Grid de Gráficos y Actividad */}
-          <div className="grid gap-6 lg:grid-cols-3">
-            {/* Gráfico de Tendencia */}
-            <div className="lg:col-span-2">
-              <TrendChart
-                title="Tendencia de Reservas (Últimos 30 días)"
-                data={trendData}
-                color="#3b82f6"
-                height={250}
-                showGrid
-              />
-            </div>
-
-            {/* Actividad Reciente */}
-            <div>
-              <ActivityTimeline
-                title="Actividad Reciente"
-                activities={recentActivities}
-                maxItems={5}
-              />
-            </div>
+          {/* Actividad Reciente */}
+          <div>
+            <ActivityTimeline
+              title={t("recent_activity", { fallback: "Actividad Reciente" })}
+              activities={recentActivities}
+              maxItems={6}
+            />
           </div>
         </div>
 
-        {/* Contenido del dashboard (original) */}
+        {/* Reservas y Recursos */}
         <div className="grid gap-6 md:grid-cols-2 mt-6">
           {/* Reservas Recientes */}
-          <Card>
+          <Card className="border-[var(--color-border-subtle)] shadow-sm">
             <CardHeader>
-              <CardTitle>{t("recent_reservations")}</CardTitle>
-              <CardDescription>{t("recent_reservations_desc")}</CardDescription>
+              <CardTitle className="text-lg text-[var(--color-text-primary)]">{t("recent_reservations")}</CardTitle>
+              <CardDescription className="text-sm text-[var(--color-text-secondary)]">{t("recent_reservations_desc")}</CardDescription>
             </CardHeader>
             <CardContent>
               <div className="space-y-4">
@@ -399,10 +339,10 @@ export default function DashboardPage() {
                     {t("no_recent_reservations")}
                   </p>
                 ) : (
-                  recentReservations.slice(0, 3).map((reserva) => (
+                  recentReservations.slice(0, 5).map((reserva) => (
                     <div
                       key={reserva.id}
-                      className="flex items-center justify-between py-2 border-b last:border-0 border-[var(--color-border-subtle)]"
+                      className="flex items-center justify-between py-3 border-b last:border-0 border-[var(--color-border-subtle)]"
                     >
                       <div>
                         <p className="font-medium text-[var(--color-text-primary)]">
@@ -410,11 +350,11 @@ export default function DashboardPage() {
                         </p>
                         <p className="text-sm text-[var(--color-text-secondary)]">
                           {new Date(reserva.startAt).toLocaleDateString()} •{" "}
-                          {`${new Date(reserva.startAt).toLocaleTimeString()} - ${new Date(reserva.endAt).toLocaleTimeString()}`}
+                          {`${new Date(reserva.startAt).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})} - ${new Date(reserva.endAt).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}`}
                         </p>
                       </div>
                       <span
-                        className={`px-2 py-1 text-xs rounded-md ${RESERVATION_STATUS_CLASS[normalizeReservationStatus(reserva.status)]}`}
+                        className={`px-2.5 py-1 text-xs font-semibold rounded-full ${RESERVATION_STATUS_CLASS[normalizeReservationStatus(reserva.status)]}`}
                       >
                         {t(
                           RESERVATION_STATUS_LABEL_KEY[
@@ -430,13 +370,13 @@ export default function DashboardPage() {
           </Card>
 
           {/* Recursos Más Usados */}
-          <Card>
+          <Card className="border-[var(--color-border-subtle)] shadow-sm">
             <CardHeader>
-              <CardTitle>{t("most_used_resources")}</CardTitle>
-              <CardDescription>{t("most_used_desc")}</CardDescription>
+              <CardTitle className="text-lg text-[var(--color-text-primary)]">{t("most_used_resources")}</CardTitle>
+              <CardDescription className="text-sm text-[var(--color-text-secondary)]">{t("most_used_desc")}</CardDescription>
             </CardHeader>
             <CardContent>
-              <div className="space-y-4">
+              <div className="space-y-5">
                 {isLoading ? (
                   <p className="text-[var(--color-text-tertiary)]">
                     {tCommon("loading")}
@@ -450,17 +390,17 @@ export default function DashboardPage() {
                     .slice(0, 5)
                     .map((recurso) => (
                       <div key={recurso.id}>
-                        <div className="flex items-center justify-between mb-1">
+                        <div className="flex items-center justify-between mb-2">
                           <span className="text-sm font-medium text-[var(--color-text-primary)]">
                             {recurso.name}
                           </span>
-                          <span className="text-sm text-[var(--color-text-secondary)]">
+                          <span className="text-sm font-semibold text-[var(--color-text-secondary)]">
                             {recurso.usageCount} {t("reservations_count")}
                           </span>
                         </div>
-                        <div className="w-full bg-[var(--color-bg-muted)] rounded-full h-2 dark:bg-[var(--color-bg-tertiary)]">
+                        <div className="w-full bg-[var(--color-bg-muted)] rounded-full h-2.5 dark:bg-[var(--color-bg-tertiary)] overflow-hidden">
                           <div
-                            className="bg-brand-primary-500 h-2 rounded-full"
+                            className="bg-[var(--color-action-primary)] h-full rounded-full transition-all duration-500"
                             style={{
                               width: `${recurso.share > 0 ? recurso.share : Math.min(100, (recurso.usageCount / 30) * 100)}%`,
                             }}

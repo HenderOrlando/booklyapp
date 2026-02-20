@@ -9,6 +9,7 @@ import { ReservationsClient } from "@/infrastructure/api/reservations-client";
 import type {
   DashboardAggregatedResponse,
   DashboardIncludeSection,
+  DashboardQueryFilters,
 } from "@/types/entities/report";
 import type { Reservation } from "@/types/entities/reservation";
 import { useQuery } from "@tanstack/react-query";
@@ -185,23 +186,35 @@ const EMPTY_RESERVATION_STATS: ReservationStats = {
   averageDuration: 0,
 };
 
-async function getAggregatedDashboard(): Promise<DashboardAggregatedResponse | null> {
+async function getAggregatedDashboard(filters?: DashboardQueryFilters): Promise<DashboardAggregatedResponse | null> {
   const response = await ReportsClient.getAggregatedDashboard({
-    period: "last30",
+    period: filters?.period || "last30",
+    from: filters?.from,
+    to: filters?.to,
+    resourceTypeId: filters?.resourceTypeId,
+    locationId: filters?.locationId,
+    programId: filters?.programId,
     include: DEFAULT_DASHBOARD_INCLUDE,
   });
 
   return response.data || null;
 }
 
+interface UseAggregatedOptions {
+  filters?: DashboardQueryFilters;
+  pollingInterval?: number;
+}
+
 function useAggregatedDashboardQuery<TResult>(
   select: (payload: DashboardAggregatedResponse | null) => TResult,
+  options?: UseAggregatedOptions,
 ) {
   return useQuery<DashboardAggregatedResponse | null, Error, TResult>({
-    queryKey: dashboardKeys.aggregated(),
-    queryFn: getAggregatedDashboard,
+    queryKey: [...dashboardKeys.aggregated(), options?.filters],
+    queryFn: () => getAggregatedDashboard(options?.filters),
     select,
     staleTime: AGGREGATED_DASHBOARD_STALE_TIME,
+    refetchInterval: options?.pollingInterval,
   });
 }
 
@@ -401,9 +414,10 @@ export function useUserStats() {
  * const { data: metrics, isLoading } = useDashboardMetrics();
  * ```
  */
-export function useDashboardMetrics() {
-  return useAggregatedDashboardQuery((payload) =>
-    mapToDashboardMetrics(payload),
+export function useDashboardMetrics(pollingInterval?: number) {
+  return useAggregatedDashboardQuery(
+    (payload) => mapToDashboardMetrics(payload),
+    { pollingInterval }
   );
 }
 
