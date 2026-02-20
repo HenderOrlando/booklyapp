@@ -122,11 +122,11 @@ export function RecurringReservationPreview({
                 <div
                   className="bg-brand-primary-600 h-full transition-all duration-500 ease-out"
                   style={{
-                    ["--progress-percent" as any]: `${Math.round(
+                    ["--progress-width" as any]: `${Math.round(
                       ((progress.created + progress.failed) / progress.total) *
                         100,
                     )}%`,
-                    width: "var(--progress-percent)",
+                    width: "var(--progress-width)",
                   }}
                 />
               </div>

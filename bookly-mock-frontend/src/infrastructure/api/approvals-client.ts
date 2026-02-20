@@ -8,6 +8,7 @@ import { httpClient } from "@/infrastructure/http/httpClient";
 import type { ApiResponse } from "@/types/api/response";
 import type {
   ApprovalFilters,
+  ApprovalFlowConfig,
   ApprovalRequest,
   ApprovalStats,
   CreateApprovalRequestDto,
@@ -29,7 +30,103 @@ export interface CancelApprovalRequestDto {
   reason: string;
 }
 
+export interface CreateApprovalFlowDto {
+  name: string;
+  description: string;
+  resourceTypes: string[];
+  steps: Array<{
+    name: string;
+    approverRoles: string[];
+    order: number;
+    isRequired: boolean;
+    allowParallel: boolean;
+  }>;
+  autoApproveConditions?: Record<string, any>;
+}
+
+export interface UpdateApprovalFlowDto extends Partial<CreateApprovalFlowDto> {
+  isActive?: boolean;
+}
+
 export class ApprovalsClient {
+  /**
+   * Obtiene flujos de aprobación con filtros
+   */
+  static async getApprovalFlows(filters?: {
+    isActive?: boolean;
+    resourceType?: string;
+  }): Promise<ApiResponse<PaginatedResponse<ApprovalFlowConfig>>> {
+    return httpClient.get<PaginatedResponse<ApprovalFlowConfig>>(
+      STOCKPILE_ENDPOINTS.APPROVAL_FLOWS,
+      { params: filters }
+    );
+  }
+
+  /**
+   * Obtiene un flujo por ID
+   */
+  static async getApprovalFlowById(
+    id: string
+  ): Promise<ApiResponse<ApprovalFlowConfig>> {
+    return httpClient.get<ApprovalFlowConfig>(
+      STOCKPILE_ENDPOINTS.APPROVAL_FLOW_BY_ID(id)
+    );
+  }
+
+  /**
+   * Crea un nuevo flujo de aprobación
+   */
+  static async createApprovalFlow(
+    data: CreateApprovalFlowDto
+  ): Promise<ApiResponse<ApprovalFlowConfig>> {
+    return httpClient.post<ApprovalFlowConfig>(
+      STOCKPILE_ENDPOINTS.APPROVAL_FLOWS,
+      data
+    );
+  }
+
+  /**
+   * Actualiza un flujo de aprobación
+   */
+  static async updateApprovalFlow(
+    id: string,
+    data: UpdateApprovalFlowDto
+  ): Promise<ApiResponse<ApprovalFlowConfig>> {
+    return httpClient.patch<ApprovalFlowConfig>(
+      STOCKPILE_ENDPOINTS.APPROVAL_FLOW_BY_ID(id),
+      data
+    );
+  }
+
+  /**
+   * Elimina un flujo de aprobación
+   */
+  static async deleteApprovalFlow(id: string): Promise<ApiResponse<void>> {
+    return httpClient.delete<void>(STOCKPILE_ENDPOINTS.APPROVAL_FLOW_BY_ID(id));
+  }
+
+  /**
+   * Activa un flujo de aprobación
+   */
+  static async activateApprovalFlow(
+    id: string
+  ): Promise<ApiResponse<ApprovalFlowConfig>> {
+    return httpClient.post<ApprovalFlowConfig>(
+      `${STOCKPILE_ENDPOINTS.APPROVAL_FLOW_BY_ID(id)}/activate`
+    );
+  }
+
+  /**
+   * Desactiva un flujo de aprobación
+   */
+  static async deactivateApprovalFlow(
+    id: string
+  ): Promise<ApiResponse<ApprovalFlowConfig>> {
+    return httpClient.post<ApprovalFlowConfig>(
+      `${STOCKPILE_ENDPOINTS.APPROVAL_FLOW_BY_ID(id)}/deactivate`
+    );
+  }
+
   /**
    * Obtiene solicitudes de aprobación con filtros
    *
