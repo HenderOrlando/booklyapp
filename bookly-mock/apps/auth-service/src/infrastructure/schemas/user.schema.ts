@@ -52,7 +52,7 @@ export class User {
   tenantId: string;
 
   // Document Information
-  @Prop({ type: String, enum: ["CC", "TI", "CE", "PASSPORT"] })
+  @Prop({ type: String, enum: ["CC", "TI", "CE", "PASSPORT", "DNI", "OTHER"] })
   documentType?: string;
 
   @Prop({ type: String, trim: true })

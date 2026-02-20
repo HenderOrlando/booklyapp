@@ -67,64 +67,113 @@ async function seed() {
     // Flujos de aprobación (RF-24)
     const approvalFlows = [
       {
-        name: "Aprobación de Auditorio",
-        description: "Flujo de aprobación para reservas de auditorios",
-        resourceTypes: ["AUDITORIUM"],
+        name: "Flujo Rápido Docente",
+        description:
+          "Auto-aprobación para docentes reservando aulas de su programa. Sin intervención manual.",
+        resourceTypes: ["CLASSROOM", "LAB"],
+        steps: [],
+        autoApproveConditions: {
+          roleWhitelist: ["TEACHER", "PROFESSOR"],
+          maxDurationMinutes: 120,
+          maxAdvanceDays: 7,
+        },
+        isActive: true,
+        createdBy: systemUserId,
+        updatedBy: systemUserId,
+      },
+      {
+        name: "Flujo Estándar",
+        description:
+          "Una sola aprobación por el administrador de programa. Para estudiantes y personal no docente.",
+        resourceTypes: ["CLASSROOM", "LAB", "MEETING_ROOM"],
         steps: [
           {
-            name: "Revisión por Coordinador de Programa",
+            name: "Aprobación del administrador de programa",
             approverRoles: ["PROGRAM_ADMIN"],
             order: 1,
             isRequired: true,
             allowParallel: false,
+            timeoutHours: 48,
+          },
+        ],
+        autoApproveConditions: {
+          roleWhitelist: [],
+          maxDurationMinutes: 0,
+          maxAdvanceDays: 0,
+        },
+        isActive: true,
+        createdBy: systemUserId,
+        updatedBy: systemUserId,
+      },
+      {
+        name: "Flujo Multi-nivel (Auditorios)",
+        description:
+          "Requiere VoBo del docente responsable + aprobación del jefe de programa. Para auditorios y espacios de alto impacto.",
+        resourceTypes: ["AUDITORIUM", "CONFERENCE_HALL"],
+        steps: [
+          {
+            name: "VoBo del docente responsable del evento",
+            approverRoles: ["TEACHER"],
+            order: 1,
+            isRequired: true,
+            allowParallel: false,
+            timeoutHours: 24,
           },
           {
-            name: "Aprobación Final por Administración",
-            approverRoles: ["GENERAL_ADMIN"],
+            name: "Aprobación del director de programa",
+            approverRoles: ["PROGRAM_DIRECTOR"],
             order: 2,
             isRequired: true,
             allowParallel: false,
+            timeoutHours: 48,
           },
         ],
+        autoApproveConditions: {
+          roleWhitelist: [],
+          maxDurationMinutes: 0,
+          maxAdvanceDays: 0,
+        },
         isActive: true,
         createdBy: systemUserId,
         updatedBy: systemUserId,
       },
       {
-        name: "Aprobación de Equipo",
-        description: "Flujo de aprobación para préstamo de equipos",
-        resourceTypes: ["EQUIPMENT"],
+        name: "Flujo Eventos Institucionales",
+        description:
+          "Tres niveles de aprobación para eventos que afectan múltiples recursos o duran más de un día.",
+        resourceTypes: ["AUDITORIUM", "OUTDOOR_SPACE"],
         steps: [
           {
-            name: "Revisión por Staff Administrativo",
-            approverRoles: ["ADMINISTRATIVE_STAFF"],
+            name: "VoBo docente organizador",
+            approverRoles: ["TEACHER"],
             order: 1,
             isRequired: true,
             allowParallel: false,
+            timeoutHours: 24,
           },
-        ],
-        isActive: true,
-        createdBy: systemUserId,
-        updatedBy: systemUserId,
-      },
-      {
-        name: "Auto-aprobación de Salas",
-        description: "Aprobación automática para salas de conferencia pequeñas",
-        resourceTypes: ["MEETING_ROOM"],
-        steps: [
           {
-            name: "Aprobación Automática",
-            approverRoles: ["SYSTEM"],
-            order: 1,
-            isRequired: false,
+            name: "Aprobación del director de programa",
+            approverRoles: ["PROGRAM_DIRECTOR"],
+            order: 2,
+            isRequired: true,
             allowParallel: false,
+            timeoutHours: 48,
+          },
+          {
+            name: "Aprobación final de administración general",
+            approverRoles: ["GENERAL_ADMIN"],
+            order: 3,
+            isRequired: true,
+            allowParallel: false,
+            timeoutHours: 72,
           },
         ],
-        isActive: true,
         autoApproveConditions: {
-          maxCapacity: 20,
-          advanceBookingDays: 7,
+          roleWhitelist: [],
+          maxDurationMinutes: 0,
+          maxAdvanceDays: 0,
         },
+        isActive: false,
         createdBy: systemUserId,
         updatedBy: systemUserId,
       },
@@ -239,8 +288,8 @@ async function seed() {
 
     const PROGRAMA_SISTEMAS_ID = new Types.ObjectId("507f1f77bcf86cd799439041");
 
-    // Usamos el primer flow creado (Aprobación de Auditorio)
-    const auditoriumFlowId = insertedFlows[0]._id;
+    // Usamos el primer flow creado (Flujo Multi-nivel (Auditorios))
+    const auditoriumFlowId = insertedFlows.find(f => f.name === "Flujo Multi-nivel (Auditorios)")?._id || insertedFlows[0]._id;
 
     const today = new Date();
     const lastWeek = new Date(today);

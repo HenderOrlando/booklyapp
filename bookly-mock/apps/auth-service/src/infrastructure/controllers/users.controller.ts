@@ -1,4 +1,5 @@
 import { DeleteUserCommand } from "@auth/application/commands/delete-user.command";
+import { RegisterUserCommand } from "@auth/application/commands/register-user.command";
 import { UpdateMyProfileCommand } from "@auth/application/commands/update-my-profile.command";
 import { UpdateUserCommand } from "@auth/application/commands/update-user.command";
 import { GetUserByIdQuery } from "@auth/application/queries/get-user-by-id.query";
@@ -14,6 +15,7 @@ import {
   Get,
   Param,
   Patch,
+  Post,
   Query,
   UseGuards,
 } from "@nestjs/common";
@@ -29,6 +31,7 @@ import {
 import { Audit, AuditAction } from "@reports/audit-decorators";
 import { UpdateMyProfileDto } from "../dto/update-my-profile.dto";
 import { UpdateUserDto } from "../dto/update-user.dto";
+import { RegisterDto } from "../dto/register.dto";
 
 interface MyProfileResponseDto {
   personal: {
@@ -219,6 +222,55 @@ export class UsersController {
     const result = await this.queryBus.execute(query);
 
     return ResponseUtil.success(result, "Usuarios obtenidos exitosamente");
+  }
+
+  /**
+   * Crear nuevo usuario (Admin)
+   */
+  @Post()
+  @Roles("GENERAL_ADMIN")
+  @Audit({
+    entityType: "USER",
+    action: AuditAction.CREATED,
+    excludeFields: ["password"],
+  })
+  @ApiOperation({
+    summary: "Crear nuevo usuario",
+    description: "Crea un nuevo usuario en el sistema (solo admin general)",
+  })
+  @ApiResponse({
+    status: 201,
+    description: "Usuario creado exitosamente",
+  })
+  @ApiResponse({
+    status: 400,
+    description: "Datos de entrada inválidos",
+  })
+  async createUser(
+    @Body() dto: RegisterDto,
+    @CurrentUser("sub") adminId: string,
+  ) {
+    const command = new RegisterUserCommand(
+      {
+        email: dto.email,
+        password: dto.password,
+        firstName: dto.firstName,
+        lastName: dto.lastName,
+        roles: dto.roles,
+        permissions: dto.permissions,
+        username: dto.username,
+        phone: dto.phone,
+        documentType: dto.documentType,
+        documentNumber: dto.documentNumber,
+        tenantId: dto.tenantId,
+        programId: dto.programId,
+        coordinatedProgramId: dto.coordinatedProgramId,
+      },
+      adminId,
+    );
+
+    const user = await this.commandBus.execute(command);
+    return ResponseUtil.success(user, "Usuario creado exitosamente");
   }
 
   /**

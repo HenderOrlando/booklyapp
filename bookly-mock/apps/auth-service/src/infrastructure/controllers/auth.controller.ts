@@ -119,17 +119,22 @@ export class AuthController {
     }
 
     const command = new RegisterUserCommand(
-      dto.email,
-      dto.password,
-      dto.firstName,
-      dto.lastName,
-      dto.roles,
-      dto.permissions,
-      dto.username,
-      dto.phone,
-      dto.documentType,
-      dto.documentNumber,
-      dto.tenantId,
+      {
+        email: dto.email,
+        password: dto.password,
+        firstName: dto.firstName,
+        lastName: dto.lastName,
+        roles: dto.roles,
+        permissions: dto.permissions,
+        username: dto.username,
+        phone: dto.phone,
+        documentType: dto.documentType,
+        documentNumber: dto.documentNumber,
+        tenantId: dto.tenantId,
+        programId: dto.programId,
+        coordinatedProgramId: dto.coordinatedProgramId,
+      },
+      "system",
     );
 
     const user = await this.commandBus.execute(command);

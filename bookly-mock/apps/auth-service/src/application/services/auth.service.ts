@@ -259,21 +259,39 @@ export class AuthService {
   /**
    * Registrar nuevo usuario
    */
-  async register(
-    email: string,
-    password: string,
-    firstName: string,
-    lastName: string,
-    roles: string[],
-    permissions: string[],
-    username?: string,
-    phone?: string,
-    documentType?: string,
-    documentNumber?: string,
-    tenantId: string = "UFPS",
-    programId?: string,
-    coordinatedProgramId?: string,
-  ): Promise<UserEntity> {
+  async register(data: {
+    email: string;
+    password: string;
+    firstName: string;
+    lastName: string;
+    roles: string[];
+    permissions: string[];
+    username?: string;
+    phone?: string;
+    documentType?: string;
+    documentNumber?: string;
+    tenantId?: string;
+    programId?: string;
+    coordinatedProgramId?: string;
+    createdBy?: string;
+  }): Promise<UserEntity> {
+    const {
+      email,
+      password,
+      firstName,
+      lastName,
+      roles,
+      permissions,
+      username,
+      phone,
+      documentType,
+      documentNumber,
+      tenantId = "UFPS",
+      programId,
+      coordinatedProgramId,
+      createdBy = "system",
+    } = data;
+
     // Verificar si el email ya existe
     const existingUser = await this.userRepository.findByEmail(email);
     if (existingUser) {
@@ -307,7 +325,7 @@ export class AuthService {
       undefined, // lastLogin
       undefined, // passwordChangedAt
       {
-        createdBy: "system",
+        createdBy: createdBy,
       },
       resolvedUsername, // username
       false, // isPhoneVerified

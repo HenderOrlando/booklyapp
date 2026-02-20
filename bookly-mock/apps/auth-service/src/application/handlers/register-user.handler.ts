@@ -17,37 +17,14 @@ export class RegisterUserHandler
   ) {}
 
   async execute(command: RegisterUserCommand): Promise<UserEntity> {
-    const {
-      email,
-      password,
-      firstName,
-      lastName,
-      roles,
-      permissions,
-      username,
-      phone,
-      documentType,
-      documentNumber,
-      tenantId,
-      programId,
-      coordinatedProgramId,
-    } = command;
+    const { data, createdBy } = command;
 
-    const createdUser = await this.authService.register(
-      email,
-      password,
-      firstName,
-      lastName,
-      roles,
-      permissions,
-      username,
-      phone,
-      documentType,
-      documentNumber,
-      tenantId,
-      programId,
-      coordinatedProgramId,
-    );
+    const createdUser = await this.authService.register({
+      ...data,
+      roles: data.roles || ["STUDENT"],
+      permissions: data.permissions || [],
+      createdBy,
+    });
 
     // Publicar evento de auditoría
     this.eventBus.publish({
@@ -55,6 +32,7 @@ export class RegisterUserHandler
       userId: createdUser.id,
       email: createdUser.email,
       roles: createdUser.roles,
+      createdBy,
       timestamp: new Date(),
     });
 
