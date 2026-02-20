@@ -22,5 +22,7 @@
   "of_total": "Of {total} total",
   "require_attention": "Require attention",
   "monthly_avg": "Monthly average",
-  "resource": "Resource"
+  "resource": "Resource",
+  "trend_title": "Reservation Trend (Last 30 days)",
+  "recent_activity": "Recent Activity"
 }

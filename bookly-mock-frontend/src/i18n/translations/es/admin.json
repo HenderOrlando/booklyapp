@@ -136,5 +136,28 @@
       "aprobar": "Aprobar",
       "rechazar": "Rechazar"
     }
+  },
+  "users": {
+    "title": "Gestión de Usuarios",
+    "subtitle": "Administra los usuarios del sistema, sus roles y estados",
+    "create_new": "Nuevo Usuario",
+    "search_placeholder": "Buscar por nombre, email o código...",
+    "filter_role": "Filtrar por rol",
+    "filter_status": "Filtrar por estado",
+    "table_name": "Nombre",
+    "table_email": "Email",
+    "table_role": "Rol",
+    "table_status": "Estado",
+    "table_actions": "Acciones",
+    "status_active": "Activo",
+    "status_inactive": "Inactivo",
+    "status_blocked": "Bloqueado",
+    "edit_user": "Editar Usuario",
+    "delete_user": "Eliminar Usuario",
+    "delete_confirm": "¿Estás seguro de eliminar este usuario?",
+    "success_create": "Usuario creado exitosamente",
+    "success_update": "Usuario actualizado exitosamente",
+    "error_create": "Error al crear el usuario",
+    "error_update": "Error al actualizar el usuario"
   }
 }

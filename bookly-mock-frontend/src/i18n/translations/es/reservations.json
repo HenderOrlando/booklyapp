@@ -135,6 +135,16 @@
   "no_results_title": "No se encontraron reservas",
   "no_results_desc": "No hay reservas que coincidan con los filtros aplicados.",
   "empty_desc": "Aún no hay reservas registradas. Crea la primera reserva para comenzar.",
+  "stats": {
+    "total": "Total Reservas",
+    "pending": "Pendientes",
+    "confirmed": "Confirmadas",
+    "in_progress": "En Progreso",
+    "completed": "Completadas",
+    "cancelled": "Canceladas",
+    "rejected": "Rechazadas",
+    "utilization": "Tasa de Uso"
+  },
   "statuses": {
     "PENDING": "Pendiente",
     "CONFIRMED": "Confirmada",

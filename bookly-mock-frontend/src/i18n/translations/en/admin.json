@@ -136,5 +136,28 @@
       "aprobar": "Approve",
       "rechazar": "Reject"
     }
+  },
+  "users": {
+    "title": "User Management",
+    "subtitle": "Manage system users, their roles and statuses",
+    "create_new": "New User",
+    "search_placeholder": "Search by name, email or code...",
+    "filter_role": "Filter by role",
+    "filter_status": "Filter by status",
+    "table_name": "Name",
+    "table_email": "Email",
+    "table_role": "Role",
+    "table_status": "Status",
+    "table_actions": "Actions",
+    "status_active": "Active",
+    "status_inactive": "Inactive",
+    "status_blocked": "Blocked",
+    "edit_user": "Edit User",
+    "delete_user": "Delete User",
+    "delete_confirm": "Are you sure you want to delete this user?",
+    "success_create": "User created successfully",
+    "success_update": "User updated successfully",
+    "error_create": "Error creating user",
+    "error_update": "Error updating user"
   }
 }
