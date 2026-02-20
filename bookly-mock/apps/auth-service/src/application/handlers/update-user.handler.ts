@@ -38,6 +38,10 @@ export class UpdateUserHandler implements ICommandHandler<UpdateUserCommand> {
       updateData.isEmailVerified = command.data.isEmailVerified;
     if (command.data.isPhoneVerified !== undefined)
       updateData.isPhoneVerified = command.data.isPhoneVerified;
+    if (command.data.programId !== undefined)
+      updateData.programId = command.data.programId;
+    if (command.data.coordinatedProgramId !== undefined)
+      updateData.coordinatedProgramId = command.data.coordinatedProgramId;
     updateData["audit.updatedBy"] = command.updatedBy;
 
     const updated = await this.userRepository.update(

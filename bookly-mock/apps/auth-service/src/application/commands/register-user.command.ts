@@ -15,5 +15,7 @@ export class RegisterUserCommand {
     public readonly documentType?: string,
     public readonly documentNumber?: string,
     public readonly tenantId?: string,
+    public readonly programId?: string,
+    public readonly coordinatedProgramId?: string,
   ) {}
 }

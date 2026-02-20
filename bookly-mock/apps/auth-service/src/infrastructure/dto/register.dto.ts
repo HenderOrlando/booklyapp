@@ -117,4 +117,22 @@ export class RegisterDto {
   @IsString({ message: "tenantId debe ser un string" })
   @IsOptional()
   tenantId?: string;
+
+  @ApiProperty({
+    description: "ID del programa académico",
+    example: "115",
+    required: false,
+  })
+  @IsString({ message: "programId debe ser un string" })
+  @IsOptional()
+  programId?: string;
+
+  @ApiProperty({
+    description: "ID del programa coordinado",
+    example: "115",
+    required: false,
+  })
+  @IsString({ message: "coordinatedProgramId debe ser un string" })
+  @IsOptional()
+  coordinatedProgramId?: string;
 }

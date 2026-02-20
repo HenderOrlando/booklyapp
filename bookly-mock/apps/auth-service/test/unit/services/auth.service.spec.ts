@@ -35,6 +35,8 @@ describe("AuthService", () => {
     address: null,
     preferences: {},
     lastLogin: null,
+    programId: null,
+    coordinatedProgramId: null,
     createdAt: new Date(),
     updatedAt: new Date(),
     deletedAt: null,

@@ -271,6 +271,8 @@ export class AuthService {
     documentType?: string,
     documentNumber?: string,
     tenantId: string = "UFPS",
+    programId?: string,
+    coordinatedProgramId?: string,
   ): Promise<UserEntity> {
     // Verificar si el email ya existe
     const existingUser = await this.userRepository.findByEmail(email);
@@ -315,6 +317,8 @@ export class AuthService {
       phone,
       documentType,
       documentNumber,
+      programId,
+      coordinatedProgramId,
     );
 
     const createdUser = await this.userRepository.create(user);

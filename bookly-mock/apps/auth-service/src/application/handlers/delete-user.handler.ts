@@ -25,6 +25,14 @@ export class DeleteUserHandler implements ICommandHandler<DeleteUserCommand> {
       isActive: false,
     } as any);
 
+    // Publicar evento de auditoría
+    this.eventBus.publish({
+      type: "USER_DELETED",
+      userId: command.userId,
+      deletedBy: command.deletedBy,
+      timestamp: new Date(),
+    });
+
     return { id: command.userId, deleted: true };
   }
 }

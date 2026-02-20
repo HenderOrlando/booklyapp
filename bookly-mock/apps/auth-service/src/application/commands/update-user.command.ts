@@ -15,6 +15,8 @@ export class UpdateUserCommand {
       isActive?: boolean;
       isEmailVerified?: boolean;
       isPhoneVerified?: boolean;
+      programId?: string;
+      coordinatedProgramId?: string;
     },
     public readonly updatedBy: string,
   ) {}

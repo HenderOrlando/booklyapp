@@ -102,4 +102,22 @@ export class UpdateUserDto {
   @IsBoolean({ message: "isPhoneVerified debe ser un booleano" })
   @IsOptional()
   isPhoneVerified?: boolean;
+
+  @ApiProperty({
+    description: "ID del programa académico",
+    example: "115",
+    required: false,
+  })
+  @IsString({ message: "programId debe ser un string" })
+  @IsOptional()
+  programId?: string;
+
+  @ApiProperty({
+    description: "ID del programa coordinado",
+    example: "115",
+    required: false,
+  })
+  @IsString({ message: "coordinatedProgramId debe ser un string" })
+  @IsOptional()
+  coordinatedProgramId?: string;
 }
