@@ -46,6 +46,8 @@
     "active": "Activas",
     "inactive": "Inactivas",
     "search_label": "Búsqueda",
+    "search_placeholder": "Buscar por nombre, código...",
     "status_label": "Estado"
-  }
+  },
+  "delete_confirm_button": "Eliminar"
 }

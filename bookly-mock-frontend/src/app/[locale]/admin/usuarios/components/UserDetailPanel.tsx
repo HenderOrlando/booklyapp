@@ -14,6 +14,8 @@ import {
   CardTitle,
 } from "@/components/atoms/Card";
 import { Input } from "@/components/atoms/Input";
+import { Skeleton } from "@/components/atoms/Skeleton";
+import { usePrograms } from "@/hooks/usePrograms";
 import type { Permission, User } from "@/types/entities/user";
 import { UserStatus } from "@/types/entities/user";
 import { useTranslations } from "next-intl";
@@ -23,8 +25,10 @@ interface UserDetailPanelProps {
   show: boolean;
   user: User | null;
   filterPermissions: string;
+  isLoading?: boolean;
   isDeleting?: boolean;
   onClose: () => void;
+  onEdit?: (user: User) => void;
   onDelete?: (userId: string) => void;
   onFilterPermissionsChange: (value: string) => void;
 }
@@ -33,17 +37,19 @@ export function UserDetailPanel({
   show,
   user,
   filterPermissions,
+  isLoading = false,
   isDeleting = false,
   onClose,
+  onEdit,
   onDelete,
   onFilterPermissionsChange,
 }: UserDetailPanelProps) {
   const t = useTranslations("admin.users");
-
-  if (!show || !user) return null;
+  const { data: programs = [] } = usePrograms();
 
   // Obtener permisos efectivos de todos los roles del usuario
   const effectivePermissions = React.useMemo(() => {
+    if (!user) return [];
     const permsMap = new Map<string, Permission>();
     user.roles.forEach((role) => {
       role.permissions.forEach((perm) => {
@@ -53,7 +59,60 @@ export function UserDetailPanel({
       });
     });
     return Array.from(permsMap.values());
-  }, [user.roles]);
+  }, [user]);
+
+  if (!show) return null;
+
+  // Render Skeleton while loading
+  if (isLoading || !user) {
+    return (
+      <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+        <div className="w-full max-w-5xl max-h-[90vh] overflow-y-auto">
+          <Card>
+            <CardHeader>
+              <div className="flex items-center justify-between">
+                <div className="space-y-2">
+                  <Skeleton className="h-8 w-48" />
+                  <Skeleton className="h-4 w-64" />
+                </div>
+                <Button variant="outline" size="sm" onClick={onClose}>✕</Button>
+              </div>
+            </CardHeader>
+            <CardContent className="space-y-8">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <div className="space-y-4">
+                  <Skeleton className="h-6 w-32" />
+                  <div className="grid grid-cols-2 gap-4">
+                    {[...Array(4)].map((_, i) => (
+                      <div key={i} className="space-y-1">
+                        <Skeleton className="h-3 w-16" />
+                        <Skeleton className="h-5 w-full" />
+                      </div>
+                    ))}
+                  </div>
+                </div>
+                <div className="space-y-4">
+                  <Skeleton className="h-6 w-32" />
+                  <div className="flex gap-4">
+                    <Skeleton className="h-10 w-24 rounded-full" />
+                    <Skeleton className="h-10 w-24 rounded-full" />
+                  </div>
+                </div>
+              </div>
+              <div className="space-y-4">
+                <Skeleton className="h-6 w-40" />
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  {[...Array(2)].map((_, i) => (
+                    <Skeleton key={i} className="h-24 w-full rounded-lg" />
+                  ))}
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      </div>
+    );
+  }
 
   const filteredPermissions = effectivePermissions.filter(
     (p: Permission) =>
@@ -156,6 +215,32 @@ export function UserDetailPanel({
                   </div>
                 </div>
               </div>
+
+              {/* Información de Programa */}
+              {(user.programId || user.coordinatedProgramId) && (
+                <div className="grid grid-cols-2 gap-4 mt-4">
+                  <div>
+                    <label className="text-sm font-medium text-[var(--color-text-tertiary)]">
+                      {t("program_id") || "Programa Académico"}
+                    </label>
+                    <div className="text-foreground mt-1">
+                      {programs.find((p) => p.id === user.programId)?.name ||
+                        user.programId ||
+                        t("not_provided")}
+                    </div>
+                  </div>
+                  <div>
+                    <label className="text-sm font-medium text-[var(--color-text-tertiary)]">
+                      {t("coordinated_program_id") || "Programa Coordinado"}
+                    </label>
+                    <div className="text-foreground mt-1">
+                      {programs.find((p) => p.id === user.coordinatedProgramId)?.name ||
+                        user.coordinatedProgramId ||
+                        t("not_provided")}
+                    </div>
+                  </div>
+                </div>
+              )}
 
               {/* Documento */}
               {(user.documentType || user.documentNumber) && (
@@ -323,12 +408,22 @@ export function UserDetailPanel({
             </div>
 
             {/* Botones de acción */}
-            <div className="flex gap-2 justify-end">
+            <div className="flex gap-3 justify-end pt-6 border-t border-[var(--color-border-strong)]">
+              {onEdit && (
+                <Button
+                  variant="outline"
+                  onClick={() => onEdit(user)}
+                  disabled={isDeleting}
+                >
+                  {t("edit")}
+                </Button>
+              )}
               {onDelete && user.status !== UserStatus.SUSPENDED && (
                 <Button
                   variant="destructive"
                   onClick={() => onDelete(user.id)}
                   disabled={isDeleting}
+                  className="bg-state-error-600 hover:bg-state-error-700 text-white"
                 >
                   {isDeleting ? (
                     <>

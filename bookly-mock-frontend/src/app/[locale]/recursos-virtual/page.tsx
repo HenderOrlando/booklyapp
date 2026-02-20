@@ -42,8 +42,8 @@ export default function RecursosVirtualPage() {
     categoryId: "",
   });
 
-  const header = <AppHeader title={t("virtual_scrolling_title")} />;
-  const sidebar = <AppSidebar />;
+  const _header = <AppHeader title={t("virtual_scrolling_title")} />;
+  const _sidebar = <AppSidebar />;
 
   const handleFilterChange = (key: string, value: string) => {
     setFilters((prev) => ({ ...prev, [key]: value }));

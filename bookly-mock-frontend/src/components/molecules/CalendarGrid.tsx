@@ -27,11 +27,11 @@ export function CalendarGrid({
   onDateClick,
   onDayDrop,
   onEventDrop,
-  draggedResource,
-  draggedEvent,
+  draggedResource: _draggedResource,
+  draggedEvent: _draggedEvent,
   firstDayOfWeek = 1, // Lunes por defecto
 }: CalendarGridProps) {
-  const [dragOverDay, setDragOverDay] = useState<string | null>(null);
+  const [dragOverDay, _setDragOverDay] = useState<string | null>(null);
   // Generar nombres de días de la semana
   const weekDays = Array.from({ length: 7 }, (_, i) => {
     const date = addDays(

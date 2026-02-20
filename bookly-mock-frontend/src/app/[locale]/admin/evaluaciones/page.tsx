@@ -110,8 +110,8 @@ function ScoreStars({ score }: { score: number }) {
 }
 
 export default function EvaluacionesPage() {
-  const t = useTranslations("admin");
-  const { data: evaluations = mockEvaluations, isLoading } = useEvaluations();
+  const _t = useTranslations("admin");
+  const { data: evaluations = mockEvaluations, isLoading: _isLoading } = useEvaluations();
   const [search, setSearch] = React.useState("");
 
   const filtered = evaluations.filter(

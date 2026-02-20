@@ -142,7 +142,7 @@ export function useDragConflictValidator() {
       newStart.setHours(event.start.getHours(), event.start.getMinutes(), 0, 0);
 
       const duration = event.end.getTime() - event.start.getTime();
-      const newEnd = new Date(newStart.getTime() + duration);
+      const _newEnd = new Date(newStart.getTime() + duration);
 
       // Por ahora retornamos sin conflicto, pero esto debería
       // hacer una query real al hook useConflictValidator

@@ -201,17 +201,17 @@ export class WebSocketClient {
     const trimmedUrl = url.trim();
 
     if (!trimmedUrl) {
-      return `http://localhost:3000${GATEWAY_WS_NAMESPACE}`;
+      return "http://localhost:3000";
     }
 
     const [withoutQuery] = trimmedUrl.split("?");
     const normalized = withoutQuery.replace(/\/+$/, "");
 
     if (normalized.endsWith(GATEWAY_WS_NAMESPACE)) {
-      return normalized;
+      return normalized.replace(GATEWAY_WS_NAMESPACE, "");
     }
 
-    return `${normalized}${GATEWAY_WS_NAMESPACE}`;
+    return normalized;
   }
 
   private normalizeEventName(eventName: string): string {

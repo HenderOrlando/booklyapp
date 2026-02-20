@@ -28,6 +28,7 @@ jest.mock("next-intl", () => ({
 // Mock i18n navigation
 jest.mock("@/i18n/navigation", () => ({
   Link: ({ children, href, ...props }: any) => {
+    // eslint-disable-next-line @typescript-eslint/no-var-requires
     const { createElement } = require("react");
     return createElement("a", { href, ...props }, children);
   },

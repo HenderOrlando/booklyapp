@@ -357,12 +357,11 @@ export default function RecursoDetailPage() {
       router.push(`/${locale}/recursos`);
     } catch (err) {
       console.error("Error al eliminar recurso:", err);
-      alert(t("delete_error"));
     }
   };
 
-  const header = <AppHeader title={t("title")} />;
-  const sidebar = <AppSidebar />;
+  const _header = <AppHeader title={t("title")} />;
+  const _sidebar = <AppSidebar />;
 
   const resourceTypeLabel = React.useMemo(() => {
     if (!resource) return "";

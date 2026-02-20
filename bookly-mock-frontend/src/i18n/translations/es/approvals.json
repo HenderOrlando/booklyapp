@@ -53,5 +53,18 @@
     "high": "Alta",
     "normal": "Normal",
     "low": "Baja"
-  }
+  },
+  "history_title": "Historial de Aprobaciones",
+  "history_description": "Registro completo de todas las aprobaciones",
+  "export_csv": "Exportar CSV",
+  "search_history_placeholder": "Buscar por usuario, recurso o propósito...",
+  "all_statuses": "Todos los estados",
+  "status_expired": "Expiradas",
+  "reviewed_at": "Revisada:",
+  "reservation_date": "Fecha de Reserva",
+  "attendees_count": "{count} asistentes",
+  "rejection_reason_title": "Razón de Rechazo",
+  "action_history": "Historial de Acciones",
+  "no_records_found": "No se encontraron registros",
+  "showing_records": "Mostrando {count} de {total} registros"
 }

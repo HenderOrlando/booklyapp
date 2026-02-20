@@ -1,22 +1,30 @@
 import { Badge } from "@/components/atoms/Badge";
 import { Card, CardContent } from "@/components/atoms/Card";
+import { Input } from "@/components/atoms/Input";
+import { CheckInClient } from "@/infrastructure/api/check-in-client";
 import type {
   ActiveReservationView,
   VigilanceAlert,
   VigilanceAlertType,
 } from "@/types/entities/checkInOut";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { format } from "date-fns";
-import { es } from "date-fns/locale";
 import {
   AlertCircle,
   Bell,
   CheckCircle,
   Clock,
+  ExternalLink,
+  Filter,
   MapPin,
   Phone,
+  QrCode,
+  Search,
+  Shield,
   User,
   XCircle,
 } from "lucide-react";
+import { useTranslations } from "next-intl";
 import * as React from "react";
 
 /**
@@ -24,16 +32,7 @@ import * as React from "react";
  *
  * Panel de vigilancia en tiempo real que muestra reservas activas,
  * con retraso y alertas. Usado por personal de seguridad.
- *
- * @example
- * ```tsx
- * <VigilancePanel
- *   activeReservations={active}
- *   overdueReservations={overdue}
- *   alerts={alerts}
- *   onContact={handleContact}
- * />
- * ```
+ * Incluye búsqueda y filtros avanzados.
  */
 
 export interface VigilancePanelProps {
@@ -56,48 +55,48 @@ export interface VigilancePanelProps {
 const ALERT_TYPE_CONFIG: Record<
   VigilanceAlertType,
   {
-    label: string;
+    labelKey: string;
     variant: "error" | "warning" | "default";
     icon: React.ComponentType<{ className?: string }>;
   }
 > = {
   NO_CHECK_IN: {
-    label: "Sin Check-in",
+    labelKey: "alert_no_checkin",
     variant: "error",
     icon: XCircle,
   },
   LATE_CHECK_IN: {
-    label: "Check-in Tardío",
+    labelKey: "alert_late_checkin",
     variant: "warning",
     icon: Clock,
   },
   NO_CHECK_OUT: {
-    label: "Sin Check-out",
+    labelKey: "alert_no_checkout",
     variant: "warning",
     icon: AlertCircle,
   },
   LATE_CHECK_OUT: {
-    label: "Check-out Tardío",
+    labelKey: "alert_late_checkout",
     variant: "warning",
     icon: Clock,
   },
   SUSPICIOUS_ACTIVITY: {
-    label: "Actividad Sospechosa",
+    labelKey: "alert_suspicious",
     variant: "error",
     icon: AlertCircle,
   },
   UNAUTHORIZED_ACCESS: {
-    label: "Acceso No Autorizado",
+    labelKey: "alert_unauthorized",
     variant: "error",
     icon: XCircle,
   },
   RESOURCE_ISSUE: {
-    label: "Problema con Recurso",
+    labelKey: "alert_resource_issue",
     variant: "warning",
     icon: AlertCircle,
   },
   EMERGENCY: {
-    label: "Emergencia",
+    labelKey: "alert_emergency",
     variant: "error",
     icon: XCircle,
   },
@@ -113,18 +112,58 @@ export const VigilancePanel = React.memo<VigilancePanelProps>(
     loading = false,
     className = "",
   }) => {
+    const t = useTranslations("vigilance");
     const [selectedTab, setSelectedTab] = React.useState<
       "active" | "overdue" | "alerts"
     >("active");
+    const [searchQuery, setSearchQuery] = React.useState("");
+    const [filterType, setFilterType] = React.useState<string>("all");
+    const queryClient = useQueryClient();
 
-    // Estadísticas
+    // Mutations para Check-in/out real
+    const checkOutMutation = useMutation({
+      mutationFn: (reservationId: string) => CheckInClient.checkOut({
+        reservationId,
+        checkInId: reservationId,
+        method: "MANUAL",
+        vigilantId: "current_vigilant",
+      }),
+      onSuccess: () => {
+        queryClient.invalidateQueries({ queryKey: ["vigilance-data"] });
+      },
+    });
+
+    // Filtros aplicados
+    const filteredActive = React.useMemo(() => {
+      return activeReservations.filter((res) => {
+        const matchesSearch = 
+          res.userName.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          res.resourceName.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          res.reservationId.toLowerCase().includes(searchQuery.toLowerCase());
+        const matchesType = filterType === "all" || res.resourceType === filterType;
+        return matchesSearch && matchesType;
+      });
+    }, [activeReservations, searchQuery, filterType]);
+
+    const filteredOverdue = React.useMemo(() => {
+      return overdueReservations.filter((res) => {
+        const matchesSearch = 
+          res.userName.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          res.resourceName.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          res.reservationId.toLowerCase().includes(searchQuery.toLowerCase());
+        const matchesType = filterType === "all" || res.resourceType === filterType;
+        return matchesSearch && matchesType;
+      });
+    }, [overdueReservations, searchQuery, filterType]);
+
+    // Estadísticas actualizadas según filtros
     const stats = React.useMemo(
       () => ({
-        totalActive: activeReservations.length,
-        totalOverdue: overdueReservations.length,
+        totalActive: filteredActive.length,
+        totalOverdue: filteredOverdue.length,
         totalAlerts: alerts.filter((a) => !a.isResolved).length,
       }),
-      [activeReservations, overdueReservations, alerts],
+      [filteredActive, filteredOverdue, alerts],
     );
 
     const renderReservationCard = (
@@ -142,106 +181,153 @@ export const VigilancePanel = React.memo<VigilancePanelProps>(
       return (
         <Card
           key={reservation.reservationId}
-          className={`${
+          className={`group transition-all hover:shadow-md ${
             isOverdue
-              ? "border-[var(--color-state-error-border)] bg-[var(--color-state-error-bg)]"
-              : ""
+              ? "border-red-200 bg-red-50/30 dark:border-red-900/30 dark:bg-red-900/10"
+              : "border-slate-200 dark:border-slate-800"
           }`}
         >
           <CardContent className="p-4">
-            <div className="space-y-3">
+            <div className="space-y-4">
               {/* Header con estado */}
               <div className="flex items-start justify-between">
                 <div className="flex-1">
-                  <h4 className="font-semibold text-[var(--color-text-primary)] dark:text-[var(--color-text-inverse)]">
-                    {reservation.resourceName}
-                  </h4>
-                  <div className="flex items-center gap-2 mt-1 text-sm text-[var(--color-text-secondary)] dark:text-[var(--color-text-tertiary)]">
+                  <div className="flex items-center gap-2">
+                    <h4 className="font-bold text-lg text-slate-900 dark:text-slate-100">
+                      {reservation.resourceName}
+                    </h4>
+                    <button 
+                      title={t("view_resource_details")}
+                      className="p-1 text-slate-400 hover:text-brand-primary-500 transition-colors"
+                    >
+                      <ExternalLink className="h-4 w-4" />
+                    </button>
+                  </div>
+                  <div className="flex items-center gap-2 mt-1 text-sm text-slate-500 dark:text-slate-400">
                     <MapPin className="h-3.5 w-3.5" />
                     <span>{reservation.resourceType}</span>
+                    <span className="text-slate-300">|</span>
+                    <span className="font-mono text-xs bg-slate-100 dark:bg-slate-800 px-1.5 py-0.5 rounded">
+                      {reservation.reservationId}
+                    </span>
                   </div>
                 </div>
                 <div className="flex flex-col items-end gap-1">
                   {reservation.status === "CHECKED_IN" ||
                   reservation.status === "CHECKED_OUT" ? (
-                    <Badge variant="success" className="text-xs">
+                    <Badge variant="success" className="animate-pulse-subtle">
                       <CheckCircle className="h-3 w-3 mr-1" />
-                      Check-in OK
+                      {t("badge_in_use")}
                     </Badge>
                   ) : isOverdue ? (
-                    <Badge variant="error" className="text-xs">
+                    <Badge variant="error" className="animate-bounce-subtle">
                       <XCircle className="h-3 w-3 mr-1" />
-                      Sin Check-in
+                      {t("badge_overdue")}
                     </Badge>
                   ) : (
-                    <Badge variant="warning" className="text-xs">
+                    <Badge variant="warning">
                       <Clock className="h-3 w-3 mr-1" />
-                      Pendiente
+                      {t("badge_upcoming")}
                     </Badge>
                   )}
                 </div>
               </div>
 
-              {/* Usuario */}
-              <div className="flex items-center gap-2 text-sm">
-                <User className="h-4 w-4 text-[var(--color-text-secondary)] dark:text-[var(--color-text-tertiary)]" />
-                <span className="font-medium text-[var(--color-text-primary)] dark:text-[var(--color-text-inverse)]">
-                  {reservation.userName}
-                </span>
-                {reservation.userEmail && (
-                  <span className="text-xs text-[var(--color-text-secondary)] dark:text-[var(--color-text-tertiary)]">
-                    {reservation.userEmail}
-                  </span>
-                )}
-              </div>
-
-              {/* Horario */}
-              <div className="flex items-center gap-4 text-sm text-[var(--color-text-secondary)] dark:text-[var(--color-text-tertiary)]">
-                <div className="flex items-center gap-1">
-                  <Clock className="h-3.5 w-3.5" />
-                  <span>
-                    {format(start, "HH:mm")} - {format(end, "HH:mm")}
-                  </span>
+              {/* Grid de Información Principal */}
+              <div className="grid grid-cols-2 gap-4 py-3 border-y border-slate-100 dark:border-slate-800">
+                <div className="space-y-1">
+                  <p className="text-[10px] uppercase tracking-wider font-semibold text-slate-400">{t("label_user")}</p>
+                  <div className="flex items-center gap-2">
+                    <div className="h-7 w-7 rounded-full bg-brand-primary-100 dark:bg-brand-primary-900/30 flex items-center justify-center text-brand-primary-700 dark:text-brand-primary-300">
+                      <User className="h-4 w-4" />
+                    </div>
+                    <div>
+                      <p className="text-sm font-semibold text-slate-800 dark:text-slate-200 truncate max-w-[120px]">
+                        {reservation.userName}
+                      </p>
+                      <p className="text-[10px] text-slate-500 truncate max-w-[120px]">
+                        {reservation.userEmail}
+                      </p>
+                    </div>
+                  </div>
                 </div>
-                {isActive && (
-                  <span className="text-xs text-[var(--color-state-success-text)]">
-                    • En curso
-                  </span>
-                )}
+
+                <div className="space-y-1">
+                  <p className="text-[10px] uppercase tracking-wider font-semibold text-slate-400">{t("label_schedule")}</p>
+                  <div className="flex items-center gap-2">
+                    <div className="h-7 w-7 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-slate-600 dark:text-slate-400">
+                      <Clock className="h-4 w-4" />
+                    </div>
+                    <div>
+                      <p className="text-sm font-bold text-slate-800 dark:text-slate-200">
+                        {format(start, "HH:mm")} - {format(end, "HH:mm")}
+                      </p>
+                      <p className="text-[10px] text-slate-500">
+                        {isActive ? t("in_progress") : t("today")}
+                      </p>
+                    </div>
+                  </div>
+                </div>
               </div>
 
-              {/* Alerta de retraso */}
+              {/* Alerta de retraso mejorada */}
               {isOverdue && (
-                <div className="flex items-start gap-2 p-2 rounded-md bg-[var(--color-state-error-bg)] text-[var(--color-state-error-text)] text-sm">
-                  <AlertCircle className="h-4 w-4 flex-shrink-0 mt-0.5" />
+                <div className="flex items-start gap-3 p-3 rounded-lg bg-red-50 dark:bg-red-900/20 text-red-700 dark:text-red-400 border border-red-100 dark:border-red-900/40">
+                  <AlertCircle className="h-5 w-5 flex-shrink-0" />
                   <div>
-                    <p className="font-medium">
-                      Retraso de {minutesOverdue} minutos
+                    <p className="text-sm font-bold">
+                      {t("overdue_warning", { minutes: minutesOverdue })}
                     </p>
-                    <p className="text-xs mt-1">
-                      No se ha realizado check-in. Contacte al usuario.
+                    <p className="text-xs opacity-90 leading-relaxed">
+                      {t("overdue_recommendation")}
                     </p>
                   </div>
                 </div>
               )}
 
-              {/* Información de check-in */}
-              {reservation.checkInTime && (
-                <div className="text-xs text-[var(--color-text-secondary)] dark:text-[var(--color-text-tertiary)]">
-                  Check-in:{" "}
-                  {format(new Date(reservation.checkInTime), "HH:mm:ss")}
-                </div>
-              )}
+              {/* Información de check-in / QR */}
+              <div className="flex items-center justify-between text-xs">
+                {reservation.checkInTime ? (
+                  <div className="flex items-center gap-1.5 text-slate-500">
+                    <CheckCircle className="h-3.5 w-3.5 text-green-500" />
+                    <span>{t("checkin_at")} <span className="font-semibold text-slate-700 dark:text-slate-300">{format(new Date(reservation.checkInTime), "HH:mm:ss")}</span></span>
+                  </div>
+                ) : (
+                  <div className="flex items-center gap-1.5 text-slate-400 italic">
+                    <QrCode className="h-3.5 w-3.5" />
+                    <span>{t("waiting_qr")}</span>
+                  </div>
+                )}
+                
+                {reservation.qrCode && (
+                  <button 
+                    title={t("view_qr")}
+                    className="text-brand-primary-600 hover:underline font-medium"
+                  >
+                    {t("view_qr")}
+                  </button>
+                )}
+              </div>
 
-              {/* Acciones */}
-              <div className="flex gap-2 pt-2 border-t border-[var(--color-border-subtle)] dark:border-[var(--color-border-strong)]">
+              {/* Acciones Expandidas */}
+              <div className="flex gap-2 pt-2">
                 {onContact && (
                   <button
                     onClick={() => onContact(reservation.reservationId)}
-                    className="flex-1 flex items-center justify-center gap-2 px-3 py-2 text-sm font-medium text-[var(--color-action-primary)] border border-[var(--color-action-primary)] rounded-lg hover:bg-[var(--color-action-primary)] hover:text-[var(--color-text-inverse)] transition-colors"
+                    className="flex-1 flex items-center justify-center gap-2 px-3 py-2.5 text-sm font-bold text-slate-700 dark:text-slate-200 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-700 transition-all shadow-sm"
                   >
-                    <Phone className="h-4 w-4" />
-                    Contactar
+                    <Phone className="h-4 w-4 text-brand-primary-500" />
+                    {t("contact")}
+                  </button>
+                )}
+                {reservation.canCheckOut && (
+                  <button
+                    onClick={() => checkOutMutation.mutate(reservation.reservationId)}
+                    disabled={checkOutMutation.isPending}
+                    className="flex-1 flex items-center justify-center gap-2 px-3 py-2.5 text-sm font-bold text-white bg-red-600 rounded-lg hover:bg-red-700 transition-all shadow-sm disabled:opacity-50"
+                  >
+                    <XCircle className="h-4 w-4" />
+                    {t("finish")}
                   </button>
                 )}
               </div>
@@ -258,55 +344,50 @@ export const VigilancePanel = React.memo<VigilancePanelProps>(
       return (
         <Card
           key={alert.id}
-          className="border-[var(--color-state-warning-border)]"
+          className="border-amber-200 bg-amber-50/20 dark:border-amber-900/30 dark:bg-amber-900/10"
         >
           <CardContent className="p-4">
-            <div className="space-y-3">
+            <div className="space-y-4">
               <div className="flex items-start justify-between">
-                <div className="flex items-start gap-3 flex-1">
-                  <div className="p-2 bg-[var(--color-state-warning-bg)] rounded-lg">
-                    <Icon className="h-5 w-5 text-[var(--color-state-warning-text)]" />
+                <div className="flex items-start gap-4 flex-1">
+                  <div className={`p-3 rounded-xl ${
+                    alert.severity === 'HIGH' ? 'bg-red-100 text-red-600' : 'bg-amber-100 text-amber-600'
+                  }`}>
+                    <Icon className="h-6 w-6" />
                   </div>
                   <div className="flex-1">
-                    <div className="flex items-center gap-2">
-                      <h4 className="font-semibold text-[var(--color-text-primary)] dark:text-[var(--color-text-inverse)]">
-                        {config.label}
+                    <div className="flex items-center gap-3">
+                      <h4 className="font-bold text-slate-900 dark:text-slate-100">
+                        {t(config.labelKey)}
                       </h4>
-                      <Badge variant={config.variant} className="text-xs">
+                      <Badge variant={alert.severity === 'HIGH' ? 'error' : 'warning'} className="text-[10px] px-1.5 py-0">
                         {alert.severity}
                       </Badge>
                     </div>
-                    <p className="text-sm text-[var(--color-text-secondary)] dark:text-[var(--color-text-tertiary)] mt-1">
+                    <p className="text-sm text-slate-600 dark:text-slate-400 mt-1 leading-relaxed">
                       {alert.message}
                     </p>
                   </div>
                 </div>
               </div>
 
-              {/* Detalles de la reserva */}
-              {alert.reservationId && (
-                <div className="text-sm text-[var(--color-text-secondary)] dark:text-[var(--color-text-tertiary)]">
-                  <p>
-                    <span className="font-medium">Reserva:</span>{" "}
-                    {alert.reservationId}
-                  </p>
+              <div className="grid grid-cols-2 gap-2 bg-white/50 dark:bg-black/20 p-2 rounded-lg text-[11px]">
+                <div className="flex items-center gap-1.5 text-slate-500">
+                  <span className="font-semibold">{t("reservation_id")}</span>
+                  <span className="font-mono">{alert.reservationId}</span>
                 </div>
-              )}
-
-              {/* Timestamp */}
-              <div className="text-xs text-[var(--color-text-secondary)] dark:text-[var(--color-text-tertiary)]">
-                {format(new Date(alert.timestamp), "d 'de' MMM, HH:mm:ss", {
-                  locale: es,
-                })}
+                <div className="flex items-center gap-1.5 text-slate-500 justify-end">
+                  <Clock className="h-3 w-3" />
+                  <span>{format(new Date(alert.timestamp), "HH:mm:ss")}</span>
+                </div>
               </div>
 
-              {/* Acciones */}
               {!alert.isResolved && onResolveAlert && (
                 <button
                   onClick={() => onResolveAlert(alert.id)}
-                  className="w-full px-3 py-2 text-sm font-medium text-[var(--color-text-inverse)] bg-[var(--color-action-secondary)] rounded-lg hover:bg-[var(--color-action-secondary-hover)] transition-colors"
+                  className="w-full px-3 py-2 text-sm font-bold text-white bg-slate-800 dark:bg-slate-700 rounded-lg hover:bg-slate-900 dark:hover:bg-slate-600 transition-all"
                 >
-                  Marcar como Resuelta
+                  {t("mark_resolved")}
                 </button>
               )}
             </div>
@@ -316,103 +397,102 @@ export const VigilancePanel = React.memo<VigilancePanelProps>(
     };
 
     return (
-      <div className={`space-y-4 ${className}`}>
-        {/* Estadísticas */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <Card>
-            <CardContent className="p-4 flex items-center gap-3">
-              <div className="p-3 bg-[var(--color-state-success-bg)] rounded-lg">
-                <CheckCircle className="h-6 w-6 text-[var(--color-state-success-text)]" />
-              </div>
-              <div>
-                <p className="text-sm text-[var(--color-text-secondary)] dark:text-[var(--color-text-tertiary)]">
-                  Activas
-                </p>
-                <p className="text-2xl font-bold text-[var(--color-text-primary)] dark:text-[var(--color-text-inverse)]">
-                  {stats.totalActive}
-                </p>
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardContent className="p-4 flex items-center gap-3">
-              <div className="p-3 bg-[var(--color-state-error-bg)] rounded-lg">
-                <XCircle className="h-6 w-6 text-[var(--color-state-error-text)]" />
-              </div>
-              <div>
-                <p className="text-sm text-[var(--color-text-secondary)] dark:text-[var(--color-text-tertiary)]">
-                  Con Retraso
-                </p>
-                <p className="text-2xl font-bold text-[var(--color-text-primary)] dark:text-[var(--color-text-inverse)]">
-                  {stats.totalOverdue}
-                </p>
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardContent className="p-4 flex items-center gap-3">
-              <div className="p-3 bg-[var(--color-state-warning-bg)] rounded-lg">
-                <Bell className="h-6 w-6 text-[var(--color-state-warning-text)]" />
-              </div>
-              <div>
-                <p className="text-sm text-[var(--color-text-secondary)] dark:text-[var(--color-text-tertiary)]">
-                  Alertas
-                </p>
-                <p className="text-2xl font-bold text-[var(--color-text-primary)] dark:text-[var(--color-text-inverse)]">
-                  {stats.totalAlerts}
-                </p>
-              </div>
-            </CardContent>
-          </Card>
+      <div className={`space-y-6 ${className}`}>
+        {/* Barra de Búsqueda y Filtros */}
+        <div className="flex flex-col md:flex-row gap-4 items-center bg-white dark:bg-slate-900 p-4 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm">
+          <div className="relative flex-1 w-full">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
+            <Input
+              type="text"
+              placeholder={t("search_filter_placeholder")}
+              className="pl-10 w-full"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+            />
+          </div>
+          <div className="flex items-center gap-2 w-full md:w-auto">
+            <Filter className="h-4 w-4 text-slate-400 hidden md:block" />
+            <select 
+              title={t("filter")}
+              className="flex-1 md:w-48 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-brand-primary-500 outline-none"
+              value={filterType}
+              onChange={(e) => setFilterType(e.target.value)}
+            >
+              <option value="all">{t("filter_all_resources")}</option>
+              <option value="Sala">{t("filter_rooms")}</option>
+              <option value="Auditorio">{t("filter_auditoriums")}</option>
+              <option value="Laboratorio">{t("filter_labs")}</option>
+            </select>
+          </div>
         </div>
 
-        {/* Tabs */}
-        <div className="flex gap-2 border-b border-[var(--color-border-subtle)] dark:border-[var(--color-border-strong)]">
+        {/* Tabs de Navegación Mejorados */}
+        <div className="flex p-1 bg-slate-100 dark:bg-slate-800/50 rounded-xl">
           <button
             onClick={() => setSelectedTab("active")}
-            className={`px-4 py-2 font-medium text-sm transition-colors ${
+            className={`flex-1 flex items-center justify-center gap-2 py-2.5 px-4 rounded-lg font-bold text-sm transition-all ${
               selectedTab === "active"
-                ? "text-[var(--color-action-primary)] border-b-2 border-[var(--color-action-primary)]"
-                : "text-[var(--color-text-secondary)] dark:text-[var(--color-text-tertiary)] hover:text-[var(--color-text-primary)] dark:hover:text-[var(--color-text-inverse)]"
+                ? "bg-white dark:bg-slate-700 text-brand-primary-600 dark:text-brand-primary-400 shadow-sm"
+                : "text-slate-500 hover:text-slate-700 dark:hover:text-slate-300"
             }`}
           >
-            Activas ({stats.totalActive})
+            <CheckCircle className={`h-4 w-4 ${selectedTab === 'active' ? 'text-brand-primary-500' : ''}`} />
+            {t("tab_in_use")}
+            <span className={`ml-1 px-2 py-0.5 rounded-full text-[10px] ${
+              selectedTab === 'active' ? 'bg-brand-primary-100 dark:bg-brand-primary-900/30' : 'bg-slate-200 dark:bg-slate-800'
+            }`}>
+              {stats.totalActive}
+            </span>
           </button>
           <button
             onClick={() => setSelectedTab("overdue")}
-            className={`px-4 py-2 font-medium text-sm transition-colors ${
+            className={`flex-1 flex items-center justify-center gap-2 py-2.5 px-4 rounded-lg font-bold text-sm transition-all ${
               selectedTab === "overdue"
-                ? "text-[var(--color-action-primary)] border-b-2 border-[var(--color-action-primary)]"
-                : "text-[var(--color-text-secondary)] dark:text-[var(--color-text-tertiary)] hover:text-[var(--color-text-primary)] dark:hover:text-[var(--color-text-inverse)]"
+                ? "bg-white dark:bg-slate-700 text-red-600 dark:text-red-400 shadow-sm"
+                : "text-slate-500 hover:text-slate-700 dark:hover:text-slate-300"
             }`}
           >
-            Con Retraso ({stats.totalOverdue})
+            <Clock className={`h-4 w-4 ${selectedTab === 'overdue' ? 'text-red-500' : ''}`} />
+            {t("tab_overdue")}
+            <span className={`ml-1 px-2 py-0.5 rounded-full text-[10px] ${
+              selectedTab === 'overdue' ? 'bg-red-100 dark:bg-red-900/30' : 'bg-slate-200 dark:bg-slate-800'
+            }`}>
+              {stats.totalOverdue}
+            </span>
           </button>
           <button
             onClick={() => setSelectedTab("alerts")}
-            className={`px-4 py-2 font-medium text-sm transition-colors ${
+            className={`flex-1 flex items-center justify-center gap-2 py-2.5 px-4 rounded-lg font-bold text-sm transition-all ${
               selectedTab === "alerts"
-                ? "text-[var(--color-action-primary)] border-b-2 border-[var(--color-action-primary)]"
-                : "text-[var(--color-text-secondary)] dark:text-[var(--color-text-tertiary)] hover:text-[var(--color-text-primary)] dark:hover:text-[var(--color-text-inverse)]"
+                ? "bg-white dark:bg-slate-700 text-amber-600 dark:text-amber-400 shadow-sm"
+                : "text-slate-500 hover:text-slate-700 dark:hover:text-slate-300"
             }`}
           >
-            Alertas ({stats.totalAlerts})
+            <Bell className={`h-4 w-4 ${selectedTab === 'alerts' ? 'text-amber-500' : ''}`} />
+            {t("tab_alerts")}
+            <span className={`ml-1 px-2 py-0.5 rounded-full text-[10px] ${
+              selectedTab === 'alerts' ? 'bg-amber-100 dark:bg-amber-900/30' : 'bg-slate-200 dark:bg-slate-800'
+            }`}>
+              {stats.totalAlerts}
+            </span>
           </button>
         </div>
 
-        {/* Contenido */}
+        {/* Grid de Contenido con Layout Adaptable */}
         {loading ? (
-          <div className="flex items-center justify-center py-12">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[var(--color-action-primary)]" />
+          <div className="flex flex-col items-center justify-center py-24 space-y-4">
+            <div className="relative">
+              <div className="h-12 w-12 rounded-full border-4 border-slate-100 dark:border-slate-800 border-t-brand-primary-500 animate-spin" />
+              <Shield className="absolute inset-0 m-auto h-5 w-5 text-brand-primary-400" />
+            </div>
+            <p className="text-sm font-medium text-slate-500 animate-pulse">{t("loading_monitor")}</p>
           </div>
         ) : (
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
             {selectedTab === "active" &&
-              activeReservations.map((res) => renderReservationCard(res))}
+              filteredActive.map((res) => renderReservationCard(res))}
             {selectedTab === "overdue" &&
-              overdueReservations.map((res) =>
+              filteredOverdue.map((res) =>
                 renderReservationCard(res, true),
               )}
             {selectedTab === "alerts" &&
@@ -420,37 +500,42 @@ export const VigilancePanel = React.memo<VigilancePanelProps>(
                 .filter((a) => !a.isResolved)
                 .map((alert) => renderAlert(alert))}
 
-            {/* Empty states */}
-            {selectedTab === "active" && activeReservations.length === 0 && (
-              <div className="col-span-2 flex flex-col items-center justify-center py-16 bg-[var(--color-bg-secondary)]/30 rounded-xl border-2 border-dashed border-[var(--color-border-subtle)]">
-                <div className="p-4 bg-[var(--color-bg-secondary)] rounded-full mb-4">
-                  <CheckCircle className="h-10 w-10 text-[var(--color-text-tertiary)] opacity-20" />
+            {/* Empty states mejorados */}
+            {selectedTab === "active" && filteredActive.length === 0 && (
+              <div className="col-span-full flex flex-col items-center justify-center py-20 bg-slate-50 dark:bg-slate-900/40 rounded-2xl border-2 border-dashed border-slate-200 dark:border-slate-800">
+                <div className="p-5 bg-white dark:bg-slate-800 rounded-2xl shadow-sm mb-6">
+                  <CheckCircle className="h-12 w-12 text-slate-300" />
                 </div>
-                <p className="text-lg font-medium text-[var(--color-text-primary)]">No hay reservas activas</p>
-                <p className="text-sm text-[var(--color-text-secondary)] mt-1">
-                  En este momento no hay usuarios utilizando recursos.
+                <h3 className="text-xl font-bold text-slate-800 dark:text-slate-200">{t("empty_active_title")}</h3>
+                <p className="text-slate-500 mt-2 max-w-sm text-center">
+                  {searchQuery ? t("empty_active_search") : t("empty_active_desc")}
                 </p>
+                {searchQuery && (
+                  <button onClick={() => setSearchQuery("")} className="mt-4 text-brand-primary-600 font-bold hover:underline">
+                    {t("clear_search")}
+                  </button>
+                )}
               </div>
             )}
-            {selectedTab === "overdue" && overdueReservations.length === 0 && (
-              <div className="col-span-2 flex flex-col items-center justify-center py-16 bg-[var(--color-state-success-bg)]/10 rounded-xl border-2 border-dashed border-[var(--color-state-success-border)]/30">
-                <div className="p-4 bg-[var(--color-state-success-bg)] rounded-full mb-4">
-                  <CheckCircle className="h-10 w-10 text-[var(--color-state-success-text)]" />
+            {selectedTab === "overdue" && filteredOverdue.length === 0 && (
+              <div className="col-span-full flex flex-col items-center justify-center py-20 bg-green-50/30 dark:bg-green-900/10 rounded-2xl border-2 border-dashed border-green-200 dark:border-green-900/30">
+                <div className="p-5 bg-white dark:bg-slate-800 rounded-2xl shadow-sm mb-6">
+                  <CheckCircle className="h-12 w-12 text-green-400" />
                 </div>
-                <p className="text-lg font-medium text-[var(--color-state-success-text)]">Todo al día</p>
-                <p className="text-sm text-[var(--color-state-success-text)] opacity-80 mt-1">
-                  No hay reservas con retraso en el check-in.
+                <h3 className="text-xl font-bold text-green-700 dark:text-green-400">{t("empty_overdue_title")}</h3>
+                <p className="text-green-600/70 dark:text-green-400/70 mt-2">
+                  {t("empty_overdue_desc")}
                 </p>
               </div>
             )}
             {selectedTab === "alerts" && stats.totalAlerts === 0 && (
-              <div className="col-span-2 flex flex-col items-center justify-center py-16 bg-[var(--color-bg-secondary)]/30 rounded-xl border-2 border-dashed border-[var(--color-border-subtle)]">
-                <div className="p-4 bg-[var(--color-bg-secondary)] rounded-full mb-4">
-                  <Bell className="h-10 w-10 text-[var(--color-text-tertiary)] opacity-20" />
+              <div className="col-span-full flex flex-col items-center justify-center py-20 bg-slate-50 dark:bg-slate-900/40 rounded-2xl border-2 border-dashed border-slate-200 dark:border-slate-800">
+                <div className="p-5 bg-white dark:bg-slate-800 rounded-2xl shadow-sm mb-6">
+                  <Bell className="h-12 w-12 text-slate-300" />
                 </div>
-                <p className="text-lg font-medium text-[var(--color-text-primary)]">Sin alertas activas</p>
-                <p className="text-sm text-[var(--color-text-secondary)] mt-1">
-                  El sistema no ha detectado incidencias que requieran atención.
+                <h3 className="text-xl font-bold text-slate-800 dark:text-slate-200">{t("empty_alerts_title")}</h3>
+                <p className="text-slate-500 mt-2">
+                  {t("empty_alerts_desc")}
                 </p>
               </div>
             )}

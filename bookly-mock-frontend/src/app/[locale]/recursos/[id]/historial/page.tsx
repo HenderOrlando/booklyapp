@@ -16,8 +16,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/atoms/Select";
-import { AppHeader } from "@/components/organisms/AppHeader";
-import { AppSidebar } from "@/components/organisms/AppSidebar";
+// import { AppHeader } from "@/components/organisms/AppHeader";
+// import { AppSidebar } from "@/components/organisms/AppSidebar";
 import { MainLayout } from "@/components/templates/MainLayout";
 import { httpClient } from "@/infrastructure/http";
 import { cn } from "@/lib/utils";
@@ -143,7 +143,7 @@ const typeBadgeVariant: Record<
 };
 
 export default function RecursoHistorialPage() {
-  const t = useTranslations("resources");
+  const _t = useTranslations("resources");
   const params = useParams();
   const router = useRouter();
   const resourceId = params.id as string;

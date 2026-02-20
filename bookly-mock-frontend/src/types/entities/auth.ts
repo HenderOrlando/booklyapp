@@ -26,6 +26,8 @@ export interface RegisterDto {
   roles?: string[];
   permissions?: string[];
   tenantId?: string;
+  programId?: string;
+  coordinatedProgramId?: string;
 }
 
 export interface LoginResponse {

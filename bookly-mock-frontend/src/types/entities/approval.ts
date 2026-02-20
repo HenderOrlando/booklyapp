@@ -125,6 +125,7 @@ export interface ApprovalFlowConfig {
  */
 export interface ApprovalStepConfig {
   name: string;
+  description?: string;
   approverRoles: string[]; // Roles que pueden aprobar en este paso
   order: number;
   isRequired: boolean;

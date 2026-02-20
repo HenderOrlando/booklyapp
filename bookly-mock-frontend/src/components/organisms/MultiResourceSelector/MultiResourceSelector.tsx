@@ -4,7 +4,7 @@ import { Badge } from "@/components/atoms/Badge";
 import { Button } from "@/components/atoms/Button";
 import { Input } from "@/components/atoms/Input";
 import { cn } from "@/lib/utils";
-import { Plus, X, Search, MapPin, Users, Check } from "lucide-react";
+import { Plus, X, Search, MapPin, Users } from "lucide-react";
 import * as React from "react";
 
 /**

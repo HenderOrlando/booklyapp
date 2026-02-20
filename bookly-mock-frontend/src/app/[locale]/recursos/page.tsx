@@ -346,7 +346,6 @@ export default function RecursosPage() {
       },
       onError: (err) => {
         console.error("Error deleting resource:", err);
-        alert(t("delete_error"));
       },
     });
   };

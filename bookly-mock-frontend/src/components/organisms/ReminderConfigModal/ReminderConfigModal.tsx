@@ -1,7 +1,7 @@
 "use client";
 
 import { Button } from "@/components/atoms/Button/Button";
-import { Input } from "@/components/atoms/Input/Input";
+// import { Input } from "@/components/atoms/Input/Input";
 import { cn } from "@/lib/utils";
 import * as Dialog from "@radix-ui/react-dialog";
 import { Bell, X, Plus, Trash2 } from "lucide-react";
@@ -89,7 +89,7 @@ export function ReminderConfigModal({
     }
   };
 
-  const formatTime = (minutes: number): string => {
+  const _formatTime = (minutes: number): string => {
     if (minutes >= 1440) return `${Math.floor(minutes / 1440)} día(s)`;
     if (minutes >= 60) return `${Math.floor(minutes / 60)} hora(s)`;
     return `${minutes} min`;

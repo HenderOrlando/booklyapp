@@ -91,7 +91,7 @@ const typeIcons = {
 };
 
 export default function IntegracionesPage() {
-  const t = useTranslations("admin");
+  const _t = useTranslations("admin");
   const [integrations, setIntegrations] =
     React.useState<IntegrationConfig[]>(mockIntegrations);
   const [connecting, setConnecting] = React.useState<string | null>(null);
@@ -172,7 +172,7 @@ export default function IntegracionesPage() {
     }
   };
 
-  const header = <AppHeader title="Integraciones" />;
+  const _header = <AppHeader title="Integraciones" />;
   return (
     <MainLayout>
       <div className="space-y-6 pb-6">

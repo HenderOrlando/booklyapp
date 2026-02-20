@@ -64,7 +64,7 @@ const mockData: ComplianceData[] = [
 ];
 
 export default function CumplimientoPage() {
-  const t = useTranslations("reports");
+  const _t = useTranslations("reports");
   const { data: serverData } = useComplianceReport();
   const complianceData = (
     serverData && serverData.length > 0 ? serverData : mockData

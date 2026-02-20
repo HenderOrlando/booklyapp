@@ -109,7 +109,6 @@ export default function ProgramasPage() {
         },
         onError: (err: any) => {
           console.error("Error creating program:", err);
-          alert(t("save_error"));
         },
       });
     } else {
@@ -126,7 +125,6 @@ export default function ProgramasPage() {
           },
           onError: (err: any) => {
             console.error("Error updating program:", err);
-            alert(t("save_error"));
           },
         },
       );
@@ -142,7 +140,6 @@ export default function ProgramasPage() {
       {
         onError: (err: any) => {
           console.error("Error changing program status:", err);
-          alert(t("status_change_error"));
         },
       },
     );

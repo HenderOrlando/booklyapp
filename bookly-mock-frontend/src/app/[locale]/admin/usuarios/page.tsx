@@ -4,16 +4,16 @@ import { Alert, AlertDescription } from "@/components/atoms/Alert";
 import { Button } from "@/components/atoms/Button";
 import { ConfirmDialog } from "@/components/molecules/ConfirmDialog";
 import { MainLayout } from "@/components/templates/MainLayout";
-import { useRoles } from "@/hooks/useRoles";
 import { useToast } from "@/hooks/useToast";
+import { useRoles } from "@/hooks/useRoles";
 import {
   useCreateUser,
   useDeleteUser,
   useUpdateUser,
   useUsers,
 } from "@/hooks/useUsers";
-import type { User, CreateUserDto } from "@/types/entities/user";
-import { UserStatus } from "@/types/entities/user";
+import type { User } from "@/types/entities/user";
+// import { UserStatus } from "@/types/entities/user";
 import { useTranslations } from "next-intl";
 import * as React from "react";
 import {
@@ -22,6 +22,7 @@ import {
   UserStatsCards,
   UsersTable,
 } from "./components";
+import type { UserFormValues } from "./components/user-schema";
 
 /**
  * Página de Administración de Usuarios - Bookly
@@ -103,7 +104,7 @@ export default function UsersAdminPage() {
     setFilterPermissions("");
   };
 
-  const handleSaveUser = async (data: CreateUserDto & { roles: string[]; status: UserStatus; password?: string }) => {
+  const handleSaveUser = async (data: UserFormValues) => {
     try {
       if (selectedUser) {
         // Actualizar usuario existente
@@ -117,6 +118,8 @@ export default function UsersAdminPage() {
             documentNumber: data.documentNumber || undefined,
             status: data.status,
             roles: data.roles,
+            programId: data.programId || undefined,
+            coordinatedProgramId: data.coordinatedProgramId || undefined,
           },
         });
 
@@ -126,16 +129,23 @@ export default function UsersAdminPage() {
         );
       } else {
         // Crear nuevo usuario
+        // Nos aseguramos de que los campos requeridos estén presentes (validados por el schema)
+        if (!data.email || !data.username || !data.password) {
+          throw new Error("Email, username and password are required for new users");
+        }
+
         await createUserMutation.mutateAsync({
           email: data.email,
           username: data.username,
-          password: data.password!,
+          password: data.password,
           firstName: data.firstName,
           lastName: data.lastName,
           phoneNumber: data.phoneNumber || undefined,
           documentType: data.documentType || undefined,
           documentNumber: data.documentNumber || undefined,
           roles: data.roles,
+          programId: data.programId || undefined,
+          coordinatedProgramId: data.coordinatedProgramId || undefined,
         });
 
         showSuccess(
@@ -179,17 +189,6 @@ export default function UsersAdminPage() {
       );
     }
   };
-
-  // Helper: Toggle role selection - Not used in this version
-  /*
-  const handleRoleToggle = (roleId: string) => {
-    if (selectedRoles.includes(roleId)) {
-      setSelectedRoles(selectedRoles.filter((id) => id !== roleId));
-    } else {
-      setSelectedRoles([...selectedRoles, roleId]);
-    }
-  };
-  */
 
   // Get loading states from mutations
   const isCreating = createUserMutation.isPending;
@@ -241,7 +240,7 @@ export default function UsersAdminPage() {
         )}
 
         {/* Stats Cards */}
-        <UserStatsCards users={users} roles={roles} />
+        <UserStatsCards users={users} roles={roles} isLoading={loading} />
 
         {/* Users Table */}
         <UsersTable
@@ -258,8 +257,10 @@ export default function UsersAdminPage() {
           show={showUserDetail}
           user={selectedUser}
           filterPermissions={filterPermissions}
+          isLoading={loadingUsers}
           isDeleting={isDeleting}
           onClose={handleCloseDetailPanel}
+          onEdit={handleOpenEditModal}
           onDelete={handleDeleteUser}
           onFilterPermissionsChange={setFilterPermissions}
         />

@@ -26,6 +26,8 @@ export interface User {
   permissions: Permission[];
   preferences?: UserPreferences;
   lastLoginAt?: string;
+  programId?: string;
+  coordinatedProgramId?: string;
   createdAt: string;
   updatedAt: string;
 }
@@ -98,6 +100,8 @@ export interface UpdateUserDto {
   isActive?: boolean;
   isEmailVerified?: boolean;
   isPhoneVerified?: boolean;
+  programId?: string;
+  coordinatedProgramId?: string;
   preferences?: Partial<UserPreferences>;
 }
 

@@ -5,6 +5,7 @@
  */
 
 import { Card, CardContent } from "@/components/atoms/Card";
+import { Skeleton } from "@/components/atoms/Skeleton";
 import type { Role, User } from "@/types/entities/user";
 import { UserStatus } from "@/types/entities/user";
 import { useTranslations } from "next-intl";
@@ -12,10 +13,36 @@ import { useTranslations } from "next-intl";
 interface UserStatsCardsProps {
   users: User[];
   roles: Role[];
+  isLoading?: boolean;
 }
 
-export function UserStatsCards({ users, roles }: UserStatsCardsProps) {
+export function UserStatsCards({
+  users,
+  roles,
+  isLoading = false,
+}: UserStatsCardsProps) {
   const t = useTranslations("admin.users");
+
+  if (isLoading) {
+    return (
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        {[...Array(4)].map((_, i) => (
+          <Card key={i} className="bg-gradient-to-br from-gray-500/5 to-gray-600/5 border-gray-500/10">
+            <CardContent className="p-6">
+              <div className="flex items-center justify-between">
+                <div className="space-y-2 flex-1">
+                  <Skeleton className="h-4 w-24" />
+                  <Skeleton className="h-8 w-16" />
+                  <Skeleton className="h-3 w-32" />
+                </div>
+                <Skeleton className="w-12 h-12 rounded-full" />
+              </div>
+            </CardContent>
+          </Card>
+        ))}
+      </div>
+    );
+  }
 
   const activeUsers = users.filter((u) => u.status === UserStatus.ACTIVE);
   const inactiveUsers = users.filter((u) => u.status !== UserStatus.ACTIVE);

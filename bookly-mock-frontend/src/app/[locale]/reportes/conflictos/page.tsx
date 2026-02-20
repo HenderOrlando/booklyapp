@@ -119,7 +119,7 @@ const severityColors: Record<string, string> = {
 };
 
 export default function ConflictosPage() {
-  const t = useTranslations("reports");
+  const _t = useTranslations("reports");
   const [conflicts, setConflicts] = React.useState<ConflictEntry[]>([]);
   const [loading, setLoading] = React.useState(true);
   const [searchTerm, setSearchTerm] = React.useState("");
@@ -155,7 +155,7 @@ export default function ConflictosPage() {
   ).length;
   const highSeverity = conflicts.filter((c) => c.severity === "high").length;
 
-  const header = <AppHeader title="Conflictos de Disponibilidad" />;
+  const _header = <AppHeader title="Conflictos de Disponibilidad" />;
   return (
     <MainLayout>
       <div className="space-y-6 pb-6">

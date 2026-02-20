@@ -16,6 +16,7 @@ import {
 import { Input } from "@/components/atoms/Input";
 import type { Permission, Role, User } from "@/types/entities/user";
 import { useTranslations } from "next-intl";
+import * as React from "react";
 
 interface RoleFormModalProps {
   show: boolean;
@@ -38,6 +39,7 @@ interface RoleFormModalProps {
   onFilterPermissionChange: (value: string) => void;
   onFilterUserChange: (value: string) => void;
   onPermissionToggle: (permissionId: string) => void;
+  onPermissionBulkChange?: (permissionIds: string[], add: boolean) => void;
   onUserToggle: (userId: string) => void;
 }
 
@@ -62,28 +64,54 @@ export function RoleFormModal({
   onFilterPermissionChange,
   onFilterUserChange,
   onPermissionToggle,
+  onPermissionBulkChange,
   onUserToggle,
 }: RoleFormModalProps) {
   const t = useTranslations("admin.roles");
 
+  const filteredPermissions = React.useMemo(() => {
+    return allPermissions.filter(
+      (p: Permission) =>
+        p.description
+          ?.toLowerCase()
+          .includes(filterPermissionModal.toLowerCase()) ||
+        p.resource.toLowerCase().includes(filterPermissionModal.toLowerCase()) ||
+        p.action.toLowerCase().includes(filterPermissionModal.toLowerCase()),
+    );
+  }, [allPermissions, filterPermissionModal]);
+
+  // Agrupar permisos por recurso
+  const groupedPermissions = React.useMemo(() => {
+    const groups: Record<string, Permission[]> = {};
+    filteredPermissions.forEach((p) => {
+      if (!groups[p.resource]) {
+        groups[p.resource] = [];
+      }
+      groups[p.resource].push(p);
+    });
+    return groups;
+  }, [filteredPermissions]);
+
+  const filteredUsers = React.useMemo(() => {
+    return users.filter(
+      (u: User) =>
+        `${u.firstName} ${u.lastName}`
+          .toLowerCase()
+          .includes(filterUserModal.toLowerCase()) ||
+        u.email.toLowerCase().includes(filterUserModal.toLowerCase()),
+    );
+  }, [users, filterUserModal]);
+
+  const handleSelectAllInResource = (resource: string, perms: Permission[]) => {
+    if (!onPermissionBulkChange) return;
+    
+    const permIds = perms.map(p => p.id);
+    const allSelected = perms.every(p => selectedPermissions.includes(p.id));
+    
+    onPermissionBulkChange(permIds, !allSelected);
+  };
+
   if (!show) return null;
-
-  const filteredPermissions = allPermissions.filter(
-    (p: Permission) =>
-      p.description
-        ?.toLowerCase()
-        .includes(filterPermissionModal.toLowerCase()) ||
-      p.resource.toLowerCase().includes(filterPermissionModal.toLowerCase()) ||
-      p.action.toLowerCase().includes(filterPermissionModal.toLowerCase()),
-  );
-
-  const filteredUsers = users.filter(
-    (u: User) =>
-      `${u.firstName} ${u.lastName}`
-        .toLowerCase()
-        .includes(filterUserModal.toLowerCase()) ||
-      u.email.toLowerCase().includes(filterUserModal.toLowerCase()),
-  );
 
   return (
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
@@ -116,7 +144,7 @@ export function RoleFormModal({
               placeholder={t("role_placeholder")}
               value={roleName}
               onChange={(e) => onRoleNameChange(e.target.value)}
-              disabled={isLoading}
+              disabled={isLoading || (selectedRole?.isSystem ?? false)}
             />
           </div>
           <div>
@@ -127,7 +155,7 @@ export function RoleFormModal({
               placeholder={t("desc_placeholder")}
               value={roleDescription}
               onChange={(e) => onRoleDescriptionChange(e.target.value)}
-              disabled={isLoading}
+              disabled={isLoading || (selectedRole?.isSystem ?? false)}
             />
           </div>
 
@@ -161,11 +189,11 @@ export function RoleFormModal({
 
           {/* Tab Content: Permisos */}
           {activeTab === "permissions" && (
-            <div>
+            <div className="space-y-6">
               <div className="flex items-center justify-between mb-3">
                 <label className="text-sm font-medium text-foreground">
                   {t("select_permissions")} ({selectedPermissions.length}{" "}
-                  {t("selected")}, {filteredPermissions.length} {t("visible")})
+                  {t("selected")})
                 </label>
                 <Input
                   placeholder={t("filter_permissions")}
@@ -175,40 +203,71 @@ export function RoleFormModal({
                   disabled={isLoading}
                 />
               </div>
-              <div className="grid grid-cols-1 gap-2 max-h-96 overflow-y-auto pr-2">
-                {filteredPermissions.map((perm: Permission) => (
-                  <label
-                    key={perm.id}
-                    className={`flex items-center gap-3 p-3 rounded-lg cursor-pointer border transition-all ${
-                      selectedPermissions.includes(perm.id)
-                        ? "bg-brand-primary-500/10 border-brand-primary-500 hover:bg-brand-primary-500/20"
-                        : "bg-[var(--color-bg-primary)] border-[var(--color-border-strong)] hover:bg-[var(--color-bg-secondary)] hover:border-[var(--color-border-strong)]"
-                    } ${isLoading ? "opacity-50 cursor-not-allowed" : ""}`}
-                  >
-                    <input
-                      type="checkbox"
-                      checked={selectedPermissions.includes(perm.id)}
-                      onChange={() => onPermissionToggle(perm.id)}
-                      disabled={isLoading}
-                      className="rounded w-4 h-4"
-                    />
-                    <div className="flex items-start gap-2 flex-1">
-                      <div className="flex-shrink-0 w-8 h-8 bg-brand-primary-500 rounded-lg flex items-center justify-center">
-                        <span className="text-foreground text-xs font-bold">
-                          {perm.resource.charAt(0).toUpperCase()}
-                        </span>
+
+              <div className="max-h-96 overflow-y-auto pr-2 space-y-6">
+                {Object.entries(groupedPermissions).map(([resource, perms]) => {
+                  const allSelectedInResource = perms.every(p => selectedPermissions.includes(p.id));
+                  return (
+                    <div key={resource} className="space-y-3">
+                      <div className="flex items-center gap-2 border-b border-[var(--color-border-strong)] pb-2">
+                        <div className="w-6 h-6 bg-brand-primary-500 rounded flex items-center justify-center">
+                          <span className="text-foreground text-[10px] font-bold">
+                            {resource.charAt(0).toUpperCase()}
+                          </span>
+                        </div>
+                        <h4 className="text-sm font-bold text-foreground uppercase tracking-wider">
+                          {resource}
+                        </h4>
+                        <Badge variant="secondary" className="ml-auto text-[10px]">
+                          {perms.length} {t("available")}
+                        </Badge>
+                        <button
+                          type="button"
+                          onClick={() => handleSelectAllInResource(resource, perms)}
+                          disabled={isLoading || (selectedRole?.isSystem ?? false)}
+                          className="text-[10px] font-bold text-brand-primary-500 hover:underline disabled:opacity-50"
+                        >
+                          {allSelectedInResource ? t("deselect_all") : t("select_all")}
+                        </button>
                       </div>
-                      <div className="flex-1 min-w-0">
-                        <div className="text-foreground text-sm font-medium">
-                          {perm.description}
-                        </div>
-                        <div className="text-[var(--color-text-tertiary)] text-xs mt-1">
-                          {perm.resource}:{perm.action}
-                        </div>
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+                        {perms.map((perm: Permission) => (
+                          <label
+                            key={perm.id}
+                            className={`flex items-center gap-3 p-3 rounded-lg cursor-pointer border transition-all ${
+                              selectedPermissions.includes(perm.id)
+                                ? "bg-brand-primary-500/10 border-brand-primary-500 hover:bg-brand-primary-500/20 shadow-sm"
+                                : "bg-[var(--color-bg-primary)] border-[var(--color-border-strong)] hover:bg-[var(--color-bg-secondary)]"
+                            } ${isLoading || (selectedRole?.isSystem ?? false) ? "opacity-50 cursor-not-allowed" : ""}`}
+                          >
+                            <input
+                              type="checkbox"
+                              checked={selectedPermissions.includes(perm.id)}
+                              onChange={() => onPermissionToggle(perm.id)}
+                              disabled={isLoading || (selectedRole?.isSystem ?? false)}
+                              className="rounded w-4 h-4 accent-brand-primary-500"
+                            />
+                            <div className="flex-1 min-w-0">
+                              <div className="text-foreground text-sm font-medium">
+                                {perm.description}
+                              </div>
+                              <div className="flex items-center gap-2 mt-1">
+                                <code className="text-[10px] bg-[var(--color-bg-secondary)] px-1.5 py-0.5 rounded text-[var(--color-text-tertiary)]">
+                                  {perm.action}
+                                </code>
+                              </div>
+                            </div>
+                          </label>
+                        ))}
                       </div>
                     </div>
-                  </label>
-                ))}
+                  );
+                })}
+                {Object.keys(groupedPermissions).length === 0 && (
+                  <div className="text-center py-8 text-[var(--color-text-tertiary)]">
+                    {t("no_permissions_found")}
+                  </div>
+                )}
               </div>
             </div>
           )}
@@ -284,7 +343,7 @@ export function RoleFormModal({
             <Button variant="outline" onClick={onClose} disabled={isLoading}>
               {t("cancel")}
             </Button>
-            <Button onClick={onSave} disabled={isLoading}>
+            <Button onClick={onSave} disabled={isLoading || (selectedRole?.isSystem ?? false)}>
               {isLoading ? (
                 <>
                   <span className="animate-spin mr-2">⏳</span>
@@ -295,6 +354,11 @@ export function RoleFormModal({
               )}
             </Button>
           </div>
+          {selectedRole?.isSystem && (
+            <p className="text-xs text-warning-500 mt-2">
+              {t("system_role_edit_warning")}
+            </p>
+          )}
         </CardContent>
       </Card>
     </div>

@@ -59,7 +59,7 @@ export default function AuditoriaPage() {
   const [filterStatus, setFilterStatus] = React.useState("");
   const [selectedLog, setSelectedLog] = React.useState<AuditLog | null>(null);
   const [showLogDetail, setShowLogDetail] = React.useState(false);
-  const [filterLogTable, setFilterLogTable] = React.useState("");
+  const [filterLogTable, _setFilterLogTable] = React.useState("");
 
   // Cargar logs de auditoría
   React.useEffect(() => {
@@ -82,8 +82,8 @@ export default function AuditoriaPage() {
     fetchLogs();
   }, []);
 
-  const header = <AppHeader title={t("title")} />;
-  const sidebar = <AppSidebar />;
+  const _header = <AppHeader title={t("title")} />;
+  const _sidebar = <AppSidebar />;
 
   // Filtrar logs (para la sección de filtros de búsqueda)
   const filteredLogs = logs.filter((log) => {
@@ -106,7 +106,7 @@ export default function AuditoriaPage() {
   });
 
   // Filtrar logs adicional para la tabla
-  const tableFilteredLogs = filteredLogs.filter((log) => {
+  const _tableFilteredLogs = filteredLogs.filter((log) => {
     if (filterLogTable === "") return true;
 
     return (
@@ -508,10 +508,10 @@ export default function AuditoriaPage() {
                               }
                             >
                               {log.status === "success"
-                                ? "Éxito"
+                                ? t("status_success")
                                 : log.status === "error"
-                                  ? "Error"
-                                  : "Advertencia"}
+                                  ? t("status_error")
+                                  : t("status_warning")}
                             </Badge>
                           </div>
                         </div>
@@ -524,7 +524,7 @@ export default function AuditoriaPage() {
                           setShowLogDetail(true);
                         }}
                       >
-                        Ver
+                        {t("view_detail")}
                       </Button>
                     </div>
                     <div className="text-sm text-[var(--color-text-secondary)] mt-2 ml-16 truncate">
@@ -539,7 +539,7 @@ export default function AuditoriaPage() {
                 itemHeight={90}
                 containerHeight="700px"
                 isLoading={loading}
-                emptyMessage="No hay logs de auditoría"
+                emptyMessage={t("empty")}
               />
             ) : (
               <DataTable data={filteredLogs} columns={columns} />
@@ -554,9 +554,9 @@ export default function AuditoriaPage() {
               <CardHeader>
                 <div className="flex items-center justify-between">
                   <div>
-                    <CardTitle>Detalle del Log</CardTitle>
+                    <CardTitle>{t("detail_title")}</CardTitle>
                     <CardDescription>
-                      Información completa del evento
+                      {t("detail_desc")}
                     </CardDescription>
                   </div>
                   <Button
@@ -575,13 +575,13 @@ export default function AuditoriaPage() {
                 <div className="grid grid-cols-2 gap-4">
                   <div>
                     <label className="text-sm font-medium text-[var(--color-text-tertiary)]">
-                      ID
+                      {t("id")}
                     </label>
                     <div className="text-foreground mt-1">{selectedLog.id}</div>
                   </div>
                   <div>
                     <label className="text-sm font-medium text-[var(--color-text-tertiary)]">
-                      Timestamp
+                      {t("timestamp")}
                     </label>
                     <div className="text-foreground mt-1">
                       {new Date(selectedLog.timestamp).toLocaleString("es-ES")}
@@ -592,7 +592,7 @@ export default function AuditoriaPage() {
                 <div className="grid grid-cols-2 gap-4">
                   <div>
                     <label className="text-sm font-medium text-[var(--color-text-tertiary)]">
-                      Usuario
+                      {t("user")}
                     </label>
                     <div className="text-foreground mt-1">
                       {selectedLog.user}
@@ -600,7 +600,7 @@ export default function AuditoriaPage() {
                   </div>
                   <div>
                     <label className="text-sm font-medium text-[var(--color-text-tertiary)]">
-                      IP Address
+                      {t("ip_address")}
                     </label>
                     <div className="text-foreground mt-1">
                       {selectedLog.ipAddress}
@@ -611,7 +611,7 @@ export default function AuditoriaPage() {
                 <div className="grid grid-cols-2 gap-4">
                   <div>
                     <label className="text-sm font-medium text-[var(--color-text-tertiary)]">
-                      Acción
+                      {t("action")}
                     </label>
                     <div className="mt-1">
                       <Badge variant="secondary">{selectedLog.action}</Badge>
@@ -619,7 +619,7 @@ export default function AuditoriaPage() {
                   </div>
                   <div>
                     <label className="text-sm font-medium text-[var(--color-text-tertiary)]">
-                      Estado
+                      {t("status")}
                     </label>
                     <div className="mt-1">
                       <Badge
@@ -632,10 +632,10 @@ export default function AuditoriaPage() {
                         }
                       >
                         {selectedLog.status === "success"
-                          ? "Éxito"
+                          ? t("status_success")
                           : selectedLog.status === "error"
-                            ? "Error"
-                            : "Advertencia"}
+                            ? t("status_error")
+                            : t("status_warning")}
                       </Badge>
                     </div>
                   </div>
@@ -644,7 +644,7 @@ export default function AuditoriaPage() {
                 <div className="grid grid-cols-2 gap-4">
                   <div>
                     <label className="text-sm font-medium text-[var(--color-text-tertiary)]">
-                      Entidad
+                      {t("entity")}
                     </label>
                     <div className="text-foreground mt-1">
                       {selectedLog.entity}
@@ -653,7 +653,7 @@ export default function AuditoriaPage() {
                   {selectedLog.entityId && (
                     <div>
                       <label className="text-sm font-medium text-[var(--color-text-tertiary)]">
-                        Entity ID
+                        {t("entity_id")}
                       </label>
                       <div className="text-foreground mt-1">
                         {selectedLog.entityId}
@@ -664,7 +664,7 @@ export default function AuditoriaPage() {
 
                 <div>
                   <label className="text-sm font-medium text-[var(--color-text-tertiary)]">
-                    Detalles Completos
+                    {t("full_details")}
                   </label>
                   <div className="text-foreground mt-1 p-3 bg-[var(--color-bg-primary)] rounded-lg">
                     {selectedLog.details}
@@ -679,7 +679,7 @@ export default function AuditoriaPage() {
                       setSelectedLog(null);
                     }}
                   >
-                    Cerrar
+                    {t("close")}
                   </Button>
                 </div>
               </CardContent>

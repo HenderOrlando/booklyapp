@@ -193,6 +193,13 @@ export const STOCKPILE_ENDPOINTS = {
   MY_CHECKIN_HISTORY: `${API_VERSION}/check-in-out/user/me`,
   ACTIVE_CHECKINS: `${API_VERSION}/check-in-out/active/all`,
   OVERDUE_CHECKINS: `${API_VERSION}/check-in-out/overdue/all`,
+
+  // Monitoreo y Vigilancia (Dashboard)
+  MONITORING_ACTIVE: `${API_VERSION}/monitoring/active`,
+  MONITORING_OVERDUE: `${API_VERSION}/monitoring/overdue`,
+  MONITORING_STATS: `${API_VERSION}/monitoring/statistics`,
+  MONITORING_ALERTS: `${API_VERSION}/monitoring/alerts`,
+  RESOLVE_INCIDENT: (id: string) => `${API_VERSION}/monitoring/incident/${id}/resolve`,
 } as const;
 
 /**

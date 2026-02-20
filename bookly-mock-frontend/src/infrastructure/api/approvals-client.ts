@@ -41,7 +41,7 @@ export interface CreateApprovalFlowDto {
     isRequired: boolean;
     allowParallel: boolean;
   }>;
-  autoApproveConditions?: Record<string, any>;
+  autoApproveConditions?: Record<string, unknown>;
 }
 
 export interface UpdateApprovalFlowDto extends Partial<CreateApprovalFlowDto> {
@@ -215,7 +215,7 @@ export class ApprovalsClient {
   static async approveRequest(
     id: string,
     data: ApproveStepDto
-  ): Promise<ApiResponse<any>> {
+  ): Promise<ApiResponse<unknown>> {
     return httpClient.post(STOCKPILE_ENDPOINTS.APPROVE(id), data);
   }
 
@@ -229,7 +229,7 @@ export class ApprovalsClient {
   static async rejectRequest(
     id: string,
     data: RejectStepDto
-  ): Promise<ApiResponse<any>> {
+  ): Promise<ApiResponse<unknown>> {
     return httpClient.post(STOCKPILE_ENDPOINTS.REJECT(id), data);
   }
 
@@ -243,7 +243,7 @@ export class ApprovalsClient {
   static async cancelRequest(
     id: string,
     reason: string
-  ): Promise<ApiResponse<any>> {
+  ): Promise<ApiResponse<unknown>> {
     const data: CancelApprovalRequestDto = { reason };
     return httpClient.post(STOCKPILE_ENDPOINTS.CANCEL(id), data);
   }

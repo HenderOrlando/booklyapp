@@ -69,7 +69,7 @@ export function useSendNotification() {
  */
 export function useMarkAsRead() {
   const queryClient = useQueryClient();
-  const { showError } = useToast(); // No mostrar success para "marcar como leído" para no saturar
+  const { showError: _showError } = useToast(); // No mostrar success para "marcar como leído" para no saturar
 
   return useMutation({
     mutationFn: async (notificationIds: string[]) => {

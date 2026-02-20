@@ -40,7 +40,7 @@ export default function ForgotPasswordPage() {
 
     // Validación básica
     if (!email) {
-      setError("Por favor ingrese su correo electrónico");
+      setError(t("error_email_required"));
       setLoading(false);
       return;
     }
@@ -48,7 +48,7 @@ export default function ForgotPasswordPage() {
     // Validación de email
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(email)) {
-      setError("Por favor ingrese un correo electrónico válido");
+      setError(t("error_invalid_email"));
       setLoading(false);
       return;
     }
@@ -64,13 +64,13 @@ export default function ForgotPasswordPage() {
         setEmail(""); // Limpiar el campo
       } else {
         setError(
-          response.message || "Error al enviar el correo de recuperación"
+          response.message || t("error_sending_recovery")
         );
       }
     } catch (error: any) {
       console.error("Forgot password error:", error);
       setError(
-        error?.message || "Error al procesar la solicitud. Intente nuevamente."
+        error?.message || t("error_processing_request")
       );
     } finally {
       setLoading(false);
@@ -79,24 +79,22 @@ export default function ForgotPasswordPage() {
 
   return (
     <AuthLayout
-      title="Recuperar Contraseña"
-      description="Ingrese su correo electrónico para recibir un enlace de recuperación"
+      title={t("forgot_password_title")}
+      description={t("forgot_password_description")}
     >
       {success ? (
         <div className="space-y-4">
           <Alert variant="success">
             <AlertDescription>
-              <strong>¡Correo enviado!</strong>
+              <strong>{t("recovery_email_sent_title")}</strong>
               <br />
-              Hemos enviado un enlace de recuperación a tu correo electrónico.
-              Por favor revisa tu bandeja de entrada y sigue las instrucciones.
+              {t("recovery_email_sent_desc")}
             </AlertDescription>
           </Alert>
 
           <div className="text-center space-y-4">
             <p className="text-sm text-[var(--color-text-secondary)]">
-              Si no recibes el correo en unos minutos, revisa tu carpeta de spam
-              o intenta nuevamente.
+              {t("recovery_email_not_received")}
             </p>
 
             <div className="flex flex-col gap-2">
@@ -106,12 +104,12 @@ export default function ForgotPasswordPage() {
                 onClick={() => setSuccess(false)}
                 className="w-full"
               >
-                Enviar otro correo
+                {t("send_another_email")}
               </Button>
 
               <Link href="/login" className="block">
                 <Button variant="ghost" className="w-full">
-                  Volver al inicio de sesión
+                  {t("back_to_login")}
                 </Button>
               </Link>
             </div>
@@ -127,13 +125,13 @@ export default function ForgotPasswordPage() {
 
           <div>
             <label className="block text-sm font-medium text-[var(--color-text-primary)] mb-2">
-              Correo Electrónico
+              {t("email_label")}
             </label>
             <Input
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              placeholder="tu@correo.com"
+              placeholder={t("email_placeholder")}
               required
               disabled={loading}
               className="w-full"
@@ -141,7 +139,7 @@ export default function ForgotPasswordPage() {
           </div>
 
           <Button type="submit" disabled={loading} className="w-full">
-            {loading ? "Enviando..." : "Enviar Enlace de Recuperación"}
+            {loading ? t("sending") : t("send_recovery_link")}
           </Button>
 
           <div className="text-center space-y-2">
@@ -149,7 +147,7 @@ export default function ForgotPasswordPage() {
               href="/login"
               className="text-sm text-brand-primary-500 hover:text-brand-primary-600 hover:underline"
             >
-              Volver al inicio de sesión
+              {t("back_to_login")}
             </Link>
           </div>
         </form>
@@ -158,12 +156,12 @@ export default function ForgotPasswordPage() {
       {/* Información adicional */}
       <div className="mt-6 p-4 bg-[var(--color-surface-secondary)] rounded-md">
         <h3 className="text-sm font-medium text-[var(--color-text-primary)] mb-2">
-          ¿Necesitas ayuda?
+          {t("need_help")}
         </h3>
         <ul className="text-xs text-[var(--color-text-secondary)] space-y-1">
-          <li>• El enlace de recuperación expira en 1 hora</li>
-          <li>• Solo puedes solicitar un enlace cada 5 minutos</li>
-          <li>• Si tienes problemas, contacta al soporte técnico</li>
+          <li>• {t("help_recovery_expiry")}</li>
+          <li>• {t("help_recovery_limit")}</li>
+          <li>• {t("help_contact_support")}</li>
         </ul>
       </div>
     </AuthLayout>

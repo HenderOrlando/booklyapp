@@ -122,6 +122,8 @@ function mapRegisterPayload(data: RegisterDto): Record<string, unknown> {
     documentType: data.documentType,
     documentNumber: data.documentNumber,
     tenantId: data.tenantId,
+    programId: data.programId,
+    coordinatedProgramId: data.coordinatedProgramId,
   };
 }
 
@@ -903,6 +905,14 @@ export class AuthClient {
 
     if (data.isPhoneVerified !== undefined) {
       payload.isPhoneVerified = data.isPhoneVerified;
+    }
+
+    if (data.programId !== undefined) {
+      payload.programId = data.programId;
+    }
+
+    if (data.coordinatedProgramId !== undefined) {
+      payload.coordinatedProgramId = data.coordinatedProgramId;
     }
 
     if (Array.isArray(data.roles)) {

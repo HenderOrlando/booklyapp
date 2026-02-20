@@ -36,15 +36,15 @@ import * as React from "react";
  */
 
 export default function AprobacionesPage() {
-  const queryClient = useQueryClient();
-  const { showSuccess, showError } = useToast();
+  const _queryClient = useQueryClient();
+  const { showSuccess, showError: _showError } = useToast();
   const t = useTranslations("approvals");
 
   // Hooks centralizados
-  const { approve, reject, cancel } = useApprovalActions();
+  const { approve, reject, cancel: _cancel } = useApprovalActions();
   const { generate } = useDocumentGeneration();
 
-  const [filters, setFilters] = React.useState<ApprovalFilters>({});
+  const [filters, _setFilters] = React.useState<ApprovalFilters>({});
   const [searchQuery, setSearchQuery] = React.useState("");
   const [selectedRequest, setSelectedRequest] =
     React.useState<ApprovalRequest | null>(null);
@@ -137,14 +137,14 @@ export default function AprobacionesPage() {
     }
   };
 
-  const handleModalComment = (commentText: string) => {
+  const handleModalComment = (_commentText: string) => {
     // Comentarios ahora se manejan como parte de aprobar/rechazar
     console.warn(
       "handleModalComment deprecated - use approve/reject with comment",
     );
   };
 
-  const handleModalDelegate = (userId: string, comments: string) => {
+  const handleModalDelegate = (_userId: string, _comments: string) => {
     // Delegación requiere implementación específica en el backend
     console.warn("handleModalDelegate not implemented yet");
   };

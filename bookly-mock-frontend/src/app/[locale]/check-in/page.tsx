@@ -26,7 +26,7 @@ import * as React from "react";
 export default function CheckInPage() {
   const t = useTranslations("check_in");
   const { showSuccess, showError } = useToast();
-  const [selectedReservation, setSelectedReservation] = React.useState<
+  const [_selectedReservation, _setSelectedReservation] = React.useState<
     string | null
   >(null);
 
@@ -56,7 +56,7 @@ export default function CheckInPage() {
 
       return {
         reservationId: item.reservationId,
-        resourceName: item.resourceName || "Recurso",
+        resourceName: item.resourceName || t("resource"),
         resourceType: item.resourceType || "N/A",
         startTime,
         endTime,
@@ -69,7 +69,7 @@ export default function CheckInPage() {
         canCheckOut: !!item.checkInTime && !item.checkOutTime,
       };
     });
-  }, [checkInHistory]);
+  }, [checkInHistory, t]);
 
   const handleCheckIn = (reservationId: string) => {
     checkInMutation.mutate(
@@ -80,14 +80,14 @@ export default function CheckInPage() {
       {
         onSuccess: () => {
           showSuccess(
-            "Check-in exitoso",
-            "Has realizado check-in correctamente",
+            t("success_check_in_title"),
+            t("success_check_in_desc"),
           );
         },
         onError: (error: any) => {
           showError(
-            "Error en check-in",
-            error?.response?.data?.message || "No se pudo realizar el check-in",
+            t("error_check_in_title"),
+            error?.response?.data?.message || t("error_check_in_desc"),
           );
         },
       },
@@ -101,7 +101,7 @@ export default function CheckInPage() {
     );
 
     if (!checkInRecord?.id) {
-      showError("Error", "No se encontró el registro de check-in");
+      showError(t("error") || "Error", t("error_no_check_in_record"));
       return;
     }
 
@@ -114,15 +114,15 @@ export default function CheckInPage() {
       {
         onSuccess: () => {
           showSuccess(
-            "Check-out exitoso",
-            "Has realizado check-out correctamente",
+            t("success_check_out_title"),
+            t("success_check_out_desc"),
           );
         },
         onError: (error: any) => {
           showError(
-            "Error en check-out",
+            t("error_check_out_title"),
             error?.response?.data?.message ||
-              "No se pudo realizar el check-out",
+              t("error_check_out_desc"),
           );
         },
       },
@@ -147,10 +147,10 @@ export default function CheckInPage() {
             </div>
             <div>
               <h1 className="text-3xl font-bold text-[var(--color-text-primary)] dark:text-[var(--color-text-primary)]">
-                Check-in / Check-out
+                {t("title")}
               </h1>
               <p className="text-[var(--color-text-secondary)] dark:text-[var(--color-text-tertiary)] mt-1">
-                Gestiona el acceso a tus reservas
+                {t("description")}
               </p>
             </div>
           </div>
@@ -159,20 +159,18 @@ export default function CheckInPage() {
         {/* Información */}
         <div className="bg-brand-primary-50 dark:bg-brand-primary-900/20 rounded-lg p-4 text-sm">
           <h3 className="font-semibold text-blue-900 dark:text-blue-200 mb-2">
-            ℹ️ Información Importante
+            ℹ️ {t("info_title")}
           </h3>
           <ul className="space-y-1 text-brand-primary-800 dark:text-brand-primary-300">
             <li>
-              • El check-in está disponible 15 minutos antes del horario de
-              inicio
+              • {t("info_check_in_window")}
             </li>
-            <li>• Debes realizar check-out al finalizar tu reserva</li>
+            <li>• {t("info_check_out_required")}</li>
             <li>
-              • Puedes usar el código QR en vigilancia para validar el acceso
+              • {t("info_qr_usage")}
             </li>
             <li>
-              • Si llegas tarde (más de 15 minutos), tu reserva puede ser
-              cancelada
+              • {t("info_late_penalty")}
             </li>
           </ul>
         </div>
@@ -183,9 +181,9 @@ export default function CheckInPage() {
             <div className="flex items-start justify-between mb-4">
               <div>
                 <div className="flex items-center gap-2 mb-2">
-                  <Badge variant="success">Activa</Badge>
+                  <Badge variant="success">{t("status_active")}</Badge>
                   <span className="text-sm text-[var(--color-text-secondary)] dark:text-[var(--color-text-tertiary)]">
-                    Check-in realizado
+                    {t("status_checked_in")}
                   </span>
                 </div>
                 <h2 className="text-2xl font-bold text-[var(--color-text-primary)] dark:text-[var(--color-text-primary)]">
@@ -242,7 +240,7 @@ export default function CheckInPage() {
                 canCheckOut: activeReservation.canCheckOut,
                 reason: activeReservation.canCheckIn
                   ? undefined
-                  : "Ya realizaste check-in",
+                  : t("already_checked_in"),
                 requiresApproval: false,
                 requiresVigilance: false,
                 timeWindow: {
@@ -261,7 +259,7 @@ export default function CheckInPage() {
         {/* Próximas reservas */}
         <div>
           <h2 className="text-xl font-semibold text-[var(--color-text-primary)] dark:text-[var(--color-text-primary)] mb-4">
-            Próximas Reservas
+            {t("upcoming_reservations")}
           </h2>
 
           {isLoading ? (
@@ -294,10 +292,10 @@ export default function CheckInPage() {
                         </p>
                       </div>
                       {canCheckInNow ? (
-                        <Badge variant="success">Disponible</Badge>
+                        <Badge variant="success">{t("available")}</Badge>
                       ) : (
                         <Badge variant="default">
-                          En {minutesUntilStart}min
+                          {t("starts_in", { minutes: minutesUntilStart })}
                         </Badge>
                       )}
                     </div>
@@ -341,7 +339,7 @@ export default function CheckInPage() {
                         canCheckOut: false,
                         reason: canCheckInNow
                           ? undefined
-                          : `Disponible en ${minutesUntilStart} minutos`,
+                          : t("available_in", { minutes: minutesUntilStart }),
                         requiresApproval: false,
                         requiresVigilance: false,
                         timeWindow: {
@@ -364,7 +362,7 @@ export default function CheckInPage() {
             <div className="text-center py-12 bg-[var(--color-bg-primary)] dark:bg-[var(--color-bg-secondary)] rounded-lg border border-[var(--color-border-primary)] dark:border-[var(--color-border-primary)]">
               <AlertCircle className="h-12 w-12 text-[var(--color-text-tertiary)] dark:text-[var(--color-text-secondary)] mx-auto mb-3" />
               <p className="text-[var(--color-text-secondary)] dark:text-[var(--color-text-tertiary)]">
-                No tienes reservas próximas
+                {t("no_upcoming")}
               </p>
             </div>
           )}

@@ -15,8 +15,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/atoms/Select";
-import { AppHeader } from "@/components/organisms/AppHeader";
-import { AppSidebar } from "@/components/organisms/AppSidebar";
 import { WaitlistManager } from "@/components/organisms/WaitlistManager";
 import { MainLayout } from "@/components/templates/MainLayout";
 import {
@@ -158,11 +156,10 @@ export default function ListaEsperaPage() {
       },
       {
         onSuccess: () => {
-          alert(`Notificación enviada a usuario de entrada ${entryId}`);
+          // Success handled by React Query cache invalidation
         },
         onError: (error: any) => {
           console.error("Error al notificar:", error);
-          alert("Error al enviar notificación");
         },
       },
     );
@@ -171,31 +168,24 @@ export default function ListaEsperaPage() {
   const handleAssign = (entryId: string) => {
     assignEntry.mutate(entryId, {
       onSuccess: () => {
-        alert(`Recurso asignado para entrada ${entryId}`);
+        // Success handled by React Query cache invalidation
       },
       onError: (error: any) => {
         console.error("Error al asignar:", error);
-        alert("Error al asignar recurso");
       },
     });
   };
 
   const handleCancel = (entryId: string) => {
-    if (confirm("¿Estás seguro de cancelar esta entrada de lista de espera?")) {
-      removeEntry.mutate(entryId, {
-        onSuccess: () => {
-          alert(`Entrada ${entryId} cancelada`);
-        },
-        onError: (error: any) => {
-          console.error("Error al cancelar:", error);
-          alert("Error al cancelar entrada");
-        },
-      });
-    }
+    removeEntry.mutate(entryId, {
+      onSuccess: () => {
+        // Success handled by React Query cache invalidation
+      },
+      onError: (error: any) => {
+        console.error("Error al cancelar:", error);
+      },
+    });
   };
-
-  const header = <AppHeader title="Lista de Espera" />;
-  const sidebar = <AppSidebar />;
 
   return (
     <MainLayout>
@@ -218,13 +208,10 @@ export default function ListaEsperaPage() {
             </svg>
             <div>
               <h3 className="font-semibold text-purple-300 mb-1">
-                Gestión de Lista de Espera
+                {t("management_title")}
               </h3>
               <p className="text-sm text-[var(--color-text-secondary)]">
-                Administra las solicitudes en lista de espera. Los usuarios son
-                ordenados por prioridad y tiempo de solicitud. Cuando un recurso
-                se libera, puedes notificar y asignar automáticamente al primero
-                en la cola.
+                {t("management_description")}
               </p>
             </div>
           </div>
@@ -233,26 +220,26 @@ export default function ListaEsperaPage() {
         {/* Filtro por recurso */}
         <Card>
           <CardHeader>
-            <CardTitle>Filtrar por Recurso</CardTitle>
+            <CardTitle>{t("filter_by_resource")}</CardTitle>
             <CardDescription>
-              Selecciona un recurso específico para ver su lista de espera
+              {t("filter_by_resource_desc")}
             </CardDescription>
           </CardHeader>
           <CardContent>
             <div className="flex flex-wrap gap-4 items-end">
               <div className="flex-1 min-w-[250px]">
                 <label className="block text-sm font-medium text-[var(--color-text-tertiary)] mb-2">
-                  Recurso
+                  {t("resource")}
                 </label>
                 <Select
                   value={selectedResourceId}
                   onValueChange={setSelectedResourceId}
                 >
                   <SelectTrigger>
-                    <SelectValue placeholder="Selecciona un recurso" />
+                    <SelectValue placeholder={t("select_resource")} />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="all">Todos los recursos</SelectItem>
+                    <SelectItem value="all">{t("all_resources")}</SelectItem>
                     <SelectItem value="res_1">Aula 101</SelectItem>
                     <SelectItem value="res_2">Laboratorio 3</SelectItem>
                     <SelectItem value="res_3">Auditorio Principal</SelectItem>
@@ -263,7 +250,7 @@ export default function ListaEsperaPage() {
                 variant="outline"
                 onClick={() => setSelectedResourceId("all")}
               >
-                Limpiar Filtros
+                {t("clear_filters")}
               </Button>
             </div>
           </CardContent>
@@ -281,39 +268,32 @@ export default function ListaEsperaPage() {
         {/* Información adicional */}
         <Card>
           <CardHeader>
-            <CardTitle>¿Cómo funciona la lista de espera?</CardTitle>
+            <CardTitle>{t("how_it_works")}</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="space-y-3 text-sm text-[var(--color-text-secondary)]">
               <div className="flex items-start gap-2">
                 <span className="text-brand-primary-400 font-bold">1.</span>
                 <p>
-                  <strong>Usuario solicita recurso ocupado:</strong> Se agrega
-                  automáticamente a la lista de espera con su posición en la
-                  cola.
+                  <strong>{t("step_1_title")}</strong> {t("step_1_desc")}
                 </p>
               </div>
               <div className="flex items-start gap-2">
                 <span className="text-brand-primary-400 font-bold">2.</span>
                 <p>
-                  <strong>Ordenamiento por prioridad:</strong> URGENT {">"} HIGH{" "}
-                  {">"} NORMAL {">"} LOW, con el tiempo de solicitud como
-                  segundo criterio.
+                  <strong>{t("step_2_title")}</strong> {t("step_2_desc")}
                 </p>
               </div>
               <div className="flex items-start gap-2">
                 <span className="text-brand-primary-400 font-bold">3.</span>
                 <p>
-                  <strong>Recurso se libera:</strong> El sistema notifica
-                  automáticamente al primero en la cola (#1).
+                  <strong>{t("step_3_title")}</strong> {t("step_3_desc")}
                 </p>
               </div>
               <div className="flex items-start gap-2">
                 <span className="text-brand-primary-400 font-bold">4.</span>
                 <p>
-                  <strong>Usuario acepta/rechaza:</strong> Si acepta, se crea la
-                  reserva. Si rechaza o no responde en 24h, se notifica al
-                  siguiente (#2).
+                  <strong>{t("step_4_title")}</strong> {t("step_4_desc")}
                 </p>
               </div>
             </div>

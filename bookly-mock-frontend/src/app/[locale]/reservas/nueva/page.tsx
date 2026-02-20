@@ -17,7 +17,7 @@ import { useRouter, useSearchParams } from "next/navigation";
  */
 
 export default function NuevaReservaPage() {
-  const t = useTranslations("reservations");
+  const _t = useTranslations("reservations");
   const router = useRouter();
   const searchParams = useSearchParams();
 

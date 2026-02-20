@@ -270,7 +270,7 @@ export default function ProfilePage() {
 
         // Si el idioma cambió, recargar la aplicación en la nueva ruta
         if (preferencesData.language !== locale) {
-          router.replace(pathname, { locale: preferencesData.language });
+          router.replace(pathname, { locale: preferencesData.language as "es" | "en" });
         }
       },
       onError: (mutationError: unknown) => {

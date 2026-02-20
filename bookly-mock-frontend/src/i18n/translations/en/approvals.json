@@ -53,5 +53,18 @@
     "high": "High",
     "normal": "Normal",
     "low": "Low"
-  }
+  },
+  "history_title": "Approval History",
+  "history_description": "Complete record of all approvals",
+  "export_csv": "Export CSV",
+  "search_history_placeholder": "Search by user, resource or purpose...",
+  "all_statuses": "All statuses",
+  "status_expired": "Expired",
+  "reviewed_at": "Reviewed at:",
+  "reservation_date": "Reservation Date",
+  "attendees_count": "{count} attendees",
+  "rejection_reason_title": "Rejection Reason",
+  "action_history": "Action History",
+  "no_records_found": "No records found",
+  "showing_records": "Showing {count} of {total} records"
 }

@@ -15,10 +15,19 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/atoms/Card";
+import { Checkbox } from "@/components/atoms/Checkbox";
 import { Input } from "@/components/atoms/Input";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/atoms/Select";
 import { useInfiniteResources } from "@/hooks/useInfiniteResources";
 import { ResourceStatus, type Resource } from "@/types/entities/resource";
 import { Search, X } from "lucide-react";
+import { useTranslations } from "next-intl";
 import { useEffect, useMemo, useRef, useState } from "react";
 
 interface ResourceFilterPanelProps {
@@ -109,6 +118,9 @@ export function ResourceFilterPanel({
     return () => observer.disconnect();
   }, [hasNextPage, isFetchingNextPage, fetchNextPage]);
 
+  const t = useTranslations("resources");
+  const tc = useTranslations("common");
+
   return (
     <Card
       className={`flex flex-col ${className}`}
@@ -116,9 +128,9 @@ export function ResourceFilterPanel({
     >
       <CardHeader className="pb-3 flex-shrink-0">
         <div className="flex items-center justify-between">
-          <CardTitle className="text-lg">Recursos</CardTitle>
+          <CardTitle className="text-lg">{t("title")}</CardTitle>
           <Badge variant="secondary">
-            {selectedResourceIds.length} seleccionados
+            {selectedResourceIds.length} {tc("selected") || "seleccionados"}
           </Badge>
         </div>
       </CardHeader>
@@ -129,7 +141,7 @@ export function ResourceFilterPanel({
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-[var(--color-text-tertiary)]" />
           <Input
             type="text"
-            placeholder="Buscar recursos..."
+            placeholder={tc("search_placeholder")}
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             className="pl-10 pr-10"
@@ -145,30 +157,23 @@ export function ResourceFilterPanel({
         </div>
 
         {/* Filtro por tipo */}
-        <div className="flex flex-wrap gap-2">
-          <button
-            onClick={() => setFilterByType("all")}
-            className={`px-3 py-1 text-xs rounded-full transition-colors ${
-              filterByType === "all"
-                ? "bg-blue-500 text-foreground"
-                : "bg-[var(--color-bg-elevated)] text-[var(--color-text-tertiary)] hover:bg-[var(--color-bg-elevated)]"
-            }`}
-          >
-            Todos
-          </button>
-          {resourceTypes.map((type) => (
-            <button
-              key={type}
-              onClick={() => setFilterByType(type)}
-              className={`px-3 py-1 text-xs rounded-full transition-colors ${
-                filterByType === type
-                  ? "bg-blue-500 text-foreground"
-                  : "bg-[var(--color-bg-elevated)] text-[var(--color-text-tertiary)] hover:bg-[var(--color-bg-elevated)]"
-              }`}
-            >
-              {type}
-            </button>
-          ))}
+        <div className="flex flex-col gap-2">
+          <label className="text-xs font-medium text-[var(--color-text-tertiary)]">
+            {t("filter_by_type") || "Filtrar por tipo"}
+          </label>
+          <Select value={filterByType} onValueChange={setFilterByType}>
+            <SelectTrigger>
+              <SelectValue placeholder={tc("all") || "Todos"} />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">{tc("all") || "Todos"}</SelectItem>
+              {resourceTypes.map((type) => (
+                <SelectItem key={type} value={type}>
+                  {type}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
         </div>
 
         {/* Acciones rápidas */}
@@ -179,7 +184,7 @@ export function ResourceFilterPanel({
             onClick={allSelected ? onClearAll : onSelectAll}
             className="flex-1"
           >
-            {allSelected ? "Deseleccionar todos" : "Seleccionar todos"}
+            {allSelected ? (tc("deselect_all") || "Deseleccionar todos") : (tc("select_all") || "Seleccionar todos")}
           </Button>
         </div>
 
@@ -187,11 +192,11 @@ export function ResourceFilterPanel({
         <div className="flex-1 overflow-y-auto pr-2 min-h-0 space-y-2">
           {isLoading ? (
             <div className="text-center py-8 text-[var(--color-text-tertiary)]">
-              Cargando recursos...
+              {tc("loading")}
             </div>
           ) : filteredResources.length === 0 ? (
             <div className="text-center py-8 text-[var(--color-text-tertiary)]">
-              No se encontraron recursos
+              {t("no_resources") || "No se encontraron recursos"}
             </div>
           ) : (
             <>
@@ -206,19 +211,22 @@ export function ResourceFilterPanel({
                     onDragEnd={() => onDragEnd?.()}
                     className={`flex items-start gap-3 p-3 rounded-lg border cursor-grab active:cursor-grabbing transition-all ${
                       isSelected
-                        ? "border-blue-500 bg-blue-500/10"
-                        : "border-[var(--color-border-strong)] hover:border-[var(--color-border-strong)] hover:bg-[var(--color-bg-inverse)]/50"
+                        ? "border-[var(--color-border-focus)] bg-[var(--color-bg-muted)]"
+                        : "border-[var(--color-border-subtle)] hover:border-[var(--color-border-strong)] hover:bg-[var(--color-bg-surface)]"
                     }`}
                   >
-                    <label className="flex items-start gap-3 flex-1">
-                      <input
-                        type="checkbox"
+                    <div className="flex items-start gap-3 flex-1">
+                      <Checkbox
+                        id={`resource-${resource.id}`}
                         checked={isSelected}
-                        onChange={() => onResourceToggle(resource.id)}
-                        className="mt-0.5 h-4 w-4 rounded border-[var(--color-border-strong)] text-blue-500 focus:ring-blue-500 focus:ring-offset-gray-900 cursor-pointer"
+                        onCheckedChange={() => onResourceToggle(resource.id)}
+                        className="mt-1"
                       />
 
-                      <div className="flex-1 min-w-0 ">
+                      <label
+                        htmlFor={`resource-${resource.id}`}
+                        className="flex-1 min-w-0 cursor-pointer"
+                      >
                         <div className="flex items-center justify-between gap-2">
                           <span className="font-medium text-foreground truncate">
                             {resource.name}
@@ -240,12 +248,12 @@ export function ResourceFilterPanel({
                             className="text-xs shrink-0"
                           >
                             {resource.status === ResourceStatus.AVAILABLE
-                              ? "Disponible"
+                              ? t("available")
                               : resource.status === ResourceStatus.RESERVED
-                                ? "Reservado"
+                                ? t("occupied")
                                 : resource.status === ResourceStatus.MAINTENANCE
-                                  ? "Mantenimiento"
-                                  : "No disponible"}
+                                  ? t("maintenance")
+                                  : t("unavailable")}
                           </Badge>
                           <span>{resource.type}</span>
                         </div>
@@ -263,11 +271,11 @@ export function ResourceFilterPanel({
 
                         {resource.capacity && (
                           <div className="mt-1 text-xs text-[var(--color-text-tertiary)]">
-                            Capacidad: {resource.capacity} personas
+                            {t("capacity") || "Capacidad"}: {resource.capacity}
                           </div>
                         )}
-                      </div>
-                    </label>
+                      </label>
+                    </div>
                   </div>
                 );
               })}
@@ -281,10 +289,10 @@ export function ResourceFilterPanel({
                   {isFetchingNextPage ? (
                     <div className="flex items-center justify-center gap-2">
                       <div className="w-4 h-4 border-2 border-blue-500 border-t-transparent rounded-full animate-spin" />
-                      <span>Cargando más...</span>
+                      <span>{tc("loading")}</span>
                     </div>
                   ) : (
-                    "Scroll para cargar más"
+                    ""
                   )}
                 </div>
               )}
@@ -295,7 +303,7 @@ export function ResourceFilterPanel({
         {/* Contador de resultados */}
         {!isLoading && filteredResources.length > 0 && (
           <div className="text-xs text-[var(--color-text-tertiary)] text-center pt-2 border-t border-[var(--color-border-strong)]">
-            Mostrando {filteredResources.length} de {resources.length} recursos
+            {tc("showing_results", { start: 1, end: filteredResources.length, total: resources.length })}
           </div>
         )}
       </CardContent>

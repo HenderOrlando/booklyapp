@@ -416,14 +416,16 @@ class HttpClient {
     }
   }
 
-  async get<T = unknown>(
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  async get<T = any>(
     endpoint: string,
     requestConfig?: AxiosRequestConfig,
   ): Promise<ApiResponse<T>> {
     return this.request<T>("GET", endpoint, undefined, requestConfig);
   }
 
-  async post<T = unknown>(
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  async post<T = any>(
     endpoint: string,
     data?: unknown,
     requestConfig?: AxiosRequestConfig,
@@ -431,7 +433,8 @@ class HttpClient {
     return this.request<T>("POST", endpoint, data, requestConfig);
   }
 
-  async put<T = unknown>(
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  async put<T = any>(
     endpoint: string,
     data?: unknown,
     requestConfig?: AxiosRequestConfig,
@@ -439,7 +442,8 @@ class HttpClient {
     return this.request<T>("PUT", endpoint, data, requestConfig);
   }
 
-  async patch<T = unknown>(
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  async patch<T = any>(
     endpoint: string,
     data?: unknown,
     requestConfig?: AxiosRequestConfig,
@@ -447,7 +451,8 @@ class HttpClient {
     return this.request<T>("PATCH", endpoint, data, requestConfig);
   }
 
-  async delete<T = unknown>(
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  async delete<T = any>(
     endpoint: string,
     requestConfig?: AxiosRequestConfig,
   ): Promise<ApiResponse<T>> {

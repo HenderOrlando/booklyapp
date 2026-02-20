@@ -436,7 +436,7 @@ export class ReservationsClient {
     const sanitizedFilters = sanitizeReservationSearchFilters(filters);
 
     return await httpClient.get<PaginatedResponse<Reservation>>(
-      buildUrl(AVAILABILITY_ENDPOINTS.RESERVATIONS, sanitizedFilters),
+      buildUrl(AVAILABILITY_ENDPOINTS.RESERVATIONS, sanitizedFilters as unknown as Record<string, unknown>),
     );
   }
 

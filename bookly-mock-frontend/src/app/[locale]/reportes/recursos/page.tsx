@@ -22,7 +22,7 @@ export default function ReportesRecursosPage() {
       ? (serverData as ResourceUtilization[])
       : mockResourceUtilization;
 
-  const handleExport = (format: "csv" | "excel" | "pdf", options: any) => {
+  const handleExport = (format: "csv" | "excel" | "pdf", _options: any) => {
     exportReport({ format, data: resourceData, filename: "recursos" });
   };
 
@@ -32,10 +32,10 @@ export default function ReportesRecursosPage() {
         <div className="flex items-center justify-between">
           <div>
             <h1 className="text-3xl font-bold text-[var(--color-text-primary)] dark:text-[var(--color-text-primary)]">
-              Reportes por Recurso
+              {t("resources_title")}
             </h1>
             <p className="text-[var(--color-text-secondary)] dark:text-[var(--color-text-tertiary)] mt-1">
-              Análisis detallado de utilización y ocupación de recursos
+              {t("resources_desc")}
             </p>
           </div>
         </div>
@@ -56,7 +56,7 @@ export default function ReportesRecursosPage() {
           <div>
             <ExportPanel
               onExport={handleExport}
-              title="Exportar Reporte de Recursos"
+              title={t("export_resources_title")}
               availableFormats={["csv", "excel", "pdf"]}
             />
           </div>

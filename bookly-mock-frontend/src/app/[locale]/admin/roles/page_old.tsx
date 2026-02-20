@@ -62,7 +62,7 @@ export default function RolesAdminPage() {
   const [error, setError] = React.useState("");
   const [selectedRole, setSelectedRole] = React.useState<Role | null>(null);
   const [showRoleModal, setShowRoleModal] = React.useState(false);
-  const [showUserRoleModal, setShowUserRoleModal] = React.useState(false);
+  const [_showUserRoleModal, setShowUserRoleModal] = React.useState(false);
 
   // Cargar roles y usuarios
   React.useEffect(() => {
@@ -98,8 +98,8 @@ export default function RolesAdminPage() {
     fetchData();
   }, []);
 
-  const header = <AppHeader title="Administración de Roles" />;
-  const sidebar = <AppSidebar />;
+  const _header = <AppHeader title="Administración de Roles" />;
+  const _sidebar = <AppSidebar />;
 
   // Columnas para la tabla de roles
   const roleColumns = [
@@ -197,7 +197,7 @@ export default function RolesAdminPage() {
     {
       key: "actions",
       header: "Acciones",
-      cell: (user: User) => (
+      cell: (_user: User) => (
         <Button
           size="sm"
           variant="outline"

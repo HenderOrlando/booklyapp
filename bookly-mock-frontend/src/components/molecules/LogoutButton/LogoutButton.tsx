@@ -28,7 +28,7 @@ export function LogoutButton({
   className = "",
   variant = "button",
 }: LogoutButtonProps) {
-  const router = useRouter();
+  const _router = useRouter();
   const logout = useLogout();
   const t = useTranslations("auth");
   const locale = useLocale();

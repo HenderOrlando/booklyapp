@@ -178,7 +178,7 @@ export default function HistorialAprobacionesPage() {
   }, [history, filterStatus, searchQuery]);
 
   const handleExportCSV = () => {
-    alert("Exportando historial a CSV...");
+    console.log("Exportando historial a CSV...");
     // TODO: Implementar exportación CSV
   };
 
@@ -194,17 +194,17 @@ export default function HistorialAprobacionesPage() {
               </div>
               <div>
                 <h1 className="text-3xl font-bold text-[var(--color-text-primary)] dark:text-[var(--color-text-primary)]">
-                  Historial de Aprobaciones
+                  {t("history_title")}
                 </h1>
                 <p className="text-[var(--color-text-secondary)] dark:text-[var(--color-text-tertiary)] mt-1">
-                  Registro completo de todas las aprobaciones
+                  {t("history_description")}
                 </p>
               </div>
             </div>
           </div>
           <Button onClick={handleExportCSV} variant="outline">
             <Download className="h-4 w-4 mr-2" />
-            Exportar CSV
+            {t("export_csv")}
           </Button>
         </div>
 
@@ -214,7 +214,7 @@ export default function HistorialAprobacionesPage() {
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-[var(--color-text-tertiary)]" />
             <input
               type="text"
-              placeholder="Buscar por usuario, recurso o propósito..."
+              placeholder={t("search_history_placeholder")}
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               className="w-full pl-10 pr-4 py-2 border border-[var(--color-border-strong)] rounded-lg bg-[var(--color-bg-surface)] text-[var(--color-text-primary)]"
@@ -225,11 +225,11 @@ export default function HistorialAprobacionesPage() {
             onChange={(e) => setFilterStatus(e.target.value)}
             className="px-4 py-2 border border-[var(--color-border-strong)] rounded-lg bg-[var(--color-bg-surface)] text-[var(--color-text-primary)]"
           >
-            <option value="all">Todos los estados</option>
-            <option value="APPROVED">Aprobadas</option>
-            <option value="REJECTED">Rechazadas</option>
-            <option value="CANCELLED">Canceladas</option>
-            <option value="EXPIRED">Expiradas</option>
+            <option value="all">{t("all_statuses")}</option>
+            <option value="APPROVED">{t("status.approved")}</option>
+            <option value="REJECTED">{t("status.rejected")}</option>
+            <option value="CANCELLED">{t("status.cancelled")}</option>
+            <option value="EXPIRED">{t("status_expired")}</option>
           </select>
         </div>
 
@@ -272,7 +272,7 @@ export default function HistorialAprobacionesPage() {
                             <>
                               <span>•</span>
                               <span>
-                                Revisada:{" "}
+                                {t("reviewed_at")}{" "}
                                 {format(
                                   new Date(item.reviewedAt),
                                   "d MMM yyyy",
@@ -287,10 +287,10 @@ export default function HistorialAprobacionesPage() {
                       </div>
 
                       {item.priority === "URGENT" && (
-                        <Badge variant="error">Urgente</Badge>
+                        <Badge variant="error">{t("priority.urgent")}</Badge>
                       )}
                       {item.priority === "HIGH" && (
-                        <Badge variant="warning">Alta</Badge>
+                        <Badge variant="warning">{t("priority.high")}</Badge>
                       )}
                     </div>
 
@@ -308,7 +308,7 @@ export default function HistorialAprobacionesPage() {
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div>
                           <p className="text-sm font-medium text-[var(--color-text-secondary)] dark:text-[var(--color-text-tertiary)] mb-2">
-                            Solicitante
+                            {t("requester")}
                           </p>
                           <p className="text-[var(--color-text-primary)] dark:text-[var(--color-text-primary)]">
                             {item.userName}
@@ -320,7 +320,7 @@ export default function HistorialAprobacionesPage() {
 
                         <div>
                           <p className="text-sm font-medium text-[var(--color-text-secondary)] dark:text-[var(--color-text-tertiary)] mb-2">
-                            Recurso
+                            {t("resource")}
                           </p>
                           <p className="text-[var(--color-text-primary)] dark:text-[var(--color-text-primary)]">
                             {item.resourceName}
@@ -332,7 +332,7 @@ export default function HistorialAprobacionesPage() {
 
                         <div>
                           <p className="text-sm font-medium text-[var(--color-text-secondary)] dark:text-[var(--color-text-tertiary)] mb-2">
-                            Fecha de Reserva
+                            {t("reservation_date")}
                           </p>
                           <div className="flex items-center gap-2 text-[var(--color-text-primary)] dark:text-[var(--color-text-primary)]">
                             <Calendar className="h-4 w-4 text-[var(--color-text-tertiary)]" />
@@ -353,13 +353,13 @@ export default function HistorialAprobacionesPage() {
 
                         <div>
                           <p className="text-sm font-medium text-[var(--color-text-secondary)] dark:text-[var(--color-text-tertiary)] mb-2">
-                            Propósito
+                            {t("purpose")}
                           </p>
                           <p className="text-[var(--color-text-primary)] dark:text-[var(--color-text-primary)] text-sm">
                             {item.purpose}
                           </p>
                           <p className="text-sm text-[var(--color-text-secondary)] dark:text-[var(--color-text-tertiary)] mt-1">
-                            {item.attendees} asistentes
+                            {t("attendees_count", { count: item.attendees })}
                           </p>
                         </div>
                       </div>
@@ -368,7 +368,7 @@ export default function HistorialAprobacionesPage() {
                       {item.comments && (
                         <div className="p-3 bg-[var(--color-state-success-bg)] rounded-lg">
                           <p className="text-sm font-medium text-[var(--color-state-success-text)] mb-1">
-                            Comentarios
+                            {t("history")}
                           </p>
                           <p className="text-sm text-[var(--color-state-success-text)]">
                             {item.comments}
@@ -378,7 +378,7 @@ export default function HistorialAprobacionesPage() {
                       {item.rejectionReason && (
                         <div className="p-3 bg-[var(--color-state-error-bg)] rounded-lg">
                           <p className="text-sm font-medium text-[var(--color-state-error-text)] mb-1">
-                            Razón de Rechazo
+                            {t("rejection_reason_title")}
                           </p>
                           <p className="text-sm text-[var(--color-state-error-text)]">
                             {item.rejectionReason}
@@ -390,7 +390,7 @@ export default function HistorialAprobacionesPage() {
                       {item.history && item.history.length > 0 && (
                         <div>
                           <p className="text-sm font-medium text-[var(--color-text-primary)] dark:text-[var(--color-text-primary)] mb-3">
-                            Historial de Acciones
+                            {t("action_history")}
                           </p>
                           <ApprovalTimeline history={item.history} />
                         </div>
@@ -405,7 +405,7 @@ export default function HistorialAprobacionesPage() {
           <div className="text-center py-12 bg-[var(--color-bg-surface)] rounded-lg border border-[var(--color-border-subtle)]">
             <FileText className="h-12 w-12 text-[var(--color-text-tertiary)] dark:text-[var(--color-text-secondary)] mx-auto mb-3" />
             <p className="text-[var(--color-text-secondary)] dark:text-[var(--color-text-tertiary)]">
-              No se encontraron registros
+              {t("no_records_found")}
             </p>
           </div>
         )}
@@ -413,8 +413,10 @@ export default function HistorialAprobacionesPage() {
         {/* Resumen */}
         {filteredHistory.length > 0 && (
           <div className="text-center text-sm text-[var(--color-text-secondary)] dark:text-[var(--color-text-tertiary)]">
-            Mostrando {filteredHistory.length} de {history?.length || 0}{" "}
-            registros
+            {t("showing_records", {
+              count: filteredHistory.length,
+              total: history?.length || 0,
+            })}
           </div>
         )}
       </div>

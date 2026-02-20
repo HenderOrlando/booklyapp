@@ -24,7 +24,7 @@ export default function ReportesUsuariosPage() {
     router.push(`/reportes/usuarios/${userId}`);
   };
 
-  const handleExport = (format: "csv" | "excel" | "pdf", options: any) => {
+  const handleExport = (format: "csv" | "excel" | "pdf", _options: any) => {
     exportReport({ format, data: userData, filename: "usuarios" });
   };
 
@@ -34,10 +34,10 @@ export default function ReportesUsuariosPage() {
         <div className="flex items-center justify-between">
           <div>
             <h1 className="text-3xl font-bold text-[var(--color-text-primary)] dark:text-[var(--color-text-primary)]">
-              Reportes por Usuario
+              {t("users_title")}
             </h1>
             <p className="text-[var(--color-text-secondary)] dark:text-[var(--color-text-tertiary)] mt-1">
-              Actividad y estadísticas de uso por usuario
+              {t("users_desc")}
             </p>
           </div>
         </div>
@@ -50,7 +50,7 @@ export default function ReportesUsuariosPage() {
           <div>
             <ExportPanel
               onExport={handleExport}
-              title="Exportar Reporte de Usuarios"
+              title={t("export_users_title")}
               availableFormats={["csv", "excel", "pdf"]}
               showDateRange={false}
               showOptions={false}

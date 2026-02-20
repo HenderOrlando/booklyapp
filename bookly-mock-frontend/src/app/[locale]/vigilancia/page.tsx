@@ -2,12 +2,8 @@
 
 import { VigilancePanel } from "@/components/organisms/VigilancePanel";
 import { MainLayout } from "@/components/templates/MainLayout";
-import type {
-  ActiveReservationView,
-  CheckInOutStats,
-  VigilanceAlert,
-} from "@/types/entities/checkInOut";
-import { useQuery } from "@tanstack/react-query";
+import { MonitoringClient } from "@/infrastructure/api/monitoring-client";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { RefreshCw, Shield } from "lucide-react";
 import { useTranslations } from "next-intl";
 import * as React from "react";
@@ -20,152 +16,53 @@ import * as React from "react";
  * Implementa RF-23 (Pantalla de vigilancia).
  */
 
-// Mock data temporal
-const getMockVigilanceData = (): {
-  active: ActiveReservationView[];
-  overdue: ActiveReservationView[];
-  alerts: VigilanceAlert[];
-  stats: CheckInOutStats;
-} => ({
-  active: [
-    {
-      reservationId: "res_001",
-      approvalRequestId: "apr_001",
-      resourceId: "resource_001",
-      resourceName: "Auditorio Principal",
-      resourceType: "Auditorio",
-      userId: "user_001",
-      userName: "Carlos Rodríguez",
-      userEmail: "carlos@ufps.edu.co",
-      startTime: new Date(Date.now() - 30 * 60 * 1000).toISOString(), // Comenzó hace 30 min
-      endTime: new Date(Date.now() + 90 * 60 * 1000).toISOString(), // Termina en 90 min
-      status: "CHECKED_IN",
-      checkInId: "checkin_001",
-      checkInTime: new Date(Date.now() - 25 * 60 * 1000).toISOString(),
-      qrCode: "QR_RES_001",
-      canCheckIn: false,
-      canCheckOut: true,
-    },
-    {
-      reservationId: "res_002",
-      resourceId: "resource_002",
-      resourceName: "Sala de Reuniones B",
-      resourceType: "Sala",
-      userId: "user_002",
-      userName: "María González",
-      userEmail: "maria@ufps.edu.co",
-      startTime: new Date(Date.now() - 15 * 60 * 1000).toISOString(),
-      endTime: new Date(Date.now() + 45 * 60 * 1000).toISOString(),
-      status: "CHECKED_IN",
-      checkInId: "checkin_002",
-      checkInTime: new Date(Date.now() - 10 * 60 * 1000).toISOString(),
-      qrCode: "QR_RES_002",
-      canCheckIn: false,
-      canCheckOut: true,
-    },
-  ],
-  overdue: [
-    {
-      reservationId: "res_003",
-      resourceId: "resource_003",
-      resourceName: "Laboratorio de Cómputo 3",
-      resourceType: "Laboratorio",
-      userId: "user_003",
-      userName: "Jorge Martínez",
-      userEmail: "jorge@ufps.edu.co",
-      startTime: new Date(Date.now() - 20 * 60 * 1000).toISOString(), // Comenzó hace 20 min
-      endTime: new Date(Date.now() + 40 * 60 * 1000).toISOString(),
-      status: "LATE",
-      qrCode: "QR_RES_003",
-      canCheckIn: true,
-      canCheckOut: false,
-    },
-    {
-      reservationId: "res_004",
-      resourceId: "resource_004",
-      resourceName: "Sala de Conferencias A",
-      resourceType: "Sala",
-      userId: "user_004",
-      userName: "Ana López",
-      userEmail: "ana@ufps.edu.co",
-      startTime: new Date(Date.now() - 35 * 60 * 1000).toISOString(),
-      endTime: new Date(Date.now() + 25 * 60 * 1000).toISOString(),
-      status: "LATE",
-      qrCode: "QR_RES_004",
-      canCheckIn: true,
-      canCheckOut: false,
-    },
-  ],
-  alerts: [
-    {
-      id: "alert_001",
-      type: "NO_CHECK_IN",
-      severity: "HIGH",
-      reservationId: "res_003",
-      resourceId: "resource_003",
-      resourceName: "Laboratorio de Cómputo 3",
-      userId: "user_003",
-      userName: "Jorge Martínez",
-      message:
-        "El usuario no ha realizado check-in después de 20 minutos del inicio.",
-      timestamp: new Date(Date.now() - 5 * 60 * 1000).toISOString(),
-      isResolved: false,
-    },
-    {
-      id: "alert_002",
-      type: "LATE_CHECK_IN",
-      severity: "MEDIUM",
-      reservationId: "res_004",
-      resourceId: "resource_004",
-      resourceName: "Sala de Conferencias A",
-      userId: "user_004",
-      userName: "Ana López",
-      message: "Check-in realizado con 15 minutos de retraso.",
-      timestamp: new Date(Date.now() - 20 * 60 * 1000).toISOString(),
-      isResolved: false,
-    },
-  ],
-  stats: {
-    totalCheckIns: 45,
-    totalCheckOuts: 42,
-    onTimeCheckIns: 38,
-    lateCheckIns: 5,
-    missedCheckIns: 2,
-    averageDelayMinutes: 12,
-    complianceRate: 95.5,
-    byMethod: {
-      qr: 30,
-      manual: 12,
-      automatic: 0,
-      biometric: 3,
-    },
-    byResource: {},
-    byUser: {},
-  },
-});
-
 export default function VigilanciaPage() {
   const t = useTranslations("vigilance");
   const [autoRefresh, setAutoRefresh] = React.useState(true);
+  const queryClient = useQueryClient();
 
-  // Query con auto-refresh cada 30 segundos
+  // Query para datos de vigilancia (Dashboard unificado)
   const { data, isLoading, refetch } = useQuery({
     queryKey: ["vigilance-data"],
-    queryFn: async () => getMockVigilanceData(),
-    refetchInterval: autoRefresh ? 30000 : false, // 30 segundos
-    staleTime: 10000, // 10 segundos
+    queryFn: async () => {
+      const [activeRes, overdueRes, statsRes, alertsRes] = await Promise.all([
+        MonitoringClient.getActiveCheckIns(),
+        MonitoringClient.getOverdueCheckIns(),
+        MonitoringClient.getStatistics(),
+        MonitoringClient.getActiveAlerts(),
+      ]);
+
+      return {
+        active: activeRes.data || [],
+        overdue: overdueRes.data || [],
+        stats: statsRes.data,
+        alerts: alertsRes.data || [],
+      };
+    },
+    refetchInterval: autoRefresh ? 30000 : false,
+    staleTime: 10000,
+  });
+
+  // Mutation para resolver alertas
+  const resolveAlertMutation = useMutation({
+    mutationFn: ({ alertId, resolution }: { alertId: string; resolution: string }) => 
+      MonitoringClient.resolveIncident(alertId, resolution),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["vigilance-data"] });
+    },
   });
 
   const handleContact = (reservationId: string) => {
     console.log("Contactar reserva:", reservationId);
-    // TODO: Implementar sistema de contacto (llamada, email, SMS)
-    alert(`Contactando usuario de reserva: ${reservationId}`);
+    // Simulación de contacto
+    window.alert(`${t("contacting_user")}: ${reservationId}`);
   };
 
   const handleResolveAlert = (alertId: string) => {
-    console.log("Resolver alerta:", alertId);
-    // TODO: Implementar con mutation
-    alert(`Alerta ${alertId} marcada como resuelta`);
+    const resolution = window.prompt(t("enter_resolution"));
+    if (resolution) {
+      resolveAlertMutation.mutate({ alertId, resolution });
+    }
   };
 
   const handleManualRefresh = () => {
@@ -184,10 +81,10 @@ export default function VigilanciaPage() {
               </div>
               <div>
                 <h1 className="text-3xl font-bold text-[var(--color-text-primary)] dark:text-[var(--color-text-primary)]">
-                  Panel de Vigilancia
+                  {t("panel_title")}
                 </h1>
                 <p className="mt-1 text-[var(--color-text-secondary)] dark:text-[var(--color-text-tertiary)]">
-                  Monitor en tiempo real de reservas y accesos
+                  {t("panel_description")}
                 </p>
               </div>
             </div>
@@ -202,7 +99,7 @@ export default function VigilanciaPage() {
                 onChange={(e) => setAutoRefresh(e.target.checked)}
                 className="rounded border-[var(--color-border-primary)] text-[var(--color-primary-base)] focus:ring-[var(--color-primary-base)]"
               />
-              Auto-actualizar (30s)
+              {t("auto_refresh")}
             </label>
 
             {/* Manual refresh */}
@@ -214,7 +111,7 @@ export default function VigilanciaPage() {
               <RefreshCw
                 className={`h-4 w-4 ${isLoading ? "animate-spin" : ""}`}
               />
-              Actualizar
+              {t("refresh")}
             </button>
           </div>
         </div>
@@ -224,7 +121,7 @@ export default function VigilanciaPage() {
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
             <div className="bg-[var(--color-bg-primary)] dark:bg-[var(--color-bg-secondary)] rounded-lg border border-[var(--color-border-primary)] dark:border-[var(--color-border-primary)] p-4">
               <p className="text-sm text-[var(--color-text-secondary)] dark:text-[var(--color-text-tertiary)]">
-                Activos Ahora
+                {t("active_now_stat")}
               </p>
               <p className="text-2xl font-bold text-[var(--color-text-primary)] dark:text-[var(--color-text-primary)]">
                 {data.active.length}
@@ -232,7 +129,7 @@ export default function VigilanciaPage() {
             </div>
             <div className="bg-[var(--color-bg-primary)] dark:bg-[var(--color-bg-secondary)] rounded-lg border border-[var(--color-border-primary)] dark:border-[var(--color-border-primary)] p-4">
               <p className="text-sm text-[var(--color-text-secondary)] dark:text-[var(--color-text-tertiary)]">
-                Check-ins Hoy
+                {t("check_ins_today_stat")}
               </p>
               <p className="text-2xl font-bold text-[var(--color-text-primary)] dark:text-[var(--color-text-primary)]">
                 {data.stats.totalCheckIns}
@@ -240,7 +137,7 @@ export default function VigilanciaPage() {
             </div>
             <div className="bg-[var(--color-bg-primary)] dark:bg-[var(--color-bg-secondary)] rounded-lg border border-[var(--color-border-primary)] dark:border-[var(--color-border-primary)] p-4">
               <p className="text-sm text-[var(--color-text-secondary)] dark:text-[var(--color-text-tertiary)]">
-                Retrasos
+                {t("delays_stat")}
               </p>
               <p className="text-2xl font-bold text-orange-600 dark:text-orange-400">
                 {data.stats.lateCheckIns}
@@ -248,7 +145,7 @@ export default function VigilanciaPage() {
             </div>
             <div className="bg-[var(--color-bg-primary)] dark:bg-[var(--color-bg-secondary)] rounded-lg border border-[var(--color-border-primary)] dark:border-[var(--color-border-primary)] p-4">
               <p className="text-sm text-[var(--color-text-secondary)] dark:text-[var(--color-text-tertiary)]">
-                Ausencias
+                {t("absences_stat")}
               </p>
               <p className="text-2xl font-bold text-state-error-600 dark:text-state-error-400">
                 {data.overdue.length}
@@ -271,7 +168,7 @@ export default function VigilanciaPage() {
 
         {/* Última actualización */}
         <div className="text-center text-xs text-[var(--color-text-tertiary)] dark:text-[var(--color-text-tertiary)]">
-          Última actualización:{" "}
+          {t("last_updated")}{" "}
           {new Date().toLocaleTimeString("es-ES", {
             hour: "2-digit",
             minute: "2-digit",

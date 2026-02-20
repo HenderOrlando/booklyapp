@@ -137,7 +137,7 @@ export function MaintenanceModal({
     onClose();
   };
 
-  const getTypeLabel = (type: string) => {
+  const _getTypeLabel = (type: string) => {
     switch (type) {
       case "PREVENTIVE":
         return "Preventivo";
@@ -150,7 +150,7 @@ export function MaintenanceModal({
     }
   };
 
-  const getStatusLabel = (status: string) => {
+  const _getStatusLabel = (status: string) => {
     switch (status) {
       case "SCHEDULED":
         return "Programado";

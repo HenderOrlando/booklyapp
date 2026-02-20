@@ -181,12 +181,12 @@ export function CalendarView({
     setCurrentDate(new Date());
   };
 
-  const handleEventDragStart = (event: CalendarEvent) => {
+  const _handleEventDragStart = (event: CalendarEvent) => {
     setDraggedEvent(event);
     onEventDragStart?.(event);
   };
 
-  const handleEventDragEnd = () => {
+  const _handleEventDragEnd = () => {
     setDraggedEvent(null);
     onEventDragEnd?.();
   };

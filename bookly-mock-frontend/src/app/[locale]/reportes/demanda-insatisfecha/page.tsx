@@ -84,15 +84,15 @@ export default function DemandaInsatisfechaPage() {
         <div className="flex items-center justify-between">
           <div>
             <h1 className="text-2xl font-bold text-[var(--color-text-primary)]">
-              Demanda Insatisfecha
+              {t("unsatisfied_demand_title")}
             </h1>
             <p className="mt-1 text-sm text-[var(--color-text-secondary)]">
-              Recursos con alta demanda que no pudo ser cubierta
+              {t("unsatisfied_demand_desc")}
             </p>
           </div>
           <Button variant="outline" className="gap-2">
             <Download className="h-4 w-4" />
-            Exportar
+            {t("export")}
           </Button>
         </div>
 
@@ -108,7 +108,7 @@ export default function DemandaInsatisfechaPage() {
                   {totalRejected}
                 </p>
                 <p className="text-xs text-[var(--color-text-secondary)]">
-                  Reservas rechazadas
+                  {t("rejected_reservations")}
                 </p>
               </div>
             </div>
@@ -123,7 +123,7 @@ export default function DemandaInsatisfechaPage() {
                   {totalWaitlisted}
                 </p>
                 <p className="text-xs text-[var(--color-text-secondary)]">
-                  En lista de espera
+                  {t("in_waitlist")}
                 </p>
               </div>
             </div>
@@ -138,7 +138,7 @@ export default function DemandaInsatisfechaPage() {
                   {mockData.length}
                 </p>
                 <p className="text-xs text-[var(--color-text-secondary)]">
-                  Recursos afectados
+                  {t("affected_resources")}
                 </p>
               </div>
             </div>
@@ -152,19 +152,19 @@ export default function DemandaInsatisfechaPage() {
               <thead>
                 <tr className="border-b bg-[var(--color-bg-muted)]">
                   <th className="px-4 py-3 text-left font-medium text-[var(--color-text-secondary)]">
-                    Recurso
+                    {t("resource")}
                   </th>
                   <th className="px-4 py-3 text-center font-medium text-[var(--color-text-secondary)]">
-                    Rechazadas
+                    {t("rejected")}
                   </th>
                   <th className="px-4 py-3 text-center font-medium text-[var(--color-text-secondary)]">
-                    En espera
+                    {t("waiting")}
                   </th>
                   <th className="px-4 py-3 text-left font-medium text-[var(--color-text-secondary)]">
-                    Horarios pico
+                    {t("peak_hours")}
                   </th>
                   <th className="px-4 py-3 text-center font-medium text-[var(--color-text-secondary)]">
-                    Score demanda
+                    {t("demand_score")}
                   </th>
                 </tr>
               </thead>

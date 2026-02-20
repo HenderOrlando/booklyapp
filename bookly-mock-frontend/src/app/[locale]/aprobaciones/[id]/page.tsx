@@ -88,7 +88,7 @@ export default function ApprovalDetailPage() {
       {
         id: request.id,
         stepName: request.currentLevel || "FIRST_LEVEL",
-        comment: comment || t("approve_comment_default") || "Aprobado",
+        comment: comment || t("approve_comment_default"),
       },
       {
         onSuccess: () => {
@@ -185,12 +185,12 @@ export default function ApprovalDetailPage() {
             <span
               className={`px-3 py-1 rounded-full text-sm font-medium ${getStatusColor(request.status)}`}
             >
-              {t(`status.${request.status?.toLowerCase()}`)}
+              {t(`status.${request.status?.toLowerCase() as any}`)}
             </span>
             <span
               className={`px-3 py-1 rounded-full text-sm font-medium ${getPriorityColor(request.priority)}`}
             >
-              {t(`priority.${request.priority?.toLowerCase()}`)}
+              {t(`priority.${request.priority?.toLowerCase() as any}`)}
             </span>
           </div>
         </div>

@@ -12,9 +12,19 @@ import {
 } from "@/components/atoms/Card";
 import { AppHeader } from "@/components/organisms/AppHeader";
 import { AppSidebar } from "@/components/organisms/AppSidebar";
+import { ApprovalFlowModal } from "@/components/organisms/ApprovalFlowModal";
 import { MainLayout } from "@/components/templates/MainLayout";
-import { httpClient } from "@/infrastructure/http";
+import {
+  useApprovalFlows,
+  useCreateApprovalFlow,
+  useUpdateApprovalFlow,
+  useDeleteApprovalFlow,
+  useActivateApprovalFlow,
+  useDeactivateApprovalFlow,
+} from "@/hooks/useApprovalFlows";
+import { useToast } from "@/hooks/useToast";
 import { cn } from "@/lib/utils";
+import type { ApprovalFlowConfig } from "@/types/entities/approval";
 import {
   ArrowDown,
   ChevronRight,
@@ -41,6 +51,12 @@ import * as React from "react";
  * Backend: GET/POST /approval-flows (stockpile-service)
  */
 
+interface AutoApproveConditions {
+  roleWhitelist: string[];
+  maxDurationMinutes: number;
+  maxAdvanceDays: number;
+}
+
 interface ApprovalStep {
   order: number;
   approverRole: string;
@@ -55,16 +71,12 @@ interface ApprovalFlow {
   description: string;
   resourceTypes: string[];
   steps: ApprovalStep[];
-  autoApproveConditions: {
-    roleWhitelist: string[];
-    maxDurationMinutes: number;
-    maxAdvanceDays: number;
-  };
+  autoApproveConditions: AutoApproveConditions;
   isActive: boolean;
   createdAt: string;
 }
 
-const mockFlows: ApprovalFlow[] = [
+const _mockFlows: ApprovalFlow[] = [
   {
     id: "flow-001",
     name: "Flujo Rápido Docente",
@@ -191,56 +203,82 @@ const resourceTypeLabels: Record<string, string> = {
 };
 
 export default function FlujosAprobacionPage() {
-  const t = useTranslations("admin");
-  const [flows, setFlows] = React.useState<ApprovalFlow[]>([]);
-  const [loading, setLoading] = React.useState(true);
+  const _t = useTranslations("admin");
+  const { showSuccess, showError } = useToast();
   const [expandedFlow, setExpandedFlow] = React.useState<string | null>(null);
+  const [isModalOpen, setIsModalOpen] = React.useState(false);
+  const [selectedFlow, setSelectedFlow] = React.useState<ApprovalFlowConfig | undefined>(undefined);
 
-  React.useEffect(() => {
-    const fetchFlows = async () => {
-      try {
-        const res = (await httpClient.get("approval-flows")) as any;
-        if (
-          res?.success &&
-          Array.isArray(res.data?.items || res.data?.data || res.data)
-        ) {
-          const data = res.data?.items || res.data?.data || res.data;
-          setFlows(
-            data.map((f: any) => ({
-              id: f.id || f._id,
-              name: f.name,
-              description: f.description || "",
-              resourceTypes: f.resourceTypes || [],
-              steps: f.steps || [],
-              autoApproveConditions: f.autoApproveConditions || {
-                roleWhitelist: [],
-                maxDurationMinutes: 0,
-                maxAdvanceDays: 0,
-              },
-              isActive: f.isActive ?? true,
-              createdAt: f.createdAt,
-            })),
-          );
-        } else {
-          setFlows(mockFlows);
-        }
-      } catch {
-        setFlows(mockFlows);
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchFlows();
-  }, []);
+  // Queries & Mutations
+  const { data: flowsData, isLoading: loading, refetch: _refetch } = useApprovalFlows();
+  const createFlow = useCreateApprovalFlow();
+  const updateFlow = useUpdateApprovalFlow();
+  const deleteFlow = useDeleteApprovalFlow();
+  const activateFlow = useActivateApprovalFlow();
+  const deactivateFlow = useDeactivateApprovalFlow();
+
+  const flows = flowsData?.items || [];
 
   const toggleExpand = (id: string) => {
     setExpandedFlow((prev) => (prev === id ? null : id));
   };
 
+  const handleCreate = () => {
+    setSelectedFlow(undefined);
+    setIsModalOpen(true);
+  };
+
+  const handleEdit = (flow: ApprovalFlowConfig) => {
+    setSelectedFlow(flow);
+    setIsModalOpen(true);
+  };
+
+  const handleSave = async (data: any) => {
+    try {
+      if (selectedFlow) {
+        await updateFlow.mutateAsync({ id: selectedFlow.id, data });
+        showSuccess("Flujo actualizado", "El flujo de aprobación ha sido actualizado exitosamente.");
+      } else {
+        await createFlow.mutateAsync(data);
+        showSuccess("Flujo creado", "El flujo de aprobación ha sido creado exitosamente.");
+      }
+      setIsModalOpen(false);
+    } catch (error) {
+      showError("Error", "No se pudo guardar el flujo de aprobación.");
+    }
+  };
+
+  const handleDelete = async (id: string) => {
+    if (!confirm("¿Estás seguro de que deseas eliminar este flujo? Esta acción no se puede deshacer.")) {
+      return;
+    }
+
+    try {
+      await deleteFlow.mutateAsync(id);
+      showSuccess("Flujo eliminado", "El flujo ha sido eliminado correctamente.");
+    } catch (error) {
+      showError("Error", "No se pudo eliminar el flujo.");
+    }
+  };
+
+  const handleToggleActive = async (flow: ApprovalFlowConfig) => {
+    try {
+      if (flow.isActive) {
+        await deactivateFlow.mutateAsync(flow.id);
+        showSuccess("Flujo desactivado", `El flujo ${flow.name} ha sido desactivado.`);
+      } else {
+        await activateFlow.mutateAsync(flow.id);
+        showSuccess("Flujo activado", `El flujo ${flow.name} ha sido activado.`);
+      }
+    } catch (error) {
+      showError("Error", "No se pudo cambiar el estado del flujo.");
+    }
+  };
+
   const activeFlows = flows.filter((f) => f.isActive).length;
 
-  const header = <AppHeader title="Flujos de Aprobación" />;
-  const sidebar = <AppSidebar />;
+  const _header = <AppHeader title="Flujos de Aprobación" />;
+  const _sidebar = <AppSidebar />;
 
   return (
     <MainLayout>
@@ -256,7 +294,7 @@ export default function FlujosAprobacionPage() {
               solicitante
             </p>
           </div>
-          <Button className="gap-2">
+          <Button className="gap-2" onClick={handleCreate}>
             <Plus className="h-4 w-4" />
             Nuevo flujo
           </Button>
@@ -327,8 +365,10 @@ export default function FlujosAprobacionPage() {
           <div className="space-y-4">
             {flows.map((flow) => {
               const isExpanded = expandedFlow === flow.id;
+              const autoApprove = flow.autoApproveConditions as unknown as AutoApproveConditions;
               const hasAutoApprove =
-                flow.autoApproveConditions.roleWhitelist.length > 0;
+                autoApprove && 
+                autoApprove.roleWhitelist?.length > 0;
 
               return (
                 <Card
@@ -372,6 +412,20 @@ export default function FlujosAprobacionPage() {
                         </div>
                       </div>
                       <div className="flex items-center gap-2">
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          className={cn(
+                            "h-8 px-2",
+                            flow.isActive ? "text-state-warning-600" : "text-state-success-600"
+                          )}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleToggleActive(flow);
+                          }}
+                        >
+                          {flow.isActive ? "Desactivar" : "Activar"}
+                        </Button>
                         <Badge variant={flow.isActive ? "success" : "default"}>
                           {flow.isActive ? "Activo" : "Inactivo"}
                         </Badge>
@@ -416,26 +470,26 @@ export default function FlujosAprobacionPage() {
                           <div className="grid grid-cols-1 md:grid-cols-3 gap-2 text-sm text-[var(--color-text-secondary)]">
                             <div>
                               <span className="font-medium">Roles:</span>{" "}
-                              {flow.autoApproveConditions.roleWhitelist
-                                .map((r) => roleLabels[r] || r)
+                              {(flow.autoApproveConditions as unknown as AutoApproveConditions).roleWhitelist
+                                ?.map((r: string) => roleLabels[r] || r)
                                 .join(", ")}
                             </div>
-                            {flow.autoApproveConditions.maxDurationMinutes >
+                            {(flow.autoApproveConditions as unknown as AutoApproveConditions).maxDurationMinutes >
                               0 && (
                               <div>
                                 <span className="font-medium">
                                   Duración máx:
                                 </span>{" "}
-                                {flow.autoApproveConditions.maxDurationMinutes}{" "}
+                                {(flow.autoApproveConditions as unknown as AutoApproveConditions).maxDurationMinutes}{" "}
                                 min
                               </div>
                             )}
-                            {flow.autoApproveConditions.maxAdvanceDays > 0 && (
+                            {(flow.autoApproveConditions as unknown as AutoApproveConditions).maxAdvanceDays > 0 && (
                               <div>
                                 <span className="font-medium">
                                   Anticipación máx:
                                 </span>{" "}
-                                {flow.autoApproveConditions.maxAdvanceDays} días
+                                {(flow.autoApproveConditions as unknown as AutoApproveConditions).maxAdvanceDays} días
                               </div>
                             )}
                           </div>
@@ -460,18 +514,21 @@ export default function FlujosAprobacionPage() {
                                       {step.description}
                                     </p>
                                     <div className="mt-1 flex items-center gap-3 text-xs text-[var(--color-text-tertiary)]">
-                                      <span className="flex items-center gap-1">
+                                      <div className="flex items-center gap-1">
                                         <Shield className="h-3 w-3" />
-                                        {roleLabels[step.approverRole] ||
-                                          step.approverRole}
-                                      </span>
-                                      <span className="flex items-center gap-1">
-                                        <Clock className="h-3 w-3" />
-                                        Timeout: {step.timeoutHours}h
-                                      </span>
-                                      {step.autoApproveIfTimeout && (
-                                        <Badge variant="warning">
-                                          Auto-aprueba si timeout
+                                        {step.approverRoles
+                                          .map((r) => roleLabels[r] || r)
+                                          .join(", ")}
+                                      </div>
+                                      {step.timeoutHours && (
+                                        <span className="flex items-center gap-1">
+                                          <Clock className="h-3 w-3" />
+                                          Timeout: {step.timeoutHours}h
+                                        </span>
+                                      )}
+                                      {!step.isRequired && (
+                                        <Badge variant="outline">
+                                          Opcional
                                         </Badge>
                                       )}
                                     </div>
@@ -490,7 +547,12 @@ export default function FlujosAprobacionPage() {
 
                       {/* Actions */}
                       <div className="flex justify-end gap-2 border-t pt-3">
-                        <Button variant="outline" size="sm" className="gap-1">
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          className="gap-1"
+                          onClick={() => handleEdit(flow)}
+                        >
                           <Edit className="h-3.5 w-3.5" />
                           Editar
                         </Button>
@@ -498,6 +560,7 @@ export default function FlujosAprobacionPage() {
                           variant="destructive"
                           size="sm"
                           className="gap-1"
+                          onClick={() => handleDelete(flow.id)}
                         >
                           <Trash2 className="h-3.5 w-3.5" />
                           Eliminar
@@ -510,6 +573,14 @@ export default function FlujosAprobacionPage() {
             })}
           </div>
         )}
+        {/* Modal */}
+        <ApprovalFlowModal
+          isOpen={isModalOpen}
+          onClose={() => setIsModalOpen(false)}
+          onSave={handleSave}
+          initialData={selectedFlow}
+          isLoading={createFlow.isPending || updateFlow.isPending}
+        />
       </div>
     </MainLayout>
   );

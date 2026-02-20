@@ -42,8 +42,8 @@ const defaultSlots: TimeSlotConfig[] = DAYS.map((_, i) => ({
 }));
 
 export default function HorariosPage() {
-  const t = useTranslations("admin");
-  const { data: serverSlots, isLoading } = useGlobalSchedules();
+  const _t = useTranslations("admin");
+  const { data: serverSlots, isLoading: _isLoading } = useGlobalSchedules();
   const saveSchedules = useSaveSchedules();
   const [slots, setSlots] = React.useState<TimeSlotConfig[]>(defaultSlots);
   const [saved, setSaved] = React.useState(false);

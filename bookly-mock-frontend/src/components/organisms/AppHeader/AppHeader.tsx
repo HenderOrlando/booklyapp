@@ -18,7 +18,7 @@ interface AppHeaderProps {
 }
 
 export function AppHeader({
-  title,
+  title: _title,
   showUser = true,
   className = "",
 }: AppHeaderProps) {

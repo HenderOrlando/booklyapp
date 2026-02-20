@@ -187,7 +187,7 @@ export const mockCheckInOuts: CheckInOut[] = [
       vigilantId: "vigilante_001",
       vigilantName: "Juan Pérez",
       verificationStatus: "VERIFIED",
-      delayMinutes: 0,
+      delayMinutes: "0",
     },
     createdAt: new Date(Date.now() - 30 * 60 * 1000).toISOString(),
     updatedAt: new Date(Date.now() - 30 * 60 * 1000).toISOString(),
@@ -406,7 +406,7 @@ export function mockPerformCheckIn(reservationId: string): Promise<CheckInOut> {
         metadata: {
           verificationStatus: "VERIFIED",
           scheduledTime: new Date().toISOString(),
-          delayMinutes: 0,
+          delayMinutes: "0",
         },
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString(),

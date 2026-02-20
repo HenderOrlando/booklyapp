@@ -29,20 +29,21 @@ interface User {
   enrollmentDate?: string;
 }
 
-interface ResourceWithPriority extends Resource {
+interface _ResourceWithPriority extends Resource {
   priority?: number;
 }
 
 export default function ProgramaDetallePage({
   params,
 }: {
-  params: { id: string };
+  params: Promise<{ id: string }>;
 }) {
+  const resolvedParams = React.use(params);
   const t = useTranslations("programs");
   const router = useRouter();
 
   // React Query para cargar programa
-  const { data: program, isLoading: loading } = useProgram(params.id);
+  const { data: program, isLoading: loading } = useProgram(resolvedParams.id);
 
   // Estados manuales para recursos y usuarios (mantener por ahora)
   const [allResources, setAllResources] = React.useState<Resource[]>([]);
@@ -64,10 +65,10 @@ export default function ProgramaDetallePage({
       try {
         const [resourcesRes, programResourcesRes, usersRes, programUsersRes] =
           await Promise.all([
-            httpClient.get("resources"),
-            httpClient.get(`program-resources?programId=${params.id}`),
-            httpClient.get("users"),
-            httpClient.get(`program-users?programId=${params.id}`),
+            httpClient.get<{ items?: Resource[] }>("resources"),
+            httpClient.get<{ items?: Resource[] }>(`program-resources?programId=${resolvedParams.id}`),
+            httpClient.get<{ items?: User[] }>("users"),
+            httpClient.get<{ items?: User[] }>(`program-users?programId=${resolvedParams.id}`),
           ]);
 
         if (resourcesRes.success && resourcesRes.data) {
@@ -91,7 +92,7 @@ export default function ProgramaDetallePage({
     };
 
     fetchData();
-  }, [params.id]);
+  }, [resolvedParams.id]);
 
   // Inicializar selección cuando se cargan recursos del programa
   React.useEffect(() => {
@@ -150,7 +151,7 @@ export default function ProgramaDetallePage({
       // Agregar nuevos recursos
       for (const resourceId of toAdd) {
         await httpClient.post("program-resources", {
-          programId: params.id,
+          programId: resolvedParams.id,
           resourceId,
           priority: 3,
         });
@@ -159,7 +160,7 @@ export default function ProgramaDetallePage({
       // Quitar recursos
       for (const resourceId of toRemove) {
         await httpClient.delete(
-          `program-resources?programId=${params.id}&resourceId=${resourceId}`,
+          `program-resources?programId=${resolvedParams.id}&resourceId=${resourceId}`,
         );
       }
 
@@ -172,7 +173,6 @@ export default function ProgramaDetallePage({
       setResourceFilter("");
     } catch (err: any) {
       console.error("Error saving resources:", err);
-      alert(t("save_resources_error"));
     }
   };
 
@@ -180,7 +180,7 @@ export default function ProgramaDetallePage({
   const handleAddUser = async (userId: string, role: string) => {
     try {
       const response = await httpClient.post("program-users", {
-        programId: params.id,
+        programId: resolvedParams.id,
         userId,
         role,
       });
@@ -193,7 +193,6 @@ export default function ProgramaDetallePage({
       }
     } catch (err: any) {
       console.error("Error adding user:", err);
-      alert(t("add_user_error"));
     }
   };
 
@@ -201,17 +200,16 @@ export default function ProgramaDetallePage({
   const handleRemoveUser = async (userId: string) => {
     try {
       await httpClient.delete(
-        `program-users?programId=${params.id}&userId=${userId}`,
+        `program-users?programId=${resolvedParams.id}&userId=${userId}`,
       );
       setProgramUsers(programUsers.filter((u: any) => u.id !== userId));
     } catch (err: any) {
       console.error("Error removing user:", err);
-      alert(t("remove_user_error"));
     }
   };
 
-  const header = <AppHeader title={program?.name || t("loading_program")} />;
-  const sidebar = <AppSidebar />;
+  const _header = <AppHeader title={program?.name || t("loading_program")} />;
+  const _sidebar = <AppSidebar />;
 
   if (loading) {
     return (

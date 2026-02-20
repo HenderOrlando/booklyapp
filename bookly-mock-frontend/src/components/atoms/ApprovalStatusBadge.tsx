@@ -8,6 +8,7 @@ import {
   Timer,
   XCircle,
 } from "lucide-react";
+import { useTranslations } from "next-intl";
 import * as React from "react";
 
 /**
@@ -35,7 +36,7 @@ export interface ApprovalStatusBadgeProps {
 const STATUS_CONFIG: Record<
   ApprovalStatus,
   {
-    label: string;
+    translationKey: string;
     variant:
       | "default"
       | "secondary"
@@ -48,32 +49,32 @@ const STATUS_CONFIG: Record<
   }
 > = {
   PENDING: {
-    label: "Pendiente",
+    translationKey: "status.pending",
     variant: "warning",
     icon: Clock,
   },
   IN_REVIEW: {
-    label: "En Revisión",
+    translationKey: "status.in_review",
     variant: "secondary",
     icon: AlertCircle,
   },
   APPROVED: {
-    label: "Aprobada",
+    translationKey: "status.approved",
     variant: "success",
     icon: CheckCircle,
   },
   REJECTED: {
-    label: "Rechazada",
+    translationKey: "status.rejected",
     variant: "error",
     icon: XCircle,
   },
   CANCELLED: {
-    label: "Cancelada",
+    translationKey: "status.cancelled",
     variant: "outline",
     icon: Ban,
   },
   EXPIRED: {
-    label: "Expirada",
+    translationKey: "status_expired",
     variant: "default",
     icon: Timer,
   },
@@ -81,13 +82,14 @@ const STATUS_CONFIG: Record<
 
 export const ApprovalStatusBadge = React.memo<ApprovalStatusBadgeProps>(
   ({ status, showIcon = true, className }) => {
+    const t = useTranslations("approvals");
     const config = STATUS_CONFIG[status];
     const Icon = config.icon;
 
     return (
       <Badge variant={config.variant} className={className}>
         {showIcon && <Icon className="mr-1.5 h-3.5 w-3.5" aria-hidden="true" />}
-        {config.label}
+        {t(config.translationKey)}
       </Badge>
     );
   }

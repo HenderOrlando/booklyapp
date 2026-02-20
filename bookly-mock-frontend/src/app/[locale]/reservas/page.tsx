@@ -22,6 +22,7 @@ import {
 import { useReservations, useReservationStats } from "@/hooks/useReservations";
 import { useRouter } from "@/i18n/navigation";
 import { mockResourcesForReservations } from "@/infrastructure/mock/data/reservations-service.mock";
+import type { Resource } from "@/types/entities/resource";
 import type {
   CreateReservationDto,
   Reservation,
@@ -60,9 +61,9 @@ export default function ReservasPage() {
   const [showCreateModal, setShowCreateModal] = useState(false);
 
   // Filtros para API
-  const apiFilters = {
+  const apiFilters: import("@/infrastructure/api/reservations-client").ReservationSearchFilters = {
     ...(debouncedFilter ? { search: debouncedFilter } : {}),
-    ...(statusFilter !== "all" ? { status: statusFilter } : {}),
+    ...(statusFilter !== "all" ? { status: statusFilter as import("@/infrastructure/api/reservations-client").BackendReservationStatus } : {}),
   };
 
   const { data: reservationsData, isLoading: loadingReservations } =
@@ -264,7 +265,7 @@ export default function ReservasPage() {
           isOpen={true}
           onClose={() => setEditingReservation(null)}
           onSave={handleSaveEdit}
-          resources={mockResourcesForReservations}
+          resources={mockResourcesForReservations as Resource[]}
           reservation={editingReservation}
           mode="edit"
           loading={updateReservation.isPending}
@@ -277,7 +278,7 @@ export default function ReservasPage() {
           isOpen={true}
           onClose={() => setShowCreateModal(false)}
           onSave={handleCreateReservation}
-          resources={mockResourcesForReservations}
+          resources={mockResourcesForReservations as Resource[]}
           mode="create"
           loading={createReservation.isPending}
         />

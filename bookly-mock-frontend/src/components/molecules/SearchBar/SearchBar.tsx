@@ -1,5 +1,6 @@
 import { Button } from "@/components/atoms/Button";
 import { Input } from "@/components/atoms/Input";
+import { useTranslations } from "next-intl";
 
 /**
  * SearchBar - Molecule Component
@@ -32,7 +33,7 @@ export interface SearchBarProps {
 }
 
 export function SearchBar({
-  placeholder = "Buscar...",
+  placeholder,
   value,
   onChange,
   onClear,
@@ -40,12 +41,15 @@ export function SearchBar({
   onAdvancedSearch,
   className = "",
 }: SearchBarProps) {
+  const t = useTranslations("common");
+  const resolvedPlaceholder = placeholder || t("search_placeholder");
+
   return (
     <div className={`flex gap-2 ${className}`}>
       <div className="relative flex-1">
         <Input
           type="text"
-          placeholder={placeholder}
+          placeholder={resolvedPlaceholder}
           value={value}
           onChange={(e) => onChange(e.target.value)}
           className="pr-8"
@@ -54,7 +58,7 @@ export function SearchBar({
           <button
             onClick={onClear}
             className="absolute right-2 top-1/2 -translate-y-1/2 text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] transition-colors"
-            aria-label="Limpiar búsqueda"
+            aria-label={t("clear_filters")}
           >
             <svg
               className="w-5 h-5"
@@ -88,7 +92,7 @@ export function SearchBar({
               d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4"
             />
           </svg>
-          Búsqueda Avanzada
+          {t("search")}
         </Button>
       )}
     </div>

@@ -59,9 +59,9 @@ export const DashboardGrid = React.memo<DashboardGridProps>(
           <div className="bg-[var(--color-bg-surface)] rounded-xl border border-[var(--color-border-subtle)] shadow-sm overflow-hidden p-1">
             <LineChartCard
               data={
-                trend?.map((point) => ({
-                  name: point.label || point.date || point.name,
-                  value: point.value || point.reservations,
+                trend?.map((point: Record<string, unknown>) => ({
+                  name: (point.label || point.date || point.name) as string,
+                  value: (point.value || point.reservations) as number,
                 })) || []
               }
               xKey="name"

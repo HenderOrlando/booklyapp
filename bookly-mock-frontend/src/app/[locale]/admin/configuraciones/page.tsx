@@ -282,8 +282,8 @@ export default function ConfiguracionesPage() {
   const isLoading = configLoading || storageLoading;
   const isSaving = updateConfig.isPending || updateStorage.isPending;
 
-  const header = <AppHeader title="Configuraciones" />;
-  const sidebar = <AppSidebar />;
+  const _header = <AppHeader title="Configuraciones" />;
+  const _sidebar = <AppSidebar />;
 
   if (isApplyingTheme) {
     return <ThemeReloadSplash />;

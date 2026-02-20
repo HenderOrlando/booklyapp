@@ -12,6 +12,7 @@
 
 import { Badge } from "@/components/atoms/Badge";
 import { Button } from "@/components/atoms/Button";
+import { cn } from "@/lib/utils";
 import {
   Card,
   CardContent,
@@ -122,11 +123,10 @@ export function RecurringReservationPreview({
                 <div
                   className="bg-brand-primary-600 h-full transition-all duration-500 ease-out"
                   style={{
-                    ["--progress-width" as any]: `${Math.round(
+                    width: `${Math.round(
                       ((progress.created + progress.failed) / progress.total) *
                         100,
                     )}%`,
-                    width: "var(--progress-width)",
                   }}
                 />
               </div>

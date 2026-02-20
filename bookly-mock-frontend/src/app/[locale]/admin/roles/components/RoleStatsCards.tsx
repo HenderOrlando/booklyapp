@@ -7,9 +7,6 @@
 import {
   Card,
   CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
 } from "@/components/atoms/Card";
 import type { Permission, Role, User } from "@/types/entities/user";
 import { useTranslations } from "next-intl";
@@ -27,43 +24,54 @@ export function RoleStatsCards({
 }: RoleStatsCardsProps) {
   const t = useTranslations("admin.roles");
 
+  const stats = [
+    {
+      title: t("total_roles"),
+      value: roles.length,
+      icon: "🛡️",
+      description: t("roles_in_system"),
+      color: "bg-brand-primary-500/10 text-brand-primary-500",
+    },
+    {
+      title: t("total_users"),
+      value: users.length,
+      icon: "👥",
+      description: t("assigned_users"),
+      color: "bg-blue-500/10 text-blue-500",
+    },
+    {
+      title: t("unique_permissions"),
+      value: permissions.length,
+      icon: "🔑",
+      description: t("system_permissions"),
+      color: "bg-emerald-500/10 text-emerald-500",
+    },
+  ];
+
   return (
     <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-      <Card>
-        <CardHeader>
-          <CardTitle>{t("total_roles")}</CardTitle>
-          <CardDescription>{t("roles_in_system")}</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className="text-4xl font-bold text-brand-primary-500">
-            {roles.length}
-          </div>
-        </CardContent>
-      </Card>
-
-      <Card>
-        <CardHeader>
-          <CardTitle>{t("total_users")}</CardTitle>
-          <CardDescription>{t("assigned_users")}</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className="text-4xl font-bold text-brand-primary-500">
-            {users.length}
-          </div>
-        </CardContent>
-      </Card>
-
-      <Card>
-        <CardHeader>
-          <CardTitle>{t("unique_permissions")}</CardTitle>
-          <CardDescription>{t("system_permissions")}</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className="text-4xl font-bold text-brand-primary-500">
-            {permissions.length}
-          </div>
-        </CardContent>
-      </Card>
+      {stats.map((stat, index) => (
+        <Card key={index} className="overflow-hidden border-none shadow-md hover:shadow-lg transition-shadow">
+          <CardContent className="p-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-xs font-bold text-[var(--color-text-tertiary)] uppercase tracking-wider mb-1">
+                  {stat.title}
+                </p>
+                <h3 className="text-3xl font-black text-foreground">
+                  {stat.value}
+                </h3>
+                <p className="text-xs text-[var(--color-text-tertiary)] mt-1">
+                  {stat.description}
+                </p>
+              </div>
+              <div className={`w-14 h-14 rounded-2xl flex items-center justify-center text-2xl ${stat.color}`}>
+                {stat.icon}
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      ))}
     </div>
   );
 }

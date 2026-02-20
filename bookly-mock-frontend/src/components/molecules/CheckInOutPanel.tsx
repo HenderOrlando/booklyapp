@@ -55,7 +55,7 @@ export interface CheckInOutPanelProps {
 
 export const CheckInOutPanel = React.memo<CheckInOutPanelProps>(
   ({
-    reservationId,
+    reservationId: _reservationId,
     validation,
     onCheckIn,
     onCheckOut,

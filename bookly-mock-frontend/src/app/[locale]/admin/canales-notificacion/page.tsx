@@ -159,17 +159,17 @@ export default function CanalesNotificacionPage() {
       <div className="space-y-6">
         <div>
           <h1 className="text-2xl font-bold text-[var(--color-text-primary)]">
-            Canales de Notificación
+            {t("notifications.title")}
           </h1>
           <p className="mt-1 text-sm text-[var(--color-text-secondary)]">
-            Configura los canales y preferencias de notificación del sistema
+            {t("notifications.subtitle")}
           </p>
         </div>
 
         {/* Channels */}
         <div>
           <h2 className="mb-3 text-lg font-semibold text-[var(--color-text-primary)]">
-            Canales disponibles
+            {t("notifications.available_channels")}
           </h2>
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
             {channels.map((channel) => {
@@ -208,9 +208,9 @@ export default function CanalesNotificacionPage() {
                   <div className="mt-3 flex items-center justify-between">
                     <div className="flex items-center gap-2">
                       {channel.configured ? (
-                        <Badge variant="success">Configurado</Badge>
+                        <Badge variant="success">{t("notifications.configured")}</Badge>
                       ) : (
-                        <Badge variant="warning">Sin configurar</Badge>
+                        <Badge variant="warning">{t("notifications.not_configured")}</Badge>
                       )}
                     </div>
                     <button
@@ -243,7 +243,7 @@ export default function CanalesNotificacionPage() {
         {/* Preferences Matrix */}
         <div>
           <h2 className="mb-3 text-lg font-semibold text-[var(--color-text-primary)]">
-            Preferencias por evento
+            {t("notifications.preferences_by_event")}
           </h2>
           <Card className="overflow-hidden">
             <div className="overflow-x-auto">
@@ -251,21 +251,21 @@ export default function CanalesNotificacionPage() {
                 <thead>
                   <tr className="border-b bg-[var(--color-bg-muted)]">
                     <th className="px-4 py-3 text-left font-medium text-[var(--color-text-secondary)]">
-                      Tipo de evento
+                      {t("notifications.event_type")}
                     </th>
                     <th className="px-4 py-3 text-center font-medium text-[var(--color-text-secondary)]">
                       <div className="flex items-center justify-center gap-1">
-                        <Mail className="h-4 w-4" /> Email
+                        <Mail className="h-4 w-4" /> {t("notifications.email")}
                       </div>
                     </th>
                     <th className="px-4 py-3 text-center font-medium text-[var(--color-text-secondary)]">
                       <div className="flex items-center justify-center gap-1">
-                        <MessageCircle className="h-4 w-4" /> WhatsApp
+                        <MessageCircle className="h-4 w-4" /> {t("notifications.whatsapp")}
                       </div>
                     </th>
                     <th className="px-4 py-3 text-center font-medium text-[var(--color-text-secondary)]">
                       <div className="flex items-center justify-center gap-1">
-                        <Smartphone className="h-4 w-4" /> Push
+                        <Smartphone className="h-4 w-4" /> {t("notifications.push")}
                       </div>
                     </th>
                   </tr>
@@ -274,14 +274,14 @@ export default function CanalesNotificacionPage() {
                   {preferences.map((pref) => (
                     <tr key={pref.eventType} className="border-b last:border-0">
                       <td className="px-4 py-3 font-medium text-[var(--color-text-primary)]">
-                        {pref.label}
+                        {t(`notifications.events.${pref.eventType}` as any)}
                       </td>
                       {(["email", "whatsapp", "push"] as const).map((ch) => (
                         <td key={ch} className="px-4 py-3 text-center">
                           <button
                             onClick={() => togglePreference(pref.eventType, ch)}
                             className="mx-auto"
-                            aria-label={`${pref.label} por ${ch}: ${pref.channels[ch] ? "activado" : "desactivado"}`}
+                            aria-label={`${t(`notifications.events.${pref.eventType}` as any)} por ${ch}: ${pref.channels[ch] ? "activado" : "desactivado"}`}
                           >
                             {pref.channels[ch] ? (
                               <CheckCircle2 className="h-5 w-5 text-state-success-500" />
@@ -300,7 +300,7 @@ export default function CanalesNotificacionPage() {
         </div>
 
         <div className="flex justify-end">
-          <Button>Guardar preferencias</Button>
+          <Button>{t("notifications.save_preferences")}</Button>
         </div>
       </div>
     </MainLayout>

@@ -255,7 +255,7 @@ describe("refreshTokenInterceptor", () => {
     it("no debe fallar en entorno SSR", async () => {
       // Arrange
       const originalWindow = global.window;
-      // @ts-ignore
+      // @ts-ignore -- SSR environment simulation requires deleting window
       delete global.window;
 
       const error = Object.assign(new Error("Unauthorized"), { status: 401 });
@@ -276,7 +276,7 @@ describe("refreshTokenInterceptor", () => {
       const error = Object.assign(new Error("Token expired"), { status: 401 });
       const oldToken = "expired-token";
       const refreshToken = "valid-refresh-token";
-      const newToken = "new-valid-token";
+      const _newToken = "new-valid-token";
 
       localStorage.setItem("token", oldToken);
       localStorage.setItem("refreshToken", refreshToken);

@@ -78,5 +78,5 @@ export interface ReassignmentSuggestion {
   location: string;
   available: boolean;
   matchScore: number; // 0-100, qué tan similar es al recurso original
-  attributes: Record<string, any>;
+  attributes: Record<string, unknown>;
 }

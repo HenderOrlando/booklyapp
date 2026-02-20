@@ -11,7 +11,7 @@ export interface ResourceUtilizationChartProps {
 
 export const ResourceUtilizationChart =
   React.memo<ResourceUtilizationChartProps>(
-    ({ data, loading = false, className = "" }) => {
+    ({ data, loading: _loading = false, className = "" }) => {
       const chartData = data.map((item) => ({
         name: item.resourceName,
         occupancy: item.occupancyRate,

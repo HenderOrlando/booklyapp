@@ -46,7 +46,7 @@ const MOCK_BACKUP_CODES = [
 ];
 
 export default function SeguridadPage() {
-  const t = useTranslations("profile");
+  const _t = useTranslations("profile");
   const [step, setStep] = React.useState<TwoFactorStep>("disabled");
   const [verifyCode, setVerifyCode] = React.useState("");
   const [verifyError, setVerifyError] = React.useState("");

@@ -662,8 +662,8 @@ export default function EditResourcePage() {
     }
   };
 
-  const header = <AppHeader title="Editar Recurso" />;
-  const sidebar = <AppSidebar />;
+  const _header = <AppHeader title="Editar Recurso" />;
+  const _sidebar = <AppSidebar />;
 
   if (loading) {
     return (

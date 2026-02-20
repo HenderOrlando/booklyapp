@@ -197,8 +197,8 @@ export default function CaracteristicasPage() {
     },
   ];
 
-  const header = <AppHeader title={t("title")} />;
-  const sidebar = <AppSidebar />;
+  const _header = <AppHeader title={t("title")} />;
+  const _sidebar = <AppSidebar />;
 
   if (loading) {
     return (
@@ -237,7 +237,7 @@ export default function CaracteristicasPage() {
             </div>
             <div className="flex items-center gap-3">
               <SearchBar
-                placeholder="Buscar por nombre, código..."
+                placeholder={t("search_placeholder")}
                 value={filter}
                 onChange={setFilter}
                 onClear={() => setFilter("")}
@@ -328,7 +328,7 @@ export default function CaracteristicasPage() {
           onConfirm={handleDelete}
           title={t("delete_confirm.title")}
           description={t("delete_confirm.description")}
-          confirmText={tCommon("delete")}
+          confirmText={t("delete_confirm_button")}
           variant="destructive"
         />
       </div>

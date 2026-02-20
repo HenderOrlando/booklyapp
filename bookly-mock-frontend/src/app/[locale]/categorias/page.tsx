@@ -20,8 +20,6 @@ import {
   type FilterChip,
 } from "@/components/molecules/FilterChips";
 import { SearchBar } from "@/components/molecules/SearchBar";
-import { AppHeader } from "@/components/organisms/AppHeader";
-import { AppSidebar } from "@/components/organisms/AppSidebar";
 import { CategoryModal } from "@/components/organisms/CategoryModal";
 import { MainLayout } from "@/components/templates/MainLayout";
 import {
@@ -35,6 +33,7 @@ import {
 import { httpClient } from "@/infrastructure/http";
 import { Category } from "@/types/entities/resource";
 import { useQuery } from "@tanstack/react-query";
+import { useTranslations } from "next-intl";
 import * as React from "react";
 
 type CategoryMutationApiResponse = {
@@ -56,6 +55,9 @@ type CategoryMutationApiResponse = {
  */
 
 export default function CategoriasPage() {
+  const t = useTranslations("categories");
+  const tCommon = useTranslations("common");
+
   // React Query para cargar categorías
   const { data: categories = [], isLoading: loading } = useQuery({
     queryKey: categoryKeys.lists(),
@@ -190,7 +192,6 @@ export default function CategoriasPage() {
       },
       onError: (err) => {
         console.error("Error al eliminar categoría:", err);
-        alert("Error al eliminar la categoría");
       },
     });
   };
@@ -206,7 +207,6 @@ export default function CategoriasPage() {
       {
         onError: (err: unknown) => {
           console.error("Error al cambiar estado:", err);
-          alert("Error al cambiar el estado de la categoría");
         },
       },
     );
@@ -218,7 +218,7 @@ export default function CategoriasPage() {
   const columns = [
     {
       key: "name",
-      header: "Nombre",
+      header: t("name"),
       cell: (category: Category) => (
         <div className="flex items-center gap-3">
           <ColorSwatch color={category.color} size="md" />
@@ -233,7 +233,7 @@ export default function CategoriasPage() {
     },
     {
       key: "color",
-      header: "Color",
+      header: t("color"),
       cell: (category: Category) => (
         <div className="flex items-center gap-2">
           <Badge
@@ -252,7 +252,7 @@ export default function CategoriasPage() {
     },
     {
       key: "status",
-      header: "Estado",
+      header: t("status"),
       cell: (category: Category) => (
         <StatusBadge
           type="category"
@@ -262,7 +262,7 @@ export default function CategoriasPage() {
     },
     {
       key: "actions",
-      header: "Acciones",
+      header: t("actions"),
       cell: (category: Category) => (
         <div className="flex gap-2">
           <Button
@@ -271,7 +271,7 @@ export default function CategoriasPage() {
             onClick={() => handleEdit(category)}
             data-testid="edit-category-button"
           >
-            Editar
+            {t("edit")}
           </Button>
           <Button
             variant="outline"
@@ -279,7 +279,7 @@ export default function CategoriasPage() {
             onClick={() => handleToggleStatus(category)}
             data-testid="toggle-status-button"
           >
-            {category.isActive ? "Desactivar" : "Activar"}
+            {category.isActive ? t("deactivate") : t("activate")}
           </Button>
           <Button
             variant="outline"
@@ -290,21 +290,18 @@ export default function CategoriasPage() {
             }}
             data-testid="delete-category-button"
           >
-            Eliminar
+            {t("delete")}
           </Button>
         </div>
       ),
     },
   ];
 
-  const header = <AppHeader title="Categorías" />;
-  const sidebar = <AppSidebar />;
-
   // Loading state
   if (loading) {
     return (
       <MainLayout>
-        <LoadingSpinner fullScreen text="Cargando categorías..." />
+        <LoadingSpinner fullScreen text={t("loading")} />
       </MainLayout>
     );
   }
@@ -316,14 +313,14 @@ export default function CategoriasPage() {
         <div className="flex items-center justify-between">
           <div>
             <h2 className="text-3xl font-bold text-[var(--color-text-primary)]">
-              Categorías
+              {t("title")}
             </h2>
             <p className="text-[var(--color-text-secondary)] mt-2">
-              Gestión de categorías de recursos
+              {t("description")}
             </p>
           </div>
           <Button onClick={handleCreate} data-testid="create-category-button">
-            Crear Categoría
+            {t("create")}
           </Button>
         </div>
 
@@ -332,7 +329,7 @@ export default function CategoriasPage() {
           <Card>
             <CardHeader>
               <CardTitle className="text-sm font-medium text-[var(--color-text-tertiary)]">
-                Total Categorías
+                {t("total")}
               </CardTitle>
             </CardHeader>
             <CardContent>
@@ -345,7 +342,7 @@ export default function CategoriasPage() {
           <Card>
             <CardHeader>
               <CardTitle className="text-sm font-medium text-[var(--color-text-tertiary)]">
-                Activas
+                {t("active")}
               </CardTitle>
             </CardHeader>
             <CardContent>
@@ -358,7 +355,7 @@ export default function CategoriasPage() {
           <Card>
             <CardHeader>
               <CardTitle className="text-sm font-medium text-[var(--color-text-tertiary)]">
-                Inactivas
+                {t("inactive")}
               </CardTitle>
             </CardHeader>
             <CardContent>
@@ -374,16 +371,16 @@ export default function CategoriasPage() {
           <CardHeader>
             <div className="flex items-center justify-between mb-4">
               <div>
-                <CardTitle>Lista de Categorías</CardTitle>
+                <CardTitle>{t("list")}</CardTitle>
                 <CardDescription>
-                  {filteredCategories.length} de {categories.length} categorías
+                  {t("showing_count", { count: filteredCategories.length, total: categories.length })}
                 </CardDescription>
               </div>
             </div>
 
             <div className="flex items-center gap-3">
               <SearchBar
-                placeholder="Buscar por nombre o descripción..."
+                placeholder={t("search_placeholder")}
                 value={filter}
                 onChange={setFilter}
                 onClear={() => setFilter("")}
@@ -397,21 +394,21 @@ export default function CategoriasPage() {
                   size="sm"
                   onClick={() => setStatusFilter("all")}
                 >
-                  Todas
+                  {t("all")}
                 </Button>
                 <Button
                   variant={statusFilter === "active" ? "default" : "outline"}
                   size="sm"
                   onClick={() => setStatusFilter("active")}
                 >
-                  Activas
+                  {t("active")}
                 </Button>
                 <Button
                   variant={statusFilter === "inactive" ? "default" : "outline"}
                   size="sm"
                   onClick={() => setStatusFilter("inactive")}
                 >
-                  Inactivas
+                  {t("inactive")}
                 </Button>
               </div>
 
@@ -424,7 +421,7 @@ export default function CategoriasPage() {
                     setStatusFilter("all");
                   }}
                 >
-                  Limpiar
+                  {t("clear")}
                 </Button>
               )}
             </div>
@@ -437,16 +434,16 @@ export default function CategoriasPage() {
                   if (filter) {
                     chips.push({
                       key: "search",
-                      label: "Búsqueda",
+                      label: t("search_label"),
                       value: filter,
                     });
                   }
                   if (statusFilter !== "all") {
                     chips.push({
                       key: "status",
-                      label: "Estado",
+                      label: t("status_label"),
                       value:
-                        statusFilter === "active" ? "Activas" : "Inactivas",
+                        statusFilter === "active" ? t("active") : t("inactive"),
                     });
                   }
                   return chips;
@@ -465,11 +462,11 @@ export default function CategoriasPage() {
           <CardContent>
             {filteredCategories.length === 0 ? (
               <EmptyState
-                title="No se encontraron categorías"
+                title={t("no_results_title")}
                 description={
                   filter || statusFilter !== "all"
-                    ? "No hay categorías que coincidan con los filtros aplicados."
-                    : "Aún no hay categorías registradas. Crea la primera categoría para comenzar."
+                    ? t("no_results_filtered")
+                    : t("no_results_empty")
                 }
                 action={
                   filter || statusFilter !== "all" ? (
@@ -479,14 +476,14 @@ export default function CategoriasPage() {
                         setStatusFilter("all");
                       }}
                     >
-                      Limpiar Filtros
+                      {tCommon("clear_filters")}
                     </Button>
                   ) : (
                     <Button
                       onClick={handleCreate}
                       data-testid="create-category-button-empty"
                     >
-                      Crear Categoría
+                      {t("create")}
                     </Button>
                   )
                 }
@@ -523,10 +520,10 @@ export default function CategoriasPage() {
             setCategoryToDelete(null);
           }}
           onConfirm={handleDelete}
-          title="Confirmar Eliminación"
-          description="¿Estás seguro que deseas eliminar esta categoría?"
-          confirmText="Eliminar"
-          cancelText="Cancelar"
+          title={t("confirm_delete_title")}
+          description={t("confirm_delete")}
+          confirmText={t("delete")}
+          cancelText={t("cancel")}
           variant="destructive"
           data-testid="delete-category-modal"
         >
@@ -547,8 +544,7 @@ export default function CategoriasPage() {
                 </div>
               </div>
               <p className="text-sm text-[var(--color-text-tertiary)]">
-                Esta acción no se puede deshacer. La categoría será eliminada
-                permanentemente.
+                {t("confirm_delete_warning")}
               </p>
             </div>
           )}

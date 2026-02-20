@@ -73,14 +73,11 @@ export const StatusBadge = React.memo(function StatusBadge({
   className,
   customText,
 }: StatusBadgeProps) {
-  const t = useTranslations("resources");
-
-  const resourceStatusMap: Record<ResourceStatus, StatusConfig> = {
-    AVAILABLE: { text: t("available"), variant: "success" },
-    RESERVED: { text: t("occupied"), variant: "secondary" },
-    MAINTENANCE: { text: t("maintenance"), variant: "warning" },
-    UNAVAILABLE: { text: t("unavailable"), variant: "error" },
-  };
+  const tResources = useTranslations("resources");
+  const tMaintenance = useTranslations("maintenance");
+  const tCategories = useTranslations("categories");
+  const tApprovals = useTranslations("approvals");
+  const tReservations = useTranslations("reservations");
 
   const getStatusConfig = (
     type: StatusBadgeProps["type"],
@@ -88,6 +85,12 @@ export const StatusBadge = React.memo(function StatusBadge({
   ): StatusConfig => {
     switch (type) {
       case "resource":
+        const resourceStatusMap: Record<ResourceStatus, StatusConfig> = {
+          AVAILABLE: { text: tResources("available"), variant: "success" },
+          RESERVED: { text: tResources("occupied"), variant: "secondary" },
+          MAINTENANCE: { text: tResources("maintenance"), variant: "warning" },
+          UNAVAILABLE: { text: tResources("unavailable"), variant: "error" },
+        };
         return (
           resourceStatusMap[status as ResourceStatus] || {
             text: status,
@@ -96,10 +99,13 @@ export const StatusBadge = React.memo(function StatusBadge({
         );
       case "maintenance":
         const maintenanceStatusMap: Record<MaintenanceStatus, StatusConfig> = {
-          SCHEDULED: { text: "Programado", variant: "secondary" },
-          IN_PROGRESS: { text: "En Progreso", variant: "warning" },
-          COMPLETED: { text: "Completado", variant: "success" },
-          CANCELLED: { text: "Cancelado", variant: "error" },
+          SCHEDULED: { text: tMaintenance("scheduled"), variant: "secondary" },
+          IN_PROGRESS: {
+            text: tMaintenance("in_progress"),
+            variant: "warning",
+          },
+          COMPLETED: { text: tMaintenance("completed"), variant: "success" },
+          CANCELLED: { text: tMaintenance("cancelled"), variant: "error" },
         };
         return (
           maintenanceStatusMap[status as MaintenanceStatus] || {
@@ -109,9 +115,9 @@ export const StatusBadge = React.memo(function StatusBadge({
         );
       case "maintenanceType":
         const maintenanceTypeMap: Record<MaintenanceType, StatusConfig> = {
-          PREVENTIVE: { text: "Preventivo", variant: "secondary" },
-          CORRECTIVE: { text: "Correctivo", variant: "warning" },
-          EMERGENCY: { text: "Emergencia", variant: "error" },
+          PREVENTIVE: { text: tMaintenance("preventive"), variant: "secondary" },
+          CORRECTIVE: { text: tMaintenance("corrective"), variant: "warning" },
+          EMERGENCY: { text: tMaintenance("emergency"), variant: "error" },
         };
         return (
           maintenanceTypeMap[status as MaintenanceType] || {
@@ -121,8 +127,8 @@ export const StatusBadge = React.memo(function StatusBadge({
         );
       case "category":
         const categoryStatusMap: Record<CategoryStatus, StatusConfig> = {
-          ACTIVE: { text: "Activa", variant: "success" },
-          INACTIVE: { text: "Inactiva", variant: "secondary" },
+          ACTIVE: { text: tCategories("active"), variant: "success" },
+          INACTIVE: { text: tCategories("inactive"), variant: "secondary" },
         };
         return (
           categoryStatusMap[status as CategoryStatus] || {
@@ -132,9 +138,9 @@ export const StatusBadge = React.memo(function StatusBadge({
         );
       case "approval":
         const approvalStatusMap: Record<ApprovalStatus, StatusConfig> = {
-          PENDING: { text: "Pendiente", variant: "warning" },
-          APPROVED: { text: "Aprobado", variant: "success" },
-          REJECTED: { text: "Rechazado", variant: "error" },
+          PENDING: { text: tApprovals("status.pending"), variant: "warning" },
+          APPROVED: { text: tApprovals("status.approved"), variant: "success" },
+          REJECTED: { text: tApprovals("status.rejected"), variant: "error" },
         };
         return (
           approvalStatusMap[status as ApprovalStatus] || {
@@ -144,12 +150,27 @@ export const StatusBadge = React.memo(function StatusBadge({
         );
       case "reservation":
         const reservationMap: Record<ReservationStatus, StatusConfig> = {
-          PENDING: { text: "Pendiente", variant: "warning" },
-          CONFIRMED: { text: "Confirmada", variant: "success" },
-          IN_PROGRESS: { text: "En Progreso", variant: "default" },
-          COMPLETED: { text: "Completada", variant: "success" },
-          CANCELLED: { text: "Cancelada", variant: "secondary" },
-          REJECTED: { text: "Rechazada", variant: "error" },
+          PENDING: { text: tReservations("status.pending"), variant: "warning" },
+          CONFIRMED: {
+            text: tReservations("status.confirmed"),
+            variant: "success",
+          },
+          IN_PROGRESS: {
+            text: tReservations("status.in_progress"),
+            variant: "default",
+          },
+          COMPLETED: {
+            text: tReservations("status.completed"),
+            variant: "success",
+          },
+          CANCELLED: {
+            text: tReservations("status.cancelled"),
+            variant: "secondary",
+          },
+          REJECTED: {
+            text: tReservations("status.rejected"),
+            variant: "error",
+          },
         };
         return (
           reservationMap[status as ReservationStatus] || {
@@ -158,12 +179,10 @@ export const StatusBadge = React.memo(function StatusBadge({
           }
         );
       default:
-        return (
-          resourceStatusMap[status as ResourceStatus] || {
-            text: status,
-            variant: "secondary",
-          }
-        );
+        return {
+          text: status,
+          variant: "secondary",
+        };
     }
   };
 

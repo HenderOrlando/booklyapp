@@ -40,9 +40,9 @@ export default function ResetPasswordPage() {
   // Validar que existe el token
   React.useEffect(() => {
     if (!token) {
-      setError("Token de recuperación no válido o expirado");
+      setError(t("invalid_token_error"));
     }
-  }, [token]);
+  }, [token, t]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -51,25 +51,25 @@ export default function ResetPasswordPage() {
 
     // Validaciones
     if (!password || !confirmPassword) {
-      setError("Por favor complete todos los campos");
+      setError(t("error_fields_required"));
       setLoading(false);
       return;
     }
 
     if (password.length < 8) {
-      setError("La contraseña debe tener al menos 8 caracteres");
+      setError(t("error_password_length"));
       setLoading(false);
       return;
     }
 
     if (password !== confirmPassword) {
-      setError("Las contraseñas no coinciden");
+      setError(t("error_passwords_mismatch"));
       setLoading(false);
       return;
     }
 
     if (!token) {
-      setError("Token de recuperación no válido");
+      setError(t("error_invalid_token"));
       setLoading(false);
       return;
     }
@@ -91,15 +91,13 @@ export default function ResetPasswordPage() {
         }, 3000);
       } else {
         setError(
-          response.message ||
-            "Error al restablecer la contraseña. El token podría estar expirado."
+          response.message || t("error_reset_failed")
         );
       }
     } catch (error: any) {
       console.error("Reset password error:", error);
       setError(
-        error?.message ||
-          "Error al procesar la solicitud. Por favor intente nuevamente o solicite un nuevo enlace."
+        error?.message || t("error_reset_processing")
       );
     } finally {
       setLoading(false);
@@ -108,22 +106,21 @@ export default function ResetPasswordPage() {
 
   return (
     <AuthLayout
-      title="Restablecer Contraseña"
-      description="Ingrese su nueva contraseña"
+      title={t("reset_password_title")}
+      description={t("reset_password_description")}
     >
       {success ? (
         <div className="space-y-4">
           <Alert variant="success">
             <AlertDescription>
-              <strong>¡Contraseña restablecida!</strong>
+              <strong>{t("reset_success_title")}</strong>
               <br />
-              Tu contraseña ha sido cambiada exitosamente. Serás redirigido al
-              inicio de sesión...
+              {t("reset_success_desc")}
             </AlertDescription>
           </Alert>
 
           <Link href="/login" className="block">
-            <Button className="w-full">Ir al inicio de sesión</Button>
+            <Button className="w-full">{t("back_to_login")}</Button>
           </Link>
         </div>
       ) : (
@@ -137,39 +134,38 @@ export default function ResetPasswordPage() {
           {!token && (
             <Alert variant="warning">
               <AlertDescription>
-                No se encontró un token válido. Por favor solicita un nuevo
-                enlace de recuperación.
+                {t("no_token_warning")}
               </AlertDescription>
             </Alert>
           )}
 
           <div>
             <label className="block text-sm font-medium text-[var(--color-text-primary)] mb-2">
-              Nueva Contraseña
+              {t("new_password_label")}
             </label>
             <Input
               type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              placeholder="Mínimo 8 caracteres"
+              placeholder={t("new_password_placeholder")}
               required
               disabled={loading || !token}
               className="w-full"
             />
             <p className="text-xs text-[var(--color-text-secondary)] mt-1">
-              Usa al menos 8 caracteres con una mezcla de letras y números
+              {t("new_password_hint")}
             </p>
           </div>
 
           <div>
             <label className="block text-sm font-medium text-[var(--color-text-primary)] mb-2">
-              Confirmar Contraseña
+              {t("confirm_password_label")}
             </label>
             <Input
               type="password"
               value={confirmPassword}
               onChange={(e) => setConfirmPassword(e.target.value)}
-              placeholder="Repite tu contraseña"
+              placeholder={t("confirm_password_placeholder")}
               required
               disabled={loading || !token}
               className="w-full"
@@ -177,7 +173,7 @@ export default function ResetPasswordPage() {
           </div>
 
           <Button type="submit" disabled={loading || !token} className="w-full">
-            {loading ? "Restableciendo..." : "Restablecer Contraseña"}
+            {loading ? t("resetting") : t("reset_password_button")}
           </Button>
 
           <div className="text-center space-y-2">
@@ -185,13 +181,13 @@ export default function ResetPasswordPage() {
               href="/forgot-password"
               className="text-sm text-brand-primary-500 hover:text-brand-primary-600 hover:underline block"
             >
-              Solicitar nuevo enlace de recuperación
+              {t("request_new_link")}
             </Link>
             <Link
               href="/login"
               className="text-sm text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] hover:underline block"
             >
-              Volver al inicio de sesión
+              {t("back_to_login")}
             </Link>
           </div>
         </form>
@@ -200,13 +196,13 @@ export default function ResetPasswordPage() {
       {/* Información de seguridad */}
       <div className="mt-6 p-4 bg-[var(--color-surface-secondary)] rounded-md">
         <h3 className="text-sm font-medium text-[var(--color-text-primary)] mb-2">
-          Consejos de seguridad
+          {t("security_tips_title")}
         </h3>
         <ul className="text-xs text-[var(--color-text-secondary)] space-y-1">
-          <li>• Usa una contraseña única que no uses en otros sitios</li>
-          <li>• Combina letras mayúsculas, minúsculas y números</li>
-          <li>• No compartas tu contraseña con nadie</li>
-          <li>• Cambia tu contraseña periódicamente</li>
+          <li>• {t("security_tip_unique")}</li>
+          <li>• {t("security_tip_mix")}</li>
+          <li>• {t("security_tip_share")}</li>
+          <li>• {t("security_tip_change")}</li>
         </ul>
       </div>
     </AuthLayout>

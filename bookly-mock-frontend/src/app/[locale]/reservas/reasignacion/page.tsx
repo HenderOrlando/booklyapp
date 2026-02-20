@@ -112,7 +112,7 @@ const mockReassignmentHistory: ReassignmentHistoryEntry[] = [
 ];
 
 export default function ReasignacionPage() {
-  const t = useTranslations("reservations");
+  const _t = useTranslations("reservations");
   const [suggestions, setSuggestions] =
     React.useState<ReassignmentSuggestion[]>(mockSuggestions);
   const [history, setHistory] = React.useState<ReassignmentHistoryEntry[]>(
@@ -163,7 +163,7 @@ export default function ReasignacionPage() {
 
   const pendingSuggestions = suggestions.filter((s) => s.status === "pending");
 
-  const header = <AppHeader title="Reasignación de Reservas" />;
+  const _header = <AppHeader title="Reasignación de Reservas" />;
   return (
     <MainLayout>
       <div className="space-y-6 pb-6">

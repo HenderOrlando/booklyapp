@@ -208,7 +208,6 @@ export default function CalendarioPage() {
       });
     } catch (error) {
       console.error("Error al reasignar evento:", error);
-      alert(t("reschedule_error"));
     }
   };
 

@@ -2,9 +2,6 @@
 
 import {
   ActivityTimeline,
-  MetricCard,
-  MetricsGrid,
-  QuickStats,
   TrendChart,
 } from "@/components/analytics";
 import {
@@ -119,7 +116,7 @@ export default function DashboardPage() {
     [metrics?.recentActivity],
   );
 
-  const quickStatsData = React.useMemo(
+  const _quickStatsData = React.useMemo(
     () => [
       {
         label: "Hoy",
@@ -191,7 +188,7 @@ export default function DashboardPage() {
   }, [metrics?.recentReservations, upcomingReservations, t]);
 
   // Usar componentes compartidos de Header y Sidebar
-  const header = <AppHeader title={t("title")} />;
+  const _header = <AppHeader title={t("title")} />;
   return (
     <MainLayout>
       <DashboardLayout

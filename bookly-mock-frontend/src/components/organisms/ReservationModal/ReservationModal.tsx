@@ -4,6 +4,7 @@ import {
   CardContent,
   CardHeader,
 } from "@/components/atoms/Card";
+import { cn } from "@/lib/utils";
 import {
   Dialog,
   DialogContent,
@@ -27,6 +28,7 @@ import { ButtonWithLoading } from "@/components/molecules/ButtonWithLoading";
 import { RecurringPatternSelector } from "@/components/molecules/RecurringPatternSelector";
 import { RecurringReservationPreview } from "@/components/molecules/RecurringReservationPreview";
 import { useRecurringReservations } from "@/hooks/useRecurringReservations";
+import { useAuth } from "@/hooks/useAuth";
 import { useToast } from "@/hooks/useToast";
 import { useTranslations } from "next-intl";
 import type { RecurrencePattern } from "@/types/entities/recurring";
@@ -97,8 +99,34 @@ export const ReservationModal = React.memo(function ReservationModal({
   initialDate,
   initialResourceId,
 }: ReservationModalProps) {
-  const { showError } = useToast();
+  const { showError, showSuccess } = useToast();
+  const { user } = useAuth();
   const t = useTranslations("reservations.modal");
+
+  // RF-16: Filtrar recursos basados en roles del usuario
+  const filteredResources = React.useMemo(() => {
+    if (!user?.roles || !resources.length) return resources;
+
+    return resources.filter((resource) => {
+      // Si el recurso no tiene restricciones de programa, permitir
+      if (!resource.programIds || resource.programIds.length === 0) {
+        return true;
+      }
+
+      // Verificar si el usuario tiene acceso a alguno de los programas del recurso
+      const userPrograms = [
+        user.programId,
+        user.coordinatedProgramId,
+      ].filter(Boolean);
+
+      return (
+        userPrograms.length === 0 || // Si no tiene programas asignados, permitir todo
+        resource.programIds.some((programId) =>
+          userPrograms.includes(programId)
+        )
+      );
+    });
+  }, [resources, user]);
 
   // Estado del formulario
   const [formData, setFormData] = React.useState<CreateReservationDto>({
@@ -315,7 +343,7 @@ export const ReservationModal = React.memo(function ReservationModal({
                       <SelectValue placeholder={t("resource_placeholder")} />
                     </SelectTrigger>
                     <SelectContent>
-                      {resources.map((resource) => (
+                      {filteredResources.map((resource) => (
                         <SelectItem key={resource.id} value={resource.id}>
                           {resource.name} - {resource.type}
                         </SelectItem>

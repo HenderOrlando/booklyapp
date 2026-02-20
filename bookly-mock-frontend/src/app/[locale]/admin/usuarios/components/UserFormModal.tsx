@@ -24,14 +24,14 @@ import {
 } from "@/components/atoms/Select";
 import type { Role, User } from "@/types/entities/user";
 import { UserStatus } from "@/types/entities/user";
+import { usePrograms } from "@/hooks/usePrograms";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useTranslations } from "next-intl";
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import {
-  createUserSchema,
-  updateUserSchema,
-  type CreateUserFormValues,
+  userFormSchema,
+  type UserFormValues,
 } from "./user-schema";
 
 interface UserFormModalProps {
@@ -40,7 +40,7 @@ interface UserFormModalProps {
   allRoles: Role[];
   isLoading?: boolean;
   onClose: () => void;
-  onSave: (data: any) => void;
+  onSave: (data: UserFormValues) => void;
 }
 
 export function UserFormModal({
@@ -53,8 +53,7 @@ export function UserFormModal({
 }: UserFormModalProps) {
   const t = useTranslations("admin.users");
   const [filterRoles, setFilterRoles] = useState("");
-
-  const schema = selectedUser ? updateUserSchema : createUserSchema;
+  const { data: programs = [], isLoading: isLoadingPrograms } = usePrograms();
 
   const {
     register,
@@ -63,8 +62,8 @@ export function UserFormModal({
     setValue,
     watch,
     formState: { errors },
-  } = useForm<CreateUserFormValues>({
-    resolver: zodResolver(schema),
+  } = useForm<UserFormValues>({
+    resolver: zodResolver(userFormSchema),
     defaultValues: {
       email: "",
       username: "",
@@ -74,6 +73,9 @@ export function UserFormModal({
       phoneNumber: "",
       documentType: "",
       documentNumber: "",
+      programId: "",
+      coordinatedProgramId: "",
+      status: UserStatus.ACTIVE,
       roles: [],
     },
   });
@@ -89,7 +91,10 @@ export function UserFormModal({
           phoneNumber: selectedUser.phoneNumber || "",
           documentType: selectedUser.documentType || "",
           documentNumber: selectedUser.documentNumber || "",
+          programId: selectedUser.programId || "",
+          coordinatedProgramId: selectedUser.coordinatedProgramId || "",
           roles: selectedUser.roles.map((r) => r.id),
+          status: selectedUser.status,
           // Email and username are read-only in edit
           email: selectedUser.email,
           username: selectedUser.username,
@@ -104,6 +109,9 @@ export function UserFormModal({
           phoneNumber: "",
           documentType: "",
           documentNumber: "",
+          programId: "",
+          coordinatedProgramId: "",
+          status: UserStatus.ACTIVE,
           roles: [],
         });
       }
@@ -129,7 +137,7 @@ export function UserFormModal({
     setValue("roles", currentRoles, { shouldValidate: true });
   };
 
-  const onSubmit = (data: CreateUserFormValues) => {
+  const onSubmit = (data: UserFormValues) => {
     onSave(data);
   };
 
@@ -328,6 +336,51 @@ export function UserFormModal({
                   {...register("documentNumber")}
                   disabled={isLoading}
                 />
+              </div>
+
+              {/* Sección: Programas Académicos */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="programId">{t("program_id") || "Programa Académico"}</Label>
+                  <Select
+                    onValueChange={(value) => setValue("programId", value)}
+                    value={watch("programId")}
+                    disabled={isLoading || isLoadingPrograms}
+                  >
+                    <SelectTrigger id="programId" aria-label={t("program_id") || "Programa Académico"}>
+                      <SelectValue placeholder={t("select_program") || "Seleccionar programa"} />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {programs.map((program) => (
+                        <SelectItem key={program.id} value={program.id}>
+                          {program.name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="coordinatedProgramId">
+                    {t("coordinated_program_id") || "Programa Coordinado"}
+                  </Label>
+                  <Select
+                    onValueChange={(value) => setValue("coordinatedProgramId", value)}
+                    value={watch("coordinatedProgramId")}
+                    disabled={isLoading || isLoadingPrograms}
+                  >
+                    <SelectTrigger id="coordinatedProgramId" aria-label={t("coordinated_program_id") || "Programa Coordinado"}>
+                      <SelectValue placeholder={t("select_program") || "Seleccionar programa"} />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="">{t("none") || "Ninguno"}</SelectItem>
+                      {programs.map((program) => (
+                        <SelectItem key={program.id} value={program.id}>
+                          {program.name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
               </div>
             </div>
 

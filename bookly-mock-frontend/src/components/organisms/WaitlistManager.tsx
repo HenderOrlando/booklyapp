@@ -13,6 +13,13 @@
 import { Badge } from "@/components/atoms/Badge";
 import { Button } from "@/components/atoms/Button";
 import { Card, CardContent } from "@/components/atoms/Card";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/atoms/Select";
 import type { WaitlistEntry, WaitlistStats } from "@/types/entities/waitlist";
 import React from "react";
 
@@ -113,38 +120,40 @@ export function WaitlistManager({
       <Card>
         <CardContent className="pt-6">
           <div className="flex flex-wrap gap-4">
-            <div>
+            <div className="w-full md:w-48">
               <label className="block text-sm font-medium text-[var(--color-text-tertiary)] mb-2">
                 Estado
               </label>
-              <select
-                value={filterStatus}
-                onChange={(e) => setFilterStatus(e.target.value)}
-                className="px-3 py-2 bg-background border border-[var(--color-border-subtle)] text-foreground rounded-lg"
-              >
-                <option value="all">Todos</option>
-                <option value="WAITING">En Espera</option>
-                <option value="NOTIFIED">Notificados</option>
-                <option value="ASSIGNED">Asignados</option>
-                <option value="EXPIRED">Expirados</option>
-                <option value="CANCELLED">Cancelados</option>
-              </select>
+              <Select value={filterStatus} onValueChange={setFilterStatus}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Seleccionar estado" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">Todos</SelectItem>
+                  <SelectItem value="WAITING">En Espera</SelectItem>
+                  <SelectItem value="NOTIFIED">Notificados</SelectItem>
+                  <SelectItem value="ASSIGNED">Asignados</SelectItem>
+                  <SelectItem value="EXPIRED">Expirados</SelectItem>
+                  <SelectItem value="CANCELLED">Cancelados</SelectItem>
+                </SelectContent>
+              </Select>
             </div>
-            <div>
+            <div className="w-full md:w-48">
               <label className="block text-sm font-medium text-[var(--color-text-tertiary)] mb-2">
                 Prioridad
               </label>
-              <select
-                value={filterPriority}
-                onChange={(e) => setFilterPriority(e.target.value)}
-                className="px-3 py-2 bg-background border border-[var(--color-border-subtle)] text-foreground rounded-lg"
-              >
-                <option value="all">Todas</option>
-                <option value="LOW">Baja</option>
-                <option value="NORMAL">Normal</option>
-                <option value="HIGH">Alta</option>
-                <option value="URGENT">Urgente</option>
-              </select>
+              <Select value={filterPriority} onValueChange={setFilterPriority}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Seleccionar prioridad" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">Todas</SelectItem>
+                  <SelectItem value="LOW">Baja</SelectItem>
+                  <SelectItem value="NORMAL">Normal</SelectItem>
+                  <SelectItem value="HIGH">Alta</SelectItem>
+                  <SelectItem value="URGENT">Urgente</SelectItem>
+                </SelectContent>
+              </Select>
             </div>
           </div>
         </CardContent>

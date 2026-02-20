@@ -1,4 +1,5 @@
 import { TimelinePoint } from "@/components/atoms/TimelinePoint";
+import { cn } from "@/lib/utils";
 import type { ApprovalHistoryEntry, ApprovalLevel } from "@/types/entities/approval";
 import { format } from "date-fns";
 import { es } from "date-fns/locale";
@@ -115,14 +116,15 @@ export const ApprovalTimeline = React.memo<ApprovalTimelineProps>(
               {/* Línea conectora */}
               {!isLast && (
                 <div
-                  className={`absolute left-5 top-10 h-full w-0.5 ${
+                  className={cn(
+                    "absolute left-5 top-10 w-0.5",
                     status === "completed"
                       ? "bg-[var(--color-success-base)]"
                       : status === "rejected"
                         ? "bg-[var(--color-error-base)]"
-                        : "bg-[var(--color-bg-muted)] dark:bg-[var(--color-bg-elevated)]"
-                  }`}
-                  style={{ height: "calc(100% - 2.5rem)" }}
+                        : "bg-[var(--color-bg-muted)] dark:bg-[var(--color-bg-elevated)]",
+                    "h-[calc(100%-2.5rem)]"
+                  )}
                 />
               )}
 
