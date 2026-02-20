@@ -298,7 +298,7 @@ export const ReservationModal = React.memo(function ReservationModal({
               {/* Sección: Información Principal */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div className="flex flex-col gap-2">
-                  <Label required htmlFor="resource">
+                  <Label required htmlFor="resource-select">
                     {t("resource_label")}
                   </Label>
                   <Select
@@ -308,7 +308,7 @@ export const ReservationModal = React.memo(function ReservationModal({
                     }
                   >
                     <SelectTrigger
-                      id="resource"
+                      id="resource-select"
                       error={errors.resourceId}
                       aria-label={t("resource_placeholder")}
                     >
@@ -323,18 +323,21 @@ export const ReservationModal = React.memo(function ReservationModal({
                     </SelectContent>
                   </Select>
                   {errors.resourceId && (
-                    <span className="text-xs text-[var(--color-state-error-text)]">
+                    <p
+                      id="resource-select-error"
+                      className="text-xs text-[var(--color-state-error-text)]"
+                    >
                       {errors.resourceId}
-                    </span>
+                    </p>
                   )}
                 </div>
 
                 <div className="flex flex-col gap-2">
-                  <Label required htmlFor="title">
+                  <Label required htmlFor="reservation-title">
                     {t("title_label")}
                   </Label>
                   <Input
-                    id="title"
+                    id="reservation-title"
                     type="text"
                     value={formData.title}
                     onChange={(e) =>
@@ -416,9 +419,9 @@ export const ReservationModal = React.memo(function ReservationModal({
               {/* Sección: Detalles */}
               <div className="space-y-6">
                 <div className="flex flex-col gap-2">
-                  <Label htmlFor="description">{t("description_label")}</Label>
+                  <Label htmlFor="reservation-description">{t("description_label")}</Label>
                   <Textarea
-                    id="description"
+                    id="reservation-description"
                     value={formData.description}
                     onChange={(e) =>
                       setFormData({ ...formData, description: e.target.value })
@@ -430,9 +433,9 @@ export const ReservationModal = React.memo(function ReservationModal({
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div className="flex flex-col gap-2">
-                    <Label htmlFor="attendees">{t("attendees_label")}</Label>
+                    <Label htmlFor="reservation-attendees">{t("attendees_label")}</Label>
                     <Input
-                      id="attendees"
+                      id="reservation-attendees"
                       type="number"
                       value={formData.attendees}
                       onChange={(e) =>
@@ -446,9 +449,9 @@ export const ReservationModal = React.memo(function ReservationModal({
                   </div>
 
                   <div className="flex flex-col gap-2">
-                    <Label htmlFor="notes">{t("notes_label")}</Label>
+                    <Label htmlFor="reservation-notes">{t("notes_label")}</Label>
                     <Textarea
-                      id="notes"
+                      id="reservation-notes"
                       value={formData.notes}
                       onChange={(e) =>
                         setFormData({ ...formData, notes: e.target.value })

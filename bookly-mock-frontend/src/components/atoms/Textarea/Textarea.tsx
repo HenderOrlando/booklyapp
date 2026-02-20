@@ -21,7 +21,7 @@ const Textarea = React.forwardRef<HTMLTextAreaElement, TextareaProps>(
             className,
           )}
           ref={ref}
-          aria-invalid={error ? true : undefined}
+          aria-invalid={error ? "true" : "false"}
           aria-describedby={error ? errorId : props["aria-describedby"]}
           {...props}
         />
