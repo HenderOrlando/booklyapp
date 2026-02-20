@@ -121,7 +121,13 @@ export function RecurringReservationPreview({
               <div className="w-full bg-[var(--color-bg-primary)] rounded-full h-3 mb-3 overflow-hidden border border-[var(--color-border-subtle)]">
                 <div
                   className="bg-brand-primary-600 h-full transition-all duration-500 ease-out"
-                  style={{ width: `${Math.round(((progress.created + progress.failed) / progress.total) * 100)}%` }}
+                  style={{
+                    ["--progress-percent" as any]: `${Math.round(
+                      ((progress.created + progress.failed) / progress.total) *
+                        100,
+                    )}%`,
+                    width: "var(--progress-percent)",
+                  }}
                 />
               </div>
               <p className="text-xs text-[var(--color-text-secondary)] italic">

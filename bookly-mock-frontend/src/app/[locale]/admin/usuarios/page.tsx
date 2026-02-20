@@ -3,7 +3,6 @@
 import { Alert, AlertDescription } from "@/components/atoms/Alert";
 import { Button } from "@/components/atoms/Button";
 import { ConfirmDialog } from "@/components/molecules/ConfirmDialog";
-import { AppHeader } from "@/components/organisms/AppHeader";
 import { MainLayout } from "@/components/templates/MainLayout";
 import { useRoles } from "@/hooks/useRoles";
 import { useToast } from "@/hooks/useToast";
@@ -13,7 +12,7 @@ import {
   useUpdateUser,
   useUsers,
 } from "@/hooks/useUsers";
-import type { User } from "@/types/entities/user";
+import type { User, CreateUserDto } from "@/types/entities/user";
 import { UserStatus } from "@/types/entities/user";
 import { useTranslations } from "next-intl";
 import * as React from "react";
@@ -104,7 +103,7 @@ export default function UsersAdminPage() {
     setFilterPermissions("");
   };
 
-  const handleSaveUser = async (data: any) => {
+  const handleSaveUser = async (data: CreateUserDto & { roles: string[]; status: UserStatus; password?: string }) => {
     try {
       if (selectedUser) {
         // Actualizar usuario existente
@@ -130,7 +129,7 @@ export default function UsersAdminPage() {
         await createUserMutation.mutateAsync({
           email: data.email,
           username: data.username,
-          password: data.password,
+          password: data.password!,
           firstName: data.firstName,
           lastName: data.lastName,
           phoneNumber: data.phoneNumber || undefined,
@@ -146,10 +145,11 @@ export default function UsersAdminPage() {
       }
 
       handleCloseUserModal();
-    } catch (error: any) {
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : t("error_saving_user") || "Error saving user";
       showError(
         t("error") || "Error",
-        error?.message || t("error_saving_user") || "Error saving user",
+        errorMessage,
       );
     }
   };
@@ -171,15 +171,17 @@ export default function UsersAdminPage() {
       handleCloseDetailPanel();
       setShowDeleteConfirm(false);
       setUserToDelete(null);
-    } catch (error: any) {
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : t("error_deleting_user") || "Error deleting user";
       showError(
         t("error") || "Error",
-        error?.message || t("error_deleting_user") || "Error deleting user",
+        errorMessage,
       );
     }
   };
 
-  // Helper: Toggle role selection
+  // Helper: Toggle role selection - Not used in this version
+  /*
   const handleRoleToggle = (roleId: string) => {
     if (selectedRoles.includes(roleId)) {
       setSelectedRoles(selectedRoles.filter((id) => id !== roleId));
@@ -187,6 +189,7 @@ export default function UsersAdminPage() {
       setSelectedRoles([...selectedRoles, roleId]);
     }
   };
+  */
 
   // Get loading states from mutations
   const isCreating = createUserMutation.isPending;
@@ -212,7 +215,6 @@ export default function UsersAdminPage() {
 
   const loading = loadingUsers || loadingRoles;
 
-  const header = <AppHeader />;
   return (
     <MainLayout>
       <div className="space-y-6">

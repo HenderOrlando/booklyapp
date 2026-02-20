@@ -10,8 +10,6 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
   ({ className, type, error, id, ...props }, ref) => {
     const errorId = id ? `${id}-error` : undefined;
 
-    const isInvalid = !!error;
-
     return (
       <div className="w-full">
         <input
@@ -24,7 +22,7 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
             className,
           )}
           ref={ref}
-          aria-invalid={isInvalid}
+          aria-invalid={error ? true : undefined}
           aria-describedby={error ? errorId : undefined}
           {...props}
         />
