@@ -7,10 +7,13 @@ export interface TextareaProps
 }
 
 const Textarea = React.forwardRef<HTMLTextAreaElement, TextareaProps>(
-  ({ className, error, ...props }, ref) => {
+  ({ className, error, id, ...props }, ref) => {
+    const errorId = id ? `${id}-error` : undefined;
+
     return (
       <div className="w-full">
         <textarea
+          id={id}
           className={cn(
             "flex min-h-[80px] w-full rounded-md border border-[var(--color-border-subtle)] bg-[var(--color-bg-surface)] px-3 py-2 text-sm text-[var(--color-text-primary)] ring-offset-background placeholder:text-[var(--color-text-secondary)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-border-focus)] focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:border-[var(--color-border-subtle)] disabled:bg-[var(--color-bg-muted)] disabled:text-[var(--color-text-tertiary)] disabled:opacity-80",
             error &&
@@ -18,10 +21,15 @@ const Textarea = React.forwardRef<HTMLTextAreaElement, TextareaProps>(
             className,
           )}
           ref={ref}
+          aria-invalid={error ? true : undefined}
+          aria-describedby={error ? errorId : props["aria-describedby"]}
           {...props}
         />
         {error && (
-          <p className="mt-1 text-sm text-[var(--color-state-error-text)]">
+          <p
+            id={errorId}
+            className="mt-1 text-sm text-[var(--color-state-error-text)]"
+          >
             {error}
           </p>
         )}

@@ -1,5 +1,5 @@
 import { TimelinePoint } from "@/components/atoms/TimelinePoint";
-import type { ApprovalHistoryEntry } from "@/types/entities/approval";
+import type { ApprovalHistoryEntry, ApprovalLevel } from "@/types/entities/approval";
 import { format } from "date-fns";
 import { es } from "date-fns/locale";
 import * as React from "react";
@@ -20,13 +20,27 @@ import * as React from "react";
 export interface ApprovalTimelineProps {
   /** Historial de entradas de aprobación */
   history: ApprovalHistoryEntry[];
-  /** Índice del paso actual (opcional) */
-  currentStep?: number;
+  /** Nivel actual del flujo */
+  currentLevel?: ApprovalLevel;
+  /** Nivel máximo requerido */
+  maxLevel?: ApprovalLevel;
   /** Mostrar timestamps */
   showTimestamps?: boolean;
   /** Clase CSS adicional */
   className?: string;
 }
+
+const LEVEL_ORDER: Record<ApprovalLevel, number> = {
+  FIRST_LEVEL: 1,
+  SECOND_LEVEL: 2,
+  FINAL_LEVEL: 3,
+};
+
+const LEVEL_LABELS: Record<ApprovalLevel, string> = {
+  FIRST_LEVEL: "Primer Nivel",
+  SECOND_LEVEL: "Segundo Nivel",
+  FINAL_LEVEL: "Nivel Final",
+};
 
 const ACTION_LABELS: Record<string, string> = {
   SUBMIT: "Solicitud enviada",
@@ -41,27 +55,60 @@ const ACTION_LABELS: Record<string, string> = {
 };
 
 export const ApprovalTimeline = React.memo<ApprovalTimelineProps>(
-  ({ history, currentStep, showTimestamps = true, className = "" }) => {
+  ({ history, currentLevel, maxLevel, showTimestamps = true, className = "" }) => {
     // Determinar el estado de cada paso
     const getStepStatus = (
-      index: number,
-      action: string
+      entryLevel: ApprovalLevel,
+      action?: string
     ): "completed" | "current" | "pending" | "rejected" => {
       if (action === "REJECT") return "rejected";
-      if (currentStep !== undefined) {
-        if (index < currentStep) return "completed";
-        if (index === currentStep) return "current";
-        return "pending";
+      
+      if (currentLevel && LEVEL_ORDER[entryLevel] < LEVEL_ORDER[currentLevel]) {
+        return "completed";
       }
-      // Si no hay currentStep, todos los del historial son completed
-      return "completed";
+      if (currentLevel === entryLevel) {
+        return "current";
+      }
+      return "pending";
     };
+
+    // Combinar historial con pasos futuros si maxLevel está presente
+    const allSteps = React.useMemo(() => {
+      const steps = [...history];
+      
+      if (maxLevel && currentLevel) {
+        const currentOrder = LEVEL_ORDER[currentLevel];
+        const maxOrder = LEVEL_ORDER[maxLevel];
+        
+        // Solo añadir pasos futuros si la solicitud no ha sido rechazada o cancelada
+        const lastAction = history[history.length - 1]?.action;
+        const isClosed = lastAction === "REJECT" || lastAction === "CANCEL" || lastAction === "APPROVE" && currentLevel === maxLevel;
+
+        if (!isClosed) {
+          for (const [level, order] of Object.entries(LEVEL_ORDER)) {
+            if (order > currentOrder && order <= maxOrder) {
+              steps.push({
+                id: `future-${level}`,
+                approvalRequestId: "",
+                action: "PENDING" as any,
+                performedBy: "",
+                performerName: "Pendiente de asignación",
+                level: level as ApprovalLevel,
+                timestamp: new Date().toISOString(),
+              });
+            }
+          }
+        }
+      }
+      return steps;
+    }, [history, currentLevel, maxLevel]);
 
     return (
       <div className={`space-y-0 ${className}`}>
-        {history.map((entry, index) => {
-          const status = getStepStatus(index, entry.action);
-          const isLast = index === history.length - 1;
+        {allSteps.map((entry, index) => {
+          const status = getStepStatus(entry.level, entry.action);
+          const isLast = index === allSteps.length - 1;
+          const isFuture = entry.id.startsWith("future-");
 
           return (
             <div key={entry.id} className="relative">
@@ -90,35 +137,43 @@ export const ApprovalTimeline = React.memo<ApprovalTimelineProps>(
                 <div className="flex-1 pt-1">
                   {/* Acción y nivel */}
                   <div className="flex items-center gap-2 mb-1">
-                    <h4 className="font-semibold text-sm text-[var(--color-text-primary)] dark:text-[var(--color-text-inverse)]">
-                      {ACTION_LABELS[entry.action] || entry.action}
+                    <h4 className={`font-semibold text-sm ${isFuture ? "text-[var(--color-text-tertiary)]" : "text-[var(--color-text-primary)] dark:text-[var(--color-text-inverse)]"}`}>
+                      {isFuture ? `Pendiente: ${LEVEL_LABELS[entry.level]}` : (ACTION_LABELS[entry.action] || entry.action)}
                     </h4>
-                    <span className="text-xs text-[var(--color-text-secondary)] dark:text-[var(--color-text-tertiary)] px-2 py-0.5 rounded-full bg-[var(--color-bg-secondary)] dark:bg-[var(--color-bg-inverse)]">
-                      {entry.level.replace("_", " ")}
-                    </span>
+                    {!isFuture && (
+                      <span className="text-xs text-[var(--color-text-secondary)] dark:text-[var(--color-text-tertiary)] px-2 py-0.5 rounded-full bg-[var(--color-bg-secondary)] dark:bg-[var(--color-bg-inverse)]">
+                        {LEVEL_LABELS[entry.level] || entry.level.replace("_", " ")}
+                      </span>
+                    )}
                   </div>
 
                   {/* Performer y timestamp */}
-                  <div className="text-sm text-[var(--color-text-secondary)] dark:text-[var(--color-text-tertiary)] mb-2">
-                    <span className="font-medium">{entry.performerName}</span>
-                    {entry.performerRole && (
-                      <span className="text-xs ml-1">
-                        ({entry.performerRole})
-                      </span>
-                    )}
-                    {showTimestamps && (
-                      <>
-                        <span className="mx-2">•</span>
-                        <time dateTime={entry.timestamp} className="text-xs">
-                          {format(
-                            new Date(entry.timestamp),
-                            "d 'de' MMM, yyyy 'a las' HH:mm",
-                            { locale: es }
-                          )}
-                        </time>
-                      </>
-                    )}
-                  </div>
+                  {!isFuture ? (
+                    <div className="text-sm text-[var(--color-text-secondary)] dark:text-[var(--color-text-tertiary)] mb-2">
+                      <span className="font-medium">{entry.performerName}</span>
+                      {entry.performerRole && (
+                        <span className="text-xs ml-1">
+                          ({entry.performerRole})
+                        </span>
+                      )}
+                      {showTimestamps && (
+                        <>
+                          <span className="mx-2">•</span>
+                          <time dateTime={entry.timestamp} className="text-xs">
+                            {format(
+                              new Date(entry.timestamp),
+                              "d 'de' MMM, yyyy 'a las' HH:mm",
+                              { locale: es }
+                            )}
+                          </time>
+                        </>
+                      )}
+                    </div>
+                  ) : (
+                    <div className="text-sm text-[var(--color-text-tertiary)] italic mb-2">
+                      Esperando aprobación de este nivel...
+                    </div>
+                  )}
 
                   {/* Comentarios */}
                   {entry.comments && (

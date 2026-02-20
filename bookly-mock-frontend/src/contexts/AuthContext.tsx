@@ -179,6 +179,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
 
     // Verificar sesión con backend (asincrónico)
     checkAuth();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // Configurar auto-refresh de token
@@ -193,6 +194,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
       clearAllTimers();
       removeActivityListeners();
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user]);
 
   // Si ya hay sesión y estamos en login/callback, redirigir una sola vez
@@ -435,6 +437,11 @@ export function AuthProvider({ children }: AuthProviderProps) {
         lastValidUserRef.current = user; // Guardar en cache
         setUserToStorage(user); // Persistir en localStorage
 
+        // Sincronizar idioma del usuario con la cookie NEXT_LOCALE para next-intl
+        if (user.preferences?.language) {
+          document.cookie = `NEXT_LOCALE=${user.preferences.language}; path=/; max-age=31536000; SameSite=Strict`;
+        }
+
         // Mostrar notificación de éxito
         showSuccess(
           tAuth("login_success"),
@@ -501,6 +508,11 @@ export function AuthProvider({ children }: AuthProviderProps) {
         setUser(response.data);
         lastValidUserRef.current = response.data; // Actualizar cache
         setUserToStorage(response.data); // Persistir en localStorage
+
+        // Sincronizar idioma del usuario con la cookie NEXT_LOCALE
+        if (response.data.preferences?.language) {
+          document.cookie = `NEXT_LOCALE=${response.data.preferences.language}; path=/; max-age=31536000; SameSite=Strict`;
+        }
       }
     } catch (error) {
       console.error("Error refrescando usuario:", error);

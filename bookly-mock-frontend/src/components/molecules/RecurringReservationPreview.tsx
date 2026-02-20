@@ -21,8 +21,9 @@ import {
 } from "@/components/atoms/Card";
 import type { Reservation } from "@/types/entities/reservation";
 import { format } from "date-fns";
-import { es } from "date-fns/locale";
+import { enUS, es } from "date-fns/locale";
 import { AlertCircle, Calendar, CheckCircle, XCircle } from "lucide-react";
+import { useLocale, useTranslations } from "next-intl";
 import React from "react";
 
 interface RecurringReservationPreviewProps {
@@ -54,6 +55,10 @@ export function RecurringReservationPreview({
   isCreating = false,
   progress,
 }: RecurringReservationPreviewProps) {
+  const t = useTranslations("reservations.recurring_preview");
+  const tCommon = useTranslations("reservations");
+  const locale = useLocale();
+  const dateLocale = locale === "es" ? es : enUS;
   const [showAllDates, setShowAllDates] = React.useState(false);
   const [skipConflicts, setSkipConflicts] = React.useState(false);
 
@@ -68,7 +73,7 @@ export function RecurringReservationPreview({
             <div className="p-2 bg-brand-primary-500/10 rounded-lg text-brand-primary-600">
               <Calendar className="w-6 h-6" />
             </div>
-            Vista Previa de Reserva Recurrente
+            {t("title")}
           </CardTitle>
           <CardDescription className="text-base mt-2">{description}</CardDescription>
         </CardHeader>
@@ -81,7 +86,7 @@ export function RecurringReservationPreview({
                 {instances.length}
               </div>
               <div className="text-xs font-medium uppercase tracking-wider text-[var(--color-text-tertiary)] mt-1">
-                Total
+                {t("total_label")}
               </div>
             </div>
             <div className="bg-state-success-500/5 p-4 rounded-xl border border-state-success-500/20 text-center">
@@ -89,7 +94,7 @@ export function RecurringReservationPreview({
                 {validation.successCount}
               </div>
               <div className="text-xs font-medium uppercase tracking-wider text-state-success-700/70 mt-1">
-                Disponibles
+                {t("available_label")}
               </div>
             </div>
             <div className="bg-state-error-500/5 p-4 rounded-xl border border-state-error-500/20 text-center">
@@ -97,7 +102,7 @@ export function RecurringReservationPreview({
                 {validation.failureCount}
               </div>
               <div className="text-xs font-medium uppercase tracking-wider text-state-error-700/70 mt-1">
-                Conflictos
+                {t("conflicts_label")}
               </div>
             </div>
           </div>
@@ -107,7 +112,7 @@ export function RecurringReservationPreview({
             <div className="p-5 bg-brand-primary-500/5 rounded-xl border border-brand-primary-500/20 animate-pulse">
               <div className="flex items-center justify-between mb-3">
                 <span className="text-sm font-bold text-brand-primary-700">
-                  Procesando solicitudes...
+                  {t("processing")}
                 </span>
                 <span className="text-sm font-mono font-bold text-brand-primary-600">
                   {Math.round(((progress.created + progress.failed) / progress.total) * 100)}%
@@ -116,9 +121,7 @@ export function RecurringReservationPreview({
               <div className="w-full bg-[var(--color-bg-primary)] rounded-full h-3 mb-3 overflow-hidden border border-[var(--color-border-subtle)]">
                 <div
                   className="bg-brand-primary-600 h-full transition-all duration-500 ease-out"
-                  style={{
-                    width: `${((progress.created + progress.failed) / progress.total) * 100}%`,
-                  }}
+                  style={{ width: `${Math.round(((progress.created + progress.failed) / progress.total) * 100)}%` }}
                 />
               </div>
               <p className="text-xs text-[var(--color-text-secondary)] italic">
@@ -136,11 +139,10 @@ export function RecurringReservationPreview({
                 </div>
                 <div className="flex-1">
                   <h4 className="font-bold text-state-warning-800 mb-1">
-                    Atención: Conflictos detectados
+                    {t("conflict_warning_title")}
                   </h4>
                   <p className="text-sm text-state-warning-700/80 leading-relaxed">
-                    Se encontraron {validation.failureCount} fechas donde el recurso ya está reservado.
-                    Puedes elegir omitir estas fechas y proceder con las disponibles.
+                    {t("conflict_warning_desc", { count: validation.failureCount })}
                   </p>
                   <label className="flex items-center gap-3 mt-4 cursor-pointer group">
                     <div className="relative">
@@ -154,7 +156,7 @@ export function RecurringReservationPreview({
                       <div className="absolute left-1 top-1 w-3 h-3 bg-white rounded-full transition-transform peer-checked:translate-x-5"></div>
                     </div>
                     <span className="text-sm font-semibold text-state-warning-800 group-hover:text-state-warning-900 transition-colors">
-                      Omitir conflictos y crear {validation.successCount} reservas
+                      {t("skip_conflicts_label", { count: validation.successCount })}
                     </span>
                   </label>
                 </div>
@@ -166,10 +168,10 @@ export function RecurringReservationPreview({
           <div className="space-y-4">
             <div className="flex items-center justify-between">
               <h4 className="font-bold text-[var(--color-text-primary)] flex items-center gap-2">
-                <span>🗓️</span> Cronograma propuesto
+                <span>🗓️</span> {t("schedule_title")}
               </h4>
               <span className="text-xs font-bold px-2 py-1 bg-[var(--color-bg-muted)] rounded-md text-[var(--color-text-tertiary)] uppercase">
-                {instances.length} instancias
+                {t("instances_count", { count: instances.length })}
               </span>
             </div>
             
@@ -200,7 +202,7 @@ export function RecurringReservationPreview({
                         </div>
                         <div>
                           <p className="font-bold text-[var(--color-text-primary)] capitalize">
-                            {format(date, "EEEE, d 'de' MMMM", { locale: es })}
+                            {format(date, t("date_format"), { locale: dateLocale })}
                           </p>
                           <div className="flex items-center gap-2 mt-0.5">
                             <span className="text-xs font-mono bg-[var(--color-bg-primary)] px-1.5 py-0.5 rounded text-[var(--color-text-secondary)]">
@@ -214,7 +216,7 @@ export function RecurringReservationPreview({
                         </div>
                       </div>
                       {hasConflict && (
-                        <Badge variant="error" className="font-bold">Conflicto</Badge>
+                        <Badge variant="error" className="font-bold">{tCommon("statuses.CONFLICT")}</Badge>
                       )}
                     </div>
                   </div>
@@ -228,7 +230,7 @@ export function RecurringReservationPreview({
                 onClick={() => setShowAllDates(true)}
                 className="w-full h-12 border-dashed border-2 hover:bg-brand-primary-500/5 hover:border-brand-primary-500/40 hover:text-brand-primary-600 transition-all"
               >
-                Ver todas las {instances.length} fechas
+                {t("view_all_btn", { count: instances.length })}
               </Button>
             )}
           </div>
@@ -242,7 +244,7 @@ export function RecurringReservationPreview({
               disabled={isCreating}
               className="flex-1 h-12 font-bold"
             >
-              Cancelar
+              {t("cancel_btn") || "Cancelar"}
             </Button>
             {validation.failureCount > 0 && !skipConflicts ? (
               <Button
@@ -251,7 +253,7 @@ export function RecurringReservationPreview({
                 disabled
                 className="flex-[2] h-12 font-bold opacity-70"
               >
-                Corrija los conflictos para continuar
+                {t("fix_conflicts_btn")}
               </Button>
             ) : (
               <Button
@@ -261,10 +263,10 @@ export function RecurringReservationPreview({
                 className="flex-[2] h-12 font-bold shadow-lg shadow-brand-primary-500/20"
               >
                 {isCreating
-                  ? "Procesando..."
+                  ? t("processing")
                   : skipConflicts
-                    ? `Confirmar ${validation.successCount} Reservas`
-                    : `Confirmar ${instances.length} Reservas`}
+                    ? t("confirm_skip_btn", { count: validation.successCount })
+                    : t("confirm_all_btn", { count: instances.length })}
               </Button>
             )}
           </div>

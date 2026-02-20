@@ -2,6 +2,7 @@
 
 import { Alert, AlertDescription } from "@/components/atoms/Alert";
 import { Button } from "@/components/atoms/Button";
+import { ConfirmDialog } from "@/components/molecules/ConfirmDialog";
 import { AppHeader } from "@/components/organisms/AppHeader";
 import { MainLayout } from "@/components/templates/MainLayout";
 import { useRoles } from "@/hooks/useRoles";
@@ -63,26 +64,15 @@ export default function UsersAdminPage() {
   // Filtros
   const [filterUserTable, setFilterUserTable] = React.useState("");
   const [filterPermissions, setFilterPermissions] = React.useState("");
-  const [filterRoles, setFilterRoles] = React.useState("");
 
   // Modales y paneles
   const [showUserModal, setShowUserModal] = React.useState(false);
   const [showUserDetail, setShowUserDetail] = React.useState(false);
+  const [showDeleteConfirm, setShowDeleteConfirm] = React.useState(false);
+  const [userToDelete, setUserToDelete] = React.useState<string | null>(null);
 
   // Usuario seleccionado
   const [selectedUser, setSelectedUser] = React.useState<User | null>(null);
-
-  // Formulario de usuario
-  const [email, setEmail] = React.useState("");
-  const [username, setUsername] = React.useState("");
-  const [firstName, setFirstName] = React.useState("");
-  const [lastName, setLastName] = React.useState("");
-  const [phoneNumber, setPhoneNumber] = React.useState("");
-  const [documentType, setDocumentType] = React.useState("");
-  const [documentNumber, setDocumentNumber] = React.useState("");
-  const [password, setPassword] = React.useState("");
-  const [status, setStatus] = React.useState<UserStatus>(UserStatus.ACTIVE);
-  const [selectedRoles, setSelectedRoles] = React.useState<string[]>([]);
 
   // ============================================
   // HANDLERS
@@ -90,31 +80,11 @@ export default function UsersAdminPage() {
 
   const handleOpenCreateModal = () => {
     setSelectedUser(null);
-    setEmail("");
-    setUsername("");
-    setFirstName("");
-    setLastName("");
-    setPhoneNumber("");
-    setDocumentType("");
-    setDocumentNumber("");
-    setPassword("");
-    setStatus(UserStatus.ACTIVE);
-    setSelectedRoles([]);
     setShowUserModal(true);
   };
 
   const handleOpenEditModal = (user: User) => {
     setSelectedUser(user);
-    setEmail(user.email);
-    setUsername(user.username);
-    setFirstName(user.firstName);
-    setLastName(user.lastName);
-    setPhoneNumber(user.phoneNumber || "");
-    setDocumentType(user.documentType || "");
-    setDocumentNumber(user.documentNumber || "");
-    setPassword(""); // No mostrar password en edición
-    setStatus(user.status);
-    setSelectedRoles(user.roles.map((r) => r.id));
     setShowUserModal(true);
   };
 
@@ -126,17 +96,6 @@ export default function UsersAdminPage() {
   const handleCloseUserModal = () => {
     setShowUserModal(false);
     setSelectedUser(null);
-    // Resetear formulario
-    setEmail("");
-    setUsername("");
-    setFirstName("");
-    setLastName("");
-    setPhoneNumber("");
-    setDocumentType("");
-    setDocumentNumber("");
-    setPassword("");
-    setStatus(UserStatus.ACTIVE);
-    setSelectedRoles([]);
   };
 
   const handleCloseDetailPanel = () => {
@@ -145,54 +104,20 @@ export default function UsersAdminPage() {
     setFilterPermissions("");
   };
 
-  const handleSaveUser = async () => {
-    // Validaciones
-    if (!firstName.trim()) {
-      showError(
-        t("error") || "Error",
-        t("error_firstname_required") || "First name is required",
-      );
-      return;
-    }
-    if (!lastName.trim()) {
-      showError(
-        t("error") || "Error",
-        t("error_lastname_required") || "Last name is required",
-      );
-      return;
-    }
-    if (!email.trim()) {
-      showError(
-        t("error") || "Error",
-        t("error_email_required") || "Email is required",
-      );
-      return;
-    }
-    if (!username.trim()) {
-      showError(
-        t("error") || "Error",
-        t("error_username_required") || "Username is required",
-      );
-      return;
-    }
-    if (!selectedUser && !password.trim()) {
-      showError(
-        t("error") || "Error",
-        t("error_password_required") || "Password is required",
-      );
-      return;
-    }
-
+  const handleSaveUser = async (data: any) => {
     try {
       if (selectedUser) {
         // Actualizar usuario existente
         await updateUserMutation.mutateAsync({
           id: selectedUser.id,
           data: {
-            phoneNumber: phoneNumber || undefined,
-            documentType: documentType || undefined,
-            documentNumber: documentNumber || undefined,
-            status,
+            firstName: data.firstName,
+            lastName: data.lastName,
+            phoneNumber: data.phoneNumber || undefined,
+            documentType: data.documentType || undefined,
+            documentNumber: data.documentNumber || undefined,
+            status: data.status,
+            roles: data.roles,
           },
         });
 
@@ -203,14 +128,15 @@ export default function UsersAdminPage() {
       } else {
         // Crear nuevo usuario
         await createUserMutation.mutateAsync({
-          email,
-          username,
-          password,
-          firstName,
-          lastName,
-          phoneNumber: phoneNumber || undefined,
-          documentType: documentType || undefined,
-          documentNumber: documentNumber || undefined,
+          email: data.email,
+          username: data.username,
+          password: data.password,
+          firstName: data.firstName,
+          lastName: data.lastName,
+          phoneNumber: data.phoneNumber || undefined,
+          documentType: data.documentType || undefined,
+          documentNumber: data.documentNumber || undefined,
+          roles: data.roles,
         });
 
         showSuccess(
@@ -229,21 +155,22 @@ export default function UsersAdminPage() {
   };
 
   const handleDeleteUser = async (userId: string) => {
-    if (
-      !confirm(
-        t("confirm_delete") || "Are you sure you want to delete this user?",
-      )
-    ) {
-      return;
-    }
+    setUserToDelete(userId);
+    setShowDeleteConfirm(true);
+  };
+
+  const handleConfirmDelete = async () => {
+    if (!userToDelete) return;
 
     try {
-      await deleteUserMutation.mutateAsync(userId);
+      await deleteUserMutation.mutateAsync(userToDelete);
       showSuccess(
         t("success") || "Success",
         t("success_user_deleted") || "User deleted successfully",
       );
       handleCloseDetailPanel();
+      setShowDeleteConfirm(false);
+      setUserToDelete(null);
     } catch (error: any) {
       showError(
         t("error") || "Error",
@@ -318,6 +245,7 @@ export default function UsersAdminPage() {
         <UsersTable
           users={filteredUsers}
           filter={filterUserTable}
+          isLoading={loadingUsers}
           onFilterChange={setFilterUserTable}
           onEdit={handleOpenEditModal}
           onView={handleOpenDetailPanel}
@@ -338,32 +266,23 @@ export default function UsersAdminPage() {
         <UserFormModal
           show={showUserModal}
           selectedUser={selectedUser}
-          email={email}
-          username={username}
-          firstName={firstName}
-          lastName={lastName}
-          phoneNumber={phoneNumber}
-          documentType={documentType}
-          documentNumber={documentNumber}
-          password={password}
-          status={status}
-          selectedRoles={selectedRoles}
           allRoles={roles}
-          filterRoles={filterRoles}
           isLoading={isSaving}
           onClose={handleCloseUserModal}
           onSave={handleSaveUser}
-          onEmailChange={setEmail}
-          onUsernameChange={setUsername}
-          onFirstNameChange={setFirstName}
-          onLastNameChange={setLastName}
-          onPhoneNumberChange={setPhoneNumber}
-          onDocumentTypeChange={setDocumentType}
-          onDocumentNumberChange={setDocumentNumber}
-          onPasswordChange={setPassword}
-          onStatusChange={setStatus}
-          onFilterRolesChange={setFilterRoles}
-          onRoleToggle={handleRoleToggle}
+        />
+
+        {/* Delete Confirmation */}
+        <ConfirmDialog
+          open={showDeleteConfirm}
+          onClose={() => setShowDeleteConfirm(false)}
+          onConfirm={handleConfirmDelete}
+          title={t("confirm_delete_title") || "Confirm Delete"}
+          description={t("confirm_delete_description") || "Are you sure you want to delete this user? This action cannot be undone."}
+          confirmText={t("delete") || "Delete"}
+          cancelText={t("cancel") || "Cancel"}
+          variant="destructive"
+          loading={isDeleting}
         />
       </div>
     </MainLayout>

@@ -63,6 +63,21 @@
     "loading": "Loading roles...",
     "clear": "Clear"
   },
+  "templates": {
+    "title": "Template Management",
+    "subtitle": "Manage notification, approval, and rejection templates",
+    "create": "New Template",
+    "default": "Default",
+    "active": "Active",
+    "inactive": "Inactive",
+    "type": "Type",
+    "category": "Category",
+    "edit": "Edit",
+    "duplicate": "Duplicate",
+    "delete": "Delete",
+    "delete_confirm": "Are you sure you want to delete this template?",
+    "copy_suffix": "(Copy)"
+  },
   "audit": {
     "title": "System Audit",
     "description": "Complete log of system actions",

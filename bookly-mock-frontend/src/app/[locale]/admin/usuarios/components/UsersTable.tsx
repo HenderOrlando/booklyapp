@@ -13,6 +13,7 @@ import {
   CardTitle,
 } from "@/components/atoms/Card";
 import { Input } from "@/components/atoms/Input";
+import { Skeleton } from "@/components/atoms/Skeleton";
 import { DataTable } from "@/components/molecules/DataTable";
 import type { User } from "@/types/entities/user";
 import { UserStatus } from "@/types/entities/user";
@@ -21,6 +22,7 @@ import { useTranslations } from "next-intl";
 interface UsersTableProps {
   users: User[];
   filter: string;
+  isLoading?: boolean;
   onFilterChange: (value: string) => void;
   onEdit: (user: User) => void;
   onView: (user: User) => void;
@@ -29,6 +31,7 @@ interface UsersTableProps {
 export function UsersTable({
   users,
   filter,
+  isLoading = false,
   onFilterChange,
   onEdit,
   onView,
@@ -166,12 +169,24 @@ export function UsersTable({
             value={filter}
             onChange={(e) => onFilterChange(e.target.value)}
             className="max-w-xs"
+            disabled={isLoading}
           />
         </div>
       </CardHeader>
       <CardContent>
-        <DataTable data={users} columns={columns} />
+        {isLoading ? (
+          <div className="space-y-3">
+            <Skeleton className="h-10 w-full" />
+            <Skeleton className="h-10 w-full" />
+            <Skeleton className="h-10 w-full" />
+            <Skeleton className="h-10 w-full" />
+            <Skeleton className="h-10 w-full" />
+          </div>
+        ) : (
+          <DataTable data={users} columns={columns} />
+        )}
       </CardContent>
     </Card>
   );
 }
+

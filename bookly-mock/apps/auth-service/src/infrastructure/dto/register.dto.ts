@@ -89,11 +89,12 @@ export class RegisterDto {
 
   @ApiProperty({
     description: "Tipo de documento",
-    enum: ["CC", "TI", "CE", "PASSPORT"],
+    enum: ["CC", "TI", "CE", "PASSPORT", "DNI", "OTHER"],
     example: "CC",
     required: false,
   })
-  @IsIn(["CC", "TI", "CE", "PASSPORT"], {
+  @IsString({ message: "Tipo de documento debe ser un string" })
+  @IsIn(["CC", "TI", "CE", "PASSPORT", "DNI", "OTHER"], {
     message: "Tipo de documento inválido",
   })
   @IsOptional()

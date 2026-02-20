@@ -422,18 +422,36 @@ export const VigilancePanel = React.memo<VigilancePanelProps>(
 
             {/* Empty states */}
             {selectedTab === "active" && activeReservations.length === 0 && (
-              <div className="col-span-2 text-center py-12 text-[var(--color-text-secondary)] dark:text-[var(--color-text-tertiary)]">
-                No hay reservas activas en este momento
+              <div className="col-span-2 flex flex-col items-center justify-center py-16 bg-[var(--color-bg-secondary)]/30 rounded-xl border-2 border-dashed border-[var(--color-border-subtle)]">
+                <div className="p-4 bg-[var(--color-bg-secondary)] rounded-full mb-4">
+                  <CheckCircle className="h-10 w-10 text-[var(--color-text-tertiary)] opacity-20" />
+                </div>
+                <p className="text-lg font-medium text-[var(--color-text-primary)]">No hay reservas activas</p>
+                <p className="text-sm text-[var(--color-text-secondary)] mt-1">
+                  En este momento no hay usuarios utilizando recursos.
+                </p>
               </div>
             )}
             {selectedTab === "overdue" && overdueReservations.length === 0 && (
-              <div className="col-span-2 text-center py-12 text-[var(--color-text-secondary)] dark:text-[var(--color-text-tertiary)]">
-                ✅ No hay reservas con retraso
+              <div className="col-span-2 flex flex-col items-center justify-center py-16 bg-[var(--color-state-success-bg)]/10 rounded-xl border-2 border-dashed border-[var(--color-state-success-border)]/30">
+                <div className="p-4 bg-[var(--color-state-success-bg)] rounded-full mb-4">
+                  <CheckCircle className="h-10 w-10 text-[var(--color-state-success-text)]" />
+                </div>
+                <p className="text-lg font-medium text-[var(--color-state-success-text)]">Todo al día</p>
+                <p className="text-sm text-[var(--color-state-success-text)] opacity-80 mt-1">
+                  No hay reservas con retraso en el check-in.
+                </p>
               </div>
             )}
             {selectedTab === "alerts" && stats.totalAlerts === 0 && (
-              <div className="col-span-2 text-center py-12 text-[var(--color-text-secondary)] dark:text-[var(--color-text-tertiary)]">
-                ✅ No hay alertas activas
+              <div className="col-span-2 flex flex-col items-center justify-center py-16 bg-[var(--color-bg-secondary)]/30 rounded-xl border-2 border-dashed border-[var(--color-border-subtle)]">
+                <div className="p-4 bg-[var(--color-bg-secondary)] rounded-full mb-4">
+                  <Bell className="h-10 w-10 text-[var(--color-text-tertiary)] opacity-20" />
+                </div>
+                <p className="text-lg font-medium text-[var(--color-text-primary)]">Sin alertas activas</p>
+                <p className="text-sm text-[var(--color-text-secondary)] mt-1">
+                  El sistema no ha detectado incidencias que requieran atención.
+                </p>
               </div>
             )}
           </div>

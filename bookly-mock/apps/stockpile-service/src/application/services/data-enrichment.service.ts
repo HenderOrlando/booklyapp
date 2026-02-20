@@ -62,6 +62,13 @@ export class DataEnrichmentService {
           ? new Date(approval.metadata.reservationEndDate)
           : undefined,
         purpose: approval.metadata?.purpose,
+        currentLevel: approval.metadata?.currentLevel,
+        maxLevel: approval.metadata?.maxLevel,
+        nextApprover: approval.metadata?.nextApprover,
+        expiresAt: approval.metadata?.expiresAt
+          ? new Date(approval.metadata.expiresAt)
+          : undefined,
+        priority: approval.metadata?.priority || "NORMAL",
         approvalHistory: approval.approvalHistory?.map((h) => ({
           stepName: h.stepName,
           decision: h.decision,
@@ -224,6 +231,13 @@ export class DataEnrichmentService {
         ? new Date(approval.metadata.reservationEndDate)
         : undefined,
       purpose: approval.metadata?.purpose,
+      currentLevel: approval.metadata?.currentLevel,
+      maxLevel: approval.metadata?.maxLevel,
+      nextApprover: approval.metadata?.nextApprover,
+      expiresAt: approval.metadata?.expiresAt
+        ? new Date(approval.metadata.expiresAt)
+        : undefined,
+      priority: approval.metadata?.priority || "NORMAL",
       approvalHistory: approval.approvalHistory?.map((h) => ({
         stepName: h.stepName,
         decision: h.decision,

@@ -2,10 +2,14 @@ import { Button } from "@/components/atoms/Button";
 import {
   Card,
   CardContent,
-  CardDescription,
   CardHeader,
-  CardTitle,
 } from "@/components/atoms/Card";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogTitle,
+} from "@/components/atoms/Dialog";
 import { DateInput } from "@/components/atoms/DateInput";
 import { DurationBadge } from "@/components/atoms/DurationBadge";
 import { TimeInput } from "@/components/atoms/TimeInput";
@@ -24,6 +28,7 @@ import { RecurringPatternSelector } from "@/components/molecules/RecurringPatter
 import { RecurringReservationPreview } from "@/components/molecules/RecurringReservationPreview";
 import { useRecurringReservations } from "@/hooks/useRecurringReservations";
 import { useToast } from "@/hooks/useToast";
+import { useTranslations } from "next-intl";
 import type { RecurrencePattern } from "@/types/entities/recurring";
 import type {
   CreateReservationDto,
@@ -92,7 +97,8 @@ export const ReservationModal = React.memo(function ReservationModal({
   initialDate,
   initialResourceId,
 }: ReservationModalProps) {
-  const { showSuccess, showError } = useToast();
+  const { showError } = useToast();
+  const t = useTranslations("reservations.modal");
 
   // Estado del formulario
   const [formData, setFormData] = React.useState<CreateReservationDto>({
@@ -162,30 +168,29 @@ export const ReservationModal = React.memo(function ReservationModal({
     const newErrors: Record<string, string> = {};
 
     if (!formData.resourceId) {
-      newErrors.resourceId = "Selecciona un recurso";
+      newErrors.resourceId = t("errors.resource_required");
     }
     if (!formData.title) {
-      newErrors.title = "El título es requerido";
+      newErrors.title = t("errors.title_required");
     }
     if (!formData.startDate) {
-      newErrors.startDate = "La fecha de inicio es requerida";
+      newErrors.startDate = t("errors.start_date_required");
     }
     if (!formData.endDate) {
-      newErrors.endDate = "La fecha de fin es requerida";
+      newErrors.endDate = t("errors.end_date_required");
     }
     if (
       formData.startDate &&
       formData.endDate &&
       formData.startDate > formData.endDate
     ) {
-      newErrors.endDate = "La fecha de fin debe ser posterior a la de inicio";
+      newErrors.endDate = t("errors.end_date_after_start");
     }
     if (duration <= 0) {
-      newErrors.time = "La hora de fin debe ser posterior a la de inicio";
+      newErrors.time = t("errors.end_time_after_start");
     }
     if (formData.recurrenceType !== "NONE" && !formData.recurrenceEndDate) {
-      newErrors.recurrenceEndDate =
-        "La fecha de fin de recurrencia es requerida";
+      newErrors.recurrenceEndDate = t("errors.recurrence_end_required");
     }
 
     setErrors(newErrors);
@@ -230,23 +235,17 @@ export const ReservationModal = React.memo(function ReservationModal({
       );
 
       if (result.success) {
-        const message =
-          `✅ Se crearon ${result.summary.totalCreated} reservas exitosamente.\n` +
-          (result.summary.totalFailed > 0
-            ? `⚠️ ${result.summary.totalFailed} no se pudieron crear por conflictos.`
-            : "");
-
-        if (result.summary.totalFailed > 0) {
-          showSuccess("Creación Parcial", message, { duration: 8000 });
-        } else {
-          showSuccess("Reservas Recurrentes Creadas", message);
-        }
+        const message = t("recurring_preview.success_message", {
+          total: result.summary.totalCreated,
+        });
+        showSuccess(t("recurring_preview.success_title"), message);
         onClose();
       }
     } catch (error) {
-      const errorMessage =
-        error instanceof Error ? error.message : "Error desconocido";
-      showError("Error al crear reservas recurrentes", errorMessage);
+      showError(
+        t("errors.recurring_creation_failed"),
+        error instanceof Error ? error.message : t("errors.unknown_error")
+      );
     }
   };
 
@@ -280,280 +279,286 @@ export const ReservationModal = React.memo(function ReservationModal({
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
-      <Card className="w-full max-w-2xl max-h-[90vh] overflow-y-auto">
-        <CardHeader>
-          <CardTitle>
-            {mode === "create" ? "Nueva Reserva" : "Editar Reserva"}
-          </CardTitle>
-          <CardDescription>
-            {mode === "create"
-              ? "Completa los datos para crear una nueva reserva"
-              : "Modifica los datos de la reserva existente"}
-          </CardDescription>
-        </CardHeader>
+    <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
+      <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto p-0 gap-0 border-none bg-transparent shadow-none">
+        <Card className="w-full h-full border-none shadow-none">
+          <CardHeader>
+            <DialogTitle className="text-2xl">
+              {mode === "create" ? t("title_create") : t("title_edit")}
+            </DialogTitle>
+            <DialogDescription>
+              {mode === "create"
+                ? t("description_create")
+                : t("description_edit")}
+            </DialogDescription>
+          </CardHeader>
 
-        <CardContent className="p-6">
-          <form onSubmit={handleSubmit} className="space-y-8">
-            {/* Sección: Información Principal */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div className="flex flex-col gap-2">
-                <Label required htmlFor="resource">
-                  Recurso
-                </Label>
-                <Select
-                  value={formData.resourceId}
-                  onValueChange={(value) =>
-                    setFormData({ ...formData, resourceId: value })
-                  }
-                >
-                  <SelectTrigger
-                    id="resource"
-                    error={errors.resourceId}
-                    aria-label="Seleccionar recurso"
+          <CardContent className="p-6">
+            <form onSubmit={handleSubmit} className="space-y-8">
+              {/* Sección: Información Principal */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="flex flex-col gap-2">
+                  <Label required htmlFor="resource">
+                    {t("resource_label")}
+                  </Label>
+                  <Select
+                    value={formData.resourceId}
+                    onValueChange={(value) =>
+                      setFormData({ ...formData, resourceId: value })
+                    }
                   >
-                    <SelectValue placeholder="Selecciona un recurso" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {resources.map((resource) => (
-                      <SelectItem key={resource.id} value={resource.id}>
-                        {resource.name} - {resource.type}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-                {errors.resourceId && (
-                  <span className="text-xs text-[var(--color-state-error-text)]">
-                    {errors.resourceId}
-                  </span>
-                )}
-              </div>
-
-              <div className="flex flex-col gap-2">
-                <Label required htmlFor="title">
-                  Título de la reserva
-                </Label>
-                <Input
-                  id="title"
-                  type="text"
-                  value={formData.title}
-                  onChange={(e) =>
-                    setFormData({ ...formData, title: e.target.value })
-                  }
-                  placeholder="Ej: Reunión de equipo"
-                  error={errors.title}
-                  required
-                />
-              </div>
-            </div>
-
-            {/* Sección: Fechas y Horarios */}
-            <div className="bg-[var(--color-bg-primary)]/30 p-4 rounded-lg border border-[var(--color-border-subtle)] space-y-6">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <DateInput
-                  label="Fecha de inicio"
-                  value={formData.startDate}
-                  onChange={(value) =>
-                    setFormData({ ...formData, startDate: value })
-                  }
-                  required
-                  error={errors.startDate}
-                  min={new Date().toISOString().split("T")[0]}
-                />
-                <DateInput
-                  label="Fecha de fin"
-                  value={formData.endDate}
-                  onChange={(value) =>
-                    setFormData({ ...formData, endDate: value })
-                  }
-                  required
-                  error={errors.endDate}
-                  min={
-                    formData.startDate || new Date().toISOString().split("T")[0]
-                  }
-                />
-              </div>
-
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <TimeInput
-                  label="Hora de inicio"
-                  value={startTime}
-                  onChange={setStartTime}
-                  required
-                  step={30}
-                />
-                <TimeInput
-                  label="Hora de fin"
-                  value={endTime}
-                  onChange={setEndTime}
-                  required
-                  step={30}
-                />
-              </div>
-
-              <div className="flex items-center justify-between pt-2 border-t border-[var(--color-border-subtle)]/50">
-                <div className="flex items-center gap-2">
-                  <span className="text-sm font-medium text-[var(--color-text-secondary)]">
-                    Tiempo total reservado:
-                  </span>
-                  {duration > 0 ? (
-                    <DurationBadge minutes={duration} />
-                  ) : (
-                    <span className="text-sm text-[var(--color-state-error-text)]">
-                      Hora inválida
+                    <SelectTrigger
+                      id="resource"
+                      error={errors.resourceId}
+                      aria-label={t("resource_placeholder")}
+                    >
+                      <SelectValue placeholder={t("resource_placeholder")} />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {resources.map((resource) => (
+                        <SelectItem key={resource.id} value={resource.id}>
+                          {resource.name} - {resource.type}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  {errors.resourceId && (
+                    <span className="text-xs text-[var(--color-state-error-text)]">
+                      {errors.resourceId}
                     </span>
                   )}
                 </div>
-                {errors.time && (
-                  <span className="text-sm text-[var(--color-state-error-text)] font-medium">
-                    {errors.time}
-                  </span>
-                )}
-              </div>
-            </div>
-
-            {/* Sección: Detalles */}
-            <div className="space-y-6">
-              <div className="flex flex-col gap-2">
-                <Label htmlFor="description">Descripción</Label>
-                <Textarea
-                  id="description"
-                  value={formData.description}
-                  onChange={(e) =>
-                    setFormData({ ...formData, description: e.target.value })
-                  }
-                  placeholder="Describe el propósito de la reserva..."
-                  className="min-h-[100px]"
-                />
-              </div>
-
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div className="flex flex-col gap-2">
-                  <Label htmlFor="attendees">Número de asistentes</Label>
-                  <Input
-                    id="attendees"
-                    type="number"
-                    value={formData.attendees}
-                    onChange={(e) =>
-                      setFormData({
-                        ...formData,
-                        attendees: parseInt(e.target.value) || 1,
-                      })
-                    }
-                    min="1"
-                  />
-                </div>
 
                 <div className="flex flex-col gap-2">
-                  <Label htmlFor="notes">Notas adicionales</Label>
-                  <Textarea
-                    id="notes"
-                    value={formData.notes}
-                    onChange={(e) =>
-                      setFormData({ ...formData, notes: e.target.value })
-                    }
-                    placeholder="Información extra relevante..."
-                    className="min-h-[40px]"
-                  />
-                </div>
-              </div>
-            </div>
-
-            {/* Sección: Recurrencia */}
-            <div className="rounded-xl border border-[var(--color-border-subtle)] overflow-hidden">
-              <div
-                className={cn(
-                  "flex items-center justify-between p-4 transition-colors",
-                  showRecurringConfig
-                    ? "bg-brand-primary-500/5 border-b border-[var(--color-border-subtle)]"
-                    : "bg-[var(--color-bg-surface)]"
-                )}
-              >
-                <div className="flex flex-col">
-                  <Label htmlFor="recurring-toggle" className="text-base font-semibold cursor-pointer">
-                    Reserva recurrente
+                  <Label required htmlFor="title">
+                    {t("title_label")}
                   </Label>
-                  <span className="text-xs text-[var(--color-text-tertiary)]">
-                    Repite esta reserva automáticamente en el tiempo
-                  </span>
-                </div>
-                <label className="relative inline-flex items-center cursor-pointer">
-                  <input
-                    id="recurring-toggle"
-                    type="checkbox"
-                    checked={showRecurringConfig}
-                    onChange={(e) => {
-                      setShowRecurringConfig(e.target.checked);
-                      if (!e.target.checked) {
-                        setFormData({ ...formData, recurrenceType: "NONE" });
-                      } else {
-                        setFormData({ ...formData, recurrenceType: "WEEKLY" });
-                      }
-                    }}
-                    className="sr-only peer"
-                    aria-label="Activar reserva recurrente"
+                  <Input
+                    id="title"
+                    type="text"
+                    value={formData.title}
+                    onChange={(e) =>
+                      setFormData({ ...formData, title: e.target.value })
+                    }
+                    placeholder={t("title_placeholder")}
+                    error={errors.title}
+                    required
                   />
-                  <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 dark:peer-focus:ring-blue-800 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-blue-600"></div>
-                </label>
+                </div>
               </div>
 
-              {showRecurringConfig && (
-                <div className="p-6 bg-brand-primary-500/[0.02] animate-in fade-in slide-in-from-top-2 duration-300">
-                  <RecurringPatternSelector
-                    pattern={recurringPattern}
-                    onChange={(pattern) => {
-                      setRecurringPattern(pattern);
-                      setFormData({
-                        ...formData,
-                        recurrenceType: pattern.frequency as RecurrenceType,
-                        recurrenceEndDate: pattern.endDate || "",
-                      });
-                    }}
+              {/* Sección: Fechas y Horarios */}
+              <div className="bg-[var(--color-bg-primary)]/30 p-4 rounded-lg border border-[var(--color-border-subtle)] space-y-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <DateInput
+                    label={t("start_date_label")}
+                    value={formData.startDate}
+                    onChange={(value) =>
+                      setFormData({ ...formData, startDate: value })
+                    }
+                    required
+                    error={errors.startDate}
+                    min={new Date().toISOString().split("T")[0]}
+                  />
+                  <DateInput
+                    label={t("end_date_label")}
+                    value={formData.endDate}
+                    onChange={(value) =>
+                      setFormData({ ...formData, endDate: value })
+                    }
+                    required
+                    error={errors.endDate}
+                    min={
+                      formData.startDate ||
+                      new Date().toISOString().split("T")[0]
+                    }
                   />
                 </div>
-              )}
-            </div>
 
-            {/* Acciones */}
-            <div className="flex justify-end gap-4 pt-6 border-t border-[var(--color-border-subtle)]">
-              <Button
-                type="button"
-                variant="outline"
-                onClick={onClose}
-                disabled={loading}
-                className="px-8"
-              >
-                Cancelar
-              </Button>
-              <ButtonWithLoading
-                type="submit"
-                isLoading={loading}
-                loadingText={mode === "create" ? "Procesando..." : "Guardando..."}
-                className="px-8 min-w-[160px]"
-              >
-                {showRecurringConfig && formData.recurrenceType !== "NONE"
-                  ? "Ver Resumen"
-                  : mode === "create"
-                  ? "Confirmar Reserva"
-                  : "Actualizar Reserva"}
-              </ButtonWithLoading>
-            </div>
-          </form>
-        </CardContent>
-      </Card>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <TimeInput
+                    label={t("start_time_label")}
+                    value={startTime}
+                    onChange={setStartTime}
+                    required
+                    step={30}
+                  />
+                  <TimeInput
+                    label={t("end_time_label")}
+                    value={endTime}
+                    onChange={setEndTime}
+                    required
+                    step={30}
+                  />
+                </div>
 
-      {/* Modal de Preview de Reservas Recurrentes */}
-      {showRecurringPreview && recurringPreviewData && (
-        <RecurringReservationPreview
-          instances={recurringPreviewData.instances}
-          description={recurringPreviewData.description}
-          validation={recurringPreviewData.validation}
-          onConfirm={handleConfirmRecurring}
-          onCancel={() => setShowRecurringPreview(false)}
-          isCreating={isCreatingRecurring}
-          progress={creationProgress}
-        />
-      )}
-    </div>
+                <div className="flex items-center justify-between pt-2 border-t border-[var(--color-border-subtle)]/50">
+                  <div className="flex items-center gap-2">
+                    <span className="text-sm font-medium text-[var(--color-text-secondary)]">
+                      {t("total_time_label")}
+                    </span>
+                    {duration > 0 ? (
+                      <DurationBadge minutes={duration} />
+                    ) : (
+                      <span className="text-sm text-[var(--color-state-error-text)]">
+                        {t("invalid_time")}
+                      </span>
+                    )}
+                  </div>
+                  {errors.time && (
+                    <span className="text-sm text-[var(--color-state-error-text)] font-medium">
+                      {errors.time}
+                    </span>
+                  )}
+                </div>
+              </div>
+
+              {/* Sección: Detalles */}
+              <div className="space-y-6">
+                <div className="flex flex-col gap-2">
+                  <Label htmlFor="description">{t("description_label")}</Label>
+                  <Textarea
+                    id="description"
+                    value={formData.description}
+                    onChange={(e) =>
+                      setFormData({ ...formData, description: e.target.value })
+                    }
+                    placeholder={t("description_placeholder")}
+                    className="min-h-[100px]"
+                  />
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div className="flex flex-col gap-2">
+                    <Label htmlFor="attendees">{t("attendees_label")}</Label>
+                    <Input
+                      id="attendees"
+                      type="number"
+                      value={formData.attendees}
+                      onChange={(e) =>
+                        setFormData({
+                          ...formData,
+                          attendees: parseInt(e.target.value) || 1,
+                        })
+                      }
+                      min="1"
+                    />
+                  </div>
+
+                  <div className="flex flex-col gap-2">
+                    <Label htmlFor="notes">{t("notes_label")}</Label>
+                    <Textarea
+                      id="notes"
+                      value={formData.notes}
+                      onChange={(e) =>
+                        setFormData({ ...formData, notes: e.target.value })
+                      }
+                      placeholder={t("notes_placeholder")}
+                      className="min-h-[40px]"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              {/* Sección: Recurrencia */}
+              <div className="rounded-xl border border-[var(--color-border-subtle)] overflow-hidden">
+                <div
+                  className={cn(
+                    "flex items-center justify-between p-4 transition-colors",
+                    showRecurringConfig
+                      ? "bg-brand-primary-500/5 border-b border-[var(--color-border-subtle)]"
+                      : "bg-[var(--color-bg-surface)]"
+                  )}
+                >
+                  <div className="flex flex-col">
+                    <Label
+                      htmlFor="recurring-toggle"
+                      className="text-base font-semibold cursor-pointer"
+                    >
+                      {t("recurring_section_title")}
+                    </Label>
+                    <span className="text-xs text-[var(--color-text-tertiary)]">
+                      {t("recurring_section_desc")}
+                    </span>
+                  </div>
+                  <label className="relative inline-flex items-center cursor-pointer">
+                    <input
+                      id="recurring-toggle"
+                      type="checkbox"
+                      checked={showRecurringConfig}
+                      onChange={(e) => {
+                        setShowRecurringConfig(e.target.checked);
+                        if (!e.target.checked) {
+                          setFormData({ ...formData, recurrenceType: "NONE" });
+                        } else {
+                          setFormData({ ...formData, recurrenceType: "WEEKLY" });
+                        }
+                      }}
+                      className="sr-only peer"
+                      aria-label={t("recurring_toggle_aria")}
+                    />
+                    <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 dark:peer-focus:ring-blue-800 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-blue-600"></div>
+                  </label>
+                </div>
+
+                {showRecurringConfig && (
+                  <div className="p-6 bg-brand-primary-500/[0.02] animate-in fade-in slide-in-from-top-2 duration-300">
+                    <RecurringPatternSelector
+                      pattern={recurringPattern}
+                      onChange={(pattern) => {
+                        setRecurringPattern(pattern);
+                        setFormData({
+                          ...formData,
+                          recurrenceType: pattern.frequency as RecurrenceType,
+                          recurrenceEndDate: pattern.endDate || "",
+                        });
+                      }}
+                    />
+                  </div>
+                )}
+              </div>
+
+              {/* Acciones */}
+              <div className="flex justify-end gap-4 pt-6 border-t border-[var(--color-border-subtle)]">
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={onClose}
+                  disabled={loading}
+                  className="px-8"
+                >
+                  {t("cancel_btn")}
+                </Button>
+                <ButtonWithLoading
+                  type="submit"
+                  isLoading={loading}
+                  loadingText={mode === "create" ? t("processing") : t("saving")}
+                  className="px-8 min-w-[160px]"
+                >
+                  {showRecurringConfig && formData.recurrenceType !== "NONE"
+                    ? t("recurring_summary_btn")
+                    : mode === "create"
+                    ? t("confirm_create_btn")
+                    : t("confirm_edit_btn")}
+                </ButtonWithLoading>
+              </div>
+            </form>
+          </CardContent>
+        </Card>
+
+        {/* Modal de Preview de Reservas Recurrentes */}
+        {showRecurringPreview && recurringPreviewData && (
+          <RecurringReservationPreview
+            instances={recurringPreviewData.instances}
+            description={recurringPreviewData.description}
+            validation={recurringPreviewData.validation}
+            onConfirm={handleConfirmRecurring}
+            onCancel={() => setShowRecurringPreview(false)}
+            isCreating={isCreatingRecurring}
+            progress={creationProgress}
+          />
+        )}
+      </DialogContent>
+    </Dialog>
   );
 });

@@ -465,7 +465,11 @@ export const ApprovalModal = React.memo<ApprovalModalProps>(
               {activeTab === "timeline" && (
                 <div className="py-4">
                   {request.history && request.history.length > 0 ? (
-                    <ApprovalTimeline history={request.history} />
+                    <ApprovalTimeline
+                      history={request.history}
+                      currentLevel={request.currentLevel}
+                      maxLevel={request.maxLevel}
+                    />
                   ) : (
                     <div className="text-center py-12 text-[var(--color-text-secondary)] dark:text-[var(--color-text-tertiary)]">
                       <FileText className="h-12 w-12 mx-auto mb-3 opacity-50" />
@@ -509,6 +513,7 @@ export const ApprovalModal = React.memo<ApprovalModalProps>(
             {/* Botón de cerrar */}
             <button
               onClick={onClose}
+              title="Cerrar"
               className="absolute top-4 right-4 p-1 rounded-lg hover:bg-[var(--color-bg-secondary)] dark:hover:bg-[var(--color-bg-inverse)] transition-colors"
             >
               <X className="h-5 w-5 text-[var(--color-text-secondary)] dark:text-[var(--color-text-tertiary)]" />

@@ -1,6 +1,7 @@
 "use client";
 
 import { Button } from "@/components/atoms/Button";
+import { ApprovalTimeline } from "@/components/molecules/ApprovalTimeline";
 import { LoadingState } from "@/components/molecules/LoadingState";
 import { MainLayout } from "@/components/templates/MainLayout";
 import { useApprovalActions } from "@/hooks/useApprovalActions";
@@ -285,55 +286,17 @@ export default function ApprovalDetailPage() {
         </div>
 
         {/* Timeline / History */}
-        {request.history && request.history.length > 0 && (
-          <div className="bg-[var(--color-bg-primary)] dark:bg-[var(--color-bg-secondary)] rounded-lg border border-[var(--color-border-primary)] dark:border-[var(--color-border-primary)] p-6">
-            <h2 className="text-xl font-semibold text-[var(--color-text-primary)] dark:text-[var(--color-text-primary)] mb-4">
-              {t("history")}
-            </h2>
-            <div className="space-y-4">
-              {request.history.map((entry, index) => (
-                <div key={index} className="flex gap-4">
-                  <div className="flex flex-col items-center">
-                    <div
-                      className={`p-2 rounded-full ${
-                        entry.action === "APPROVE"
-                          ? "bg-state-success-100 dark:bg-state-success-900/20"
-                          : entry.action === "REJECT"
-                            ? "bg-state-error-100 dark:bg-state-error-900/20"
-                            : "bg-brand-primary-100 dark:bg-brand-primary-900/20"
-                      }`}
-                    >
-                      {entry.action === "APPROVE" ? (
-                        <CheckCircle className="h-4 w-4 text-state-success-600 dark:text-state-success-400" />
-                      ) : entry.action === "REJECT" ? (
-                        <XCircle className="h-4 w-4 text-state-error-600 dark:text-state-error-400" />
-                      ) : (
-                        <Clock className="h-4 w-4 text-brand-primary-600 dark:text-brand-primary-400" />
-                      )}
-                    </div>
-                    {index < request.history!.length - 1 && (
-                      <div className="w-0.5 h-full bg-[var(--color-bg-muted)] dark:bg-[var(--color-bg-tertiary)] my-1" />
-                    )}
-                  </div>
-                  <div className="flex-1 pb-4">
-                    <p className="font-medium text-[var(--color-text-primary)] dark:text-[var(--color-text-primary)]">
-                      {entry.action} - {entry.level}
-                    </p>
-                    <p className="text-sm text-[var(--color-text-secondary)] dark:text-[var(--color-text-tertiary)]">
-                      {entry.performerName} •{" "}
-                      {new Date(entry.timestamp).toLocaleString()}
-                    </p>
-                    {entry.comments && (
-                      <p className="mt-2 text-sm text-[var(--color-text-secondary)] dark:text-[var(--color-text-secondary)] bg-[var(--color-bg-secondary)] dark:bg-[var(--color-bg-primary)]/50 p-3 rounded">
-                        {entry.comments}
-                      </p>
-                    )}
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        )}
+        <div className="bg-[var(--color-bg-primary)] dark:bg-[var(--color-bg-secondary)] rounded-lg border border-[var(--color-border-primary)] dark:border-[var(--color-border-primary)] p-6">
+          <h2 className="text-xl font-semibold text-[var(--color-text-primary)] dark:text-[var(--color-text-primary)] mb-6 flex items-center gap-2">
+            <Clock className="h-5 w-5 text-[var(--color-action-primary)]" />
+            {t("history")}
+          </h2>
+          <ApprovalTimeline
+            history={request.history || []}
+            currentLevel={request.currentLevel}
+            maxLevel={request.maxLevel}
+          />
+        </div>
 
         {/* Actions */}
         {request.status === "PENDING" && (

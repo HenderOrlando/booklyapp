@@ -2,6 +2,12 @@ import { ApprovalActionButton } from "@/components/atoms/ApprovalActionButton";
 import { ApprovalStatusBadge } from "@/components/atoms/ApprovalStatusBadge";
 import { Badge } from "@/components/atoms/Badge";
 import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/atoms/Tooltip";
+import {
   Card,
   CardContent,
   CardDescription,
@@ -89,16 +95,32 @@ export const ApprovalCard = React.memo<ApprovalCardProps>(
                 <Badge variant="outline" className="text-xs">
                   {request.currentLevel.replace("_", " ")}
                 </Badge>
-                {request.priority === "HIGH" && (
-                  <Badge variant="warning" className="text-xs">
-                    Alta Prioridad
-                  </Badge>
-                )}
-                {request.priority === "URGENT" && (
-                  <Badge variant="error" className="text-xs">
-                    Urgente
-                  </Badge>
-                )}
+                <TooltipProvider>
+                  {request.priority === "HIGH" && (
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <Badge variant="warning" className="text-xs cursor-help">
+                          Alta Prioridad
+                        </Badge>
+                      </TooltipTrigger>
+                      <TooltipContent>
+                        <p>Esta solicitud requiere atención prioritaria.</p>
+                      </TooltipContent>
+                    </Tooltip>
+                  )}
+                  {request.priority === "URGENT" && (
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <Badge variant="error" className="text-xs cursor-help">
+                          Urgente
+                        </Badge>
+                      </TooltipTrigger>
+                      <TooltipContent>
+                        <p>Atención inmediata: Esta solicitud es crítica.</p>
+                      </TooltipContent>
+                    </Tooltip>
+                  )}
+                </TooltipProvider>
               </div>
               <CardTitle className="text-lg">{request.resourceName}</CardTitle>
               <CardDescription className="flex items-center gap-1">

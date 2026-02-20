@@ -21,6 +21,7 @@ import {
   SelectValue,
 } from "@/components/atoms/Select";
 import type { DayOfWeek, RecurrencePattern } from "@/types/entities/recurring";
+import { useTranslations } from "next-intl";
 import React from "react";
 
 interface RecurringPatternSelectorProps {
@@ -28,21 +29,22 @@ interface RecurringPatternSelectorProps {
   onChange: (pattern: RecurrencePattern) => void;
 }
 
-const DAYS_OF_WEEK: Array<{ value: DayOfWeek; label: string }> = [
-  { value: "MONDAY", label: "Lun" },
-  { value: "TUESDAY", label: "Mar" },
-  { value: "WEDNESDAY", label: "Mié" },
-  { value: "THURSDAY", label: "Jue" },
-  { value: "FRIDAY", label: "Vie" },
-  { value: "SATURDAY", label: "Sáb" },
-  { value: "SUNDAY", label: "Dom" },
-];
-
 export function RecurringPatternSelector({
   pattern,
   onChange,
 }: RecurringPatternSelectorProps) {
+  const t = useTranslations("reservations.recurring_selector");
   const [endType, setEndType] = React.useState<"date" | "occurrences">("date");
+
+  const DAYS_OF_WEEK: Array<{ value: DayOfWeek; label: string }> = [
+    { value: "MONDAY", label: t("days_of_week.monday") },
+    { value: "TUESDAY", label: t("days_of_week.tuesday") },
+    { value: "WEDNESDAY", label: t("days_of_week.wednesday") },
+    { value: "THURSDAY", label: t("days_of_week.thursday") },
+    { value: "FRIDAY", label: t("days_of_week.friday") },
+    { value: "SATURDAY", label: t("days_of_week.saturday") },
+    { value: "SUNDAY", label: t("days_of_week.sunday") },
+  ];
 
   const handleFrequencyChange = (value: string) => {
     onChange({
@@ -67,24 +69,25 @@ export function RecurringPatternSelector({
       {/* Frecuencia e Intervalo */}
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
         <div className="flex flex-col gap-2">
-          <Label htmlFor="frequency">Repetir</Label>
+          <Label htmlFor="frequency">{t("repeat_label")}</Label>
           <Select value={pattern.frequency} onValueChange={handleFrequencyChange}>
             <SelectTrigger id="frequency">
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="DAILY">Diariamente</SelectItem>
-              <SelectItem value="WEEKLY">Semanalmente</SelectItem>
-              <SelectItem value="MONTHLY">Mensualmente</SelectItem>
+              <SelectItem value="DAILY">{t("daily")}</SelectItem>
+              <SelectItem value="WEEKLY">{t("weekly")}</SelectItem>
+              <SelectItem value="MONTHLY">{t("monthly")}</SelectItem>
             </SelectContent>
           </Select>
         </div>
 
         <div className="flex flex-col gap-2">
           <Label htmlFor="interval">
-            Cada {pattern.frequency === "DAILY" && "día(s)"}
-            {pattern.frequency === "WEEKLY" && "semana(s)"}
-            {pattern.frequency === "MONTHLY" && "mes(es)"}
+            {t("every_label")}{" "}
+            {pattern.frequency === "DAILY" && t("days")}
+            {pattern.frequency === "WEEKLY" && t("weeks")}
+            {pattern.frequency === "MONTHLY" && t("months")}
           </Label>
           <Input
             id="interval"
@@ -102,7 +105,7 @@ export function RecurringPatternSelector({
       {/* Días de la semana (solo para semanal) */}
       {pattern.frequency === "WEEKLY" && (
         <div className="flex flex-col gap-3">
-          <Label>Días de la semana</Label>
+          <Label>{t("days_of_week_label")}</Label>
           <div className="flex flex-wrap gap-2">
             {DAYS_OF_WEEK.map((day) => {
               const isActive = pattern.daysOfWeek?.includes(day.value);
@@ -128,7 +131,7 @@ export function RecurringPatternSelector({
       {/* Día del mes (solo para mensual) */}
       {pattern.frequency === "MONTHLY" && (
         <div className="flex flex-col gap-2">
-          <Label htmlFor="dayOfMonth">Día del mes</Label>
+          <Label htmlFor="dayOfMonth">{t("day_of_month_label")}</Label>
           <Input
             id="dayOfMonth"
             type="number"
@@ -144,7 +147,7 @@ export function RecurringPatternSelector({
 
       {/* Fin de recurrencia */}
       <div className="flex flex-col gap-3 pt-2 border-t border-[var(--color-border-subtle)]/50">
-        <Label>Termina</Label>
+        <Label>{t("ends_label")}</Label>
         <div className="flex p-1 bg-[var(--color-bg-muted)] rounded-lg w-full sm:w-fit">
           <button
             type="button"
@@ -155,7 +158,7 @@ export function RecurringPatternSelector({
                 : "text-[var(--color-text-tertiary)] hover:text-[var(--color-text-secondary)]"
             }`}
           >
-            En fecha
+            {t("on_date")}
           </button>
           <button
             type="button"
@@ -166,7 +169,7 @@ export function RecurringPatternSelector({
                 : "text-[var(--color-text-tertiary)] hover:text-[var(--color-text-secondary)]"
             }`}
           >
-            Después de
+            {t("after")}
           </button>
         </div>
 
@@ -204,7 +207,7 @@ export function RecurringPatternSelector({
                 />
               </div>
               <span className="text-sm font-medium text-[var(--color-text-secondary)]">
-                repeticiones
+                {t("occurrences_label")}
               </span>
             </div>
           )}
@@ -215,27 +218,34 @@ export function RecurringPatternSelector({
       <div className="p-4 bg-brand-primary-500/5 rounded-xl border border-brand-primary-500/20">
         <div className="flex items-center gap-2 text-xs font-bold text-brand-primary-600 uppercase tracking-wider mb-2">
           <span>📝</span>
-          <span>Resumen de recurrencia</span>
+          <span>{t("summary_title")}</span>
         </div>
         <div className="text-sm text-[var(--color-text-secondary)] leading-relaxed italic">
           {pattern.frequency === "DAILY" &&
-            `Cada ${pattern.interval} día${pattern.interval > 1 ? "s" : ""}`}
+            t("summary_desc.daily", { interval: pattern.interval })}
           {pattern.frequency === "WEEKLY" &&
-            `Cada ${pattern.interval} semana${pattern.interval > 1 ? "s" : ""} los ${
-              pattern.daysOfWeek
+            t("summary_desc.weekly", {
+              interval: pattern.interval,
+              days: pattern.daysOfWeek
                 ?.map((d) => DAYS_OF_WEEK.find((day) => day.value === d)?.label)
-                .join(", ") || "días seleccionados"
-            }`}
+                .join(", ") || t("days_of_week_label"),
+            })}
           {pattern.frequency === "MONTHLY" &&
-            `Cada ${pattern.interval} mes${pattern.interval > 1 ? "es" : ""} el día ${pattern.dayOfMonth || 1}`}
+            t("summary_desc.monthly", {
+              interval: pattern.interval,
+              day: pattern.dayOfMonth || 1,
+            })}
           {pattern.endDate &&
-            ` hasta el ${new Date(pattern.endDate).toLocaleDateString("es-ES", {
-              weekday: 'long',
-              year: 'numeric',
-              month: 'long',
-              day: 'numeric'
-            })}`}
-          {pattern.occurrences && ` por ${pattern.occurrences} veces`}
+            t("summary_desc.until", {
+              date: new Date(pattern.endDate).toLocaleDateString("es-ES", {
+                weekday: "long",
+                year: "numeric",
+                month: "long",
+                day: "numeric",
+              }),
+            })}
+          {pattern.occurrences &&
+            t("summary_desc.for_occurrences", { count: pattern.occurrences })}
         </div>
       </div>
     </div>

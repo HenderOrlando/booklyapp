@@ -12,6 +12,7 @@ import type {
   Reservation,
 } from "@/types/entities/reservation";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useTranslations } from "next-intl";
 import { reservationKeys } from "../useReservations";
 
 /**
@@ -20,6 +21,7 @@ import { reservationKeys } from "../useReservations";
 export function useCreateReservation() {
   const queryClient = useQueryClient();
   const { showSuccess, showError } = useToast();
+  const t = useTranslations("reservations.modal");
 
   return useMutation({
     mutationFn: async (data: CreateReservationDto) => {
@@ -29,18 +31,18 @@ export function useCreateReservation() {
       );
       return response;
     },
-    onSuccess: (data) => {
+    onSuccess: () => {
       showSuccess(
-        "Reserva Creada",
-        "La reserva se creó exitosamente y está pendiente de aprobación"
+        t("success_create_title") || "Reserva Creada",
+        t("success_create_message") || "La reserva se creó exitosamente"
       );
       // Invalidar cache de reservas para refrescar lista
       queryClient.invalidateQueries({ queryKey: reservationKeys.lists() });
     },
-    onError: (error: any) => {
+    onError: (error: unknown) => {
       const errorMessage =
-        error?.response?.data?.message || "Error al crear la reserva";
-      showError("Error al Crear Reserva", errorMessage);
+        (error as any)?.response?.data?.message || t("errors.unknown_error");
+      showError(t("errors.create_failed") || "Error", errorMessage);
       console.error("Error al crear reserva:", error);
     },
   });
@@ -52,6 +54,7 @@ export function useCreateReservation() {
 export function useUpdateReservation() {
   const queryClient = useQueryClient();
   const { showSuccess, showError } = useToast();
+  const t = useTranslations("reservations.modal");
 
   return useMutation({
     mutationFn: async ({
@@ -69,8 +72,8 @@ export function useUpdateReservation() {
     },
     onSuccess: (_, variables) => {
       showSuccess(
-        "Reserva Actualizada",
-        "Los cambios se guardaron correctamente"
+        t("success_update_title") || "Reserva Actualizada",
+        t("success_update_message") || "Los cambios se guardaron correctamente"
       );
       // Invalidar cache de la reserva específica y listas
       queryClient.invalidateQueries({
@@ -78,10 +81,10 @@ export function useUpdateReservation() {
       });
       queryClient.invalidateQueries({ queryKey: reservationKeys.lists() });
     },
-    onError: (error: any) => {
+    onError: (error: unknown) => {
       const errorMessage =
-        error?.response?.data?.message || "Error al actualizar la reserva";
-      showError("Error al Actualizar", errorMessage);
+        (error as any)?.response?.data?.message || t("errors.unknown_error");
+      showError(t("errors.update_failed") || "Error", errorMessage);
       console.error("Error al actualizar reserva:", error);
     },
   });
@@ -109,9 +112,9 @@ export function useCancelReservation() {
       });
       queryClient.invalidateQueries({ queryKey: reservationKeys.lists() });
     },
-    onError: (error: any) => {
+    onError: (error: unknown) => {
       const errorMessage =
-        error?.response?.data?.message || "Error al cancelar la reserva";
+        (error as any)?.response?.data?.message || "Error al cancelar la reserva";
       showError("Error al Cancelar", errorMessage);
       console.error("Error al cancelar reserva:", error);
     },
@@ -138,9 +141,9 @@ export function useDeleteReservation() {
       });
       queryClient.invalidateQueries({ queryKey: reservationKeys.lists() });
     },
-    onError: (error: any) => {
+    onError: (error: unknown) => {
       const errorMessage =
-        error?.response?.data?.message || "Error al eliminar la reserva";
+        (error as any)?.response?.data?.message || "Error al eliminar la reserva";
       showError("Error al Eliminar", errorMessage);
       console.error("Error al eliminar reserva:", error);
     },

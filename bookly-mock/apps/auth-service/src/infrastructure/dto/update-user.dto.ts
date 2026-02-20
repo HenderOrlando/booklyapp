@@ -1,5 +1,5 @@
 import { ApiProperty } from "@nestjs/swagger";
-import { IsArray, IsBoolean, IsOptional, IsString } from "class-validator";
+import { IsArray, IsBoolean, IsIn, IsOptional, IsString } from "class-validator";
 
 /**
  * Update User DTO
@@ -35,10 +35,14 @@ export class UpdateUserDto {
 
   @ApiProperty({
     description: "Tipo de documento",
+    enum: ["CC", "TI", "CE", "PASSPORT", "DNI", "OTHER"],
     example: "CC",
     required: false,
   })
   @IsString({ message: "Tipo de documento debe ser un string" })
+  @IsIn(["CC", "TI", "CE", "PASSPORT", "DNI", "OTHER"], {
+    message: "Tipo de documento inválido",
+  })
   @IsOptional()
   documentType?: string;
 

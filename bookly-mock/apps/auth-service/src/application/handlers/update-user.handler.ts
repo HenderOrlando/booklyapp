@@ -45,6 +45,15 @@ export class UpdateUserHandler implements ICommandHandler<UpdateUserCommand> {
       updateData,
     );
 
+    // Publicar evento de auditoría o similar si es necesario
+    this.eventBus.publish({
+      type: "USER_UPDATED",
+      userId: command.userId,
+      updatedBy: command.updatedBy,
+      timestamp: new Date(),
+      changes: Object.keys(updateData).filter(key => key !== "audit.updatedBy"),
+    });
+
     return updated;
   }
 }

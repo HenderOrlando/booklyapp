@@ -263,6 +263,11 @@ export default function ProfilePage() {
         void refreshUser();
         setPreferencesSuccess(t("preferences_success"));
 
+        // Sincronizar idioma del usuario con la cookie NEXT_LOCALE
+        if (preferencesData.language) {
+          document.cookie = `NEXT_LOCALE=${preferencesData.language}; path=/; max-age=31536000; SameSite=Strict`;
+        }
+
         // Si el idioma cambió, recargar la aplicación en la nueva ruta
         if (preferencesData.language !== locale) {
           router.replace(pathname, { locale: preferencesData.language });

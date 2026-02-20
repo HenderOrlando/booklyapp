@@ -25,6 +25,8 @@
   "showing_count": "{count} of {total} resources",
   "search_placeholder": "Search by name, code, location...",
   "loading": "Loading resources...",
+  "show_unavailable": "Show unavailable",
+  "restore": "Restore",
   "clear_filters": "Clear Filters",
   "no_results_title": "No resources found",
   "no_results_desc": "No resources match the applied filters. Try adjusting search criteria.",
