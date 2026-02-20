@@ -1,4 +1,5 @@
 import { Input } from "@/components/atoms/Input";
+import { Label } from "@/components/atoms/Label";
 import * as React from "react";
 
 /**
@@ -80,17 +81,11 @@ export const TimeInput = React.memo(function TimeInput({
   const stepInSeconds = step ? step * 60 : undefined;
 
   return (
-    <div className={`flex flex-col gap-1 ${className}`}>
+    <div className={`flex flex-col gap-2 ${className}`}>
       {label && (
-        <label
-          htmlFor={id}
-          className="text-sm font-medium text-[var(--color-text-primary)]"
-        >
+        <Label htmlFor={id} required={required}>
           {label}
-          {required && (
-            <span className="text-[var(--color-state-error-600)] ml-1">*</span>
-          )}
-        </label>
+        </Label>
       )}
 
       <Input
@@ -105,14 +100,8 @@ export const TimeInput = React.memo(function TimeInput({
         required={required}
         disabled={disabled}
         placeholder={placeholder}
-        className={error ? "border-[var(--color-state-error-600)]" : ""}
+        error={error}
       />
-
-      {error && (
-        <span className="text-sm text-[var(--color-state-error-600)]">
-          {error}
-        </span>
-      )}
     </div>
   );
 });

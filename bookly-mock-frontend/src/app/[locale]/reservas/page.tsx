@@ -11,8 +11,6 @@ import {
 import { EmptyState } from "@/components/atoms/EmptyState";
 import { LoadingSpinner } from "@/components/atoms/LoadingSpinner";
 import { ReservationCard } from "@/components/molecules/ReservationCard";
-import { AppHeader } from "@/components/organisms/AppHeader";
-import { AppSidebar } from "@/components/organisms/AppSidebar";
 import { ReservationModal } from "@/components/organisms/ReservationModal";
 import { VirtualizedList } from "@/components/organisms/VirtualizedList";
 import { MainLayout } from "@/components/templates/MainLayout";
@@ -21,18 +19,17 @@ import {
   useCreateReservation,
   useUpdateReservation,
 } from "@/hooks/mutations";
-import { reservationKeys } from "@/hooks/useReservations";
+import { useReservations, useReservationStats } from "@/hooks/useReservations";
 import { useRouter } from "@/i18n/navigation";
-import { ReservationsClient } from "@/infrastructure/api";
 import { mockResourcesForReservations } from "@/infrastructure/mock/data/reservations-service.mock";
 import type {
   CreateReservationDto,
   Reservation,
   ReservationStatus,
 } from "@/types/entities/reservation";
-import { useQuery } from "@tanstack/react-query";
 import { useTranslations } from "next-intl";
 import { useState } from "react";
+import { useDebounce } from "@/hooks/use-debounce";
 import { ReservationFiltersSection, ReservationStatsCards } from "./components";
 
 /**
@@ -51,23 +48,9 @@ export default function ReservasPage() {
   const t = useTranslations("reservations");
   const tCommon = useTranslations("common");
 
-  // React Query para cargar reservas
-  const { data: reservations = [], isLoading: loading } = useQuery({
-    queryKey: reservationKeys.all,
-    queryFn: async () => {
-      const response = await ReservationsClient.getAll();
-      return response.data?.items || [];
-    },
-    staleTime: 1000 * 60 * 3, // 3 minutos
-  });
-
-  // Mutations
-  const createReservation = useCreateReservation();
-  const updateReservation = useUpdateReservation();
-  const cancelReservation = useCancelReservation();
-
   // Estados locales
   const [filter, setFilter] = useState("");
+  const debouncedFilter = useDebounce(filter, 500);
   const [statusFilter, setStatusFilter] = useState<ReservationStatus | "all">(
     "all",
   );
@@ -76,18 +59,25 @@ export default function ReservasPage() {
     useState<Reservation | null>(null);
   const [showCreateModal, setShowCreateModal] = useState(false);
 
-  // React Query maneja el fetch automáticamente
+  // Filtros para API
+  const apiFilters = {
+    ...(debouncedFilter ? { search: debouncedFilter } : {}),
+    ...(statusFilter !== "all" ? { status: statusFilter } : {}),
+  };
 
-  // Filtrar reservas
-  const filteredReservations = reservations.filter((reservation) => {
-    const matchesSearch =
-      reservation.title.toLowerCase().includes(filter.toLowerCase()) ||
-      reservation.resourceName?.toLowerCase().includes(filter.toLowerCase());
-    const matchesStatus =
-      statusFilter === "all" || reservation.status === statusFilter;
+  const { data: reservationsData, isLoading: loadingReservations } =
+    useReservations(apiFilters);
+  const reservations = reservationsData?.items || [];
 
-    return matchesSearch && matchesStatus;
-  });
+  // React Query para estadísticas
+  const { data: statsData, isLoading: loadingStats } = useReservationStats();
+
+  const loading = loadingReservations || loadingStats;
+
+  // Mutations
+  const createReservation = useCreateReservation();
+  const updateReservation = useUpdateReservation();
+  const cancelReservation = useCancelReservation();
 
   // Handlers
   const handleView = (id: string) => {
@@ -107,7 +97,7 @@ export default function ReservasPage() {
     updateReservation.mutate(
       {
         id: editingReservation.id,
-        data: data as any,
+        data: data,
       },
       {
         onSuccess: () => {
@@ -121,7 +111,7 @@ export default function ReservasPage() {
   };
 
   const handleCreateReservation = (data: CreateReservationDto) => {
-    createReservation.mutate(data as any, {
+    createReservation.mutate(data, {
       onSuccess: () => {
         setShowCreateModal(false);
       },
@@ -145,10 +135,6 @@ export default function ReservasPage() {
   };
 
   const hasActiveFilters = filter || statusFilter !== "all";
-
-  // Usar componentes compartidos de Header y Sidebar
-  const header = <AppHeader title="Reservas" />;
-  const sidebar = <AppSidebar />;
 
   if (loading) {
     return (
@@ -191,14 +177,14 @@ export default function ReservasPage() {
         </div>
 
         {/* Stats Cards */}
-        <ReservationStatsCards reservations={reservations} />
+        <ReservationStatsCards stats={statsData} />
 
         {/* Card con contenido */}
         <Card>
           <CardHeader>
             <CardTitle>{t("list")}</CardTitle>
             <CardDescription>
-              {t("showing_count", { count: filteredReservations.length })}
+              {t("showing_count", { count: reservations.length })}
             </CardDescription>
 
             {/* Filtros */}
@@ -214,7 +200,7 @@ export default function ReservasPage() {
           </CardHeader>
 
           <CardContent>
-            {filteredReservations.length === 0 ? (
+            {reservations.length === 0 ? (
               <EmptyState
                 title={t("no_results_title")}
                 description={
@@ -234,8 +220,8 @@ export default function ReservasPage() {
               />
             ) : useVirtualScrolling ? (
               <VirtualizedList
-                items={filteredReservations}
-                renderItem={(reservation: Reservation, index: number) => (
+                items={reservations}
+                renderItem={(reservation: Reservation) => (
                   <div className="p-4 border-b border-[var(--color-border-strong)] hover:bg-[var(--color-bg-primary)]/50 transition-colors">
                     <ReservationCard
                       reservation={reservation}
@@ -256,7 +242,7 @@ export default function ReservasPage() {
               />
             ) : (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                {filteredReservations.map((reservation) => (
+                {reservations.map((reservation) => (
                   <ReservationCard
                     key={reservation.id}
                     reservation={reservation}
@@ -278,7 +264,7 @@ export default function ReservasPage() {
           isOpen={true}
           onClose={() => setEditingReservation(null)}
           onSave={handleSaveEdit}
-          resources={mockResourcesForReservations as any}
+          resources={mockResourcesForReservations}
           reservation={editingReservation}
           mode="edit"
           loading={updateReservation.isPending}
@@ -291,7 +277,7 @@ export default function ReservasPage() {
           isOpen={true}
           onClose={() => setShowCreateModal(false)}
           onSave={handleCreateReservation}
-          resources={mockResourcesForReservations as any}
+          resources={mockResourcesForReservations}
           mode="create"
           loading={createReservation.isPending}
         />

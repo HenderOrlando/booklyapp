@@ -6,6 +6,13 @@
 
 import { Button } from "@/components/atoms/Button";
 import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/atoms/Select";
+import {
   FilterChips,
   type FilterChip,
 } from "@/components/molecules/FilterChips";
@@ -97,19 +104,25 @@ export function ReservationFiltersSection({
         />
 
         {/* Filtro de estado */}
-        <select
-          value={statusFilter}
-          onChange={(e) =>
-            onStatusFilterChange(e.target.value as ReservationStatus | "all")
-          }
-          className="px-4 py-2 bg-[var(--color-bg-primary)] border border-[var(--color-border-strong)] rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-brand-primary-500 min-w-[180px]"
-        >
-          {statusOptions.map((option) => (
-            <option key={option.value} value={option.value}>
-              {option.label}
-            </option>
-          ))}
-        </select>
+        <div className="min-w-[180px]">
+          <Select
+            value={statusFilter}
+            onValueChange={(value) =>
+              onStatusFilterChange(value as ReservationStatus | "all")
+            }
+          >
+            <SelectTrigger>
+              <SelectValue placeholder={t("filters.status") || "Estado"} />
+            </SelectTrigger>
+            <SelectContent>
+              {statusOptions.map((option) => (
+                <SelectItem key={option.value} value={option.value}>
+                  {option.label}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
 
         {/* Botón limpiar filtros */}
         {hasActiveFilters && (

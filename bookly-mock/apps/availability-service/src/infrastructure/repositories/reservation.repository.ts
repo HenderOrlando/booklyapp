@@ -55,6 +55,123 @@ export class ReservationRepository implements IReservationRepository {
     return doc ? this.toEntity(doc) : null;
   }
 
+  async getStats(filters?: {
+    userId?: string;
+    resourceId?: string;
+    startDate?: Date;
+    endDate?: Date;
+  }): Promise<{
+    total: number;
+    pending: number;
+    confirmed: number;
+    inProgress: number;
+    completed: number;
+    cancelled: number;
+    active: number;
+    upcoming: number;
+    today: number;
+  }> {
+    const conditions: any = {};
+
+    if (filters?.userId) {
+      conditions.userId = new Types.ObjectId(filters.userId);
+    }
+    if (filters?.resourceId) {
+      conditions.resourceId = new Types.ObjectId(filters.resourceId);
+    }
+    if (filters?.startDate || filters?.endDate) {
+      conditions.$and = [];
+      if (filters.startDate) {
+        conditions.$and.push({ endDate: { $gte: filters.startDate } });
+      }
+      if (filters.endDate) {
+        conditions.$and.push({ startDate: { $lte: filters.endDate } });
+      }
+    }
+
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const todayEnd = new Date(today);
+    todayEnd.setHours(23, 59, 59, 999);
+
+    const pipeline = [
+      { $match: conditions },
+      {
+        $group: {
+          _id: null,
+          total: { $sum: 1 },
+          pending: {
+            $sum: { $cond: [{ $eq: ["$status", "PENDING"] }, 1, 0] }
+          },
+          confirmed: {
+            $sum: { $cond: [{ $eq: ["$status", "CONFIRMED"] }, 1, 0] }
+          },
+          inProgress: {
+            $sum: { $cond: [{ $eq: ["$status", "IN_PROGRESS"] }, 1, 0] }
+          },
+          completed: {
+            $sum: { $cond: [{ $eq: ["$status", "COMPLETED"] }, 1, 0] }
+          },
+          cancelled: {
+            $sum: { $cond: [{ $eq: ["$status", "CANCELLED"] }, 1, 0] }
+          },
+          upcoming: {
+            $sum: {
+              $cond: [
+                {
+                  $and: [
+                    { $gte: ["$startDate", today] },
+                    { $in: ["$status", ["PENDING", "CONFIRMED"]] }
+                  ]
+                },
+                1,
+                0
+              ]
+            }
+          },
+          today: {
+            $sum: {
+              $cond: [
+                {
+                  $and: [
+                    { $gte: ["$startDate", today] },
+                    { $lte: ["$startDate", todayEnd] }
+                  ]
+                },
+                1,
+                0
+              ]
+            }
+          }
+        }
+      }
+    ];
+
+    const result = await this.reservationModel.aggregate(pipeline).exec();
+    
+    if (!result || result.length === 0) {
+      return {
+        total: 0, pending: 0, confirmed: 0, inProgress: 0, completed: 0,
+        cancelled: 0, active: 0, upcoming: 0, today: 0
+      };
+    }
+
+    const stats = result[0];
+    const active = stats.pending + stats.confirmed + stats.inProgress;
+
+    return {
+      total: stats.total || 0,
+      pending: stats.pending || 0,
+      confirmed: stats.confirmed || 0,
+      inProgress: stats.inProgress || 0,
+      completed: stats.completed || 0,
+      cancelled: stats.cancelled || 0,
+      active,
+      upcoming: stats.upcoming || 0,
+      today: stats.today || 0,
+    };
+  }
+
   async findMany(
     query: PaginationQuery,
     filters?: {
@@ -63,6 +180,7 @@ export class ReservationRepository implements IReservationRepository {
       status?: ReservationStatus;
       startDate?: Date;
       endDate?: Date;
+      search?: string;
     }
   ): Promise<{ reservations: ReservationEntity[]; meta: PaginationMeta }> {
     const conditions: any = {};
@@ -77,6 +195,16 @@ export class ReservationRepository implements IReservationRepository {
 
     if (filters?.status) {
       conditions.status = filters.status;
+    }
+
+    if (filters?.search) {
+      // Búsqueda por propósito (título de reserva)
+      // Opcionalmente se podría agregar búsqueda por nombre de recurso si hacemos un lookup/populate
+      // pero para mantenerlo simple y eficiente en MongoDB buscamos en los campos de la reserva.
+      conditions.$or = [
+        { purpose: { $regex: filters.search, $options: "i" } },
+        { notes: { $regex: filters.search, $options: "i" } }
+      ];
     }
 
     if (filters?.startDate || filters?.endDate) {

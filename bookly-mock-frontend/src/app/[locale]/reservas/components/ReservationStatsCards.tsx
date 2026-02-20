@@ -5,79 +5,47 @@
  */
 
 import { Card, CardContent } from "@/components/atoms/Card";
-import type { Reservation } from "@/types/entities/reservation";
 import { useTranslations } from "next-intl";
 import * as React from "react";
 
+export interface ReservationStats {
+  total: number;
+  pending: number;
+  confirmed: number;
+  inProgress: number;
+  completed: number;
+  cancelled: number;
+  active: number;
+  upcoming: number;
+  today: number;
+}
+
 interface ReservationStatsCardsProps {
-  reservations: Reservation[];
+  stats: ReservationStats | undefined;
 }
 
 export function ReservationStatsCards({
-  reservations,
+  stats,
 }: ReservationStatsCardsProps) {
   const t = useTranslations("reservations.stats");
 
-  // Calcular estadísticas
-  const stats = React.useMemo(() => {
-    const total = reservations.length;
-
-    // Por estado
-    const pending = reservations.filter((r) => r.status === "PENDING").length;
-    const confirmed = reservations.filter(
-      (r) => r.status === "CONFIRMED",
-    ).length;
-    const inProgress = reservations.filter(
-      (r) => r.status === "IN_PROGRESS",
-    ).length;
-    const completed = reservations.filter(
-      (r) => r.status === "COMPLETED",
-    ).length;
-    const cancelled = reservations.filter(
-      (r) => r.status === "CANCELLED",
-    ).length;
-
-    // Reservas activas (pendientes, confirmadas, en progreso)
-    const active = pending + confirmed + inProgress;
-
-    // Próximas reservas (hoy y futuro)
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-
-    const upcoming = reservations.filter((r) => {
-      const startDate = new Date(r.startDate);
-      return (
-        startDate >= today &&
-        (r.status === "PENDING" || r.status === "CONFIRMED")
-      );
-    }).length;
-
-    // Reservas de hoy
-    const todayEnd = new Date(today);
-    todayEnd.setHours(23, 59, 59, 999);
-
-    const todayReservations = reservations.filter((r) => {
-      const startDate = new Date(r.startDate);
-      return startDate >= today && startDate <= todayEnd;
-    }).length;
-
-    return {
-      total,
-      pending,
-      confirmed,
-      inProgress,
-      completed,
-      cancelled,
-      active,
-      upcoming,
-      today: todayReservations,
-    };
-  }, [reservations]);
+  // Si no hay stats, mostrar ceros
+  const displayStats = stats || {
+    total: 0,
+    pending: 0,
+    confirmed: 0,
+    inProgress: 0,
+    completed: 0,
+    cancelled: 0,
+    active: 0,
+    upcoming: 0,
+    today: 0,
+  };
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
       {/* Total reservas */}
-      <Card className="bg-gradient-to-br from-blue-500/10 to-blue-600/10 border-blue-500/20">
+      <Card className="bg-[var(--color-bg-surface)] border-l-4 border-l-brand-primary-500 shadow-sm border-[var(--color-border-subtle)]">
         <CardContent className="p-6">
           <div className="flex items-center justify-between">
             <div>
@@ -85,13 +53,13 @@ export function ReservationStatsCards({
                 {t("total") || "Total Reservas"}
               </p>
               <h3 className="text-3xl font-bold text-foreground mt-2">
-                {stats.total}
+                {displayStats.total}
               </h3>
               <p className="text-xs text-[var(--color-text-tertiary)] mt-1">
-                {stats.active} {t("active") || "activas"}
+                {displayStats.active} {t("active") || "activas"}
               </p>
             </div>
-            <div className="w-12 h-12 bg-brand-primary-500/20 rounded-full flex items-center justify-center">
+            <div className="w-12 h-12 bg-brand-primary-50 text-brand-primary-600 rounded-full flex items-center justify-center">
               <span className="text-2xl">📅</span>
             </div>
           </div>
@@ -99,7 +67,7 @@ export function ReservationStatsCards({
       </Card>
 
       {/* Reservas de hoy */}
-      <Card className="bg-gradient-to-br from-purple-500/10 to-purple-600/10 border-purple-500/20">
+      <Card className="bg-[var(--color-bg-surface)] border-l-4 border-l-purple-500 shadow-sm border-[var(--color-border-subtle)]">
         <CardContent className="p-6">
           <div className="flex items-center justify-between">
             <div>
@@ -107,13 +75,13 @@ export function ReservationStatsCards({
                 {t("today") || "Hoy"}
               </p>
               <h3 className="text-3xl font-bold text-foreground mt-2">
-                {stats.today}
+                {displayStats.today}
               </h3>
               <p className="text-xs text-[var(--color-text-tertiary)] mt-1">
-                {stats.upcoming} {t("upcoming") || "próximas"}
+                {displayStats.upcoming} {t("upcoming") || "próximas"}
               </p>
             </div>
-            <div className="w-12 h-12 bg-purple-500/20 rounded-full flex items-center justify-center">
+            <div className="w-12 h-12 bg-purple-50 text-purple-600 rounded-full flex items-center justify-center">
               <span className="text-2xl">⏰</span>
             </div>
           </div>
@@ -121,7 +89,7 @@ export function ReservationStatsCards({
       </Card>
 
       {/* Confirmadas */}
-      <Card className="bg-gradient-to-br from-green-500/10 to-green-600/10 border-green-500/20">
+      <Card className="bg-[var(--color-bg-surface)] border-l-4 border-l-state-success-500 shadow-sm border-[var(--color-border-subtle)]">
         <CardContent className="p-6">
           <div className="flex items-center justify-between">
             <div>
@@ -129,13 +97,13 @@ export function ReservationStatsCards({
                 {t("confirmed") || "Confirmadas"}
               </p>
               <h3 className="text-3xl font-bold text-foreground mt-2">
-                {stats.confirmed}
+                {displayStats.confirmed}
               </h3>
               <p className="text-xs text-[var(--color-text-tertiary)] mt-1">
-                {stats.pending} {t("pending") || "pendientes"}
+                {displayStats.pending} {t("pending") || "pendientes"}
               </p>
             </div>
-            <div className="w-12 h-12 bg-state-success-500/20 rounded-full flex items-center justify-center">
+            <div className="w-12 h-12 bg-state-success-50 text-state-success-600 rounded-full flex items-center justify-center">
               <span className="text-2xl">✅</span>
             </div>
           </div>
@@ -143,7 +111,7 @@ export function ReservationStatsCards({
       </Card>
 
       {/* Completadas */}
-      <Card className="bg-gradient-to-br from-indigo-500/10 to-indigo-600/10 border-indigo-500/20">
+      <Card className="bg-[var(--color-bg-surface)] border-l-4 border-l-indigo-500 shadow-sm border-[var(--color-border-subtle)]">
         <CardContent className="p-6">
           <div className="flex items-center justify-between">
             <div>
@@ -151,13 +119,13 @@ export function ReservationStatsCards({
                 {t("completed") || "Completadas"}
               </p>
               <h3 className="text-3xl font-bold text-foreground mt-2">
-                {stats.completed}
+                {displayStats.completed}
               </h3>
               <p className="text-xs text-[var(--color-text-tertiary)] mt-1">
-                {stats.cancelled} {t("cancelled") || "canceladas"}
+                {displayStats.cancelled} {t("cancelled") || "canceladas"}
               </p>
             </div>
-            <div className="w-12 h-12 bg-indigo-500/20 rounded-full flex items-center justify-center">
+            <div className="w-12 h-12 bg-indigo-50 text-indigo-600 rounded-full flex items-center justify-center">
               <span className="text-2xl">🎯</span>
             </div>
           </div>

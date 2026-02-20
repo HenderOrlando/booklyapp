@@ -53,6 +53,7 @@ export interface ReservationSearchFilters {
   status?: BackendReservationStatus;
   startDate?: string;
   endDate?: string;
+  search?: string;
   page?: number;
   limit?: number;
 }
@@ -197,6 +198,33 @@ export class ReservationsClient {
   static async cancel(id: string): Promise<ApiResponse<Reservation>> {
     return await httpClient.delete<Reservation>(
       AVAILABILITY_ENDPOINTS.RESERVATION_BY_ID(id),
+    );
+  }
+
+  /**
+   * Obtiene estadísticas de reservas
+   *
+   * @param filters - Filtros de búsqueda (opcional)
+   * @returns Estadísticas de reservas
+   */
+  static async getStats(filters?: ReservationSearchFilters): Promise<
+    ApiResponse<{
+      total: number;
+      pending: number;
+      confirmed: number;
+      inProgress: number;
+      completed: number;
+      cancelled: number;
+      active: number;
+      upcoming: number;
+      today: number;
+    }>
+  > {
+    const sanitizedFilters = filters
+      ? sanitizeReservationSearchFilters(filters)
+      : {};
+    return await httpClient.get(
+      buildUrl(`${AVAILABILITY_ENDPOINTS.RESERVATIONS}/stats`, sanitizedFilters as Record<string, unknown>),
     );
   }
 

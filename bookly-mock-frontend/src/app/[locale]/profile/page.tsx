@@ -11,8 +11,8 @@ import {
   CardTitle,
 } from "@/components/atoms/Card";
 import { Input } from "@/components/atoms/Input";
-import { AppHeader } from "@/components/organisms/AppHeader";
-import { AppSidebar } from "@/components/organisms/AppSidebar";
+// import { AppHeader } from "@/components/organisms/AppHeader";
+// import { AppSidebar } from "@/components/organisms/AppSidebar";
 import { MainLayout } from "@/components/templates/MainLayout";
 import { useAuth } from "@/contexts/AuthContext";
 import {
@@ -23,7 +23,8 @@ import {
 } from "@/hooks/mutations";
 import { useCurrentUser } from "@/hooks/useCurrentUser";
 import type { UserPreferences } from "@/types/entities/user";
-import { useTranslations } from "next-intl";
+import { usePathname, useRouter } from "@/i18n/navigation";
+import { useLocale, useTranslations } from "next-intl";
 import * as React from "react";
 
 /**
@@ -75,6 +76,9 @@ export default function ProfilePage() {
   const tAuth = useTranslations("auth");
   const { refreshUser } = useAuth();
   const photoInputRef = React.useRef<HTMLInputElement | null>(null);
+  const router = useRouter();
+  const pathname = usePathname();
+  const locale = useLocale();
 
   // React Query: Usuario actual (reemplaza Redux completamente)
   const { data: user, isLoading: loading } = useCurrentUser();
@@ -258,6 +262,11 @@ export default function ProfilePage() {
       onSuccess: () => {
         void refreshUser();
         setPreferencesSuccess(t("preferences_success"));
+
+        // Si el idioma cambió, recargar la aplicación en la nueva ruta
+        if (preferencesData.language !== locale) {
+          router.replace(pathname, { locale: preferencesData.language });
+        }
       },
       onError: (mutationError: unknown) => {
         setPreferencesError(
@@ -270,8 +279,8 @@ export default function ProfilePage() {
   };
 
   // Usar componentes compartidos de Header y Sidebar
-  const header = <AppHeader title={t("title")} />;
-  const sidebar = <AppSidebar />;
+  // const header = <AppHeader title={t("title")} />;
+  // const sidebar = <AppSidebar />;
 
   // Mostrar loading
   if (loading) {
@@ -530,6 +539,9 @@ export default function ProfilePage() {
                         {t("document_type")}
                       </label>
                       <select
+                        id="profile-document-type"
+                        name="documentType"
+                        title={t("document_type")}
                         data-testid="profile-document-type-select"
                         value={profileData.documentType}
                         onChange={(e) =>
@@ -898,6 +910,9 @@ export default function ProfilePage() {
                     {t("preferences_language")}
                   </label>
                   <select
+                    id="profile-preferences-language"
+                    name="language"
+                    title={t("preferences_language")}
                     className="w-full rounded-md border border-[var(--color-border-subtle)] bg-[var(--color-bg-surface)] px-3 py-2 text-[var(--color-text-primary)]"
                     data-testid="preferences-language-select"
                     onChange={(event) =>

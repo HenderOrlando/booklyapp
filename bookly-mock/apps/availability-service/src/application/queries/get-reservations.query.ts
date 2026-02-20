@@ -14,6 +14,7 @@ export class GetReservationsQuery {
       status?: ReservationStatus;
       startDate?: Date;
       endDate?: Date;
+      search?: string;
     }
   ) {}
 }

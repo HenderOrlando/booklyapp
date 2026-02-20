@@ -28,8 +28,29 @@ export interface IReservationRepository {
       status?: ReservationStatus;
       startDate?: Date;
       endDate?: Date;
+      search?: string;
     }
   ): Promise<{ reservations: ReservationEntity[]; meta: PaginationMeta }>;
+
+  /**
+   * Obtiene estadísticas de reservas
+   */
+  getStats(filters?: {
+    userId?: string;
+    resourceId?: string;
+    startDate?: Date;
+    endDate?: Date;
+  }): Promise<{
+    total: number;
+    pending: number;
+    confirmed: number;
+    inProgress: number;
+    completed: number;
+    cancelled: number;
+    active: number;
+    upcoming: number;
+    today: number;
+  }>;
 
   /**
    * Busca reservas por usuario

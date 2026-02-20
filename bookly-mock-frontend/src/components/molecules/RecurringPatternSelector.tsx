@@ -12,6 +12,7 @@
 "use client";
 
 import { Input } from "@/components/atoms/Input";
+import { Label } from "@/components/atoms/Label";
 import {
   Select,
   SelectContent,
@@ -62,74 +63,74 @@ export function RecurringPatternSelector({
   };
 
   return (
-    <div className="space-y-4">
-      {/* Frecuencia */}
-      <div>
-        <label className="block text-sm font-medium text-foreground mb-2">
-          Repetir
-        </label>
-        <Select value={pattern.frequency} onValueChange={handleFrequencyChange}>
-          <SelectTrigger>
-            <SelectValue />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="DAILY">Diariamente</SelectItem>
-            <SelectItem value="WEEKLY">Semanalmente</SelectItem>
-            <SelectItem value="MONTHLY">Mensualmente</SelectItem>
-          </SelectContent>
-        </Select>
-      </div>
+    <div className="space-y-6">
+      {/* Frecuencia e Intervalo */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+        <div className="flex flex-col gap-2">
+          <Label htmlFor="frequency">Repetir</Label>
+          <Select value={pattern.frequency} onValueChange={handleFrequencyChange}>
+            <SelectTrigger id="frequency">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="DAILY">Diariamente</SelectItem>
+              <SelectItem value="WEEKLY">Semanalmente</SelectItem>
+              <SelectItem value="MONTHLY">Mensualmente</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
 
-      {/* Intervalo */}
-      <div>
-        <label className="block text-sm font-medium text-foreground mb-2">
-          Cada {pattern.frequency === "DAILY" && "día(s)"}
-          {pattern.frequency === "WEEKLY" && "semana(s)"}
-          {pattern.frequency === "MONTHLY" && "mes(es)"}
-        </label>
-        <Input
-          type="number"
-          min="1"
-          max="30"
-          value={pattern.interval}
-          onChange={(e) =>
-            onChange({ ...pattern, interval: parseInt(e.target.value) })
-          }
-        />
+        <div className="flex flex-col gap-2">
+          <Label htmlFor="interval">
+            Cada {pattern.frequency === "DAILY" && "día(s)"}
+            {pattern.frequency === "WEEKLY" && "semana(s)"}
+            {pattern.frequency === "MONTHLY" && "mes(es)"}
+          </Label>
+          <Input
+            id="interval"
+            type="number"
+            min="1"
+            max="30"
+            value={pattern.interval}
+            onChange={(e) =>
+              onChange({ ...pattern, interval: parseInt(e.target.value) })
+            }
+          />
+        </div>
       </div>
 
       {/* Días de la semana (solo para semanal) */}
       {pattern.frequency === "WEEKLY" && (
-        <div>
-          <label className="block text-sm font-medium text-foreground mb-2">
-            Días de la semana
-          </label>
+        <div className="flex flex-col gap-3">
+          <Label>Días de la semana</Label>
           <div className="flex flex-wrap gap-2">
-            {DAYS_OF_WEEK.map((day) => (
-              <button
-                key={day.value}
-                type="button"
-                onClick={() => handleDayToggle(day.value)}
-                className={`px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
-                  pattern.daysOfWeek?.includes(day.value)
-                    ? "bg-blue-600 text-foreground"
-                    : "bg-[var(--color-bg-elevated)] text-[var(--color-text-tertiary)] hover:bg-[var(--color-bg-elevated)]"
-                }`}
-              >
-                {day.label}
-              </button>
-            ))}
+            {DAYS_OF_WEEK.map((day) => {
+              const isActive = pattern.daysOfWeek?.includes(day.value);
+              return (
+                <button
+                  key={day.value}
+                  type="button"
+                  onClick={() => handleDayToggle(day.value)}
+                  className={`min-w-[44px] h-10 rounded-lg text-sm font-semibold transition-all duration-200 border ${
+                    isActive
+                      ? "bg-brand-primary-600 text-white border-brand-primary-600 shadow-sm"
+                      : "bg-[var(--color-bg-surface)] text-[var(--color-text-secondary)] border-[var(--color-border-subtle)] hover:border-brand-primary-300 hover:text-brand-primary-600"
+                  }`}
+                >
+                  {day.label}
+                </button>
+              );
+            })}
           </div>
         </div>
       )}
 
       {/* Día del mes (solo para mensual) */}
       {pattern.frequency === "MONTHLY" && (
-        <div>
-          <label className="block text-sm font-medium text-foreground mb-2">
-            Día del mes
-          </label>
+        <div className="flex flex-col gap-2">
+          <Label htmlFor="dayOfMonth">Día del mes</Label>
           <Input
+            id="dayOfMonth"
             type="number"
             min="1"
             max="31"
@@ -142,18 +143,16 @@ export function RecurringPatternSelector({
       )}
 
       {/* Fin de recurrencia */}
-      <div>
-        <label className="block text-sm font-medium text-foreground mb-2">
-          Termina
-        </label>
-        <div className="flex gap-2 mb-2">
+      <div className="flex flex-col gap-3 pt-2 border-t border-[var(--color-border-subtle)]/50">
+        <Label>Termina</Label>
+        <div className="flex p-1 bg-[var(--color-bg-muted)] rounded-lg w-full sm:w-fit">
           <button
             type="button"
             onClick={() => setEndType("date")}
-            className={`flex-1 py-2 px-4 rounded-lg text-sm font-medium transition-colors ${
+            className={`flex-1 sm:flex-none py-1.5 px-6 rounded-md text-sm font-medium transition-all ${
               endType === "date"
-                ? "bg-blue-600 text-foreground"
-                : "bg-[var(--color-bg-elevated)] text-[var(--color-text-tertiary)] hover:bg-[var(--color-bg-elevated)]"
+                ? "bg-[var(--color-bg-surface)] text-brand-primary-600 shadow-sm"
+                : "text-[var(--color-text-tertiary)] hover:text-[var(--color-text-secondary)]"
             }`}
           >
             En fecha
@@ -161,55 +160,64 @@ export function RecurringPatternSelector({
           <button
             type="button"
             onClick={() => setEndType("occurrences")}
-            className={`flex-1 py-2 px-4 rounded-lg text-sm font-medium transition-colors ${
+            className={`flex-1 sm:flex-none py-1.5 px-6 rounded-md text-sm font-medium transition-all ${
               endType === "occurrences"
-                ? "bg-blue-600 text-foreground"
-                : "bg-[var(--color-bg-elevated)] text-[var(--color-text-tertiary)] hover:bg-[var(--color-bg-elevated)]"
+                ? "bg-[var(--color-bg-surface)] text-brand-primary-600 shadow-sm"
+                : "text-[var(--color-text-tertiary)] hover:text-[var(--color-text-secondary)]"
             }`}
           >
             Después de
           </button>
         </div>
 
-        {endType === "date" ? (
-          <Input
-            type="date"
-            value={pattern.endDate || ""}
-            onChange={(e) =>
-              onChange({
-                ...pattern,
-                endDate: e.target.value,
-                occurrences: undefined,
-              })
-            }
-          />
-        ) : (
-          <div className="flex items-center gap-2">
-            <Input
-              type="number"
-              min="1"
-              max="365"
-              placeholder="10"
-              value={pattern.occurrences || ""}
-              onChange={(e) =>
-                onChange({
-                  ...pattern,
-                  occurrences: parseInt(e.target.value),
-                  endDate: undefined,
-                })
-              }
-            />
-            <span className="text-sm text-[var(--color-text-tertiary)]">
-              ocurrencias
-            </span>
-          </div>
-        )}
+        <div className="mt-1">
+          {endType === "date" ? (
+            <div className="max-w-xs">
+              <Input
+                type="date"
+                value={pattern.endDate || ""}
+                onChange={(e) =>
+                  onChange({
+                    ...pattern,
+                    endDate: e.target.value,
+                    occurrences: undefined,
+                  })
+                }
+              />
+            </div>
+          ) : (
+            <div className="flex items-center gap-3">
+              <div className="w-24">
+                <Input
+                  type="number"
+                  min="1"
+                  max="365"
+                  placeholder="10"
+                  value={pattern.occurrences || ""}
+                  onChange={(e) =>
+                    onChange({
+                      ...pattern,
+                      occurrences: parseInt(e.target.value),
+                      endDate: undefined,
+                    })
+                  }
+                />
+              </div>
+              <span className="text-sm font-medium text-[var(--color-text-secondary)]">
+                repeticiones
+              </span>
+            </div>
+          )}
+        </div>
       </div>
 
       {/* Resumen */}
-      <div className="p-3 bg-blue-900/20 border border-blue-800 rounded-lg">
-        <div className="text-xs font-medium text-blue-300 mb-1">Resumen:</div>
-        <div className="text-sm text-[var(--color-text-tertiary)]">
+      <div className="p-4 bg-brand-primary-500/5 rounded-xl border border-brand-primary-500/20">
+        <div className="flex items-center gap-2 text-xs font-bold text-brand-primary-600 uppercase tracking-wider mb-2">
+          <span>📝</span>
+          <span>Resumen de recurrencia</span>
+        </div>
+        <div className="text-sm text-[var(--color-text-secondary)] leading-relaxed italic">
           {pattern.frequency === "DAILY" &&
             `Cada ${pattern.interval} día${pattern.interval > 1 ? "s" : ""}`}
           {pattern.frequency === "WEEKLY" &&
@@ -221,7 +229,12 @@ export function RecurringPatternSelector({
           {pattern.frequency === "MONTHLY" &&
             `Cada ${pattern.interval} mes${pattern.interval > 1 ? "es" : ""} el día ${pattern.dayOfMonth || 1}`}
           {pattern.endDate &&
-            ` hasta el ${new Date(pattern.endDate).toLocaleDateString("es-ES")}`}
+            ` hasta el ${new Date(pattern.endDate).toLocaleDateString("es-ES", {
+              weekday: 'long',
+              year: 'numeric',
+              month: 'long',
+              day: 'numeric'
+            })}`}
           {pattern.occurrences && ` por ${pattern.occurrences} veces`}
         </div>
       </div>
