@@ -4,8 +4,13 @@ import { NestFactory } from "@nestjs/core";
 import { getModelToken } from "@nestjs/mongoose";
 import { Model, Types } from "mongoose";
 import {
+  CheckInOutStatus,
+  CheckInOutType,
+} from "@libs/common/enums";
+import {
   ApprovalFlow,
   ApprovalRequest,
+  CheckInOut,
   DocumentTemplate,
   Notification,
 } from "../infrastructure/schemas";
@@ -35,6 +40,9 @@ async function seed() {
     const notificationModel = app.get<Model<Notification>>(
       getModelToken(Notification.name),
     );
+    const checkInOutModel = app.get<Model<CheckInOut>>(
+      getModelToken(CheckInOut.name),
+    );
 
     // Limpiar datos existentes (solo con flag --clean)
     if (process.argv.includes("--clean")) {
@@ -43,6 +51,7 @@ async function seed() {
       await approvalFlowModel.deleteMany({});
       await documentTemplateModel.deleteMany({});
       await notificationModel.deleteMany({});
+      await checkInOutModel.deleteMany({});
     } else if (process.env.NODE_ENV === "development") {
       logger.info(
         "ℹ️ Modo desarrollo detectado. Usar --clean para limpiar DB antes del seed.",
@@ -286,6 +295,9 @@ async function seed() {
     const ESTUDIANTE_MARIA_ID = new Types.ObjectId("507f1f77bcf86cd799439023");
     const ADMIN_GENERAL_ID = new Types.ObjectId("507f1f77bcf86cd799439022");
 
+    const COORDINADOR_INDUSTRIAL_ID = new Types.ObjectId(
+      "507f1f77bcf86cd799439026",
+    );
     const PROGRAMA_SISTEMAS_ID = new Types.ObjectId("507f1f77bcf86cd799439041");
 
     // Usamos el primer flow creado (Flujo Multi-nivel (Auditorios))
@@ -329,13 +341,70 @@ async function seed() {
       {
         reservationId: reservation2Id,
         requesterId: ESTUDIANTE_MARIA_ID,
-        programId: PROGRAMA_SISTEMAS_ID, // Programa del recurso
+        programId: PROGRAMA_SISTEMAS_ID,
         approvalFlowId: auditoriumFlowId,
         status: "PENDING",
         currentStepIndex: 0,
         submittedAt: new Date(today),
         approvalHistory: [],
         createdBy: ESTUDIANTE_MARIA_ID,
+      },
+      // ── CU-019: Solicitud RECHAZADA ──
+      {
+        reservationId: new Types.ObjectId("507f1f77bcf86cd799439083"),
+        requesterId: ESTUDIANTE_MARIA_ID,
+        programId: PROGRAMA_SISTEMAS_ID,
+        approvalFlowId: auditoriumFlowId,
+        status: "REJECTED",
+        currentStepIndex: 1,
+        submittedAt: new Date(new Date(lastWeek).setHours(8, 0, 0)),
+        completedAt: new Date(new Date(lastWeek).setHours(12, 0, 0)),
+        approvalHistory: [
+          {
+            stepName: "Revisión por Coordinador de Programa",
+            approverId: COORDINADOR_SISTEMAS_ID,
+            decision: "REJECTED",
+            comment: "El propósito no corresponde a actividad académica",
+            approvedAt: new Date(new Date(lastWeek).setHours(12, 0, 0)),
+          },
+        ],
+        createdBy: ESTUDIANTE_MARIA_ID,
+        updatedBy: COORDINADOR_SISTEMAS_ID,
+      },
+      // ── Solicitud EN REVISIÓN (en proceso) ──
+      {
+        reservationId: new Types.ObjectId("507f1f77bcf86cd799439084"),
+        requesterId: COORDINADOR_INDUSTRIAL_ID,
+        programId: PROGRAMA_SISTEMAS_ID,
+        approvalFlowId: auditoriumFlowId,
+        status: "IN_REVIEW",
+        currentStepIndex: 1,
+        submittedAt: new Date(new Date(today).setHours(7, 0, 0)),
+        approvalHistory: [
+          {
+            stepName: "VoBo del docente responsable",
+            approverId: COORDINADOR_SISTEMAS_ID,
+            decision: "APPROVED",
+            comment: "Evento académico válido",
+            approvedAt: new Date(new Date(today).setHours(9, 0, 0)),
+          },
+        ],
+        createdBy: COORDINADOR_INDUSTRIAL_ID,
+        updatedBy: COORDINADOR_SISTEMAS_ID,
+      },
+      // ── Solicitud CANCELADA ──
+      {
+        reservationId: new Types.ObjectId("507f1f77bcf86cd799439085"),
+        requesterId: ESTUDIANTE_MARIA_ID,
+        programId: PROGRAMA_SISTEMAS_ID,
+        approvalFlowId: auditoriumFlowId,
+        status: "CANCELLED",
+        currentStepIndex: 0,
+        submittedAt: new Date(new Date(lastWeek).setHours(10, 0, 0)),
+        completedAt: new Date(new Date(lastWeek).setHours(11, 0, 0)),
+        approvalHistory: [],
+        createdBy: ESTUDIANTE_MARIA_ID,
+        updatedBy: ESTUDIANTE_MARIA_ID,
       },
     ];
 
@@ -353,8 +422,12 @@ async function seed() {
       insertedRequests.push(doc);
     }
 
-    // Notificaciones (RF-22, RF-28)
+    // Notificaciones (RF-22, RF-28) - Todos los canales, estados y tipos
+    const resourceAuditorioId = new Types.ObjectId("507f1f77bcf86cd799439011");
+    const resourceLabId = new Types.ObjectId("507f1f77bcf86cd799439012");
+
     const notifications = [
+      // EMAIL - SENT - APPROVAL
       {
         recipientId: COORDINADOR_SISTEMAS_ID,
         recipientName: "Juan Docente",
@@ -363,13 +436,13 @@ async function seed() {
         subject: "Reserva Aprobada",
         message: "Su reserva ha sido aprobada exitosamente.",
         status: "SENT",
+        priority: "NORMAL",
         relatedEntity: "approval_request",
         relatedEntityId: insertedRequests[0]._id,
         sentAt: new Date(new Date(lastWeek).setHours(15, 30, 0)),
-        audit: {
-          createdBy: systemUserId,
-        },
+        audit: { createdBy: systemUserId },
       },
+      // EMAIL - SENT - PENDING_APPROVAL
       {
         recipientId: ESTUDIANTE_MARIA_ID,
         recipientName: "María Estudiante",
@@ -378,12 +451,86 @@ async function seed() {
         subject: "Solicitud en Revisión",
         message: "Su solicitud de reserva está siendo revisada.",
         status: "SENT",
+        priority: "NORMAL",
         relatedEntity: "approval_request",
         relatedEntityId: insertedRequests[1]._id,
         sentAt: new Date(today),
-        audit: {
-          createdBy: systemUserId,
-        },
+        audit: { createdBy: systemUserId },
+      },
+      // EMAIL - SENT - REJECTION (HU-19)
+      {
+        recipientId: ESTUDIANTE_MARIA_ID,
+        recipientName: "María Estudiante",
+        type: "REJECTION",
+        channel: "EMAIL",
+        subject: "Solicitud Rechazada",
+        message: "Su solicitud de reserva ha sido rechazada. Motivo: El propósito no corresponde a actividad académica.",
+        status: "SENT",
+        priority: "HIGH",
+        relatedEntity: "approval_request",
+        relatedEntityId: insertedRequests[2]?._id || insertedRequests[0]._id,
+        sentAt: new Date(new Date(lastWeek).setHours(12, 30, 0)),
+        audit: { createdBy: systemUserId },
+      },
+      // WHATSAPP - SENT - REMINDER (HU-24)
+      {
+        recipientId: COORDINADOR_SISTEMAS_ID,
+        recipientName: "Juan Docente",
+        type: "REMINDER",
+        channel: "WHATSAPP",
+        subject: "Recordatorio de Reserva",
+        message: "Recuerde que tiene una reserva mañana a las 9:00 AM en el Auditorio Principal.",
+        status: "SENT",
+        priority: "NORMAL",
+        relatedEntity: "reservation",
+        relatedEntityId: reservation1Id,
+        sentAt: new Date(new Date(today).setHours(18, 0, 0)),
+        audit: { createdBy: systemUserId },
+      },
+      // SMS - FAILED (error de envío)
+      {
+        recipientId: ESTUDIANTE_MARIA_ID,
+        recipientName: "María Estudiante",
+        type: "CANCELLATION",
+        channel: "SMS",
+        subject: "Reserva Cancelada",
+        message: "Su reserva ha sido cancelada.",
+        status: "FAILED",
+        priority: "HIGH",
+        relatedEntity: "reservation",
+        relatedEntityId: reservation2Id,
+        errorMessage: "Error al enviar SMS: número no válido",
+        audit: { createdBy: systemUserId },
+      },
+      // IN_APP - PENDING (no leída)
+      {
+        recipientId: ADMIN_GENERAL_ID,
+        recipientName: "Admin Principal",
+        type: "PENDING_APPROVAL",
+        channel: "IN_APP",
+        subject: "Nueva solicitud pendiente",
+        message: "Hay una nueva solicitud de aprobación que requiere su revisión.",
+        status: "PENDING",
+        priority: "URGENT",
+        relatedEntity: "approval_request",
+        relatedEntityId: insertedRequests[1]._id,
+        audit: { createdBy: systemUserId },
+      },
+      // IN_APP - READ
+      {
+        recipientId: COORDINADOR_SISTEMAS_ID,
+        recipientName: "Juan Docente",
+        type: "SYSTEM",
+        channel: "IN_APP",
+        subject: "Mantenimiento programado",
+        message: "El Laboratorio de Sistemas 1 estará en mantenimiento la próxima semana.",
+        status: "READ",
+        priority: "LOW",
+        relatedEntity: "resource",
+        relatedEntityId: resourceLabId,
+        sentAt: new Date(new Date(lastWeek).setHours(10, 0, 0)),
+        readAt: new Date(new Date(lastWeek).setHours(11, 0, 0)),
+        audit: { createdBy: systemUserId },
       },
     ];
 
@@ -394,12 +541,90 @@ async function seed() {
       const doc = await notificationModel.findOneAndUpdate(
         {
           recipientId: notif.recipientId,
-          relatedEntityId: notif.relatedEntityId,
+          subject: notif.subject,
+          channel: notif.channel,
         },
         notif,
         { upsert: true, new: true },
       );
       insertedNotifications.push(doc);
+    }
+
+    // ── Check-in/Check-out Records (HU-23, RF-26) ──
+    const STAFF_VIGILANTE_ID = new Types.ObjectId("507f1f77bcf86cd799439024");
+
+    const checkInOuts = [
+      // Check-in + Check-out completado (reserva pasada)
+      {
+        reservationId: reservation1Id,
+        resourceId: resourceAuditorioId,
+        userId: COORDINADOR_SISTEMAS_ID,
+        status: CheckInOutStatus.CHECKED_OUT,
+        checkInTime: new Date(new Date(lastWeek).setHours(9, 55, 0)),
+        checkInBy: STAFF_VIGILANTE_ID,
+        checkInType: CheckInOutType.MANUAL,
+        checkInNotes: "Docente llegó puntual",
+        checkOutTime: new Date(new Date(lastWeek).setHours(12, 10, 0)),
+        checkOutBy: STAFF_VIGILANTE_ID,
+        checkOutType: CheckInOutType.MANUAL,
+        checkOutNotes: "Salida normal, recurso en buen estado",
+        expectedReturnTime: new Date(new Date(lastWeek).setHours(12, 0, 0)),
+        actualReturnTime: new Date(new Date(lastWeek).setHours(12, 10, 0)),
+        resourceCondition: {
+          beforeCheckIn: "Buen estado",
+          afterCheckOut: "Buen estado",
+          damageReported: false,
+        },
+      },
+      // Check-in sin check-out aún (reserva en progreso)
+      {
+        reservationId: new Types.ObjectId("507f1f77bcf86cd799439035"),
+        resourceId: new Types.ObjectId("507f1f77bcf86cd799439013"),
+        userId: COORDINADOR_SISTEMAS_ID,
+        status: CheckInOutStatus.CHECKED_IN,
+        checkInTime: new Date(new Date(today).setHours(7, 55, 0)),
+        checkInBy: STAFF_VIGILANTE_ID,
+        checkInType: CheckInOutType.MANUAL,
+        checkInNotes: "Check-in para reunión de planeación",
+        expectedReturnTime: new Date(new Date(today).setHours(10, 0, 0)),
+        resourceCondition: {
+          beforeCheckIn: "Buen estado",
+          damageReported: false,
+        },
+      },
+      // Check-out tardío (LATE)
+      {
+        reservationId: new Types.ObjectId("507f1f77bcf86cd799439036"),
+        resourceId: resourceLabId,
+        userId: ESTUDIANTE_MARIA_ID,
+        status: CheckInOutStatus.LATE,
+        checkInTime: new Date(new Date(lastWeek).setHours(8, 0, 0)),
+        checkInBy: STAFF_VIGILANTE_ID,
+        checkInType: CheckInOutType.MANUAL,
+        checkOutTime: new Date(new Date(lastWeek).setHours(11, 30, 0)),
+        checkOutBy: STAFF_VIGILANTE_ID,
+        checkOutType: CheckInOutType.MANUAL,
+        checkOutNotes: "Devolución tardía - 1.5 horas después de lo esperado",
+        expectedReturnTime: new Date(new Date(lastWeek).setHours(10, 0, 0)),
+        actualReturnTime: new Date(new Date(lastWeek).setHours(11, 30, 0)),
+        resourceCondition: {
+          beforeCheckIn: "Buen estado",
+          afterCheckOut: "Buen estado",
+          damageReported: false,
+        },
+      },
+    ];
+
+    logger.info(`Procesando ${checkInOuts.length} registros de check-in/out...`);
+    const insertedCheckInOuts: any[] = [];
+
+    for (const cio of checkInOuts) {
+      const doc = await checkInOutModel.findOneAndUpdate(
+        { reservationId: cio.reservationId },
+        cio,
+        { upsert: true, new: true },
+      );
+      insertedCheckInOuts.push(doc);
     }
 
     logger.info("✅ Seed de Stockpile Service completado exitosamente");
@@ -409,6 +634,7 @@ async function seed() {
     logger.info(`  ✓ ${insertedTemplates.length} plantillas de documentos`);
     logger.info(`  ✓ ${insertedRequests.length} solicitudes de aprobación`);
     logger.info(`  ✓ ${insertedNotifications.length} notificaciones`);
+    logger.info(`  ✓ ${insertedCheckInOuts.length} registros check-in/out`);
 
     await app.close();
     process.exit(0);

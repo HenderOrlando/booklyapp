@@ -22,7 +22,17 @@ export class GlobalResponseInterceptor<T>
   ): Observable<Response<T>> {
     return next.handle().pipe(
       map((res) => {
-        // Si la respuesta ya viene con el formato estándar (ej: desde un paginador), la dejamos pasar
+        // Si la respuesta ya viene con el formato estándar (ApiResponseBookly), la dejamos pasar
+        if (
+          res &&
+          typeof res === 'object' &&
+          'success' in res &&
+          'data' in res
+        ) {
+          return res;
+        }
+
+        // Si la respuesta es de un paginador antiguo, la dejamos pasar
         if (res && res.data && typeof res === 'object' && Object.keys(res).length <= 2 && (res.meta !== undefined || Object.keys(res).length === 1)) {
           return res;
         }

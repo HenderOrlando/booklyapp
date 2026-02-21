@@ -218,6 +218,90 @@ async function seed() {
           cancellationReason: "El docente tuvo una emergencia médica",
         },
       },
+      // ── HU-12: Reserva APROBADA (lista para usar) ──
+      {
+        resourceId: resourceLabId,
+        userId: COORDINADOR_INDUSTRIAL_ID,
+        programId: PROGRAMA_INDUSTRIAL_ID,
+        approvalRequestId: undefined,
+        startDate: new Date(new Date(tomorrow).setHours(14, 0, 0)),
+        endDate: new Date(new Date(tomorrow).setHours(16, 0, 0)),
+        purpose: "Práctica de Laboratorio de Producción",
+        status: "APPROVED",
+        audit: {
+          createdBy: COORDINADOR_INDUSTRIAL_ID,
+          updatedBy: ADMIN_GENERAL_ID,
+        },
+      },
+      // ── HU-23: Reserva IN_PROGRESS (check-in realizado, en uso) ──
+      {
+        resourceId: resourceSalaId,
+        userId: COORDINADOR_SISTEMAS_ID,
+        programId: PROGRAMA_SISTEMAS_ID,
+        approvalRequestId: undefined,
+        startDate: new Date(new Date(today).setHours(8, 0, 0)),
+        endDate: new Date(new Date(today).setHours(10, 0, 0)),
+        purpose: "Reunión de Planeación Semestral",
+        status: "IN_PROGRESS",
+        checkInTime: new Date(new Date(today).setHours(7, 55, 0)),
+        audit: {
+          createdBy: COORDINADOR_SISTEMAS_ID,
+          updatedBy: COORDINADOR_SISTEMAS_ID,
+        },
+      },
+      // ── CU-019: Reserva RECHAZADA ──
+      {
+        resourceId: resourceAuditorioId,
+        userId: ESTUDIANTE_MARIA_ID,
+        programId: PROGRAMA_SISTEMAS_ID,
+        approvalRequestId: new Types.ObjectId("507f1f77bcf86cd799439083"),
+        startDate: new Date(new Date(lastWeek).setHours(14, 0, 0)),
+        endDate: new Date(new Date(lastWeek).setHours(18, 0, 0)),
+        purpose: "Fiesta de fin de semestre",
+        status: "REJECTED",
+        audit: {
+          createdBy: ESTUDIANTE_MARIA_ID,
+          updatedBy: ADMIN_GENERAL_ID,
+          rejectionReason: "El propósito no corresponde a actividad académica",
+        },
+      },
+      // ── HU-23: Reserva NO_SHOW (no asistió) ──
+      {
+        resourceId: resourceLabId,
+        userId: ESTUDIANTE_MARIA_ID,
+        programId: PROGRAMA_SISTEMAS_ID,
+        approvalRequestId: undefined,
+        startDate: new Date(new Date(lastWeek).setHours(8, 0, 0)),
+        endDate: new Date(new Date(lastWeek).setHours(10, 0, 0)),
+        purpose: "Práctica de Programación",
+        status: "NO_SHOW",
+        audit: {
+          createdBy: ESTUDIANTE_MARIA_ID,
+          updatedBy: ADMIN_GENERAL_ID,
+        },
+      },
+      // ── HU-13: Reserva periódica / recurrente ──
+      {
+        resourceId: resourceLabId,
+        userId: COORDINADOR_SISTEMAS_ID,
+        programId: PROGRAMA_SISTEMAS_ID,
+        approvalRequestId: undefined,
+        startDate: new Date(new Date(nextWeek).setHours(10, 0, 0)),
+        endDate: new Date(new Date(nextWeek).setHours(12, 0, 0)),
+        purpose: "Clase semanal de Bases de Datos",
+        status: "CONFIRMED",
+        isRecurring: true,
+        recurrencePattern: {
+          type: "WEEKLY",
+          daysOfWeek: ["MONDAY"],
+          interval: 1,
+          endDate: new Date(new Date(nextWeek).getTime() + 90 * 24 * 60 * 60 * 1000),
+        },
+        audit: {
+          createdBy: COORDINADOR_SISTEMAS_ID,
+          updatedBy: COORDINADOR_SISTEMAS_ID,
+        },
+      },
     ];
 
     logger.info(`Procesando ${reservations.length} reservas...`);
@@ -292,9 +376,13 @@ async function seed() {
     logger.info(`  ✓ ${insertedWaitList.length} registros en lista de espera`);
     logger.info("");
     logger.info("📦 Estados de reservas:");
-    logger.info("  - COMPLETED: 1 (pasada)");
-    logger.info("  - CONFIRMED: 1 (futura)");
+    logger.info("  - COMPLETED: 1 (pasada con check-in/out)");
+    logger.info("  - CONFIRMED: 2 (futura + recurrente)");
     logger.info("  - PENDING: 1 (pendiente aprobación)");
+    logger.info("  - APPROVED: 1 (lista para usar)");
+    logger.info("  - IN_PROGRESS: 1 (check-in realizado)");
+    logger.info("  - REJECTED: 1 (rechazada)");
+    logger.info("  - NO_SHOW: 1 (no asistió)");
     logger.info("  - CANCELLED: 1");
 
     await app.close();

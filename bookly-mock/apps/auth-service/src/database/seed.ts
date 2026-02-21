@@ -236,6 +236,52 @@ async function seedUsers(
       isActive: true,
       isEmailVerified: true,
     },
+    // ── Casos edge: usuario deshabilitado (HU-33) ──
+    {
+      email: "suspendido@ufps.edu.co",
+      password: defaultPasswordHash,
+      firstName: "Luis",
+      lastName: "Suspendido",
+      documentType: "CC",
+      documentNumber: "1000000010",
+      phone: "+573001234576",
+      roles: ["STUDENT"],
+      programId: PROGRAMA_SISTEMAS_ID,
+      coordinatedProgramId: undefined,
+      isActive: false, // Usuario suspendido/deshabilitado
+      isEmailVerified: true,
+    },
+    // ── Caso edge: email no verificado (HU-35) ──
+    {
+      email: "nuevo.registro@ufps.edu.co",
+      password: defaultPasswordHash,
+      firstName: "Diana",
+      lastName: "NuevoRegistro",
+      documentType: "CC",
+      documentNumber: "1000000011",
+      phone: "+573001234577",
+      roles: ["STUDENT"],
+      programId: PROGRAMA_INDUSTRIAL_ID,
+      coordinatedProgramId: undefined,
+      isActive: true,
+      isEmailVerified: false, // Email pendiente de verificación
+    },
+    // ── Caso edge: 2FA habilitado (HU-37) ──
+    {
+      email: "seguro.docente@ufps.edu.co",
+      password: defaultPasswordHash,
+      firstName: "Roberto",
+      lastName: "Seguro",
+      documentType: "CC",
+      documentNumber: "1000000012",
+      phone: "+573001234578",
+      roles: ["TEACHER"],
+      programId: PROGRAMA_SISTEMAS_ID,
+      coordinatedProgramId: undefined,
+      isActive: true,
+      isEmailVerified: true,
+      twoFactorEnabled: true, // 2FA activo
+    },
   ];
 
   let createdCount = 0;
@@ -267,6 +313,7 @@ async function seedUsers(
           isActive: userData.isActive,
           isEmailVerified: userData.isEmailVerified,
           isPhoneVerified: false,
+          twoFactorEnabled: (userData as any).twoFactorEnabled || false,
           username,
           tenantId: "UFPS",
         },

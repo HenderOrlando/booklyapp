@@ -431,6 +431,97 @@ async function seed() {
           updatedBy: ADMIN_GENERAL_ID,
         },
       },
+      // ── HU-01: Tipo CLASSROOM (aula regular) ──
+      {
+        code: "RES-AULA-201",
+        name: "Aula 201",
+        description: "Aula de clases estándar con capacidad para 40 estudiantes",
+        type: ResourceType.CLASSROOM,
+        categoryId: catMap.get("Salas de Conferencia"),
+        capacity: 40,
+        location: "Edificio de Ingenierías - Piso 2",
+        floor: "2",
+        building: "Edificio de Ingenierías",
+        attributes: {
+          features: ["Tablero acrílico", "Proyector fijo", "Aire acondicionado"],
+        },
+        programIds: [PROGRAMA_SISTEMAS_ID, PROGRAMA_INDUSTRIAL_ID],
+        isActive: true,
+        status: ResourceStatus.AVAILABLE,
+        availabilityRules: {
+          requiresApproval: false,
+          maxAdvanceBookingDays: 14,
+          minBookingDurationMinutes: 45,
+          maxBookingDurationMinutes: 240,
+          allowRecurring: true,
+        },
+        audit: {
+          createdBy: ADMIN_GENERAL_ID,
+          updatedBy: ADMIN_GENERAL_ID,
+        },
+      },
+      // ── HU-03/HU-08: Recurso en MANTENIMIENTO ──
+      {
+        code: "RES-LAB-ELE-1",
+        name: "Laboratorio de Electrónica 1",
+        description: "Laboratorio de circuitos y electrónica básica - EN MANTENIMIENTO",
+        type: ResourceType.LABORATORY,
+        categoryId: catMap.get("Laboratorios"),
+        capacity: 25,
+        location: "Edificio de Ingenierías - Piso 4",
+        floor: "4",
+        building: "Edificio de Ingenierías",
+        attributes: {
+          features: [
+            "25 estaciones de trabajo",
+            "Osciloscopios",
+            "Generadores de señal",
+          ],
+        },
+        programIds: [PROGRAMA_ELECTRONICA_ID],
+        isActive: true,
+        status: ResourceStatus.MAINTENANCE, // En mantenimiento
+        availabilityRules: {
+          requiresApproval: false,
+          maxAdvanceBookingDays: 30,
+          minBookingDurationMinutes: 90,
+          maxBookingDurationMinutes: 180,
+          allowRecurring: true,
+        },
+        audit: {
+          createdBy: ADMIN_GENERAL_ID,
+          updatedBy: ADMIN_GENERAL_ID,
+        },
+      },
+      // ── HU-03: Recurso NO DISPONIBLE (deshabilitado) ──
+      {
+        code: "RES-AUD-ANTIGUO",
+        name: "Auditorio Antiguo",
+        description: "Auditorio fuera de servicio por remodelación",
+        type: ResourceType.AUDITORIUM,
+        categoryId: catMap.get("Auditorios"),
+        capacity: 200,
+        location: "Edificio Administrativo - Piso 1",
+        floor: "1",
+        building: "Edificio Administrativo",
+        attributes: {
+          features: ["En remodelación"],
+        },
+        programIds: [],
+        isActive: false, // Deshabilitado
+        status: ResourceStatus.UNAVAILABLE, // No disponible
+        availabilityRules: {
+          requiresApproval: true,
+          maxAdvanceBookingDays: 0,
+          minBookingDurationMinutes: 0,
+          maxBookingDurationMinutes: 0,
+          allowRecurring: false,
+        },
+        audit: {
+          createdBy: ADMIN_GENERAL_ID,
+          updatedBy: ADMIN_GENERAL_ID,
+        },
+      },
     ];
 
     logger.info(`Procesando ${resources.length} recursos...`);
