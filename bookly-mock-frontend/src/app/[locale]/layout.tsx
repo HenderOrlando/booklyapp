@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { NextIntlClientProvider } from "next-intl";
 import { getMessages } from "next-intl/server";
 import { Inter } from "next/font/google";
@@ -7,17 +7,21 @@ import { Providers } from "../providers";
 
 const inter = Inter({ subsets: ["latin"] });
 
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  themeColor: [
+    { media: "(prefers-color-scheme: light)", color: "white" },
+    { media: "(prefers-color-scheme: dark)", color: "black" },
+  ],
+};
+
 export const metadata: Metadata = {
   title: "Bookly - Sistema de Reservas Institucionales",
   description:
     "Sistema de gestión de reservas para recursos institucionales de la UFPS",
   keywords: ["reservas", "UFPS", "recursos", "institucional"],
   authors: [{ name: "Equipo Bookly" }],
-  viewport: "width=device-width, initial-scale=1",
-  themeColor: [
-    { media: "(prefers-color-scheme: light)", color: "white" },
-    { media: "(prefers-color-scheme: dark)", color: "black" },
-  ],
 };
 
 export default async function LocaleLayout({

@@ -1,5 +1,5 @@
-import { BarChartCard } from "@/components/molecules/BarChartCard";
-import { PieChartCard } from "@/components/molecules/PieChartCard";
+import { DynamicBarChartCard as BarChartCard } from "@/components/molecules/charts-dynamic";
+import { DynamicPieChartCard as PieChartCard } from "@/components/molecules/charts-dynamic";
 import type { ResourceUtilization } from "@/types/entities/report";
 import * as React from "react";
 

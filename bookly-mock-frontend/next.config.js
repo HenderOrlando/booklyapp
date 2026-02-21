@@ -1,5 +1,9 @@
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const createNextIntlPlugin = require("next-intl/plugin");
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+const withBundleAnalyzer = require("@next/bundle-analyzer")({
+  enabled: process.env.ANALYZE === "true",
+});
 
 const withNextIntl = createNextIntlPlugin("./src/i18n/request.ts");
 
@@ -33,6 +37,22 @@ const nextConfig = {
     serverActions: {
       bodySizeLimit: "2mb",
     },
+    optimizePackageImports: [
+      "lucide-react",
+      "recharts",
+      "date-fns",
+      "@radix-ui/react-dialog",
+      "@radix-ui/react-dropdown-menu",
+      "@radix-ui/react-popover",
+      "@radix-ui/react-select",
+      "@radix-ui/react-tabs",
+      "@radix-ui/react-tooltip",
+      "@radix-ui/react-toast",
+      "@radix-ui/react-checkbox",
+      "@radix-ui/react-avatar",
+      "@radix-ui/react-separator",
+      "@radix-ui/react-label",
+    ],
   },
   async headers() {
     return [
@@ -112,4 +132,4 @@ const nextConfig = {
   },
 };
 
-module.exports = withNextIntl(nextConfig);
+module.exports = withBundleAnalyzer(withNextIntl(nextConfig));

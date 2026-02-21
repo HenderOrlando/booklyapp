@@ -1,6 +1,6 @@
-import { BarChartCard } from "@/components/molecules/BarChartCard";
+import { DynamicBarChartCard as BarChartCard } from "@/components/molecules/charts-dynamic";
 import { KPIGrid } from "@/components/molecules/KPIGrid";
-import { LineChartCard } from "@/components/molecules/LineChartCard";
+import { DynamicLineChartCard as LineChartCard } from "@/components/molecules/charts-dynamic";
 import type { DashboardData } from "@/types/entities/report";
 import * as React from "react";
 

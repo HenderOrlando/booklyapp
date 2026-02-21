@@ -17,6 +17,8 @@ import {
 } from "@/components/atoms/Card";
 import { Checkbox } from "@/components/atoms/Checkbox";
 import { Input } from "@/components/atoms/Input";
+import { Label } from "@/components/atoms/Label";
+import { LoadingSpinner } from "@/components/atoms/LoadingSpinner";
 import {
   Select,
   SelectContent,
@@ -146,20 +148,23 @@ export function ResourceFilterPanel({
             className="pl-10 pr-10"
           />
           {searchQuery && (
-            <button
+            <Button
+              variant="ghost"
+              size="icon"
               onClick={() => setSearchQuery("")}
-              className="absolute right-3 top-1/2 -translate-y-1/2 text-[var(--color-text-tertiary)] hover:text-foreground"
+              className="absolute right-3 top-1/2 -translate-y-1/2 h-6 w-6 text-[var(--color-text-tertiary)] hover:text-[var(--color-text-primary)]"
+              aria-label={tc("clear_search") || "Limpiar búsqueda"}
             >
-              <X className="h-4 w-4" />
-            </button>
+              <X className="h-4 w-4" aria-hidden="true" />
+            </Button>
           )}
         </div>
 
         {/* Filtro por tipo */}
         <div className="flex flex-col gap-2">
-          <label className="text-xs font-medium text-[var(--color-text-tertiary)]">
+          <Label className="text-xs text-[var(--color-text-tertiary)]">
             {t("filter_by_type") || "Filtrar por tipo"}
-          </label>
+          </Label>
           <Select value={filterByType} onValueChange={setFilterByType}>
             <SelectTrigger>
               <SelectValue placeholder={tc("all") || "Todos"} />
@@ -222,12 +227,12 @@ export function ResourceFilterPanel({
                         className="mt-1"
                       />
 
-                      <label
+                      <Label
                         htmlFor={`resource-${resource.id}`}
-                        className="flex-1 min-w-0 cursor-pointer"
+                        className="flex-1 min-w-0 cursor-pointer font-normal"
                       >
                         <div className="flex items-center justify-between gap-2">
-                          <span className="font-medium text-foreground truncate">
+                          <span className="font-medium text-[var(--color-text-primary)] truncate">
                             {resource.name}
                           </span>
                         </div>
@@ -273,7 +278,7 @@ export function ResourceFilterPanel({
                             {t("capacity") || "Capacidad"}: {resource.capacity}
                           </div>
                         )}
-                      </label>
+                      </Label>
                     </div>
                   </div>
                 );
@@ -286,10 +291,7 @@ export function ResourceFilterPanel({
                   className="py-4 text-center text-sm text-[var(--color-text-tertiary)]"
                 >
                   {isFetchingNextPage ? (
-                    <div className="flex items-center justify-center gap-2">
-                      <div className="w-4 h-4 border-2 border-blue-500 border-t-transparent rounded-full animate-spin" />
-                      <span>{tc("loading")}</span>
-                    </div>
+                    <LoadingSpinner size="sm" text={tc("loading")} />
                   ) : (
                     ""
                   )}

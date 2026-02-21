@@ -1,5 +1,5 @@
 import { StatCard } from "@/components/atoms/StatCard";
-import { LineChartCard } from "@/components/molecules/LineChartCard";
+import { DynamicLineChartCard as LineChartCard } from "@/components/molecules/charts-dynamic";
 import { Calendar } from "lucide-react";
 import * as React from "react";
 

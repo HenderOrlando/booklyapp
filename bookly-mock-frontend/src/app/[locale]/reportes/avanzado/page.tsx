@@ -1,9 +1,9 @@
 "use client";
 
 import { ExportButton } from "@/components/atoms/ExportButton";
-import { AreaChartCard } from "@/components/molecules/AreaChartCard";
+import { DynamicAreaChartCard as AreaChartCard } from "@/components/molecules/charts-dynamic";
 import { ReportFilters } from "@/components/molecules/ReportFilters";
-import { ScatterChartCard } from "@/components/molecules/ScatterChartCard";
+import { DynamicScatterChartCard as ScatterChartCard } from "@/components/molecules/charts-dynamic";
 import { PeriodComparison } from "@/components/organisms/PeriodComparison";
 import { SavedFiltersPanel } from "@/components/organisms/SavedFiltersPanel";
 import { MainLayout } from "@/components/templates/MainLayout";
