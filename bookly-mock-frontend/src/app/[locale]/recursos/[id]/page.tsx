@@ -236,6 +236,7 @@ function extractPrograms(
 
 export default function RecursoDetailPage() {
   const t = useTranslations("resource_detail");
+  const tResource = useTranslations("resources");
   const params = useParams();
   const router = useRouter();
   const resourceId = params.id as string;
@@ -365,8 +366,8 @@ export default function RecursoDetailPage() {
 
   const resourceTypeLabel = React.useMemo(() => {
     if (!resource) return "";
-    return t(`type_labels.${resource.type}`, { defaultValue: resource.type });
-  }, [resource, t]);
+    return tResource(`type_labels.${resource.type}` as "type_labels.CLASSROOM" | "type_labels.LABORATORY" | "type_labels.AUDITORIUM" | "type_labels.MULTIMEDIA_EQUIPMENT" | "type_labels.SPORTS_FACILITY" | "type_labels.MEETING_ROOM" | "type_labels.VEHICLE" | "type_labels.OTHER");
+  }, [resource, tResource]);
 
   const sidebarContent = resource ? (
     <div className="space-y-4">
