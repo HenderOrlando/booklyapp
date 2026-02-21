@@ -8,6 +8,7 @@ export class CreateApprovalRequestCommand {
     public readonly requesterId: string,
     public readonly approvalFlowId: string,
     public readonly metadata?: Record<string, any>,
-    public readonly createdBy?: string
+    public readonly createdBy?: string,
+    public readonly securityInfo?: { ipAddress?: string; userAgent?: string }
   ) {}
 }

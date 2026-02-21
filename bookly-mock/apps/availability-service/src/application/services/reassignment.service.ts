@@ -169,7 +169,9 @@ export class ReassignmentService {
     reassignmentId: string,
     accepted: boolean,
     newResourceId?: string,
-    feedback?: string
+    userFeedback?: string,
+    reasonDetails?: string,
+    notifyUser: boolean = true
   ): Promise<void> {
     const reassignment =
       await this.reassignmentHistoryRepository.findById(reassignmentId);
@@ -180,7 +182,9 @@ export class ReassignmentService {
     // Actualizar respuesta
     await this.reassignmentHistoryRepository.update(reassignmentId, {
       accepted,
-      userFeedback: feedback,
+      userFeedback,
+      reasonDetails,
+      notifyUser,
       respondedAt: new Date(),
     } as any);
 
@@ -201,6 +205,8 @@ export class ReassignmentService {
           reservationId: reassignment.originalReservationId.toString(),
           newResourceId,
           userId: reassignment.userId.toString(),
+          notifyUser,
+          reasonDetails
         },
       });
     } else {
@@ -211,7 +217,8 @@ export class ReassignmentService {
           reassignmentId,
           reservationId: reassignment.originalReservationId.toString(),
           userId: reassignment.userId.toString(),
-          feedback,
+          feedback: userFeedback,
+          reasonDetails
         },
       });
     }

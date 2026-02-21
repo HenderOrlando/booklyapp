@@ -1,11 +1,17 @@
 // Registrar path aliases para runtime
 import "tsconfig-paths/register";
 
-import { createLogger } from "@libs/common";
+import { createLogger, initOtel } from "@libs/common";
 import { ValidationPipe } from "@nestjs/common";
 import { NestFactory } from "@nestjs/core";
 import { DocumentBuilder, SwaggerModule } from "@nestjs/swagger";
 import { StockpileModule } from "./stockpile.module";
+
+// Inicializar Telemetría antes de NestJS
+initOtel({
+  serviceName: "stockpile-service",
+  serviceVersion: "1.0.0",
+});
 
 const logger = createLogger("StockpileService");
 

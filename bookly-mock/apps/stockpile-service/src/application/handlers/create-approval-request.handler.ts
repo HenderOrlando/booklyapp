@@ -31,6 +31,7 @@ export class CreateApprovalRequestHandler
       approvalFlowId: command.approvalFlowId,
       metadata: command.metadata,
       createdBy: command.createdBy,
+      securityInfo: command.securityInfo,
     });
   }
 }

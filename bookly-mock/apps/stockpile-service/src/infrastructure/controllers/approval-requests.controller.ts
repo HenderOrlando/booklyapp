@@ -9,10 +9,12 @@ import {
   Param,
   Post,
   Query,
+  Req,
   UseGuards,
   UseInterceptors,
 } from "@nestjs/common";
 import { CommandBus, QueryBus } from "@nestjs/cqrs";
+import { Request } from "express";
 import {
   ApiBearerAuth,
   ApiOperation,
@@ -237,12 +239,17 @@ export class ApprovalRequestsController {
     @Param("id") id: string,
     @Body() dto: ApproveStepDto,
     @CurrentUser() user: any,
+    @Req() req: Request,
   ): Promise<any> {
     const command = new ApproveStepCommand(
       id,
       user.sub,
       dto.stepName,
       dto.comment,
+      {
+        ipAddress: req.ip,
+        userAgent: req.headers["user-agent"],
+      },
     );
 
     const result = await this.commandBus.execute(command);
@@ -268,12 +275,17 @@ export class ApprovalRequestsController {
     @Param("id") id: string,
     @Body() dto: RejectStepDto,
     @CurrentUser() user: any,
+    @Req() req: Request,
   ): Promise<any> {
     const command = new RejectStepCommand(
       id,
       user.sub,
       dto.stepName,
       dto.comment,
+      {
+        ipAddress: req.ip,
+        userAgent: req.headers["user-agent"],
+      },
     );
 
     const result = await this.commandBus.execute(command);
@@ -299,8 +311,17 @@ export class ApprovalRequestsController {
     @Param("id") id: string,
     @Body() dto: CancelApprovalRequestDto,
     @CurrentUser() user: any,
+    @Req() req: Request,
   ): Promise<any> {
-    const command = new CancelApprovalRequestCommand(id, user.sub, dto.reason);
+    const command = new CancelApprovalRequestCommand(
+      id, 
+      user.sub, 
+      dto.reason,
+      {
+        ipAddress: req.ip,
+        userAgent: req.headers["user-agent"],
+      },
+    );
 
     const result = await this.commandBus.execute(command);
     return ResponseUtil.success(
