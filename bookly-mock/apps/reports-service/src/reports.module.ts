@@ -1,3 +1,4 @@
+import { I18nModule } from "@bookly/i18n";
 import { JWT_SECRET } from "@libs/common/constants";
 import { DatabaseModule, ReferenceDataModule } from "@libs/database";
 import { EventBusModule } from "@libs/event-bus";

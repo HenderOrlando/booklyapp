@@ -12,6 +12,7 @@ import { JwtModule } from "@nestjs/jwt";
 import { MongooseModule } from "@nestjs/mongoose";
 import { PassportModule } from "@nestjs/passport";
 import { AuditDecoratorsModule } from "@reports/audit-decorators";
+import { I18nModule } from "@bookly/i18n";
 
 // Schemas
 import {
@@ -107,6 +108,7 @@ import { EventBusIntegrationModule } from "./infrastructure/event-bus";
       isGlobal: true,
       envFilePath: [".env", "apps/stockpile-service/.env"],
     }),
+    I18nModule,
     // DatabaseModule reemplaza MongooseModule.forRoot
     DatabaseModule,
     // Reference Data (tipos, estados dinámicos del dominio stockpile)

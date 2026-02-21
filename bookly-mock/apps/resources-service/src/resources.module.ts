@@ -16,6 +16,7 @@ import { JwtModule } from "@nestjs/jwt";
 import { MongooseModule } from "@nestjs/mongoose";
 import { PassportModule } from "@nestjs/passport";
 import { AuditDecoratorsModule } from "@reports/audit-decorators";
+import { I18nModule } from "@bookly/i18n";
 import { ResourceImportService } from "./application/services/resource-import.service";
 import { JwtStrategy } from "./infrastructure/strategies/jwt.strategy";
 
@@ -85,6 +86,8 @@ const IMPORT_JOB_REPOSITORY = "IImportJobRepository";
       isGlobal: true,
       envFilePath: [".env", "apps/resources-service/.env"],
     }),
+
+    I18nModule,
 
     // CQRS
     CqrsModule,

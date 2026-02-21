@@ -5,7 +5,14 @@
     "deleteOutDir": true,
     "webpack": false,
     "tsConfigPath": "tsconfig.json",
-    "builder": "tsc"
+    "builder": "tsc",
+    "assets": [
+      {
+        "include": "libs/i18n/src/translations/**/*",
+        "outDir": "dist",
+        "watchAssets": true
+      }
+    ]
   },
   "monorepo": true,
   "projects": {
