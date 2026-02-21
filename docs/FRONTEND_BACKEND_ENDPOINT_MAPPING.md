@@ -155,8 +155,12 @@
 | **GET** | `/search/resources` | Buscar recursos disponibles | ⚠️ **FALTA FRONTEND** |
 | **GET** | `/search/availability` | Buscar horarios disponibles | ⚠️ **FALTA FRONTEND** |
 | **POST** | `/search/advanced` | Búsqueda avanzada | ⚠️ **FALTA FRONTEND** |
-| **POST** | `/waiting-list` | Lista de espera | ⚠️ **FALTA FRONTEND** |
-| **GET** | `/waiting-list` | Obtener lista espera | ⚠️ **FALTA FRONTEND** |
+| **POST** | `/waiting-lists` | Lista de espera | ✅ **IMPLEMENTADO** |
+| **GET** | `/waiting-lists/resource/:id` | Obtener lista espera | ✅ **IMPLEMENTADO** |
+| **DELETE** | `/waiting-lists/:id` | Remover de lista | ✅ **IMPLEMENTADO** |
+| **POST** | `/waiting-lists/notify` | Notificar siguientes | ✅ **IMPLEMENTADO** |
+| **PATCH** | `/waiting-lists/:id/priority` | Actualizar prioridad | ✅ **IMPLEMENTADO** |
+| **POST** | `/waiting-lists/:id/accept` | Aceptar oferta | ✅ **IMPLEMENTADO** |
 | **POST** | `/recurring-reservations` | Reservas recurrentes | ⚠️ **FALTA FRONTEND** |
 | **GET** | `/availability/:resourceId/calendar` | Vista calendario | ⚠️ **FALTA FRONTEND** |
 

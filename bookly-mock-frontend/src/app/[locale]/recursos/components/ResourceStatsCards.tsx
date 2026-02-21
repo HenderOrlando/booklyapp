@@ -17,6 +17,7 @@ interface ResourceStatsCardsProps {
 
 export function ResourceStatsCards({ resources }: ResourceStatsCardsProps) {
   const t = useTranslations("resources.stats");
+  const tResource = useTranslations("resources");
 
   // Calcular estadísticas
   const stats = React.useMemo(() => {
@@ -41,14 +42,14 @@ export function ResourceStatsCards({ resources }: ResourceStatsCardsProps) {
     const resourceTypes = new Set(resources.map((r) => r.type));
 
     const typeLabels: Record<string, string> = {
-      CLASSROOM: t("type_labels.CLASSROOM"),
-      LABORATORY: t("type_labels.LABORATORY"),
-      AUDITORIUM: t("type_labels.AUDITORIUM"),
-      MULTIMEDIA_EQUIPMENT: t("type_labels.MULTIMEDIA_EQUIPMENT"),
-      SPORTS_FACILITY: t("type_labels.SPORTS_FACILITY"),
-      MEETING_ROOM: t("type_labels.MEETING_ROOM"),
-      VEHICLE: t("type_labels.VEHICLE"),
-      OTHER: t("type_labels.OTHER"),
+      CLASSROOM: tResource("type_labels.CLASSROOM"),
+      LABORATORY: tResource("type_labels.LABORATORY"),
+      AUDITORIUM: tResource("type_labels.AUDITORIUM"),
+      MULTIMEDIA_EQUIPMENT: tResource("type_labels.MULTIMEDIA_EQUIPMENT"),
+      SPORTS_FACILITY: tResource("type_labels.SPORTS_FACILITY"),
+      MEETING_ROOM: tResource("type_labels.MEETING_ROOM"),
+      VEHICLE: tResource("type_labels.VEHICLE"),
+      OTHER: tResource("type_labels.OTHER"),
     };
 
     const typeCountText = Array.from(resourceTypes)

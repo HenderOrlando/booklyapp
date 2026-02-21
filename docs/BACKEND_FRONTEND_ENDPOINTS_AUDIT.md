@@ -167,9 +167,12 @@ Este documento mapea los endpoints disponibles en el backend (bookly-mock) con s
 
 | Método | Endpoint             | Descripción               | Frontend Client                              | Hook                         | Status   |
 | ------ | -------------------- | ------------------------- | -------------------------------------------- | ---------------------------- | -------- |
-| POST   | `/waiting-lists`     | Agregar a lista de espera | ✅ `ReservationsClient.addToWaitlist()`      | ✅ `useAddToWaitlist()`      | ✅ OK    |
-| GET    | `/waiting-lists`     | Listar esperas            | ❌ Falta                                     | ❌ Falta                     | ⚠️ Falta |
-| DELETE | `/waiting-lists/:id` | Remover de lista          | ✅ `ReservationsClient.removeFromWaitlist()` | ✅ `useRemoveFromWaitlist()` | ✅ OK    |
+| POST   | `/waiting-lists`            | Agregar a lista de espera | ✅ `ReservationsClient.addToWaitlist()`      | ✅ `useAddToWaitlist()`      | ✅ OK    |
+| GET    | `/waiting-lists/resource/:id` | Listar esperas por recurso| ✅ `ReservationsClient.getWaitlist()`        | ✅ `useWaitlist()`           | ✅ OK    |
+| DELETE | `/waiting-lists/:id`        | Remover de lista          | ✅ `ReservationsClient.removeFromWaitlist()` | ✅ `useRemoveFromWaitlist()` | ✅ OK    |
+| POST   | `/waiting-lists/notify`     | Notificar siguientes      | ✅ `ReservationsClient.notifyWaitlist()`     | ✅ `useNotifyWaitlist()`     | ✅ OK    |
+| PATCH  | `/waiting-lists/:id/priority`| Actualizar prioridad      | ✅ `ReservationsClient.updateWaitlistPriority()`| ✅ `useUpdateWaitlistPriority()`| ✅ OK    |
+| POST   | `/waiting-lists/:id/accept` | Aceptar oferta            | ✅ `ReservationsClient.acceptWaitlistOffer()`| ✅ `useAcceptWaitlistOffer()`| ✅ OK    |
 
 ---
 

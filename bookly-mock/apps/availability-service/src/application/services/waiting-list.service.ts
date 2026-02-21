@@ -130,7 +130,7 @@ export class WaitingListService {
     const limit = notifyTop || 1;
     const toNotify = activeList.slice(0, limit);
 
-    const notifiedList = [];
+    const notifiedList: WaitingListEntity[] = [];
     for (const entry of toNotify) {
       const notified = entry.markAsNotified();
       const updated = await this.waitingListRepository.update(entry.id, {
