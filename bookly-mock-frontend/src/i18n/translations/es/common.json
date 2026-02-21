@@ -21,6 +21,7 @@
   "showing_results": "Mostrando {start} - {end} de {total} resultados",
   "search_placeholder": "Buscar...",
   "saving": "Guardando...",
+  "retry": "Reintentar",
   "error_logout": "Error al cerrar sesión",
   "selected": "seleccionados",
   "all": "Todos",

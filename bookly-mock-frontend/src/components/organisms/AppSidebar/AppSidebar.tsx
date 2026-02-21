@@ -479,7 +479,7 @@ export function AppSidebar({
       {visibleSections.map((section, sectionIdx) => (
         <div key={section.title || sectionIdx} className="space-y-2">
           {section.title && (
-            <h3 className="px-4 text-xs font-semibold text-[var(--color-text-muted)] uppercase tracking-wider">
+            <h3 className="px-4 text-[10px] font-bold text-slate-500 uppercase tracking-widest mt-4 mb-2">
               {section.title}
             </h3>
           )}
@@ -504,8 +504,8 @@ export function AppSidebar({
               );
 
               const activeStyles = isActive
-                ? "bg-[var(--color-action-primary)] text-[var(--color-text-inverse)]"
-                : "hover:bg-[var(--color-navigation-sidebar-hover,var(--color-bg-elevated))] text-[var(--color-text-tertiary)]";
+                ? "bg-[var(--color-action-primary)] text-white"
+                : "text-slate-300 hover:text-white hover:bg-[var(--color-bg-elevated)]";
 
               const baseStyles = `flex items-center justify-between w-full px-4 py-2 rounded-md transition-colors ${activeStyles} ${isDisabled ? "cursor-default opacity-80" : ""}`;
 

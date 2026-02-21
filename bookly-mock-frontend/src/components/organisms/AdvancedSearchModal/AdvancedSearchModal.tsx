@@ -1,5 +1,6 @@
 "use client";
 
+import { DynamicIcon } from "@/components/atoms/DynamicIcon";
 import { Badge } from "@/components/atoms/Badge";
 import { Button } from "@/components/atoms/Button";
 import {
@@ -306,7 +307,9 @@ export function AdvancedSearchModal({
                       : "border-[var(--color-border-subtle)] bg-[var(--color-bg-surface)] text-[var(--color-text-secondary)] hover:border-brand-primary-200 hover:bg-brand-primary-50/30"
                   }`}
                 >
-                  <span className="text-lg">{icon}</span>
+                  <span className="text-lg">
+                    <DynamicIcon name={typeof icon === "string" ? icon : "HelpCircle"} className="w-5 h-5" />
+                  </span>
                   {label}
                 </button>
               ))}
@@ -470,7 +473,9 @@ export function AdvancedSearchModal({
                   />
                   <div className="flex items-center gap-2 truncate">
                     {char.icon ? (
-                      <span className="text-lg">{char.icon}</span>
+                      <span className="text-lg">
+                        <DynamicIcon name={char.icon} className="w-4 h-4" />
+                      </span>
                     ) : (
                       <Tag size={14} className="text-brand-primary-500" />
                     )}

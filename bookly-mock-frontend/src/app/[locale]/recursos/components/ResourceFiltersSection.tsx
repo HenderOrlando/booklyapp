@@ -135,7 +135,7 @@ export function ResourceFiltersSection({
       chips.push({
         key: "types",
         label: t("filters.types"),
-        value: advancedFilters.types.length,
+        value: advancedFilters.types.length.toString(),
       });
     }
 
@@ -143,7 +143,7 @@ export function ResourceFiltersSection({
       chips.push({
         key: "statuses",
         label: t("filters.statuses"),
-        value: advancedFilters.statuses.length,
+        value: advancedFilters.statuses.length.toString(),
       });
     }
 
@@ -186,7 +186,7 @@ export function ResourceFiltersSection({
       chips.push({
         key: "characteristics",
         label: "Características",
-        value: advancedFilters.characteristicIds.length,
+        value: advancedFilters.characteristicIds.length.toString(),
       });
     }
 
@@ -194,7 +194,7 @@ export function ResourceFiltersSection({
       chips.push({
         key: "programs",
         label: "Programas",
-        value: advancedFilters.programIds.length,
+        value: advancedFilters.programIds.length.toString(),
       });
     }
 

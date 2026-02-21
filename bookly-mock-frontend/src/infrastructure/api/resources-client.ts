@@ -181,18 +181,14 @@ export class ResourcesClient {
     skipErrors: boolean = false,
   ): Promise<
     ApiResponse<{
-      successCount: number;
-      updatedCount: number;
-      errorCount: number;
-      errors: string[];
+      importedCount: number;
+      errors?: Array<{ row: number; error: string }>;
     }>
   > {
     return httpClient.post<{
-      successCount: number;
-      updatedCount: number;
-      errorCount: number;
-      errors: string[];
-    }>(`${RESOURCES_ENDPOINTS.BASE}/import`, {
+      importedCount: number;
+      errors?: Array<{ row: number; error: string }>;
+    }>(RESOURCES_ENDPOINTS.IMPORT_CSV, {
       csvContent,
       mode,
       skipErrors,
@@ -222,7 +218,7 @@ export class ResourcesClient {
     sortOrder?: "asc" | "desc";
   }): Promise<ApiResponse<PaginatedResponse<Resource>>> {
     return httpClient.get<PaginatedResponse<Resource>>(
-      `${RESOURCES_ENDPOINTS.BASE}/search/advanced`,
+      RESOURCES_ENDPOINTS.SEARCH_ADVANCED,
       { params: filters },
     );
   }
@@ -239,7 +235,7 @@ export class ResourcesClient {
    */
   static async restoreResource(id: string): Promise<ApiResponse<Resource>> {
     return httpClient.post<Resource>(
-      `${RESOURCES_ENDPOINTS.BY_ID(id)}/restore`,
+      RESOURCES_ENDPOINTS.RESTORE(id),
     );
   }
 
@@ -410,7 +406,7 @@ export class ResourcesClient {
   > {
     return httpClient.get<
       PaginatedResponse<{ id: string; name: string; icon?: string }>
-    >(`${RESOURCES_ENDPOINTS.BASE}/characteristics`);
+    >(RESOURCES_ENDPOINTS.CHARACTERISTICS);
   }
 
   // ============================================
@@ -430,8 +426,8 @@ export class ResourcesClient {
     resourceId: string,
     startDate: string,
     endDate: string,
-  ): Promise<ApiResponse<{ available: boolean; conflicts?: any[] }>> {
-    return httpClient.get<{ available: boolean; conflicts?: any[] }>(
+  ): Promise<ApiResponse<{ available: boolean; conflicts?: Record<string, unknown>[] }>> {
+    return httpClient.get<{ available: boolean; conflicts?: Record<string, unknown>[] }>(
       buildUrl(RESOURCES_ENDPOINTS.AVAILABILITY_BY_ID(resourceId), {
         startDate,
         endDate,

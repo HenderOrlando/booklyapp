@@ -66,6 +66,8 @@ export const RESOURCES_ENDPOINTS = {
   // CRUD de Recursos
   BASE: `${API_VERSION}/resources`,
   BY_ID: (id: string) => `${API_VERSION}/resources/${id}`,
+  RESTORE: (id: string) => `${API_VERSION}/resources/${id}/restore`,
+  SEARCH_ADVANCED: `${API_VERSION}/resources/search/advanced`,
 
   // Categorías
   CATEGORIES: `${API_VERSION}/categories`,
@@ -76,7 +78,13 @@ export const RESOURCES_ENDPOINTS = {
   PROGRAM_BY_ID: (id: string) => `${API_VERSION}/programs/${id}`,
 
   // Importación/Exportación
-  IMPORT_CSV: `${API_VERSION}/resources/import/csv`,
+  IMPORT_CSV: `${API_VERSION}/resources/import`,
+  IMPORT_ASYNC: `${API_VERSION}/import/async`,
+  IMPORT_VALIDATE: `${API_VERSION}/import/validate`,
+  IMPORT_JOBS: `${API_VERSION}/import/jobs`,
+  IMPORT_JOB_BY_ID: (id: string) => `${API_VERSION}/import/jobs/${id}`,
+  IMPORT_ROLLBACK: `${API_VERSION}/import/rollback`,
+  IMPORT_TEMPLATE: `${API_VERSION}/import/template`,
   EXPORT_CSV: `${API_VERSION}/resources/export/csv`,
   EXPORT_PDF: `${API_VERSION}/resources/export/pdf`,
 
@@ -203,34 +211,29 @@ export const STOCKPILE_ENDPOINTS = {
 } as const;
 
 /**
- * Endpoints de Reportes y Análisis (Reports Service - Puerto 3005)
+ * Endpoints de Reportes y AnÃ¡lisis (Reports Service - Puerto 3005)
  */
 export const REPORTS_ENDPOINTS = {
-  // Dashboard (routed via reports service)
+  // Dashboard
   BASE: `${API_VERSION}/usage-reports`,
-  DASHBOARD: `${API_VERSION}/reports/dashboard`,
-  DASHBOARD_ADMIN: `${API_VERSION}/reports/dashboard?scope=admin`,
-  DASHBOARD_USER: `${API_VERSION}/reports/dashboard?scope=user`,
+  DASHBOARD_OVERVIEW: `${API_VERSION}/dashboard/overview`,
+  DASHBOARD_OCCUPANCY: `${API_VERSION}/dashboard/occupancy`,
+  DASHBOARD_TRENDS: `${API_VERSION}/dashboard/trends`,
+  DASHBOARD_KPIS: `${API_VERSION}/dashboard/kpis`,
 
-  // Reportes de Uso (BE controller: "usage-reports")
+  // Reportes de Uso
   USAGE: `${API_VERSION}/usage-reports`,
   USAGE_BY_RESOURCE: (resourceId: string) =>
     `${API_VERSION}/usage-reports?resourceId=${resourceId}`,
   USAGE_BY_USER: (userId: string) =>
-    `${API_VERSION}/usage-reports?userId=${userId}`,
+    `${API_VERSION}/user-reports?userId=${userId}`,
   USAGE_BY_PROGRAM: (programId: string) =>
     `${API_VERSION}/usage-reports?programId=${programId}`,
 
-  // Estadísticas (via usage-reports generate)
-  STATISTICS: `${API_VERSION}/usage-reports/generate`,
-  STATISTICS_SUMMARY: `${API_VERSION}/usage-reports/generate?type=summary`,
-  STATISTICS_TRENDS: `${API_VERSION}/usage-reports/generate?type=trends`,
-
-  // Exportación (BE controller: "reports/export")
+  // Exportación
   EXPORT: `${API_VERSION}/reports/export`,
-  EXPORT_CSV: `${API_VERSION}/reports/export`,
-  EXPORT_PDF: `${API_VERSION}/reports/export`,
-  EXPORT_EXCEL: `${API_VERSION}/reports/export`,
+  EXPORT_STATUS: (id: string) => `${API_VERSION}/reports/export/${id}`,
+  EXPORT_DOWNLOAD: (id: string) => `${API_VERSION}/reports/export/${id}/download`,
 
   // Demanda Insatisfecha (BE controller: "demand-reports")
   UNSATISFIED_DEMAND: `${API_VERSION}/demand-reports`,
@@ -336,7 +339,7 @@ export function getServiceFromEndpoint(endpoint: string): string {
     return "STOCKPILE";
 
   // Reports Service
-  if (endpoint.includes("/reports") || endpoint.includes("/feedback"))
+  if (endpoint.includes("/reports") || endpoint.includes("/usage-reports") || endpoint.includes("/demand-reports") || endpoint.includes("/feedback"))
     return "REPORTS";
 
   if (endpoint.includes("/health")) return "SYSTEM";

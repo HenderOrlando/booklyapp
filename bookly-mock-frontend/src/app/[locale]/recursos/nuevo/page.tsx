@@ -12,13 +12,6 @@ import {
 } from "@/components/atoms/Card";
 import { Input } from "@/components/atoms/Input";
 import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/atoms/Select";
-import {
   Tabs,
   TabsContent,
   TabsList,
@@ -43,6 +36,7 @@ import {
   ResourceType,
 } from "@/types/entities/resource";
 import { AlertCircle, Plus, Search, Tag, X } from "lucide-react";
+import { DynamicIcon } from "@/components/atoms/DynamicIcon";
 import { useParams } from "next/navigation";
 import * as React from "react";
 
@@ -188,7 +182,7 @@ export default function CreateResourcePage() {
     return (resourceTypesData || []).map((rt) => ({
       id: rt.code as ResourceType,
       label: rt.name,
-      icon: rt.icon || "📦",
+      icon: rt.icon || "Box",
     }));
   }, [resourceTypesData]);
 
@@ -227,6 +221,16 @@ export default function CreateResourcePage() {
   const [characteristicQuery, setCharacteristicQuery] = React.useState("");
   const [programQuery, setProgramQuery] = React.useState("");
   const [typeQuery, setTypeQuery] = React.useState("");
+
+  const [categoryQuery, setCategoryQuery] = React.useState("");
+
+  const filteredCategories = React.useMemo(() => {
+    const query = categoryQuery.toLowerCase().trim();
+    const options = !query
+      ? categories
+      : categories.filter((c) => c.name.toLowerCase().includes(query));
+    return options.slice(0, 6);
+  }, [categoryQuery, categories]);
 
   const filteredTypes = React.useMemo(() => {
     const query = typeQuery.toLowerCase().trim();
@@ -848,7 +852,9 @@ export default function CreateResourcePage() {
                                 : "border-[var(--color-border-subtle)] bg-[var(--color-bg-surface)] text-[var(--color-text-secondary)] hover:border-brand-primary-200 hover:bg-brand-primary-50/30",
                             )}
                           >
-                            <span className="text-xl">{icon}</span>
+                            <span className="text-xl">
+                              <DynamicIcon name={icon} className="w-6 h-6" />
+                            </span>
                             <span className="text-center line-clamp-1">
                               {label}
                             </span>
@@ -862,39 +868,60 @@ export default function CreateResourcePage() {
                       </div>
                     </div>
 
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      <div>
+                    <div className="space-y-3">
+                      <div className="flex items-center justify-between">
                         <label className="block text-sm font-medium text-[var(--color-text-primary)] mb-2">
                           Categoría *
                         </label>
-                        <Select
-                          value={formData.categoryId}
-                          onValueChange={(value) =>
-                            handleInputChange("categoryId", value)
-                          }
-                        >
-                          <SelectTrigger
-                            className={cn(
-                              formErrors.categoryId && "border-state-error-500",
-                            )}
-                          >
-                            <SelectValue placeholder="Selecciona una categoría" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            {categories.map((category) => (
-                              <SelectItem key={category.id} value={category.id}>
-                                {category.name}
-                              </SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
-                        {formErrors.categoryId && (
-                          <p className="text-[10px] text-state-error-500 mt-1">
-                            {formErrors.categoryId}
-                          </p>
-                        )}
+                        <div className="relative w-48 mb-2">
+                          <Search
+                            size={12}
+                            className="absolute left-2.5 top-1/2 -translate-y-1/2 text-[var(--color-text-tertiary)]"
+                          />
+                          <Input
+                            placeholder="Filtrar categorías..."
+                            value={categoryQuery}
+                            onChange={(e) => setCategoryQuery(e.target.value)}
+                            className="h-8 pl-8 text-xs bg-[var(--color-bg-muted)]/20 border-[var(--color-border-subtle)] rounded-lg focus:ring-brand-primary-500"
+                          />
+                        </div>
                       </div>
 
+                      <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+                        {filteredCategories.map((category) => (
+                          <button
+                            key={category.id}
+                            type="button"
+                            onClick={() => handleInputChange("categoryId", category.id)}
+                            className={cn(
+                              "flex flex-col items-center gap-2 p-3 rounded-xl border text-xs font-semibold transition-colors",
+                              formData.categoryId === category.id
+                                ? "border-brand-primary-500 bg-brand-primary-50 text-brand-primary-700 shadow-sm"
+                                : "border-[var(--color-border-subtle)] bg-[var(--color-bg-surface)] text-[var(--color-text-secondary)] hover:border-brand-primary-200 hover:bg-brand-primary-50/30",
+                            )}
+                          >
+                            <span className="text-xl">
+                              <DynamicIcon name={category.icon || "Folder"} className="w-6 h-6" />
+                            </span>
+                            <span className="text-center line-clamp-1">
+                              {category.name}
+                            </span>
+                          </button>
+                        ))}
+                        {filteredCategories.length === 0 && (
+                          <div className="col-span-full py-4 text-center text-xs text-[var(--color-text-tertiary)] italic">
+                            No se encontraron categorías que coincidan.
+                          </div>
+                        )}
+                      </div>
+                      {formErrors.categoryId && (
+                        <p className="text-[10px] text-state-error-500 mt-1">
+                          {formErrors.categoryId}
+                        </p>
+                      )}
+                    </div>
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       <div>
                         <label className="block text-sm font-medium text-[var(--color-text-primary)] mb-2">
                           Capacidad *

@@ -291,7 +291,7 @@ export class ReportsClient {
         ? filters.include
         : DEFAULT_DASHBOARD_INCLUDE;
 
-    const endpoint = buildUrl(REPORTS_ENDPOINTS.DASHBOARD, {
+    const endpoint = buildUrl(REPORTS_ENDPOINTS.DASHBOARD_OVERVIEW, {
       ...filters,
       period: filters.period || DEFAULT_DASHBOARD_PERIOD,
       include: include.join(","),

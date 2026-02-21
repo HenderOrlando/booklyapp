@@ -25,6 +25,7 @@
   "showing_count": "{count} de {total} recursos",
   "search_placeholder": "Buscar por nombre, código, ubicación...",
   "loading": "Cargando recursos...",
+  "error_loading": "Error al cargar los recursos",
   "show_unavailable": "Ver no disponibles",
   "restore": "Restaurar",
   "clear_filters": "Limpiar Filtros",
