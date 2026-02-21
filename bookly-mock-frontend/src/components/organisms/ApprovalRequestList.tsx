@@ -2,6 +2,7 @@ import { Badge } from "@/components/atoms/Badge";
 import { Checkbox } from "@/components/atoms/Checkbox";
 import { useApprovalActions } from "@/hooks/useApprovalActions";
 import { ApprovalCard } from "@/components/molecules/ApprovalCard";
+import { ApprovalCardSkeleton } from "@/components/molecules/ApprovalCardSkeleton";
 import type {
   ApprovalFilters,
   ApprovalLevel,
@@ -114,7 +115,10 @@ export const ApprovalRequestList = React.memo<ApprovalRequestListProps>(
       onFiltersChange?.({ ...localFilters, search: value });
     };
 
-    const handleFilterChange = (key: keyof ApprovalFilters, value: any) => {
+    const handleFilterChange = <K extends keyof ApprovalFilters>(
+      key: K,
+      value: ApprovalFilters[K],
+    ) => {
       const newFilters = { ...localFilters, [key]: value };
       setLocalFilters(newFilters);
       onFiltersChange?.(newFilters);
@@ -303,7 +307,7 @@ export const ApprovalRequestList = React.memo<ApprovalRequestListProps>(
                 <select
                   value={localFilters.status || ""}
                   onChange={(e) =>
-                    handleFilterChange("status", e.target.value || undefined)
+                    handleFilterChange("status", (e.target.value as ApprovalStatus) || undefined)
                   }
                   title="Filtrar por estado"
                   className="w-full px-3 py-2 border border-[var(--color-border-strong)] rounded-lg bg-[var(--color-bg-surface)] text-[var(--color-text-primary)]"
@@ -325,7 +329,7 @@ export const ApprovalRequestList = React.memo<ApprovalRequestListProps>(
                 <select
                   value={localFilters.level || ""}
                   onChange={(e) =>
-                    handleFilterChange("level", e.target.value || undefined)
+                    handleFilterChange("level", (e.target.value as ApprovalLevel) || undefined)
                   }
                   title="Filtrar por nivel"
                   className="w-full px-3 py-2 border border-[var(--color-border-strong)] rounded-lg bg-[var(--color-bg-surface)] text-[var(--color-text-primary)]"
@@ -347,7 +351,7 @@ export const ApprovalRequestList = React.memo<ApprovalRequestListProps>(
                 <select
                   value={localFilters.priority || ""}
                   onChange={(e) =>
-                    handleFilterChange("priority", e.target.value || undefined)
+                    handleFilterChange("priority", (e.target.value as ApprovalPriority) || undefined)
                   }
                   title="Filtrar por prioridad"
                   className="w-full px-3 py-2 border border-[var(--color-border-strong)] rounded-lg bg-[var(--color-bg-surface)] text-[var(--color-text-primary)]"
@@ -366,11 +370,10 @@ export const ApprovalRequestList = React.memo<ApprovalRequestListProps>(
 
         {/* Lista de solicitudes */}
         {loading ? (
-          <div className="flex items-center justify-center py-12">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[var(--color-action-primary)]" />
-            <span className="ml-3 text-[var(--color-text-secondary)] dark:text-[var(--color-text-tertiary)]">
-              Cargando solicitudes...
-            </span>
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+            {Array.from({ length: 4 }).map((_, i) => (
+              <ApprovalCardSkeleton key={i} />
+            ))}
           </div>
         ) : filteredRequests.length > 0 ? (
           <div className="space-y-4">

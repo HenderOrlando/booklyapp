@@ -53,7 +53,7 @@ import * as React from "react";
 
 // Remove local interfaces that conflict with global types
 
-const _mockFlows: ApprovalFlow[] = [
+const _mockFlows: unknown[] = [
   {
     id: "flow-001",
     name: "Flujo Rápido Docente",
@@ -341,10 +341,11 @@ export default function FlujosAprobacionPage() {
         ) : (
           <div className="space-y-4">
             {flows.map((flow) => {
-                              const autoApprove = flow.autoApproveConditions as any;
-                              const hasAutoApprove =
-                                autoApprove && 
-                                (autoApprove.roleWhitelist?.length > 0 || autoApprove.roles?.length > 0);
+              const isExpanded = expandedFlow === flow.id;
+              const autoApprove = flow.autoApproveConditions as any;
+              const hasAutoApprove =
+                autoApprove && 
+                (autoApprove.roleWhitelist?.length > 0 || autoApprove.roles?.length > 0);
 
               return (
                 <Card

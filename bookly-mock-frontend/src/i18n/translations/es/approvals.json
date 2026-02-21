@@ -38,6 +38,17 @@
   "reject_confirmation_text": "¿Estás seguro de que deseas rechazar esta solicitud?",
   "comment_optional": "Comentario (opcional)",
   "reject_reason_required": "Motivo del rechazo (obligatorio)",
+  "error_messages": {
+    "action_failed": "No se pudo procesar la acción de aprobación. Intenta de nuevo.",
+    "conflict_detected": "Esta solicitud tiene conflictos con otras reservas aprobadas.",
+    "expired_request": "Esta solicitud ha expirado y no puede ser procesada.",
+    "insufficient_permissions": "No tienes los permisos necesarios para aprobar en este nivel."
+  },
+  "notifications": {
+    "approved_subject": "Tu reserva ha sido Aprobada",
+    "rejected_subject": "Tu reserva ha sido Rechazada",
+    "pending_reminder": "Tienes una solicitud de aprobación pendiente que expira pronto."
+  },
   "confirm": "Confirmar",
   "cancel": "Cancelar",
   "cancel_reason_prompt": "¿Cuál es el motivo de la cancelación?",

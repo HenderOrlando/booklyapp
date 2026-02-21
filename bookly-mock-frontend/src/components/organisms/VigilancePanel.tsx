@@ -1,12 +1,14 @@
 import { Badge } from "@/components/atoms/Badge";
 import { Card, CardContent } from "@/components/atoms/Card";
 import { Input } from "@/components/atoms/Input";
+import { QRViewerModal } from "@/components/organisms/QRViewerModal";
 import { CheckInClient } from "@/infrastructure/api/check-in-client";
 import type {
   ActiveReservationView,
   VigilanceAlert,
   VigilanceAlertType,
 } from "@/types/entities/checkInOut";
+import type { ApprovalRequest } from "@/types/entities/approval";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { format } from "date-fns";
 import {
@@ -23,6 +25,7 @@ import {
   Shield,
   User,
   XCircle,
+  FileCheck,
 } from "lucide-react";
 import { useTranslations } from "next-intl";
 import * as React from "react";
@@ -40,6 +43,8 @@ export interface VigilancePanelProps {
   activeReservations: ActiveReservationView[];
   /** Reservas con retraso (sin check-in) */
   overdueReservations: ActiveReservationView[];
+  /** Aprobaciones del día (sin check-in aún) */
+  todayApprovals?: ApprovalRequest[];
   /** Alertas activas */
   alerts: VigilanceAlert[];
   /** Handler para contactar usuario */
@@ -106,6 +111,7 @@ export const VigilancePanel = React.memo<VigilancePanelProps>(
   ({
     activeReservations,
     overdueReservations,
+    todayApprovals = [],
     alerts,
     onContact,
     onResolveAlert,
@@ -114,10 +120,19 @@ export const VigilancePanel = React.memo<VigilancePanelProps>(
   }) => {
     const t = useTranslations("vigilance");
     const [selectedTab, setSelectedTab] = React.useState<
-      "active" | "overdue" | "alerts"
+      "active" | "overdue" | "approvals" | "alerts"
     >("active");
     const [searchQuery, setSearchQuery] = React.useState("");
     const [filterType, setFilterType] = React.useState<string>("all");
+    const [qrModal, setQrModal] = React.useState<{
+      isOpen: boolean;
+      value: string;
+      title: string;
+    }>({
+      isOpen: false,
+      value: "",
+      title: "",
+    });
     const queryClient = useQueryClient();
 
     // Mutations para Check-in/out real
@@ -136,7 +151,7 @@ export const VigilancePanel = React.memo<VigilancePanelProps>(
     // Filtros aplicados
     const filteredActive = React.useMemo(() => {
       return activeReservations.filter((res) => {
-        const matchesSearch = 
+        const matchesSearch =
           res.userName.toLowerCase().includes(searchQuery.toLowerCase()) ||
           res.resourceName.toLowerCase().includes(searchQuery.toLowerCase()) ||
           res.reservationId.toLowerCase().includes(searchQuery.toLowerCase());
@@ -147,7 +162,7 @@ export const VigilancePanel = React.memo<VigilancePanelProps>(
 
     const filteredOverdue = React.useMemo(() => {
       return overdueReservations.filter((res) => {
-        const matchesSearch = 
+        const matchesSearch =
           res.userName.toLowerCase().includes(searchQuery.toLowerCase()) ||
           res.resourceName.toLowerCase().includes(searchQuery.toLowerCase()) ||
           res.reservationId.toLowerCase().includes(searchQuery.toLowerCase());
@@ -156,15 +171,96 @@ export const VigilancePanel = React.memo<VigilancePanelProps>(
       });
     }, [overdueReservations, searchQuery, filterType]);
 
+    const filteredApprovals = React.useMemo(() => {
+      return todayApprovals.filter((req) => {
+        const matchesSearch =
+          req.userName.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          req.resourceName.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          req.reservationId.toLowerCase().includes(searchQuery.toLowerCase());
+        const matchesType = filterType === "all" || req.resourceType === filterType;
+        return matchesSearch && matchesType;
+      });
+    }, [todayApprovals, searchQuery, filterType]);
+
     // Estadísticas actualizadas según filtros
     const stats = React.useMemo(
       () => ({
         totalActive: filteredActive.length,
         totalOverdue: filteredOverdue.length,
+        totalApprovals: filteredApprovals.length,
         totalAlerts: alerts.filter((a) => !a.isResolved).length,
       }),
-      [filteredActive, filteredOverdue, alerts],
+      [filteredActive, filteredOverdue, filteredApprovals, alerts],
     );
+
+    const handleViewQr = (value: string, title: string) => {
+      setQrModal({ isOpen: true, value, title });
+    };
+
+    const renderApprovalCard = (request: ApprovalRequest) => {
+      const start = new Date(request.startDate);
+
+      return (
+        <Card
+          key={request.id}
+          className="border-blue-200 bg-blue-50/30 dark:border-blue-900/30 dark:bg-blue-900/10"
+        >
+          <CardContent className="p-4">
+            <div className="space-y-4">
+              <div className="flex items-start justify-between">
+                <div className="flex-1">
+                  <div className="flex items-center gap-2">
+                    <h4 className="font-bold text-lg text-slate-900 dark:text-slate-100">
+                      {request.resourceName}
+                    </h4>
+                    <FileCheck className="h-4 w-4 text-blue-500" />
+                  </div>
+                  <div className="flex items-center gap-2 mt-1 text-sm text-slate-500 dark:text-slate-400">
+                    <MapPin className="h-3.5 w-3.5" />
+                    <span>{request.resourceType}</span>
+                    <span className="text-slate-300">|</span>
+                    <Badge variant="outline" className="text-[10px]">APROBADA</Badge>
+                  </div>
+                </div>
+                <div className="flex flex-col items-end gap-1">
+                  <Badge variant="primary">
+                    <Clock className="h-3 w-3 mr-1" />
+                    {format(start, "HH:mm")}
+                  </Badge>
+                </div>
+              </div>
+
+              <div className="flex items-center gap-3 p-2 bg-white/50 dark:bg-black/20 rounded-lg">
+                <div className="h-8 w-8 rounded-full bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center">
+                  <User className="h-4 w-4 text-blue-600" />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="text-sm font-semibold truncate">{request.userName}</p>
+                  <p className="text-[10px] text-slate-500 truncate">{request.userEmail}</p>
+                </div>
+              </div>
+
+              <div className="flex gap-2">
+                <button
+                  onClick={() => onContact?.(request.reservationId)}
+                  className="flex-1 flex items-center justify-center gap-2 px-3 py-2 text-xs font-bold text-slate-700 dark:text-slate-200 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg hover:bg-slate-50 transition-all"
+                >
+                  <Phone className="h-3 w-3" />
+                  {t("contact")}
+                </button>
+                <button
+                  onClick={() => handleViewQr(request.id, request.resourceName)}
+                  className="flex-1 flex items-center justify-center gap-2 px-3 py-2 text-xs font-bold text-white bg-blue-600 rounded-lg hover:bg-blue-700 transition-all"
+                >
+                  <QrCode className="h-3 w-3" />
+                  {t("view_qr")}
+                </button>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      );
+    };
 
     const renderReservationCard = (
       reservation: ActiveReservationView,
@@ -196,7 +292,7 @@ export const VigilancePanel = React.memo<VigilancePanelProps>(
                     <h4 className="font-bold text-lg text-slate-900 dark:text-slate-100">
                       {reservation.resourceName}
                     </h4>
-                    <button 
+                    <button
                       title={t("view_resource_details")}
                       className="p-1 text-slate-400 hover:text-brand-primary-500 transition-colors"
                     >
@@ -301,6 +397,7 @@ export const VigilancePanel = React.memo<VigilancePanelProps>(
                 
                 {reservation.qrCode && (
                   <button 
+                    onClick={() => handleViewQr(reservation.reservationId, reservation.resourceName)}
                     title={t("view_qr")}
                     className="text-brand-primary-600 hover:underline font-medium"
                   >
@@ -461,6 +558,22 @@ export const VigilancePanel = React.memo<VigilancePanelProps>(
             </span>
           </button>
           <button
+            onClick={() => setSelectedTab("approvals")}
+            className={`flex-1 flex items-center justify-center gap-2 py-2.5 px-4 rounded-lg font-bold text-sm transition-all ${
+              selectedTab === "approvals"
+                ? "bg-white dark:bg-slate-700 text-blue-600 dark:text-blue-400 shadow-sm"
+                : "text-slate-500 hover:text-slate-700 dark:hover:text-slate-300"
+            }`}
+          >
+            <FileCheck className={`h-4 w-4 ${selectedTab === 'approvals' ? 'text-blue-500' : ''}`} />
+            {t("tab_approvals") || "Aprobadas"}
+            <span className={`ml-1 px-2 py-0.5 rounded-full text-[10px] ${
+              selectedTab === 'approvals' ? 'bg-blue-100 dark:bg-blue-900/30' : 'bg-slate-200 dark:bg-slate-800'
+            }`}>
+              {stats.totalApprovals}
+            </span>
+          </button>
+          <button
             onClick={() => setSelectedTab("alerts")}
             className={`flex-1 flex items-center justify-center gap-2 py-2.5 px-4 rounded-lg font-bold text-sm transition-all ${
               selectedTab === "alerts"
@@ -495,6 +608,8 @@ export const VigilancePanel = React.memo<VigilancePanelProps>(
               filteredOverdue.map((res) =>
                 renderReservationCard(res, true),
               )}
+            {selectedTab === "approvals" &&
+              filteredApprovals.map((req) => renderApprovalCard(req))}
             {selectedTab === "alerts" &&
               alerts
                 .filter((a) => !a.isResolved)
@@ -528,6 +643,17 @@ export const VigilancePanel = React.memo<VigilancePanelProps>(
                 </p>
               </div>
             )}
+            {selectedTab === "approvals" && filteredApprovals.length === 0 && (
+              <div className="col-span-full flex flex-col items-center justify-center py-20 bg-blue-50/30 dark:bg-blue-900/10 rounded-2xl border-2 border-dashed border-blue-200 dark:border-blue-900/30">
+                <div className="p-5 bg-white dark:bg-slate-800 rounded-2xl shadow-sm mb-6">
+                  <FileCheck className="h-12 w-12 text-blue-400" />
+                </div>
+                <h3 className="text-xl font-bold text-blue-700 dark:text-blue-400">{t("empty_approvals_title")}</h3>
+                <p className="text-blue-600/70 dark:text-blue-400/70 mt-2">
+                  {t("empty_approvals_desc")}
+                </p>
+              </div>
+            )}
             {selectedTab === "alerts" && stats.totalAlerts === 0 && (
               <div className="col-span-full flex flex-col items-center justify-center py-20 bg-slate-50 dark:bg-slate-900/40 rounded-2xl border-2 border-dashed border-slate-200 dark:border-slate-800">
                 <div className="p-5 bg-white dark:bg-slate-800 rounded-2xl shadow-sm mb-6">
@@ -541,6 +667,14 @@ export const VigilancePanel = React.memo<VigilancePanelProps>(
             )}
           </div>
         )}
+        {/* Modal de QR */}
+        <QRViewerModal
+          isOpen={qrModal.isOpen}
+          onClose={() => setQrModal({ ...qrModal, isOpen: false })}
+          qrValue={qrModal.value}
+          title={`Acceso: ${qrModal.title}`}
+          description="Presenta este código al personal de vigilancia para ingresar."
+        />
       </div>
     );
   },

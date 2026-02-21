@@ -57,6 +57,7 @@
   "filter_labs": "Laboratorios",
   "tab_in_use": "En Uso",
   "tab_overdue": "Retrasos",
+  "tab_approvals": "Aprobadas Hoy",
   "tab_alerts": "Alertas",
   "loading_monitor": "Actualizando monitor de vigilancia...",
   "empty_active_title": "No hay reservas activas",
@@ -66,5 +67,7 @@
   "empty_overdue_title": "Todo bajo control",
   "empty_overdue_desc": "No se han detectado retrasos en el inicio de las reservas programadas.",
   "empty_alerts_title": "Sin incidencias",
-  "empty_alerts_desc": "El sistema no ha generado alertas de seguridad o uso indebido."
+  "empty_alerts_desc": "El sistema no ha generado alertas de seguridad o uso indebido.",
+  "empty_approvals_title": "Sin aprobaciones pendientes",
+  "empty_approvals_desc": "Todas las reservas aprobadas para hoy ya han realizado su ingreso al sitio."
 }

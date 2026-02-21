@@ -9,6 +9,7 @@ import {
 } from "@/components/atoms/Dialog";
 import { ApprovalActions } from "@/components/molecules/ApprovalActions";
 import { ApprovalTimeline } from "@/components/molecules/ApprovalTimeline";
+import { ConflictAlert } from "@/components/molecules/ConflictAlert";
 import { DocumentPreview } from "@/components/molecules/DocumentPreview";
 import type { ApprovalRequest } from "@/types/entities/approval";
 import { format } from "date-fns";
@@ -211,6 +212,16 @@ export const ApprovalModal = React.memo<ApprovalModalProps>(
                   </p>
                 </div>
               </div>
+            )}
+
+            {/* Alerta de conflictos de disponibilidad */}
+            {request.status === "PENDING" && (
+              <ConflictAlert
+                resourceId={request.resourceId}
+                startDate={request.startDate}
+                endDate={request.endDate}
+                excludeReservationId={request.reservationId}
+              />
             )}
 
             {/* Tabs */}

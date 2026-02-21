@@ -59,24 +59,77 @@ export interface RequestReassignmentDto {
 }
 
 /**
- * DTO para aprobar/rechazar reasignación
+ * DTO para responder a reasignación
  */
-export interface ProcessReassignmentDto {
+export interface RespondReassignmentDto {
   reassignmentId: string;
-  approved: boolean;
-  notes?: string;
+  accepted: boolean;
+  newResourceId?: string;
+  userFeedback?: string;
+  reasonDetails?: string;
+  notifyUser?: boolean;
 }
 
 /**
- * Opciones de reasignación sugeridas
+ * Respuesta con alternativas
  */
-export interface ReassignmentSuggestion {
+export interface ResourceAlternative {
   resourceId: string;
   resourceName: string;
   resourceType: string;
-  capacity: number;
-  location: string;
-  available: boolean;
-  matchScore: number; // 0-100, qué tan similar es al recurso original
-  attributes: Record<string, unknown>;
+  similarityScore: number;
+  scoreBreakdown: {
+    capacity: number;
+    features: number;
+    location: number;
+    availability: number;
+  };
+  isAvailable: boolean;
+  capacity?: number;
+  features?: string[];
+  location?: string;
+  unavailabilityReason?: string;
+}
+
+export interface ReassignmentResponseDto {
+  originalReservationId: string;
+  originalResourceId: string;
+  originalResourceName: string;
+  alternatives: ResourceAlternative[];
+  reason: string;
+  totalAlternatives: number;
+  bestAlternative: ResourceAlternative | null;
+}
+
+/**
+ * Historial de reasignaciones
+ */
+export interface ReassignmentHistoryResponseDto {
+  id: string;
+  originalReservationId: string;
+  originalResource: {
+    id: string;
+    name: string;
+  };
+  newResource: {
+    id: string;
+    name: string;
+  };
+  userId: string;
+  reason: string;
+  similarityScore: number;
+  scoreBreakdown: {
+    capacity: number;
+    features: number;
+    location: number;
+    availability: number;
+    total: number;
+  };
+  alternativesConsidered: string[];
+  accepted: boolean;
+  userFeedback?: string;
+  notificationSent: boolean;
+  notifiedAt?: string;
+  respondedAt?: string;
+  createdAt: string;
 }

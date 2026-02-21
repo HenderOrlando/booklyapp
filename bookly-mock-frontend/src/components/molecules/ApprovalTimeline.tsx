@@ -1,7 +1,8 @@
+import { Avatar, AvatarFallback } from "@/components/atoms/Avatar/Avatar";
 import { TimelinePoint } from "@/components/atoms/TimelinePoint";
 import { cn } from "@/lib/utils";
 import type { ApprovalHistoryEntry, ApprovalLevel } from "@/types/entities/approval";
-import { format } from "date-fns";
+import { format, formatDistanceToNow } from "date-fns";
 import { es } from "date-fns/locale";
 import * as React from "react";
 
@@ -91,7 +92,7 @@ export const ApprovalTimeline = React.memo<ApprovalTimelineProps>(
               steps.push({
                 id: `future-${level}`,
                 approvalRequestId: "",
-                action: "PENDING" as any,
+                action: "PENDING" as unknown as ApprovalHistoryEntry["action"],
                 performedBy: "",
                 performerName: "Pendiente de asignación",
                 level: level as ApprovalLevel,
@@ -131,51 +132,62 @@ export const ApprovalTimeline = React.memo<ApprovalTimelineProps>(
               {/* Contenido del paso */}
               <div className="flex gap-4 pb-8">
                 {/* Punto de timeline */}
-                <div className="flex-shrink-0">
+                <div className="flex-shrink-0 flex flex-col items-center">
                   <TimelinePoint status={status} pulse={status === "current"} />
                 </div>
 
                 {/* Información del paso */}
                 <div className="flex-1 pt-1">
-                  {/* Acción y nivel */}
-                  <div className="flex items-center gap-2 mb-1">
-                    <h4 className={`font-semibold text-sm ${isFuture ? "text-[var(--color-text-tertiary)]" : "text-[var(--color-text-primary)] dark:text-[var(--color-text-inverse)]"}`}>
-                      {isFuture ? `Pendiente: ${LEVEL_LABELS[entry.level]}` : (ACTION_LABELS[entry.action] || entry.action)}
-                    </h4>
-                    {!isFuture && (
-                      <span className="text-xs text-[var(--color-text-secondary)] dark:text-[var(--color-text-tertiary)] px-2 py-0.5 rounded-full bg-[var(--color-bg-secondary)] dark:bg-[var(--color-bg-inverse)]">
-                        {LEVEL_LABELS[entry.level] || entry.level.replace("_", " ")}
-                      </span>
+                  {/* Performer y avatar */}
+                  <div className="flex items-center gap-2 mb-2">
+                    {!isFuture ? (
+                      <>
+                        <Avatar size="sm">
+                          <AvatarFallback>
+                            {entry.performerName.split(" ").map(n => n[0]).join("").toUpperCase()}
+                          </AvatarFallback>
+                        </Avatar>
+                        <div className="flex flex-col">
+                          <div className="flex items-center gap-2">
+                            <span className="text-sm font-semibold text-[var(--color-text-primary)] dark:text-[var(--color-text-inverse)]">
+                              {entry.performerName}
+                            </span>
+                            <span className="text-[10px] px-1.5 py-0.5 rounded bg-[var(--color-bg-secondary)] dark:bg-[var(--color-bg-inverse)] text-[var(--color-text-secondary)]">
+                              {LEVEL_LABELS[entry.level]}
+                            </span>
+                          </div>
+                          <div className="flex items-center gap-2 text-xs text-[var(--color-text-tertiary)]">
+                            <span>{ACTION_LABELS[entry.action] || entry.action}</span>
+                            {showTimestamps && (
+                              <>
+                                <span>•</span>
+                                <time 
+                                  dateTime={entry.timestamp} 
+                                  title={format(new Date(entry.timestamp), "PPpp", { locale: es })}
+                                >
+                                  {formatDistanceToNow(new Date(entry.timestamp), { addSuffix: true, locale: es })}
+                                </time>
+                              </>
+                            )}
+                          </div>
+                        </div>
+                      </>
+                    ) : (
+                      <div className="flex items-center gap-2 opacity-50">
+                        <div className="h-8 w-8 rounded-full border-2 border-dashed border-[var(--color-border-subtle)] flex items-center justify-center">
+                          <span className="text-[10px] text-[var(--color-text-tertiary)]">?</span>
+                        </div>
+                        <div className="flex flex-col">
+                          <span className="text-sm font-medium text-[var(--color-text-tertiary)]">
+                            Pendiente: {LEVEL_LABELS[entry.level]}
+                          </span>
+                          <span className="text-xs text-[var(--color-text-tertiary)] italic">
+                            Esperando asignación...
+                          </span>
+                        </div>
+                      </div>
                     )}
                   </div>
-
-                  {/* Performer y timestamp */}
-                  {!isFuture ? (
-                    <div className="text-sm text-[var(--color-text-secondary)] dark:text-[var(--color-text-tertiary)] mb-2">
-                      <span className="font-medium">{entry.performerName}</span>
-                      {entry.performerRole && (
-                        <span className="text-xs ml-1">
-                          ({entry.performerRole})
-                        </span>
-                      )}
-                      {showTimestamps && (
-                        <>
-                          <span className="mx-2">•</span>
-                          <time dateTime={entry.timestamp} className="text-xs">
-                            {format(
-                              new Date(entry.timestamp),
-                              "d 'de' MMM, yyyy 'a las' HH:mm",
-                              { locale: es }
-                            )}
-                          </time>
-                        </>
-                      )}
-                    </div>
-                  ) : (
-                    <div className="text-sm text-[var(--color-text-tertiary)] italic mb-2">
-                      Esperando aprobación de este nivel...
-                    </div>
-                  )}
 
                   {/* Comentarios */}
                   {entry.comments && (

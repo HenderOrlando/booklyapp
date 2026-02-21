@@ -5,6 +5,8 @@ import {
   type RejectStepDto,
 } from "@/infrastructure/api/approvals-client";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useTranslations } from "next-intl";
+import type { AxiosError } from "axios";
 import * as React from "react";
 
 /**
@@ -40,9 +42,14 @@ export interface CancelParams {
   reason: string;
 }
 
+interface ErrorResponse {
+  message: string;
+}
+
 export function useApprovalActions() {
   const queryClient = useQueryClient();
   const { showSuccess, showError } = useToast();
+  const t = useTranslations("approvals");
   const [lastAction, setLastAction] = React.useState<string | null>(null);
 
   // Mutation para aprobar
@@ -65,15 +72,15 @@ export function useApprovalActions() {
 
       // Notificación de éxito
       showSuccess(
-        "Solicitud Aprobada",
-        "La solicitud ha sido aprobada exitosamente"
+        t("approve_confirmation"),
+        t("approve_comment_default")
       );
     },
-    onError: (error: any) => {
+    onError: (error: AxiosError<ErrorResponse>) => {
       console.error("❌ Error al aprobar:", error);
       const errorMessage =
-        error?.response?.data?.message || "Error al aprobar la solicitud";
-      showError("Error al Aprobar", errorMessage);
+        error.response?.data?.message || t("error_messages.action_failed");
+      showError(t("error_loading"), errorMessage);
     },
   });
 
@@ -94,13 +101,13 @@ export function useApprovalActions() {
       });
       queryClient.invalidateQueries({ queryKey: ["approvals", "statistics"] });
 
-      showSuccess("Solicitud Rechazada", "La solicitud ha sido rechazada");
+      showSuccess(t("status.rejected"), t("reject_reason_default"));
     },
-    onError: (error: any) => {
+    onError: (error: AxiosError<ErrorResponse>) => {
       console.error("❌ Error al rechazar:", error);
       const errorMessage =
-        error?.response?.data?.message || "Error al rechazar la solicitud";
-      showError("Error al Rechazar", errorMessage);
+        error.response?.data?.message || t("error_messages.action_failed");
+      showError(t("error_loading"), errorMessage);
     },
   });
 
@@ -116,13 +123,13 @@ export function useApprovalActions() {
         queryKey: ["approvals", "detail", variables.id],
       });
 
-      showSuccess("Solicitud Cancelada", "La solicitud ha sido cancelada");
+      showSuccess(t("status.cancelled"), t("cancel_request"));
     },
-    onError: (error: any) => {
+    onError: (error: AxiosError<ErrorResponse>) => {
       console.error("❌ Error al cancelar:", error);
       const errorMessage =
-        error?.response?.data?.message || "Error al cancelar la solicitud";
-      showError("Error al Cancelar", errorMessage);
+        error.response?.data?.message || t("error_messages.action_failed");
+      showError(t("error_loading"), errorMessage);
     },
   });
 

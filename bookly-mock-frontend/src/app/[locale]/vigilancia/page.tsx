@@ -2,6 +2,7 @@
 
 import { VigilancePanel } from "@/components/organisms/VigilancePanel";
 import { MainLayout } from "@/components/templates/MainLayout";
+import { ApprovalsClient } from "@/infrastructure/api/approvals-client";
 import { MonitoringClient } from "@/infrastructure/api/monitoring-client";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { RefreshCw, Shield } from "lucide-react";
@@ -25,11 +26,12 @@ export default function VigilanciaPage() {
   const { data, isLoading, refetch } = useQuery({
     queryKey: ["vigilance-data"],
     queryFn: async () => {
-      const [activeRes, overdueRes, statsRes, alertsRes] = await Promise.all([
+      const [activeRes, overdueRes, statsRes, alertsRes, approvalsRes] = await Promise.all([
         MonitoringClient.getActiveCheckIns(),
         MonitoringClient.getOverdueCheckIns(),
         MonitoringClient.getStatistics(),
         MonitoringClient.getActiveAlerts(),
+        ApprovalsClient.getActiveToday({ limit: 100 }), // Cargar aprobaciones de hoy
       ]);
 
       return {
@@ -37,6 +39,7 @@ export default function VigilanciaPage() {
         overdue: overdueRes.data || [],
         stats: statsRes.data,
         alerts: alertsRes.data || [],
+        todayApprovals: approvalsRes.data?.items || [],
       };
     },
     refetchInterval: autoRefresh ? 30000 : false,

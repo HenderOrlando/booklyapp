@@ -29,15 +29,15 @@ import {
 import { ButtonWithLoading } from "@/components/molecules/ButtonWithLoading";
 import type {
   ReassignmentReason,
-  ReassignmentSuggestion,
   RequestReassignmentDto,
+  ResourceAlternative,
 } from "@/types/entities/reassignment";
 import type { Reservation } from "@/types/entities/reservation";
 import React from "react";
 
 interface ResourceReassignmentModalProps {
   reservation: Reservation;
-  suggestions: ReassignmentSuggestion[];
+  suggestions: ResourceAlternative[];
   onSubmit: (data: RequestReassignmentDto) => void;
   onClose: () => void;
   loading?: boolean;
@@ -83,7 +83,7 @@ export function ResourceReassignmentModal({
     (s) => s.resourceId === selectedResourceId,
   );
   const sortedSuggestions = [...suggestions].sort(
-    (a, b) => b.matchScore - a.matchScore,
+    (a, b) => b.similarityScore - a.similarityScore,
   );
 
   const handleSubmit = () => {
@@ -206,7 +206,7 @@ export function ResourceReassignmentModal({
                         <span className="px-2 py-1 bg-[var(--color-bg-elevated)] text-xs rounded">
                           {suggestion.resourceType}
                         </span>
-                        {!suggestion.available && (
+                        {!suggestion.isAvailable && (
                           <span className="px-2 py-1 bg-[var(--color-state-error-bg)] text-[var(--color-state-error-text)] text-xs rounded">
                             No disponible
                           </span>
@@ -220,11 +220,11 @@ export function ResourceReassignmentModal({
                         <div className="flex-1 h-2 bg-[var(--color-bg-elevated)] rounded-full overflow-hidden">
                           <div
                             className="h-full bg-gradient-to-r from-[var(--color-state-success-border)] to-[var(--color-action-primary)]"
-                            style={{ width: `${suggestion.matchScore}%` }}
+                            style={{ width: `${suggestion.similarityScore}%` }}
                           />
                         </div>
                         <span className="text-xs text-[var(--color-text-tertiary)]">
-                          {suggestion.matchScore}%
+                          {suggestion.similarityScore}%
                         </span>
                       </div>
                     </div>

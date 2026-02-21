@@ -1,279 +1,209 @@
 "use client";
 
-import { Alert, AlertDescription, AlertTitle } from "@/components/atoms/Alert";
-import { Badge } from "@/components/atoms/Badge";
-import { Button } from "@/components/atoms/Button";
+import { Badge } from "@/components/atoms/Badge/Badge";
+import { Button } from "@/components/atoms/Button/Button";
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-} from "@/components/atoms/Card";
+} from "@/components/atoms/Card/Card";
 import { AppHeader } from "@/components/organisms/AppHeader";
 import { MainLayout } from "@/components/templates/MainLayout";
-import { httpClient } from "@/infrastructure/http";
+import { useReassignment } from "@/hooks/useReassignment";
+import { useToast } from "@/hooks/useToast";
+import type { 
+  ReassignmentHistoryResponseDto, 
+} from "@/types/entities/reassignment";
+import { Skeleton } from "@/components/atoms/Skeleton/Skeleton";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/atoms/Tooltip/Tooltip";
 import { cn } from "@/lib/utils";
 import {
+  AlertCircle,
   ArrowRightLeft,
   CheckCircle2,
   Clock,
-  MapPin,
   Star,
-  Users,
   XCircle,
 } from "lucide-react";
+import { LoadingSpinner } from "@/components/atoms/LoadingSpinner";
 import { useTranslations } from "next-intl";
 import * as React from "react";
 
-/**
- * Page: Reasignación de Reservas — RF-15
- *
- * Flujo end-to-end de reasignación cuando un recurso no está disponible:
- * 1. Muestra alternativas sugeridas por algoritmo de similitud
- * 2. Usuario acepta/rechaza cada alternativa
- * 3. Historial de reasignaciones
- *
- * Backend endpoints:
- * - POST /reassignments/request (availability-service)
- * - POST /reassignments/respond (availability-service)
- * - GET /reassignments/my-history (availability-service)
- */
-
-interface ReassignmentSuggestion {
-  id: string;
-  originalResourceName: string;
-  originalDate: string;
-  suggestedResourceId: string;
-  suggestedResourceName: string;
-  suggestedLocation: string;
-  suggestedCapacity: number;
-  similarityScore: number;
-  reason: string;
-  status: "pending" | "accepted" | "rejected";
-  createdAt: string;
-}
-
-const mockSuggestions: ReassignmentSuggestion[] = [
-  {
-    id: "ra-001",
-    originalResourceName: "Auditorio Principal",
-    originalDate: "2026-02-20T10:00:00Z",
-    suggestedResourceId: "res-alt-1",
-    suggestedResourceName: "Auditorio B",
-    suggestedLocation: "Edificio B, Piso 2",
-    suggestedCapacity: 200,
-    similarityScore: 0.92,
-    reason: "Capacidad similar, mismo edificio, equipamiento compatible",
-    status: "pending",
-    createdAt: "2026-02-16T08:00:00Z",
-  },
-  {
-    id: "ra-002",
-    originalResourceName: "Auditorio Principal",
-    originalDate: "2026-02-20T10:00:00Z",
-    suggestedResourceId: "res-alt-2",
-    suggestedResourceName: "Sala de Conferencias A",
-    suggestedLocation: "Edificio A, Piso 1",
-    suggestedCapacity: 100,
-    similarityScore: 0.78,
-    reason: "Menor capacidad pero con proyector y audio",
-    status: "pending",
-    createdAt: "2026-02-16T08:00:00Z",
-  },
-];
-
-interface ReassignmentHistoryEntry {
-  id: string;
-  originalResource: string;
-  newResource: string;
-  date: string;
-  decision: "accepted" | "rejected";
-  decidedAt: string;
-}
-
-const mockReassignmentHistory: ReassignmentHistoryEntry[] = [
-  {
-    id: "rh-001",
-    originalResource: "Lab Cómputo 1",
-    newResource: "Lab Cómputo 3",
-    date: "2026-02-10T14:00:00Z",
-    decision: "accepted",
-    decidedAt: "2026-02-08T09:00:00Z",
-  },
-  {
-    id: "rh-002",
-    originalResource: "Sala Multimedia",
-    newResource: "Sala de Juntas B",
-    date: "2026-02-05T08:00:00Z",
-    decision: "rejected",
-    decidedAt: "2026-02-03T11:00:00Z",
-  },
-];
-
 export default function ReasignacionPage() {
-  const _t = useTranslations("reservations");
-  const [suggestions, setSuggestions] =
-    React.useState<ReassignmentSuggestion[]>(mockSuggestions);
-  const [history, setHistory] = React.useState<ReassignmentHistoryEntry[]>(
-    mockReassignmentHistory,
-  );
-  const [loading, setLoading] = React.useState(false);
 
-  React.useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const res = await httpClient.get("reassignments/my-history");
-        if (res?.success && Array.isArray(res.data)) {
-          setHistory(
-            res.data.map((r: any) => ({
-              id: r.id || r._id,
-              originalResource: r.originalResourceName || "—",
-              newResource: r.newResourceName || "—",
-              date: r.requestedDate || r.createdAt,
-              decision: r.response || "accepted",
-              decidedAt: r.respondedAt || r.updatedAt,
-            })),
-          );
-        }
-      } catch {
-        // keep mock data
-      }
-    };
-    fetchData();
-  }, []);
+  const t = useTranslations("reservations");
+  const { showSuccess, showError } = useToast();
+  const { useHistory, respondToReassignment } = useReassignment();
+  const { data: history = [], isLoading: loadingHistory } = useHistory();
 
   const handleRespond = async (
-    suggestionId: string,
-    response: "accepted" | "rejected",
+    reassignmentId: string,
+    accepted: boolean,
+    newResourceId?: string
   ) => {
-    setLoading(true);
     try {
-      // TODO: await httpClient.post("reassignments/respond", { reassignmentId: suggestionId, response });
-      await new Promise((r) => setTimeout(r, 800));
-      setSuggestions((prev) =>
-        prev.map((s) =>
-          s.id === suggestionId ? { ...s, status: response } : s,
-        ),
+      await respondToReassignment.mutateAsync({
+        reassignmentId,
+        accepted,
+        newResourceId,
+        notifyUser: true,
+      });
+      showSuccess(
+        accepted ? "Reasignación aceptada" : "Reasignación rechazada",
+        "La decisión ha sido registrada exitosamente."
       );
-    } finally {
-      setLoading(false);
+    } catch (error) {
+      showError(
+        "Error",
+        "No se pudo registrar la respuesta. Intenta de nuevo."
+      );
     }
   };
 
-  const pendingSuggestions = suggestions.filter((s) => s.status === "pending");
+  const pendingSuggestions: ReassignmentHistoryResponseDto[] = history.filter(
+    (h) => !h.accepted && !h.respondedAt
+  );
 
-  const _header = <AppHeader title="Reasignación de Reservas" />;
+  if (loadingHistory) {
+    return (
+      <MainLayout>
+        <AppHeader title={t("reasignacion.titulo")} />
+        <div className="space-y-6 pb-6">
+          <Skeleton className="h-10 w-64" />
+          <div className="space-y-4">
+            {[1, 2].map((i) => (
+              <Card key={i}>
+                <CardContent className="pt-6">
+                  <div className="flex gap-4">
+                    <Skeleton className="h-20 flex-1" />
+                    <Skeleton className="h-20 w-32" />
+                  </div>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        </div>
+      </MainLayout>
+    );
+  }
+
   return (
     <MainLayout>
+      <AppHeader title={t("reasignacion.titulo")} />
       <div className="space-y-6 pb-6">
         <div>
           <h2 className="text-3xl font-bold text-[var(--color-text-primary)]">
-            Reasignación de Reservas
+            {t("reasignacion.titulo")}
           </h2>
           <p className="text-[var(--color-text-secondary)] mt-2">
-            Alternativas sugeridas cuando un recurso no está disponible
+            {t("reasignacion.descripcion")}
           </p>
         </div>
 
-        {/* Pending Suggestions */}
+        {/* Sugerencias Pendientes */}
         {pendingSuggestions.length > 0 && (
           <div>
             <h3 className="mb-3 text-lg font-semibold text-[var(--color-text-primary)]">
-              Sugerencias pendientes ({pendingSuggestions.length})
+              {t("reasignacion.pendientes", { count: pendingSuggestions.length })}
             </h3>
             <div className="space-y-4">
               {pendingSuggestions.map((suggestion) => (
-                <Card key={suggestion.id}>
+                <Card key={suggestion.id} className="border-l-4 border-l-brand-primary-500">
                   <CardContent className="pt-6">
-                    <div className="flex flex-col md:flex-row md:items-center gap-4">
-                      {/* Original → Suggested */}
-                      <div className="flex-1">
-                        <div className="flex items-center gap-3 flex-wrap">
-                          <div>
-                            <p className="text-xs text-[var(--color-text-tertiary)]">
-                              Recurso original
+                    <div className="flex flex-col md:flex-row md:items-center gap-6">
+                      {/* Comparativa Visual */}
+                      <div className="flex-1 space-y-4">
+                        <div className="flex items-center gap-4 flex-wrap">
+                          <div className="flex-1 min-w-[200px] p-3 rounded-lg bg-[var(--color-bg-subtle)] border border-[var(--color-border-subtle)]">
+                            <p className="text-[10px] uppercase tracking-wider text-[var(--color-text-tertiary)] font-bold">
+                              Original
                             </p>
                             <p className="font-medium text-[var(--color-text-primary)] line-through opacity-60">
-                              {suggestion.originalResourceName}
+                              {suggestion.originalResource.name}
                             </p>
                           </div>
-                          <ArrowRightLeft className="h-4 w-4 text-brand-primary-500 shrink-0" />
-                          <div>
-                            <p className="text-xs text-[var(--color-text-tertiary)]">
-                              Alternativa sugerida
+                          
+                          <div className="flex items-center justify-center w-8 h-8 rounded-full bg-brand-primary-50 text-brand-primary-600">
+                            <ArrowRightLeft className="h-4 w-4" />
+                          </div>
+
+                          <div className="flex-1 min-w-[200px] p-3 rounded-lg bg-brand-primary-50 border border-brand-primary-200">
+                            <p className="text-[10px] uppercase tracking-wider text-brand-primary-700 font-bold">
+                              Propuesto
                             </p>
-                            <p className="font-semibold text-brand-primary-500">
-                              {suggestion.suggestedResourceName}
+                            <p className="font-semibold text-brand-primary-900">
+                              {suggestion.newResource.name}
                             </p>
                           </div>
                         </div>
 
-                        <div className="mt-3 flex flex-wrap gap-3 text-sm text-[var(--color-text-secondary)]">
-                          <span className="flex items-center gap-1">
-                            <MapPin className="h-3.5 w-3.5" />
-                            {suggestion.suggestedLocation}
-                          </span>
-                          <span className="flex items-center gap-1">
-                            <Users className="h-3.5 w-3.5" />
-                            Cap. {suggestion.suggestedCapacity}
-                          </span>
-                          <span className="flex items-center gap-1">
-                            <Clock className="h-3.5 w-3.5" />
-                            {new Date(
-                              suggestion.originalDate,
-                            ).toLocaleDateString("es-ES", {
-                              day: "2-digit",
-                              month: "short",
-                              hour: "2-digit",
-                              minute: "2-digit",
-                            })}
+                        <div className="flex flex-wrap gap-4 text-sm text-[var(--color-text-secondary)]">
+                          <TooltipProvider>
+                            <Tooltip>
+                              <TooltipTrigger asChild>
+                                <div className="flex items-center gap-1.5 cursor-help">
+                                  <Star className={cn(
+                                    "h-4 w-4",
+                                    suggestion.similarityScore > 80 ? "text-state-success-500" : "text-state-warning-500"
+                                  )} />
+                                  <span className="font-bold">{suggestion.similarityScore}% Similitud</span>
+                                </div>
+                              </TooltipTrigger>
+                              <TooltipContent>
+                                <div className="space-y-1 p-1">
+                                  <p className="text-xs font-bold">Desglose de Similitud:</p>
+                                  <div className="grid grid-cols-2 gap-x-4 gap-y-1 text-[10px]">
+                                    <span>Capacidad:</span> <span className="text-right">{suggestion.scoreBreakdown.capacity}%</span>
+                                    <span>Equipamiento:</span> <span className="text-right">{suggestion.scoreBreakdown.features}%</span>
+                                    <span>Ubicación:</span> <span className="text-right">{suggestion.scoreBreakdown.location}%</span>
+                                  </div>
+                                </div>
+                              </TooltipContent>
+                            </Tooltip>
+                          </TooltipProvider>
+
+                          <span className="flex items-center gap-1.5">
+                            <Clock className="h-4 w-4 text-[var(--color-text-tertiary)]" />
+                            {new Date(suggestion.createdAt).toLocaleDateString()}
                           </span>
                         </div>
 
-                        <p className="mt-2 text-xs text-[var(--color-text-tertiary)]">
-                          {suggestion.reason}
-                        </p>
+                        <div className="p-2 rounded bg-state-info-50 text-[var(--color-state-info-text)] text-xs flex items-start gap-2">
+                          <AlertCircle className="h-3.5 w-3.5 mt-0.5" />
+                          <span><strong>Razón:</strong> {suggestion.reason}</span>
+                        </div>
                       </div>
 
-                      {/* Score + Actions */}
-                      <div className="flex flex-col items-center gap-3 shrink-0">
-                        <div className="text-center">
-                          <div className="flex items-center gap-1">
-                            <Star className="h-4 w-4 text-state-warning-500 fill-state-warning-500" />
-                            <span className="text-lg font-bold text-[var(--color-text-primary)]">
-                              {Math.round(suggestion.similarityScore * 100)}%
-                            </span>
-                          </div>
-                          <p className="text-[10px] text-[var(--color-text-tertiary)]">
-                            Similitud
-                          </p>
-                        </div>
-                        <div className="flex gap-2">
-                          <Button
-                            size="sm"
-                            disabled={loading}
-                            onClick={() =>
-                              handleRespond(suggestion.id, "accepted")
-                            }
-                            className="gap-1"
-                          >
-                            <CheckCircle2 className="h-3.5 w-3.5" />
-                            Aceptar
-                          </Button>
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            disabled={loading}
-                            onClick={() =>
-                              handleRespond(suggestion.id, "rejected")
-                            }
-                            className="gap-1"
-                          >
-                            <XCircle className="h-3.5 w-3.5" />
-                            Rechazar
-                          </Button>
-                        </div>
+                      {/* Acciones */}
+                      <div className="flex flex-col gap-2 shrink-0">
+                        <Button
+                          disabled={respondToReassignment.isPending}
+                          onClick={() => handleRespond(suggestion.id, true, suggestion.newResource.id)}
+                          className="w-full md:w-32 bg-brand-primary-600 hover:bg-brand-primary-700"
+                        >
+                          {respondToReassignment.isPending ? (
+                            <LoadingSpinner size="sm" className="mr-2" />
+                          ) : (
+                            <CheckCircle2 className="h-4 w-4 mr-2" />
+                          )}
+                          Aceptar
+                        </Button>
+                        <Button
+                          variant="outline"
+                          disabled={respondToReassignment.isPending}
+                          onClick={() => handleRespond(suggestion.id, false)}
+                          className="w-full md:w-32 border-state-error-200 text-state-error-600 hover:bg-state-error-50"
+                        >
+                          <XCircle className="h-4 w-4 mr-2" />
+                          Rechazar
+                        </Button>
                       </div>
                     </div>
                   </CardContent>
@@ -283,61 +213,63 @@ export default function ReasignacionPage() {
           </div>
         )}
 
+        {/* Empty State */}
         {pendingSuggestions.length === 0 && (
-          <Alert>
-            <CheckCircle2 className="h-4 w-4" />
-            <AlertTitle>Sin sugerencias pendientes</AlertTitle>
-            <AlertDescription>
-              No tienes reasignaciones pendientes de revisión.
-            </AlertDescription>
-          </Alert>
+          <Card className="border-dashed py-12">
+            <CardContent className="flex flex-col items-center text-center">
+              <div className="w-16 h-16 rounded-full bg-[var(--color-bg-subtle)] flex items-center justify-center mb-4">
+                <CheckCircle2 className="h-8 w-8 text-state-success-500" />
+              </div>
+              <h3 className="text-lg font-semibold text-[var(--color-text-primary)]">
+                {t("reasignacion.sin_pendientes_titulo")}
+              </h3>
+              <p className="text-[var(--color-text-secondary)] max-w-sm mt-2">
+                {t("reasignacion.sin_pendientes_desc")}
+              </p>
+            </CardContent>
+          </Card>
         )}
 
-        {/* History */}
+        {/* Historial */}
         <Card>
           <CardHeader>
-            <CardTitle>Historial de Reasignaciones</CardTitle>
-            <CardDescription>
-              Decisiones previas sobre alternativas sugeridas
-            </CardDescription>
+            <CardTitle>{t("reasignacion.historial_titulo")}</CardTitle>
+            <CardDescription>{t("reasignacion.historial_desc")}</CardDescription>
           </CardHeader>
           <CardContent>
             {history.length === 0 ? (
-              <p className="py-4 text-center text-sm text-[var(--color-text-tertiary)]">
-                No hay historial de reasignaciones.
+              <p className="py-8 text-center text-sm text-[var(--color-text-tertiary)] italic">
+                {t("reasignacion.sin_historial")}
               </p>
             ) : (
-              <div className="space-y-2">
-                {history.map((entry) => (
-                  <div
-                    key={entry.id}
-                    className="flex items-center justify-between rounded-lg border p-3"
-                  >
-                    <div className="flex items-center gap-3">
-                      <div
-                        className={cn(
-                          "h-2 w-2 rounded-full",
-                          entry.decision === "accepted"
-                            ? "bg-state-success-500"
-                            : "bg-state-error-500",
-                        )}
-                      />
-                      <div>
-                        <p className="text-sm font-medium text-[var(--color-text-primary)]">
-                          {entry.originalResource} → {entry.newResource}
-                        </p>
-                        <p className="text-xs text-[var(--color-text-tertiary)]">
-                          {new Date(entry.date).toLocaleDateString("es-ES")}
-                        </p>
+              <div className="divide-y divide-[var(--color-border-subtle)]">
+                {history.filter(h => h.respondedAt).map((entry) => (
+                  <div key={entry.id} className="py-4 first:pt-0 last:pb-0">
+                    <div className="flex items-center justify-between gap-4">
+                      <div className="flex items-start gap-3">
+                        <div className={cn(
+                          "mt-1.5 h-2 w-2 rounded-full shrink-0",
+                          entry.accepted ? "bg-state-success-500" : "bg-state-error-500"
+                        )} />
+                        <div>
+                          <div className="flex items-center gap-2 flex-wrap">
+                            <span className="text-sm font-medium text-[var(--color-text-primary)]">
+                              {entry.originalResource.name}
+                            </span>
+                            <ArrowRightLeft className="h-3 w-3 text-[var(--color-text-tertiary)]" />
+                            <span className="text-sm font-semibold text-brand-primary-600">
+                              {entry.newResource.name}
+                            </span>
+                          </div>
+                          <p className="text-xs text-[var(--color-text-tertiary)] mt-1">
+                            {new Date(entry.createdAt).toLocaleDateString()} • {entry.reason}
+                          </p>
+                        </div>
                       </div>
+                      <Badge variant={entry.accepted ? "success" : "error"}>
+                        {entry.accepted ? "Aceptada" : "Rechazada"}
+                      </Badge>
                     </div>
-                    <Badge
-                      variant={
-                        entry.decision === "accepted" ? "success" : "error"
-                      }
-                    >
-                      {entry.decision === "accepted" ? "Aceptada" : "Rechazada"}
-                    </Badge>
                   </div>
                 ))}
               </div>

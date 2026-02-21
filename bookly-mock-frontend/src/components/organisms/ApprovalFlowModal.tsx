@@ -17,11 +17,53 @@ import { Textarea } from "@/components/atoms/Textarea";
 import {
   type ApprovalFlowConfig,
 } from "@/types/entities/approval";
-import { Plus, Trash2, GitBranch, Clock } from "lucide-react";
+import { Plus, Trash2, GitBranch, Clock, ArrowRight, Zap } from "lucide-react";
 import * as React from "react";
 import { useForm, useFieldArray } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
+
+/**
+ * VisualPipeline - Componente interno para previsualizar el flujo
+ */
+const VisualPipeline = ({ 
+  steps, 
+  roles 
+}: { 
+  steps: Array<{ name: string; approverRoles: string[] }>; 
+  roles: Array<{ value: string; label: string }> 
+}) => {
+  return (
+    <div className="flex items-center gap-2 overflow-x-auto py-4 px-2 bg-[var(--color-bg-secondary)]/20 rounded-lg border border-dashed border-[var(--color-border-subtle)]">
+      {steps.length === 0 ? (
+        <p className="text-xs text-[var(--color-text-tertiary)] italic mx-auto">
+          No hay pasos configurados. El flujo será de auto-aprobación.
+        </p>
+      ) : (
+        steps.map((step, index) => (
+          <React.Fragment key={index}>
+            <div className="flex flex-col items-center gap-1 shrink-0">
+              <div className="flex h-10 w-10 items-center justify-center rounded-full bg-brand-primary-500 text-sm font-bold text-white shadow-sm">
+                {index + 1}
+              </div>
+              <span className="text-[10px] font-medium max-w-[80px] truncate text-center">
+                {step.name || `Paso ${index + 1}`}
+              </span>
+              <div className="flex flex-wrap gap-0.5 justify-center max-w-[100px]">
+                {step.approverRoles?.map((r: string) => (
+                  <div key={r} className="h-1.5 w-1.5 rounded-full bg-brand-secondary-400" title={roles.find(role => role.value === r)?.label || r} />
+                ))}
+              </div>
+            </div>
+            {index < steps.length - 1 && (
+              <ArrowRight className="h-4 w-4 text-[var(--color-text-tertiary)] shrink-0 mt-[-20px]" />
+            )}
+          </React.Fragment>
+        ))
+      )}
+    </div>
+  );
+};
 
 const stepSchema = z.object({
   name: z.string().min(3, "El nombre del paso es requerido"),
@@ -223,6 +265,86 @@ export function ApprovalFlowModal({
               {errors.resourceTypes && (
                 <p className="text-sm text-state-error-500">{errors.resourceTypes.message}</p>
               )}
+            </div>
+
+            {/* Previsualización del Flujo */}
+            <div className="space-y-3">
+              <Label className="text-sm font-semibold flex items-center gap-2">
+                Previsualización del Pipeline
+                <Badge variant="outline" className="text-[10px] font-normal px-1.5 h-4">En tiempo real</Badge>
+              </Label>
+              <VisualPipeline steps={watch("steps")} roles={ROLES} />
+            </div>
+
+            {/* Condiciones de Auto-Aprobación */}
+            <div className="rounded-xl border border-brand-primary-100 bg-brand-primary-50/10 p-4 space-y-4">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <Zap className="h-4 w-4 text-brand-primary-500" />
+                  <Label className="text-sm font-bold text-brand-primary-700">Condiciones de Auto-Aprobación</Label>
+                </div>
+                <Badge variant="outline" className="text-[10px]">Opcional</Badge>
+              </div>
+              
+              <p className="text-xs text-[var(--color-text-secondary)]">
+                Define criterios bajo los cuales las solicitudes se aprueban automáticamente sin intervención manual.
+              </p>
+
+              <div className="space-y-4 pt-2">
+                <div className="space-y-2">
+                  <Label className="text-xs">Roles exentos de aprobación</Label>
+                  <div className="flex flex-wrap gap-2">
+                    {ROLES.map((role) => (
+                      <div
+                        key={role.value}
+                        className="flex items-center space-x-2 rounded-md border border-[var(--color-border-subtle)] p-2 bg-[var(--color-bg-surface)]"
+                      >
+                        <Checkbox
+                          id={`auto-role-${role.value}`}
+                          checked={watch("autoApproveConditions.roleWhitelist")?.includes(role.value)}
+                          onCheckedChange={(checked) => {
+                            const current = watch("autoApproveConditions.roleWhitelist") || [];
+                            if (checked) {
+                              setValue("autoApproveConditions.roleWhitelist", [...current, role.value]);
+                            } else {
+                              setValue("autoApproveConditions.roleWhitelist", current.filter(r => r !== role.value));
+                            }
+                          }}
+                        />
+                        <Label
+                          htmlFor={`auto-role-${role.value}`}
+                          className="text-[10px] cursor-pointer"
+                        >
+                          {role.label}
+                        </Label>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="maxDuration" className="text-xs">Duración Máxima (min)</Label>
+                    <Input
+                      id="maxDuration"
+                      type="number"
+                      placeholder="Ej: 120"
+                      className="h-8 text-xs"
+                      {...register("autoApproveConditions.maxDurationMinutes", { valueAsNumber: true })}
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="maxAdvance" className="text-xs">Anticipación Máxima (días)</Label>
+                    <Input
+                      id="maxAdvance"
+                      type="number"
+                      placeholder="Ej: 7"
+                      className="h-8 text-xs"
+                      {...register("autoApproveConditions.maxAdvanceDays", { valueAsNumber: true })}
+                    />
+                  </div>
+                </div>
+              </div>
             </div>
 
             {/* Pasos de Aprobación */}
