@@ -13,6 +13,13 @@ import {
 import { Input } from "@/components/atoms/Input";
 // import { AppHeader } from "@/components/organisms/AppHeader";
 // import { AppSidebar } from "@/components/organisms/AppSidebar";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/atoms/Select";
 import { MainLayout } from "@/components/templates/MainLayout";
 import { useAuth } from "@/contexts/AuthContext";
 import {
@@ -538,32 +545,30 @@ export default function ProfilePage() {
                     />
                   </div>
 
-                  <div className="grid grid-cols-2 gap-4">
+                  <div className="grid gap-4 md:grid-cols-2">
                     <div>
                       <label className="block text-sm font-medium mb-2">
                         {t("document_type")}
                       </label>
-                      <select
-                        id="profile-document-type"
-                        name="documentType"
-                        title={t("document_type")}
-                        data-testid="profile-document-type-select"
+                      <Select
                         value={profileData.documentType}
-                        onChange={(e) =>
+                        onValueChange={(val) =>
                           setProfileData({
                             ...profileData,
-                            documentType: e.target.value,
+                            documentType: val,
                           })
                         }
-                        className="w-full px-3 py-2 border border-[var(--color-border-subtle)] rounded-md bg-[var(--color-bg-primary)] text-[var(--color-text-primary)]"
                       >
-                        <option value="CC">{t("document_types.cc")}</option>
-                        <option value="TI">{t("document_types.ti")}</option>
-                        <option value="CE">{t("document_types.ce")}</option>
-                        <option value="PASSPORT">
-                          {t("document_types.pa")}
-                        </option>
-                      </select>
+                        <SelectTrigger id="profile-document-type" data-testid="profile-document-type-select">
+                          <SelectValue placeholder={t("document_type")} />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="CC">{t("document_types.cc")}</SelectItem>
+                          <SelectItem value="TI">{t("document_types.ti")}</SelectItem>
+                          <SelectItem value="CE">{t("document_types.ce")}</SelectItem>
+                          <SelectItem value="PASSPORT">{t("document_types.pa")}</SelectItem>
+                        </SelectContent>
+                      </Select>
                     </div>
 
                     <div>
@@ -914,48 +919,53 @@ export default function ProfilePage() {
                   <label className="block text-sm font-medium mb-2">
                     {t("preferences_language")}
                   </label>
-                  <select
-                    id="profile-preferences-language"
-                    name="language"
-                    title={t("preferences_language")}
-                    className="w-full rounded-md border border-[var(--color-border-subtle)] bg-[var(--color-bg-surface)] px-3 py-2 text-[var(--color-text-primary)]"
-                    data-testid="preferences-language-select"
-                    onChange={(event) =>
+                  <Select
+                    value={preferencesData.language}
+                    onValueChange={(val) =>
                       setPreferencesData((prev) => ({
                         ...prev,
-                        language: event.target.value,
+                        language: val,
                       }))
                     }
-                    value={preferencesData.language}
                   >
-                    <option value="es">Español</option>
-                    <option value="en">English</option>
-                  </select>
+                    <SelectTrigger id="profile-preferences-language" data-testid="preferences-language-select">
+                      <SelectValue placeholder={t("preferences_language")} />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="es">Español</SelectItem>
+                      <SelectItem value="en">English</SelectItem>
+                    </SelectContent>
+                  </Select>
                 </div>
 
                 <div>
                   <label className="block text-sm font-medium mb-2">
                     {t("preferences_theme")}
                   </label>
-                  <select
-                    className="w-full rounded-md border border-[var(--color-border-subtle)] bg-[var(--color-bg-surface)] px-3 py-2 text-[var(--color-text-primary)]"
-                    data-testid="preferences-theme-select"
-                    onChange={(event) =>
+                  <Select
+                    value={preferencesData.theme}
+                    onValueChange={(val) =>
                       setPreferencesData((prev) => ({
                         ...prev,
-                        theme: event.target.value as UserPreferences["theme"],
+                        theme: val as UserPreferences["theme"],
                       }))
                     }
-                    value={preferencesData.theme}
                   >
-                    <option value="system">
-                      {t("preferences_theme_system")}
-                    </option>
-                    <option value="light">
-                      {t("preferences_theme_light")}
-                    </option>
-                    <option value="dark">{t("preferences_theme_dark")}</option>
-                  </select>
+                    <SelectTrigger id="profile-preferences-theme" data-testid="preferences-theme-select">
+                      <SelectValue placeholder={t("preferences_theme")} />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="system">
+                        {t("preferences_theme_system")}
+                      </SelectItem>
+                      <SelectItem value="light">
+                        {t("preferences_theme_light")}
+                      </SelectItem>
+                      <SelectItem value="dark">
+                        {t("preferences_theme_dark")}
+                      </SelectItem>
+                    </SelectContent>
+                  </Select>
                 </div>
               </div>
 

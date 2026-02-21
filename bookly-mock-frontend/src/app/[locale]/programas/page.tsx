@@ -9,7 +9,9 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/atoms/Card";
+import { Checkbox } from "@/components/atoms/Checkbox";
 import { Input } from "@/components/atoms/Input";
+import { Textarea } from "@/components/atoms/Textarea";
 import { DataTable } from "@/components/molecules/DataTable";
 import { MainLayout } from "@/components/templates/MainLayout";
 import { useCreateProgram, useUpdateProgram } from "@/hooks/mutations";
@@ -103,11 +105,11 @@ export default function ProgramasPage() {
 
   const handleSave = () => {
     if (modalMode === "create") {
-      createProgram.mutate(formData as any, {
+      createProgram.mutate(formData as Parameters<typeof createProgram.mutate>[0], {
         onSuccess: () => {
           setShowModal(false);
         },
-        onError: (err: any) => {
+        onError: (err: Error) => {
           console.error("Error creating program:", err);
         },
       });
@@ -117,13 +119,13 @@ export default function ProgramasPage() {
       updateProgram.mutate(
         {
           id: selectedProgram.id,
-          data: formData as any,
+          data: formData as Parameters<typeof updateProgram.mutate>[0]["data"],
         },
         {
           onSuccess: () => {
             setShowModal(false);
           },
-          onError: (err: any) => {
+          onError: (err: Error) => {
             console.error("Error updating program:", err);
           },
         },
@@ -135,10 +137,10 @@ export default function ProgramasPage() {
     updateProgram.mutate(
       {
         id: program.id,
-        data: { isActive: !program.isActive } as any,
+        data: { isActive: !program.isActive } as Parameters<typeof updateProgram.mutate>[0]["data"],
       },
       {
-        onError: (err: any) => {
+        onError: (err: Error) => {
           console.error("Error changing program status:", err);
         },
       },
@@ -350,7 +352,7 @@ export default function ProgramasPage() {
                     <label className="block text-sm font-medium text-[var(--color-text-primary)] mb-2">
                       {t("description_label")}
                     </label>
-                    <textarea
+                    <Textarea
                       value={formData.description}
                       onChange={(e) =>
                         setFormData({
@@ -359,7 +361,6 @@ export default function ProgramasPage() {
                         })
                       }
                       rows={3}
-                      className="w-full px-3 py-2 bg-background border border-[var(--color-border-subtle)] rounded-lg text-foreground placeholder:text-muted-foreground"
                     />
                   </div>
 
@@ -391,19 +392,21 @@ export default function ProgramasPage() {
                     </div>
                   </div>
 
-                  <label className="flex items-center gap-2">
-                    <input
-                      type="checkbox"
+                  <div className="flex items-center gap-2">
+                    <Checkbox
+                      id="isActive"
                       checked={formData.isActive}
-                      onChange={(e) =>
-                        setFormData({ ...formData, isActive: e.target.checked })
+                      onCheckedChange={(checked) =>
+                        setFormData({ ...formData, isActive: !!checked })
                       }
-                      className="w-4 h-4"
                     />
-                    <span className="text-sm text-[var(--color-text-primary)]">
+                    <label
+                      htmlFor="isActive"
+                      className="text-sm text-[var(--color-text-primary)] cursor-pointer"
+                    >
                       {t("is_active")}
-                    </span>
-                  </label>
+                    </label>
+                  </div>
 
                   <div className="flex justify-end gap-3 pt-4">
                     <Button

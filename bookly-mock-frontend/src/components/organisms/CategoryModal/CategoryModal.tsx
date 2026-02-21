@@ -9,7 +9,9 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/atoms/Card";
+import { Checkbox } from "@/components/atoms/Checkbox";
 import { Input } from "@/components/atoms/Input";
+import { Textarea } from "@/components/atoms/Textarea";
 import { ButtonWithLoading } from "@/components/molecules/ButtonWithLoading";
 import { Category } from "@/types/entities/resource";
 import * as React from "react";
@@ -181,24 +183,17 @@ export function CategoryModal({
               <label className="block text-sm font-medium text-[var(--color-text-primary)] mb-2">
                 Descripción
               </label>
-              <textarea
+              <Textarea
                 value={formData.description || ""}
                 onChange={(e) =>
                   setFormData({ ...formData, description: e.target.value })
                 }
                 placeholder="Descripción breve de la categoría..."
                 rows={3}
-                className={`w-full px-3 py-2 bg-background border rounded-lg text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring ${
-                  errors.description
-                    ? "border-red-500"
-                    : "border-[var(--color-border-subtle)]"
-                }`}
+                error={errors.description}
                 data-testid="category-description-input"
               />
               <div className="flex items-center justify-between mt-1">
-                {errors.description && (
-                  <p className="text-xs text-red-500">{errors.description}</p>
-                )}
                 <p className="text-xs text-[var(--color-text-tertiary)] ml-auto">
                   {formData.description?.length || 0}/200
                 </p>
@@ -287,24 +282,21 @@ export function CategoryModal({
             </div>
 
             {/* Estado */}
-            <div>
-              <label className="flex items-center gap-3 cursor-pointer">
-                <input
-                  type="checkbox"
-                  checked={formData.isActive ?? true}
-                  onChange={(e) =>
-                    setFormData({ ...formData, isActive: e.target.checked })
-                  }
-                  className="w-5 h-5 rounded border-[var(--color-border-subtle)] bg-background checked:bg-brand-primary-500"
-                />
-                <div>
-                  <p className="text-sm font-medium text-[var(--color-text-primary)]">
-                    Categoría activa
-                  </p>
-                  <p className="text-xs text-[var(--color-text-tertiary)]">
-                    Las categorías inactivas no se mostrarán en los formularios
-                  </p>
-                </div>
+            <div className="flex items-center gap-3">
+              <Checkbox
+                id="isActive"
+                checked={formData.isActive ?? true}
+                onCheckedChange={(checked) =>
+                  setFormData({ ...formData, isActive: !!checked })
+                }
+              />
+              <label htmlFor="isActive" className="cursor-pointer">
+                <p className="text-sm font-medium text-[var(--color-text-primary)]">
+                  Categoría activa
+                </p>
+                <p className="text-xs text-[var(--color-text-tertiary)]">
+                  Las categorías inactivas no se mostrarán en los formularios
+                </p>
               </label>
             </div>
 

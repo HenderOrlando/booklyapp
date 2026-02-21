@@ -1,8 +1,10 @@
 "use client";
 
-import { Badge } from "@/components/atoms/Badge/Badge";
-import { Button } from "@/components/atoms/Button/Button";
-import { Card } from "@/components/atoms/Card/Card";
+import { Badge } from "@/components/atoms/Badge";
+import { Button } from "@/components/atoms/Button";
+import { Card, CardContent } from "@/components/atoms/Card";
+import { Checkbox } from "@/components/atoms/Checkbox";
+import { TimeInput } from "@/components/atoms/TimeInput";
 import { MainLayout } from "@/components/templates/MainLayout";
 import {
   useGlobalSchedules,
@@ -106,123 +108,102 @@ export default function HorariosPage() {
 
         {/* Schedule Grid */}
         <Card className="overflow-hidden">
-          <div className="overflow-x-auto">
-            <table className="w-full text-sm">
-              <thead>
-                <tr className="border-b bg-[var(--color-bg-muted)]">
-                  <th className="px-4 py-3 text-left font-medium text-[var(--color-text-secondary)]">
-                    Día
-                  </th>
-                  <th className="px-4 py-3 text-center font-medium text-[var(--color-text-secondary)]">
-                    Estado
-                  </th>
-                  <th className="px-4 py-3 text-center font-medium text-[var(--color-text-secondary)]">
-                    Hora inicio
-                  </th>
-                  <th className="px-4 py-3 text-center font-medium text-[var(--color-text-secondary)]">
-                    Hora fin
-                  </th>
-                  <th className="px-4 py-3 text-center font-medium text-[var(--color-text-secondary)]">
-                    Duración
-                  </th>
-                </tr>
-              </thead>
-              <tbody>
-                {slots.map((slot) => {
-                  const startH = parseInt(slot.startTime.split(":")[0]);
-                  const endH = parseInt(slot.endTime.split(":")[0]);
-                  const duration = endH - startH;
+          <CardContent className="p-0">
+            <div className="overflow-x-auto">
+              <table className="w-full text-sm">
+                <thead>
+                  <tr className="border-b bg-[var(--color-bg-muted)]">
+                    <th className="px-4 py-3 text-left font-medium text-[var(--color-text-secondary)]">
+                      Día
+                    </th>
+                    <th className="px-4 py-3 text-center font-medium text-[var(--color-text-secondary)]">
+                      Estado
+                    </th>
+                    <th className="px-4 py-3 text-center font-medium text-[var(--color-text-secondary)]">
+                      Hora inicio
+                    </th>
+                    <th className="px-4 py-3 text-center font-medium text-[var(--color-text-secondary)]">
+                      Hora fin
+                    </th>
+                    <th className="px-4 py-3 text-center font-medium text-[var(--color-text-secondary)]">
+                      Duración
+                    </th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {slots.map((slot) => {
+                    const startH = parseInt(slot.startTime.split(":")[0]);
+                    const endH = parseInt(slot.endTime.split(":")[0]);
+                    const duration = endH - startH;
 
-                  return (
-                    <tr
-                      key={slot.id}
-                      className={cn(
-                        "border-b last:border-0",
-                        !slot.enabled && "opacity-50",
-                      )}
-                    >
-                      <td className="px-4 py-3">
-                        <div className="flex items-center gap-2">
-                          <Clock className="h-4 w-4 text-[var(--color-text-tertiary)]" />
-                          <span className="font-medium text-[var(--color-text-primary)]">
-                            {DAYS[slot.dayOfWeek]}
-                          </span>
-                        </div>
-                      </td>
-                      <td className="px-4 py-3 text-center">
-                        <button
-                          type="button"
-                          role="switch"
-                          aria-checked={slot.enabled}
-                          onClick={() => toggleDay(slot.dayOfWeek)}
-                          className={cn(
-                            "relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors",
-                            slot.enabled
-                              ? "bg-brand-primary-500"
-                              : "bg-[var(--color-bg-muted)]",
-                          )}
-                        >
-                          <span
-                            className={cn(
-                              "pointer-events-none inline-block h-5 w-5 transform rounded-full bg-[var(--color-bg-primary)] shadow transition-transform",
-                              slot.enabled ? "translate-x-5" : "translate-x-0",
-                            )}
-                          />
-                        </button>
-                      </td>
-                      <td className="px-4 py-3 text-center">
-                        <input
-                          type="time"
-                          value={slot.startTime}
-                          onChange={(e) =>
-                            updateSlot(
-                              slot.dayOfWeek,
-                              "startTime",
-                              e.target.value,
-                            )
-                          }
-                          disabled={!slot.enabled}
-                          className="rounded-md border bg-background px-2 py-1 text-sm disabled:opacity-50"
-                        />
-                      </td>
-                      <td className="px-4 py-3 text-center">
-                        <input
-                          type="time"
-                          value={slot.endTime}
-                          onChange={(e) =>
-                            updateSlot(
-                              slot.dayOfWeek,
-                              "endTime",
-                              e.target.value,
-                            )
-                          }
-                          disabled={!slot.enabled}
-                          className="rounded-md border bg-background px-2 py-1 text-sm disabled:opacity-50"
-                        />
-                      </td>
-                      <td className="px-4 py-3 text-center">
-                        {slot.enabled ? (
-                          <Badge
-                            variant={
-                              duration >= 12
-                                ? "success"
-                                : duration >= 6
-                                  ? "primary"
-                                  : "warning"
-                            }
-                          >
-                            {duration}h
-                          </Badge>
-                        ) : (
-                          <Badge>Cerrado</Badge>
+                    return (
+                      <tr
+                        key={slot.id}
+                        className={cn(
+                          "border-b last:border-0",
+                          !slot.enabled && "opacity-50",
                         )}
-                      </td>
-                    </tr>
-                  );
-                })}
-              </tbody>
-            </table>
-          </div>
+                      >
+                        <td className="px-4 py-3">
+                          <div className="flex items-center gap-2">
+                            <Clock className="h-4 w-4 text-[var(--color-text-tertiary)]" />
+                            <span className="font-medium text-[var(--color-text-primary)]">
+                              {DAYS[slot.dayOfWeek]}
+                            </span>
+                          </div>
+                        </td>
+                        <td className="px-4 py-3">
+                          <div className="flex justify-center">
+                            <Checkbox
+                              checked={slot.enabled}
+                              onCheckedChange={() => toggleDay(slot.dayOfWeek)}
+                            />
+                          </div>
+                        </td>
+                        <td className="px-4 py-3 text-center">
+                          <TimeInput
+                            value={slot.startTime}
+                            onChange={(val) =>
+                              updateSlot(slot.dayOfWeek, "startTime", val)
+                            }
+                            disabled={!slot.enabled}
+                            className="w-32 mx-auto"
+                          />
+                        </td>
+                        <td className="px-4 py-3 text-center">
+                          <TimeInput
+                            value={slot.endTime}
+                            onChange={(val) =>
+                              updateSlot(slot.dayOfWeek, "endTime", val)
+                            }
+                            disabled={!slot.enabled}
+                            className="w-32 mx-auto"
+                          />
+                        </td>
+                        <td className="px-4 py-3 text-center">
+                          {slot.enabled ? (
+                            <Badge
+                              variant={
+                                duration >= 12
+                                  ? "success"
+                                  : duration >= 6
+                                    ? "primary"
+                                    : "warning"
+                              }
+                            >
+                              {duration}h
+                            </Badge>
+                          ) : (
+                            <Badge>Cerrado</Badge>
+                          )}
+                        </td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </div>
+          </CardContent>
         </Card>
 
         {/* Holidays / Blocked dates info */}

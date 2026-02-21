@@ -10,6 +10,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/atoms/Card";
+import { Checkbox } from "@/components/atoms/Checkbox";
 import { Input } from "@/components/atoms/Input";
 import {
   Select,
@@ -984,42 +985,46 @@ export default function EditResourcePage() {
                   <CardTitle>Reglas de Disponibilidad</CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-4">
-                  <label className="flex items-center gap-3 p-3 bg-[var(--color-bg-primary)] rounded-lg cursor-pointer">
-                    <input
-                      type="checkbox"
+                  <div className="flex items-center gap-3 p-3 bg-[var(--color-bg-primary)] rounded-lg">
+                    <Checkbox
+                      id="requiresApproval"
                       checked={
                         formData.availabilityRules?.requiresApproval || false
                       }
-                      onChange={(e) =>
+                      onCheckedChange={(checked) =>
                         handleAvailabilityRuleChange(
                           "requiresApproval",
-                          e.target.checked,
+                          !!checked,
                         )
                       }
-                      className="rounded w-4 h-4"
                     />
-                    <span className="text-sm font-medium">
+                    <label
+                      htmlFor="requiresApproval"
+                      className="text-sm font-medium cursor-pointer"
+                    >
                       Requiere Aprobación
-                    </span>
-                  </label>
-                  <label className="flex items-center gap-3 p-3 bg-[var(--color-bg-primary)] rounded-lg cursor-pointer">
-                    <input
-                      type="checkbox"
+                    </label>
+                  </div>
+                  <div className="flex items-center gap-3 p-3 bg-[var(--color-bg-primary)] rounded-lg">
+                    <Checkbox
+                      id="allowRecurring"
                       checked={
                         formData.availabilityRules?.allowRecurring || false
                       }
-                      onChange={(e) =>
+                      onCheckedChange={(checked) =>
                         handleAvailabilityRuleChange(
                           "allowRecurring",
-                          e.target.checked,
+                          !!checked,
                         )
                       }
-                      className="rounded w-4 h-4"
                     />
-                    <span className="text-sm font-medium">
+                    <label
+                      htmlFor="allowRecurring"
+                      className="text-sm font-medium cursor-pointer"
+                    >
                       Permitir Reservas Recurrentes
-                    </span>
-                  </label>
+                    </label>
+                  </div>
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                     <div>
                       <label className="block text-sm font-medium mb-2">
@@ -1123,28 +1128,30 @@ export default function EditResourcePage() {
                   />
                   <div className="space-y-2 max-h-[400px] overflow-y-auto">
                     {filteredPrograms.map((p) => (
-                      <label
+                      <div
                         key={p.id}
-                        className="flex items-center justify-between p-4 bg-[var(--color-bg-primary)]/50 rounded-lg cursor-pointer hover:bg-[var(--color-bg-primary)]"
+                        className="flex items-center justify-between p-4 bg-[var(--color-bg-primary)]/50 rounded-lg hover:bg-[var(--color-bg-primary)] transition-colors"
                       >
                         <div className="flex items-center gap-3">
-                          <input
-                            type="checkbox"
+                          <Checkbox
+                            id={`program-${p.id}`}
                             checked={selectedPrograms.includes(p.id)}
-                            onChange={() => handleProgramToggle(p.id)}
-                            className="w-5 h-5 rounded"
+                            onCheckedChange={() => handleProgramToggle(p.id)}
                           />
-                          <div>
+                          <label
+                            htmlFor={`program-${p.id}`}
+                            className="cursor-pointer"
+                          >
                             <p className="font-medium">{p.name}</p>
                             <p className="text-sm text-[var(--color-text-tertiary)]">
                               {p.code}
                             </p>
-                          </div>
+                          </label>
                         </div>
                         {selectedPrograms.includes(p.id) && (
                           <Badge variant="success">Seleccionado</Badge>
                         )}
-                      </label>
+                      </div>
                     ))}
                   </div>
                 </CardContent>

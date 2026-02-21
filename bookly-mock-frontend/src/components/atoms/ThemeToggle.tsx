@@ -51,13 +51,9 @@ export function ThemeToggle({
       onClick={toggleTheme}
       className={cn(
         "relative inline-flex h-7 w-14 items-center rounded-full border border-[var(--color-border-subtle)] transition-colors focus:outline-none focus:ring-2 focus:ring-[var(--color-border-focus)] focus:ring-offset-2",
+        isDark ? "bg-[var(--color-bg-primary)]" : "bg-[var(--color-border-strong)]",
         className,
       )}
-      style={{
-        backgroundColor: isDark
-          ? "var(--color-bg-primary)"
-          : "var(--color-border-strong)",
-      }}
       data-testid={testId}
       aria-label={`Cambiar a tema ${isDark ? "claro" : "oscuro"}`}
       aria-pressed={isDark}

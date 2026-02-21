@@ -3,6 +3,14 @@
 import { ApprovalStatusBadge } from "@/components/atoms/ApprovalStatusBadge";
 import { Badge } from "@/components/atoms/Badge";
 import { Button } from "@/components/atoms/Button";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/atoms/Select";
+import { Input } from "@/components/atoms/Input";
 import { ApprovalTimeline } from "@/components/molecules/ApprovalTimeline";
 import { MainLayout } from "@/components/templates/MainLayout";
 import type { ApprovalRequest } from "@/types/entities/approval";
@@ -212,25 +220,28 @@ export default function HistorialAprobacionesPage() {
         <div className="flex flex-col sm:flex-row gap-3">
           <div className="flex-1 relative">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-[var(--color-text-tertiary)]" />
-            <input
+            <Input
               type="text"
               placeholder={t("search_history_placeholder")}
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-10 pr-4 py-2 border border-[var(--color-border-strong)] rounded-lg bg-[var(--color-bg-surface)] text-[var(--color-text-primary)]"
+              className="pl-10"
             />
           </div>
-          <select
-            value={filterStatus}
-            onChange={(e) => setFilterStatus(e.target.value)}
-            className="px-4 py-2 border border-[var(--color-border-strong)] rounded-lg bg-[var(--color-bg-surface)] text-[var(--color-text-primary)]"
-          >
-            <option value="all">{t("all_statuses")}</option>
-            <option value="APPROVED">{t("status.approved")}</option>
-            <option value="REJECTED">{t("status.rejected")}</option>
-            <option value="CANCELLED">{t("status.cancelled")}</option>
-            <option value="EXPIRED">{t("status_expired")}</option>
-          </select>
+          <div className="w-full sm:w-64">
+            <Select value={filterStatus} onValueChange={setFilterStatus}>
+              <SelectTrigger>
+                <SelectValue placeholder={t("all_statuses")} />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">{t("all_statuses")}</SelectItem>
+                <SelectItem value="APPROVED">{t("status.approved")}</SelectItem>
+                <SelectItem value="REJECTED">{t("status.rejected")}</SelectItem>
+                <SelectItem value="CANCELLED">{t("status.cancelled")}</SelectItem>
+                <SelectItem value="EXPIRED">{t("status_expired")}</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
         </div>
 
         {/* Lista de historial */}

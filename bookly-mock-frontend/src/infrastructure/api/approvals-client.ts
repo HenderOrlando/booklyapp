@@ -40,6 +40,7 @@ export interface CreateApprovalFlowDto {
     order: number;
     isRequired: boolean;
     allowParallel: boolean;
+    timeoutHours?: number;
   }>;
   autoApproveConditions?: Record<string, unknown>;
 }

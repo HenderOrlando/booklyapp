@@ -9,7 +9,15 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/atoms/Card";
+import { Checkbox } from "@/components/atoms/Checkbox";
 import { Input } from "@/components/atoms/Input";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/atoms/Select";
 import { AppHeader } from "@/components/organisms/AppHeader";
 import { AppSidebar } from "@/components/organisms/AppSidebar";
 import { MainLayout } from "@/components/templates/MainLayout";
@@ -38,7 +46,9 @@ import {
   Settings,
   Shield,
   Undo2,
+  X,
 } from "lucide-react";
+import Image from "next/image";
 import * as React from "react";
 
 type ConfigTab = "general" | "auth" | "theme" | "features" | "storage";
@@ -101,59 +111,27 @@ function ThemeReloadSplash() {
   );
 }
 
-function ToggleSwitch({
-  checked,
-  onChange,
-  disabled,
-  label,
-}: {
-  checked: boolean;
-  onChange: (value: boolean) => void;
-  disabled?: boolean;
-  label: string;
-}) {
-  return (
-    <button
-      type="button"
-      role="switch"
-      aria-checked={checked}
-      aria-label={label}
-      disabled={disabled}
-      onClick={() => onChange(!checked)}
-      className={cn(
-        "relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors disabled:opacity-50 disabled:cursor-not-allowed",
-        checked ? "bg-brand-primary-500" : "bg-[var(--color-bg-muted)]",
-      )}
-    >
-      <span
-        className={cn(
-          "pointer-events-none inline-block h-5 w-5 transform rounded-full bg-[var(--color-bg-primary)] shadow transition-transform",
-          checked ? "translate-x-5" : "translate-x-0",
-        )}
-      />
-    </button>
-  );
-}
-
 function SettingRow({
   title,
   description,
   children,
+  id,
 }: {
   title: string;
   description?: string;
   children: React.ReactNode;
+  id?: string;
 }) {
   return (
     <div className="flex items-center justify-between rounded-lg border border-[var(--color-border-subtle)] p-4">
-      <div className="flex-1 mr-4">
+      <label htmlFor={id} className="flex-1 mr-4 cursor-pointer">
         <p className="font-medium text-[var(--color-text-primary)]">{title}</p>
         {description && (
           <p className="text-xs text-[var(--color-text-secondary)] mt-0.5">
             {description}
           </p>
         )}
-      </div>
+      </label>
       <div className="shrink-0">{children}</div>
     </div>
   );
@@ -459,14 +437,18 @@ function GeneralTab({
               <label className="text-sm font-medium text-[var(--color-text-primary)]">
                 Idioma predeterminado
               </label>
-              <select
+              <Select
                 value={config.defaultLocale}
-                onChange={(e) => updateField("defaultLocale", e.target.value)}
-                className="flex h-10 w-full rounded-md border border-[var(--color-border-subtle)] bg-[var(--color-bg-surface)] px-3 py-2 text-sm text-[var(--color-text-primary)]"
+                onValueChange={(val) => updateField("defaultLocale", val)}
               >
-                <option value="es">Español</option>
-                <option value="en">English</option>
-              </select>
+                <SelectTrigger>
+                  <SelectValue placeholder="Seleccionar idioma" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="es">Español</SelectItem>
+                  <SelectItem value="en">English</SelectItem>
+                </SelectContent>
+              </Select>
             </div>
           </div>
         </CardContent>
@@ -482,13 +464,14 @@ function GeneralTab({
         </CardHeader>
         <CardContent>
           <SettingRow
+            id="maintenanceMode"
             title="Activar modo mantenimiento"
             description="Los usuarios verán un mensaje de mantenimiento y no podrán acceder"
           >
-            <ToggleSwitch
+            <Checkbox
+              id="maintenanceMode"
               checked={config.maintenanceMode}
-              onChange={(val) => updateField("maintenanceMode", val)}
-              label="Modo mantenimiento"
+              onCheckedChange={(val) => updateField("maintenanceMode", !!val)}
             />
           </SettingRow>
         </CardContent>
@@ -527,35 +510,38 @@ function AuthTab({
         </CardHeader>
         <CardContent className="space-y-3">
           <SettingRow
+            id="registrationEnabled"
             title="Registro abierto"
             description="Permite que nuevos usuarios se registren en la plataforma"
           >
-            <ToggleSwitch
+            <Checkbox
+              id="registrationEnabled"
               checked={config.registrationEnabled}
-              onChange={(val) => updateField("registrationEnabled", val)}
-              label="Registro abierto"
+              onCheckedChange={(val) => updateField("registrationEnabled", !!val)}
             />
           </SettingRow>
 
           <SettingRow
+            id="corporateAuthEnabled"
             title="Autenticación corporativa (SSO)"
             description="Permite inicio de sesión con cuentas institucionales (Google OAuth)"
           >
-            <ToggleSwitch
+            <Checkbox
+              id="corporateAuthEnabled"
               checked={config.corporateAuthEnabled}
-              onChange={(val) => updateField("corporateAuthEnabled", val)}
-              label="Autenticación corporativa"
+              onCheckedChange={(val) => updateField("corporateAuthEnabled", !!val)}
             />
           </SettingRow>
 
           <SettingRow
+            id="autoRegisterOnSSO"
             title="Auto-registro en SSO"
             description="Crea automáticamente la cuenta al iniciar sesión por primera vez con SSO"
           >
-            <ToggleSwitch
+            <Checkbox
+              id="autoRegisterOnSSO"
               checked={config.autoRegisterOnSSO}
-              onChange={(val) => updateField("autoRegisterOnSSO", val)}
-              label="Auto-registro en SSO"
+              onCheckedChange={(val) => updateField("autoRegisterOnSSO", !!val)}
             />
           </SettingRow>
         </CardContent>
@@ -593,31 +579,20 @@ function AuthTab({
 
           <div className="flex flex-wrap gap-2">
             {config.allowedDomains.map((domain) => (
-              <span
+              <Badge
                 key={domain}
-                className="inline-flex items-center gap-1.5 rounded-full bg-brand-primary-100 px-3 py-1 text-sm text-brand-primary-700"
+                variant="primary"
+                className="gap-1.5 px-3 py-1 text-sm"
               >
                 @{domain}
                 <button
                   onClick={() => removeDomain(domain)}
-                  className="rounded-full p-0.5 hover:bg-brand-primary-200 transition-colors"
+                  className="rounded-full hover:bg-white/20 transition-colors p-0.5"
                   aria-label={`Eliminar dominio ${domain}`}
                 >
-                  <svg
-                    className="h-3 w-3"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M6 18L18 6M6 6l12 12"
-                    />
-                  </svg>
+                  <X className="h-3 w-3" />
                 </button>
-              </span>
+              </Badge>
             ))}
             {config.allowedDomains.length === 0 && (
               <p className="text-sm text-[var(--color-text-secondary)]">
@@ -797,27 +772,29 @@ function ThemeTab({
               {config.logoLightUrl && (
                 <div className="rounded-lg border border-[var(--color-border-subtle)] p-3 bg-white">
                   <p className="text-[10px] text-gray-400 mb-1">Light</p>
-                  <img
-                    src={config.logoLightUrl}
-                    alt="Logo light"
-                    className="h-8 max-w-[120px] object-contain"
-                    onError={(e) => {
-                      (e.target as HTMLImageElement).style.display = "none";
-                    }}
-                  />
+                  <div className="relative h-8 w-32">
+                    <Image
+                      src={config.logoLightUrl}
+                      alt="Logo light"
+                      fill
+                      className="object-contain"
+                      unoptimized={config.logoLightUrl.startsWith("http")}
+                    />
+                  </div>
                 </div>
               )}
               {config.logoDarkUrl && (
                 <div className="rounded-lg border border-[var(--color-border-subtle)] p-3 bg-slate-800">
                   <p className="text-[10px] text-slate-400 mb-1">Dark</p>
-                  <img
-                    src={config.logoDarkUrl}
-                    alt="Logo dark"
-                    className="h-8 max-w-[120px] object-contain"
-                    onError={(e) => {
-                      (e.target as HTMLImageElement).style.display = "none";
-                    }}
-                  />
+                  <div className="relative h-8 w-32">
+                    <Image
+                      src={config.logoDarkUrl}
+                      alt="Logo dark"
+                      fill
+                      className="object-contain"
+                      unoptimized={config.logoDarkUrl.startsWith("http")}
+                    />
+                  </div>
                 </div>
               )}
             </div>
@@ -853,24 +830,26 @@ function FeaturesTab({
       </CardHeader>
       <CardContent className="space-y-3">
         <SettingRow
+          id="enableNotifications"
           title="Notificaciones"
           description="Habilita el envío de notificaciones por email, push y WhatsApp"
         >
-          <ToggleSwitch
+          <Checkbox
+            id="enableNotifications"
             checked={config.features.enableNotifications}
-            onChange={(val) => updateFeature("enableNotifications", val)}
-            label="Notificaciones"
+            onCheckedChange={(val) => updateFeature("enableNotifications", !!val)}
           />
         </SettingRow>
 
         <SettingRow
+          id="enableRealtime"
           title="Tiempo real (WebSocket)"
           description="Habilita actualizaciones en tiempo real mediante WebSocket"
         >
-          <ToggleSwitch
+          <Checkbox
+            id="enableRealtime"
             checked={config.features.enableRealtime}
-            onChange={(val) => updateFeature("enableRealtime", val)}
-            label="Tiempo real"
+            onCheckedChange={(val) => updateFeature("enableRealtime", !!val)}
           />
         </SettingRow>
       </CardContent>

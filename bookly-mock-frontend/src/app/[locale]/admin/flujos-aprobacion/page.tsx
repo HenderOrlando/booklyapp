@@ -51,30 +51,7 @@ import * as React from "react";
  * Backend: GET/POST /approval-flows (stockpile-service)
  */
 
-interface AutoApproveConditions {
-  roleWhitelist: string[];
-  maxDurationMinutes: number;
-  maxAdvanceDays: number;
-}
-
-interface ApprovalStep {
-  order: number;
-  approverRole: string;
-  description: string;
-  timeoutHours: number;
-  autoApproveIfTimeout: boolean;
-}
-
-interface ApprovalFlow {
-  id: string;
-  name: string;
-  description: string;
-  resourceTypes: string[];
-  steps: ApprovalStep[];
-  autoApproveConditions: AutoApproveConditions;
-  isActive: boolean;
-  createdAt: string;
-}
+// Remove local interfaces that conflict with global types
 
 const _mockFlows: ApprovalFlow[] = [
   {
@@ -364,11 +341,10 @@ export default function FlujosAprobacionPage() {
         ) : (
           <div className="space-y-4">
             {flows.map((flow) => {
-              const isExpanded = expandedFlow === flow.id;
-              const autoApprove = flow.autoApproveConditions as unknown as AutoApproveConditions;
-              const hasAutoApprove =
-                autoApprove && 
-                autoApprove.roleWhitelist?.length > 0;
+                              const autoApprove = flow.autoApproveConditions as any;
+                              const hasAutoApprove =
+                                autoApprove && 
+                                (autoApprove.roleWhitelist?.length > 0 || autoApprove.roles?.length > 0);
 
               return (
                 <Card
@@ -470,26 +446,26 @@ export default function FlujosAprobacionPage() {
                           <div className="grid grid-cols-1 md:grid-cols-3 gap-2 text-sm text-[var(--color-text-secondary)]">
                             <div>
                               <span className="font-medium">Roles:</span>{" "}
-                              {(flow.autoApproveConditions as unknown as AutoApproveConditions).roleWhitelist
+                              {((flow.autoApproveConditions as any).roleWhitelist || (flow.autoApproveConditions as any).roles)
                                 ?.map((r: string) => roleLabels[r] || r)
                                 .join(", ")}
                             </div>
-                            {(flow.autoApproveConditions as unknown as AutoApproveConditions).maxDurationMinutes >
+                            {(flow.autoApproveConditions as any).maxDurationMinutes >
                               0 && (
                               <div>
                                 <span className="font-medium">
                                   Duración máx:
                                 </span>{" "}
-                                {(flow.autoApproveConditions as unknown as AutoApproveConditions).maxDurationMinutes}{" "}
+                                {(flow.autoApproveConditions as any).maxDurationMinutes}{" "}
                                 min
                               </div>
                             )}
-                            {(flow.autoApproveConditions as unknown as AutoApproveConditions).maxAdvanceDays > 0 && (
+                            {(flow.autoApproveConditions as any).maxAdvanceDays > 0 && (
                               <div>
                                 <span className="font-medium">
                                   Anticipación máx:
                                 </span>{" "}
-                                {(flow.autoApproveConditions as unknown as AutoApproveConditions).maxAdvanceDays} días
+                                {(flow.autoApproveConditions as any).maxAdvanceDays} días
                               </div>
                             )}
                           </div>
@@ -511,7 +487,7 @@ export default function FlujosAprobacionPage() {
                                   </div>
                                   <div className="flex-1">
                                     <p className="text-sm font-medium text-[var(--color-text-primary)]">
-                                      {step.description}
+                                      {step.name}
                                     </p>
                                     <div className="mt-1 flex items-center gap-3 text-xs text-[var(--color-text-tertiary)]">
                                       <div className="flex items-center gap-1">

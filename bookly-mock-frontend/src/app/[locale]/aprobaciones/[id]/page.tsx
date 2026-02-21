@@ -1,6 +1,8 @@
 "use client";
 
 import { Button } from "@/components/atoms/Button";
+import { Card, CardContent } from "@/components/atoms/Card";
+import { Textarea } from "@/components/atoms/Textarea";
 import { ApprovalTimeline } from "@/components/molecules/ApprovalTimeline";
 import { LoadingState } from "@/components/molecules/LoadingState";
 import { MainLayout } from "@/components/templates/MainLayout";
@@ -185,229 +187,243 @@ export default function ApprovalDetailPage() {
             <span
               className={`px-3 py-1 rounded-full text-sm font-medium ${getStatusColor(request.status)}`}
             >
-              {t(`status.${request.status?.toLowerCase() as any}`)}
+              {t(`status.${String(request.status).toLowerCase() as "pending" | "approved" | "rejected" | "in_review" | "cancelled"}`)}
             </span>
             <span
               className={`px-3 py-1 rounded-full text-sm font-medium ${getPriorityColor(request.priority)}`}
             >
-              {t(`priority.${request.priority?.toLowerCase() as any}`)}
+              {t(`priority.${String(request.priority).toLowerCase() as "urgent" | "high" | "normal" | "low"}`)}
             </span>
           </div>
         </div>
 
         {/* Main Info Card */}
-        <div className="bg-[var(--color-bg-primary)] dark:bg-[var(--color-bg-secondary)] rounded-lg border border-[var(--color-border-primary)] dark:border-[var(--color-border-primary)] p-6">
-          <h2 className="text-xl font-semibold text-[var(--color-text-primary)] dark:text-[var(--color-text-primary)] mb-4">
-            {t("request_information")}
-          </h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {/* Solicitante */}
-            <div className="flex gap-3">
-              <User className="h-5 w-5 text-[var(--color-text-tertiary)] mt-1" />
-              <div>
-                <p className="text-sm text-[var(--color-text-secondary)] dark:text-[var(--color-text-tertiary)]">
-                  {t("requester")}
-                </p>
-                <p className="font-medium text-[var(--color-text-primary)] dark:text-[var(--color-text-primary)]">
-                  {request.userName}
-                </p>
-                <p className="text-sm text-[var(--color-text-secondary)] dark:text-[var(--color-text-tertiary)]">
-                  {request.userEmail}
-                </p>
-                <p className="text-sm text-[var(--color-text-tertiary)] dark:text-[var(--color-text-tertiary)]">
-                  {request.userRole}
-                </p>
-              </div>
-            </div>
-
-            {/* Recurso */}
-            <div className="flex gap-3">
-              <MapPin className="h-5 w-5 text-[var(--color-text-tertiary)] mt-1" />
-              <div>
-                <p className="text-sm text-[var(--color-text-secondary)] dark:text-[var(--color-text-tertiary)]">
-                  {t("resource")}
-                </p>
-                <p className="font-medium text-[var(--color-text-primary)] dark:text-[var(--color-text-primary)]">
-                  {request.resourceName}
-                </p>
-                <p className="text-sm text-[var(--color-text-secondary)] dark:text-[var(--color-text-tertiary)]">
-                  {request.resourceType} - {request.categoryName}
-                </p>
-              </div>
-            </div>
-
-            {/* Fecha y Hora */}
-            <div className="flex gap-3">
-              <Calendar className="h-5 w-5 text-[var(--color-text-tertiary)] mt-1" />
-              <div>
-                <p className="text-sm text-[var(--color-text-secondary)] dark:text-[var(--color-text-tertiary)]">
-                  {t("schedule")}
-                </p>
-                <p className="font-medium text-[var(--color-text-primary)] dark:text-[var(--color-text-primary)]">
-                  {new Date(request.startDate).toLocaleDateString()}
-                </p>
-                <p className="text-sm text-[var(--color-text-secondary)] dark:text-[var(--color-text-tertiary)]">
-                  {new Date(request.startDate).toLocaleTimeString()} -{" "}
-                  {new Date(request.endDate).toLocaleTimeString()}
-                </p>
-              </div>
-            </div>
-
-            {/* Asistentes */}
-            <div className="flex gap-3">
-              <Users className="h-5 w-5 text-[var(--color-text-tertiary)] mt-1" />
-              <div>
-                <p className="text-sm text-[var(--color-text-secondary)] dark:text-[var(--color-text-tertiary)]">
-                  {t("attendees")}
-                </p>
-                <p className="font-medium text-[var(--color-text-primary)] dark:text-[var(--color-text-primary)]">
-                  {request.attendees || 0} {t("people")}
-                </p>
-              </div>
-            </div>
-          </div>
-
-          {/* Propósito */}
-          {request.purpose && (
-            <div className="mt-6 pt-6 border-t border-[var(--color-border-primary)] dark:border-[var(--color-border-primary)]">
+        <Card className="bg-[var(--color-bg-primary)] border-[var(--color-border-primary)]">
+          <CardContent className="pt-6">
+            <h2 className="text-xl font-semibold text-[var(--color-text-primary)] mb-4">
+              {t("request_information")}
+            </h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              {/* Solicitante */}
               <div className="flex gap-3">
-                <FileText className="h-5 w-5 text-[var(--color-text-tertiary)] mt-1" />
-                <div className="flex-1">
-                  <p className="text-sm text-[var(--color-text-secondary)] dark:text-[var(--color-text-tertiary)] mb-2">
-                    {t("purpose")}
+                <User className="h-5 w-5 text-[var(--color-text-tertiary)] mt-1" />
+                <div>
+                  <p className="text-sm text-[var(--color-text-secondary)]">
+                    {t("requester")}
                   </p>
-                  <p className="text-[var(--color-text-primary)] dark:text-[var(--color-text-primary)]">
-                    {request.purpose}
+                  <p className="font-medium text-[var(--color-text-primary)]">
+                    {request.userName}
+                  </p>
+                  <p className="text-sm text-[var(--color-text-secondary)]">
+                    {request.userEmail}
+                  </p>
+                  <p className="text-sm text-[var(--color-text-tertiary)]">
+                    {request.userRole}
+                  </p>
+                </div>
+              </div>
+
+              {/* Recurso */}
+              <div className="flex gap-3">
+                <MapPin className="h-5 w-5 text-[var(--color-text-tertiary)] mt-1" />
+                <div>
+                  <p className="text-sm text-[var(--color-text-secondary)]">
+                    {t("resource")}
+                  </p>
+                  <p className="font-medium text-[var(--color-text-primary)]">
+                    {request.resourceName}
+                  </p>
+                  <p className="text-sm text-[var(--color-text-secondary)]">
+                    {request.resourceType} - {request.categoryName}
+                  </p>
+                </div>
+              </div>
+
+              {/* Fecha y Hora */}
+              <div className="flex gap-3">
+                <Calendar className="h-5 w-5 text-[var(--color-text-tertiary)] mt-1" />
+                <div>
+                  <p className="text-sm text-[var(--color-text-secondary)]">
+                    {t("schedule")}
+                  </p>
+                  <p className="font-medium text-[var(--color-text-primary)]">
+                    {new Date(request.startDate).toLocaleDateString()}
+                  </p>
+                  <p className="text-sm text-[var(--color-text-secondary)]">
+                    {new Date(request.startDate).toLocaleTimeString()} -{" "}
+                    {new Date(request.endDate).toLocaleTimeString()}
+                  </p>
+                </div>
+              </div>
+
+              {/* Asistentes */}
+              <div className="flex gap-3">
+                <Users className="h-5 w-5 text-[var(--color-text-tertiary)] mt-1" />
+                <div>
+                  <p className="text-sm text-[var(--color-text-secondary)]">
+                    {t("attendees")}
+                  </p>
+                  <p className="font-medium text-[var(--color-text-primary)]">
+                    {request.attendees || 0} {t("people")}
                   </p>
                 </div>
               </div>
             </div>
-          )}
-        </div>
+
+            {/* Propósito */}
+            {request.purpose && (
+              <div className="mt-6 pt-6 border-t border-[var(--color-border-primary)]">
+                <div className="flex gap-3">
+                  <FileText className="h-5 w-5 text-[var(--color-text-tertiary)] mt-1" />
+                  <div className="flex-1">
+                    <p className="text-sm text-[var(--color-text-secondary)] mb-2">
+                      {t("purpose")}
+                    </p>
+                    <p className="text-[var(--color-text-primary)]">
+                      {request.purpose}
+                    </p>
+                  </div>
+                </div>
+              </div>
+            )}
+          </CardContent>
+        </Card>
 
         {/* Timeline / History */}
-        <div className="bg-[var(--color-bg-primary)] dark:bg-[var(--color-bg-secondary)] rounded-lg border border-[var(--color-border-primary)] dark:border-[var(--color-border-primary)] p-6">
-          <h2 className="text-xl font-semibold text-[var(--color-text-primary)] dark:text-[var(--color-text-primary)] mb-6 flex items-center gap-2">
-            <Clock className="h-5 w-5 text-[var(--color-action-primary)]" />
-            {t("history")}
-          </h2>
-          <ApprovalTimeline
-            history={request.history || []}
-            currentLevel={request.currentLevel}
-            maxLevel={request.maxLevel}
-          />
-        </div>
+        <Card className="bg-[var(--color-bg-primary)] border-[var(--color-border-primary)]">
+          <CardContent className="pt-6">
+            <h2 className="text-xl font-semibold text-[var(--color-text-primary)] mb-6 flex items-center gap-2">
+              <Clock className="h-5 w-5 text-[var(--color-action-primary)]" />
+              {t("history")}
+            </h2>
+            <ApprovalTimeline
+              history={request.history || []}
+              currentLevel={request.currentLevel}
+              maxLevel={request.maxLevel}
+            />
+          </CardContent>
+        </Card>
 
         {/* Actions */}
         {request.status === "PENDING" && (
-          <div className="bg-[var(--color-bg-primary)] dark:bg-[var(--color-bg-secondary)] rounded-lg border border-[var(--color-border-primary)] dark:border-[var(--color-border-primary)] p-6">
-            <h2 className="text-xl font-semibold text-[var(--color-text-primary)] dark:text-[var(--color-text-primary)] mb-4">
-              {t("actions")}
-            </h2>
-            <div className="flex gap-4">
-              <button
-                onClick={() => setShowApproveModal(true)}
-                disabled={isActionLoading}
-                className="flex-1 px-6 py-3 bg-green-600 text-foreground rounded-lg hover:bg-state-success-700 disabled:opacity-50 disabled:cursor-not-allowed font-medium"
-              >
-                <CheckCircle className="h-5 w-5 inline mr-2" />
-                {t("approve")}
-              </button>
-              <button
-                onClick={() => setShowRejectModal(true)}
-                disabled={isActionLoading}
-                className="flex-1 px-6 py-3 bg-state-error-600 text-foreground rounded-lg hover:bg-state-error-700 disabled:opacity-50 disabled:cursor-not-allowed font-medium"
-              >
-                <XCircle className="h-5 w-5 inline mr-2" />
-                {t("reject")}
-              </button>
-              <button
-                onClick={handleCancel}
-                disabled={isActionLoading}
-                className="px-6 py-3 border border-[var(--color-border-primary)] dark:border-[var(--color-border-primary)] text-[var(--color-text-secondary)] dark:text-[var(--color-text-secondary)] rounded-lg hover:bg-[var(--color-bg-secondary)] dark:hover:bg-[var(--color-bg-tertiary)] disabled:opacity-50 disabled:cursor-not-allowed font-medium"
-              >
-                {t("cancel_request")}
-              </button>
-            </div>
-          </div>
+          <Card className="bg-[var(--color-bg-primary)] border-[var(--color-border-primary)]">
+            <CardContent className="pt-6">
+              <h2 className="text-xl font-semibold text-[var(--color-text-primary)] mb-4">
+                {t("actions")}
+              </h2>
+              <div className="flex gap-4">
+                <Button
+                  onClick={() => setShowApproveModal(true)}
+                  disabled={isActionLoading}
+                  className="flex-1 bg-green-600 hover:bg-green-700"
+                >
+                  <CheckCircle className="h-5 w-5 mr-2" />
+                  {t("approve")}
+                </Button>
+                <Button
+                  onClick={() => setShowRejectModal(true)}
+                  disabled={isActionLoading}
+                  variant="destructive"
+                  className="flex-1"
+                >
+                  <XCircle className="h-5 w-5 mr-2" />
+                  {t("reject")}
+                </Button>
+                <Button
+                  onClick={handleCancel}
+                  disabled={isActionLoading}
+                  variant="outline"
+                >
+                  {t("cancel_request")}
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
         )}
 
         {/* Approve Modal */}
         {showApproveModal && (
           <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-            <div className="bg-[var(--color-bg-primary)] dark:bg-[var(--color-bg-secondary)] rounded-lg max-w-md w-full p-6">
-              <h3 className="text-xl font-semibold text-[var(--color-text-primary)] dark:text-[var(--color-text-primary)] mb-4">
-                {t("approve_confirmation")}
-              </h3>
-              <p className="text-[var(--color-text-secondary)] dark:text-[var(--color-text-tertiary)] mb-4">
-                {t("approve_confirmation_text")}
-              </p>
-              <textarea
-                value={comment}
-                onChange={(e) => setComment(e.target.value)}
-                placeholder={t("comment_optional")}
-                className="w-full px-3 py-2 border border-[var(--color-border-primary)] dark:border-[var(--color-border-primary)] rounded-lg bg-[var(--color-bg-primary)] dark:bg-[var(--color-bg-primary)] text-[var(--color-text-primary)] dark:text-[var(--color-text-primary)] mb-4"
-                rows={3}
-              />
-              <div className="flex gap-3">
-                <button
-                  onClick={handleApprove}
-                  disabled={isActionLoading}
-                  className="flex-1 px-4 py-2 bg-green-600 text-foreground rounded-lg hover:bg-state-success-700 disabled:opacity-50"
-                >
-                  {t("confirm")}
-                </button>
-                <button
-                  onClick={() => {
-                    setShowApproveModal(false);
-                    setComment("");
-                  }}
-                  className="flex-1 px-4 py-2 border border-[var(--color-border-primary)] dark:border-[var(--color-border-primary)] text-[var(--color-text-secondary)] dark:text-[var(--color-text-secondary)] rounded-lg hover:bg-[var(--color-bg-secondary)] dark:hover:bg-[var(--color-bg-tertiary)]"
-                >
-                  {t("cancel")}
-                </button>
-              </div>
-            </div>
+            <Card className="max-w-md w-full">
+              <CardContent className="pt-6">
+                <h3 className="text-xl font-semibold text-[var(--color-text-primary)] mb-4">
+                  {t("approve_confirmation")}
+                </h3>
+                <p className="text-[var(--color-text-secondary)] mb-4">
+                  {t("approve_confirmation_text")}
+                </p>
+                <Textarea
+                  value={comment}
+                  onChange={(e) => setComment(e.target.value)}
+                  placeholder={t("comment_optional")}
+                  className="mb-4"
+                  rows={3}
+                />
+                <div className="flex gap-3">
+                  <Button
+                    onClick={handleApprove}
+                    disabled={isActionLoading}
+                    className="flex-1 bg-green-600 hover:bg-green-700"
+                  >
+                    {t("confirm")}
+                  </Button>
+                  <Button
+                    variant="outline"
+                    onClick={() => {
+                      setShowApproveModal(false);
+                      setComment("");
+                    }}
+                    className="flex-1"
+                  >
+                    {t("cancel")}
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
           </div>
         )}
 
         {/* Reject Modal */}
         {showRejectModal && (
           <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-            <div className="bg-[var(--color-bg-primary)] dark:bg-[var(--color-bg-secondary)] rounded-lg max-w-md w-full p-6">
-              <h3 className="text-xl font-semibold text-[var(--color-text-primary)] dark:text-[var(--color-text-primary)] mb-4">
-                {t("reject_confirmation")}
-              </h3>
-              <p className="text-[var(--color-text-secondary)] dark:text-[var(--color-text-tertiary)] mb-4">
-                {t("reject_confirmation_text")}
-              </p>
-              <textarea
-                value={comment}
-                onChange={(e) => setComment(e.target.value)}
-                placeholder={t("reject_reason_required")}
-                className="w-full px-3 py-2 border border-[var(--color-border-primary)] dark:border-[var(--color-border-primary)] rounded-lg bg-[var(--color-bg-primary)] dark:bg-[var(--color-bg-primary)] text-[var(--color-text-primary)] dark:text-[var(--color-text-primary)] mb-4"
-                rows={3}
-                required
-              />
-              <div className="flex gap-3">
-                <button
-                  onClick={handleReject}
-                  disabled={isActionLoading || !comment.trim()}
-                  className="flex-1 px-4 py-2 bg-state-error-600 text-foreground rounded-lg hover:bg-state-error-700 disabled:opacity-50"
-                >
-                  {t("confirm")}
-                </button>
-                <button
-                  onClick={() => {
-                    setShowRejectModal(false);
-                    setComment("");
-                  }}
-                  className="flex-1 px-4 py-2 border border-[var(--color-border-primary)] dark:border-[var(--color-border-primary)] text-[var(--color-text-secondary)] dark:text-[var(--color-text-secondary)] rounded-lg hover:bg-[var(--color-bg-secondary)] dark:hover:bg-[var(--color-bg-tertiary)]"
-                >
-                  {t("cancel")}
-                </button>
-              </div>
-            </div>
+            <Card className="max-w-md w-full">
+              <CardContent className="pt-6">
+                <h3 className="text-xl font-semibold text-[var(--color-text-primary)] mb-4">
+                  {t("reject_confirmation")}
+                </h3>
+                <p className="text-[var(--color-text-secondary)] mb-4">
+                  {t("reject_confirmation_text")}
+                </p>
+                <Textarea
+                  value={comment}
+                  onChange={(e) => setComment(e.target.value)}
+                  placeholder={t("reject_reason_required")}
+                  className="mb-4"
+                  rows={3}
+                  required
+                />
+                <div className="flex gap-3">
+                  <Button
+                    onClick={handleReject}
+                    disabled={isActionLoading || !comment.trim()}
+                    variant="destructive"
+                    className="flex-1"
+                  >
+                    {t("confirm")}
+                  </Button>
+                  <Button
+                    variant="outline"
+                    onClick={() => {
+                      setShowRejectModal(false);
+                      setComment("");
+                    }}
+                    className="flex-1"
+                  >
+                    {t("cancel")}
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
           </div>
         )}
       </div>

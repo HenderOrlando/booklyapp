@@ -1,6 +1,7 @@
 "use client";
 
-import { Input } from "@/components/atoms/Input/Input";
+import { Checkbox } from "@/components/atoms/Checkbox";
+import { Input } from "@/components/atoms/Input";
 import { cn } from "@/lib/utils";
 import { Clock, CalendarDays, RefreshCw, Shield, Timer } from "lucide-react";
 import * as React from "react";
@@ -29,7 +30,10 @@ export function AvailabilityRulesEditor({
   onChange,
   className,
 }: AvailabilityRulesEditorProps) {
-  const update = (field: keyof AvailabilityRules, val: any) => {
+  const update = <K extends keyof AvailabilityRules>(
+    field: K,
+    val: AvailabilityRules[K]
+  ) => {
     onChange({ ...value, [field]: val });
   };
 
@@ -41,31 +45,22 @@ export function AvailabilityRulesEditor({
       </h4>
 
       {/* Requires Approval */}
-      <label className="flex items-center justify-between">
+      <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
           <Shield className="h-4 w-4 text-[var(--color-text-tertiary)]" />
-          <span className="text-sm text-[var(--color-text-primary)]">
+          <label
+            htmlFor="requiresApproval"
+            className="text-sm text-[var(--color-text-primary)] cursor-pointer"
+          >
             Requiere aprobación
-          </span>
+          </label>
         </div>
-        <button
-          type="button"
-          role="switch"
-          aria-checked={value.requiresApproval}
-          onClick={() => update("requiresApproval", !value.requiresApproval)}
-          className={cn(
-            "relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors",
-            value.requiresApproval ? "bg-brand-primary-500" : "bg-[var(--color-bg-muted)]"
-          )}
-        >
-          <span
-            className={cn(
-              "pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow-lg ring-0 transition-transform",
-              value.requiresApproval ? "translate-x-5" : "translate-x-0"
-            )}
-          />
-        </button>
-      </label>
+        <Checkbox
+          id="requiresApproval"
+          checked={value.requiresApproval}
+          onCheckedChange={(checked) => update("requiresApproval", !!checked)}
+        />
+      </div>
 
       {/* Max Advance Booking Days */}
       <div className="flex items-center gap-3">
@@ -135,31 +130,22 @@ export function AvailabilityRulesEditor({
       </div>
 
       {/* Allow Recurring */}
-      <label className="flex items-center justify-between">
+      <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
           <RefreshCw className="h-4 w-4 text-[var(--color-text-tertiary)]" />
-          <span className="text-sm text-[var(--color-text-primary)]">
+          <label
+            htmlFor="allowRecurring"
+            className="text-sm text-[var(--color-text-primary)] cursor-pointer"
+          >
             Permitir reservas recurrentes
-          </span>
+          </label>
         </div>
-        <button
-          type="button"
-          role="switch"
-          aria-checked={value.allowRecurring}
-          onClick={() => update("allowRecurring", !value.allowRecurring)}
-          className={cn(
-            "relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors",
-            value.allowRecurring ? "bg-brand-primary-500" : "bg-[var(--color-bg-muted)]"
-          )}
-        >
-          <span
-            className={cn(
-              "pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow-lg ring-0 transition-transform",
-              value.allowRecurring ? "translate-x-5" : "translate-x-0"
-            )}
-          />
-        </button>
-      </label>
+        <Checkbox
+          id="allowRecurring"
+          checked={value.allowRecurring}
+          onCheckedChange={(checked) => update("allowRecurring", !!checked)}
+        />
+      </div>
     </div>
   );
 }

@@ -11,6 +11,13 @@ import { Badge } from "@/components/atoms/Badge";
 import { Button } from "@/components/atoms/Button";
 import { Card, CardContent } from "@/components/atoms/Card";
 import { Input } from "@/components/atoms/Input";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/atoms/Select";
 import { StatusBadge } from "@/components/atoms/StatusBadge";
 import { AppHeader } from "@/components/organisms/AppHeader";
 import { AppSidebar } from "@/components/organisms/AppSidebar";
@@ -133,18 +140,20 @@ export default function RecursosVirtualPage() {
                   <label className="block text-sm font-medium text-[var(--color-text-secondary)] mb-2">
                     {t("status_label")}
                   </label>
-                  <select
+                  <Select
                     value={filters.status}
-                    onChange={(e) =>
-                      handleFilterChange("status", e.target.value)
-                    }
-                    className="w-full px-3 py-2 bg-[var(--color-bg-primary)] border border-[var(--color-border-strong)] rounded-md text-foreground"
+                    onValueChange={(val) => handleFilterChange("status", val)}
                   >
-                    <option value="">{t("filters.statuses")}</option>
-                    <option value="AVAILABLE">{t("available")}</option>
-                    <option value="IN_USE">{t("occupied")}</option>
-                    <option value="MAINTENANCE">{t("maintenance")}</option>
-                  </select>
+                    <SelectTrigger>
+                      <SelectValue placeholder={t("filters.statuses")} />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="all">{t("filters.statuses")}</SelectItem>
+                      <SelectItem value="AVAILABLE">{t("available")}</SelectItem>
+                      <SelectItem value="IN_USE">{t("occupied")}</SelectItem>
+                      <SelectItem value="MAINTENANCE">{t("maintenance")}</SelectItem>
+                    </SelectContent>
+                  </Select>
                 </div>
                 <div className="flex items-end">
                   <Button
