@@ -183,8 +183,13 @@ export interface ApprovalFilters {
  */
 export interface CreateApprovalRequestDto {
   reservationId: string;
-  purpose: string;
-  attendees: number;
+  requesterId: string;
+  approvalFlowId: string;
+  metadata?: Record<string, any>;
+  
+  // Legacy fields for backward compatibility in UI
+  purpose?: string;
+  attendees?: number;
   requiresEquipment?: string[];
   specialRequirements?: string;
   priority?: ApprovalPriority;

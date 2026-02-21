@@ -3,6 +3,7 @@
  * Celda individual de día en el calendario
  */
 
+import { Button } from "@/components/atoms/Button/Button";
 import type { CalendarDay, CalendarEvent } from "@/types/calendar";
 import * as Tooltip from "@radix-ui/react-tooltip";
 import { format } from "date-fns";
@@ -70,38 +71,39 @@ export function CalendarDayCell({
   const eventCount = day.events.length;
 
   const buttonContent = (
-    <button
+    <Button
       type="button"
+      variant="ghost"
       onClick={handleClick}
       onContextMenu={handleContextMenu}
       onDragOver={handleDragOver}
       onDrop={handleDrop}
       disabled={day.isDisabled}
       className={`
-        relative min-h-[80px] p-2 border border-[var(--color-border-subtle)]
-        transition-all duration-200
+        relative min-h-[80px] h-auto w-full p-2 border border-[var(--color-border-subtle)]
+        transition-all duration-200 flex-col items-stretch justify-start rounded-none whitespace-normal
         ${
           !day.isCurrentMonth
-            ? "bg-[var(--color-bg-secondary)] text-[var(--color-text-tertiary)]"
+            ? "bg-[var(--color-bg-secondary)] text-[var(--color-text-tertiary)] hover:bg-[var(--color-bg-secondary)]"
             : "bg-background text-[var(--color-text-primary)]"
         }
         ${day.isToday ? "border-2 border-[var(--color-border-focus)] ring-1 ring-[var(--color-border-focus)]" : ""}
-        ${isSelected ? "bg-[var(--color-state-info-bg)] border-[var(--color-state-info-border)]" : ""}
-        ${isDragOver && !day.isDisabled ? "border-2 border-[var(--color-state-success-border)] bg-[var(--color-state-success-bg)]" : ""}
+        ${isSelected ? "bg-[var(--color-state-info-bg)] border-[var(--color-state-info-border)] hover:bg-[var(--color-state-info-bg)]" : ""}
+        ${isDragOver && !day.isDisabled ? "border-2 border-[var(--color-state-success-border)] bg-[var(--color-state-success-bg)] hover:bg-[var(--color-state-success-bg)]" : ""}
         ${day.isPast && day.isCurrentMonth ? "opacity-60" : ""}
         ${
           day.isDisabled
             ? "cursor-not-allowed opacity-40"
             : "cursor-pointer hover:bg-[var(--color-state-info-bg)] hover:border-[var(--color-state-info-border)]"
         }
-        ${day.isWeekend && day.isCurrentMonth ? "bg-[var(--color-bg-secondary)]" : ""}
+        ${day.isWeekend && day.isCurrentMonth ? "bg-[var(--color-bg-secondary)] hover:bg-[var(--color-bg-secondary)]" : ""}
       `}
       aria-label={format(day.date, "d 'de' MMMM", { locale: es })}
       aria-current={day.isToday ? "date" : undefined}
       aria-disabled={day.isDisabled}
     >
       {/* Número del día */}
-      <div className="flex items-center justify-between mb-1">
+      <div className="flex items-center justify-between mb-1 w-full">
         <span
           className={`
             text-sm font-medium
@@ -128,7 +130,7 @@ export function CalendarDayCell({
 
       {/* Dots de eventos (máximo 3 visibles) */}
       {hasEvents && (
-        <div className="flex gap-1 flex-wrap">
+        <div className="flex gap-1 flex-wrap w-full">
           {day.events.slice(0, 3).map((event) => (
             <div
               key={event.id}
@@ -153,7 +155,7 @@ export function CalendarDayCell({
           aria-hidden="true"
         />
       )}
-    </button>
+    </Button>
   );
 
   // Si no hay eventos, retornar solo el botón

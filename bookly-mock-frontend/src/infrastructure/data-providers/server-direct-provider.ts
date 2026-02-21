@@ -37,7 +37,22 @@ export class ServerDirectDataProvider implements DataProvider {
 
     // Handle standard backend format { data: ... }
     if (response.data && "data" in response.data) {
-      return response.data as ApiResponse<T>;
+      const payload = response.data as Record<string, unknown>;
+      
+      // Check for double-wrapped responses from GlobalResponseInterceptor
+      if (
+        payload.data &&
+        typeof payload.data === "object" &&
+        "success" in payload.data &&
+        "data" in (payload.data as Record<string, unknown>)
+      ) {
+        return payload.data as ApiResponse<T>;
+      }
+
+      return {
+        ...payload,
+        success: payload.success ?? true,
+      } as ApiResponse<T>;
     }
 
     // Fallback for legacy format or unformatted responses

@@ -124,7 +124,13 @@ export interface UpdateResourceDto {
   programIds?: string[];
   status?: ResourceStatus;
   isActive?: boolean;
-  availabilityRules?: AvailabilityRules;
+  availabilityRules?: {
+    requiresApproval?: boolean;
+    maxAdvanceBookingDays?: number;
+    minBookingDurationMinutes?: number;
+    maxBookingDurationMinutes?: number;
+    allowRecurring?: boolean;
+  };
 }
 
 export interface SearchResourcesAdvancedDto {
