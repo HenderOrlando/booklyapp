@@ -19,6 +19,9 @@ export class ApprovalStepSchema {
 
   @Prop({ required: true, default: false })
   allowParallel: boolean;
+
+  @Prop({ type: Number })
+  timeoutHours?: number;
 }
 
 /**

@@ -25,7 +25,14 @@ export class ApprovalFlowRepository implements IApprovalFlowRepository {
       name: flow.name,
       description: flow.description,
       resourceTypes: flow.resourceTypes,
-      steps: flow.steps,
+      steps: flow.steps.map(step => ({
+        name: step.name,
+        approverRoles: step.approverRoles,
+        order: step.order,
+        isRequired: step.isRequired,
+        allowParallel: step.allowParallel,
+        timeoutHours: step.timeoutHours,
+      })),
       isActive: flow.isActive,
       autoApproveConditions: flow.autoApproveConditions,
       createdBy: new Types.ObjectId(flow.audit?.createdBy || ""),
@@ -143,7 +150,16 @@ export class ApprovalFlowRepository implements IApprovalFlowRepository {
     if (data.name) updateData.name = data.name;
     if (data.description) updateData.description = data.description;
     if (data.resourceTypes) updateData.resourceTypes = data.resourceTypes;
-    if (data.steps) updateData.steps = data.steps;
+    if (data.steps) {
+      updateData.steps = data.steps.map(step => ({
+        name: step.name,
+        approverRoles: step.approverRoles,
+        order: step.order,
+        isRequired: step.isRequired,
+        allowParallel: step.allowParallel,
+        timeoutHours: step.timeoutHours,
+      }));
+    }
     if (data.isActive !== undefined) updateData.isActive = data.isActive;
     if (data.autoApproveConditions)
       updateData.autoApproveConditions = data.autoApproveConditions;
