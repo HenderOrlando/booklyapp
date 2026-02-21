@@ -1,10 +1,11 @@
 // Registrar path aliases para runtime
 import "tsconfig-paths/register";
 
-import { createLogger } from "@libs/common";
+import { createLogger, GlobalResponseInterceptor, I18nGlobalExceptionFilter } from "@libs/common";
 import { ValidationPipe } from "@nestjs/common";
 import { NestFactory } from "@nestjs/core";
 import { DocumentBuilder, SwaggerModule } from "@nestjs/swagger";
+import { I18nService } from "nestjs-i18n";
 import { AvailabilityModule } from "./availability.module";
 
 const logger = createLogger("AvailabilityService");
@@ -20,6 +21,11 @@ async function bootstrap() {
     origin: process.env.CORS_ORIGIN || "*",
     credentials: true,
   });
+
+  // Global Interceptors & Filters
+  app.useGlobalInterceptors(new GlobalResponseInterceptor());
+  const i18nService = app.get(I18nService);
+  app.useGlobalFilters(new I18nGlobalExceptionFilter(i18nService));
 
   // Global validation pipe
   app.useGlobalPipes(
