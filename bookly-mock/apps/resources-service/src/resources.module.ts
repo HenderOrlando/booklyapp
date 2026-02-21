@@ -8,6 +8,7 @@ import { EventBusModule, EventBusService } from "@libs/event-bus";
 import { IdempotencyModule } from "@libs/idempotency";
 import { RedisModule, RedisService } from "@libs/redis";
 import { AuthClientModule } from "@libs/security";
+import { CacheModule } from "@nestjs/cache-manager";
 import { Module } from "@nestjs/common";
 import { ConfigModule, ConfigService } from "@nestjs/config";
 import { CqrsModule } from "@nestjs/cqrs";
@@ -77,6 +78,8 @@ const IMPORT_JOB_REPOSITORY = "IImportJobRepository";
  */
 @Module({
   imports: [
+    // Cache
+    CacheModule.register({ isGlobal: true }),
     // Configuration
     ConfigModule.forRoot({
       isGlobal: true,
