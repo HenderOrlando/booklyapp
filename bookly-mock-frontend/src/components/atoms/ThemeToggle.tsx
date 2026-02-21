@@ -85,8 +85,8 @@ export function ThemeToggle({
         className={cn(
           "pointer-events-none z-10 block h-6 w-6 transform rounded-full shadow-md ring-0 transition-transform duration-300 ease-in-out",
           isDark 
-            ? "translate-x-[1em] bg-slate-800 border border-transparent" 
-            : "translate-x-[-1em] bg-white border border-slate-200"
+            ? "translate-x-8 bg-slate-800 border border-transparent" 
+            : "translate-x-0 bg-white border border-slate-200"
         )}
       />
     </Button>

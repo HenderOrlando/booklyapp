@@ -1,10 +1,8 @@
 import { useToast } from "@/hooks/useToast";
-import type { GenerateDocumentDto } from "@/services/documentsClient";
 import {
-  downloadDocument,
-  generateDocument,
-  sendDocumentByEmail,
-} from "@/services/documentsClient";
+  DocumentsClient,
+  type GenerateDocumentDto,
+} from "@/infrastructure/api/documents-client";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import * as React from "react";
 
@@ -16,14 +14,6 @@ import * as React from "react";
  *
  * @example
  * ```tsx
- * const { generate, download, sendEmail, isGenerating } = useDocumentGeneration();
- *
- * generate.mutate({
- *   templateId: "tpl_001",
- *   approvalRequestId: "apr_001",
- *   type: "approval",
- * });
- * ```
  */
 
 export interface GenerateDocumentParams {
@@ -41,8 +31,8 @@ export interface SendEmailParams {
 }
 
 export function useDocumentGeneration() {
-  const queryClient = useQueryClient();
   const { showSuccess, showError } = useToast();
+  const queryClient = useQueryClient();
   const [generatedDocumentUrl, setGeneratedDocumentUrl] = React.useState<
     string | null
   >(null);
@@ -60,37 +50,39 @@ export function useDocumentGeneration() {
         format: "PDF",
       };
 
-      return await generateDocument(documentData);
+      const response = await DocumentsClient.generateDocument(documentData);
+      return response.data;
     },
     onSuccess: (data) => {
       setGeneratedDocumentUrl(data.fileUrl);
       setLastDocumentId(data.id);
 
-      // Invalidar queries relevantes
+      // Invalidar queries de documentos
+      queryClient.invalidateQueries({ queryKey: ["documents"] });
       if (data.approvalRequestId) {
         queryClient.invalidateQueries({
-          queryKey: ["documents", data.approvalRequestId],
+          queryKey: ["documents", "approval", data.approvalRequestId],
         });
       }
-      queryClient.invalidateQueries({ queryKey: ["documents"] });
 
-      // Notificación de éxito
-      showSuccess("Documento Generado", "El documento se generó correctamente");
+      showSuccess(
+        "Documento Generado",
+        `El documento ${data.fileName} se generó correctamente`
+      );
       console.log("✅ Documento generado exitosamente", data);
     },
-    onError: (error: any) => {
+    onError: (error: Error & { mapped?: { fallbackMessage: string } }) => {
       console.error("❌ Error al generar documento:", error);
       const errorMessage =
-        error?.response?.data?.message || "Error al generar el documento";
+        error.mapped?.fallbackMessage || error.message || "Error al generar el documento";
       showError("Error al Generar", errorMessage);
-      console.error(errorMessage);
     },
   });
 
   // Mutation para descargar documento
   const download = useMutation({
     mutationFn: async (documentId: string) => {
-      const blob = await downloadDocument(documentId);
+      const blob = await DocumentsClient.downloadDocument(documentId);
 
       // Crear URL y descargar automáticamente
       const url = window.URL.createObjectURL(blob);
@@ -113,32 +105,30 @@ export function useDocumentGeneration() {
       );
       console.log("✅ Documento descargado exitosamente");
     },
-    onError: (error: any) => {
+    onError: (error: Error & { mapped?: { fallbackMessage: string } }) => {
       console.error("❌ Error al descargar documento:", error);
       const errorMessage =
-        error?.response?.data?.message || "Error al descargar el documento";
+        error.mapped?.fallbackMessage || error.message || "Error al descargar el documento";
       showError("Error al Descargar", errorMessage);
-      console.error(errorMessage);
     },
   });
 
   // Mutation para enviar por email
   const sendEmail = useMutation({
     mutationFn: async ({ documentId, email }: SendEmailParams) => {
-      await sendDocumentByEmail(documentId, email);
+      await DocumentsClient.sendDocumentByEmail(documentId, email);
       return { success: true, email };
     },
     onSuccess: (data) => {
       showSuccess("Documento Enviado", `El documento se envió a ${data.email}`);
       console.log(`✅ Documento enviado exitosamente a: ${data.email}`);
     },
-    onError: (error: any) => {
+    onError: (error: Error & { mapped?: { fallbackMessage: string } }) => {
       console.error("❌ Error al enviar email:", error);
       const errorMessage =
-        error?.response?.data?.message ||
+        error.mapped?.fallbackMessage || error.message ||
         "Error al enviar el documento por email";
       showError("Error al Enviar Email", errorMessage);
-      console.error(errorMessage);
     },
   });
 
@@ -146,7 +136,7 @@ export function useDocumentGeneration() {
   const print = useMutation({
     mutationFn: async (documentId: string) => {
       // Descargar el documento primero
-      const blob = await downloadDocument(documentId);
+      const blob = await DocumentsClient.downloadDocument(documentId);
       const url = window.URL.createObjectURL(blob);
 
       // Abrir en ventana nueva para imprimir
@@ -172,12 +162,11 @@ export function useDocumentGeneration() {
       );
       console.log("✅ Documento enviado a impresión");
     },
-    onError: (error: any) => {
+    onError: (error: Error & { mapped?: { fallbackMessage: string } }) => {
       console.error("❌ Error al imprimir:", error);
       const errorMessage =
-        error?.response?.data?.message || "Error al imprimir el documento";
+        error.mapped?.fallbackMessage || error.message || "Error al imprimir el documento";
       showError("Error al Imprimir", errorMessage);
-      console.error(errorMessage);
     },
   });
 

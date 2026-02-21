@@ -17,7 +17,7 @@ export class ServerGatewayDataProvider implements DataProvider {
   }
 
   async request<T>(request: DataProviderRequest): Promise<ApiResponse<T>> {
-    const response = await this.axiosInstance.request<ApiResponse<T>>({
+    const response = await this.axiosInstance.request<{ data: T } | ApiResponse<T>>({
       url: this.buildUrl(request.endpoint),
       method: request.method,
       data: request.data,
@@ -25,6 +25,15 @@ export class ServerGatewayDataProvider implements DataProvider {
       signal: request.signal ?? request.config?.signal,
     });
 
-    return response.data;
+    // Handle standard backend format { data: ... }
+    if (response.data && "data" in response.data) {
+      return response.data as ApiResponse<T>;
+    }
+
+    // Fallback for legacy format or unformatted responses
+    return {
+      success: true,
+      data: response.data as T,
+    };
   }
 }

@@ -88,7 +88,7 @@ function generateCorrelationId(): string {
 }
 
 /**
- * Interceptor para agregar token de autenticación y correlation ID
+ * Interceptor para agregar token de autenticación, correlation ID e Idempotency-Key
  */
 axiosInstance.interceptors.request.use(
   (requestConfig) => {
@@ -96,6 +96,16 @@ axiosInstance.interceptors.request.use(
 
     // Agregar correlation ID para trazabilidad end-to-end
     headers.set("X-Correlation-ID", generateCorrelationId());
+
+    // Agregar Idempotency-Key para mutaciones seguras
+    if (
+      requestConfig.method &&
+      ["post", "put", "patch", "delete"].includes(requestConfig.method.toLowerCase())
+    ) {
+      if (!headers.has("Idempotency-Key")) {
+        headers.set("Idempotency-Key", generateCorrelationId());
+      }
+    }
 
     // Obtener token de localStorage
     if (typeof window !== "undefined") {

@@ -288,7 +288,7 @@ export function ResourceFiltersSection({
           </div>
         </div>
         <div className="flex items-center gap-2 overflow-x-auto pb-1 no-scrollbar">
-          {filteredQuickTypes.map(({ id, label, icon }) => (
+          {filteredQuickTypes.map(({ id, label }) => (
             <button
               key={id}
               onClick={() => handleTypeQuickToggle(id)}
@@ -299,7 +299,6 @@ export function ResourceFiltersSection({
                   : "border-[var(--color-border-subtle)] bg-white text-[var(--color-text-secondary)] hover:border-brand-primary-300 hover:bg-brand-primary-50/50",
               )}
             >
-              <span>{icon}</span>
               {label}
             </button>
           ))}

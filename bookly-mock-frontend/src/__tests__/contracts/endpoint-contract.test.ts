@@ -174,7 +174,7 @@ describe("Contract: REPORTS_ENDPOINTS → reports-service controllers", () => {
     { name: "EXPORT", path: REPORTS_ENDPOINTS.EXPORT },
     { name: "FEEDBACK", path: REPORTS_ENDPOINTS.FEEDBACK },
     { name: "EVALUATIONS", path: REPORTS_ENDPOINTS.EVALUATIONS },
-    { name: "DASHBOARD", path: REPORTS_ENDPOINTS.DASHBOARD },
+    { name: "DASHBOARD_OVERVIEW", path: REPORTS_ENDPOINTS.DASHBOARD_OVERVIEW },
   ];
 
   it.each(endpoints)(
