@@ -19,7 +19,8 @@
     "verify:backend": "./scripts/verify-backend-connectivity.sh",
     "integration:check": "npm run verify:backend && npm run type-check",
     "analyze": "ANALYZE=true next build",
-    "analyze:win": "set ANALYZE=true&& next build"
+    "analyze:win": "set ANALYZE=true&& next build",
+    "verify:i18n": "node ./scripts/verify-i18n.js"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.3.0",
@@ -96,4 +97,4 @@
     "node": ">=18.0.0",
     "npm": ">=9.0.0"
   }
-}
+}\n

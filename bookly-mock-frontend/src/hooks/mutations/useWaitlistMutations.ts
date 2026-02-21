@@ -74,7 +74,16 @@ export function useAddToWaitlist() {
 
   return useMutation({
     mutationFn: async (data: AddToWaitlistDto) => {
-      const response = await httpClient.post("/waitlist", data);
+      // Mapear DTO del frontend al backend
+      const backendData = {
+        resourceId: data.resourceId,
+        userId: data.userId,
+        requestedStartDate: data.startDate,
+        requestedEndDate: data.endDate,
+        priority: data.priority === "HIGH" ? 10 : data.priority === "MEDIUM" ? 5 : 0,
+        purpose: data.reason
+      };
+      const response = await httpClient.post("/waiting-lists", backendData);
       return response;
     },
     onSuccess: (_, variables) => {
@@ -116,7 +125,7 @@ export function useRemoveFromWaitlist() {
 
   return useMutation({
     mutationFn: async (id: string) => {
-      await httpClient.delete(`/waitlist/${id}`);
+      await httpClient.delete(`/waiting-lists/${id}`);
       return id;
     },
     onSuccess: (id) => {
@@ -164,7 +173,7 @@ export function useNotifyWaitlist() {
       availableUntil: string;
       notifyTop?: number; // Notificar a los primeros N usuarios
     }) => {
-      const response = await httpClient.post("/waitlist/notify", data);
+      const response = await httpClient.post("/waiting-lists/notify", data);
       return response;
     },
     onSuccess: (_, variables) => {
@@ -210,7 +219,13 @@ export function useUpdateWaitlistPriority() {
       id: string;
       data: UpdateWaitlistPositionDto;
     }) => {
-      const response = await httpClient.patch(`/waitlist/${id}/priority`, data);
+      // Mapear prioridad string a number
+      const priorityNum = data.newPriority === "HIGH" ? 10 : data.newPriority === "MEDIUM" ? 5 : 0;
+      
+      const response = await httpClient.patch(`/waiting-lists/${id}/priority`, {
+        newPriority: priorityNum,
+        reason: data.reason
+      });
       return response;
     },
     onSuccess: (_, variables) => {
@@ -250,7 +265,7 @@ export function useAcceptWaitlistOffer() {
 
   return useMutation({
     mutationFn: async (id: string) => {
-      const response = await httpClient.post(`/waitlist/${id}/accept`);
+      const response = await httpClient.post(`/waiting-lists/${id}/accept`);
       return response;
     },
     onSuccess: (_, id) => {
