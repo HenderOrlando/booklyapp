@@ -73,9 +73,9 @@ describe("WaitingListService", () => {
         meta: { total: 1, page: 1, limit: 10 },
       });
 
-      const result = await service.getWaitingListByResource("res-123", { page: 1, limit: 10 });
+      const result = await service.getWaitingList("res-123", { page: 1, limit: 10 });
 
-      expect(result.entries).toHaveLength(1);
+      expect(result.waitingLists).toHaveLength(1);
     });
   });
 });
