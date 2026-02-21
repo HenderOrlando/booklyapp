@@ -211,6 +211,7 @@ export function CategoryModal({
                   <div
                     className="w-16 h-16 rounded-lg border-2 border-white shadow-lg"
                     style={{ backgroundColor: formData.color }}
+                    aria-hidden="true"
                   />
                   <div>
                     <p className="text-sm text-[var(--color-text-primary)] font-medium">
@@ -220,11 +221,8 @@ export function CategoryModal({
                       {formData.color}
                     </p>
                     <Badge
-                      style={{
-                        backgroundColor: formData.color,
-                        color: "#fff",
-                        marginTop: "4px",
-                      }}
+                      className="mt-1 text-white"
+                      style={{ backgroundColor: formData.color }}
                     >
                       {formData.name || "Categoría"}
                     </Badge>
@@ -265,6 +263,8 @@ export function CategoryModal({
                       value={formData.color || "#10b981"}
                       onChange={(e) => handleColorSelect(e.target.value)}
                       className="w-20 h-10 rounded-lg border border-[var(--color-border-subtle)] cursor-pointer"
+                      aria-label="Selector de color personalizado"
+                      title="Selector de color personalizado"
                     />
                     <Input
                       value={formData.color || ""}

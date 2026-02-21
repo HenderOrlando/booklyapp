@@ -4,6 +4,7 @@ import { Button } from "@/components/atoms/Button";
 import { Card, CardContent } from "@/components/atoms/Card";
 import { Textarea } from "@/components/atoms/Textarea";
 import { ApprovalTimeline } from "@/components/molecules/ApprovalTimeline";
+import { ConflictAlert } from "@/components/molecules/ConflictAlert";
 import { LoadingState } from "@/components/molecules/LoadingState";
 import { MainLayout } from "@/components/templates/MainLayout";
 import { useApprovalActions } from "@/hooks/useApprovalActions";
@@ -172,8 +173,9 @@ export default function ApprovalDetailPage() {
           <button
             onClick={() => router.back()}
             className="p-2 hover:bg-[var(--color-bg-tertiary)] dark:hover:bg-[var(--color-bg-primary)] rounded-lg"
+            aria-label={t("back_to_list")}
           >
-            <ArrowLeft className="h-5 w-5" />
+            <ArrowLeft className="h-5 w-5" aria-hidden="true" />
           </button>
           <div className="flex-1">
             <h1 className="text-3xl font-bold text-[var(--color-text-primary)] dark:text-[var(--color-text-primary)]">
@@ -196,6 +198,16 @@ export default function ApprovalDetailPage() {
             </span>
           </div>
         </div>
+
+        {/* Alerta de Conflictos */}
+        {request.status === "PENDING" && request.resourceId && (
+          <ConflictAlert
+            resourceId={request.resourceId}
+            startDate={request.startDate}
+            endDate={request.endDate}
+            excludeReservationId={request.reservationId}
+          />
+        )}
 
         {/* Main Info Card */}
         <Card className="bg-[var(--color-bg-primary)] border-[var(--color-border-primary)]">
@@ -343,10 +355,15 @@ export default function ApprovalDetailPage() {
 
         {/* Approve Modal */}
         {showApproveModal && (
-          <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+          <div
+            className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="approve-modal-title"
+          >
             <Card className="max-w-md w-full">
               <CardContent className="pt-6">
-                <h3 className="text-xl font-semibold text-[var(--color-text-primary)] mb-4">
+                <h3 id="approve-modal-title" className="text-xl font-semibold text-[var(--color-text-primary)] mb-4">
                   {t("approve_confirmation")}
                 </h3>
                 <p className="text-[var(--color-text-secondary)] mb-4">
@@ -358,6 +375,7 @@ export default function ApprovalDetailPage() {
                   placeholder={t("comment_optional")}
                   className="mb-4"
                   rows={3}
+                  aria-label={t("comment_optional")}
                 />
                 <div className="flex gap-3">
                   <Button
@@ -385,10 +403,15 @@ export default function ApprovalDetailPage() {
 
         {/* Reject Modal */}
         {showRejectModal && (
-          <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+          <div
+            className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="reject-modal-title"
+          >
             <Card className="max-w-md w-full">
               <CardContent className="pt-6">
-                <h3 className="text-xl font-semibold text-[var(--color-text-primary)] mb-4">
+                <h3 id="reject-modal-title" className="text-xl font-semibold text-[var(--color-text-primary)] mb-4">
                   {t("reject_confirmation")}
                 </h3>
                 <p className="text-[var(--color-text-secondary)] mb-4">
@@ -401,6 +424,7 @@ export default function ApprovalDetailPage() {
                   className="mb-4"
                   rows={3}
                   required
+                  aria-label={t("reject_reason_required")}
                 />
                 <div className="flex gap-3">
                   <Button

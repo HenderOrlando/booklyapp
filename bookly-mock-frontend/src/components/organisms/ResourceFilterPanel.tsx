@@ -123,8 +123,7 @@ export function ResourceFilterPanel({
 
   return (
     <Card
-      className={`flex flex-col ${className}`}
-      style={{ maxHeight: "calc(100vh - 12rem)" }}
+      className={`flex flex-col max-h-[calc(100vh-12rem)] ${className}`}
     >
       <CardHeader className="pb-3 flex-shrink-0">
         <div className="flex items-center justify-between">

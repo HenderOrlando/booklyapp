@@ -389,6 +389,8 @@ export default function ProfilePage() {
                 <div
                   className="flex h-24 w-24 items-center justify-center rounded-full bg-[var(--color-bg-muted)] bg-cover bg-center"
                   data-testid="profile-avatar-image"
+                  role="img"
+                  aria-label={`${user.firstName} ${user.lastName}`}
                   style={
                     user.profilePicture
                       ? { backgroundImage: `url(${user.profilePicture})` }
@@ -420,10 +422,14 @@ export default function ProfilePage() {
               </div>
 
               <div className="flex items-center gap-2">
+                <label className="sr-only" htmlFor="profile-photo-file-input">
+                  {t("upload_photo")}
+                </label>
                 <input
                   accept="image/*"
                   className="hidden"
                   data-testid="profile-photo-input"
+                  id="profile-photo-file-input"
                   onChange={handleProfilePhotoChange}
                   ref={photoInputRef}
                   type="file"

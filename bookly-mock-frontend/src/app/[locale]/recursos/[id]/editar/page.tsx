@@ -933,8 +933,9 @@ export default function EditResourcePage() {
                               handleRemoveCharacteristic(c.normalizedName)
                             }
                             className="rounded p-0.5 text-[var(--color-text-tertiary)] hover:text-[var(--color-text-primary)]"
+                            aria-label={`Eliminar característica ${c.name}`}
                           >
-                            <X className="h-3.5 w-3.5" />
+                            <X className="h-3.5 w-3.5" aria-hidden="true" />
                           </button>
                         </span>
                       ))}
