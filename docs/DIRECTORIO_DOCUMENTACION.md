@@ -50,25 +50,25 @@ Documentación técnica, arquitectura y planes específicos del backend (microse
 
 Documentación transversal, requisitos de negocio, alineación entre equipos y reportes globales. Útil como punto de partida para nuevos desarrollos o auditorías.
 
-* **Requisitos y Negocio (PDFs Oficiales):**
+* **Requisitos y Negocio (`business-requirements/`):**
   * `Bookly-Requerimientos.pdf` / `Bookly-Historias-de-Usuario.pdf` - Definiciones funcionales oficiales, RFs, RNFs y criterios de aceptación.
   * `Bookly-Flujos-de-procesos-v1.pdf` / `Bookly-Detalle-de-Casos-de-Uso.pdf` - Diagramas de flujo de negocio y casos de uso detallados por actor.
   * `bookly-documentacion-de-errores.pdf` - Catálogo estándar de códigos de error (ej. AUTH-001).
 
-* **Alineación e Integración (Frontend ↔ Backend):**
-  * [`ALINEACION_BACKEND_FRONTEND.md`](./ALINEACION_BACKEND_FRONTEND.md) - Políticas y reglas estrictas para mantener la consistencia entre ambos repositorios.
-  * [`FRONTEND_BACKEND_ENDPOINT_MAPPING.md`](./FRONTEND_BACKEND_ENDPOINT_MAPPING.md) - Diccionario oficial de mapeo: qué endpoint usa qué pantalla.
-  * [`BACKEND_FRONTEND_ENDPOINTS_AUDIT.md`](./BACKEND_FRONTEND_ENDPOINTS_AUDIT.md) - Resultados de la auditoría de contratos de API (Gaps y discrepancias).
-  * `backend-inventory-*.md` - Inventarios exhaustivos de los endpoints implementados en cada microservicio.
+* **Alineación e Integración (`api-alignment/`):**
+  * [`ALINEACION_BACKEND_FRONTEND.md`](./api-alignment/ALINEACION_BACKEND_FRONTEND.md) - Políticas y reglas estrictas para mantener la consistencia entre ambos repositorios.
+  * [`FRONTEND_BACKEND_ENDPOINT_MAPPING.md`](./api-alignment/FRONTEND_BACKEND_ENDPOINT_MAPPING.md) - Diccionario oficial de mapeo: qué endpoint usa qué pantalla.
+  * [`BACKEND_FRONTEND_ENDPOINTS_AUDIT.md`](./api-alignment/BACKEND_FRONTEND_ENDPOINTS_AUDIT.md) - Resultados de la auditoría de contratos de API (Gaps y discrepancias).
+  * `inventories/` - Inventarios exhaustivos de los endpoints implementados en cada microservicio.
 
-* **Workflows y Automatización (Windsurf):**
-  * [`INICIO_RAPIDO_WORKFLOWS.md`](./INICIO_RAPIDO_WORKFLOWS.md) - Guía sobre cómo ejecutar los flujos de trabajo automatizados del agente.
+* **Workflows y Automatización (`workflows-guide/`):**
+  * [`INICIO_RAPIDO_WORKFLOWS.md`](./workflows-guide/INICIO_RAPIDO_WORKFLOWS.md) - Guía sobre cómo ejecutar los flujos de trabajo automatizados del agente.
   * `windsurf/` - Definiciones Markdown de workflows personalizados (ej. `WF-REV-01-windsurf-workflow.md`).
   * `rules-review/` - Logs y resultados de las auditorías automáticas de reglas.
 
-* **Reportes y Progreso de Calidad:**
-  * [`PROGRESO_IMPLEMENTACION.md`](./PROGRESO_IMPLEMENTACION.md) - Estado general del proyecto, porcentaje de avance y próximos pasos.
-  * [`SECURITY_SUMMARY.md`](./SECURITY_SUMMARY.md) - Resumen ejecutivo de la postura de seguridad actual.
+* **Reportes y Progreso de Calidad (`project-management/` & `reports/`):**
+  * [`PROGRESO_IMPLEMENTACION.md`](./project-management/PROGRESO_IMPLEMENTACION.md) - Estado general del proyecto, porcentaje de avance y próximos pasos.
+  * [`SECURITY_SUMMARY.md`](./project-management/SECURITY_SUMMARY.md) - Resumen ejecutivo de la postura de seguridad actual.
   * `reports/` - Auditorías específicas de pantallas (ej. DASHBOARD-IMPROVEMENTS.md).
   * `qa/` - Reportes de calidad, resultados de pruebas E2E globales (ej. F12-SMOKE-TEST-REPORT.md).
 

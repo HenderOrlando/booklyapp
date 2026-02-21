@@ -226,9 +226,15 @@ Plantillas estandarizadas para documentación:
 
 Ejemplos de código y configuración.
 
-### [seeds/](./seeds/)
-
-Scripts y documentación de seeding de datos.
+### [adr/](./adr/) - Architecture Decision Records (Registro histórico de decisiones).
+* [api/](./api/) - Contratos OpenAPI, Postman y estándares de respuesta.
+* [architecture/](./architecture/) - Diagramas C4, flujos de datos y diseño del sistema.
+* [deployment/](./deployment/) - Guías de despliegue y configuración en entornos remotos.
+* [development/](./development/) - Guías de desarrollo local y convenciones de código.
+* [implementation/](./implementation/) - Detalles de implementación por módulo y servicio.
+* [operations/](./operations/) - Manuales de operación, monitoreo y soporte.
+* [testing/](./testing/) - Estrategias de QA, pruebas unitarias y de integración.
+* [archive/](./archive/) - Documentación histórica y planes anteriores (ej. `PLAN-BACKEND-CONSOLIDATION.md`).
 
 ---
 

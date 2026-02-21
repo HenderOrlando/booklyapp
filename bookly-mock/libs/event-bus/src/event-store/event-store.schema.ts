@@ -34,7 +34,7 @@ export class EventStore extends Document {
   @Prop({ index: true })
   causationId?: string;
 
-  @Prop({ index: true, sparse: true })
+  @Prop({ index: true, sparse: true, unique: true })
   idempotencyKey?: string;
 
   @Prop({ type: Object })
@@ -57,9 +57,6 @@ export const EventStoreSchema = SchemaFactory.createForClass(EventStore);
 EventStoreSchema.index({ aggregateId: 1, version: 1 }, { unique: true });
 EventStoreSchema.index({ aggregateType: 1, aggregateId: 1 });
 EventStoreSchema.index({ eventType: 1, timestamp: -1 });
-EventStoreSchema.index({ correlationId: 1 });
-EventStoreSchema.index({ causationId: 1 });
-EventStoreSchema.index({ idempotencyKey: 1 }, { unique: true, sparse: true });
 
 /**
  * Snapshot Schema
