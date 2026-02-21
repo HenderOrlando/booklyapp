@@ -18,7 +18,9 @@ import {
   Post,
   Query,
   UseGuards,
+  UseInterceptors,
 } from "@nestjs/common";
+import { CacheInterceptor, CacheKey, CacheTTL } from "@nestjs/cache-manager";
 import { CommandBus, QueryBus } from "@nestjs/cqrs";
 import {
   ApiBearerAuth,
@@ -157,6 +159,8 @@ export class ResourcesController {
   }
 
   @Get("search/advanced")
+  @UseInterceptors(CacheInterceptor)
+  @CacheTTL(60000) // 1 min de caché para búsquedas avanzadas
   @ApiOperation({
     summary: "Búsqueda avanzada de recursos",
     description:
@@ -223,6 +227,8 @@ export class ResourcesController {
   }
 
   @Get()
+  @UseInterceptors(CacheInterceptor)
+  @CacheTTL(30000) // 30 sec de caché para lista general
   @ApiOperation({
     summary: "Obtener lista de recursos",
     description:
@@ -403,6 +409,8 @@ export class ResourcesController {
   }
 
   @Get(":id/category")
+  @UseInterceptors(CacheInterceptor)
+  @CacheTTL(3600000) // 1h de caché, la categoría de un recurso cambia poco
   @ApiOperation({
     summary: "Obtener categoría de un recurso",
     description:

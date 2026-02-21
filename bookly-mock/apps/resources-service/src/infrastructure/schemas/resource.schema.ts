@@ -9,7 +9,10 @@ export type ResourceDocument = Resource & Document;
  */
 @Schema({ timestamps: true, collection: "resources" })
 export class Resource {
-  @Prop({ required: true, unique: true, uppercase: true, trim: true })
+  @Prop({ type: String, required: true, index: true })
+  tenantId: string;
+
+  @Prop({ required: true, trim: true })
   code: string;
 
   @Prop({ required: true, trim: true })
@@ -100,12 +103,13 @@ export class Resource {
 
 export const ResourceSchema = SchemaFactory.createForClass(Resource);
 
-// Indexes (code already has unique index from @Prop decorator)
-ResourceSchema.index({ type: 1 });
-ResourceSchema.index({ categoryId: 1 });
-ResourceSchema.index({ programIds: 1 });
-ResourceSchema.index({ status: 1 });
-ResourceSchema.index({ isActive: 1 });
-ResourceSchema.index({ location: 1 });
-ResourceSchema.index({ building: 1 });
-ResourceSchema.index({ createdAt: -1 });
+// Indexes (Multi-tenant awareness)
+ResourceSchema.index({ tenantId: 1, code: 1 }, { unique: true });
+ResourceSchema.index({ tenantId: 1, type: 1 });
+ResourceSchema.index({ tenantId: 1, categoryId: 1 });
+ResourceSchema.index({ tenantId: 1, programIds: 1 });
+ResourceSchema.index({ tenantId: 1, status: 1 });
+ResourceSchema.index({ tenantId: 1, isActive: 1 });
+ResourceSchema.index({ tenantId: 1, location: 1 });
+ResourceSchema.index({ tenantId: 1, building: 1 });
+ResourceSchema.index({ tenantId: 1, createdAt: -1 });
