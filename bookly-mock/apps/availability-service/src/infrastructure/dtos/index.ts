@@ -1,4 +1,6 @@
 export * from "./add-to-waiting-list.dto";
+export * from "./notify-waiting-list.dto";
+export * from "./update-waiting-list-priority.dto";
 export * from "./cancel-reservation.dto";
 export * from "./check-availability.dto";
 export * from "./create-availability.dto";

@@ -8,7 +8,9 @@
     "experimentalDecorators": true,
     "allowSyntheticDefaultImports": true,
     "target": "ES2022",
-    "lib": ["ES2022"],
+    "lib": [
+      "ES2022"
+    ],
     "sourceMap": true,
     "outDir": "./dist",
     "baseUrl": "./",
@@ -23,44 +25,114 @@
     "resolveJsonModule": true,
     "allowJs": false,
     "paths": {
-      "@libs/common": ["libs/common/src"],
-      "@libs/common/*": ["libs/common/src/*"],
-      "@libs/event-bus": ["libs/event-bus/src"],
-      "@libs/event-bus/*": ["libs/event-bus/src/*"],
-      "@libs/redis": ["libs/redis/src"],
-      "@libs/redis/*": ["libs/redis/src/*"],
-      "@libs/database": ["libs/database/src"],
-      "@libs/database/*": ["libs/database/src/*"],
-      "@libs/decorators": ["libs/decorators/src"],
-      "@libs/decorators/*": ["libs/decorators/src/*"],
-      "@libs/guards": ["libs/guards/src"],
-      "@libs/guards/*": ["libs/guards/src/*"],
-      "@libs/filters": ["libs/filters/src"],
-      "@libs/filters/*": ["libs/filters/src/*"],
-      "@libs/interceptors": ["libs/interceptors/src"],
-      "@libs/interceptors/*": ["libs/interceptors/src/*"],
-      "@libs/kafka": ["libs/kafka/src"],
-      "@libs/kafka/*": ["libs/kafka/src/*"],
-      "@libs/notifications": ["libs/notifications/src"],
-      "@libs/notifications/*": ["libs/notifications/src/*"],
-      "@libs/security": ["libs/security/src"],
-      "@libs/security/*": ["libs/security/src/*"],
-      "@libs/idempotency": ["libs/idempotency/src"],
-      "@libs/idempotency/*": ["libs/idempotency/src/*"],
-      "@libs/storage": ["libs/storage/src"],
-      "@libs/storage/*": ["libs/storage/src/*"],
+      "@libs/common": [
+        "libs/common/src"
+      ],
+      "@libs/common/*": [
+        "libs/common/src/*"
+      ],
+      "@libs/event-bus": [
+        "libs/event-bus/src"
+      ],
+      "@libs/event-bus/*": [
+        "libs/event-bus/src/*"
+      ],
+      "@libs/redis": [
+        "libs/redis/src"
+      ],
+      "@libs/redis/*": [
+        "libs/redis/src/*"
+      ],
+      "@libs/database": [
+        "libs/database/src"
+      ],
+      "@libs/database/*": [
+        "libs/database/src/*"
+      ],
+      "@libs/decorators": [
+        "libs/decorators/src"
+      ],
+      "@libs/decorators/*": [
+        "libs/decorators/src/*"
+      ],
+      "@libs/guards": [
+        "libs/guards/src"
+      ],
+      "@libs/guards/*": [
+        "libs/guards/src/*"
+      ],
+      "@libs/filters": [
+        "libs/filters/src"
+      ],
+      "@libs/filters/*": [
+        "libs/filters/src/*"
+      ],
+      "@libs/interceptors": [
+        "libs/interceptors/src"
+      ],
+      "@libs/interceptors/*": [
+        "libs/interceptors/src/*"
+      ],
+      "@libs/kafka": [
+        "libs/kafka/src"
+      ],
+      "@libs/kafka/*": [
+        "libs/kafka/src/*"
+      ],
+      "@libs/notifications": [
+        "libs/notifications/src"
+      ],
+      "@libs/notifications/*": [
+        "libs/notifications/src/*"
+      ],
+      "@libs/security": [
+        "libs/security/src"
+      ],
+      "@libs/security/*": [
+        "libs/security/src/*"
+      ],
+      "@libs/idempotency": [
+        "libs/idempotency/src"
+      ],
+      "@libs/idempotency/*": [
+        "libs/idempotency/src/*"
+      ],
+      "@libs/storage": [
+        "libs/storage/src"
+      ],
+      "@libs/storage/*": [
+        "libs/storage/src/*"
+      ],
       "@reports/audit-decorators": [
         "apps/reports-service/src/libs/audit-decorators/src"
       ],
       "@reports/audit-decorators/*": [
         "apps/reports-service/src/libs/audit-decorators/src/*"
       ],
-      "@auth/*": ["apps/auth-service/src/*"],
-      "@resources/*": ["apps/resources-service/src/*"],
-      "@availability/*": ["apps/availability-service/src/*"],
-      "@stockpile/*": ["apps/stockpile-service/src/*"],
-      "@reports/*": ["apps/reports-service/src/*"],
-      "@gateway/*": ["apps/api-gateway/src/*"]
+      "@auth/*": [
+        "apps/auth-service/src/*"
+      ],
+      "@resources/*": [
+        "apps/resources-service/src/*"
+      ],
+      "@availability/*": [
+        "apps/availability-service/src/*"
+      ],
+      "@stockpile/*": [
+        "apps/stockpile-service/src/*"
+      ],
+      "@reports/*": [
+        "apps/reports-service/src/*"
+      ],
+      "@gateway/*": [
+        "apps/api-gateway/src/*"
+      ],
+      "@bookly/i18n": [
+        "libs/i18n/src"
+      ],
+      "@bookly/i18n/*": [
+        "libs/i18n/src/*"
+      ]
     }
   },
   "exclude": [
@@ -71,4 +143,4 @@
     "scripts",
     "**/*.disabled"
   ]
-}
+}\n

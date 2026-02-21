@@ -78,7 +78,10 @@ export const AllHandlers = [
 ];
 
 export * from "./add-to-waiting-list.handler";
-export * from "./cancel-maintenance-block.handler";
+export * from "./cancel-waiting-list.handler";
+export * from "./notify-waiting-list.handler";
+export * from "./update-waiting-list-priority.handler";
+export * from "./accept-waiting-list-offer.handler";
 export * from "./cancel-recurring-instance.handler";
 export * from "./cancel-recurring-series.handler";
 export * from "./cancel-reservation.handler";

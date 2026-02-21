@@ -1,5 +1,10 @@
-import { AddToWaitingListCommand } from "@availability/application/commands";
-import { CancelWaitingListCommand } from "@availability/application/commands/cancel-waiting-list.command";
+import {
+  AddToWaitingListCommand,
+  CancelWaitingListCommand,
+  NotifyWaitingListCommand,
+  UpdateWaitingListPriorityCommand,
+  AcceptWaitingListOfferCommand,
+} from "@availability/application/commands";
 import { GetWaitingListQuery } from "@availability/application/queries";
 import { ResponseUtil } from "@libs/common";
 import { CurrentUser } from "@libs/decorators";
@@ -10,6 +15,7 @@ import {
   Delete,
   Get,
   Param,
+  Patch,
   Post,
   Query,
   UseGuards,
@@ -21,7 +27,11 @@ import {
   ApiResponse,
   ApiTags,
 } from "@nestjs/swagger";
-import { AddToWaitingListDto } from "../dtos";
+import {
+  AddToWaitingListDto,
+  NotifyWaitingListDto,
+  UpdateWaitingListPriorityDto,
+} from "../dtos";
 
 /**
  * Waiting Lists Controller
@@ -99,6 +109,71 @@ export class WaitingListsController {
     }
 
     return ResponseUtil.success(result, "Waiting list retrieved successfully");
+  }
+
+  @Post("notify")
+  @ApiOperation({ summary: "Notificar a los siguientes en lista de espera" })
+  @ApiResponse({
+    status: 200,
+    description: "Usuarios notificados exitosamente",
+  })
+  async notifyWaitlist(
+    @Body() dto: NotifyWaitingListDto,
+  ): Promise<any> {
+    const command = new NotifyWaitingListCommand(
+      dto.resourceId,
+      new Date(dto.availableFrom),
+      new Date(dto.availableUntil),
+      dto.notifyTop
+    );
+
+    const result = await this.commandBus.execute(command);
+    return ResponseUtil.success(
+      result,
+      "Users notified successfully",
+    );
+  }
+
+  @Patch(":id/priority")
+  @ApiOperation({ summary: "Actualizar prioridad de una solicitud" })
+  @ApiResponse({
+    status: 200,
+    description: "Prioridad actualizada exitosamente",
+  })
+  async updatePriority(
+    @Param("id") id: string,
+    @Body() dto: UpdateWaitingListPriorityDto,
+  ): Promise<any> {
+    const command = new UpdateWaitingListPriorityCommand(
+      id,
+      dto.newPriority,
+      dto.reason
+    );
+
+    const result = await this.commandBus.execute(command);
+    return ResponseUtil.success(
+      result,
+      "Priority updated successfully",
+    );
+  }
+
+  @Post(":id/accept")
+  @ApiOperation({ summary: "Aceptar oferta de lista de espera" })
+  @ApiResponse({
+    status: 200,
+    description: "Oferta aceptada y convertida a reserva exitosamente",
+  })
+  async acceptOffer(
+    @Param("id") id: string,
+    @CurrentUser("sub") userId: string,
+  ): Promise<any> {
+    const command = new AcceptWaitingListOfferCommand(id, userId);
+
+    const result = await this.commandBus.execute(command);
+    return ResponseUtil.success(
+      result,
+      "Offer accepted successfully",
+    );
   }
 
   @Delete(":id")

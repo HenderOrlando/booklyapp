@@ -64,6 +64,7 @@ export class ProxyService {
       reservations: "availability",
       availabilities: "availability",
       "waiting-lists": "availability",
+      waitlist: "availability",
       reassignments: "availability",
       calendar: "availability",
       schedules: "availability",
