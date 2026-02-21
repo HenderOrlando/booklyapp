@@ -122,6 +122,7 @@ import { JwtStrategy } from "./infrastructure/strategies/jwt.strategy";
       isGlobal: true,
       envFilePath: [".env", "apps/reports-service/.env"],
     }),
+    I18nModule,
     EventBusModule.forRootAsync({
       useFactory: (configService: ConfigService) => ({
         brokerType:

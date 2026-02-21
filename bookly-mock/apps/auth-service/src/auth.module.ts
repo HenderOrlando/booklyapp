@@ -3,6 +3,7 @@ import { DatabaseModule, ReferenceDataModule } from "@libs/database";
 import { EventBusModule } from "@libs/event-bus";
 import { IdempotencyModule } from "@libs/idempotency";
 import { RedisModule } from "@libs/redis";
+import { I18nModule } from "@bookly/i18n";
 import { Module } from "@nestjs/common";
 import { ConfigModule, ConfigService } from "@nestjs/config";
 import { CqrsModule } from "@nestjs/cqrs";
@@ -63,6 +64,8 @@ import { OAuthModule, OAuthProvider, OAuthPurpose } from "./modules/oauth";
       isGlobal: true,
       envFilePath: [".env", "apps/auth-service/.env"],
     }),
+
+    I18nModule,
 
     // CQRS
     CqrsModule,

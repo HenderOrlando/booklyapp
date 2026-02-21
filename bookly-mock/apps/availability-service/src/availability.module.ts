@@ -12,6 +12,7 @@ import { MongooseModule } from "@nestjs/mongoose";
 import { PassportModule } from "@nestjs/passport";
 import { ScheduleModule } from "@nestjs/schedule";
 import { AuditDecoratorsModule } from "@reports/audit-decorators";
+import { I18nModule } from "@bookly/i18n";
 
 // Schemas
 import {
@@ -96,10 +97,16 @@ import * as InfraEventHandlers from "./infrastructure/event-handlers";
  */
 @Module({
   imports: [
+    // Config
     ConfigModule.forRoot({
       isGlobal: true,
       envFilePath: [".env", "apps/availability-service/.env"],
     }),
+
+    I18nModule,
+
+    // CQRS
+    CqrsModule,
     // DatabaseModule reemplaza MongooseModule.forRoot
     DatabaseModule,
     // Reference Data (tipos, estados dinámicos del dominio availability)
