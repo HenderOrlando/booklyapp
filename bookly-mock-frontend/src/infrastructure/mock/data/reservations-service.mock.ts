@@ -76,7 +76,7 @@ export const mockReservations: Reservation[] = [
     description: "Revisión de plan de estudios 2026",
     startDate: "2025-11-24T15:00:00",
     endDate: "2025-11-24T17:00:00",
-    status: "IN_PROGRESS",
+    status: "ACTIVE",
     attendees: 12,
     createdAt: "2025-11-20T08:00:00",
     updatedAt: "2025-11-24T15:00:00",

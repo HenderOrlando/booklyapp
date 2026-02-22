@@ -172,19 +172,19 @@
 
 | Método | Frontend Endpoint | Estado Backend | Backend Real | Acción Requerida |
 |--------|------------------|----------------|--------------|------------------|
-| **POST** | `reports/usage/generate` | ✅ **EXISTE** | `GET /reports/usage` | **ADAPTAR MÉTODO** |
-| **GET** | `reports/usage` | ✅ **EXISTE** | `GET /reports/usage` | **OK** |
-| **POST** | `reports/users/generate` | ✅ **EXISTE** | `GET /reports/user/:userId` | **ADAPTAR URL** |
-| **GET** | `reports/users` | ✅ **EXISTE** | `GET /reports/user/:userId` | **ADAPTAR URL** |
-| **GET** | `reports/export/:id` | ✅ **EXISTE** | `POST /reports/export/csv` | **ADAPTAR MÉTODO** |
-| **GET** | `reports/export/usage` | ✅ **EXISTE** | `POST /reports/export/csv` | **ADAPTAR MÉTODO** |
-| **POST** | `reports/demand/generate` | ✅ **EXISTE** | `GET /reports/demand` | **ADAPTAR MÉTODO** |
-| **GET** | `reports/demand` | ✅ **EXISTE** | `GET /reports/demand` | **OK** |
-| **POST** | `reports/feedback/generate` | ✅ **EXISTE** | `POST /reports/feedback` | **ADAPTAR URL** |
+| **POST** | `reports/usage/generate` | ✅ **EXISTE** | `GET /reports/usage-reports` | **OK** |
+| **GET** | `reports/usage` | ✅ **EXISTE** | `GET /reports/usage-reports` | **OK** |
+| **POST** | `reports/users/generate` | ✅ **EXISTE** | `GET /reports/user-reports?userId=:userId` | **OK** |
+| **GET** | `reports/users` | ✅ **EXISTE** | `GET /reports/user-reports?userId=:userId` | **OK** |
+| **GET** | `reports/export/:id` | ✅ **EXISTE** | `GET /reports/export/:id` | **OK** |
+| **GET** | `reports/export/usage` | ✅ **EXISTE** | `GET /reports/export/:id/download` | **OK** |
+| **POST** | `reports/demand/generate` | ✅ **EXISTE** | `GET /reports/demand-reports` | **OK** |
+| **GET** | `reports/demand` | ✅ **EXISTE** | `GET /reports/demand-reports` | **OK** |
+| **POST** | `reports/feedback/generate` | ✅ **EXISTE** | `POST /reports/feedback` | **OK** |
 | **GET** | `reports/feedback` | ✅ **EXISTE** | `GET /reports/feedback` | **OK** |
-| **GET** | `reports/dashboard/stats` | ✅ **EXISTE** | `GET /reports/dashboard` | **ADAPTAR URL** |
-| **GET** | `reports/dashboard/utilization` | ✅ **EXISTE** | `GET /reports/dashboard` | **ADAPTAR URL** |
-| **GET** | `reports/dashboard/activity` | ✅ **EXISTE** | `GET /reports/dashboard` | **ADAPTAR URL** |
+| **GET** | `reports/dashboard/stats` | ✅ **EXISTE** | `GET /reports/dashboard/overview` | **OK** |
+| **GET** | `reports/dashboard/utilization` | ✅ **EXISTE** | `GET /reports/dashboard/occupancy` | **OK** |
+| **GET** | `reports/dashboard/activity` | ✅ **EXISTE** | `GET /reports/dashboard/trends` | **OK** |
 
 ### 📊 REPORTS SERVICE - CONTROLADORES EXPANDIDOS
 
@@ -438,8 +438,8 @@ await http.get('resource-categories', { searchParams })
 |--------|------------------|-------------|------------------|
 | **POST** | `/search/advanced` | Búsqueda avanzada | ⚠️ **FALTA FRONTEND** |
 | **GET** | `/search/suggestions` | Sugerencias búsqueda | ⚠️ **FALTA FRONTEND** |
-| **POST** | `/waiting-list/join` | Unirse a lista espera | ⚠️ **FALTA FRONTEND** |
-| **GET** | `/waiting-list/position/:id` | Posición en lista | ⚠️ **FALTA FRONTEND** |
+| **POST** | `/waiting-lists/join` | Unirse a lista espera | ⚠️ **FALTA FRONTEND** |
+| **GET** | `/waiting-lists/position/:id` | Posición en lista | ⚠️ **FALTA FRONTEND** |
 | **POST** | `/recurring-reservations` | Reservas recurrentes | ⚠️ **FALTA FRONTEND** |
 | **GET** | `/calendar/conflicts` | Detectar conflictos | ⚠️ **FALTA FRONTEND** |
 | **POST** | `/calendar/optimize` | Optimizar horarios | ⚠️ **FALTA FRONTEND** |
@@ -475,10 +475,10 @@ await http.get('resource-categories', { searchParams })
 
 ### Fase 1: Corrección de URLs (1-2 días)
 
-1. **Auth Service**: Agregar prefijo `/api/auth`
-2. **Resources Service**: Cambiar `categories` → `resource-categories`  
-3. **Availability Service**: Alinear rutas de reservas
-4. **Reports Service**: Ajustar métodos HTTP
+1. ✅ **Auth Service**: Agregar prefijo `/api/auth`
+2. ✅ **Resources Service**: Cambiar `categories` → `resource-categories`  
+3. ✅ **Availability Service**: Alinear rutas de reservas
+4. ✅ **Reports Service**: Ajustar métodos HTTP y rutas
 
 ### Fase 2: Funcionalidades Críticas (1 semana)
 

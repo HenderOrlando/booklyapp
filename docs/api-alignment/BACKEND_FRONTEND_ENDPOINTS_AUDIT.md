@@ -273,15 +273,15 @@ Este documento mapea los endpoints disponibles en el backend (bookly-mock) con s
 
 #### 1. Perfil de Usuario
 
-- **Backend**: `/api/v1/users/me`
-- **Frontend**: Usa `/api/v1/auth/profile`
-- **Acción**: Unificar en `/auth/profile`
+- **Backend**: `/api/v1/users/me` y `/api/v1/users/me/profile`
+- **Frontend**: Usaba `/api/v1/auth/profile`
+- **Acción**: ✅ Unificado para usar `/api/v1/users/me` y `/api/v1/users/me/profile` en `endpoints.ts`.
 
 #### 2. Check-In/Check-Out
 
-- **Backend**: Endpoints en Availability y Stockpile
-- **Frontend**: No implementado
-- **Acción**: Decidir ubicación única y implementar
+- **Backend**: Endpoints en Stockpile (`/api/v1/check-in-out`)
+- **Frontend**: Implementado usando `CheckInClient`.
+- **Acción**: ✅ Consolidado bajo `STOCKPILE_ENDPOINTS` en `endpoints.ts`.
 
 ---
 
@@ -289,14 +289,14 @@ Este documento mapea los endpoints disponibles en el backend (bookly-mock) con s
 
 ### Prioridad Alta (Semana 1)
 
-- [ ] Implementar clientes HTTP faltantes
-- [ ] Crear hooks para endpoints existentes sin hook
-- [ ] Unificar endpoint de perfil
+- [x] Implementar clientes HTTP faltantes
+- [x] Crear hooks para endpoints existentes sin hook
+- [x] Unificar endpoint de perfil
 
 ### Prioridad Media (Semana 2-3)
 
-- [ ] Implementar sistema de aprobaciones
-- [ ] Agregar check-in/check-out
+- [x] Implementar sistema de aprobaciones
+- [x] Agregar check-in/check-out
 - [ ] Crear sistema de feedback
 
 ### Prioridad Baja (Semana 4+)
@@ -307,5 +307,5 @@ Este documento mapea los endpoints disponibles en el backend (bookly-mock) con s
 
 ---
 
-**Última actualización**: 2025-11-24  
-**Próxima revisión**: Después de implementar endpoints faltantes
+**Última actualización**: 2026-02-22  
+**Próxima revisión**: Después de implementar feedback y tests de integración

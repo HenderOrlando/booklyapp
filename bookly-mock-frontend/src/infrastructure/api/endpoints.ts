@@ -79,9 +79,17 @@ export const RESOURCES_ENDPOINTS = {
   CATEGORIES: `${API_VERSION}/categories`,
   CATEGORY_BY_ID: (id: string) => `${API_VERSION}/categories/${id}`,
 
-  // Programas Académicos (BE controller: "programs")
+  // Programas Académicos
   PROGRAMS: `${API_VERSION}/programs`,
   PROGRAM_BY_ID: (id: string) => `${API_VERSION}/programs/${id}`,
+
+  // Facultades
+  FACULTIES: `${API_VERSION}/faculties`,
+  FACULTY_BY_ID: (id: string) => `${API_VERSION}/faculties/${id}`,
+
+  // Departamentos
+  DEPARTMENTS: `${API_VERSION}/departments`,
+  DEPARTMENT_BY_ID: (id: string) => `${API_VERSION}/departments/${id}`,
 
   // Importación/Exportación
   IMPORT_CSV: `${API_VERSION}/resources/import`,
@@ -94,23 +102,23 @@ export const RESOURCES_ENDPOINTS = {
   EXPORT_CSV: `${API_VERSION}/resources/export/csv`,
   EXPORT_PDF: `${API_VERSION}/resources/export/pdf`,
 
-  // Mantenimiento (BE controller: "maintenances")
+  // Mantenimiento
   MAINTENANCE: `${API_VERSION}/maintenances`,
   MAINTENANCE_BY_ID: (id: string) => `${API_VERSION}/maintenances/${id}`,
   MAINTENANCE_HISTORY: (resourceId: string) =>
     `${API_VERSION}/maintenances?resourceId=${resourceId}`,
 
   // Disponibilidad
-  AVAILABILITY: `${API_VERSION}/resources/availability`,
+  AVAILABILITY: `${API_VERSION}/availabilities`,
   AVAILABILITY_BY_ID: (id: string) =>
-    `${API_VERSION}/resources/${id}/availability`,
+    `${API_VERSION}/availabilities/resource/${id}`,
 
   // Atributos y Características
   ATTRIBUTES: `${API_VERSION}/resources/attributes`,
   CHARACTERISTICS: `${API_VERSION}/resources/characteristics`,
   EQUIPMENT: `${API_VERSION}/resources/equipment`,
 
-  // Datos de Referencia (BE controller: "reference-data")
+  // Datos de Referencia
   REFERENCE_DATA: `${API_VERSION}/reference-data`,
   REFERENCE_DATA_BY_ID: (id: string) => `${API_VERSION}/reference-data/${id}`,
   REFERENCE_DATA_GROUPS: `${API_VERSION}/reference-data/groups`,
@@ -221,7 +229,7 @@ export const STOCKPILE_ENDPOINTS = {
  */
 export const REPORTS_ENDPOINTS = {
   // Dashboard
-  BASE: `${API_VERSION}/usage-reports`,
+  BASE: `${API_VERSION}/reports`,
   DASHBOARD_OVERVIEW: `${API_VERSION}/dashboard/overview`,
   DASHBOARD_OCCUPANCY: `${API_VERSION}/dashboard/occupancy`,
   DASHBOARD_TRENDS: `${API_VERSION}/dashboard/trends`,

@@ -175,7 +175,7 @@ export class ReportsClient {
   static async getUsageReport(
     filters?: UsageFilters,
   ): Promise<ApiResponse<UsageReport>> {
-    return await httpClient.get<UsageReport>("usage-reports", {
+    return await httpClient.get<UsageReport>(REPORTS_ENDPOINTS.USAGE, {
       params: filters,
     });
   }
@@ -187,7 +187,7 @@ export class ReportsClient {
     resourceId: string,
   ): Promise<ApiResponse<ResourceReport>> {
     return await httpClient.get<ResourceReport>(
-      `dashboard/occupancy?resourceId=${resourceId}`,
+      buildUrl(REPORTS_ENDPOINTS.DASHBOARD_OCCUPANCY, { resourceId }),
     );
   }
 
@@ -195,7 +195,7 @@ export class ReportsClient {
    * Obtener reporte de un usuario específico
    */
   static async getUserReport(userId: string): Promise<ApiResponse<UserReport>> {
-    return await httpClient.get<UserReport>(`user-reports?userId=${userId}`);
+    return await httpClient.get<UserReport>(REPORTS_ENDPOINTS.USAGE_BY_USER(userId));
   }
 
   /**
@@ -204,7 +204,7 @@ export class ReportsClient {
   static async getDemandReport(
     filters?: DemandFilters,
   ): Promise<ApiResponse<DemandReport>> {
-    return await httpClient.get<DemandReport>("demand-reports", {
+    return await httpClient.get<DemandReport>(REPORTS_ENDPOINTS.UNSATISFIED_DEMAND, {
       params: filters,
     });
   }
@@ -215,7 +215,7 @@ export class ReportsClient {
   static async getOccupancyReport(
     filters?: OccupancyFilters,
   ): Promise<ApiResponse<OccupancyReport>> {
-    return await httpClient.get<OccupancyReport>("dashboard/occupancy", {
+    return await httpClient.get<OccupancyReport>(REPORTS_ENDPOINTS.DASHBOARD_OCCUPANCY, {
       params: filters,
     });
   }
@@ -224,14 +224,14 @@ export class ReportsClient {
    * Exportar reporte a CSV
    */
   static async exportToCSV(reportId: string): Promise<ApiResponse<Blob>> {
-    return await httpClient.get<Blob>(`${reportId}/export/csv`);
+    return await httpClient.get<Blob>(REPORTS_ENDPOINTS.EXPORT_DOWNLOAD(reportId));
   }
 
   /**
    * Exportar reporte a PDF
    */
   static async exportToPDF(reportId: string): Promise<ApiResponse<Blob>> {
-    return await httpClient.get<Blob>(`${reportId}/export/pdf`);
+    return await httpClient.get<Blob>(`${REPORTS_ENDPOINTS.EXPORT}/${reportId}/pdf`);
   }
 
   /**

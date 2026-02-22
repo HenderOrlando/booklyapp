@@ -22,10 +22,12 @@ export interface CalendarEvent {
   status:
     | "PENDING"
     | "CONFIRMED"
-    | "IN_PROGRESS"
+    | "ACTIVE"
     | "CANCELLED"
     | "COMPLETED"
-    | "REJECTED";
+    | "REJECTED"
+    | "APPROVED"
+    | "CHECKED_IN";
   color?: string;
   userId?: string;
   userName?: string;
@@ -114,18 +116,22 @@ function getStatusColor(
   status:
     | "PENDING"
     | "CONFIRMED"
-    | "IN_PROGRESS"
+    | "ACTIVE"
     | "CANCELLED"
     | "COMPLETED"
     | "REJECTED"
+    | "APPROVED"
+    | "CHECKED_IN"
 ): string {
   const colors: Record<typeof status, string> = {
     PENDING: "#F59E0B", // Amber
     CONFIRMED: "#10B981", // Green
-    IN_PROGRESS: "#3B82F6", // Blue
+    ACTIVE: "#3B82F6", // Blue
     CANCELLED: "#EF4444", // Red
     COMPLETED: "#6B7280", // Gray
-    REJECTED: "#DC2626", // Dark Red
+    REJECTED: "#DC2626", // Red darker
+    APPROVED: "#10B981", // Green
+    CHECKED_IN: "#8B5CF6", // Purple
   };
   return colors[status];
 }

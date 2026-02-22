@@ -344,6 +344,7 @@
 - ✅ Implementar gestión de usuarios
 - 🔄 Implementar flujo de aprobaciones
 - 🔄 Implementar check-in/check-out
+- 🔄 **Plan de Alineación Frontend-Backend**: Ejecutar auditoría y corrección sistemática de endpoints en todas las páginas (Skills: `web-app`, `ux-ui`, `backend`, `align-front-back`, `qa-calidad`, `operacion-interna-equipo`, `gestion-ingenieria-delivery`).
 
 ### Próxima Semana (1-7 Dic)
 

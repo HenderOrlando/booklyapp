@@ -28,7 +28,7 @@ import { ButtonWithLoading } from "@/components/molecules/ButtonWithLoading";
 import { RecurringPatternSelector } from "@/components/molecules/RecurringPatternSelector";
 import { RecurringReservationPreview } from "@/components/molecules/RecurringReservationPreview";
 import { useRecurringReservations } from "@/hooks/useRecurringReservations";
-import { useAuth } from "@/hooks/useAuth";
+import { useAuth } from "@/contexts/AuthContext";
 import { useToast } from "@/hooks/useToast";
 import { useTranslations } from "next-intl";
 import type { RecurrencePattern } from "@/types/entities/recurring";
