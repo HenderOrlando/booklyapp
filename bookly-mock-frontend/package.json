@@ -20,7 +20,9 @@
     "integration:check": "npm run verify:backend && npm run type-check",
     "analyze": "ANALYZE=true next build",
     "analyze:win": "set ANALYZE=true&& next build",
-    "verify:i18n": "node ./scripts/verify-i18n.js"
+    "verify:i18n": "node ./scripts/verify-i18n.js",
+    "storybook": "storybook dev -p 6006",
+    "build-storybook": "storybook build"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.3.0",
@@ -71,7 +73,15 @@
     "zod": "^3.23.0"
   },
   "devDependencies": {
+    "@chromatic-com/storybook": "^3.2.7",
+    "@next/bundle-analyzer": "^15.1.0",
     "@playwright/test": "^1.44.0",
+    "@storybook/addon-a11y": "^8.6.14",
+    "@storybook/addon-essentials": "^8.6.14",
+    "@storybook/addon-interactions": "^8.6.14",
+    "@storybook/nextjs": "^8.6.14",
+    "@storybook/react": "^8.6.14",
+    "@storybook/test": "^8.6.14",
     "@testing-library/jest-dom": "^6.4.0",
     "@testing-library/react": "^15.0.0",
     "@testing-library/user-event": "^14.6.1",
@@ -82,6 +92,7 @@
     "@typescript-eslint/eslint-plugin": "^7.8.0",
     "@typescript-eslint/parser": "^7.8.0",
     "autoprefixer": "^10.4.0",
+    "esbuild-wasm": "^0.27.3",
     "eslint": "^8.57.0",
     "eslint-config-next": "^14.2.0",
     "jest": "^29.7.0",
@@ -89,9 +100,9 @@
     "postcss": "^8.4.0",
     "prettier": "^3.2.0",
     "prettier-plugin-tailwindcss": "^0.5.0",
+    "storybook": "^8.6.14",
     "tailwindcss": "^3.4.0",
-    "typescript": "^5.4.0",
-    "@next/bundle-analyzer": "^15.1.0"
+    "typescript": "^5.4.0"
   },
   "engines": {
     "node": ">=18.0.0",
