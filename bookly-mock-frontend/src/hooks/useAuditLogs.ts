@@ -7,8 +7,8 @@
  * - Exportación CSV server-side
  */
 
-import { httpClient } from "@/infrastructure/http/httpClient";
 import { AUDIT_ENDPOINTS } from "@/infrastructure/api/endpoints";
+import { httpClient } from "@/infrastructure/http/httpClient";
 import type { PaginatedResponse } from "@/infrastructure/api/types";
 import { useQuery } from "@tanstack/react-query";
 
@@ -99,18 +99,40 @@ export function useAuditLogs(filters?: AuditFilters) {
         };
       }
 
-      const data = response.data as Record<string, unknown>;
-      const items = (data.items || data.data || data) as AuditLog[];
+      const payload = response.data;
+
+      // Backend may return: array | { items, meta } | { data: [...] }
+      let rawItems: unknown[];
+      let rawMeta: Record<string, unknown> | undefined;
+
+      if (Array.isArray(payload)) {
+        rawItems = payload;
+      } else if (typeof payload === "object" && payload !== null) {
+        const obj = payload as Record<string, unknown>;
+        const candidateItems = obj.items ?? obj.data ?? obj.logs;
+        rawItems = Array.isArray(candidateItems) ? candidateItems : [];
+        rawMeta = typeof obj.meta === "object" && obj.meta !== null
+          ? (obj.meta as Record<string, unknown>)
+          : undefined;
+      } else {
+        rawItems = [];
+      }
+
+      const items = rawItems as AuditLog[];
+      const currentPage = Number(rawMeta?.page) || filters?.page || 1;
+      const currentLimit = Number(rawMeta?.limit) || filters?.limit || 20;
+      const total = Number(rawMeta?.total) || items.length;
+      const totalPages = Number(rawMeta?.totalPages) || Math.max(1, Math.ceil(total / currentLimit));
 
       return {
-        items: Array.isArray(items) ? items : [],
-        meta: (data.meta as PaginatedResponse<AuditLog>["meta"]) || {
-          total: Array.isArray(items) ? items.length : 0,
-          page: filters?.page || 1,
-          limit: filters?.limit || 20,
-          totalPages: 1,
-          hasNextPage: false,
-          hasPreviousPage: false,
+        items,
+        meta: {
+          total,
+          page: currentPage,
+          limit: currentLimit,
+          totalPages,
+          hasNextPage: rawMeta?.hasNextPage !== undefined ? Boolean(rawMeta.hasNextPage) : currentPage < totalPages,
+          hasPreviousPage: rawMeta?.hasPreviousPage !== undefined ? Boolean(rawMeta.hasPreviousPage) : currentPage > 1,
         },
       };
     },
