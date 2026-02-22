@@ -173,7 +173,7 @@ export default function CalendarioPage() {
     const start = new Date(startDate);
     const end = new Date(endDate);
 
-    return reservationsData.items.filter((r) => {
+    return reservationsData.items.filter((r: Reservation) => {
       if (r.id === excludeId || r.resourceId !== resourceId) return false;
       if (
         r.status === "CANCELLED" ||

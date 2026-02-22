@@ -33,10 +33,10 @@
 
 ### 1. Problema con Interpolación de Variables
 
-La clave usa interpolación `{{count}}` que puede no estar siendo parseada correctamente por next-intl:
+La clave usa interpolación `{count}}` que puede no estar siendo parseada correctamente por next-intl:
 
 ```json
-"programs_title": "Programas que Usan este Recurso ({{count}})"
+"programs_title": "Programas que Usan este Recurso ({count}})"
 ```
 
 ### 2. Caché de Componente React
@@ -60,7 +60,7 @@ Cambiar de interpolación ICU a template string manual:
 ```json
 // es/resource_detail.json
 "programs_title": "Programas que Usan este Recurso",
-"programs_count": "({{count}})"
+"programs_count": "({count}})"
 ```
 
 **Modificar código:**

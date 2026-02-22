@@ -106,7 +106,7 @@
 - **Estado:** ✅ 100% traducido + Issue resuelto
 - **Namespace:** `resource_detail`
 - **Problema identificado:**
-  - `programs_title` con interpolación `{{count}}` no se cargaba correctamente
+  - `programs_title` con interpolación `{count}}` no se cargaba correctamente
 - **Solución implementada:**
   - ✅ Agregada clave `programs_title_prefix` sin interpolación
   - ✅ Cambiado código para usar: `{t("programs_title_prefix")} ({resourcePrograms.length})`

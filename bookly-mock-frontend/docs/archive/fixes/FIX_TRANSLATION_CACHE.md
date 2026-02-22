@@ -50,7 +50,7 @@ La clave `programs_title` SÍ existe en los archivos de traducción:
 
 ```json
 {
-  "programs_title": "Programas que Usan este Recurso ({{count}})"
+  "programs_title": "Programas que Usan este Recurso ({count}})"
 }
 ```
 
@@ -58,7 +58,7 @@ La clave `programs_title` SÍ existe en los archivos de traducción:
 
 ```json
 {
-  "programs_title": "Programs Using this Resource ({{count}})"
+  "programs_title": "Programs Using this Resource ({count}})"
 }
 ```
 

@@ -123,7 +123,7 @@ Al retornar `locale`, le indicamos a `next-intl` explícitamente qué idioma se 
 
 1. ✅ Cargue los archivos JSON correctos
 2. ✅ Aplique las traducciones al renderizar
-3. ✅ Permita interpolación de variables (`{{count}}`)
+3. ✅ Permita interpolación de variables (`{count}}`)
 4. ✅ Soporte cambio dinámico de idioma
 
 ---
