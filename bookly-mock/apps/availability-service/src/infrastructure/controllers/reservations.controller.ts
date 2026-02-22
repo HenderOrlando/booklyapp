@@ -29,6 +29,7 @@ import {
   CancelReservationCommand,
   CheckInReservationCommand,
   CheckOutReservationCommand,
+  CreateBatchReservationCommand,
   CreateRecurringReservationCommand,
   CreateReservationCommand,
   ModifyRecurringInstanceCommand,
@@ -49,6 +50,7 @@ import {
   CancelInstanceDto,
   CancelRecurringSeriesDto,
   CancelReservationDto,
+  CreateBatchReservationDto,
   CreateRecurringReservationDto,
   CreateReservationDto,
   ModifyInstanceDto,
@@ -144,6 +146,45 @@ export class ReservationsController {
     }
     
     return ResponseUtil.success(result, 'Reservations retrieved successfully');
+  }
+
+  /**
+   * RF-19: Crear reservas múltiples en una solicitud
+   */
+  @Post("batch")
+  @RequirePermissions("reservations:create")
+  @ApiOperation({
+    summary: "Crear reservas múltiples en una solicitud (RF-19)",
+    description:
+      "Permite reservar múltiples recursos de forma atómica. Si failOnConflict=true (default), se hace rollback de todas las reservas si alguna falla.",
+  })
+  @ApiResponse({
+    status: 201,
+    description: "Reservas batch creadas exitosamente",
+  })
+  @ApiResponse({
+    status: 400,
+    description: "Datos inválidos o conflicto de disponibilidad",
+  })
+  async createBatch(
+    @Body() dto: CreateBatchReservationDto,
+    @CurrentUser() user: any
+  ): Promise<any> {
+    const command = new CreateBatchReservationCommand(
+      user.sub,
+      dto.reservations.map((r) => ({
+        resourceId: r.resourceId,
+        startDate: new Date(r.startDate),
+        endDate: new Date(r.endDate),
+        purpose: r.purpose,
+        notes: r.notes,
+      })),
+      dto.failOnConflict ?? true,
+      user.sub
+    );
+
+    const result = await this.commandBus.execute(command);
+    return ResponseUtil.success(result, "Batch reservations processed successfully");
   }
 
   @Get("stats")

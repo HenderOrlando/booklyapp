@@ -10,4 +10,5 @@ export * from "./query-reservation.dto";
 export * from "./recurring-analytics.dto";
 export * from "./recurring-reservation.dto";
 export * from "./search-availability.dto";
+export * from "./create-batch-reservation.dto";
 export * from "./update-reservation.dto";
