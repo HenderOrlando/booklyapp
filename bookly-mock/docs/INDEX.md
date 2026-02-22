@@ -8,8 +8,8 @@
 - [API](#api)
 - [Implementación](#implementación)
 - [Testing](#testing)
-- [Rules Review](#rules-review)
-- [Documentación Histórica](#documentación-histórica)
+- [Plantillas](#plantillas)
+- [Archivo Histórico](#archivo-histórico)
 
 ---
 
@@ -104,46 +104,53 @@
 
 Guías para desarrollo, debugging y ejecución de servicios.
 
-- **[DEBUG_README.md](./development/DEBUG_README.md)** - Resumen de configuración de debugging
-- **[DEBUG_QUICK_START.md](./development/DEBUG_QUICK_START.md)** ⚡ - Inicio rápido de debugging en VS Code
-- **[DEBUG_SETUP.md](./development/DEBUG_SETUP.md)** 🔧 - Guía completa de debugging
-- **[RUNNING_SERVICES.md](./development/RUNNING_SERVICES.md)** - Comandos para ejecutar servicios
 - **[CONTRIBUTING.md](./development/CONTRIBUTING.md)** - Guía de contribución
-- **[MIGRATION_GUIDE_REORGANIZATION.md](./development/MIGRATION_GUIDE_REORGANIZATION.md)** 🔄 - Guía de migración tras reorganización
+- **[RUNNING_SERVICES.md](./development/RUNNING_SERVICES.md)** - Comandos para ejecutar servicios
+- **[DEBUG_QUICK_START.md](./development/DEBUG_QUICK_START.md)** - Inicio rápido de debugging
+- **[DEBUG_SETUP.md](./development/DEBUG_SETUP.md)** - Guía completa de debugging
+- **[DEBUG_README.md](./development/DEBUG_README.md)** - Resumen de configuración
+- **[MIGRATION_GUIDE_REORGANIZATION.md](./development/MIGRATION_GUIDE_REORGANIZATION.md)** - Guía de migración
+- **[GUIA_USO_AUDIT_DECORATORS.md](./development/GUIA_USO_AUDIT_DECORATORS.md)** - Uso de decoradores de auditoría
+- **[SEED_IDS_REFERENCE.md](./development/SEED_IDS_REFERENCE.md)** - Referencia de IDs de seeds
+- **[resources-import-template.csv](./development/resources-import-template.csv)** - Template CSV de importación
 
 ---
 
 ## Arquitectura
 
-Documentación de arquitectura, configuración y estado del proyecto.
+Configuración y diseño del sistema.
 
-- **[ESTADO_PROYECTO.md](./architecture/ESTADO_PROYECTO.md)** - Estado actual y roadmap
-- **[ORGANIZATION_SUMMARY.md](./architecture/ORGANIZATION_SUMMARY.md)** - Resumen organizativo
-- **[ESM_CONFIGURATION.md](./architecture/ESM_CONFIGURATION.md)** - Configuración de módulos ES
-- **[ESM_VERIFICATION_REPORT.md](./architecture/ESM_VERIFICATION_REPORT.md)** - Verificación de ESM
-- **[MONGODB_CONFIGURATION.md](./architecture/MONGODB_CONFIGURATION.md)** - Configuración de MongoDB
-- **[EVENTBUS_RABBITMQ_CONFIG.md](./architecture/EVENTBUS_RABBITMQ_CONFIG.md)** - Configuración de RabbitMQ
+- **[C4-ARCHITECTURE.md](./architecture/C4-ARCHITECTURE.md)** - Modelo C4
+- **[ESM_CONFIGURATION.md](./architecture/ESM_CONFIGURATION.md)** - Configuración ES Modules
+- **[MONGODB_CONFIGURATION.md](./architecture/MONGODB_CONFIGURATION.md)** - Configuración MongoDB
+- **[EVENTBUS_RABBITMQ_CONFIG.md](./architecture/EVENTBUS_RABBITMQ_CONFIG.md)** - Configuración RabbitMQ
+
+### ADRs (Architecture Decision Records)
+
+- **[ADR-001](./adr/ADR-001-auth-service-sot.md)** - Auth Service como fuente de verdad
+- **[ADR-002](./adr/ADR-002-event-store-outbox.md)** - Event Store con Outbox Pattern
+- **[ADR-003](./adr/ADR-003-dlq-policy.md)** - Política de Dead Letter Queue
 
 ---
 
 ## API
 
-Documentación de APIs, estándares de respuesta, Swagger y AsyncAPI.
+Estándares de respuesta, Swagger y AsyncAPI.
 
-- **[API_DOCUMENTATION_STATUS.md](./api/API_DOCUMENTATION_STATUS.md)** - Estado de documentación de APIs (313 OpenAPI ops + 78 AsyncAPI channels)
-- **[API_RESPONSE_STANDARD.md](./api/API_RESPONSE_STANDARD.md)** - Estándar de respuestas API
+- **[API_RESPONSE_STANDARD.md](./api/API_RESPONSE_STANDARD.md)** - Estándar de respuestas
 - **[API_SWAGGER_DOCUMENTATION.md](./api/API_SWAGGER_DOCUMENTATION.md)** - Documentación Swagger
+- **[API_DOCUMENTATION_STATUS.md](./api/API_DOCUMENTATION_STATUS.md)** - Estado (313 OpenAPI ops + 78 AsyncAPI channels)
 - **[RESPONSE_STANDARD_SUMMARY.md](./api/RESPONSE_STANDARD_SUMMARY.md)** - Resumen del estándar
 - **[RESPONSE_UTIL_USAGE_EXAMPLES.md](./api/RESPONSE_UTIL_USAGE_EXAMPLES.md)** - Ejemplos de uso
 
-### AsyncAPI Specs (Event-Driven Architecture)
+### AsyncAPI Specs
 
-- **[auth-events.asyncapi.yaml](../apps/auth-service/docs/auth-events.asyncapi.yaml)** - Eventos de autenticación, usuarios y 2FA
-- **[resources-events.asyncapi.yaml](../apps/resources-service/docs/resources-events.asyncapi.yaml)** - Eventos de recursos, status y request-reply
-- **[availability-events.asyncapi.yaml](../apps/availability-service/docs/availability-events.asyncapi.yaml)** - Eventos de reservas, recurrentes, reasignación y mantenimiento
-- **[stockpile-events.asyncapi.yaml](../apps/stockpile-service/docs/stockpile-events.asyncapi.yaml)** - Eventos de check-in/out, aprobaciones y notificaciones
-- **[reports-events.asyncapi.yaml](../apps/reports-service/docs/reports-events.asyncapi.yaml)** - Eventos de exportación, evaluación y feedback
-- **[geolocation-dashboard.asyncapi.yaml](../apps/stockpile-service/src/infrastructure/gateways/geolocation-dashboard.asyncapi.yaml)** - WebSocket de geolocalización
+- [auth-events.asyncapi.yaml](../apps/auth-service/docs/auth-events.asyncapi.yaml)
+- [resources-events.asyncapi.yaml](../apps/resources-service/docs/resources-events.asyncapi.yaml)
+- [availability-events.asyncapi.yaml](../apps/availability-service/docs/availability-events.asyncapi.yaml)
+- [stockpile-events.asyncapi.yaml](../apps/stockpile-service/docs/stockpile-events.asyncapi.yaml)
+- [reports-events.asyncapi.yaml](../apps/reports-service/docs/reports-events.asyncapi.yaml)
+- [geolocation-dashboard.asyncapi.yaml](../apps/stockpile-service/src/infrastructure/gateways/geolocation-dashboard.asyncapi.yaml)
 
 ---
 
@@ -151,90 +158,53 @@ Documentación de APIs, estándares de respuesta, Swagger y AsyncAPI.
 
 Guías de implementación de características y patrones.
 
-### Idempotencia y Distributed Tracing
-
-- **[IDEMPOTENCY_README.md](./implementation/IDEMPOTENCY_README.md)** 📖 - Guía principal
-- **[IDEMPOTENCY_AND_DISTRIBUTED_TRACING.md](./implementation/IDEMPOTENCY_AND_DISTRIBUTED_TRACING.md)** - Teoría y conceptos
-
-### Observabilidad y Logging
-
+- **[IDEMPOTENCY_README.md](./implementation/IDEMPOTENCY_README.md)** - Guía de idempotencia
+- **[IDEMPOTENCY_AND_DISTRIBUTED_TRACING.md](./implementation/IDEMPOTENCY_AND_DISTRIBUTED_TRACING.md)** - Tracing distribuido
 - **[LOGGER_ENHANCEMENTS.md](./implementation/LOGGER_ENHANCEMENTS.md)** - Mejoras del logger
 - **[LOGGER_STANDARDIZATION.md](./implementation/LOGGER_STANDARDIZATION.md)** - Estandarización de logging
 - **[CHANGELOG_LOGGER.md](./implementation/CHANGELOG_LOGGER.md)** - Historial de cambios
 - **[CACHE_METRICS_IMPLEMENTATION.md](./implementation/CACHE_METRICS_IMPLEMENTATION.md)** - Métricas de cache
-
-### WebSocket y Real-time
-
 - **[WEBSOCKET_REALTIME.md](./implementation/WEBSOCKET_REALTIME.md)** - Comunicación en tiempo real
-
-### Integraciones
-
-- **[INTEGRATION_GUIDE.md](./implementation/INTEGRATION_GUIDE.md)** - Guía de integración entre microservicios
+- **[INTEGRATION_GUIDE.md](./implementation/INTEGRATION_GUIDE.md)** - Integración entre microservicios
 
 ---
 
 ## Testing
-
-Documentación de testing, auditoría y dashboards.
 
 - **[TESTING_STATUS.md](./testing/TESTING_STATUS.md)** - Estado de testing y cobertura
 - **[AUDIT_DASHBOARD_SPEC.md](./testing/AUDIT_DASHBOARD_SPEC.md)** - Especificación del dashboard de auditoría
 
 ---
 
-## Rules Review
+## Plantillas
 
-Auditorías formales de cumplimiento de Requerimientos Funcionales.
+Plantillas estandarizadas en [`templates/`](./templates/):
 
-### [Run 2026-02-16-bookly-mock-01](./rules-review/runs/2026-02-16-bookly-mock-01/README.md)
-
-- **44 RFs** auditados con score individual
-- **PLAN-RF-RESOLUTION.md** - Plan de resolución para llevar todos los RFs a score ≥ 4
-- **RULE-{SERVICE}-RF{XX}.md** - Evidencia por RF
+- `REQUIREMENT_TEMPLATE.md`, `ENDPOINTS_TEMPLATE.md`, `SEEDS_TEMPLATE.md`
+- `ARCHITECTURE_TEMPLATE.md`, `DATABASE_TEMPLATE.md`, `EVENT_BUS_TEMPLATE.md`
 
 ---
 
-## Documentación Histórica
+## Despliegue y Operaciones
 
-Documentación de migraciones, refactorings y reportes históricos archivados.
-
-### [archive/](./archive/)
-
-Documentos archivados:
-
-- **Migraciones**: Reportes de migraciones completadas
-- **Refactorings**: Documentación de refactorings mayores
-- **Fixes**: Reportes de resolución de errores
-- **Verificaciones**: Reportes de verificación de plantillas
-- **Resúmenes**: Documentación de progreso por fase
-
-Consulta [archive/README.md](./archive/README.md) para más detalles.
+- **[DEPLOY_LOCAL.md](./deployment/DEPLOY_LOCAL.md)** - Despliegue local
+- **[DEPLOY_DOCKER.md](./deployment/DEPLOY_DOCKER.md)** - Docker
+- **[DEPLOY_GH_ACTIONS.md](./deployment/DEPLOY_GH_ACTIONS.md)** - GitHub Actions CI/CD
+- **[DEPLOY_PULUMI.md](./deployment/DEPLOY_PULUMI.md)** - IaC con Pulumi
+- **[KPIS.md](./operations/KPIS.md)** - KPIs operativos
 
 ---
 
-## Plantillas y Ejemplos
+## Archivo Histórico
 
-### [templates/](./templates/)
+Documentación completada en [`archive/`](./archive/):
 
-Plantillas estandarizadas para documentación:
-
-- **REQUIREMENT_TEMPLATE.md** - Template para requerimientos
-- **ENDPOINTS_TEMPLATE.md** - Template para endpoints
-- **SEEDS_TEMPLATE.md** - Template para seeds
-
-### [examples/](./examples/)
-
-Ejemplos de código y configuración.
-
-### [adr/](./adr/) - Architecture Decision Records (Registro histórico de decisiones).
-* [api/](./api/) - Contratos OpenAPI, Postman y estándares de respuesta.
-* [architecture/](./architecture/) - Diagramas C4, flujos de datos y diseño del sistema.
-* [deployment/](./deployment/) - Guías de despliegue y configuración en entornos remotos.
-* [development/](./development/) - Guías de desarrollo local y convenciones de código.
-* [implementation/](./implementation/) - Detalles de implementación por módulo y servicio.
-* [operations/](./operations/) - Manuales de operación, monitoreo y soporte.
-* [testing/](./testing/) - Estrategias de QA, pruebas unitarias y de integración.
-* [archive/](./archive/) - Documentación histórica y planes anteriores (ej. `PLAN-BACKEND-CONSOLIDATION.md`).
+- `plans/` - Planes de consolidación, hardening y auditoría completados.
+- `migrations/` - Reportes de migraciones (OAuth, response standard, etc.).
+- `refactoring/` - Documentación de refactorings mayores.
+- `rules-review/` - Logs de auditorías de reglas por ejecución.
+- `resumen/` - Resúmenes de progreso por fase.
+- Verificaciones de plantillas por servicio.
 
 ---
 
@@ -242,61 +212,25 @@ Ejemplos de código y configuración.
 
 ```text
 docs/
-├── INDEX.md                      # Este archivo (índice maestro)
-├── api/                          # Estándares de respuesta y Swagger
-├── architecture/                 # Configuración y diseño del sistema
-├── development/                  # Guías de desarrollo y debugging
-├── examples/                     # Ejemplos (CSV de importación, etc.)
-├── guides/                       # Guías de uso (audit decorators, etc.)
-├── implementation/               # Guías de implementación activas
-├── rules-review/                 # Auditorías de RFs por run
-│   └── runs/{RUN_ID}/           # Resultados por ejecución
-├── seeds/                        # Integridad referencial y seeds
-├── templates/                    # Plantillas estandarizadas
-├── testing/                      # Testing y cobertura
-└── archive/                      # Documentación histórica
-    ├── implementation/           # Planes completados
-    ├── migrations/               # Migraciones completadas
-    ├── refactoring/              # Refactorings completados
-    └── resumen/                  # Progreso por fase
-
-apps/{service}/
-├── docs/
-│   ├── INDEX.md                 # Índice del servicio
-│   ├── ARCHITECTURE.md          # Arquitectura
-│   ├── DATABASE.md              # Esquemas y modelos
-│   ├── ENDPOINTS.md             # Endpoints REST
-│   ├── EVENT_BUS.md             # Eventos publicados/consumidos
-│   ├── SEEDS.md                 # Datos iniciales
-│   ├── requirements/            # Documentación por RF
-│   └── archive/                 # Docs completados del servicio
-└── test/unit/services/           # Tests unitarios BDD
+├── INDEX.md                    # Este archivo
+├── adr/                        # Architecture Decision Records
+├── api/                        # Estándares de respuesta y Swagger
+├── architecture/               # Configuración y diseño del sistema
+├── deployment/                 # Guías de despliegue
+├── development/                # Guías de desarrollo, seeds y debug
+├── implementation/             # Guías de implementación activas
+├── operations/                 # KPIs y manuales
+├── templates/                  # Plantillas estandarizadas
+├── testing/                    # Testing y cobertura
+└── archive/                    # Documentación histórica
+    ├── plans/
+    ├── migrations/
+    ├── refactoring/
+    ├── rules-review/
+    └── resumen/
 ```
 
 ---
 
-## Guía de Contribución
-
-Al agregar nueva documentación:
-
-1. **Documentación de microservicio**: Agregar en `apps/{service}/docs/` y actualizar su `INDEX.md`
-2. **Desarrollo**: Documentos de debugging y desarrollo → `docs/development/`
-3. **Arquitectura**: Configuración y diseño → `docs/architecture/`
-4. **APIs**: Estándares y documentación → `docs/api/`
-5. **Implementación**: Guías de features → `docs/implementation/`
-6. **Testing**: Cobertura y auditoría → `docs/testing/`
-7. **Histórico**: Documentos obsoletos → `docs/archive/`
-
----
-
-## Enlaces Útiles
-
-- **[README Principal](../README.md)** - Documentación principal del proyecto
-- **[Scripts](../scripts/README.md)** - Documentación de scripts utilitarios
-- **Swagger UIs**: Disponibles en cada microservicio (puertos 3000-3005)
-
----
-
 **Última actualización**: Febrero 2026  
-**Proyecto**: Bookly Mock - Sistema de Reservas Institucionales  
-**Mantenido por**: Equipo Bookly
+**Proyecto**: Bookly Mock - Sistema de Reservas Institucionales

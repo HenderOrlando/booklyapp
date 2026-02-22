@@ -1,78 +1,93 @@
 ---
 description: Reglas y estándares para la creación, actualización y mantenimiento de la documentación en Bookly (Frontend, Backend y Global)
+globs:
   - "docs/**/*.md"
   - "bookly-mock/docs/**/*.md"
   - "bookly-mock-frontend/docs/**/*.md"
-trigger: always_on
 ---
 
 # Estándares de Documentación Bookly
 
-Esta regla establece los lineamientos obligatorios para crear, modificar y organizar cualquier archivo de documentación dentro del proyecto Bookly. Aplica para la documentación global, del backend y del frontend.
+Lineamientos obligatorios para crear, modificar y organizar documentación en Bookly.
 
 ## 1. Estructura de Directorios (Single Source of Truth)
 
-La documentación debe crearse o modificarse **únicamente** en los siguientes directorios, respetando su alcance:
+### `docs/` (Global)
 
-- **`docs/` (Global):**
-  - `business-requirements/`: Requerimientos, historias de usuario, diagramas de flujo.
-  - `api-alignment/`: Políticas de integración frontend-backend, inventarios de endpoints.
-  - `project-management/`: Progreso, seguridad, auditorías generales.
-  - `workflows-guide/`: Guías de windsurf y automatizaciones.
+- `business-requirements/` - PDFs oficiales: requerimientos, HU, flujos, casos de uso, catálogo de errores.
+- `api-alignment/` - Políticas de alineación frontend-backend, mapeo de endpoints, auditorías.
+  - `inventories/` - Inventario de endpoints por servicio (.md y .csv).
+  - `missing-definitions/` - Definiciones faltantes (MD-002 a MD-011).
+- `project-management/` - Progreso, seguridad, planes activos (i18n, waitlist).
+- `qa/` - Smoke tests, auditorías de funciones, mejoras de dashboard, planes E2E.
+- `workflows-guide/` - Guías rápidas y definiciones de workflows de Windsurf.
+- `archive/` - Documentación obsoleta (rules-review, workflows-old, fixes anteriores).
 
-- **`bookly-mock/docs/` (Backend):**
-  - `api/`: Swagger, Postman, contratos.
-  - `architecture/`: C4 model, ADRs, diseño de base de datos.
-  - `implementation/`: Detalles por microservicio.
-  - `deployment/` / `operations/`: DevOps, CI/CD, Kubernetes.
+### `bookly-mock/docs/` (Backend)
 
-- **`bookly-mock-frontend/docs/` (Frontend):**
-  - `architecture-and-standards/`: `ARCHITECTURE.md`, `BEST_PRACTICES.md`, `PERFORMANCE.md`, `TESTING.md`.
-  - `api-integration/`: Guías de cómo el frontend consume cada servicio (01 a 06).
-  - `project-management/`: `PENDIENTES.md` (Deuda técnica y TODOs).
+- `adr/` - Architecture Decision Records (ADR-001 a ADR-003).
+- `api/` - Estándar de respuestas, Swagger, AsyncAPI, ejemplos de uso.
+- `architecture/` - Modelo C4, configuración ESM, MongoDB, RabbitMQ.
+- `deployment/` - Guías de despliegue (Local, Docker, GH Actions, Pulumi).
+- `development/` - Contribución, debug, ejecución, seeds, guías de uso, template CSV.
+- `implementation/` - Idempotencia, logging, cache, WebSocket, integración.
+- `operations/` - KPIs operativos.
+- `templates/` - Plantillas estándar (requirement, endpoints, seeds, architecture, database, event bus).
+- `testing/` - Estado de testing y auditoría de dashboard.
+- `archive/` - Planes completados, migraciones, refactorings, verificaciones, rules-review.
 
-**Regla de Oro:** NO crear documentación técnica del backend en la carpeta global ni en el frontend. NO mezclar reportes de progreso con requerimientos de negocio.
+### `bookly-mock-frontend/docs/` (Frontend)
+
+- `architecture-and-standards/` - ARCHITECTURE, BEST_PRACTICES, PERFORMANCE, TESTING.
+- `api-integration/` - Guías de integración UI-API por servicio (01-06), configuración backend, estructura de respuesta.
+- `project-management/` - Backlog técnico (PENDIENTES.md).
+- `reports/` - Auditorías UX y accesibilidad.
+- `archive/` - Trabajo histórico organizado en subdirectorios:
+  - `sprints/`, `fixes/`, `plans/`, `implementations/`, `migrations/`, `refactoring/`, `design-system/`, `translations/`, `sessions/`.
+
+### Regla de Oro
+
+- NO crear documentación técnica del backend en la carpeta global ni en el frontend.
+- NO mezclar reportes de progreso con requerimientos de negocio.
+- NO crear archivos sueltos en la raíz de ningún directorio `docs/` (solo INDEX o DIRECTORIO).
 
 ## 2. Formato y Estilo (Markdown)
 
-Todos los archivos `.md` deben cumplir con las siguientes reglas de formato (Markdown Linting):
-
 1. **Título Principal (H1):** Todo archivo debe comenzar con un único `# Título Descriptivo`.
-2. **Jerarquía de Encabezados:** Usar secuencialmente `##`, `###`, `####`. No saltar niveles (ej. de `##` a `####`).
+2. **Jerarquía de Encabezados:** Usar secuencialmente `##`, `###`, `####`. No saltar niveles.
 3. **Listas y Espaciado:**
-   - Dejar una línea en blanco antes y después de cada encabezado (`##`, `###`).
-   - Dejar una línea en blanco antes y después de cada lista o bloque de código.
+   - Dejar una línea en blanco antes y después de cada encabezado y cada lista o bloque de código.
    - Usar sangría de 2 o 4 espacios para listas anidadas de forma consistente.
-4. **Enlaces Relativos:** Siempre usar enlaces relativos explícitos (ej. `./ruta/archivo.md` o `../ruta/archivo.md`). NUNCA usar rutas absolutas de la máquina local.
+   - Usar `-` (dash) para listas desordenadas, nunca `*`.
+4. **Enlaces Relativos:** Siempre usar `./ruta/archivo.md` o `../ruta/archivo.md`. NUNCA rutas absolutas.
 
 ## 3. Actualización de Índices
 
-Cualquier adición, movimiento o eliminación de un archivo de documentación obliga a actualizar los índices correspondientes:
+Cualquier adición, movimiento o eliminación de un archivo de documentación obliga a actualizar:
 
-- Si modificas `docs/` -> Actualiza `docs/DIRECTORIO_DOCUMENTACION.md`.
-- Si modificas `bookly-mock/docs/` -> Actualiza `bookly-mock/docs/INDEX.md`.
-- Si modificas `bookly-mock-frontend/docs/` -> Actualiza `bookly-mock-frontend/docs/INDEX.md`.
+- `docs/` → `docs/DIRECTORIO_DOCUMENTACION.md`
+- `bookly-mock/docs/` → `bookly-mock/docs/INDEX.md`
+- `bookly-mock-frontend/docs/` → `bookly-mock-frontend/docs/INDEX.md`
 
 ## 4. Archivo de Documentación Obsoleta (Archive)
 
-**NUNCA ELIMINAR** documentación histórica (planes completados, soluciones a errores pasados, refactorizaciones terminadas).
+**NUNCA ELIMINAR** documentación histórica. Mover a `archive/` correspondiente:
 
-- Los documentos obsoletos deben moverse a la carpeta `archive/` correspondiente:
-  - `docs/archive/`
-  - `bookly-mock/docs/archive/`
-  - `bookly-mock-frontend/docs/archive/`
-- Si el documento era un plan, mover a `archive/plans/`.
-- Si era un fix, mover a `archive/fixes/`.
+- Planes completados → `archive/plans/`
+- Fixes resueltos → `archive/fixes/`
+- Migraciones completadas → `archive/migrations/`
+- Refactorings terminados → `archive/refactoring/`
+- Sprints/fases completadas → `archive/sprints/`
+- Implementaciones terminadas → `archive/implementations/`
 
 ## 5. Plantillas Estándar
 
-Al crear nuevos documentos, utilizar las plantillas existentes cuando aplique:
-- Para features nuevas frontend: Seguir estructura de `Feature: [Nombre]`, `Requerimientos`, `Implementación`, `Tests`.
-- Para fixes frontend: Usar `Fix: [Nombre]`, `Problema`, `Causa Raíz`, `Solución`, `Prevención`.
-- Para backend: Usar `REQUIREMENT_TEMPLATE.md` o `ENDPOINTS_TEMPLATE.md` si están disponibles.
+- **Features frontend:** Estructura `Feature: [Nombre]` → Requerimientos → Implementación → Tests.
+- **Fixes frontend:** Estructura `Fix: [Nombre]` → Problema → Causa Raíz → Solución → Prevención.
+- **Backend:** Usar plantillas de `bookly-mock/docs/templates/` (REQUIREMENT, ENDPOINTS, SEEDS, ARCHITECTURE, DATABASE, EVENT_BUS).
 
 ## 6. Lenguaje y Tono
 
 - **Idioma:** Español neutro.
 - **Tono:** Técnico, directo y conciso.
-- **Evitar:** Textos extremadamente largos sin estructura. Preferir bullet points, tablas y diagramas (Mermaid.js si es posible) para explicar conceptos complejos.
+- **Formato:** Preferir bullet points, tablas y diagramas Mermaid.js. Evitar textos largos sin estructura.
