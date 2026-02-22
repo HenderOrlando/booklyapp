@@ -72,7 +72,6 @@ sonar-project.properties
 
 # 9. 🎨 Archivos del Frontend (Next.js, Storybook, Vite)
 .next/
-.storybook/
 .vite/
 .eslintcache
 jest/
