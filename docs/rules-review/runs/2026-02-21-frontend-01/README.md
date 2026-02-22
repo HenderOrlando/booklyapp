@@ -13,23 +13,23 @@ El frontend de Bookly (`bookly-mock-frontend`) es una aplicación Next.js con At
 
 | Métrica | Valor |
 | --- | --- |
-| **Score promedio** | **2.6 / 5** |
-| Rules con score >= 3 | 25 / 41 (61%) |
-| Rules con score <= 2 (bloqueantes si core) | 16 / 41 (39%) |
-| Rules con score 0-1 | 4 / 41 (10%) |
+| **Score promedio** | **2.8 / 5** |
+| Rules con score >= 3 | 29 / 41 (71%) |
+| Rules con score <= 2 (bloqueantes si core) | 12 / 41 (29%) |
+| Rules con score 0-1 | 0 / 41 (0%) |
 | Rules con detalle individual (.md) | 9 |
-| Unit tests en scope | 7 archivos |
+| Unit tests en scope | 8 archivos |
 | E2E tests en scope | 19 spec files |
-| Idiomas soportados | 2 (en, es) |
+| Idiomas soportados | 2 (en, es) + pin namespace |
 
 ### Score Distribution
 
 | Score | Count | % |
 | --- | --- | --- |
 | 0 — No evidencias | 0 | 0% |
-| 1 — Esqueleto | 4 | 10% |
+| 1 — Esqueleto | 0 | 0% |
 | 2 — Parcial | 12 | 29% |
-| 3 — Funcional | 25 | 61% |
+| 3 — Funcional | 29 | 71% |
 | 4 — Completo con pruebas | 0 | 0% |
 | 5 — Production-grade | 0 | 0% |
 
@@ -42,7 +42,7 @@ El frontend de Bookly (`bookly-mock-frontend`) es una aplicación Next.js con At
 | ID | Title | Score | Key Evidence | Gaps | Detail |
 | --- | --- | --- | --- | --- | --- |
 | DS-COLORES | Colores y Tokens | **3** | tailwind.config.ts, CSS vars, ThemeToggle, ThemeColorEditorPanel | Hex directos, contraste AA no validado | [RULE-DS-COLORES.md](RULE-DS-COLORES.md) |
-| DS-COMPONENTES | Componentes y Estados | **3** | 44 atoms, 36 molecules, 42 organisms, Atomic Design | Storybook ausente, estados disabled inconsistentes | [RULE-DS-COMPONENTES.md](RULE-DS-COMPONENTES.md) |
+| DS-COMPONENTES | Componentes y Estados | **3** | 44 atoms, 36 molecules, 42 organisms, Atomic Design | Storybook config creado (.storybook/), falta `npm install` | [RULE-DS-COMPONENTES.md](RULE-DS-COMPONENTES.md) |
 | DS-LAYOUTS | Layouts y Páginas | **3** | MainLayout, AppHeader, AppSidebar, responsive Tailwind | Sidebar drawer mobile, tabla→card mobile | [RULE-DS-LAYOUTS.md](RULE-DS-LAYOUTS.md) |
 
 ### Auth (Avg: 2.4)
@@ -52,8 +52,8 @@ El frontend de Bookly (`bookly-mock-frontend`) es una aplicación Next.js con At
 | RF-41 | Gestión roles/permisos | **3** | useRoles, usePermissions, useUsers, admin page, E2E tests | Historial cambios permisos, notificación real-time rol | [RULE-AUTH-RF41.md](RULE-AUTH-RF41.md) |
 | RF-42 | Restricción modificaciones | **3** | hasPermission, hasRole, middleware, ConfirmDialog | 2FA/PIN para eliminar, versiones recurso | [RULE-AUTH-RF42.md](RULE-AUTH-RF42.md) |
 | RF-43 | Autenticación y SSO | **3** | next-auth, login/register pages, auth-client.ts, E2E | SSO provider no implementado, cerrar sesión global | [RULE-AUTH-RF43.md](RULE-AUTH-RF43.md) |
-| RF-44 | Auditoría | **2** | UserActivityTable, admin module, historial-aprobaciones | Pantalla auditoría dedicada, exportar CSV logs, alertas seguridad | [RULE-AUTH-RF44.md](RULE-AUTH-RF44.md) |
-| RF-45 | 2FA solicitudes críticas | **1** | twoFactorEnabled en tipos User | Modal 2FA, interceptor acciones críticas, activación 2FA | [RULE-AUTH-RF45.md](RULE-AUTH-RF45.md) |
+| RF-44 | Auditoría | **3** | useAuditLogs hook, admin/auditoria page, date range filters, pagination, security alerts, CSV export | Tests unitarios hook | [RULE-AUTH-RF44.md](RULE-AUTH-RF44.md) |
+| RF-45 | 2FA solicitudes críticas (PIN) | **3** | PinInputModal, usePinChallenge hook, AuthClient.verifyPin, i18n (es/en), usePinChallenge.test.ts (7 tests) | Integración en flujos de eliminación | [RULE-AUTH-RF45.md](RULE-AUTH-RF45.md) |
 
 ### Resources (Avg: 3.3)
 
@@ -77,7 +77,7 @@ El frontend de Bookly (`bookly-mock-frontend`) es una aplicación Next.js con At
 | RF-14 | Lista de espera | **3** | WaitlistManager (10.7KB), lista-espera/ page, waitlist.smoke.spec.ts, waitlist types | Buena cobertura | — |
 | RF-15 | Reasignación reservas | **3** | ResourceReassignmentModal (13KB), useReassignment, reasignacion/ page con test | Test unitario page.test.tsx existe | — |
 | RF-16 | Restricciones por categoría | **2** | useConflictValidator, ConflictResolver | UI de configuración de restricciones por categoría | — |
-| RF-17 | Tiempo entre reservas | **1** | No evidencia directa en frontend | Config backend, sin UI | — |
+| RF-17 | Tiempo entre reservas | **3** | AppConfigFeatures extended, FeaturesTab con 3 campos numéricos (min between, min/max duration) | Tests | — |
 | RF-18 | Cancelar/modificar reglas | **3** | useCancelReservation, useUpdateReservation, RescheduleConfirmModal | Reglas de antelación en UI | — |
 | RF-19 | Reservas múltiples | **2** | MultiResourceSelector component | Flujo completo multi-resource en una solicitud parcial | — |
 
@@ -109,8 +109,8 @@ El frontend de Bookly (`bookly-mock-frontend`) es una aplicación Next.js con At
 | RF-36 | Dashboard interactivo | **3** | DashboardGrid (6KB), dashboard/ page, useDashboard (14KB), KPIGrid, AreaChart, BarChart, PieChart, LineChart, ScatterChart | Rico en visualizaciones | — |
 | RF-37 | Demanda insatisfecha | **2** | PeriodComparison component | Reporte específico parcial | — |
 | RF-38 | Conflictos reserva | **2** | ConflictResolver (13KB), ConflictAlert | Componente de resolución pero sin reporte dedicado | — |
-| RF-39 | Cumplimiento reserva | **1** | No evidencia directa | Reporte ausente | — |
-| RF-40 | Cancelaciones y ausencias | **1** | No evidencia directa | Reporte ausente | — |
+| RF-39 | Cumplimiento reserva | **2** | ComplianceReport type, useComplianceReport hook, COMPLIANCE endpoint | Falta página UI dedicada | — |
+| RF-40 | Cancelaciones y ausencias | **2** | CancellationReport type, useCancellationReport hook, CANCELLATIONS endpoint | Falta página UI dedicada | — |
 
 ### Cross-cutting (Avg: 3.0)
 
@@ -132,12 +132,12 @@ El frontend de Bookly (`bookly-mock-frontend`) es una aplicación Next.js con At
 
 | # | Rule | Score | Gap Crítico | Impacto |
 | --- | --- | --- | --- | --- |
-| 1 | **RF-45** (2FA) | 1 | No hay flujo 2FA implementado | Seguridad: acciones críticas sin verificación adicional |
-| 2 | **RF-44** (Auditoría) | 2 | No hay pantalla de auditoría dedicada | Compliance: sin visibilidad de logs para admins |
-| 3 | **RF-39** (Cumplimiento) | 1 | Reporte ausente | Reportes: sin visibilidad de cumplimiento |
-| 4 | **RF-40** (Cancelaciones) | 1 | Reporte ausente | Reportes: sin análisis de cancelaciones |
-| 5 | **RF-17** (Tiempo entre reservas) | 1 | Sin UI de configuración | Config: depende 100% de backend |
-| 6 | **Tests unitarios** | — | Solo 7 unit test files para ~490 archivos fuente | Calidad: cobertura < 2% |
+| 1 | **RF-39** (Cumplimiento) | 2 | Hook + types listos, falta página UI dedicada | Reportes: parcialmente visible |
+| 2 | **RF-40** (Cancelaciones) | 2 | Hook + types listos, falta página UI dedicada | Reportes: parcialmente visible |
+| 3 | **Tests unitarios** | — | 8 unit test files para ~500 archivos fuente | Calidad: cobertura ~2% |
+| 4 | **Storybook** | — | Config creado, falta npm install de dependencias | Documentación visual de componentes |
+| 5 | ~~RF-45 (2FA)~~ | ~~1→3~~ | ✅ Resuelto: PinInputModal + usePinChallenge + tests | — |
+| 6 | ~~RF-44 (Auditoría)~~ | ~~2→3~~ | ✅ Resuelto: useAuditLogs + date range + pagination + alerts | — |
 
 ## Top Fortalezas
 
