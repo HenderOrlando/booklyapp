@@ -64,15 +64,17 @@ export function useInfiniteReservations(
         },
       });
 
-      const data = response.data;
+      const data = response.data as any;
+      const total = data?.meta?.total ?? data?.total ?? 0;
+      
       return {
         items: data?.items || [],
         page: pageParam as number,
         limit,
-        total: data?.total || 0,
-        totalPages: Math.ceil((data?.total || 0) / limit),
+        total,
+        totalPages: Math.ceil(total / limit),
         hasNextPage:
-          (pageParam as number) < Math.ceil((data?.total || 0) / limit),
+          (pageParam as number) < Math.ceil(total / limit),
       };
     },
     getNextPageParam: (lastPage) => {

@@ -41,7 +41,7 @@
   "associated": "Associated",
   "select_resources": "Select Resources",
   "search_resources": "Search resources...",
-  "selected_resources_count": "{count}} resource(s) selected",
+  "selected_resources_count": "{count} resource(s) selected",
   "associated_users_title": "Associated Users",
   "no_users_associated": "No associated users",
   "remove": "Remove",

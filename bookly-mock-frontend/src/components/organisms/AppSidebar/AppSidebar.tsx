@@ -485,11 +485,16 @@ export function AppSidebar({
           )}
           <div className="space-y-1">
             {section.items.map((item: NavItem) => {
+              const isExactMatch = pathname === item.href;
+              const hasExactMatchInNav = visibleSections.some(s => 
+                s.items.some(i => i.href === pathname || (i.children && i.children.some(c => c.href === pathname)))
+              );
+
               const isActive =
-                pathname === item.href ||
+                isExactMatch ||
                 (item.children && item.children.length > 0
                   ? item.children.some((child: { href: string; label: string }) => pathname === child.href)
-                  : pathname.startsWith(`${item.href}/`));
+                  : pathname.startsWith(`${item.href}/`) && !hasExactMatchInNav);
               const isExpanded = expandedItems.includes(item.href);
               const hasChildren = !!(item.children && item.children.length > 0);
 

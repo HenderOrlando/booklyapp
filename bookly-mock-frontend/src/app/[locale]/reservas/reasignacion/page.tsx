@@ -9,7 +9,6 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/atoms/Card/Card";
-import { AppHeader } from "@/components/organisms/AppHeader";
 import { MainLayout } from "@/components/templates/MainLayout";
 import { useReassignment } from "@/hooks/useReassignment";
 import { useToast } from "@/hooks/useToast";
@@ -74,7 +73,6 @@ export default function ReasignacionPage() {
   if (loadingHistory) {
     return (
       <MainLayout>
-        <AppHeader title={t("reasignacion.titulo")} />
         <div className="space-y-6 pb-6">
           <Skeleton className="h-10 w-64" />
           <div className="space-y-4">
@@ -96,7 +94,6 @@ export default function ReasignacionPage() {
 
   return (
     <MainLayout>
-      <AppHeader title={t("reasignacion.titulo")} />
       <div className="space-y-6 pb-6">
         <div>
           <h2 className="text-3xl font-bold text-[var(--color-text-primary)]">

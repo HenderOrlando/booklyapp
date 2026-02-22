@@ -68,7 +68,7 @@ export default function ReservasPage() {
 
   const { data: reservationsData, isLoading: loadingReservations } =
     useReservations(apiFilters);
-  const reservations = reservationsData?.items || [];
+  const reservations: Reservation[] = reservationsData?.items || [];
 
   // React Query para estadísticas
   const { data: statsData, isLoading: loadingStats } = useReservationStats();
@@ -86,7 +86,7 @@ export default function ReservasPage() {
   };
 
   const handleEdit = (id: string) => {
-    const reservation = reservations.find((r) => r.id === id);
+    const reservation = reservations.find((r: Reservation) => r.id === id);
     if (reservation) {
       setEditingReservation(reservation);
     }
@@ -243,7 +243,7 @@ export default function ReservasPage() {
               />
             ) : (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                {reservations.map((reservation) => (
+                {reservations.map((reservation: Reservation) => (
                   <ReservationCard
                     key={reservation.id}
                     reservation={reservation}

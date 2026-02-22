@@ -72,14 +72,17 @@ export const ApprovalCard = React.memo<ApprovalCardProps>(
     loading = false,
     className = "",
   }) => {
-    const startDate = new Date(request.startDate);
-    const endDate = new Date(request.endDate);
+    const startDate = request.startDate ? new Date(request.startDate) : null;
+    const endDate = request.endDate ? new Date(request.endDate) : null;
+    const isValidStartDate = startDate && !isNaN(startDate.getTime());
+    const isValidEndDate = endDate && !isNaN(endDate.getTime());
 
     // Calcular si está cerca de expirar
     const isNearExpiry = React.useMemo(() => {
       if (!request.expiresAt) return false;
       const now = new Date();
       const expiry = new Date(request.expiresAt);
+      if (isNaN(expiry.getTime())) return false;
       const hoursRemaining =
         (expiry.getTime() - now.getTime()) / (1000 * 60 * 60);
       return hoursRemaining < 24 && hoursRemaining > 0;
@@ -92,9 +95,11 @@ export const ApprovalCard = React.memo<ApprovalCardProps>(
             <div className="flex-1 space-y-1">
               <div className="flex items-center gap-2">
                 <ApprovalStatusBadge status={request.status} />
-                <Badge variant="outline" className="text-xs">
-                  {request.currentLevel.replace("_", " ")}
-                </Badge>
+                {request.currentLevel && (
+                  <Badge variant="outline" className="text-xs">
+                    {request.currentLevel.replace("_", " ")}
+                  </Badge>
+                )}
                 <TooltipProvider>
                   {request.priority === "HIGH" && (
                     <Tooltip>
@@ -148,26 +153,38 @@ export const ApprovalCard = React.memo<ApprovalCardProps>(
             <div className="flex items-start gap-2">
               <Calendar className="h-4 w-4 text-[var(--color-text-secondary)] dark:text-[var(--color-text-tertiary)] mt-0.5" />
               <div>
-                <p className="font-medium">
-                  {format(startDate, "d 'de' MMMM, yyyy", { locale: es })}
-                </p>
-                <p className="text-xs text-[var(--color-text-secondary)] dark:text-[var(--color-text-tertiary)]">
-                  {format(startDate, "EEEE", { locale: es })}
-                </p>
+                {isValidStartDate ? (
+                  <>
+                    <p className="font-medium">
+                      {format(startDate, "d 'de' MMMM, yyyy", { locale: es })}
+                    </p>
+                    <p className="text-xs text-[var(--color-text-secondary)] dark:text-[var(--color-text-tertiary)]">
+                      {format(startDate, "EEEE", { locale: es })}
+                    </p>
+                  </>
+                ) : (
+                  <p className="font-medium text-red-500 text-xs">Fecha no disponible</p>
+                )}
               </div>
             </div>
             <div className="flex items-start gap-2">
               <Clock className="h-4 w-4 text-[var(--color-text-secondary)] dark:text-[var(--color-text-tertiary)] mt-0.5" />
               <div>
-                <p className="font-medium">
-                  {format(startDate, "HH:mm")} - {format(endDate, "HH:mm")}
-                </p>
-                <p className="text-xs text-[var(--color-text-secondary)] dark:text-[var(--color-text-tertiary)]">
-                  {Math.round(
-                    (endDate.getTime() - startDate.getTime()) / (1000 * 60)
-                  )}{" "}
-                  minutos
-                </p>
+                {isValidStartDate && isValidEndDate ? (
+                  <>
+                    <p className="font-medium">
+                      {format(startDate, "HH:mm")} - {format(endDate, "HH:mm")}
+                    </p>
+                    <p className="text-xs text-[var(--color-text-secondary)] dark:text-[var(--color-text-tertiary)]">
+                      {Math.round(
+                        (endDate.getTime() - startDate.getTime()) / (1000 * 60)
+                      )}{" "}
+                      minutos
+                    </p>
+                  </>
+                ) : (
+                  <p className="font-medium text-red-500 text-xs">Hora no disponible</p>
+                )}
               </div>
             </div>
           </div>

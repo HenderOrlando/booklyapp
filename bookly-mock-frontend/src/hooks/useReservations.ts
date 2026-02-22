@@ -56,32 +56,7 @@ export function useReservations(filters?: ReservationSearchFilters) {
       if (!response.success) {
         throw new Error(response.message || "Error al cargar reservas");
       }
-      
-      const data: any = response.data;
-      
-      // Normalizar la respuesta para asegurar que siempre tenga la estructura { items, meta }
-      // Backend real podría retornar un arreglo directo en data con meta en la raíz
-      if (Array.isArray(data)) {
-        return {
-          items: data,
-          meta: response.meta || {
-            total: data.length,
-            page: 1,
-            limit: data.length,
-            totalPages: 1,
-          }
-        };
-      }
-      
-      // Backend real podría retornar { reservations, meta }
-      if (data && data.reservations && !data.items) {
-        return {
-          items: data.reservations,
-          meta: data.meta || response.meta
-        };
-      }
-
-      return data;
+      return response.data;
     },
     staleTime: 1000 * 60 * 5, // 5 minutos
   });

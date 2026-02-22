@@ -33,7 +33,6 @@ const connectSrc = [
 const nextConfig = {
   reactStrictMode: true,
   output: "standalone", // Required for Docker deployment
-  transpilePackages: ["socket.io-client", "engine.io-client"],
   experimental: {
     serverActions: {
       bodySizeLimit: "2mb",

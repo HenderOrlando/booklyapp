@@ -49,6 +49,41 @@ export class ServerDirectDataProvider implements DataProvider {
         return payload.data as ApiResponse<T>;
       }
 
+      // Handle backend paginated format where data is an array and meta is at the root
+      if (Array.isArray(payload.data) && payload.meta) {
+        return {
+          ...payload,
+          success: payload.success ?? true,
+          data: {
+            items: payload.data,
+            meta: payload.meta,
+          } as unknown as T,
+        } as ApiResponse<T>;
+      }
+
+      // Handle backend format where data is an object containing arrays but named differently (e.g. { reservations, meta })
+      if (
+        payload.data &&
+        typeof payload.data === "object" &&
+        !Array.isArray(payload.data) &&
+        !("items" in (payload.data as Record<string, unknown>))
+      ) {
+        const dataObj = payload.data as Record<string, unknown>;
+        const arrayKey = Object.keys(dataObj).find(key => Array.isArray(dataObj[key]));
+        
+        if (arrayKey && (dataObj.meta || payload.meta)) {
+          return {
+            ...payload,
+            success: payload.success ?? true,
+            data: {
+              ...dataObj,
+              items: dataObj[arrayKey],
+              meta: dataObj.meta || payload.meta,
+            } as unknown as T,
+          } as ApiResponse<T>;
+        }
+      }
+
       return {
         ...payload,
         success: payload.success ?? true,
