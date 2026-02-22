@@ -1,11 +1,25 @@
 "use client";
 
 import { useToast } from "@/hooks/useToast";
+import { i18nConfig } from "@/i18n/config";
 import { AuthClient } from "@/infrastructure/api/auth-client";
+import {
+  type ErrorTranslator,
+  resolveErrorMessage,
+} from "@/infrastructure/http/errorMessageResolver";
+import {
+  clearPostAuthRedirect,
+  consumePostAuthRedirect,
+  isAuthEntryRoute,
+  resolveDashboardFallbackPath,
+  resolvePostAuthRedirect,
+} from "@/lib/auth/post-auth-redirect";
 import { User } from "@/types/entities/auth";
+import { useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
 import React, {
   createContext,
+  useCallback,
   useContext,
   useEffect,
   useRef,
@@ -19,7 +33,7 @@ interface AuthContextType {
   login: (
     email: string,
     password: string,
-    rememberMe?: boolean
+    rememberMe?: boolean,
   ) => Promise<void>;
   logout: () => Promise<void>;
   refreshUser: () => Promise<void>;
@@ -36,11 +50,42 @@ interface AuthProviderProps {
 const SESSION_TIMEOUT = 30 * 60 * 1000; // 30 minutos de inactividad
 const SESSION_WARNING_TIME = 5 * 60 * 1000; // Avisar 5 minutos antes
 const REFRESH_TOKEN_INTERVAL = 10 * 60 * 1000; // Refresh cada 10 minutos
+const POST_AUTH_REDIRECT_RETRY_DELAY = 220;
+const POST_AUTH_REDIRECT_MAX_RETRIES = 2;
+
+interface TokenRefreshPayload {
+  accessToken?: string;
+  token?: string;
+  refreshToken?: string;
+}
+
+interface AuthContextHttpError {
+  message?: string;
+  code?: string;
+  response?: {
+    status?: number;
+    data?: unknown;
+  };
+}
+
+function toAuthContextHttpError(error: unknown): AuthContextHttpError {
+  if (typeof error === "object" && error !== null) {
+    return error as AuthContextHttpError;
+  }
+
+  if (error instanceof Error) {
+    return { message: error.message };
+  }
+
+  return { message: String(error) };
+}
 
 export function AuthProvider({ children }: AuthProviderProps) {
   const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const router = useRouter();
+  const tAuth = useTranslations("auth");
+  const tErrors = useTranslations("errors");
   const { showError, showWarning, showSuccess, showInfo } = useToast();
 
   // Referencias para timers
@@ -51,6 +96,75 @@ export function AuthProvider({ children }: AuthProviderProps) {
   const checkAuthRetryRef = useRef<NodeJS.Timeout | null>(null);
   const retryCountRef = useRef<number>(0);
   const lastValidUserRef = useRef<User | null>(null);
+  const postAuthRedirectHandledRef = useRef(false);
+  const postAuthRedirectRetryRef = useRef<NodeJS.Timeout | null>(null);
+  const postAuthRedirectRetryCountRef = useRef(0);
+
+  const navigateToPostAuthDestination = useCallback(() => {
+    if (postAuthRedirectHandledRef.current) {
+      return;
+    }
+
+    const currentPath =
+      typeof window !== "undefined"
+        ? window.location.pathname
+        : `/${i18nConfig.defaultLocale}/login`;
+
+    const fallbackPath = resolveDashboardFallbackPath(
+      currentPath,
+      i18nConfig.locales,
+      i18nConfig.defaultLocale,
+    );
+
+    const destination =
+      typeof window !== "undefined"
+        ? (resolvePostAuthRedirect({
+            pathname: currentPath,
+            search: window.location.search,
+            storageRedirect: consumePostAuthRedirect(),
+            origin: window.location.origin,
+            locales: i18nConfig.locales,
+          }) ?? fallbackPath)
+        : fallbackPath;
+
+    postAuthRedirectHandledRef.current = true;
+    clearPostAuthRedirect();
+    router.replace(destination);
+  }, [router]);
+
+  const schedulePostAuthRedirectRetry = useCallback(() => {
+    if (typeof window === "undefined") {
+      return;
+    }
+
+    if (postAuthRedirectRetryRef.current) {
+      clearTimeout(postAuthRedirectRetryRef.current);
+    }
+
+    postAuthRedirectRetryRef.current = setTimeout(() => {
+      const stillOnAuthEntry = isAuthEntryRoute(
+        window.location.pathname,
+        i18nConfig.locales,
+      );
+
+      if (!stillOnAuthEntry || !getToken()) {
+        postAuthRedirectRetryCountRef.current = 0;
+        return;
+      }
+
+      if (
+        postAuthRedirectRetryCountRef.current >= POST_AUTH_REDIRECT_MAX_RETRIES
+      ) {
+        postAuthRedirectRetryCountRef.current = 0;
+        return;
+      }
+
+      postAuthRedirectRetryCountRef.current += 1;
+      postAuthRedirectHandledRef.current = false;
+      navigateToPostAuthDestination();
+      schedulePostAuthRedirectRetry();
+    }, POST_AUTH_REDIRECT_RETRY_DELAY);
+  }, [navigateToPostAuthDestination]);
 
   // Cargar usuario desde localStorage al montar (sincrónico)
   useEffect(() => {
@@ -65,6 +179,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
 
     // Verificar sesión con backend (asincrónico)
     checkAuth();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // Configurar auto-refresh de token
@@ -79,7 +194,29 @@ export function AuthProvider({ children }: AuthProviderProps) {
       clearAllTimers();
       removeActivityListeners();
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user]);
+
+  // Si ya hay sesión y estamos en login/callback, redirigir una sola vez
+  useEffect(() => {
+    if (!user || typeof window === "undefined") {
+      return;
+    }
+
+    const currentPath = window.location.pathname;
+    if (!isAuthEntryRoute(currentPath, i18nConfig.locales)) {
+      postAuthRedirectHandledRef.current = false;
+      postAuthRedirectRetryCountRef.current = 0;
+      if (postAuthRedirectRetryRef.current) {
+        clearTimeout(postAuthRedirectRetryRef.current);
+        postAuthRedirectRetryRef.current = null;
+      }
+      return;
+    }
+
+    navigateToPostAuthDestination();
+    schedulePostAuthRedirectRetry();
+  }, [user, navigateToPostAuthDestination, schedulePostAuthRedirectRetry]);
 
   const checkAuth = async () => {
     const token = getToken();
@@ -116,7 +253,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
         }
       } else {
         console.log(
-          "⚠️ checkAuth - Respuesta sin éxito, intentando refresh..."
+          "⚠️ checkAuth - Respuesta sin éxito, intentando refresh...",
         );
         // Token inválido, intentar refresh
         const refreshSuccess = await attemptTokenRefresh();
@@ -127,7 +264,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
           setUser(null);
         } else {
           console.log(
-            "✅ checkAuth - Refresh exitoso, reintentando getProfile..."
+            "✅ checkAuth - Refresh exitoso, reintentando getProfile...",
           );
           // Intentar obtener perfil nuevamente con el nuevo token
           const retryResponse = await AuthClient.getProfile();
@@ -142,26 +279,30 @@ export function AuthProvider({ children }: AuthProviderProps) {
           }
         }
       }
-    } catch (error: any) {
+    } catch (error: unknown) {
+      const normalizedError = toAuthContextHttpError(error);
       console.error("❌ checkAuth - Error capturado:", {
-        message: error?.message,
-        status: error?.response?.status,
-        data: error?.response?.data,
+        message: normalizedError.message,
+        status: normalizedError.response?.status,
+        data: normalizedError.response?.data,
       });
 
       // Solo limpiar sesión si es un error de autenticación válido
       const isAuthError =
-        error?.response?.status === 401 || error?.response?.status === 403;
+        normalizedError.response?.status === 401 ||
+        normalizedError.response?.status === 403;
+
+      const normalizedMessage = (normalizedError.message || "").toLowerCase();
 
       const isNetworkError =
-        !error?.response ||
-        error?.message?.includes("network") ||
-        error?.message?.includes("fetch") ||
-        error?.code === "ECONNREFUSED";
+        !normalizedError.response ||
+        normalizedMessage.includes("network") ||
+        normalizedMessage.includes("fetch") ||
+        normalizedError.code === "ECONNREFUSED";
 
       if (isAuthError) {
         console.log(
-          "🔄 checkAuth - Error de autenticación detectado, intentando refresh..."
+          "🔄 checkAuth - Error de autenticación detectado, intentando refresh...",
         );
         const refreshSuccess = await attemptTokenRefresh();
         if (refreshSuccess) {
@@ -177,7 +318,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
           } catch (retryError) {
             console.error(
               "❌ checkAuth - Error en retry después de refresh:",
-              retryError
+              retryError,
             );
           }
         }
@@ -190,13 +331,13 @@ export function AuthProvider({ children }: AuthProviderProps) {
       } else if (isNetworkError) {
         // Error de red: mantener el token, usuario Y reintentar
         console.warn(
-          "⚠️ checkAuth - Error de red/backend, manteniendo sesión completa. Reintentando en 3 segundos..."
+          "⚠️ checkAuth - Error de red/backend, manteniendo sesión completa. Reintentando en 3 segundos...",
         );
         // No limpiar tokens ni usuario - mantener UI funcional
         // Si hay un usuario válido previo, usarlo
         if (lastValidUserRef.current && !user) {
           console.log(
-            "💾 checkAuth - Restaurando último usuario válido desde cache"
+            "💾 checkAuth - Restaurando último usuario válido desde cache",
           );
           setUser(lastValidUserRef.current);
         }
@@ -208,13 +349,13 @@ export function AuthProvider({ children }: AuthProviderProps) {
           }
           checkAuthRetryRef.current = setTimeout(() => {
             console.log(
-              `🔄 Reintentando checkAuth (intento ${retryCountRef.current}/3)...`
+              `🔄 Reintentando checkAuth (intento ${retryCountRef.current}/3)...`,
             );
             checkAuth();
           }, 3000);
         } else {
           console.warn(
-            "⚠️ checkAuth - Máximo de reintentos alcanzado. Usuario debe recargar manualmente."
+            "⚠️ checkAuth - Máximo de reintentos alcanzado. Usuario debe recargar manualmente.",
           );
           retryCountRef.current = 0;
         }
@@ -223,12 +364,12 @@ export function AuthProvider({ children }: AuthProviderProps) {
         // Otro tipo de error: ser conservador y mantener sesión completa
         console.warn(
           "⚠️ checkAuth - Error desconocido, manteniendo sesión completa. Error:",
-          error?.message
+          normalizedError.message,
         );
         // Si hay un usuario válido previo, usarlo
         if (lastValidUserRef.current && !user) {
           console.log(
-            "💾 checkAuth - Restaurando último usuario válido desde cache"
+            "💾 checkAuth - Restaurando último usuario válido desde cache",
           );
           setUser(lastValidUserRef.current);
         }
@@ -250,9 +391,9 @@ export function AuthProvider({ children }: AuthProviderProps) {
       const response = await AuthClient.refreshToken(currentRefreshToken);
 
       if (response.success && response.data) {
-        const newAccessToken =
-          (response.data as any).accessToken || (response.data as any).token;
-        const newRefreshToken = (response.data as any).refreshToken;
+        const tokenPayload = response.data as TokenRefreshPayload;
+        const newAccessToken = tokenPayload.accessToken || tokenPayload.token;
+        const newRefreshToken = tokenPayload.refreshToken;
         const rememberMe = isRememberMeEnabled();
 
         if (newAccessToken) {
@@ -275,8 +416,10 @@ export function AuthProvider({ children }: AuthProviderProps) {
   const login = async (
     email: string,
     password: string,
-    rememberMe: boolean = false
+    rememberMe: boolean = false,
   ) => {
+    postAuthRedirectHandledRef.current = false;
+
     try {
       setIsLoading(true);
       const response = await AuthClient.login({ email, password });
@@ -294,22 +437,31 @@ export function AuthProvider({ children }: AuthProviderProps) {
         lastValidUserRef.current = user; // Guardar en cache
         setUserToStorage(user); // Persistir en localStorage
 
+        // Sincronizar idioma del usuario con la cookie NEXT_LOCALE para next-intl
+        if (user.preferences?.language) {
+          document.cookie = `NEXT_LOCALE=${user.preferences.language}; path=/; max-age=31536000; SameSite=Strict`;
+        }
+
         // Mostrar notificación de éxito
         showSuccess(
-          "Inicio de sesión exitoso",
-          `Bienvenido ${user.firstName || user.email}`
+          tAuth("login_success"),
+          `Bienvenido ${user.firstName || user.email}`,
         );
 
-        // Redirigir al dashboard
-        router.push("/dashboard");
+        navigateToPostAuthDestination();
+        schedulePostAuthRedirectRetry();
       } else {
         throw new Error(response.message || "Error al iniciar sesión");
       }
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error("Error en login:", error);
+      const resolvedMessage = resolveErrorMessage(
+        error,
+        tErrors as unknown as ErrorTranslator,
+      );
       showError(
-        "Error de autenticación",
-        error.message || "No se pudo iniciar sesión. Verifica tus credenciales."
+        tErrors("auth.default"),
+        resolvedMessage || tAuth("default_error"),
       );
       throw error;
     } finally {
@@ -333,6 +485,13 @@ export function AuthProvider({ children }: AuthProviderProps) {
       setUser(null);
       lastValidUserRef.current = null; // Limpiar cache de usuario
       setUserToStorage(null); // Limpiar de localStorage
+      postAuthRedirectHandledRef.current = false;
+      postAuthRedirectRetryCountRef.current = 0;
+      if (postAuthRedirectRetryRef.current) {
+        clearTimeout(postAuthRedirectRetryRef.current);
+        postAuthRedirectRetryRef.current = null;
+      }
+      clearPostAuthRedirect();
 
       if (showMessage) {
         showInfo("Sesión cerrada", "Has cerrado sesión exitosamente");
@@ -349,6 +508,11 @@ export function AuthProvider({ children }: AuthProviderProps) {
         setUser(response.data);
         lastValidUserRef.current = response.data; // Actualizar cache
         setUserToStorage(response.data); // Persistir en localStorage
+
+        // Sincronizar idioma del usuario con la cookie NEXT_LOCALE
+        if (response.data.preferences?.language) {
+          document.cookie = `NEXT_LOCALE=${response.data.preferences.language}; path=/; max-age=31536000; SameSite=Strict`;
+        }
       }
     } catch (error) {
       console.error("Error refrescando usuario:", error);
@@ -366,9 +530,9 @@ export function AuthProvider({ children }: AuthProviderProps) {
 
       if (response.success && response.data) {
         // El backend puede devolver { token, expiresIn } o { accessToken, refreshToken }
-        const newAccessToken =
-          (response.data as any).accessToken || (response.data as any).token;
-        const newRefreshToken = (response.data as any).refreshToken;
+        const tokenPayload = response.data as TokenRefreshPayload;
+        const newAccessToken = tokenPayload.accessToken || tokenPayload.token;
+        const newRefreshToken = tokenPayload.refreshToken;
         const rememberMe = isRememberMeEnabled();
 
         if (newAccessToken) {
@@ -386,9 +550,13 @@ export function AuthProvider({ children }: AuthProviderProps) {
       console.error("Error refrescando token:", error);
       // Si falla el refresh, cerrar sesión
       await logout(false);
+      const resolvedMessage = resolveErrorMessage(
+        error,
+        tErrors as unknown as ErrorTranslator,
+      );
       showError(
-        "Sesión expirada",
-        "Tu sesión ha expirado. Por favor, inicia sesión nuevamente."
+        tErrors("auth.default"),
+        resolvedMessage || tErrors("http.unauthorized"),
       );
       return false;
     }
@@ -426,7 +594,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
     warningTimeoutRef.current = setTimeout(() => {
       showWarning(
         "Sesión por expirar",
-        "Tu sesión se cerrará en 5 minutos por inactividad. Mueve el mouse para mantenerla activa."
+        "Tu sesión se cerrará en 5 minutos por inactividad. Mueve el mouse para mantenerla activa.",
       );
     }, SESSION_TIMEOUT - SESSION_WARNING_TIME);
 
@@ -435,7 +603,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
       await logout(false);
       showError(
         "Sesión cerrada por inactividad",
-        "Tu sesión se cerró automáticamente después de 30 minutos de inactividad."
+        "Tu sesión se cerró automáticamente después de 30 minutos de inactividad.",
       );
     }, SESSION_TIMEOUT);
   };
@@ -477,6 +645,10 @@ export function AuthProvider({ children }: AuthProviderProps) {
     }
     if (checkAuthRetryRef.current) {
       clearTimeout(checkAuthRetryRef.current);
+    }
+    if (postAuthRedirectRetryRef.current) {
+      clearTimeout(postAuthRedirectRetryRef.current);
+      postAuthRedirectRetryRef.current = null;
     }
   };
 

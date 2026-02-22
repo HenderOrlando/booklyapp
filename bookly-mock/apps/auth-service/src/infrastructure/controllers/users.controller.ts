@@ -1,6 +1,11 @@
-import { UserRole } from "@libs/common/enums";
-import { PaginationQuery } from "@libs/common";
-import { ResponseUtil } from "@libs/common";
+import { DeleteUserCommand } from "@auth/application/commands/delete-user.command";
+import { RegisterUserCommand } from "@auth/application/commands/register-user.command";
+import { UpdateMyProfileCommand } from "@auth/application/commands/update-my-profile.command";
+import { UpdateUserCommand } from "@auth/application/commands/update-user.command";
+import { GetUserByIdQuery } from "@auth/application/queries/get-user-by-id.query";
+import { GetUsersQuery } from "@auth/application/queries/get-users.query";
+import { UserEntity } from "@auth/domain/entities/user.entity";
+import { PaginationQuery, ResponseUtil } from "@libs/common";
 import { CurrentUser, Roles } from "@libs/decorators";
 import { JwtAuthGuard, RolesGuard } from "@libs/guards";
 import {
@@ -10,6 +15,7 @@ import {
   Get,
   Param,
   Patch,
+  Post,
   Query,
   UseGuards,
 } from "@nestjs/common";
@@ -23,9 +29,60 @@ import {
   ApiTags,
 } from "@nestjs/swagger";
 import { Audit, AuditAction } from "@reports/audit-decorators";
-import { GetUserByIdQuery } from '@auth/application/queries/get-user-by-id.query';
-import { GetUsersQuery } from '@auth/application/queries/get-users.query';
+import { UpdateMyProfileDto } from "../dto/update-my-profile.dto";
 import { UpdateUserDto } from "../dto/update-user.dto";
+import { RegisterDto } from "../dto/register.dto";
+
+interface MyProfileResponseDto {
+  personal: {
+    userId: string;
+    nombreCompleto: string;
+    correo: string;
+    usuario: string;
+    estadoCuenta: "ACTIVE" | "INACTIVE";
+    tenantId: string;
+    phone?: string;
+    documentType?: string;
+    documentNumber?: string;
+  };
+  roles: Array<{
+    code: string;
+    name: string;
+  }>;
+  verificaciones: {
+    emailVerificado: boolean;
+    telefonoVerificado: boolean;
+    twoFactor: {
+      habilitada: boolean;
+      metodos: string[];
+    };
+  };
+  cuenta: {
+    fechaCreacion: string | null;
+    ultimaActualizacion: string | null;
+  };
+  preferences: {
+    language: string;
+    theme: "light" | "dark" | "system";
+    timezone?: string;
+    notifications: {
+      email: boolean;
+      push: boolean;
+      sms: boolean;
+    };
+  };
+}
+
+const DEFAULT_USER_PREFERENCES: MyProfileResponseDto["preferences"] = {
+  language: "es",
+  theme: "system",
+  timezone: "America/Bogota",
+  notifications: {
+    email: true,
+    push: true,
+    sms: false,
+  },
+};
 
 /**
  * Users Controller
@@ -38,7 +95,7 @@ import { UpdateUserDto } from "../dto/update-user.dto";
 export class UsersController {
   constructor(
     private readonly queryBus: QueryBus,
-    private readonly commandBus: CommandBus
+    private readonly commandBus: CommandBus,
   ) {}
 
   /**
@@ -61,10 +118,58 @@ export class UsersController {
   }
 
   /**
+   * Obtener perfil detallado del usuario autenticado
+   */
+  @Get("me/profile")
+  @ApiOperation({
+    summary: "Obtener perfil detallado propio",
+    description: "Retorna el perfil detallado del usuario autenticado",
+  })
+  @ApiResponse({
+    status: 200,
+    description: "Perfil detallado obtenido exitosamente",
+  })
+  async getMyProfile(@CurrentUser("sub") userId: string) {
+    const query = new GetUserByIdQuery(userId);
+    const user = await this.queryBus.execute(query);
+    const profile = this.toMyProfileResponse(user);
+
+    return ResponseUtil.success(profile, "Perfil obtenido exitosamente");
+  }
+
+  /**
+   * Actualizar perfil propio del usuario autenticado
+   */
+  @Patch("me/profile")
+  @Audit({
+    entityType: "USER",
+    action: AuditAction.UPDATED,
+  })
+  @ApiOperation({
+    summary: "Actualizar perfil propio",
+    description:
+      "Actualiza los datos permitidos del perfil del usuario autenticado",
+  })
+  @ApiResponse({
+    status: 200,
+    description: "Perfil actualizado exitosamente",
+  })
+  async updateMyProfile(
+    @CurrentUser("sub") userId: string,
+    @Body() dto: UpdateMyProfileDto,
+  ) {
+    const command = new UpdateMyProfileCommand(userId, dto);
+    const result = await this.commandBus.execute(command);
+    const profile = this.toMyProfileResponse(result);
+
+    return ResponseUtil.success(profile, "Perfil actualizado exitosamente");
+  }
+
+  /**
    * Obtener todos los usuarios (paginado)
    */
   @Get()
-  @Roles(UserRole.GENERAL_ADMIN, UserRole.PROGRAM_ADMIN)
+  @Roles("GENERAL_ADMIN", "PROGRAM_ADMIN")
   @ApiOperation({
     summary: "Obtener todos los usuarios",
     description:
@@ -85,8 +190,8 @@ export class UsersController {
   @ApiQuery({
     name: "role",
     required: false,
-    enum: UserRole,
-    description: "Filtrar por rol",
+    type: String,
+    description: "Filtrar por rol (ej: GENERAL_ADMIN, STUDENT)",
   })
   @ApiResponse({
     status: 200,
@@ -101,7 +206,7 @@ export class UsersController {
     @Query("limit") limit?: number,
     @Query("sortBy") sortBy?: string,
     @Query("sortOrder") sortOrder?: "asc" | "desc",
-    @Query("role") role?: UserRole
+    @Query("role") role?: string,
   ) {
     const paginationQuery: PaginationQuery = {
       page: page ? Number(page) : 1,
@@ -112,7 +217,7 @@ export class UsersController {
 
     const query = new GetUsersQuery(
       paginationQuery,
-      role ? { role } : undefined
+      role ? { role } : undefined,
     );
     const result = await this.queryBus.execute(query);
 
@@ -120,10 +225,59 @@ export class UsersController {
   }
 
   /**
+   * Crear nuevo usuario (Admin)
+   */
+  @Post()
+  @Roles("GENERAL_ADMIN")
+  @Audit({
+    entityType: "USER",
+    action: AuditAction.CREATED,
+    excludeFields: ["password"],
+  })
+  @ApiOperation({
+    summary: "Crear nuevo usuario",
+    description: "Crea un nuevo usuario en el sistema (solo admin general)",
+  })
+  @ApiResponse({
+    status: 201,
+    description: "Usuario creado exitosamente",
+  })
+  @ApiResponse({
+    status: 400,
+    description: "Datos de entrada inválidos",
+  })
+  async createUser(
+    @Body() dto: RegisterDto,
+    @CurrentUser("sub") adminId: string,
+  ) {
+    const command = new RegisterUserCommand(
+      {
+        email: dto.email,
+        password: dto.password,
+        firstName: dto.firstName,
+        lastName: dto.lastName,
+        roles: dto.roles,
+        permissions: dto.permissions,
+        username: dto.username,
+        phone: dto.phone,
+        documentType: dto.documentType,
+        documentNumber: dto.documentNumber,
+        tenantId: dto.tenantId,
+        programId: dto.programId,
+        coordinatedProgramId: dto.coordinatedProgramId,
+      },
+      adminId,
+    );
+
+    const user = await this.commandBus.execute(command);
+    return ResponseUtil.success(user, "Usuario creado exitosamente");
+  }
+
+  /**
    * Obtener usuario por ID
    */
   @Get(":id")
-  @Roles(UserRole.GENERAL_ADMIN, UserRole.PROGRAM_ADMIN)
+  @Roles("GENERAL_ADMIN", "PROGRAM_ADMIN")
   @ApiOperation({
     summary: "Obtener usuario por ID",
     description: "Retorna la información de un usuario específico",
@@ -157,7 +311,7 @@ export class UsersController {
     action: AuditAction.UPDATED,
     excludeFields: ["password"],
   })
-  @Roles(UserRole.GENERAL_ADMIN)
+  @Roles("GENERAL_ADMIN")
   @ApiOperation({
     summary: "Actualizar usuario",
     description: "Actualiza la información de un usuario (solo admin general)",
@@ -179,13 +333,14 @@ export class UsersController {
     status: 403,
     description: "No tiene permisos para actualizar usuarios",
   })
-  async updateUser(@Param("id") id: string, @Body() dto: UpdateUserDto) {
-    // TODO: Implementar UpdateUserCommand cuando sea necesario
-    // Por ahora retornamos un placeholder
-    return ResponseUtil.success(
-      { id, ...dto },
-      "Usuario actualizado exitosamente"
-    );
+  async updateUser(
+    @Param("id") id: string,
+    @Body() dto: UpdateUserDto,
+    @CurrentUser("sub") userId: string,
+  ) {
+    const command = new UpdateUserCommand(id, dto, userId);
+    const result = await this.commandBus.execute(command);
+    return ResponseUtil.success(result, "Usuario actualizado exitosamente");
   }
 
   /**
@@ -197,7 +352,7 @@ export class UsersController {
     action: AuditAction.DELETED,
     captureBeforeData: true,
   })
-  @Roles(UserRole.GENERAL_ADMIN)
+  @Roles("GENERAL_ADMIN")
   @ApiOperation({
     summary: "Eliminar usuario",
     description: "Elimina un usuario del sistema (solo admin general)",
@@ -219,9 +374,63 @@ export class UsersController {
     status: 403,
     description: "No tiene permisos para eliminar usuarios",
   })
-  async deleteUser(@Param("id") id: string) {
-    // TODO: Implementar DeleteUserCommand cuando sea necesario
-    // Por ahora retornamos un placeholder
-    return ResponseUtil.success(undefined, "Usuario eliminado exitosamente");
+  async deleteUser(
+    @Param("id") id: string,
+    @CurrentUser("sub") userId: string,
+  ) {
+    const command = new DeleteUserCommand(id, userId);
+    const result = await this.commandBus.execute(command);
+    return ResponseUtil.success(result, "Usuario eliminado exitosamente");
+  }
+
+  private toMyProfileResponse(user: UserEntity): MyProfileResponseDto {
+    const roleNameMap: Record<string, string> = {
+      GENERAL_ADMIN: "Administrador General",
+      PROGRAM_ADMIN: "Administrador de Programa",
+      TEACHER: "Docente",
+      STUDENT: "Estudiante",
+      SECURITY: "Vigilante",
+      ADMINISTRATIVE_STAFF: "Administrativo General",
+    };
+
+    return {
+      personal: {
+        userId: user.id,
+        nombreCompleto: `${user.firstName} ${user.lastName}`.trim(),
+        correo: user.email,
+        usuario: user.username || user.email,
+        estadoCuenta: user.isActive ? "ACTIVE" : "INACTIVE",
+        tenantId: user.tenantId || "UFPS",
+        phone: user.phone,
+        documentType: user.documentType,
+        documentNumber: user.documentNumber,
+      },
+      roles: (user.roles || []).map((roleCode) => ({
+        code: roleCode,
+        name: roleNameMap[roleCode] || roleCode,
+      })),
+      verificaciones: {
+        emailVerificado: user.isEmailVerified,
+        telefonoVerificado: user.isPhoneVerified ?? false,
+        twoFactor: {
+          habilitada: user.twoFactorEnabled === true,
+          metodos: ["EMAIL", "TOTP"],
+        },
+      },
+      cuenta: {
+        fechaCreacion: user.createdAt ? user.createdAt.toISOString() : null,
+        ultimaActualizacion: user.updatedAt
+          ? user.updatedAt.toISOString()
+          : null,
+      },
+      preferences: {
+        ...DEFAULT_USER_PREFERENCES,
+        ...user.preferences,
+        notifications: {
+          ...DEFAULT_USER_PREFERENCES.notifications,
+          ...(user.preferences?.notifications ?? {}),
+        },
+      },
+    };
   }
 }

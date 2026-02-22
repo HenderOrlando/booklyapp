@@ -1,4 +1,3 @@
-import { FeedbackCategory, FeedbackStatus } from "@libs/common/enums";
 import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
 import { Document, Types } from "mongoose";
 
@@ -26,13 +25,8 @@ export class UserFeedback extends Document {
   @Prop({ required: true, min: 1, max: 5, index: true })
   rating: number;
 
-  @Prop({
-    type: String,
-    enum: Object.values(FeedbackStatus),
-    default: FeedbackStatus.PENDING,
-    index: true,
-  })
-  status: FeedbackStatus;
+  @Prop({ type: String, default: "PENDING", index: true })
+  status: string;
 
   @Prop()
   comments?: string;
@@ -40,12 +34,8 @@ export class UserFeedback extends Document {
   @Prop({ type: Date, default: Date.now, index: true })
   feedbackDate: Date;
 
-  @Prop({
-    type: String,
-    enum: Object.values(FeedbackCategory),
-    index: true,
-  })
-  category?: FeedbackCategory;
+  @Prop({ type: String, index: true })
+  category?: string;
 
   @Prop({ default: false })
   isAnonymous: boolean;

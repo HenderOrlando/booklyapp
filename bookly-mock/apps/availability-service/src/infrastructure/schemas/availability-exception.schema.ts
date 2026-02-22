@@ -1,4 +1,3 @@
-import { ExceptionReason } from "@libs/common/enums";
 import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
 import { Document, Types } from "mongoose";
 
@@ -21,12 +20,8 @@ export class AvailabilityException {
   @Prop({ type: Date, required: true })
   exceptionDate: Date;
 
-  @Prop({
-    type: String,
-    enum: Object.values(ExceptionReason),
-    required: true,
-  })
-  reason: ExceptionReason;
+  @Prop({ type: String, required: true })
+  reason: string;
 
   @Prop({ type: String })
   customReason?: string; // Razón personalizada si reason === CUSTOM
@@ -54,13 +49,13 @@ export class AvailabilityException {
 }
 
 export const AvailabilityExceptionSchema = SchemaFactory.createForClass(
-  AvailabilityException
+  AvailabilityException,
 );
 
 // Índices compuestos para búsquedas eficientes
 AvailabilityExceptionSchema.index(
   { resourceId: 1, exceptionDate: 1 },
-  { unique: true }
+  { unique: true },
 );
 AvailabilityExceptionSchema.index({ exceptionDate: 1 });
 AvailabilityExceptionSchema.index({ reason: 1 });

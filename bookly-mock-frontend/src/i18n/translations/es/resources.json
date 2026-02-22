@@ -10,6 +10,7 @@
   "available": "Disponible",
   "occupied": "Ocupado",
   "maintenance": "Mantenimiento",
+  "unavailable": "No Disponible",
   "code": "Código",
   "location": "Ubicación",
   "description": "Descripción",
@@ -21,13 +22,18 @@
   "actions": "Acciones",
   "management": "Gestión de recursos del sistema",
   "list": "Lista de Recursos",
-  "showing_count": "{{count}} de {{total}} recursos",
+  "showing_count": "{count} de {total} recursos",
   "search_placeholder": "Buscar por nombre, código, ubicación...",
+  "loading": "Cargando recursos...",
+  "error_loading": "Error al cargar los recursos",
+  "show_unavailable": "Ver no disponibles",
+  "restore": "Restaurar",
   "clear_filters": "Limpiar Filtros",
   "no_results_title": "No se encontraron recursos",
   "no_results_desc": "No hay recursos que coincidan con los filtros aplicados. Intenta ajustar los criterios de búsqueda.",
   "empty_desc": "Aún no hay recursos registrados. Crea el primer recurso para comenzar.",
   "view_table": "Vista Tabla",
+  "view_list": "Vista Lista",
   "view_virtual": "Vista Virtual",
   "delete_title": "Confirmar Eliminación",
   "delete_confirm": "¿Estás seguro que deseas eliminar este recurso?",
@@ -66,5 +72,15 @@
     "total_capacity": "Capacidad Total",
     "people": "personas",
     "reserved": "reservados"
+  },
+  "type_labels": {
+    "CLASSROOM": "Aula/Salón",
+    "LABORATORY": "Laboratorio",
+    "AUDITORIUM": "Auditorio",
+    "MULTIMEDIA_EQUIPMENT": "Equipo Multimedial",
+    "SPORTS_FACILITY": "Instalación Deportiva",
+    "MEETING_ROOM": "Sala de Juntas",
+    "VEHICLE": "Vehículo",
+    "OTHER": "Otro"
   }
 }

@@ -1,5 +1,74 @@
-import { UserRole } from "@libs/common/enums";
 import { AuditInfo } from "@libs/common";
+
+export interface UserNotificationPreferences {
+  email: boolean;
+  push: boolean;
+  sms: boolean;
+}
+
+export interface UserPreferences {
+  language: string;
+  theme: "light" | "dark" | "system";
+  notifications: UserNotificationPreferences;
+  timezone?: string;
+}
+
+const DEFAULT_USER_PREFERENCES: UserPreferences = {
+  language: "es",
+  theme: "system",
+  notifications: {
+    email: true,
+    push: true,
+    sms: false,
+  },
+  timezone: "America/Bogota",
+};
+
+function normalizeUserPreferences(value: unknown): UserPreferences | undefined {
+  if (!value || typeof value !== "object") {
+    return undefined;
+  }
+
+  const source = value as Record<string, unknown>;
+  const sourceNotifications =
+    typeof source.notifications === "object" && source.notifications !== null
+      ? (source.notifications as Record<string, unknown>)
+      : {};
+
+  const themeCandidate = source.theme;
+  const normalizedTheme =
+    themeCandidate === "light" ||
+    themeCandidate === "dark" ||
+    themeCandidate === "system"
+      ? themeCandidate
+      : DEFAULT_USER_PREFERENCES.theme;
+
+  return {
+    language:
+      typeof source.language === "string" && source.language.length > 0
+        ? source.language
+        : DEFAULT_USER_PREFERENCES.language,
+    theme: normalizedTheme,
+    timezone:
+      typeof source.timezone === "string" && source.timezone.length > 0
+        ? source.timezone
+        : DEFAULT_USER_PREFERENCES.timezone,
+    notifications: {
+      email:
+        typeof sourceNotifications.email === "boolean"
+          ? sourceNotifications.email
+          : DEFAULT_USER_PREFERENCES.notifications.email,
+      push:
+        typeof sourceNotifications.push === "boolean"
+          ? sourceNotifications.push
+          : DEFAULT_USER_PREFERENCES.notifications.push,
+      sms:
+        typeof sourceNotifications.sms === "boolean"
+          ? sourceNotifications.sms
+          : DEFAULT_USER_PREFERENCES.notifications.sms,
+    },
+  };
+}
 
 /**
  * User Domain Entity
@@ -12,7 +81,7 @@ export class UserEntity {
     public password: string | undefined,
     public firstName: string,
     public lastName: string,
-    public roles: UserRole[],
+    public roles: string[],
     public permissions: string[],
     public isActive: boolean,
     public isEmailVerified: boolean,
@@ -25,7 +94,18 @@ export class UserEntity {
     public twoFactorBackupCodes?: string[],
     public lastLogin?: Date,
     public passwordChangedAt?: Date,
-    public audit?: AuditInfo
+    public audit?: AuditInfo,
+    public username?: string,
+    public isPhoneVerified?: boolean,
+    public tenantId?: string,
+    public createdAt?: Date,
+    public updatedAt?: Date,
+    public phone?: string,
+    public documentType?: string,
+    public documentNumber?: string,
+    public programId?: string,
+    public coordinatedProgramId?: string,
+    public preferences?: UserPreferences,
   ) {}
 
   /**
@@ -38,21 +118,21 @@ export class UserEntity {
   /**
    * Verificar si el usuario tiene un rol específico
    */
-  hasRole(role: UserRole): boolean {
+  hasRole(role: string): boolean {
     return this.roles.includes(role);
   }
 
   /**
    * Verificar si el usuario tiene alguno de los roles especificados
    */
-  hasAnyRole(roles: UserRole[]): boolean {
+  hasAnyRole(roles: string[]): boolean {
     return roles.some((role) => this.hasRole(role));
   }
 
   /**
    * Verificar si el usuario tiene todos los roles especificados
    */
-  hasAllRoles(roles: UserRole[]): boolean {
+  hasAllRoles(roles: string[]): boolean {
     return roles.every((role) => this.hasRole(role));
   }
 
@@ -81,13 +161,13 @@ export class UserEntity {
    * Verificar si el usuario es administrador
    */
   isAdmin(): boolean {
-    return this.hasRole(UserRole.GENERAL_ADMIN);
+    return this.hasRole("GENERAL_ADMIN");
   }
 
   /**
    * Agregar rol al usuario
    */
-  addRole(role: UserRole): void {
+  addRole(role: string): void {
     if (!this.hasRole(role)) {
       this.roles.push(role);
     }
@@ -96,7 +176,7 @@ export class UserEntity {
   /**
    * Remover rol del usuario
    */
-  removeRole(role: UserRole): void {
+  removeRole(role: string): void {
     this.roles = this.roles.filter((r) => r !== role);
   }
 
@@ -179,7 +259,7 @@ export class UserEntity {
     provider: string,
     providerId: string,
     email: string,
-    photoUrl?: string
+    photoUrl?: string,
   ): void {
     this.ssoProvider = provider;
     this.ssoProviderId = providerId;
@@ -258,6 +338,17 @@ export class UserEntity {
       lastLogin: this.lastLogin,
       passwordChangedAt: this.passwordChangedAt,
       audit: this.audit,
+      username: this.username,
+      isPhoneVerified: this.isPhoneVerified,
+      tenantId: this.tenantId,
+      createdAt: this.createdAt,
+      updatedAt: this.updatedAt,
+      phone: this.phone,
+      documentType: this.documentType,
+      documentNumber: this.documentNumber,
+      programId: this.programId,
+      coordinatedProgramId: this.coordinatedProgramId,
+      preferences: this.preferences,
     };
   }
 
@@ -284,7 +375,18 @@ export class UserEntity {
       data.twoFactorBackupCodes || [],
       data.lastLogin,
       data.passwordChangedAt,
-      data.audit
+      data.audit,
+      data.username,
+      data.isPhoneVerified ?? false,
+      data.tenantId ?? "UFPS",
+      data.createdAt,
+      data.updatedAt,
+      data.phone,
+      data.documentType,
+      data.documentNumber,
+      data.programId,
+      data.coordinatedProgramId,
+      normalizeUserPreferences(data.preferences),
     );
   }
 }

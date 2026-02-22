@@ -16,14 +16,14 @@
    - Scripts disponibles
    - Estado del proyecto (100% completo)
 
-2. **[ARCHITECTURE.md](./ARCHITECTURE.md)** 🏗️
+2. **[ARCHITECTURE.md](./architecture-and-standards/ARCHITECTURE.md)** 🏗️
    - Principios de diseño (9 aspectos de calidad)
    - Estructura del proyecto
    - Atomic Design pattern
    - Flujo de datos
    - Patrones de componentes
 
-3. **[BEST_PRACTICES.md](./BEST_PRACTICES.md)** ✅
+3. **[BEST_PRACTICES.md](./architecture-and-standards/BEST_PRACTICES.md)** ✅
    - Componentes React
    - TypeScript
    - Hooks
@@ -34,7 +34,7 @@
    - Testing
    - Git y Commits
 
-4. **[TESTING.md](./TESTING.md)** 🧪
+4. **[TESTING.md](./architecture-and-standards/TESTING.md)** 🧪
    - Estrategia de testing
    - Tests unitarios
    - Tests de integración
@@ -42,7 +42,7 @@
    - Coverage
    - Utilidades y mocks
 
-5. **[PERFORMANCE.md](./PERFORMANCE.md)** ⚡
+5. **[PERFORMANCE.md](./architecture-and-standards/PERFORMANCE.md)** ⚡
    - Core Web Vitals
    - Code splitting
    - Memoization
@@ -50,7 +50,7 @@
    - Image optimization
    - Bundle optimization
 
-6. **[PENDIENTES.md](./PENDIENTES.md)** 📋
+6. **[PENDIENTES.md](./project-management/PENDIENTES.md)** 📋
    - 106 TODOs consolidados
    - Priorización por categoría
    - Análisis de impacto
@@ -62,27 +62,27 @@
 
 ### Planes de Implementación por Servicio
 
-7. **[00_PLAN_GENERAL.md](./00_PLAN_GENERAL.md)** 🗺️
+7. **[00_PLAN_GENERAL.md](./archive/plans/00_PLAN_GENERAL.md)** 🗺️
    - Visión general del proyecto
    - Arquitectura del sistema
    - Stack tecnológico
    - Roadmap completo
 
-8. **[01_AUTH_SERVICE.md](./01_AUTH_SERVICE.md)** 🔐
+8. **[01_AUTH_SERVICE.md](./api-integration/01_AUTH_SERVICE.md)** 🔐
    - RF-41 a RF-45
    - Autenticación tradicional y SSO
    - Gestión de usuarios, roles y permisos
    - Sistema de auditoría
    - 2FA
 
-9. **[02_RESOURCES_SERVICE.md](./02_RESOURCES_SERVICE.md)** 🏢
+9. **[02_RESOURCES_SERVICE.md](./api-integration/02_RESOURCES_SERVICE.md)** 🏢
    - RF-01 a RF-06
    - CRUD de recursos físicos
    - Gestión de categorías
    - Importación/exportación CSV
    - Sistema de mantenimiento
 
-10. **[03_AVAILABILITY_SERVICE.md](./03_AVAILABILITY_SERVICE.md)** 📅
+10. **[03_AVAILABILITY_SERVICE.md](./api-integration/03_AVAILABILITY_SERVICE.md)** 📅
     - RF-07 a RF-19
     - Gestión de reservas
     - Calendario y visualización
@@ -90,7 +90,7 @@
     - Lista de espera
     - Reasignación de recursos
 
-11. **[04_STOCKPILE_SERVICE.md](./04_STOCKPILE_SERVICE.md)** ✅
+11. **[04_STOCKPILE_SERVICE.md](./api-integration/04_STOCKPILE_SERVICE.md)** ✅
     - RF-20 a RF-28
     - Flujos de aprobación
     - Check-in/Check-out digital
@@ -98,58 +98,38 @@
     - Notificaciones multi-canal
     - Panel de vigilancia
 
-12. **[05_REPORTS_SERVICE.md](./05_REPORTS_SERVICE.md)** 📊
+12. **[05_REPORTS_SERVICE.md](./api-integration/05_REPORTS_SERVICE.md)** 📊
     - RF-31 a RF-37
     - Reportes de uso
     - Dashboards interactivos
     - Exportación de datos
     - Sistema de feedback
 
-13. **[06_API_GATEWAY.md](./06_API_GATEWAY.md)** 🌐
+13. **[06_API_GATEWAY.md](./api-integration/06_API_GATEWAY.md)** 🌐
     - WebSocket tiempo real
     - Sistema de notificaciones
     - Event streaming
     - Health checks
     - Métricas de sistema
+    - [CONFIGURACION_BACKEND.md](./api-integration/CONFIGURACION_BACKEND.md) - Guía para conexión.
+    - [API_RESPONSE_STRUCTURE.md](./api-integration/API_RESPONSE_STRUCTURE.md) - Estructura global.
 
 ---
 
-## 🗄️ Documentación Archivada
+### Documentación Archivada
 
 > Documentos de procesos completados - Movidos a `/docs/archive/`
 
-### Implementaciones Completadas
+#### Planes completados (`archive/plans/`)
 
-- **IMPLEMENTACION_AUTH_COMPLETA.md** - Autenticación implementada
-- **TYPESCRIPT_FIXES_COMPLETADO.md** - Errores TypeScript resueltos
-- **VERIFICACION_FASE_1_Y_2.md** - Fases iniciales completadas
-- **VERIFICACION_FASE_3.md** - Fase 3 completada
-- **VIRTUAL_SCROLLING_APLICADO_FINAL.md** - Virtual scrolling implementado
-- **VIRTUAL_SCROLLING_IMPLEMENTADO.md** - Primera implementación
-- **README_INTEGRACION.md** - Guía de integración (obsoleta)
-- **README_OLD.md** - README antiguo (reemplazado)
+- LIMPIEZA_COMPLETADA.md
+- TODOS_CRITICOS_IMPLEMENTADOS.md
 
-### Procesos de Desarrollo Archivados
+#### Soluciones a errores críticos (`archive/fixes/`)
 
-- **00_PLAN_GENERAL_ACTUALIZADO.md** - Plan actualizado (fusionado)
-- **ARQUITECTURA_HTTP_CLIENT.md** - HTTP client documentado
-- **AUTH_IMPROVEMENTS.md** - Mejoras de auth implementadas
-- **AUTH_SIN_NEXTAUTH.md** - Decisión de arquitectura
-- **FIX_DATA_MODE_SERVE.md** - Fix implementado
-- **FIX_DATA_MODE_SERVE_FINAL.md** - Fix final
-- **FIX_PERFIL_Y_PROTECCION_RUTAS.md** - Fix implementado
-- **FIX_SESSION_PERSISTENCE.md** - Persistencia arreglada
-- **GUIA_RAPIDA_INTEGRACION.md** - Guía rápida (obsoleta)
-- **INTEGRACION_RESUMEN.md** - Resumen integración
-- **MEJORES_PRACTICAS_CONSULTAS.md** - Integrado en BEST_PRACTICES.md
-- **PERMISOS_CONTEXTUALES_COORDINADOR.md** - Permisos implementados
-- **PLAN_INTEGRACION_BACKEND.md** - Integración completada
-- **PROGRESO_INTEGRACION.md** - Progreso 100%
-- **PROXIMOS_PASOS_INTEGRACION.md** - Ya no aplica
-- **ROLES_Y_PERMISOS_SIDEBAR.md** - Implementado
-- **SERVICIOS_DIRECTOS.md** - Arquitectura decidida
-- **TESTING_AUTH.md** - Tests implementados
-- **TESTING_INTEGRACION_AUTH.md** - Integración testeada
+- FIX_MISSING_SIDENAV.md
+- FIX_ROLE_VALIDATION.md
+- FIX_SESSION_PERSISTENCE.md
 
 ---
 
@@ -350,23 +330,23 @@
 
 ### ¿Dónde encuentro la arquitectura del proyecto?
 
-Ver [ARCHITECTURE.md](./ARCHITECTURE.md)
+Ver [ARCHITECTURE.md](./architecture-and-standards/ARCHITECTURE.md)
 
 ### ¿Cómo hago tests?
 
-Ver [TESTING.md](./TESTING.md)
+Ver [TESTING.md](./architecture-and-standards/TESTING.md)
 
 ### ¿Cuáles son las convenciones de código?
 
-Ver [BEST_PRACTICES.md](./BEST_PRACTICES.md)
+Ver [BEST_PRACTICES.md](./architecture-and-standards/BEST_PRACTICES.md)
 
 ### ¿Qué TODOs hay pendientes?
 
-Ver [PENDIENTES.md](./PENDIENTES.md)
+Ver [PENDIENTES.md](./project-management/PENDIENTES.md)
 
 ### ¿Cómo mejoro la performance?
 
-Ver [PERFORMANCE.md](./PERFORMANCE.md)
+Ver [PERFORMANCE.md](./architecture-and-standards/PERFORMANCE.md)
 
 ---
 

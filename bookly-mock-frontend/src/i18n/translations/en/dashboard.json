@@ -9,12 +9,20 @@
   "most_used_resources": "Most Used Resources",
   "most_used_desc": "Top 5 this month",
   "confirmed": "Confirmed",
+  "status_pending": "Pending",
+  "status_confirmed": "Confirmed",
+  "status_in_progress": "In progress",
+  "status_completed": "Completed",
+  "status_cancelled": "Cancelled",
+  "status_rejected": "Rejected",
   "no_recent_reservations": "No upcoming reservations",
   "no_data": "No data available",
   "reservations_count": "reservations",
   "total_this_month": "Total this month",
-  "of_total": "Of {{total}} total",
+  "of_total": "Of {total} total",
   "require_attention": "Require attention",
   "monthly_avg": "Monthly average",
-  "resource": "Resource"
+  "resource": "Resource",
+  "trend_title": "Reservation Trend (Last 30 days)",
+  "recent_activity": "Recent Activity"
 }

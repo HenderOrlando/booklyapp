@@ -1,0 +1,24 @@
+﻿import { HttpException, HttpStatus } from "@nestjs/common";
+
+export class BaseAppException extends HttpException {
+  constructor(
+    public readonly code: string,
+    public readonly i18nKey: string,
+    public readonly i18nArgs?: Record<string, any>,
+    status: HttpStatus = HttpStatus.BAD_REQUEST,
+  ) {
+    super({ code, message: i18nKey }, status);
+  }
+}
+
+export class ResourceNotFoundException extends BaseAppException {
+  constructor(resourceId: string) {
+    super("RSRC-001", "errors.RSRC.001", { id: resourceId }, HttpStatus.NOT_FOUND);
+  }
+}
+
+export class InvalidCredentialsException extends BaseAppException {
+  constructor() {
+    super("AUTH-001", "errors.AUTH.001", undefined, HttpStatus.UNAUTHORIZED);
+  }
+}

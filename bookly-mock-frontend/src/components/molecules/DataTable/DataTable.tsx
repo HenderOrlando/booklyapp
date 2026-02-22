@@ -3,6 +3,7 @@
 import { Button } from "@/components/atoms/Button";
 import { Skeleton } from "@/components/atoms/Skeleton";
 import { cn } from "@/lib/utils";
+import { useTranslations } from "next-intl";
 import * as React from "react";
 
 /**
@@ -22,7 +23,7 @@ import * as React from "react";
 
 interface Column<T> {
   key: string;
-  header: string;
+  header: React.ReactNode;
   cell: (item: T) => React.ReactNode;
   sortable?: boolean;
   className?: string;
@@ -51,7 +52,7 @@ export function DataTable<T>({
   data,
   columns,
   loading = false,
-  emptyMessage = "No hay datos para mostrar",
+  emptyMessage,
   currentPage = 1,
   totalPages = 1,
   pageSize = 10,
@@ -62,6 +63,9 @@ export function DataTable<T>({
   onSort,
   className,
 }: DataTableProps<T>) {
+  const t = useTranslations("common");
+  const resolvedEmptyMessage = emptyMessage || t("no_data");
+
   const handleSort = (columnKey: string) => {
     if (onSort) {
       onSort(columnKey);
@@ -89,7 +93,7 @@ export function DataTable<T>({
       <div
         className={cn(
           "rounded-md border border-[var(--color-border-subtle)]",
-          className
+          className,
         )}
       >
         <div className="flex flex-col items-center justify-center py-12 px-4">
@@ -106,7 +110,7 @@ export function DataTable<T>({
               d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4"
             />
           </svg>
-          <p className="text-[var(--color-text-secondary)]">{emptyMessage}</p>
+          <p className="text-[var(--color-text-secondary)]">{resolvedEmptyMessage}</p>
         </div>
       </div>
     );
@@ -132,7 +136,7 @@ export function DataTable<T>({
                       "text-[var(--color-text-secondary)]",
                       column.sortable &&
                         "cursor-pointer select-none hover:text-[var(--color-text-primary)]",
-                      column.className
+                      column.className,
                     )}
                     onClick={() => column.sortable && handleSort(column.key)}
                   >
@@ -144,7 +148,7 @@ export function DataTable<T>({
                             "h-4 w-4 transition-transform",
                             sortColumn === column.key &&
                               sortDirection === "desc" &&
-                              "rotate-180"
+                              "rotate-180",
                           )}
                           fill="none"
                           stroke="currentColor"
@@ -176,7 +180,7 @@ export function DataTable<T>({
                       key={column.key}
                       className={cn(
                         "px-6 py-4 whitespace-nowrap text-sm text-[var(--color-text-primary)]",
-                        column.className
+                        column.className,
                       )}
                     >
                       {column.cell(item)}
@@ -193,7 +197,7 @@ export function DataTable<T>({
       {totalPages > 1 && (
         <div className="flex items-center justify-between px-2">
           <div className="text-sm text-[var(--color-text-secondary)]">
-            Mostrando {startItem} - {endItem} de {totalItems} resultados
+            {t("showing_results", { start: startItem, end: endItem, total: totalItems })}
           </div>
 
           <div className="flex items-center gap-2">
@@ -216,7 +220,7 @@ export function DataTable<T>({
                   d="M15 19l-7-7 7-7"
                 />
               </svg>
-              Anterior
+              {t("previous")}
             </Button>
 
             <div className="flex items-center gap-1">
@@ -252,7 +256,7 @@ export function DataTable<T>({
               onClick={() => onPageChange?.(currentPage + 1)}
               disabled={currentPage === totalPages}
             >
-              Siguiente
+              {t("next")}
               <svg
                 className="h-4 w-4"
                 fill="none"

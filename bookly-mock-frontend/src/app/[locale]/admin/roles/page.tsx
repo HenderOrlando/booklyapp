@@ -1,6 +1,5 @@
 "use client";
 
-import { Alert, AlertDescription } from "@/components/atoms/Alert";
 import { Badge } from "@/components/atoms/Badge";
 import { Button } from "@/components/atoms/Button";
 import {
@@ -12,15 +11,11 @@ import {
 } from "@/components/atoms/Card";
 import { Input } from "@/components/atoms/Input";
 import { DataTable } from "@/components/molecules/DataTable";
-import { AppHeader } from "@/components/organisms/AppHeader";
-import { AppSidebar } from "@/components/organisms/AppSidebar";
 import { MainLayout } from "@/components/templates/MainLayout";
 import { usePermissions } from "@/hooks/usePermissions";
 import {
-  useAssignPermissionsToRole,
   useCreateRole,
   useDeleteRole,
-  useRemovePermissionsFromRole,
   useRoles,
   useUpdateRole,
 } from "@/hooks/useRoles";
@@ -29,7 +24,7 @@ import { useUsers } from "@/hooks/useUsers";
 import type { Permission, Role, User } from "@/types/entities/user";
 import { useTranslations } from "next-intl";
 import * as React from "react";
-import { RoleDetailPanel, RoleFormModal, RoleStatsCards } from "./components";
+import { RoleDetailPanel, RoleFormModal, RoleStatsCards, RolesTable } from "./components";
 
 /**
  * Página de Administración de Roles y Permisos - Bookly
@@ -65,7 +60,7 @@ export default function RolesAdminPage() {
     return roles.map((role) => ({
       ...role,
       usersCount: users.filter((user) =>
-        user.roles.some((r) => r.id === role.id)
+        user.roles.some((r) => r.id === role.id),
       ).length,
     }));
   }, [roles, users]);
@@ -74,16 +69,13 @@ export default function RolesAdminPage() {
   const createRoleMutation = useCreateRole();
   const updateRoleMutation = useUpdateRole();
   const deleteRoleMutation = useDeleteRole();
-  const assignPermissionsMutation = useAssignPermissionsToRole();
-  const removePermissionsMutation = useRemovePermissionsFromRole();
 
   const loading = loadingRoles;
-  const error = "";
   const [selectedRole, setSelectedRole] = React.useState<Role | null>(null);
   const [showRoleModal, setShowRoleModal] = React.useState(false);
   const [showRoleDetail, setShowRoleDetail] = React.useState(false);
   const [activeTab, setActiveTab] = React.useState<"permissions" | "users">(
-    "permissions"
+    "permissions",
   );
   const [selectedPermissions, setSelectedPermissions] = React.useState<
     string[]
@@ -109,96 +101,21 @@ export default function RolesAdminPage() {
 
   // React Query maneja el fetch automáticamente
 
-  const header = <AppHeader title={t("title")} />;
-  const sidebar = <AppSidebar />;
-
-  // Columnas para la tabla de roles
-  const roleColumns = [
-    {
-      key: "name",
-      header: t("role_name"),
-      cell: (role: Role) => (
-        <div>
-          <div className="font-medium text-white">{role.name}</div>
-          <div className="text-sm text-gray-400">{role.description}</div>
-        </div>
-      ),
-    },
-    {
-      key: "permissions",
-      header: t("permissions"),
-      cell: (role: Role) => (
-        <div className="flex flex-wrap gap-1">
-          {role.permissions.slice(0, 3).map((perm) => (
-            <Badge key={perm.id} variant="secondary">
-              {perm.description}
-            </Badge>
-          ))}
-          {role.permissions.length > 3 && (
-            <Badge variant="secondary">
-              {t("more", { count: role.permissions.length - 3 })}
-            </Badge>
-          )}
-        </div>
-      ),
-    },
-    {
-      key: "usersCount",
-      header: t("users"),
-      cell: (role: RoleWithStats) => (
-        <Badge variant="primary">{role.usersCount}</Badge>
-      ),
-    },
-    {
-      key: "actions",
-      header: t("actions"),
-      cell: (role: Role) => (
-        <div className="flex gap-2">
-          <Button
-            size="sm"
-            variant="outline"
-            onClick={() => {
-              setSelectedRole(role);
-              setRoleName(role.name);
-              setRoleDescription(role.description || "");
-              setSelectedPermissions(
-                role.permissions.map((p: Permission) => p.id)
-              );
-              // Get users with this role
-              const usersWithRole = users.filter((u: User) =>
-                u.roles.some((r) => r.id === role.id)
-              );
-              setSelectedUsers(usersWithRole.map((u: User) => u.id));
-              setShowRoleModal(true);
-            }}
-          >
-            {t("edit")}
-          </Button>
-          <Button
-            size="sm"
-            variant="outline"
-            onClick={() => {
-              setSelectedRole(role);
-              setShowRoleDetail(true);
-            }}
-          >
-            {t("view")}
-          </Button>
-        </div>
-      ),
-    },
-  ];
-
   // Tabla de permisos mostrando qué roles los tienen
   const permissionsColumns = [
     {
       key: "permission",
       header: t("permission"),
       cell: (perm: Permission) => (
-        <div>
-          <div className="font-medium text-white">{perm.description}</div>
-          <div className="text-sm text-gray-400">
-            {perm.resource} : {perm.action}
+        <div className="flex items-center gap-3">
+          <div className="w-8 h-8 rounded-lg bg-brand-primary-500/10 flex items-center justify-center text-brand-primary-500 font-bold text-xs">
+            {perm.resource.charAt(0).toUpperCase()}
+          </div>
+          <div>
+            <div className="font-bold text-foreground">{perm.description}</div>
+            <div className="text-xs text-[var(--color-text-tertiary)]">
+              {perm.resource} : {perm.action}
+            </div>
           </div>
         </div>
       ),
@@ -208,15 +125,17 @@ export default function RolesAdminPage() {
       header: t("roles_with_perm"),
       cell: (perm: Permission) => {
         const rolesWithPermission = roles.filter((role: Role) =>
-          role.permissions.some((p: Permission) => p.id === perm.id)
+          role.permissions.some((p: Permission) => p.id === perm.id),
         );
         return (
           <div className="flex flex-wrap gap-1">
             {rolesWithPermission.length === 0 ? (
-              <span className="text-gray-400 text-sm">{t("no_roles")}</span>
+              <span className="text-[var(--color-text-tertiary)] text-xs italic">
+                {t("no_roles")}
+              </span>
             ) : (
               rolesWithPermission.map((role: Role) => (
-                <Badge key={role.id} variant="primary">
+                <Badge key={role.id} variant={role.isSystem ? "warning" : "primary"} className="text-[10px]">
                   {role.name}
                 </Badge>
               ))
@@ -227,11 +146,31 @@ export default function RolesAdminPage() {
     },
   ];
 
+  const handleEditRole = (role: Role) => {
+    setSelectedRole(role);
+    setRoleName(role.name);
+    setRoleDescription(role.description || "");
+    setSelectedPermissions(
+      role.permissions.map((p: Permission) => p.id),
+    );
+    // Get users with this role
+    const usersWithRole = users.filter((u: User) =>
+      u.roles.some((r) => r.id === role.id),
+    );
+    setSelectedUsers(usersWithRole.map((u: User) => u.id));
+    setShowRoleModal(true);
+  };
+
+  const handleViewRole = (role: Role) => {
+    setSelectedRole(role);
+    setShowRoleDetail(true);
+  };
+
   const handleSaveRole = async () => {
     if (!roleName.trim()) {
       showError(
         t("error") || "Error",
-        t("error_name_required") || "Name is required"
+        t("error_name_required") || "Name is required",
       );
       return;
     }
@@ -250,7 +189,7 @@ export default function RolesAdminPage() {
         });
         showSuccess(
           t("success") || "Success",
-          t("success_role_updated") || "Role updated successfully"
+          t("success_role_updated") || "Role updated successfully",
         );
       } else {
         // Crear nuevo rol
@@ -263,14 +202,15 @@ export default function RolesAdminPage() {
         });
         showSuccess(
           t("success") || "Success",
-          t("success_role_created") || "Role created successfully"
+          t("success_role_created") || "Role created successfully",
         );
       }
       handleCloseRoleModal();
-    } catch (error: any) {
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : t("error_saving_role");
       showError(
         t("error") || "Error",
-        error?.message || t("error_saving_role") || "Error saving role"
+        errorMessage || "Error saving role",
       );
     }
   };
@@ -296,7 +236,7 @@ export default function RolesAdminPage() {
   const handleDeleteRole = async (roleId: string) => {
     if (
       !confirm(
-        t("confirm_delete") || "Are you sure you want to delete this role?"
+        t("confirm_delete") || "Are you sure you want to delete this role?",
       )
     ) {
       return;
@@ -306,59 +246,14 @@ export default function RolesAdminPage() {
       await deleteRoleMutation.mutateAsync(roleId);
       showSuccess(
         t("success") || "Success",
-        t("success_role_deleted") || "Role deleted successfully"
+        t("success_role_deleted") || "Role deleted successfully",
       );
       handleCloseRoleDetail();
-    } catch (error: any) {
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : t("error_deleting_role");
       showError(
         t("error") || "Error",
-        error?.message || t("error_deleting_role") || "Error deleting role"
-      );
-    }
-  };
-
-  const handleAssignPermissions = async (
-    roleId: string,
-    permissionIds: string[]
-  ) => {
-    try {
-      await assignPermissionsMutation.mutateAsync({
-        id: roleId,
-        permissionIds,
-      });
-      showSuccess(
-        t("success") || "Success",
-        t("success_permissions_assigned") || "Permissions assigned successfully"
-      );
-    } catch (error: any) {
-      showError(
-        t("error") || "Error",
-        error?.message ||
-          t("error_assigning_permissions") ||
-          "Error assigning permissions"
-      );
-    }
-  };
-
-  const handleRemovePermissions = async (
-    roleId: string,
-    permissionIds: string[]
-  ) => {
-    try {
-      await removePermissionsMutation.mutateAsync({
-        id: roleId,
-        permissionIds,
-      });
-      showSuccess(
-        t("success") || "Success",
-        t("success_permissions_removed") || "Permissions removed successfully"
-      );
-    } catch (error: any) {
-      showError(
-        t("error") || "Error",
-        error?.message ||
-          t("error_removing_permissions") ||
-          "Error removing permissions"
+        errorMessage || "Error deleting role",
       );
     }
   };
@@ -367,10 +262,24 @@ export default function RolesAdminPage() {
   const handlePermissionToggle = (permissionId: string) => {
     if (selectedPermissions.includes(permissionId)) {
       setSelectedPermissions(
-        selectedPermissions.filter((id) => id !== permissionId)
+        selectedPermissions.filter((id) => id !== permissionId),
       );
     } else {
       setSelectedPermissions([...selectedPermissions, permissionId]);
+    }
+  };
+
+  // Helper: Bulk change permissions
+  const handlePermissionBulkChange = (permissionIds: string[], add: boolean) => {
+    if (add) {
+      setSelectedPermissions((prev) => {
+        const newIds = permissionIds.filter(id => !prev.includes(id));
+        return [...prev, ...newIds];
+      });
+    } else {
+      setSelectedPermissions((prev) => 
+        prev.filter(id => !permissionIds.includes(id))
+      );
     }
   };
 
@@ -389,15 +298,6 @@ export default function RolesAdminPage() {
   const isDeleting = deleteRoleMutation.isPending;
   const isSaving = isCreating || isUpdating;
 
-  // Filtrar roles para la tabla
-  const filteredRoles = rolesWithStats.filter(
-    (role: RoleWithStats) =>
-      role.name.toLowerCase().includes(filterRoleTable.toLowerCase()) ||
-      (role.description || "")
-        .toLowerCase()
-        .includes(filterRoleTable.toLowerCase())
-  );
-
   // Filtrar permisos para la tabla
   const filteredPermissions = allPermissions.filter(
     (perm: Permission) =>
@@ -407,16 +307,18 @@ export default function RolesAdminPage() {
       perm.resource
         .toLowerCase()
         .includes(filterPermissionTable.toLowerCase()) ||
-      perm.action.toLowerCase().includes(filterPermissionTable.toLowerCase())
+      perm.action.toLowerCase().includes(filterPermissionTable.toLowerCase()),
   );
 
   if (loading) {
     return (
-      <MainLayout header={header} sidebar={sidebar}>
+      <MainLayout>
         <div className="flex items-center justify-center h-96">
           <div className="text-center">
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-brand-primary-500 mx-auto mb-4"></div>
-            <p className="text-[var(--color-text-secondary)]">{t("loading")}</p>
+            <p className="text-[var(--color-text-secondary)]">
+              {t("loading")}
+            </p>
           </div>
         </div>
       </MainLayout>
@@ -424,23 +326,31 @@ export default function RolesAdminPage() {
   }
 
   return (
-    <MainLayout header={header} sidebar={sidebar}>
-      <div className="space-y-6 pb-6">
-        {/* Header */}
-        <div>
-          <h2 className="text-3xl font-bold text-[var(--color-text-primary)]">
-            {t("title")}
-          </h2>
-          <p className="text-[var(--color-text-secondary)] mt-2">
-            {t("subtitle")}
-          </p>
+    <MainLayout>
+      <div className="space-y-8 pb-10">
+        {/* Header Seccion */}
+        <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
+          <div>
+            <h2 className="text-4xl font-black text-[var(--color-text-primary)] tracking-tight">
+              {t("title")}
+            </h2>
+            <p className="text-[var(--color-text-secondary)] mt-2 text-lg">
+              {t("subtitle")}
+            </p>
+          </div>
+          <Button
+            size="lg"
+            className="shadow-lg shadow-brand-primary-500/20"
+            onClick={() => {
+              setSelectedRole(null);
+              setSelectedPermissions([]);
+              setSelectedUsers([]);
+              setShowRoleModal(true);
+            }}
+          >
+            {t("create_new")}
+          </Button>
         </div>
-
-        {error && (
-          <Alert variant="error">
-            <AlertDescription>{error}</AlertDescription>
-          </Alert>
-        )}
 
         {/* Estadísticas */}
         <RoleStatsCards
@@ -449,86 +359,37 @@ export default function RolesAdminPage() {
           permissions={allPermissions}
         />
 
-        {/* Tabla de Roles */}
-        <Card>
-          <CardHeader>
-            <div className="flex items-center justify-between mb-4">
-              <div>
-                <CardTitle>{t("roles_in_system")}</CardTitle>
-                <CardDescription>{t("roles_list_desc")}</CardDescription>
-              </div>
-              <Button
-                onClick={() => {
-                  setSelectedRole(null);
-                  setSelectedPermissions([]);
-                  setSelectedUsers([]);
-                  setShowRoleModal(true);
-                }}
-              >
-                {t("create_new")}
-              </Button>
-            </div>
-            <div className="flex items-center gap-3">
-              <Input
-                placeholder={t("filter_placeholder")}
-                value={filterRoleTable}
-                onChange={(e) => setFilterRoleTable(e.target.value)}
-                className="max-w-md"
-              />
-              {filterRoleTable && (
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => setFilterRoleTable("")}
-                >
-                  {t("clear")}
-                </Button>
-              )}
-              <span className="text-sm text-gray-400 whitespace-nowrap">
-                {t("showing_count", {
-                  count: filteredRoles.length,
-                  total: roles.length,
-                })}
-              </span>
-            </div>
-          </CardHeader>
-          <CardContent>
-            <DataTable data={filteredRoles} columns={roleColumns} />
-          </CardContent>
-        </Card>
+        {/* Tabla de Roles Refactorizada */}
+        <RolesTable 
+          roles={rolesWithStats}
+          onEdit={handleEditRole}
+          onView={handleViewRole}
+          filter={filterRoleTable}
+          onFilterChange={setFilterRoleTable}
+        />
 
-        {/* Tabla de Permisos */}
-        <Card>
-          <CardHeader>
-            <div className="mb-4">
-              <CardTitle>{t("system_permissions")}</CardTitle>
-              <CardDescription>{t("permissions_desc")}</CardDescription>
-            </div>
-            <div className="flex items-center gap-3">
-              <Input
-                placeholder={t("filter_perm_placeholder")}
-                value={filterPermissionTable}
-                onChange={(e) => setFilterPermissionTable(e.target.value)}
-                className="max-w-md"
-              />
-              {filterPermissionTable && (
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => setFilterPermissionTable("")}
-                >
-                  {t("clear")}
-                </Button>
-              )}
-              <span className="text-sm text-gray-400 whitespace-nowrap">
-                {t("showing_perm_count", {
-                  count: filteredPermissions.length,
-                  total: allPermissions.length,
-                })}
-              </span>
+        {/* Tabla de Permisos del Sistema */}
+        <Card className="border-none shadow-md overflow-hidden">
+          <CardHeader className="bg-[var(--color-bg-secondary)] border-b border-[var(--color-border-strong)]">
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+              <div>
+                <CardTitle className="text-xl font-bold">{t("system_permissions")}</CardTitle>
+                <CardDescription>{t("permissions_desc")}</CardDescription>
+              </div>
+              <div className="flex items-center gap-3">
+                <Input
+                  placeholder={t("filter_perm_placeholder")}
+                  value={filterPermissionTable}
+                  onChange={(e) => setFilterPermissionTable(e.target.value)}
+                  className="max-w-md h-10 bg-[var(--color-bg-primary)]"
+                />
+                <span className="text-xs font-bold text-[var(--color-text-tertiary)] bg-[var(--color-bg-primary)] px-2 py-1 rounded-md border border-[var(--color-border-strong)] whitespace-nowrap">
+                  {filteredPermissions.length} / {allPermissions.length}
+                </span>
+              </div>
             </div>
           </CardHeader>
-          <CardContent>
+          <CardContent className="p-0">
             <DataTable
               data={filteredPermissions}
               columns={permissionsColumns}
@@ -572,6 +433,7 @@ export default function RolesAdminPage() {
           onFilterPermissionChange={setFilterPermissionModal}
           onFilterUserChange={setFilterUserModal}
           onPermissionToggle={handlePermissionToggle}
+          onPermissionBulkChange={handlePermissionBulkChange}
           onUserToggle={handleUserToggle}
         />
       </div>

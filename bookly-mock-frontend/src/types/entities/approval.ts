@@ -74,7 +74,7 @@ export interface ApprovalHistoryEntry {
   comments?: string;
   reason?: string;
   timestamp: string;
-  metadata?: Record<string, any>;
+  metadata?: Record<string, unknown>;
 }
 
 /**
@@ -112,48 +112,25 @@ export interface ApprovalFlowConfig {
   id: string;
   name: string;
   description?: string;
-  resourceTypes?: string[]; // Tipos de recursos que usan este flujo
-  categoryIds?: string[]; // Categorías que usan este flujo
-  programIds?: string[]; // Programas que usan este flujo
-  levels: ApprovalLevelConfig[];
-  requiresAllLevels: boolean; // Si requiere pasar por todos los niveles
-  autoApproveConditions?: Record<string, any>; // Condiciones para auto-aprobación
-  timeouts: {
-    perLevel?: number; // Timeout por nivel (minutos)
-    total?: number; // Timeout total (minutos)
-  };
-  notifications: {
-    onSubmit: boolean;
-    onApprove: boolean;
-    onReject: boolean;
-    onEscalate: boolean;
-    reminders: {
-      enabled: boolean;
-      intervalMinutes?: number;
-      maxReminders?: number;
-    };
-  };
+  resourceTypes: string[]; // Tipos de recursos que usan este flujo
+  steps: ApprovalStepConfig[];
+  autoApproveConditions?: Record<string, unknown>; // Condiciones para auto-aprobación
   isActive: boolean;
   createdAt: string;
   updatedAt: string;
 }
 
 /**
- * Configuración de nivel de aprobación
+ * Configuración de paso de aprobación
  */
-export interface ApprovalLevelConfig {
-  level: ApprovalLevel;
-  order: number;
+export interface ApprovalStepConfig {
   name: string;
   description?: string;
-  approverRoles: string[]; // Roles que pueden aprobar en este nivel
-  approverUserIds?: string[]; // Usuarios específicos (opcional)
-  requiresMultipleApprovers?: boolean;
-  minimumApprovers?: number;
-  autoApproveAfterMinutes?: number; // Auto-aprobación después de X minutos
-  canDelegate: boolean;
-  canSkip: boolean;
-  conditions?: Record<string, any>; // Condiciones para este nivel
+  approverRoles: string[]; // Roles que pueden aprobar en este paso
+  order: number;
+  isRequired: boolean;
+  allowParallel: boolean;
+  timeoutHours?: number; // Opcional, para el frontend
 }
 
 /**
@@ -206,8 +183,13 @@ export interface ApprovalFilters {
  */
 export interface CreateApprovalRequestDto {
   reservationId: string;
-  purpose: string;
-  attendees: number;
+  requesterId: string;
+  approvalFlowId: string;
+  metadata?: Record<string, any>;
+  
+  // Legacy fields for backward compatibility in UI
+  purpose?: string;
+  attendees?: number;
   requiresEquipment?: string[];
   specialRequirements?: string;
   priority?: ApprovalPriority;

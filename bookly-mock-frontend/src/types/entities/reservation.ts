@@ -56,22 +56,48 @@ export interface ResourceAvailability {
   days: DayAvailability[];
 }
 
+export interface RecurringPattern {
+  frequency: "daily" | "weekly" | "monthly";
+  interval: number;
+  endDate?: string;
+  daysOfWeek?: number[];
+}
+
+export interface Participant {
+  userId: string;
+  name: string;
+  email: string;
+}
+
 export interface CreateReservationDto {
   resourceId: string;
-  title: string;
-  description?: string;
+  userId: string;
   startDate: string;
   endDate: string;
+  purpose: string;
+  title?: string; // Keeping for backward compatibility or UI usage
+  description?: string;
+  isRecurring?: boolean;
+  recurringPattern?: RecurringPattern;
+  participants?: Participant[];
+  notes?: string;
+  externalCalendarId?: string;
+  externalCalendarEventId?: string;
+  
+  // Legacy fields for backward compatibility in UI
   recurrenceType?: RecurrenceType;
   recurrenceEndDate?: string;
   attendees?: number;
-  notes?: string;
 }
 
 export interface UpdateReservationDto {
-  title?: string;
-  description?: string;
   startDate?: string;
   endDate?: string;
+  purpose?: string;
+  participants?: Participant[];
   notes?: string;
+  
+  // Legacy fields for backward compatibility in UI
+  title?: string;
+  description?: string;
 }

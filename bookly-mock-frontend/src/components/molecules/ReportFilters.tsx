@@ -1,4 +1,14 @@
+import { Button } from "@/components/atoms/Button";
+import { Card, CardContent } from "@/components/atoms/Card";
 import { FilterTag } from "@/components/atoms/FilterTag";
+import { Input } from "@/components/atoms/Input";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/atoms/Select";
 import { format } from "date-fns";
 import { Filter, Search } from "lucide-react";
 import * as React from "react";
@@ -50,7 +60,10 @@ export const ReportFilters = React.memo<ReportFiltersProps>(
     showSearch = true,
     className = "",
   }) => {
-    const updateFilter = (key: keyof ReportFiltersState, value: any) => {
+    const updateFilter = <K extends keyof ReportFiltersState>(
+      key: K,
+      value: ReportFiltersState[K]
+    ) => {
       onFiltersChange({ ...filters, [key]: value });
     };
 
@@ -76,193 +89,169 @@ export const ReportFilters = React.memo<ReportFiltersProps>(
     ).length;
 
     return (
-      <div
-        className={`
-          bg-white dark:bg-gray-800 
-          border border-gray-200 dark:border-gray-700 
-          rounded-lg p-6
-          space-y-4
-          ${className}
-        `}
-      >
-        {/* Header */}
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <Filter className="h-5 w-5 text-gray-600 dark:text-gray-400" />
-            <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100">
-              Filtros
-            </h3>
+      <Card className={className}>
+        <CardContent className="pt-6 space-y-4">
+          {/* Header */}
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <Filter className="h-5 w-5 text-[var(--color-text-secondary)]" />
+              <h3 className="text-lg font-semibold text-[var(--color-text-primary)]">
+                Filtros
+              </h3>
+              {activeFiltersCount > 0 && (
+                <span className="px-2 py-0.5 text-xs font-medium bg-[var(--color-primary-base)] text-white rounded-full">
+                  {activeFiltersCount}
+                </span>
+              )}
+            </div>
+
             {activeFiltersCount > 0 && (
-              <span className="px-2 py-0.5 text-xs font-medium bg-[var(--color-primary-base)] text-white rounded-full">
-                {activeFiltersCount}
-              </span>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={clearAllFilters}
+                className="text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)]"
+              >
+                Limpiar todo
+              </Button>
             )}
           </div>
 
-          {activeFiltersCount > 0 && (
-            <button
-              onClick={clearAllFilters}
-              className="text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 transition-colors"
-            >
-              Limpiar todo
-            </button>
-          )}
-        </div>
-
-        {/* Search */}
-        {showSearch && (
-          <div className="relative">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400 dark:text-gray-500" />
-            <input
-              type="text"
-              placeholder="Buscar..."
-              value={filters.search || ""}
-              onChange={(e) => updateFilter("search", e.target.value)}
-              className="
-                w-full pl-10 pr-4 py-2
-                text-sm
-                border border-gray-300 dark:border-gray-600
-                rounded-lg
-                bg-white dark:bg-gray-800
-                text-gray-900 dark:text-gray-100
-                placeholder-gray-500 dark:placeholder-gray-400
-                focus:outline-none focus:ring-2 focus:ring-[var(--color-primary-base)] focus:border-transparent
-                transition-colors
-              "
-            />
-          </div>
-        )}
-
-        {/* Selects */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          {/* Categoría */}
-          {categories.length > 0 && (
-            <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                Categoría
-              </label>
-              <select
-                value={filters.categoryId || ""}
-                onChange={(e) =>
-                  updateFilter("categoryId", e.target.value || undefined)
-                }
-                className="
-                  w-full px-3 py-2
-                  text-sm
-                  border border-gray-300 dark:border-gray-600
-                  rounded-lg
-                  bg-white dark:bg-gray-800
-                  text-gray-900 dark:text-gray-100
-                  focus:outline-none focus:ring-2 focus:ring-[var(--color-primary-base)] focus:border-transparent
-                  transition-colors
-                "
-              >
-                <option value="">Todas las categorías</option>
-                {categories.map((cat) => (
-                  <option key={cat.id} value={cat.id}>
-                    {cat.name}
-                  </option>
-                ))}
-              </select>
+          {/* Search */}
+          {showSearch && (
+            <div className="relative">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-[var(--color-text-tertiary)]" />
+              <Input
+                type="text"
+                placeholder="Buscar..."
+                value={filters.search || ""}
+                onChange={(e) => updateFilter("search", e.target.value)}
+                className="pl-10"
+              />
             </div>
           )}
 
-          {/* Programa */}
-          {programs.length > 0 && (
-            <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                Programa
-              </label>
-              <select
-                value={filters.programId || ""}
-                onChange={(e) =>
-                  updateFilter("programId", e.target.value || undefined)
-                }
-                className="
-                  w-full px-3 py-2
-                  text-sm
-                  border border-gray-300 dark:border-gray-600
-                  rounded-lg
-                  bg-white dark:bg-gray-800
-                  text-gray-900 dark:text-gray-100
-                  focus:outline-none focus:ring-2 focus:ring-[var(--color-primary-base)] focus:border-transparent
-                  transition-colors
-                "
-              >
-                <option value="">Todos los programas</option>
-                {programs.map((prog) => (
-                  <option key={prog.id} value={prog.id}>
-                    {prog.name}
-                  </option>
-                ))}
-              </select>
-            </div>
-          )}
-        </div>
+          {/* Selects */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {/* Categoría */}
+            {categories.length > 0 && (
+              <div>
+                <label className="block text-sm font-medium text-[var(--color-text-primary)] mb-2">
+                  Categoría
+                </label>
+                <Select
+                  value={filters.categoryId || "all"}
+                  onValueChange={(val) =>
+                    updateFilter("categoryId", val === "all" ? undefined : val)
+                  }
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Todas las categorías" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">Todas las categorías</SelectItem>
+                    {categories.map((cat) => (
+                      <SelectItem key={cat.id} value={cat.id}>
+                        {cat.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+            )}
 
-        {/* Date Range */}
-        {showDateRange && (
-          <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-              Rango de fechas
-            </label>
-            <DateRangePicker
-              startDate={filters.startDate || null}
-              endDate={filters.endDate || null}
-              onRangeChange={(start, end) => {
-                onFiltersChange({
-                  ...filters,
-                  startDate: start,
-                  endDate: end,
-                });
-              }}
-            />
+            {/* Programa */}
+            {programs.length > 0 && (
+              <div>
+                <label className="block text-sm font-medium text-[var(--color-text-primary)] mb-2">
+                  Programa
+                </label>
+                <Select
+                  value={filters.programId || "all"}
+                  onValueChange={(val) =>
+                    updateFilter("programId", val === "all" ? undefined : val)
+                  }
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Todos los programas" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">Todos los programas</SelectItem>
+                    {programs.map((prog) => (
+                      <SelectItem key={prog.id} value={prog.id}>
+                        {prog.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+            )}
           </div>
-        )}
 
-        {/* Active Filters Tags */}
-        {activeFiltersCount > 0 && (
-          <div className="flex flex-wrap gap-2 pt-2 border-t border-gray-200 dark:border-gray-700">
-            {filters.search && (
-              <FilterTag
-                label="Búsqueda"
-                value={filters.search}
-                onRemove={() => removeFilter("search")}
-                color="gray"
-              />
-            )}
-            {filters.categoryId && (
-              <FilterTag
-                label="Categoría"
-                value={getCategoryName(filters.categoryId)}
-                onRemove={() => removeFilter("categoryId")}
-                color="blue"
-              />
-            )}
-            {filters.programId && (
-              <FilterTag
-                label="Programa"
-                value={getProgramName(filters.programId)}
-                onRemove={() => removeFilter("programId")}
-                color="green"
-              />
-            )}
-            {(filters.startDate || filters.endDate) && (
-              <FilterTag
-                label="Período"
-                value={`${filters.startDate ? format(filters.startDate, "dd/MM/yyyy") : "?"} - ${filters.endDate ? format(filters.endDate, "dd/MM/yyyy") : "?"}`}
-                onRemove={() => {
-                  const newFilters = { ...filters };
-                  delete newFilters.startDate;
-                  delete newFilters.endDate;
-                  onFiltersChange(newFilters);
+          {/* Date Range */}
+          {showDateRange && (
+            <div>
+              <label className="block text-sm font-medium text-[var(--color-text-primary)] mb-2">
+                Rango de fechas
+              </label>
+              <DateRangePicker
+                startDate={filters.startDate || null}
+                endDate={filters.endDate || null}
+                onRangeChange={(start, end) => {
+                  onFiltersChange({
+                    ...filters,
+                    startDate: start,
+                    endDate: end,
+                  });
                 }}
-                color="purple"
               />
-            )}
-          </div>
-        )}
-      </div>
+            </div>
+          )}
+
+          {/* Active Filters Tags */}
+          {activeFiltersCount > 0 && (
+            <div className="flex flex-wrap gap-2 pt-2 border-t border-[var(--color-border-subtle)]">
+              {filters.search && (
+                <FilterTag
+                  label="Búsqueda"
+                  value={filters.search}
+                  onRemove={() => removeFilter("search")}
+                  color="gray"
+                />
+              )}
+              {filters.categoryId && (
+                <FilterTag
+                  label="Categoría"
+                  value={getCategoryName(filters.categoryId)}
+                  onRemove={() => removeFilter("categoryId")}
+                  color="blue"
+                />
+              )}
+              {filters.programId && (
+                <FilterTag
+                  label="Programa"
+                  value={getProgramName(filters.programId)}
+                  onRemove={() => removeFilter("programId")}
+                  color="green"
+                />
+              )}
+              {(filters.startDate || filters.endDate) && (
+                <FilterTag
+                  label="Período"
+                  value={`${filters.startDate ? format(filters.startDate, "dd/MM/yyyy") : "?"} - ${filters.endDate ? format(filters.endDate, "dd/MM/yyyy") : "?"}`}
+                  onRemove={() => {
+                    const newFilters = { ...filters };
+                    delete newFilters.startDate;
+                    delete newFilters.endDate;
+                    onFiltersChange(newFilters);
+                  }}
+                  color="purple"
+                />
+              )}
+            </div>
+          )}
+        </CardContent>
+      </Card>
     );
   }
 );

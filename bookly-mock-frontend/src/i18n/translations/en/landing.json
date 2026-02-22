@@ -1,0 +1,12 @@
+{
+  "title": "Bookly Mock Frontend",
+  "subtitle": "Institutional Reservation System - UFPS",
+  "sections": {
+    "resources_title": "Resources",
+    "resources_desc": "Physical resource management",
+    "reservations_title": "Reservations",
+    "reservations_desc": "Availability and reservation system",
+    "approvals_title": "Approvals",
+    "approvals_desc": "Configurable approval flows"
+  }
+}

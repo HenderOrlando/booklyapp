@@ -1,12 +1,5 @@
 import { createLogger } from "@libs/common";
-import {
-  FeedbackCategory,
-  FeedbackStatus,
-  UnsatisfiedDemandPriority,
-  UnsatisfiedDemandReason,
-  UnsatisfiedDemandStatus,
-  UsageStatisticType,
-} from "@libs/common/enums";
+import { ReferenceDataRepository } from "@libs/database";
 import { NestFactory } from "@nestjs/core";
 import { getModelToken } from "@nestjs/mongoose";
 import { Model, Types } from "mongoose";
@@ -17,6 +10,7 @@ import {
   UserFeedback,
 } from "../infrastructure/schemas";
 import { ReportsModule } from "../reports.module";
+import { REPORTS_REFERENCE_DATA } from "./reference-data.seed-data";
 
 const logger = createLogger("ReportsSeed");
 
@@ -31,16 +25,16 @@ async function seed() {
 
     const app = await NestFactory.createApplicationContext(ReportsModule);
     const userFeedbackModel = app.get<Model<UserFeedback>>(
-      getModelToken(UserFeedback.name)
+      getModelToken(UserFeedback.name),
     );
     const userEvaluationModel = app.get<Model<UserEvaluation>>(
-      getModelToken(UserEvaluation.name)
+      getModelToken(UserEvaluation.name),
     );
     const usageStatisticModel = app.get<Model<UsageStatistic>>(
-      getModelToken(UsageStatistic.name)
+      getModelToken(UsageStatistic.name),
     );
     const unsatisfiedDemandModel = app.get<Model<UnsatisfiedDemand>>(
-      getModelToken(UnsatisfiedDemand.name)
+      getModelToken(UnsatisfiedDemand.name),
     );
 
     // Flag --clean para limpieza destructiva
@@ -54,9 +48,21 @@ async function seed() {
       logger.info("✅ Base de datos limpiada");
     } else {
       logger.info(
-        "ℹ️  Modo desarrollo detectado. Usar --clean para limpiar DB antes del seed."
+        "ℹ️  Modo desarrollo detectado. Usar --clean para limpiar DB antes del seed.",
       );
     }
+
+    // ── Reference Data (tipos, estados dinámicos del dominio reports) ──
+    const refDataRepo = app.get(ReferenceDataRepository);
+    logger.info(
+      `📋 Procesando ${REPORTS_REFERENCE_DATA.length} datos de referencia...`,
+    );
+    for (const rd of REPORTS_REFERENCE_DATA) {
+      await refDataRepo.upsert(rd);
+    }
+    logger.info(
+      `✅ ${REPORTS_REFERENCE_DATA.length} datos de referencia procesados (upsert)`,
+    );
 
     // ObjectIds fijos para consistencia
     const systemUserId = new Types.ObjectId("507f1f77bcf86cd799439000");
@@ -87,11 +93,11 @@ async function seed() {
         resourceId: auditorioId,
         resourceName: "Auditorio Principal",
         rating: 5,
-        status: FeedbackStatus.RESPONDED,
+        status: "RESPONDED",
         comments:
           "Excelente espacio, muy bien equipado. El sistema de sonido funcionó perfectamente.",
         feedbackDate: new Date(new Date(lastWeek).setHours(13, 0, 0)),
-        category: FeedbackCategory.FACILITY,
+        category: "FACILITY",
         isAnonymous: false,
         response: "Gracias por su feedback positivo.",
         respondedBy: userAdminId,
@@ -104,10 +110,58 @@ async function seed() {
         resourceId: laboratorioId,
         resourceName: "Laboratorio de Sistemas 1",
         rating: 4,
-        status: FeedbackStatus.PENDING,
+        status: "PENDING",
         comments: "Buen laboratorio, pero algunos computadores están lentos.",
         feedbackDate: new Date(new Date(lastWeek).setHours(10, 0, 0)),
-        category: FeedbackCategory.EQUIPMENT,
+        category: "EQUIPMENT",
+        isAnonymous: false,
+      },
+      // ── Feedback anónimo (RF-34) ──
+      {
+        userId: userEstudianteId,
+        userName: "Anónimo",
+        reservationId: new Types.ObjectId("507f1f77bcf86cd799439035"),
+        resourceId: salaId,
+        resourceName: "Sala de Conferencias A",
+        rating: 2,
+        status: "CLOSED",
+        comments: "El aire acondicionado no funciona correctamente y la sala es muy ruidosa.",
+        feedbackDate: new Date(new Date(lastMonth).setHours(15, 0, 0)),
+        category: "FACILITY",
+        isAnonymous: true,
+        response: "Se programó revisión del aire acondicionado. Gracias por reportar.",
+        respondedBy: userAdminId,
+        respondedAt: new Date(new Date(lastMonth).setHours(17, 0, 0)),
+      },
+      // ── Feedback de servicio ──
+      {
+        userId: userDocenteId,
+        userName: "Juan Docente",
+        reservationId: new Types.ObjectId("507f1f77bcf86cd799439036"),
+        resourceId: auditorioId,
+        resourceName: "Auditorio Principal",
+        rating: 3,
+        status: "RESPONDED",
+        comments: "El proceso de aprobación fue demasiado lento. Tardó 3 días.",
+        feedbackDate: new Date(new Date(lastWeek).setHours(9, 0, 0)),
+        category: "SERVICE",
+        isAnonymous: false,
+        response: "Estamos trabajando para agilizar los flujos de aprobación.",
+        respondedBy: userAdminId,
+        respondedAt: new Date(new Date(lastWeek).setHours(14, 0, 0)),
+      },
+      // ── Feedback de accesibilidad ──
+      {
+        userId: userEstudianteId,
+        userName: "María Estudiante",
+        reservationId: new Types.ObjectId("507f1f77bcf86cd799439037"),
+        resourceId: auditorioId,
+        resourceName: "Auditorio Principal",
+        rating: 4,
+        status: "PENDING",
+        comments: "El acceso para silla de ruedas podría mejorar. La rampa es empinada.",
+        feedbackDate: new Date(new Date(today).setHours(11, 0, 0)),
+        category: "ACCESSIBILITY",
         isAnonymous: false,
       },
     ];
@@ -119,7 +173,7 @@ async function seed() {
       const doc = await userFeedbackModel.findOneAndUpdate(
         { reservationId: feedback.reservationId },
         feedback,
-        { upsert: true, new: true }
+        { upsert: true, new: true },
       );
       insertedFeedbacks.push(doc);
     }
@@ -176,7 +230,7 @@ async function seed() {
           evaluationDate: evaluation.evaluationDate,
         },
         evaluation,
-        { upsert: true, new: true }
+        { upsert: true, new: true },
       );
       insertedEvaluations.push(doc);
     }
@@ -184,7 +238,7 @@ async function seed() {
     // Usage Statistics (RF-31, RF-32)
     const usageStatistics = [
       {
-        statisticType: UsageStatisticType.RESOURCE,
+        statisticType: "RESOURCE",
         referenceId: auditorioId,
         referenceName: "Auditorio Principal",
         periodStart: new Date(new Date(lastMonth).setDate(1)),
@@ -201,7 +255,7 @@ async function seed() {
         mostUsedResources: [],
       },
       {
-        statisticType: UsageStatisticType.USER,
+        statisticType: "USER",
         referenceId: userDocenteId,
         referenceName: "Juan Docente",
         periodStart: new Date(new Date(lastMonth).setDate(1)),
@@ -229,7 +283,7 @@ async function seed() {
         ],
       },
       {
-        statisticType: UsageStatisticType.PROGRAM,
+        statisticType: "PROGRAM",
         referenceId: new Types.ObjectId("507f1f77bcf86cd799439041"),
         referenceName: "Ingeniería de Sistemas",
         periodStart: new Date(new Date(lastMonth).setDate(1)),
@@ -269,7 +323,7 @@ async function seed() {
           periodStart: statistic.periodStart,
         },
         statistic,
-        { upsert: true, new: true }
+        { upsert: true, new: true },
       );
       insertedStatistics.push(doc);
     }
@@ -284,14 +338,14 @@ async function seed() {
         requesterName: "Juan Docente",
         requesterEmail: "juan.docente@ufps.edu.co",
         requestedDate: new Date(
-          new Date(lastWeek).setDate(lastWeek.getDate() + 2)
+          new Date(lastWeek).setDate(lastWeek.getDate() + 2),
         ),
         requestedStartTime: new Date(new Date(lastWeek).setHours(9, 0, 0)),
         requestedEndTime: new Date(new Date(lastWeek).setHours(11, 0, 0)),
         duration: 120,
-        reason: UnsatisfiedDemandReason.UNAVAILABLE,
-        priority: UnsatisfiedDemandPriority.HIGH,
-        status: UnsatisfiedDemandStatus.RESOLVED,
+        reason: "UNAVAILABLE",
+        priority: "HIGH",
+        status: "RESOLVED",
         reasonDetails: "Todas las franjas horarias reservadas para ese día",
         program: "Ingeniería de Sistemas",
         alternatives: [
@@ -316,17 +370,89 @@ async function seed() {
         requestedStartTime: new Date(new Date(today).setHours(14, 0, 0)),
         requestedEndTime: new Date(new Date(today).setHours(16, 0, 0)),
         duration: 120,
-        reason: UnsatisfiedDemandReason.MAINTENANCE,
-        priority: UnsatisfiedDemandPriority.NORMAL,
-        status: UnsatisfiedDemandStatus.PENDING,
+        reason: "MAINTENANCE",
+        priority: "NORMAL",
+        status: "PENDING",
         reasonDetails: "Laboratorio en mantenimiento preventivo",
+        program: "Ingeniería de Sistemas",
+        alternatives: [],
+      },
+      // ── Demanda por CONFLICTO de horario ──
+      {
+        resourceId: auditorioId,
+        resourceName: "Auditorio Principal",
+        resourceType: "AUDITORIUM",
+        requestedBy: new Types.ObjectId("507f1f77bcf86cd799439026"),
+        requesterName: "Pedro Coordinador",
+        requesterEmail: "pedro.coordinador@ufps.edu.co",
+        requestedDate: new Date(new Date(lastWeek).setDate(lastWeek.getDate() + 1)),
+        requestedStartTime: new Date(new Date(lastWeek).setHours(10, 0, 0)),
+        requestedEndTime: new Date(new Date(lastWeek).setHours(12, 0, 0)),
+        duration: 120,
+        reason: "CONFLICT",
+        priority: "HIGH",
+        status: "RESOLVED",
+        reasonDetails: "Conflicto con evento institucional ya programado en la misma franja",
+        program: "Ingeniería Industrial",
+        alternatives: [
+          {
+            resourceId: salaId,
+            resourceName: "Sala Conferencias A",
+            availableDate: new Date(new Date(lastWeek).setHours(10, 0, 0)),
+          },
+        ],
+        resolvedAt: new Date(new Date(lastWeek).setHours(16, 0, 0)),
+        resolvedBy: userAdminId,
+        resolutionNotes: "Se reasignó a la Sala de Conferencias A",
+      },
+      // ── Demanda por CAPACIDAD insuficiente ──
+      {
+        resourceId: salaId,
+        resourceName: "Sala de Conferencias A",
+        resourceType: "MEETING_ROOM",
+        requestedBy: userDocenteId,
+        requesterName: "Juan Docente",
+        requesterEmail: "juan.docente@ufps.edu.co",
+        requestedDate: new Date(new Date(today).setDate(today.getDate() + 3)),
+        requestedStartTime: new Date(new Date(today).setHours(9, 0, 0)),
+        requestedEndTime: new Date(new Date(today).setHours(11, 0, 0)),
+        duration: 120,
+        reason: "CAPACITY",
+        priority: "NORMAL",
+        status: "PENDING",
+        reasonDetails: "Se necesitan 50 asientos pero la sala solo tiene 20",
+        program: "Ingeniería de Sistemas",
+        alternatives: [
+          {
+            resourceId: auditorioId,
+            resourceName: "Auditorio Principal",
+            availableDate: new Date(new Date(today).setHours(9, 0, 0)),
+          },
+        ],
+      },
+      // ── Demanda CANCELADA ──
+      {
+        resourceId: laboratorioId,
+        resourceName: "Laboratorio de Sistemas 1",
+        resourceType: "LABORATORY",
+        requestedBy: userEstudianteId,
+        requesterName: "María Estudiante",
+        requesterEmail: "maria.estudiante@ufps.edu.co",
+        requestedDate: new Date(new Date(lastMonth).setDate(15)),
+        requestedStartTime: new Date(new Date(lastMonth).setHours(16, 0, 0)),
+        requestedEndTime: new Date(new Date(lastMonth).setHours(18, 0, 0)),
+        duration: 120,
+        reason: "OTHER",
+        priority: "LOW",
+        status: "CANCELLED",
+        reasonDetails: "Estudiante ya no necesita el recurso",
         program: "Ingeniería de Sistemas",
         alternatives: [],
       },
     ];
 
     logger.info(
-      `Procesando ${unsatisfiedDemands.length} unsatisfied demands...`
+      `Procesando ${unsatisfiedDemands.length} unsatisfied demands...`,
     );
     const insertedDemands: any[] = [];
 
@@ -338,7 +464,7 @@ async function seed() {
           requestedStartTime: demand.requestedStartTime,
         },
         demand,
-        { upsert: true, new: true }
+        { upsert: true, new: true },
       );
       insertedDemands.push(doc);
     }

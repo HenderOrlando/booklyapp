@@ -1,6 +1,6 @@
 import { createLogger } from "@libs/common";
 import { RedisService } from "@libs/redis";
-import { Injectable } from "@nestjs/common";
+import { HttpException, Injectable } from "@nestjs/common";
 
 type CircuitState = "CLOSED" | "OPEN" | "HALF-OPEN";
 
@@ -37,7 +37,7 @@ export class CircuitBreakerRedisService {
     this.configs.set(service, config);
     this.logger.info(
       `Circuit breaker registered for ${service}`,
-      JSON.stringify(config)
+      JSON.stringify(config),
     );
   }
 
@@ -47,12 +47,12 @@ export class CircuitBreakerRedisService {
   async execute<T>(
     service: string,
     fn: () => Promise<T>,
-    fallback?: () => Promise<T>
+    fallback?: () => Promise<T>,
   ): Promise<T> {
     const config = this.configs.get(service);
     if (!config) {
       this.logger.warn(
-        `No circuit breaker config for ${service}, executing without protection`
+        `No circuit breaker config for ${service}, executing without protection`,
       );
       return await fn();
     }
@@ -73,7 +73,7 @@ export class CircuitBreakerRedisService {
 
       // Circuito aún está OPEN
       this.logger.warn(
-        `Circuit OPEN for ${service}, using fallback (time remaining: ${Math.round((config.timeout - timeSinceFailure) / 1000)}s)`
+        `Circuit OPEN for ${service}, using fallback (time remaining: ${Math.round((config.timeout - timeSinceFailure) / 1000)}s)`,
       );
 
       if (fallback) {
@@ -94,13 +94,20 @@ export class CircuitBreakerRedisService {
     service: string,
     fn: () => Promise<T>,
     fallback: (() => Promise<T>) | undefined,
-    config: CircuitConfig
+    config: CircuitConfig,
   ): Promise<T> {
     try {
       const result = await fn();
       await this.onSuccess(service, config);
       return result;
     } catch (error) {
+      // 4xx client errors mean the service IS responding — NOT a service failure.
+      // Re-throw them without counting as a circuit breaker failure.
+      if (error instanceof HttpException && error.getStatus() < 500) {
+        await this.onSuccess(service, config);
+        throw error;
+      }
+
       await this.onFailure(service, config);
 
       // Si hay fallback, usarlo
@@ -118,7 +125,7 @@ export class CircuitBreakerRedisService {
    */
   private async onSuccess(
     service: string,
-    config: CircuitConfig
+    config: CircuitConfig,
   ): Promise<void> {
     const state = await this.getState(service, config);
 
@@ -128,7 +135,7 @@ export class CircuitBreakerRedisService {
 
       this.logger.info(
         `Success for ${service}`,
-        JSON.stringify({ successes: state.successes, state: state.state })
+        JSON.stringify({ successes: state.successes, state: state.state }),
       );
 
       // Si alcanza el threshold de éxitos, cerrar el circuito
@@ -154,7 +161,7 @@ export class CircuitBreakerRedisService {
    */
   private async onFailure(
     service: string,
-    config: CircuitConfig
+    config: CircuitConfig,
   ): Promise<void> {
     const state = await this.getState(service, config);
     state.failures++;
@@ -167,8 +174,8 @@ export class CircuitBreakerRedisService {
           failures: state.failures,
           threshold: config.failureThreshold,
           state: state.state,
-        })
-      )
+        }),
+      ),
     );
 
     // Si alcanza el threshold de fallos, abrir el circuito
@@ -180,8 +187,8 @@ export class CircuitBreakerRedisService {
             failures: state.failures,
             threshold: config.failureThreshold,
             state: state.state,
-          })
-        )
+          }),
+        ),
       );
       state.state = "OPEN";
       state.successes = 0;
@@ -195,7 +202,7 @@ export class CircuitBreakerRedisService {
    */
   private async transitionToHalfOpen(
     service: string,
-    state: CircuitStateData
+    state: CircuitStateData,
   ): Promise<void> {
     state.state = "HALF-OPEN";
     state.successes = 0;
@@ -208,7 +215,7 @@ export class CircuitBreakerRedisService {
    */
   private async getState(
     service: string,
-    config: CircuitConfig
+    config: CircuitConfig,
   ): Promise<CircuitStateData> {
     const key = `circuit:${service}`;
     const stateData = await this.redis.get<CircuitStateData>(key);
@@ -231,7 +238,7 @@ export class CircuitBreakerRedisService {
    */
   private async saveState(
     service: string,
-    state: CircuitStateData
+    state: CircuitStateData,
   ): Promise<void> {
     const key = `circuit:${service}`;
     // Guardar por 24 horas

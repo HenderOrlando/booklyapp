@@ -23,11 +23,13 @@ import {
   CreateApprovalFlowCommand,
   DeactivateApprovalFlowCommand,
   UpdateApprovalFlowCommand,
-} from '@stockpile/application/commands';
+} from "@stockpile/application/commands";
+import { ActivateApprovalFlowCommand } from "@stockpile/application/commands/activate-approval-flow.command";
+import { DeleteApprovalFlowCommand } from "@stockpile/application/commands/delete-approval-flow.command";
 import {
   GetApprovalFlowByIdQuery,
   GetApprovalFlowsQuery,
-} from '@stockpile/application/queries';
+} from "@stockpile/application/queries";
 import {
   CreateApprovalFlowDto,
   QueryApprovalFlowsDto,
@@ -45,7 +47,7 @@ import {
 export class ApprovalFlowsController {
   constructor(
     private readonly commandBus: CommandBus,
-    private readonly queryBus: QueryBus
+    private readonly queryBus: QueryBus,
   ) {}
 
   @Post()
@@ -60,7 +62,7 @@ export class ApprovalFlowsController {
   })
   async create(
     @Body() dto: CreateApprovalFlowDto,
-    @CurrentUser() user: any
+    @CurrentUser() user: any,
   ): Promise<any> {
     const command = new CreateApprovalFlowCommand(
       dto.name,
@@ -68,11 +70,11 @@ export class ApprovalFlowsController {
       dto.resourceTypes,
       dto.steps,
       dto.autoApproveConditions,
-      user.sub
+      user.sub,
     );
 
     const result = await this.commandBus.execute(command);
-    return ResponseUtil.success(result, 'Approval flow created successfully');
+    return ResponseUtil.success(result, "Approval flow created successfully");
   }
 
   @Get()
@@ -90,22 +92,24 @@ export class ApprovalFlowsController {
       {
         isActive: query.isActive,
         resourceType: query.resourceType,
-      }
+      },
     );
 
     const result = await this.queryBus.execute(queryCommand);
-    
     if (result.data && result.meta) {
       return ResponseUtil.paginated(
         result.data,
         result.meta.total,
         query.page || 1,
         query.limit || 10,
-        'Approval flows retrieved successfully'
+        "Approval flows retrieved successfully",
       );
     }
-    
-    return ResponseUtil.success(result, 'Approval flows retrieved successfully');
+
+    return ResponseUtil.success(
+      result,
+      "Approval flows retrieved successfully",
+    );
   }
 
   @Get(":id")
@@ -121,7 +125,7 @@ export class ApprovalFlowsController {
   async findOne(@Param("id") id: string): Promise<any> {
     const query = new GetApprovalFlowByIdQuery(id);
     const result = await this.queryBus.execute(query);
-    return ResponseUtil.success(result, 'Approval flow retrieved successfully');
+    return ResponseUtil.success(result, "Approval flow retrieved successfully");
   }
 
   @Patch(":id")
@@ -137,7 +141,7 @@ export class ApprovalFlowsController {
   async update(
     @Param("id") id: string,
     @Body() dto: UpdateApprovalFlowDto,
-    @CurrentUser() user: any
+    @CurrentUser() user: any,
   ): Promise<any> {
     const command = new UpdateApprovalFlowCommand(
       id,
@@ -146,11 +150,11 @@ export class ApprovalFlowsController {
       dto.resourceTypes,
       dto.steps,
       dto.autoApproveConditions,
-      user.sub
+      user.sub,
     );
 
     const result = await this.commandBus.execute(command);
-    return ResponseUtil.success(result, 'Approval flow updated successfully');
+    return ResponseUtil.success(result, "Approval flow updated successfully");
   }
 
   @Post(":id/deactivate")
@@ -165,11 +169,14 @@ export class ApprovalFlowsController {
   })
   async deactivate(
     @Param("id") id: string,
-    @CurrentUser() user: any
+    @CurrentUser() user: any,
   ): Promise<any> {
     const command = new DeactivateApprovalFlowCommand(id, user.sub);
     const result = await this.commandBus.execute(command);
-    return ResponseUtil.success(result, 'Approval flow deactivated successfully');
+    return ResponseUtil.success(
+      result,
+      "Approval flow deactivated successfully",
+    );
   }
 
   @Post(":id/activate")
@@ -184,12 +191,11 @@ export class ApprovalFlowsController {
   })
   async activate(
     @Param("id") id: string,
-    @CurrentUser() user: any
+    @CurrentUser("sub") userId: string,
   ): Promise<any> {
-    // Reutilizar el mismo comando pero con lógica en el service
-    // O crear un ActivateApprovalFlowCommand separado
-    const result = { message: "Activate functionality to be implemented", id };
-    return ResponseUtil.success(result, 'Approval flow activated successfully');
+    const command = new ActivateApprovalFlowCommand(id, userId);
+    const result = await this.commandBus.execute(command);
+    return ResponseUtil.success(result, "Approval flow activated successfully");
   }
 
   @Delete(":id")
@@ -202,9 +208,12 @@ export class ApprovalFlowsController {
     status: 404,
     description: "Flujo no encontrado",
   })
-  async remove(@Param("id") id: string): Promise<any> {
-    // Implementar DeleteApprovalFlowCommand si es necesario
-    const result = { message: "Delete functionality to be implemented", id };
-    return ResponseUtil.success(result, 'Approval flow deleted successfully');
+  async remove(
+    @Param("id") id: string,
+    @CurrentUser("sub") userId: string,
+  ): Promise<any> {
+    const command = new DeleteApprovalFlowCommand(id, userId);
+    await this.commandBus.execute(command);
+    return ResponseUtil.success({ id }, "Approval flow deleted successfully");
   }
 }

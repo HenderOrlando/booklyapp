@@ -1,0 +1,110 @@
+name: Frontend E2E Tests
+
+on:
+  pull_request:
+    paths:
+      - 'bookly-mock-frontend/**'
+      - '.github/workflows/e2e-frontend.yml'
+  schedule:
+    - cron: '0 3 * * *'
+  workflow_dispatch:
+    inputs:
+      suite:
+        description: 'Suite to run'
+        default: 'smoke'
+        type: choice
+        options:
+          - smoke
+          - regression
+          - visual
+          - all
+
+permissions:
+  contents: read
+
+jobs:
+  e2e-smoke:
+    if: github.event_name == 'pull_request' || (github.event_name == 'workflow_dispatch' && (inputs.suite == 'smoke' || inputs.suite == 'all'))
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: Cache npm
+        uses: actions/cache@v4
+        with:
+          path: ~/.npm
+          key: npm-${{ hashFiles('bookly-mock-frontend/package-lock.json') }}
+      - run: npm ci
+        working-directory: bookly-mock-frontend
+      - run: npx playwright install --with-deps chromium
+        working-directory: bookly-mock-frontend
+      - run: npx playwright test --project=smoke
+        working-directory: bookly-mock-frontend
+        env:
+          NEXT_PUBLIC_DATA_MODE: mock
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: e2e-smoke-report
+          path: bookly-mock-frontend/playwright-report/
+          retention-days: 7
+
+  e2e-regression:
+    if: github.event_name == 'schedule' || (github.event_name == 'workflow_dispatch' && (inputs.suite == 'regression' || inputs.suite == 'all'))
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: Cache npm
+        uses: actions/cache@v4
+        with:
+          path: ~/.npm
+          key: npm-${{ hashFiles('bookly-mock-frontend/package-lock.json') }}
+      - run: npm ci
+        working-directory: bookly-mock-frontend
+      - run: npx playwright install --with-deps chromium
+        working-directory: bookly-mock-frontend
+      - run: npx playwright test --project=regression
+        working-directory: bookly-mock-frontend
+        env:
+          NEXT_PUBLIC_DATA_MODE: mock
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: e2e-regression-report
+          path: |
+            bookly-mock-frontend/playwright-report/
+            bookly-mock-frontend/test-results/
+          retention-days: 30
+
+  e2e-visual:
+    if: github.event_name == 'schedule' || (github.event_name == 'workflow_dispatch' && (inputs.suite == 'visual' || inputs.suite == 'all'))
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - run: npm ci
+        working-directory: bookly-mock-frontend
+      - run: npx playwright install --with-deps chromium
+        working-directory: bookly-mock-frontend
+      - run: npx playwright test --project=visual
+        working-directory: bookly-mock-frontend
+        env:
+          NEXT_PUBLIC_DATA_MODE: mock
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: e2e-visual-report
+          path: |
+            bookly-mock-frontend/playwright-report/
+            bookly-mock-frontend/test-results/
+          retention-days: 30

@@ -109,6 +109,95 @@ export class WaitingListService {
     return await this.waitingListRepository.findNext(resourceId);
   }
 
+  async notifyNextInLine(
+    resourceId: string,
+    availableFrom: Date,
+    availableUntil: Date,
+    notifyTop?: number
+  ): Promise<WaitingListEntity[]> {
+    logger.info("Notifying next in line for waiting list", {
+      resourceId,
+      availableFrom,
+      availableUntil,
+    });
+
+    const activeList = await this.waitingListRepository.findActiveInDateRange(
+      resourceId,
+      availableFrom,
+      availableUntil
+    );
+
+    const limit = notifyTop || 1;
+    const toNotify = activeList.slice(0, limit);
+
+    const notifiedList: WaitingListEntity[] = [];
+    for (const entry of toNotify) {
+      const notified = entry.markAsNotified();
+      const updated = await this.waitingListRepository.update(entry.id, {
+        notifiedAt: notified.notifiedAt,
+        updatedAt: notified.updatedAt,
+      } as Partial<WaitingListEntity>);
+      
+      notifiedList.push(updated);
+      
+      logger.info("Notified user in waiting list", {
+        waitingListId: entry.id,
+        userId: entry.userId,
+      });
+    }
+
+    return notifiedList;
+  }
+
+  /**
+   * Actualiza la prioridad de una solicitud
+   */
+  async updatePriority(
+    id: string,
+    priority: number,
+    reason?: string
+  ): Promise<WaitingListEntity> {
+    logger.info("Updating waiting list priority", { id, priority, reason });
+
+    const waitingList = await this.findById(id);
+
+    const updated = await this.waitingListRepository.update(id, {
+      priority,
+      purpose: reason ? `${waitingList.purpose || ''} [Priority updated: ${reason}]`.trim() : waitingList.purpose,
+      updatedAt: new Date(),
+    } as Partial<WaitingListEntity>);
+
+    return updated;
+  }
+
+  /**
+   * Acepta una oferta de lista de espera
+   */
+  async acceptOffer(id: string, userId: string): Promise<WaitingListEntity> {
+    logger.info("Accepting waiting list offer", { id, userId });
+
+    const waitingList = await this.findById(id);
+
+    if (waitingList.userId !== userId) {
+      throw new Error("Unauthorized: Only the requester can accept the offer");
+    }
+
+    if (!waitingList.notifiedAt) {
+      throw new Error("Cannot accept offer: User has not been notified");
+    }
+
+    if (!waitingList.isActiveRequest()) {
+      throw new Error("Cannot accept offer: Request is not active");
+    }
+
+    // Aquí normalmente se emitiría un evento para que ReservationService cree la reserva
+    // Por ahora solo lo marcamos como convertido con un ID temporal
+    const tempReservationId = `res-from-wl-${id}`;
+    const converted = await this.convertToReservation(id, tempReservationId);
+
+    return converted;
+  }
+
   /**
    * Marca una solicitud como notificada
    */

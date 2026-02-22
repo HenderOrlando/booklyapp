@@ -1,5 +1,4 @@
-import { EventPayload } from "@libs/common";
-import { createLogger } from "@libs/common";
+import { createLogger, EventPayload } from "@libs/common";
 import { EventBusService } from "@libs/event-bus";
 import { HttpService } from "@nestjs/axios";
 import { HttpException, Injectable } from "@nestjs/common";
@@ -17,13 +16,14 @@ import { RateLimiterRedisService } from "./rate-limiter-redis.service";
 export class ProxyService {
   private readonly logger = createLogger("ProxyService");
   private readonly serviceUrls: Record<string, string>;
+  private readonly pathPrefixToService: Record<string, string>;
 
   constructor(
     private readonly httpService: HttpService,
     private readonly configService: ConfigService,
     private readonly eventBusService: EventBusService,
     private readonly circuitBreaker: CircuitBreakerRedisService,
-    private readonly rateLimiter: RateLimiterRedisService
+    private readonly rateLimiter: RateLimiterRedisService,
   ) {
     this.serviceUrls = {
       auth:
@@ -41,6 +41,59 @@ export class ProxyService {
       reports:
         this.configService.get<string>("REPORTS_SERVICE_URL") ||
         "http://localhost:3005",
+    };
+
+    // Map controller path prefixes to their owning service
+    this.pathPrefixToService = {
+      // auth-service controllers
+      auth: "auth",
+      users: "auth",
+      roles: "auth",
+      permissions: "auth",
+      config: "auth",
+      "app-config": "auth",
+      "auth/oauth": "auth",
+      // resources-service controllers
+      resources: "resources",
+      categories: "resources",
+      maintenances: "resources",
+      departments: "resources",
+      faculties: "resources",
+      programs: "resources",
+      // availability-service controllers
+      reservations: "availability",
+      availabilities: "availability",
+      "waiting-lists": "availability",
+      waitlist: "availability",
+      reassignments: "availability",
+      calendar: "availability",
+      schedules: "availability",
+      "calendar-integration": "availability",
+      // stockpile-service controllers
+      "approval-requests": "stockpile",
+      "approval-flows": "stockpile",
+      "check-in-out": "stockpile",
+      documents: "stockpile",
+      "document-templates": "stockpile",
+      monitoring: "stockpile",
+      notifications: "stockpile",
+      "notification-templates": "stockpile",
+      "tenant-notification-configs": "stockpile",
+      // reports-service controllers
+      "usage-reports": "reports",
+      "demand-reports": "reports",
+      "user-reports": "reports",
+      dashboard: "reports",
+      "audit-dashboard": "reports",
+      feedback: "reports",
+      evaluation: "reports",
+      evaluations: "reports",
+      audit: "reports",
+      "reference-data": "resources",
+      // also accept the service names directly
+      stockpile: "stockpile",
+      reports: "reports",
+      availability: "availability",
     };
 
     // Registrar circuit breakers para cada servicio
@@ -63,7 +116,7 @@ export class ProxyService {
     });
 
     this.logger.info(
-      `Circuit breakers registered for ${services.length} services`
+      `Circuit breakers registered for ${services.length} services`,
     );
   }
 
@@ -82,55 +135,86 @@ export class ProxyService {
     headers?: any,
     query?: any,
     userId?: string,
-    userIp?: string
+    userIp?: string,
   ): Promise<any> {
-    const serviceUrl = this.serviceUrls[service];
+    // Resolve the controller prefix to the owning service
+    const resolvedServiceName = this.pathPrefixToService[service] || service;
+    const serviceUrl = this.serviceUrls[resolvedServiceName];
 
     if (!serviceUrl) {
-      this.logger.error(`Service not found: ${service}`);
-      throw new HttpException(`Service ${service} not found`, 404);
+      this.logger.error(
+        `Service not found for prefix: ${service} (resolved: ${resolvedServiceName})`,
+      );
+      throw new HttpException(`Service for prefix '${service}' not found`, 404);
     }
 
     // 1. Aplicar Rate Limiting ANTES de procesar
     await this.applyRateLimiting(userId, userIp, service);
 
     // 2. Decidir estrategia según el método HTTP
-    if (method.toUpperCase() === "GET") {
-      // Queries (GET) → HTTP directo con Circuit Breaker
+    // Endpoints que DEBEN ser síncronos (requieren respuesta inmediata)
+    const synchronousPaths = [
+      "/auth/login",
+      "/auth/register",
+      "/auth/refresh",
+      "/auth/verify",
+      "/auth/forgot-password",
+      "/auth/reset-password",
+      "/auth/me",
+      "/users/me/profile",
+      "/users/me/photo",
+      "/users/me/preferences",
+      "/config",
+      "/app-config",
+      // Resources CRUD that require immediate persistence/response in UI flows
+      "/categories",
+      "/resources",
+      "/reference-data",
+    ];
+    // Build the full path to forward: /{service}{path}
+    // e.g., service="approval-requests", path="/123" → fullForwardPath="/approval-requests/123"
+    const fullForwardPath = `/${service}${path}`;
+
+    const isSynchronousEndpoint = synchronousPaths.some((sp) =>
+      fullForwardPath.toLowerCase().startsWith(sp),
+    );
+
+    if (method.toUpperCase() === "GET" || isSynchronousEndpoint) {
+      // Queries (GET) y endpoints síncronos → HTTP directo con Circuit Breaker
       return await this.circuitBreaker.execute(
-        service,
+        resolvedServiceName,
         async () => {
           return await this.proxyViaHttp(
-            service,
+            resolvedServiceName,
             serviceUrl,
-            path,
+            fullForwardPath,
             method,
             body,
             headers,
-            query
+            query,
           );
         },
         async () => {
           // Fallback: retornar respuesta en cache o error amigable
           this.logger.warn(
-            `[CIRCUIT-BREAKER] Service ${service} unavailable, using fallback`
+            `[CIRCUIT-BREAKER] Service ${service} unavailable, using fallback`,
           );
           return {
             success: false,
             message: `Service ${service} is temporarily unavailable`,
             statusCode: 503,
           };
-        }
+        },
       );
     } else {
-      // Commands (POST/PUT/DELETE/PATCH) → Kafka para procesamiento asíncrono
+      // Commands (POST/PUT/DELETE/PATCH) → Event Bus para procesamiento asíncrono
       return await this.proxyViaEventBus(
-        service,
-        path,
+        resolvedServiceName,
+        fullForwardPath,
         method,
         body,
         headers,
-        query
+        query,
       );
     }
   }
@@ -141,7 +225,7 @@ export class ProxyService {
   private async applyRateLimiting(
     userId?: string,
     userIp?: string,
-    service?: string
+    service?: string,
   ): Promise<void> {
     try {
       if (userId) {
@@ -192,7 +276,7 @@ export class ProxyService {
     method: string,
     body?: any,
     headers?: any,
-    query?: any
+    query?: any,
   ): Promise<any> {
     const url = `${serviceUrl}/api/v1${path}`;
 
@@ -206,19 +290,31 @@ export class ProxyService {
           data: body,
           headers: this.cleanHeaders(headers),
           params: query,
-        })
+        }),
       );
 
       return response.data;
     } catch (error: any) {
+      const status = error.response?.status;
+
+      // 4xx errors are client errors — NOT service failures.
+      // Re-throw them directly so the circuit breaker counts only real outages.
+      if (status && status >= 400 && status < 500) {
+        this.logger.warn(
+          `[HTTP] Client error proxying to ${service}: ${status} ${error.message}`,
+        );
+        throw new HttpException(error.response.data || error.message, status);
+      }
+
+      // 5xx and network errors ARE service failures — let circuit breaker handle them
       this.logger.error(
-        `[HTTP] Error proxying to ${service}: ${error.message}`
+        `[HTTP] Error proxying to ${service}: ${error.message}`,
       );
 
       if (error.response) {
         throw new HttpException(
           error.response.data || error.message,
-          error.response.status || 500
+          error.response.status || 500,
         );
       }
 
@@ -235,7 +331,7 @@ export class ProxyService {
     method: string,
     body?: any,
     headers?: any,
-    query?: any
+    query?: any,
   ): Promise<any> {
     const eventId = uuidv4();
     const topic = `${service}.commands`;
@@ -289,7 +385,7 @@ export class ProxyService {
 
       // Fallback a HTTP si Event Bus falla
       this.logger.warn(
-        `[EVENT-BUS] Falling back to HTTP for ${service}${path}`
+        `[EVENT-BUS] Falling back to HTTP for ${service}${path}`,
       );
 
       const serviceUrl = this.serviceUrls[service];
@@ -304,7 +400,7 @@ export class ProxyService {
         method,
         body,
         headers,
-        query
+        query,
       );
     }
   }

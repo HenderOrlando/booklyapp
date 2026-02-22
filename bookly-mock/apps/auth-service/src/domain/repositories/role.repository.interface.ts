@@ -1,4 +1,3 @@
-import { UserRole } from "@libs/common/enums";
 import { PaginationMeta, PaginationQuery } from "@libs/common";
 import { RoleEntity } from "../entities/role.entity";
 
@@ -20,7 +19,7 @@ export interface IRoleRepository {
   /**
    * Buscar rol por nombre
    */
-  findByName(name: UserRole): Promise<RoleEntity | null>;
+  findByName(name: string): Promise<RoleEntity | null>;
 
   /**
    * Buscar múltiples roles
@@ -53,7 +52,7 @@ export interface IRoleRepository {
   /**
    * Verificar si existe un rol con el nombre
    */
-  existsByName(name: UserRole): Promise<boolean>;
+  existsByName(name: string): Promise<boolean>;
 
   /**
    * Contar roles

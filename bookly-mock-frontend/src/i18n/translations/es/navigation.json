@@ -3,6 +3,7 @@
   "profile": "Mi Perfil",
   "resources": "Recursos",
   "categories": "Categorías",
+  "characteristics": "Características",
   "maintenance": "Mantenimientos",
   "programs": "Programas",
   "reservations": "Reservas",
@@ -18,5 +19,18 @@
   "audit": "Auditoría",
   "admin": "Administración",
   "design_system": "Sistema de Diseño",
-  "users": "Usuarios"
+  "users": "Usuarios",
+  "integrations": "Integraciones",
+  "approval_flows": "Flujos de Aprobación",
+  "schedules": "Horarios",
+  "notification_channels": "Canales de Notificación",
+  "evaluations": "Evaluaciones",
+  "reassignment": "Reasignación",
+  "settings": "Configuraciones",
+  "section_main": "Principal",
+  "section_resources": "Gestión de Recursos",
+  "section_reservations": "Reservas y Calendario",
+  "section_operations": "Operaciones",
+  "section_admin": "Administración",
+  "back_to_dashboard": "Volver al Dashboard"
 }

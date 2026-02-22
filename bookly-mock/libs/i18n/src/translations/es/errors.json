@@ -1,0 +1,25 @@
+{
+  "AUTH": {
+    "001": "Credenciales inválidas",
+    "002": "Usuario no encontrado",
+    "003": "Token expirado o inválido",
+    "004": "Permisos insuficientes"
+  },
+  "RSRC": {
+    "001": "Recurso no encontrado",
+    "002": "El recurso ya existe",
+    "003": "El recurso está inactivo"
+  },
+  "AVAL": {
+    "001": "Horario no disponible",
+    "002": "Conflicto de reservas"
+  },
+  "STCK": {
+    "001": "Solicitud no encontrada",
+    "002": "Estado inválido para la acción"
+  },
+  "GEN": {
+    "000": "Error interno del servidor",
+    "001": "Error de validación de datos"
+  }
+}

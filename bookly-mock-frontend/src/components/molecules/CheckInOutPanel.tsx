@@ -55,7 +55,7 @@ export interface CheckInOutPanelProps {
 
 export const CheckInOutPanel = React.memo<CheckInOutPanelProps>(
   ({
-    reservationId,
+    reservationId: _reservationId,
     validation,
     onCheckIn,
     onCheckOut,
@@ -141,7 +141,7 @@ export const CheckInOutPanel = React.memo<CheckInOutPanelProps>(
               <h4 className={`font-semibold text-sm ${statusInfo.color}`}>
                 {statusInfo.title}
               </h4>
-              <p className="text-sm text-gray-700 dark:text-gray-300 mt-1">
+              <p className="text-sm text-[var(--color-text-primary)] dark:text-[var(--color-text-tertiary)] mt-1">
                 {statusInfo.message}
               </p>
             </div>
@@ -165,23 +165,23 @@ export const CheckInOutPanel = React.memo<CheckInOutPanelProps>(
           {/* Código QR */}
           {qrCode && (
             <div className="flex flex-col items-center gap-3 py-4">
-              <p className="text-sm font-medium text-gray-700 dark:text-gray-300">
+              <p className="text-sm font-medium text-[var(--color-text-primary)] dark:text-[var(--color-text-tertiary)]">
                 Escanea el código QR
               </p>
               <QRCodeDisplay
                 value={qrCode}
                 size={200}
                 includeMargin={true}
-                className="border-2 border-gray-200 dark:border-gray-700 rounded-lg p-2 bg-white"
+                className="border-2 border-[var(--color-border-subtle)] dark:border-[var(--color-border-strong)] rounded-lg p-2 bg-white"
               />
-              <p className="text-xs text-gray-500 dark:text-gray-400 text-center max-w-xs">
+              <p className="text-xs text-[var(--color-text-secondary)] dark:text-[var(--color-text-tertiary)] text-center max-w-xs">
                 El código QR puede ser escaneado por el personal de vigilancia
               </p>
             </div>
           )}
 
           {/* Botones de acción */}
-          <div className="flex gap-3 pt-4 border-t border-gray-200 dark:border-gray-700">
+          <div className="flex gap-3 pt-4 border-t border-[var(--color-border-subtle)] dark:border-[var(--color-border-strong)]">
             {onCheckIn && (
               <CheckInButton
                 onClick={onCheckIn}
@@ -207,12 +207,12 @@ export const CheckInOutPanel = React.memo<CheckInOutPanelProps>(
 
           {/* Información de requisitos */}
           {validation.requiresApproval && (
-            <p className="text-xs text-gray-600 dark:text-gray-400 text-center">
+            <p className="text-xs text-[var(--color-text-secondary)] dark:text-[var(--color-text-tertiary)] text-center">
               Esta reserva requiere aprobación previa
             </p>
           )}
           {validation.requiresVigilance && (
-            <p className="text-xs text-gray-600 dark:text-gray-400 text-center">
+            <p className="text-xs text-[var(--color-text-secondary)] dark:text-[var(--color-text-tertiary)] text-center">
               El registro debe ser validado por vigilancia
             </p>
           )}

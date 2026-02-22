@@ -7,7 +7,7 @@ import { Document } from "mongoose";
  */
 @Schema({ collection: "resource_cache", timestamps: true })
 export class ResourceCache extends Document {
-  @Prop({ required: true, unique: true, index: true })
+  @Prop({ required: true, unique: true })
   resourceId: string;
 
   @Prop({ required: true })
@@ -68,8 +68,7 @@ export class ResourceCache extends Document {
 
 export const ResourceCacheSchema = SchemaFactory.createForClass(ResourceCache);
 
-// Índices
-ResourceCacheSchema.index({ resourceId: 1 });
+// Índices (resourceId already has unique index from @Prop decorator)
 ResourceCacheSchema.index({ type: 1 });
 ResourceCacheSchema.index({ isActive: 1 });
 ResourceCacheSchema.index({ updatedAt: -1 });

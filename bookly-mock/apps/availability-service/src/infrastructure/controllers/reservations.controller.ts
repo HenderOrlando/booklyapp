@@ -40,6 +40,7 @@ import {
   GetRecurringSeriesQuery,
   GetReservationByIdQuery,
   GetReservationsQuery,
+  GetReservationStatsQuery,
   GetUserRecurringReservationsQuery,
   PreviewRecurringSeriesQuery,
 } from '@availability/application/queries';
@@ -143,6 +144,24 @@ export class ReservationsController {
     }
     
     return ResponseUtil.success(result, 'Reservations retrieved successfully');
+  }
+
+  @Get("stats")
+  @ApiOperation({ summary: "Obtener estadísticas de reservas" })
+  @ApiResponse({
+    status: 200,
+    description: "Estadísticas obtenidas exitosamente",
+  })
+  async getStats(@Query() query: QueryReservationDto): Promise<any> {
+    const queryObj = new GetReservationStatsQuery({
+      userId: query.userId,
+      resourceId: query.resourceId,
+      startDate: query.startDate,
+      endDate: query.endDate,
+    });
+
+    const result = await this.queryBus.execute(queryObj);
+    return ResponseUtil.success(result, "Reservation stats retrieved successfully");
   }
 
   @Get(":id")

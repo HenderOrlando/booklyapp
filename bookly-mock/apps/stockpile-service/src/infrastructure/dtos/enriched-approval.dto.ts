@@ -159,6 +159,37 @@ export class EnrichedApprovalRequestDto {
   purpose?: string;
 
   @ApiPropertyOptional({
+    description: "Nivel de aprobación actual",
+    example: "FIRST_LEVEL",
+  })
+  currentLevel?: string;
+
+  @ApiPropertyOptional({
+    description: "Nivel de aprobación máximo requerido",
+    example: "FINAL_LEVEL",
+  })
+  maxLevel?: string;
+
+  @ApiPropertyOptional({
+    description: "Próximo aprobador sugerido o rol",
+    example: "Decano de Facultad",
+  })
+  nextApprover?: string;
+
+  @ApiPropertyOptional({
+    description: "Fecha de expiración de la solicitud",
+    example: "2025-01-15T09:30:00.000Z",
+  })
+  expiresAt?: Date;
+
+  @ApiPropertyOptional({
+    description: "Prioridad de la solicitud",
+    example: "HIGH",
+    enum: ["LOW", "NORMAL", "HIGH", "URGENT"],
+  })
+  priority?: string;
+
+  @ApiPropertyOptional({
     description: "Historial de aprobaciones",
     type: [ApprovalHistoryItemDto],
   })

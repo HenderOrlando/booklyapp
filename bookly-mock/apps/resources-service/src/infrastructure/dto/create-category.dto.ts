@@ -16,10 +16,11 @@ export class CreateCategoryDto {
   @ApiProperty({
     description: "Código único de la categoría",
     example: "LAB-COMP",
+    required: false,
   })
   @IsString({ message: "El código debe ser un string" })
-  @IsNotEmpty({ message: "El código es requerido" })
-  code: string;
+  @IsOptional()
+  code?: string;
 
   @ApiProperty({
     description: "Nombre de la categoría",
@@ -32,19 +33,21 @@ export class CreateCategoryDto {
   @ApiProperty({
     description: "Descripción de la categoría",
     example: "Categoría para laboratorios con equipos de cómputo",
+    required: false,
   })
   @IsString({ message: "La descripción debe ser un string" })
-  @IsNotEmpty({ message: "La descripción es requerida" })
-  description: string;
+  @IsOptional()
+  description?: string;
 
   @ApiProperty({
     description: "Tipo de categoría",
     enum: CategoryType,
     example: CategoryType.RESOURCE_TYPE,
+    required: false,
   })
   @IsEnum(CategoryType, { message: "Tipo de categoría inválido" })
-  @IsNotEmpty({ message: "El tipo es requerido" })
-  type: CategoryType;
+  @IsOptional()
+  type?: CategoryType;
 
   @ApiProperty({
     description: "Color hexadecimal para la categoría",

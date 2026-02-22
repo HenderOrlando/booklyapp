@@ -34,7 +34,7 @@ describe("retryInterceptor", () => {
       const method = "GET";
 
       // Act
-      const promise = retryInterceptor(error, endpoint, method);
+      const _promise = retryInterceptor(error, endpoint, method);
 
       // Avanzar tiempo: 1 segundo (primer reintento)
       jest.advanceTimersByTime(1000);
@@ -180,7 +180,7 @@ describe("retryInterceptor", () => {
       // No se establece __retryCount, debería ser 0
 
       // Act
-      const promise = retryInterceptor(error, "/test", "GET");
+      const _promise = retryInterceptor(error, "/test", "GET");
       jest.advanceTimersByTime(1000);
 
       // Assert

@@ -95,7 +95,7 @@ export function VirtualizedReservationList({
   if (reservations.length === 0) {
     return (
       <div className="text-center py-12">
-        <p className="text-gray-400">No se encontraron reservas</p>
+        <p className="text-[var(--color-text-tertiary)]">No se encontraron reservas</p>
       </div>
     );
   }
@@ -104,7 +104,7 @@ export function VirtualizedReservationList({
     <div className={className}>
       {/* Header */}
       <div className="mb-4 flex items-center justify-between">
-        <span className="text-sm text-gray-400">
+        <span className="text-sm text-[var(--color-text-tertiary)]">
           Mostrando {reservations.length} de {totalCount} reservas
         </span>
         {isFetchingNextPage && (
@@ -117,7 +117,7 @@ export function VirtualizedReservationList({
       {/* Contenedor virtualizado */}
       <div
         ref={parentRef}
-        className="h-[700px] overflow-auto border border-gray-700 rounded-lg bg-gray-900/50"
+        className="h-[700px] overflow-auto border border-[var(--color-border-strong)] rounded-lg bg-[var(--color-bg-inverse)]/50"
       >
         <div
           style={{
@@ -154,7 +154,7 @@ export function VirtualizedReservationList({
 
       {/* Footer */}
       {!hasNextPage && reservations.length > 0 && (
-        <div className="text-center text-gray-500 text-sm py-4">
+        <div className="text-center text-[var(--color-text-secondary)] text-sm py-4">
           Todas las reservas cargadas
         </div>
       )}

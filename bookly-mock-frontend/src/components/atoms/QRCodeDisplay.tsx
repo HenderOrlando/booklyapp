@@ -30,18 +30,28 @@ export interface QRCodeDisplayProps {
   className?: string;
 }
 
+interface QRCodeSvgProps {
+  value: string;
+  size: number;
+  level: "L" | "M" | "Q" | "H";
+  bgColor: string;
+  fgColor: string;
+  includeMargin: boolean;
+}
+
 export const QRCodeDisplay = React.memo<QRCodeDisplayProps>(
   ({
     value,
     size = 200,
     level = "M",
-    bgColor = "#ffffff",
-    fgColor = "#000000",
+    bgColor = "var(--color-bg-surface)",
+    fgColor = "var(--color-text-primary)",
     includeMargin = false,
     className = "",
   }) => {
     // Lazy load QRCode component
-    const [QRCode, setQRCode] = React.useState<any>(null);
+    const [QRCode, setQRCode] =
+      React.useState<React.ComponentType<QRCodeSvgProps> | null>(null);
 
     React.useEffect(() => {
       import("qrcode.react").then((module) => {
@@ -52,10 +62,10 @@ export const QRCodeDisplay = React.memo<QRCodeDisplayProps>(
     if (!QRCode) {
       return (
         <div
-          className={`flex items-center justify-center bg-gray-100 dark:bg-gray-800 ${className}`}
+          className={`flex items-center justify-center bg-[var(--color-bg-secondary)] ${className}`}
           style={{ width: size, height: size }}
         >
-          <div className="animate-pulse text-sm text-gray-500 dark:text-gray-400">
+          <div className="animate-pulse text-sm text-[var(--color-text-secondary)]">
             Cargando QR...
           </div>
         </div>
@@ -74,7 +84,7 @@ export const QRCodeDisplay = React.memo<QRCodeDisplayProps>(
         />
       </div>
     );
-  }
+  },
 );
 
 QRCodeDisplay.displayName = "QRCodeDisplay";

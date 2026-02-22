@@ -1,11 +1,9 @@
-import { UserRole } from "@libs/common/enums";
-import { PaginationMeta, PaginationQuery } from "@libs/common";
-import { createLogger } from "@libs/common";
+import { UserEntity } from "@auth/domain/entities/user.entity";
+import { IUserRepository } from "@auth/domain/repositories/user.repository.interface";
+import { createLogger, PaginationMeta, PaginationQuery } from "@libs/common";
 import { Injectable } from "@nestjs/common";
 import { InjectModel } from "@nestjs/mongoose";
 import { Model } from "mongoose";
-import { UserEntity } from '@auth/domain/entities/user.entity';
-import { IUserRepository } from '@auth/domain/repositories/user.repository.interface';
 import { User, UserDocument } from "../schemas/user.schema";
 
 /**
@@ -17,7 +15,7 @@ export class UserRepository implements IUserRepository {
   private readonly logger = createLogger("UserRepository");
 
   constructor(
-    @InjectModel(User.name) private readonly userModel: Model<UserDocument>
+    @InjectModel(User.name) private readonly userModel: Model<UserDocument>,
   ) {}
 
   async create(user: UserEntity): Promise<UserEntity> {
@@ -45,7 +43,7 @@ export class UserRepository implements IUserRepository {
 
   async findBySSOProvider(
     provider: string,
-    providerId: string
+    providerId: string,
   ): Promise<UserEntity | null> {
     const user = await this.userModel
       .findOne({ ssoProvider: provider, ssoProviderId: providerId })
@@ -55,7 +53,7 @@ export class UserRepository implements IUserRepository {
 
   async findMany(
     query: PaginationQuery,
-    filters?: Partial<UserEntity>
+    filters?: Partial<UserEntity>,
   ): Promise<{ users: UserEntity[]; meta: PaginationMeta }> {
     const {
       page = 1,
@@ -97,8 +95,8 @@ export class UserRepository implements IUserRepository {
   }
 
   async findByRole(
-    role: UserRole,
-    query: PaginationQuery
+    role: string,
+    query: PaginationQuery,
   ): Promise<{ users: UserEntity[]; meta: PaginationMeta }> {
     const {
       page = 1,

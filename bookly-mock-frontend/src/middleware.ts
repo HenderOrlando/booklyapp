@@ -11,6 +11,7 @@ const protectedRoutes = [
   "/profile",
   "/recursos",
   "/categorias",
+  "/caracteristicas",
   "/mantenimientos",
   "/programas",
   "/reservas",
@@ -47,7 +48,7 @@ export default function middleware(request: NextRequest) {
   const isProtectedRoute = protectedRoutes.some(
     (route) =>
       pathnameWithoutLocale === route ||
-      pathnameWithoutLocale.startsWith(`${route}/`)
+      pathnameWithoutLocale.startsWith(`${route}/`),
   );
 
   if (isProtectedRoute) {
@@ -59,7 +60,9 @@ export default function middleware(request: NextRequest) {
       // Redirigir al login manteniendo el locale actual
       const locale = pathname.split("/")[1]; // es o en
       const loginUrl = new URL(`/${locale}/login`, request.url);
-      loginUrl.searchParams.set("callbackUrl", pathname);
+      const requestedPath = `${pathname}${request.nextUrl.search}`;
+      loginUrl.searchParams.set("callback", requestedPath);
+      loginUrl.searchParams.set("callbackUrl", requestedPath);
       return NextResponse.redirect(loginUrl);
     }
 
@@ -83,5 +86,5 @@ export default function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/((?!api|_next/static|_next/image|favicon.ico).*)"],
+  matcher: ["/((?!api|_next/static|_next/image|images|favicon.ico).*)"],
 };

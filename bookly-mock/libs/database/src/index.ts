@@ -10,3 +10,6 @@
 export * from "./database.module";
 export * from "./database.service";
 export * from "./interfaces/database-config.interface";
+export * from "./reference-data.module";
+export * from "./repositories/reference-data.repository";
+export * from "./schemas/reference-data.schema";

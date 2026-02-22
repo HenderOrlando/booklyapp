@@ -1,5 +1,8 @@
 "use client";
 
+import { Button } from "@/components/atoms/Button";
+import { cn } from "@/lib/utils";
+import { Moon, Sun } from "lucide-react";
 import { useTheme } from "next-themes";
 import * as React from "react";
 
@@ -10,7 +13,15 @@ import * as React from "react";
  * Usa next-themes para persistencia
  */
 
-export function ThemeToggle() {
+interface ThemeToggleProps {
+  className?: string;
+  testId?: string;
+}
+
+export function ThemeToggle({
+  className,
+  testId = "theme-toggle-btn",
+}: ThemeToggleProps) {
   const { theme, setTheme, systemTheme } = useTheme();
   const [mounted, setMounted] = React.useState(false);
 
@@ -21,7 +32,12 @@ export function ThemeToggle() {
 
   if (!mounted) {
     return (
-      <div className="w-14 h-7 bg-gray-700 rounded-full animate-pulse"></div>
+      <div
+        className={cn(
+          "h-7 w-14 animate-pulse rounded-full bg-[var(--color-bg-elevated)]",
+          className,
+        )}
+      />
     );
   }
 
@@ -33,47 +49,46 @@ export function ThemeToggle() {
   };
 
   return (
-    <button
+    <Button
+      type="button"
+      variant="ghost"
       onClick={toggleTheme}
-      className="relative inline-flex items-center h-7 w-14 rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
-      style={{
-        backgroundColor: isDark ? "#1e293b" : "#cbd5e1",
-      }}
+      className={cn(
+        "relative inline-flex h-8 w-16 shrink-0 cursor-pointer items-center rounded-full p-1 transition-colors duration-300 ease-in-out",
+        isDark 
+          ? "bg-slate-700 hover:bg-slate-600 border border-slate-600" 
+          : "bg-white hover:bg-slate-50 border border-slate-200 shadow-sm",
+        className,
+      )}
+      data-testid={testId}
       aria-label={`Cambiar a tema ${isDark ? "claro" : "oscuro"}`}
+      aria-pressed={isDark ? "true" : "false"}
     >
+      {/* Iconos (Fondo) */}
+      <span className="absolute inset-0 flex items-center justify-between px-1.5" aria-hidden="true">
+        <Sun
+          className={cn(
+            "h-4 w-4 transition-colors duration-300",
+            isDark ? "text-slate-400" : "text-amber-500",
+          )}
+        />
+        <Moon
+          className={cn(
+            "h-4 w-4 transition-colors duration-300",
+            isDark ? "text-indigo-400" : "text-slate-400",
+          )}
+        />
+      </span>
+
       {/* Slider */}
       <span
-        className={`inline-block h-5 w-5 transform rounded-full bg-white shadow-lg transition-transform ${
-          isDark ? "translate-x-7" : "translate-x-1"
-        }`}
+        className={cn(
+          "pointer-events-none z-10 block h-6 w-6 transform rounded-full shadow-md ring-0 transition-transform duration-300 ease-in-out",
+          isDark 
+            ? "translate-x-8 bg-slate-800 border border-transparent" 
+            : "translate-x-0 bg-white border border-slate-200"
+        )}
       />
-
-      {/* Iconos */}
-      <span className="absolute left-1.5 flex items-center">
-        {/* Sol (light) */}
-        <svg
-          className={`w-3 h-3 ${isDark ? "text-gray-500" : "text-yellow-500"}`}
-          fill="currentColor"
-          viewBox="0 0 20 20"
-        >
-          <path
-            fillRule="evenodd"
-            d="M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm4 8a4 4 0 11-8 0 4 4 0 018 0zm-.464 4.95l.707.707a1 1 0 001.414-1.414l-.707-.707a1 1 0 00-1.414 1.414zm2.12-10.607a1 1 0 010 1.414l-.706.707a1 1 0 11-1.414-1.414l.707-.707a1 1 0 011.414 0zM17 11a1 1 0 100-2h-1a1 1 0 100 2h1zm-7 4a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1zM5.05 6.464A1 1 0 106.465 5.05l-.708-.707a1 1 0 00-1.414 1.414l.707.707zm1.414 8.486l-.707.707a1 1 0 01-1.414-1.414l.707-.707a1 1 0 011.414 1.414zM4 11a1 1 0 100-2H3a1 1 0 000 2h1z"
-            clipRule="evenodd"
-          />
-        </svg>
-      </span>
-
-      <span className="absolute right-1.5 flex items-center">
-        {/* Luna (dark) */}
-        <svg
-          className={`w-3 h-3 ${isDark ? "text-yellow-300" : "text-gray-500"}`}
-          fill="currentColor"
-          viewBox="0 0 20 20"
-        >
-          <path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z" />
-        </svg>
-      </span>
-    </button>
+    </Button>
   );
 }

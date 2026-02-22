@@ -1,4 +1,3 @@
-import { RecurrenceType, ReservationStatus } from "@libs/common/enums";
 import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
 import { Document, Types } from "mongoose";
 
@@ -14,6 +13,9 @@ export type ReservationDocument = Reservation & Document;
   versionKey: false,
 })
 export class Reservation {
+  @Prop({ type: String, required: true, index: true })
+  tenantId: string;
+
   @Prop({ type: Types.ObjectId, required: true })
   resourceId: Types.ObjectId;
 
@@ -35,12 +37,8 @@ export class Reservation {
   @Prop({ required: true })
   purpose: string;
 
-  @Prop({
-    type: String,
-    enum: Object.values(ReservationStatus),
-    default: ReservationStatus.PENDING,
-  })
-  status: ReservationStatus;
+  @Prop({ type: String, default: "PENDING" })
+  status: string;
 
   @Prop({ type: Boolean, default: false })
   isRecurring: boolean;
@@ -56,7 +54,7 @@ export class Reservation {
 
   @Prop({
     type: {
-      frequency: { type: String, enum: RecurrenceType },
+      frequency: { type: String },
       interval: Number,
       endDate: Date,
       occurrences: Number,
@@ -66,7 +64,7 @@ export class Reservation {
     required: false,
   })
   recurringPattern?: {
-    frequency: RecurrenceType;
+    frequency: string;
     interval: number;
     endDate?: Date;
     occurrences?: number;
@@ -148,14 +146,13 @@ export class Reservation {
 
 export const ReservationSchema = SchemaFactory.createForClass(Reservation);
 
-// Índices para mejorar performance
-ReservationSchema.index({ resourceId: 1, startDate: 1, endDate: 1 });
-ReservationSchema.index({ userId: 1, status: 1 });
-ReservationSchema.index({ status: 1 });
-ReservationSchema.index({ startDate: 1, endDate: 1 });
-ReservationSchema.index({ externalCalendarId: 1, externalCalendarEventId: 1 });
-ReservationSchema.index({ seriesId: 1 });
-ReservationSchema.index({ parentReservationId: 1 });
-ReservationSchema.index({ isRecurring: 1, seriesId: 1 });
-ReservationSchema.index({ programId: 1 });
-ReservationSchema.index({ approvalRequestId: 1 });
+// Índices para mejorar performance (Multi-tenant awareness)
+ReservationSchema.index({ tenantId: 1, resourceId: 1, startDate: 1, endDate: 1 });
+ReservationSchema.index({ tenantId: 1, userId: 1, status: 1 });
+ReservationSchema.index({ tenantId: 1, status: 1 });
+ReservationSchema.index({ tenantId: 1, startDate: 1, endDate: 1 });
+ReservationSchema.index({ tenantId: 1, externalCalendarId: 1, externalCalendarEventId: 1 });
+ReservationSchema.index({ tenantId: 1, seriesId: 1 });
+ReservationSchema.index({ tenantId: 1, isRecurring: 1 });
+ReservationSchema.index({ tenantId: 1, programId: 1 });
+ReservationSchema.index({ tenantId: 1, approvalRequestId: 1 });

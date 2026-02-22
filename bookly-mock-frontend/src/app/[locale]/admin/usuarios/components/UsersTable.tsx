@@ -13,6 +13,7 @@ import {
   CardTitle,
 } from "@/components/atoms/Card";
 import { Input } from "@/components/atoms/Input";
+import { Skeleton } from "@/components/atoms/Skeleton";
 import { DataTable } from "@/components/molecules/DataTable";
 import type { User } from "@/types/entities/user";
 import { UserStatus } from "@/types/entities/user";
@@ -21,6 +22,7 @@ import { useTranslations } from "next-intl";
 interface UsersTableProps {
   users: User[];
   filter: string;
+  isLoading?: boolean;
   onFilterChange: (value: string) => void;
   onEdit: (user: User) => void;
   onView: (user: User) => void;
@@ -29,6 +31,7 @@ interface UsersTableProps {
 export function UsersTable({
   users,
   filter,
+  isLoading = false,
   onFilterChange,
   onEdit,
   onView,
@@ -43,16 +46,18 @@ export function UsersTable({
       cell: (user: User) => (
         <div className="flex items-center gap-3">
           <div className="flex-shrink-0 w-10 h-10 bg-brand-primary-500 rounded-full flex items-center justify-center">
-            <span className="text-white font-bold text-sm">
+            <span className="text-foreground font-bold text-sm">
               {user.firstName.charAt(0)}
               {user.lastName.charAt(0)}
             </span>
           </div>
           <div>
-            <div className="text-white font-medium">
+            <div className="text-foreground font-medium">
               {user.firstName} {user.lastName}
             </div>
-            <div className="text-xs text-gray-400">{user.username}</div>
+            <div className="text-xs text-[var(--color-text-tertiary)]">
+              {user.username}
+            </div>
           </div>
         </div>
       ),
@@ -62,7 +67,7 @@ export function UsersTable({
       header: t("email"),
       cell: (user: User) => (
         <div>
-          <div className="text-white">{user.email}</div>
+          <div className="text-foreground">{user.email}</div>
           {user.emailVerified && (
             <Badge variant="success" className="text-xs mt-1">
               {t("verified")}
@@ -127,7 +132,7 @@ export function UsersTable({
       key: "lastLogin",
       header: t("last_login"),
       cell: (user: User) => (
-        <div className="text-white text-sm">
+        <div className="text-foreground text-sm">
           {user.lastLoginAt
             ? new Date(user.lastLoginAt).toLocaleDateString("es-ES", {
                 year: "numeric",
@@ -164,12 +169,24 @@ export function UsersTable({
             value={filter}
             onChange={(e) => onFilterChange(e.target.value)}
             className="max-w-xs"
+            disabled={isLoading}
           />
         </div>
       </CardHeader>
       <CardContent>
-        <DataTable data={users} columns={columns} />
+        {isLoading ? (
+          <div className="space-y-3">
+            <Skeleton className="h-10 w-full" />
+            <Skeleton className="h-10 w-full" />
+            <Skeleton className="h-10 w-full" />
+            <Skeleton className="h-10 w-full" />
+            <Skeleton className="h-10 w-full" />
+          </div>
+        ) : (
+          <DataTable data={users} columns={columns} />
+        )}
       </CardContent>
     </Card>
   );
 }
+

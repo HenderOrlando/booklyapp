@@ -5,3 +5,4 @@ export * from "./logout.command";
 export * from "./refresh-token.command";
 export * from "./register-user.command";
 export * from "./reset-password.command";
+export * from "./update-my-profile.command";

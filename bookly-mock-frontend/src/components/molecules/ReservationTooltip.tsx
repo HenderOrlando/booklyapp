@@ -46,13 +46,13 @@ export function ReservationTooltip({
         <Tooltip.Trigger asChild>{children}</Tooltip.Trigger>
         <Tooltip.Portal>
           <Tooltip.Content
-            className="z-50 overflow-hidden rounded-md border border-gray-700 bg-gray-900 px-3 py-2 text-sm shadow-md animate-in fade-in-0 zoom-in-95 data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=closed]:zoom-out-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2"
+            className="z-50 overflow-hidden rounded-md border border-[var(--color-border-strong)] bg-[var(--color-bg-inverse)] px-3 py-2 text-sm shadow-md animate-in fade-in-0 zoom-in-95 data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=closed]:zoom-out-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2"
             sideOffset={5}
           >
             <div className="flex flex-col gap-2 min-w-[280px] max-w-[320px]">
               {/* Header con título y estado */}
-              <div className="flex items-center justify-between border-b border-gray-700 pb-2">
-                <h4 className="font-semibold text-white text-sm">
+              <div className="flex items-center justify-between border-b border-[var(--color-border-strong)] pb-2">
+                <h4 className="font-semibold text-foreground text-sm">
                   {reservation.title || "Reserva"}
                 </h4>
                 <StatusBadge type="reservation" status={reservation.status} />
@@ -62,8 +62,10 @@ export function ReservationTooltip({
               <div className="space-y-1.5 text-xs">
                 {/* Recurso */}
                 <div className="flex items-start gap-2">
-                  <span className="text-gray-400 min-w-[70px]">Recurso:</span>
-                  <span className="text-white font-medium">
+                  <span className="text-[var(--color-text-tertiary)] min-w-[70px]">
+                    Recurso:
+                  </span>
+                  <span className="text-foreground font-medium">
                     {reservation.resourceName || "N/A"}
                   </span>
                 </div>
@@ -71,20 +73,30 @@ export function ReservationTooltip({
                 {/* Usuario */}
                 {reservation.userId && (
                   <div className="flex items-start gap-2">
-                    <span className="text-gray-400 min-w-[70px]">Usuario:</span>
-                    <span className="text-white">{reservation.userName}</span>
+                    <span className="text-[var(--color-text-tertiary)] min-w-[70px]">
+                      Usuario:
+                    </span>
+                    <span className="text-foreground">
+                      {reservation.userName}
+                    </span>
                   </div>
                 )}
 
                 {/* Fecha y hora */}
                 <div className="flex items-start gap-2">
-                  <span className="text-gray-400 min-w-[70px]">Fecha:</span>
-                  <span className="text-white">{formatDate(startDate)}</span>
+                  <span className="text-[var(--color-text-tertiary)] min-w-[70px]">
+                    Fecha:
+                  </span>
+                  <span className="text-foreground">
+                    {formatDate(startDate)}
+                  </span>
                 </div>
 
                 <div className="flex items-start gap-2">
-                  <span className="text-gray-400 min-w-[70px]">Horario:</span>
-                  <span className="text-white">
+                  <span className="text-[var(--color-text-tertiary)] min-w-[70px]">
+                    Horario:
+                  </span>
+                  <span className="text-foreground">
                     {formatTime(startDate)} - {formatTime(endDate)}
                   </span>
                 </div>
@@ -92,10 +104,10 @@ export function ReservationTooltip({
                 {/* Propósito */}
                 {reservation.description && (
                   <div className="flex items-start gap-2">
-                    <span className="text-gray-400 min-w-[70px]">
+                    <span className="text-[var(--color-text-tertiary)] min-w-[70px]">
                       Propósito:
                     </span>
-                    <span className="text-white line-clamp-2">
+                    <span className="text-foreground line-clamp-2">
                       {reservation.description}
                     </span>
                   </div>
@@ -104,10 +116,10 @@ export function ReservationTooltip({
                 {/* Participantes */}
                 {reservation.attendees && reservation.attendees > 0 && (
                   <div className="flex items-start gap-2">
-                    <span className="text-gray-400 min-w-[70px]">
+                    <span className="text-[var(--color-text-tertiary)] min-w-[70px]">
                       Asistentes:
                     </span>
-                    <span className="text-white">
+                    <span className="text-foreground">
                       {reservation.attendees} persona(s)
                     </span>
                   </div>
@@ -116,8 +128,10 @@ export function ReservationTooltip({
                 {/* Código de reserva */}
                 {reservation.id && (
                   <div className="flex items-start gap-2">
-                    <span className="text-gray-400 min-w-[70px]">Código:</span>
-                    <span className="text-white font-mono text-xs">
+                    <span className="text-[var(--color-text-tertiary)] min-w-[70px]">
+                      Código:
+                    </span>
+                    <span className="text-foreground font-mono text-xs">
                       {reservation.id}
                     </span>
                   </div>
@@ -125,7 +139,7 @@ export function ReservationTooltip({
               </div>
 
               {/* Footer con ID */}
-              <div className="border-t border-gray-700 pt-2 text-[10px] text-gray-500 font-mono">
+              <div className="border-t border-[var(--color-border-strong)] pt-2 text-[10px] text-[var(--color-text-secondary)] font-mono">
                 ID: {reservation.id}
               </div>
             </div>

@@ -25,7 +25,7 @@ import {
   CreateEvaluationCommand,
   DeleteEvaluationCommand,
   UpdateEvaluationCommand,
-} from '@reports/application/commands/evaluation.commands';
+} from "@reports/application/commands/evaluation.commands";
 import {
   GetEvaluationByIdQuery,
   GetEvaluationsByPeriodQuery,
@@ -35,7 +35,7 @@ import {
   GetPriorityUsersQuery,
   GetUserEvaluationsQuery,
   GetUserEvaluationStatisticsQuery,
-} from '@reports/application/queries/evaluation.queries';
+} from "@reports/application/queries/evaluation.queries";
 import {
   CreateEvaluationDto,
   EvaluationPeriodQueryDto,
@@ -50,13 +50,13 @@ import {
  * HU-30: Evaluación de usuarios
  */
 @ApiTags("Evaluations")
-@Controller("api/v1/evaluations")
+@Controller("evaluations")
 @UseGuards(JwtAuthGuard, PermissionsGuard)
 @ApiBearerAuth()
 export class EvaluationController {
   constructor(
     private readonly commandBus: CommandBus,
-    private readonly queryBus: QueryBus
+    private readonly queryBus: QueryBus,
   ) {}
 
   /**
@@ -95,36 +95,11 @@ export class EvaluationController {
       dto.resourceCareScore,
       dto.comments,
       dto.recommendations,
-      dto.period
+      dto.period,
     );
 
     const evaluation = await this.commandBus.execute(command);
     return ResponseUtil.success(evaluation, "Evaluación creada exitosamente");
-  }
-
-  /**
-   * Obtener evaluación por ID
-   * GET /evaluations/:id
-   */
-  @Get(":id")
-  @Permissions("reports:evaluation:read")
-  @ApiOperation({
-    summary: "Obtener evaluación por ID",
-    description: "Consulta los detalles de una evaluación específica",
-  })
-  @ApiParam({ name: "id", description: "ID de la evaluación" })
-  @ApiResponse({
-    status: 200,
-    description: "Evaluación encontrada",
-  })
-  @ApiResponse({
-    status: 404,
-    description: "Evaluación no encontrada",
-  })
-  async getEvaluationById(@Param("id") evaluationId: string) {
-    const query = new GetEvaluationByIdQuery(evaluationId);
-    const evaluation = await this.queryBus.execute(query);
-    return ResponseUtil.success(evaluation);
   }
 
   /**
@@ -144,12 +119,12 @@ export class EvaluationController {
   })
   async getUserEvaluations(
     @Param("userId") userId: string,
-    @Query() queryDto: EvaluationQueryDto
+    @Query() queryDto: EvaluationQueryDto,
   ) {
     const query = new GetUserEvaluationsQuery(
       userId,
       queryDto.page,
-      queryDto.limit
+      queryDto.limit,
     );
 
     const result = await this.queryBus.execute(query);
@@ -157,7 +132,7 @@ export class EvaluationController {
       result.evaluations,
       result.total,
       result.page,
-      queryDto.limit || 20
+      queryDto.limit || 20,
     );
   }
 
@@ -205,7 +180,7 @@ export class EvaluationController {
       new Date(queryDto.startDate),
       new Date(queryDto.endDate),
       queryDto.page,
-      queryDto.limit
+      queryDto.limit,
     );
 
     const result = await this.queryBus.execute(query);
@@ -213,7 +188,7 @@ export class EvaluationController {
       result.evaluations,
       result.total,
       result.page,
-      queryDto.limit || 20
+      queryDto.limit || 20,
     );
   }
 
@@ -303,6 +278,33 @@ export class EvaluationController {
   }
 
   /**
+   * Obtener evaluación por ID
+   * GET /evaluations/:id
+   * NOTA: Este handler DEBE ir después de todas las rutas GET estáticas
+   * para evitar que ":id" capture "statistics", "period", etc.
+   */
+  @Get(":id")
+  @Permissions("reports:evaluation:read")
+  @ApiOperation({
+    summary: "Obtener evaluación por ID",
+    description: "Consulta los detalles de una evaluación específica",
+  })
+  @ApiParam({ name: "id", description: "ID de la evaluación" })
+  @ApiResponse({
+    status: 200,
+    description: "Evaluación encontrada",
+  })
+  @ApiResponse({
+    status: 404,
+    description: "Evaluación no encontrada",
+  })
+  async getEvaluationById(@Param("id") evaluationId: string) {
+    const query = new GetEvaluationByIdQuery(evaluationId);
+    const evaluation = await this.queryBus.execute(query);
+    return ResponseUtil.success(evaluation);
+  }
+
+  /**
    * Actualizar evaluación
    * PATCH /evaluations/:id
    */
@@ -324,7 +326,7 @@ export class EvaluationController {
   })
   async updateEvaluation(
     @Param("id") evaluationId: string,
-    @Body() dto: UpdateEvaluationDto
+    @Body() dto: UpdateEvaluationDto,
   ) {
     const command = new UpdateEvaluationCommand(
       evaluationId,
@@ -333,13 +335,13 @@ export class EvaluationController {
       dto.resourceCareScore,
       undefined, // overallScore se calcula automáticamente
       dto.comments,
-      dto.recommendations
+      dto.recommendations,
     );
 
     const evaluation = await this.commandBus.execute(command);
     return ResponseUtil.success(
       evaluation,
-      "Evaluación actualizada exitosamente"
+      "Evaluación actualizada exitosamente",
     );
   }
 
@@ -367,7 +369,7 @@ export class EvaluationController {
     await this.commandBus.execute(command);
     return ResponseUtil.success(
       { deleted: true },
-      "Evaluación eliminada exitosamente"
+      "Evaluación eliminada exitosamente",
     );
   }
 }

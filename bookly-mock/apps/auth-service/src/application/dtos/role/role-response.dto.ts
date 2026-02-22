@@ -1,4 +1,3 @@
-import { UserRole } from "@libs/common/enums";
 import { AuditInfo } from "@libs/common";
 import { ApiProperty } from "@nestjs/swagger";
 
@@ -13,11 +12,10 @@ export class RoleResponseDto {
   id: string;
 
   @ApiProperty({
-    description: "Nombre del rol (enum)",
-    example: UserRole.TEACHER,
-    enum: UserRole,
+    description: "Nombre del rol",
+    example: "TEACHER",
   })
-  name: UserRole;
+  name: string;
 
   @ApiProperty({
     description: "Nombre para mostrar",

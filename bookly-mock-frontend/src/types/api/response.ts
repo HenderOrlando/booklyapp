@@ -3,12 +3,23 @@
  * Basados en el backend bookly-mock
  */
 
-export interface ApiResponse<T = any> {
+export interface ApiResponse<T = unknown> {
   success: boolean;
   data: T;
   message?: string;
-  timestamp: string;
+  errors?: ApiFieldError[];
+  meta?: PaginationMeta;
+  timestamp?: string;
   path?: string;
+  method?: string;
+  statusCode?: number;
+  context?: Record<string, unknown>;
+}
+
+export interface ApiFieldError {
+  field: string;
+  message: string;
+  code?: string;
 }
 
 export interface ApiErrorResponse {
@@ -21,19 +32,22 @@ export interface ApiErrorResponse {
   http_exception: string;
   timestamp: string;
   path?: string;
-  details?: any;
+  details?: unknown;
+}
+
+export interface PaginationMeta {
+  total: number;
+  page: number;
+  limit: number;
+  totalPages: number;
+  hasNextPage: boolean;
+  hasPreviousPage: boolean;
 }
 
 export interface PaginatedResponse<T> {
   items: T[];
-  meta: {
-    total: number;
-    page: number;
-    limit: number;
-    totalPages: number;
-    hasNextPage: boolean;
-    hasPreviousPage: boolean;
-  };
+  data?: T[];
+  meta: PaginationMeta;
 }
 
 export interface QueryParams {
@@ -42,7 +56,7 @@ export interface QueryParams {
   sort?: string;
   order?: "ASC" | "DESC";
   search?: string;
-  filters?: Record<string, any>;
+  filters?: Record<string, unknown>;
 }
 
 export interface DateRange {
@@ -53,5 +67,5 @@ export interface DateRange {
 export interface FilterOptions {
   field: string;
   operator: "eq" | "ne" | "gt" | "gte" | "lt" | "lte" | "in" | "like";
-  value: any;
+  value: string | number | boolean | string[] | number[];
 }

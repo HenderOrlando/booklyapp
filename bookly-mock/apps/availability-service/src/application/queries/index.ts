@@ -8,6 +8,7 @@ export * from "./get-recurring-analytics.query";
 export * from "./get-recurring-series.query";
 export * from "./get-reservation-by-id.query";
 export * from "./get-reservation-history.query";
+export * from "./get-reservation-stats.query";
 export * from "./get-reservations.query";
 export * from "./get-user-activity.query";
 export * from "./get-user-recurring-reservations.query";

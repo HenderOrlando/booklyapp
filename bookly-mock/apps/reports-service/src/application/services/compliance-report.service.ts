@@ -1,8 +1,7 @@
-import { PaginationMeta, PaginationQuery } from "@libs/common";
-import { createLogger } from "@libs/common";
+import { createLogger, PaginationMeta, PaginationQuery } from "@libs/common";
 import { Inject, Injectable, NotFoundException } from "@nestjs/common";
-import { ComplianceReportEntity } from '@reports/domain/entities/compliance-report.entity';
-import { IComplianceReportRepository } from '@reports/domain/repositories/compliance-report.repository.interface';
+import { ComplianceReportEntity } from "../../domain/entities/compliance-report.entity";
+import { IComplianceReportRepository } from "../../domain/repositories/compliance-report.repository.interface";
 
 const logger = createLogger("ComplianceReportService");
 
@@ -15,7 +14,7 @@ const logger = createLogger("ComplianceReportService");
 export class ComplianceReportService {
   constructor(
     @Inject("IComplianceReportRepository")
-    private readonly complianceReportRepository: IComplianceReportRepository
+    private readonly complianceReportRepository: IComplianceReportRepository,
   ) {}
 
   /**
@@ -65,7 +64,7 @@ export class ComplianceReportService {
       data.complianceByHour,
       data.metadata,
       new Date(),
-      new Date()
+      new Date(),
     );
 
     const createdReport = await this.complianceReportRepository.create(report);
@@ -86,9 +85,7 @@ export class ComplianceReportService {
   async getComplianceReportById(id: string): Promise<ComplianceReportEntity> {
     const report = await this.complianceReportRepository.findById(id);
     if (!report) {
-      throw new NotFoundException(
-        `Compliance report with ID ${id} not found`
-      );
+      throw new NotFoundException(`Compliance report with ID ${id} not found`);
     }
     return report;
   }
@@ -103,7 +100,7 @@ export class ComplianceReportService {
       resourceType?: string;
       startDate?: Date;
       endDate?: Date;
-    }
+    },
   ): Promise<{ reports: ComplianceReportEntity[]; meta: PaginationMeta }> {
     return await this.complianceReportRepository.findMany(query, filters);
   }
@@ -113,11 +110,11 @@ export class ComplianceReportService {
    */
   async getComplianceReportsByResource(
     resourceId: string,
-    query: PaginationQuery
+    query: PaginationQuery,
   ): Promise<{ reports: ComplianceReportEntity[]; meta: PaginationMeta }> {
     return await this.complianceReportRepository.findByResource(
       resourceId,
-      query
+      query,
     );
   }
 

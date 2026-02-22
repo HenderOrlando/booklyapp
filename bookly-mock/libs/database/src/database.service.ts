@@ -48,13 +48,13 @@ export class DatabaseService implements OnModuleInit, OnModuleDestroy {
           "⚠️ Database connection not ready during module init",
           {
             state: this.getConnectionStateName(this.connection.readyState),
-          }
+          },
         );
       }
     } catch (error) {
       this.logger.error(
         "❌ Failed to initialize database module",
-        error as Error
+        error as Error,
       );
       throw error;
     }

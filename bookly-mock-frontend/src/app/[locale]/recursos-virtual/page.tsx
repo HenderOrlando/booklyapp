@@ -11,6 +11,13 @@ import { Badge } from "@/components/atoms/Badge";
 import { Button } from "@/components/atoms/Button";
 import { Card, CardContent } from "@/components/atoms/Card";
 import { Input } from "@/components/atoms/Input";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/atoms/Select";
 import { StatusBadge } from "@/components/atoms/StatusBadge";
 import { AppHeader } from "@/components/organisms/AppHeader";
 import { AppSidebar } from "@/components/organisms/AppSidebar";
@@ -42,8 +49,8 @@ export default function RecursosVirtualPage() {
     categoryId: "",
   });
 
-  const header = <AppHeader title={t("virtual_scrolling_title")} />;
-  const sidebar = <AppSidebar />;
+  const _header = <AppHeader title={t("virtual_scrolling_title")} />;
+  const _sidebar = <AppSidebar />;
 
   const handleFilterChange = (key: string, value: string) => {
     setFilters((prev) => ({ ...prev, [key]: value }));
@@ -58,13 +65,13 @@ export default function RecursosVirtualPage() {
         <div className="flex items-center justify-between">
           <div className="flex-1">
             <div className="flex items-center gap-3">
-              <span className="text-gray-500 text-sm font-mono">
+              <span className="text-[var(--color-text-tertiary)] text-sm font-mono">
                 #{index + 1}
               </span>
-              <h3 className="font-semibold text-white">{resource.name}</h3>
+              <h3 className="font-semibold text-foreground">{resource.name}</h3>
               <StatusBadge type="resource" status={resource.status} />
             </div>
-            <p className="text-sm text-gray-400 mt-1">
+            <p className="text-sm text-[var(--color-text-tertiary)] mt-1">
               {resource.code} • {resource.location}
             </p>
             <div className="flex items-center gap-2 mt-2">
@@ -96,17 +103,17 @@ export default function RecursosVirtualPage() {
   );
 
   return (
-    <MainLayout header={header} sidebar={sidebar}>
+    <MainLayout>
       <div className="space-y-6">
         {/* Información y controles */}
         <Card>
           <CardContent className="p-6">
             <div className="space-y-4">
               <div>
-                <h2 className="text-xl font-bold text-white mb-2">
+                <h2 className="text-xl font-bold text-foreground mb-2">
                   {t("virtual_demo_title")}
                 </h2>
-                <p className="text-gray-400 text-sm">
+                <p className="text-[var(--color-text-tertiary)] text-sm">
                   {t.rich("virtual_demo_desc", {
                     code_tag: (chunks) => (
                       <code className="text-brand-primary-400">{chunks}</code>
@@ -118,7 +125,7 @@ export default function RecursosVirtualPage() {
               {/* Filtros */}
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-300 mb-2">
+                  <label className="block text-sm font-medium text-[var(--color-text-secondary)] mb-2">
                     {t("search_label")}
                   </label>
                   <Input
@@ -130,21 +137,23 @@ export default function RecursosVirtualPage() {
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-300 mb-2">
+                  <label className="block text-sm font-medium text-[var(--color-text-secondary)] mb-2">
                     {t("status_label")}
                   </label>
-                  <select
+                  <Select
                     value={filters.status}
-                    onChange={(e) =>
-                      handleFilterChange("status", e.target.value)
-                    }
-                    className="w-full px-3 py-2 bg-gray-800 border border-gray-700 rounded-md text-white"
+                    onValueChange={(val) => handleFilterChange("status", val)}
                   >
-                    <option value="">{t("filters.statuses")}</option>
-                    <option value="AVAILABLE">{t("available")}</option>
-                    <option value="IN_USE">{t("occupied")}</option>
-                    <option value="MAINTENANCE">{t("maintenance")}</option>
-                  </select>
+                    <SelectTrigger>
+                      <SelectValue placeholder={t("filters.statuses")} />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="all">{t("filters.statuses")}</SelectItem>
+                      <SelectItem value="AVAILABLE">{t("available")}</SelectItem>
+                      <SelectItem value="IN_USE">{t("occupied")}</SelectItem>
+                      <SelectItem value="MAINTENANCE">{t("maintenance")}</SelectItem>
+                    </SelectContent>
+                  </Select>
                 </div>
                 <div className="flex items-end">
                   <Button
@@ -176,7 +185,7 @@ export default function RecursosVirtualPage() {
         {/* Info técnica */}
         <Card>
           <CardContent className="p-4">
-            <div className="text-xs text-gray-500 space-y-1">
+            <div className="text-xs text-[var(--color-text-tertiary)] space-y-1">
               <p>
                 {t.rich("performance_info", {
                   strong_tag: (chunks) => <strong>{chunks}</strong>,

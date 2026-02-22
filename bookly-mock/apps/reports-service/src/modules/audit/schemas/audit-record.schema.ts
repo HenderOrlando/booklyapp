@@ -1,4 +1,3 @@
-import { AuditAction, AuditMetadataSource } from "@libs/common/enums";
 import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
 import { Document } from "mongoose";
 
@@ -27,12 +26,8 @@ export class AuditRecord extends Document {
   /**
    * Acción realizada
    */
-  @Prop({
-    required: true,
-    enum: Object.values(AuditAction),
-    index: true,
-  })
-  action: AuditAction;
+  @Prop({ required: true, index: true })
+  action: string;
 
   /**
    * Estado anterior del recurso
@@ -89,7 +84,6 @@ export class AuditRecord extends Document {
     type: {
       source: {
         type: String,
-        enum: Object.values(AuditMetadataSource),
         required: true,
       },
       method: { type: String },
@@ -101,7 +95,7 @@ export class AuditRecord extends Document {
     required: true,
   })
   metadata: {
-    source: AuditMetadataSource;
+    source: string;
     method?: string;
     url?: string;
     eventName?: string;

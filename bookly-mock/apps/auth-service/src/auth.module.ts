@@ -1,7 +1,9 @@
 import { JWT_EXPIRATION, JWT_SECRET } from "@libs/common/constants";
-import { DatabaseModule } from "@libs/database";
+import { DatabaseModule, ReferenceDataModule } from "@libs/database";
 import { EventBusModule } from "@libs/event-bus";
+import { IdempotencyModule } from "@libs/idempotency";
 import { RedisModule } from "@libs/redis";
+import { I18nModule } from "@bookly/i18n";
 import { Module } from "@nestjs/common";
 import { ConfigModule, ConfigService } from "@nestjs/config";
 import { CqrsModule } from "@nestjs/cqrs";
@@ -10,6 +12,7 @@ import { MongooseModule } from "@nestjs/mongoose";
 import { PassportModule } from "@nestjs/passport";
 import { AuditDecoratorsModule } from "@reports/audit-decorators";
 import { AllHandlers } from "./application/handlers";
+import { AppConfigurationService } from "./application/services/app-configuration.service";
 import { AuditService } from "./application/services/audit.service";
 import { AuthService } from "./application/services/auth.service";
 import { GoogleOAuthService } from "./application/services/google-oauth.service";
@@ -18,11 +21,13 @@ import { RoleService } from "./application/services/role.service";
 import { TwoFactorService } from "./application/services/two-factor.service";
 import { UserService } from "./application/services/user.service";
 import { AuthCacheService } from "./infrastructure/cache";
+import { AppConfigurationController } from "./infrastructure/controllers/app-configuration.controller";
 import { AuditController } from "./infrastructure/controllers/audit.controller";
 import { AuthController } from "./infrastructure/controllers/auth.controller";
 import { HealthController } from "./infrastructure/controllers/health.controller";
 import { OAuthController } from "./infrastructure/controllers/oauth.controller";
 import { PermissionController } from "./infrastructure/controllers/permission.controller";
+import { ReferenceDataController } from "./infrastructure/controllers/reference-data.controller";
 import { RoleController } from "./infrastructure/controllers/role.controller";
 import { UsersController } from "./infrastructure/controllers/users.controller";
 import { ActionGuard } from "./infrastructure/guards/action.guard";
@@ -30,6 +35,10 @@ import { PermissionsGuard } from "./infrastructure/guards/permissions.guard";
 import { RolesGuard } from "./infrastructure/guards/roles.guard";
 import { RoleRepository } from "./infrastructure/repositories/role.repository";
 import { UserRepository } from "./infrastructure/repositories/user.repository";
+import {
+  AppConfiguration,
+  AppConfigurationSchema,
+} from "./infrastructure/schemas/app-configuration.schema";
 import {
   AuditLog,
   AuditLogSchema,
@@ -55,6 +64,8 @@ import { OAuthModule, OAuthProvider, OAuthPurpose } from "./modules/oauth";
       isGlobal: true,
       envFilePath: [".env", "apps/auth-service/.env"],
     }),
+
+    I18nModule,
 
     // CQRS
     CqrsModule,
@@ -105,12 +116,16 @@ import { OAuthModule, OAuthProvider, OAuthPurpose } from "./modules/oauth";
     // Database - Conexión global con librería estandarizada
     DatabaseModule,
 
+    // Reference Data (tipos, estados dinámicos del dominio auth)
+    ReferenceDataModule,
+
     // Mongoose schemas
     MongooseModule.forFeature([
       { name: User.name, schema: UserSchema },
       { name: Role.name, schema: RoleSchema },
       { name: Permission.name, schema: PermissionSchema },
       { name: AuditLog.name, schema: AuditLogSchema },
+      { name: AppConfiguration.name, schema: AppConfigurationSchema },
     ]),
 
     // Passport & JWT
@@ -133,16 +148,21 @@ import { OAuthModule, OAuthProvider, OAuthPurpose } from "./modules/oauth";
       ],
     }),
 
+    // Idempotency + Correlation
+    IdempotencyModule.forRoot({ keyPrefix: "auth" }),
+
     // Audit Decorators (event-driven audit)
     AuditDecoratorsModule,
   ],
   controllers: [
     AuthController,
     OAuthController,
+    AppConfigurationController,
     UsersController,
     RoleController,
     PermissionController,
     AuditController,
+    ReferenceDataController,
     HealthController,
   ],
   providers: [
@@ -151,6 +171,7 @@ import { OAuthModule, OAuthProvider, OAuthPurpose } from "./modules/oauth";
     GoogleStrategy,
 
     // Services
+    AppConfigurationService,
     AuthService,
     UserService,
     RoleService,

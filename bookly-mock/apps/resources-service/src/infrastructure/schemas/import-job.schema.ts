@@ -1,4 +1,3 @@
-import { ImportJobStatus } from "@libs/common/enums";
 import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
 import { Document } from "mongoose";
 
@@ -27,12 +26,8 @@ export class ImportJob {
   @Prop({ default: 0 })
   errorCount: number;
 
-  @Prop({
-    type: String,
-    enum: Object.values(ImportJobStatus),
-    default: ImportJobStatus.PENDING,
-  })
-  status: ImportJobStatus;
+  @Prop({ type: String, default: "PENDING" })
+  status: string;
 
   @Prop({ required: true })
   mode: string;

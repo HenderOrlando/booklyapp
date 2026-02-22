@@ -54,7 +54,19 @@ export function useUsers(filters?: UserFilters) {
     queryFn: async () => {
       const response = await AuthClient.getUsers();
       // TODO: Aplicar filtros cuando backend lo soporte
-      return response.data || { items: [], total: 0, page: 1, limit: 10 };
+      return (
+        response.data || {
+          items: [],
+          meta: {
+            total: 0,
+            page: 1,
+            limit: 10,
+            totalPages: 0,
+            hasNextPage: false,
+            hasPreviousPage: false,
+          },
+        }
+      );
     },
     staleTime: 1000 * 60 * 5, // 5 minutos
   });

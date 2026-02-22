@@ -3,6 +3,7 @@ import { CancelMaintenanceBlockHandler } from "./cancel-maintenance-block.handle
 import { CancelRecurringInstanceHandler } from "./cancel-recurring-instance.handler";
 import { CancelRecurringSeriesHandler } from "./cancel-recurring-series.handler";
 import { CancelReservationHandler } from "./cancel-reservation.handler";
+import { CancelWaitingListHandler } from "./cancel-waiting-list.handler";
 import { CheckAvailabilityHandler } from "./check-availability.handler";
 import { CheckInReservationHandler } from "./check-in-reservation.handler";
 import { CheckOutReservationHandler } from "./check-out-reservation.handler";
@@ -14,6 +15,7 @@ import { CreateMaintenanceBlockHandler } from "./create-maintenance-block.handle
 import { CreateRecurringReservationHandler } from "./create-recurring-reservation.handler";
 import { CreateReservationHandler } from "./create-reservation.handler";
 import { DeleteAvailabilityExceptionHandler } from "./delete-availability-exception.handler";
+import { DeleteAvailabilityHandler } from "./delete-availability.handler";
 import { GetAvailabilityExceptionsHandler } from "./get-availability-exceptions.handler";
 import { GetCalendarViewHandler } from "./get-calendar-view.handler";
 import { GetMaintenanceBlocksHandler } from "./get-maintenance-blocks.handler";
@@ -56,6 +58,8 @@ export const AllHandlers = [
   RespondReassignmentHandler,
   CreateBatchReservationHandler,
   RequestTeacherApprovalHandler,
+  DeleteAvailabilityHandler,
+  CancelWaitingListHandler,
 
   // Query Handlers
   GetReservationsHandler,
@@ -74,7 +78,10 @@ export const AllHandlers = [
 ];
 
 export * from "./add-to-waiting-list.handler";
-export * from "./cancel-maintenance-block.handler";
+export * from "./cancel-waiting-list.handler";
+export * from "./notify-waiting-list.handler";
+export * from "./update-waiting-list-priority.handler";
+export * from "./accept-waiting-list-offer.handler";
 export * from "./cancel-recurring-instance.handler";
 export * from "./cancel-recurring-series.handler";
 export * from "./cancel-reservation.handler";

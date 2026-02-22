@@ -13,6 +13,13 @@
 import { Badge } from "@/components/atoms/Badge";
 import { Button } from "@/components/atoms/Button";
 import { Card, CardContent } from "@/components/atoms/Card";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/atoms/Select";
 import type { WaitlistEntry, WaitlistStats } from "@/types/entities/waitlist";
 import React from "react";
 
@@ -25,18 +32,23 @@ interface WaitlistManagerProps {
 }
 
 const PRIORITY_COLORS: Record<string, string> = {
-  LOW: "bg-gray-600",
-  NORMAL: "bg-blue-600",
-  HIGH: "bg-orange-600",
-  URGENT: "bg-red-600",
+  LOW: "bg-[var(--color-bg-muted)] text-[var(--color-text-secondary)]",
+  NORMAL: "bg-[var(--color-state-info-bg)] text-[var(--color-state-info-text)]",
+  HIGH: "bg-[var(--color-state-warning-bg)] text-[var(--color-state-warning-text)]",
+  URGENT:
+    "bg-[var(--color-state-error-bg)] text-[var(--color-state-error-text)]",
 };
 
 const STATUS_COLORS: Record<string, string> = {
-  WAITING: "bg-yellow-600",
-  NOTIFIED: "bg-blue-600",
-  ASSIGNED: "bg-green-600",
-  EXPIRED: "bg-gray-600",
-  CANCELLED: "bg-red-600",
+  WAITING:
+    "bg-[var(--color-state-warning-bg)] text-[var(--color-state-warning-text)]",
+  NOTIFIED:
+    "bg-[var(--color-state-info-bg)] text-[var(--color-state-info-text)]",
+  ASSIGNED:
+    "bg-[var(--color-state-success-bg)] text-[var(--color-state-success-text)]",
+  EXPIRED: "bg-[var(--color-bg-muted)] text-[var(--color-text-secondary)]",
+  CANCELLED:
+    "bg-[var(--color-state-error-bg)] text-[var(--color-state-error-text)]",
 };
 
 export function WaitlistManager({
@@ -63,34 +75,42 @@ export function WaitlistManager({
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
           <Card>
             <CardContent className="pt-6">
-              <div className="text-2xl font-bold text-white">
+              <div className="text-2xl font-bold text-foreground">
                 {stats.totalWaiting}
               </div>
-              <div className="text-sm text-gray-400">En Espera</div>
+              <div className="text-sm text-[var(--color-text-tertiary)]">
+                En Espera
+              </div>
             </CardContent>
           </Card>
           <Card>
             <CardContent className="pt-6">
-              <div className="text-2xl font-bold text-white">
+              <div className="text-2xl font-bold text-foreground">
                 {stats.totalNotified}
               </div>
-              <div className="text-sm text-gray-400">Notificados</div>
+              <div className="text-sm text-[var(--color-text-tertiary)]">
+                Notificados
+              </div>
             </CardContent>
           </Card>
           <Card>
             <CardContent className="pt-6">
-              <div className="text-2xl font-bold text-white">
+              <div className="text-2xl font-bold text-foreground">
                 {stats.totalAssigned}
               </div>
-              <div className="text-sm text-gray-400">Asignados</div>
+              <div className="text-sm text-[var(--color-text-tertiary)]">
+                Asignados
+              </div>
             </CardContent>
           </Card>
           <Card>
             <CardContent className="pt-6">
-              <div className="text-2xl font-bold text-white">
+              <div className="text-2xl font-bold text-foreground">
                 {stats.averageWaitTime.toFixed(1)}d
               </div>
-              <div className="text-sm text-gray-400">Tiempo Promedio</div>
+              <div className="text-sm text-[var(--color-text-tertiary)]">
+                Tiempo Promedio
+              </div>
             </CardContent>
           </Card>
         </div>
@@ -100,38 +120,40 @@ export function WaitlistManager({
       <Card>
         <CardContent className="pt-6">
           <div className="flex flex-wrap gap-4">
-            <div>
-              <label className="block text-sm font-medium text-gray-400 mb-2">
+            <div className="w-full md:w-48">
+              <label className="block text-sm font-medium text-[var(--color-text-tertiary)] mb-2">
                 Estado
               </label>
-              <select
-                value={filterStatus}
-                onChange={(e) => setFilterStatus(e.target.value)}
-                className="px-3 py-2 bg-gray-700 text-white rounded-lg"
-              >
-                <option value="all">Todos</option>
-                <option value="WAITING">En Espera</option>
-                <option value="NOTIFIED">Notificados</option>
-                <option value="ASSIGNED">Asignados</option>
-                <option value="EXPIRED">Expirados</option>
-                <option value="CANCELLED">Cancelados</option>
-              </select>
+              <Select value={filterStatus} onValueChange={setFilterStatus}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Seleccionar estado" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">Todos</SelectItem>
+                  <SelectItem value="WAITING">En Espera</SelectItem>
+                  <SelectItem value="NOTIFIED">Notificados</SelectItem>
+                  <SelectItem value="ASSIGNED">Asignados</SelectItem>
+                  <SelectItem value="EXPIRED">Expirados</SelectItem>
+                  <SelectItem value="CANCELLED">Cancelados</SelectItem>
+                </SelectContent>
+              </Select>
             </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-400 mb-2">
+            <div className="w-full md:w-48">
+              <label className="block text-sm font-medium text-[var(--color-text-tertiary)] mb-2">
                 Prioridad
               </label>
-              <select
-                value={filterPriority}
-                onChange={(e) => setFilterPriority(e.target.value)}
-                className="px-3 py-2 bg-gray-700 text-white rounded-lg"
-              >
-                <option value="all">Todas</option>
-                <option value="LOW">Baja</option>
-                <option value="NORMAL">Normal</option>
-                <option value="HIGH">Alta</option>
-                <option value="URGENT">Urgente</option>
-              </select>
+              <Select value={filterPriority} onValueChange={setFilterPriority}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Seleccionar prioridad" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">Todas</SelectItem>
+                  <SelectItem value="LOW">Baja</SelectItem>
+                  <SelectItem value="NORMAL">Normal</SelectItem>
+                  <SelectItem value="HIGH">Alta</SelectItem>
+                  <SelectItem value="URGENT">Urgente</SelectItem>
+                </SelectContent>
+              </Select>
             </div>
           </div>
         </CardContent>
@@ -142,7 +164,7 @@ export function WaitlistManager({
         {filteredEntries.length === 0 ? (
           <Card>
             <CardContent className="py-12 text-center">
-              <div className="text-gray-400">
+              <div className="text-[var(--color-text-tertiary)]">
                 No hay entradas en lista de espera
               </div>
             </CardContent>
@@ -151,21 +173,21 @@ export function WaitlistManager({
           filteredEntries.map((entry) => (
             <Card
               key={entry.id}
-              className="hover:border-blue-600 transition-colors"
+              className="hover:border-[var(--color-action-primary)] transition-colors"
             >
               <CardContent className="pt-6">
                 <div className="flex items-start justify-between">
                   <div className="flex-1">
                     {/* Posición y Usuario */}
                     <div className="flex items-center gap-3 mb-2">
-                      <div className="flex items-center justify-center w-10 h-10 rounded-full bg-blue-900 text-blue-200 font-bold">
+                      <div className="flex items-center justify-center w-10 h-10 rounded-full bg-[var(--color-state-info-bg)] text-[var(--color-state-info-text)] font-bold">
                         #{entry.position}
                       </div>
                       <div>
-                        <div className="font-medium text-white">
+                        <div className="font-medium text-foreground">
                           {entry.userName}
                         </div>
-                        <div className="text-sm text-gray-400">
+                        <div className="text-sm text-[var(--color-text-tertiary)]">
                           {entry.userEmail}
                         </div>
                       </div>
@@ -174,24 +196,28 @@ export function WaitlistManager({
                     {/* Recurso y Fecha */}
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-3 mt-3">
                       <div>
-                        <div className="text-xs text-gray-400">Recurso</div>
-                        <div className="text-sm text-white">
+                        <div className="text-xs text-[var(--color-text-tertiary)]">
+                          Recurso
+                        </div>
+                        <div className="text-sm text-foreground">
                           {entry.resourceName}
                         </div>
                       </div>
                       <div>
-                        <div className="text-xs text-gray-400">
+                        <div className="text-xs text-[var(--color-text-tertiary)]">
                           Fecha Deseada
                         </div>
-                        <div className="text-sm text-white">
+                        <div className="text-sm text-foreground">
                           {new Date(entry.desiredDate).toLocaleDateString(
-                            "es-ES"
+                            "es-ES",
                           )}
                         </div>
                       </div>
                       <div>
-                        <div className="text-xs text-gray-400">Horario</div>
-                        <div className="text-sm text-white">
+                        <div className="text-xs text-[var(--color-text-tertiary)]">
+                          Horario
+                        </div>
+                        <div className="text-sm text-foreground">
                           {entry.startTime} - {entry.endTime}
                         </div>
                       </div>
@@ -199,7 +225,7 @@ export function WaitlistManager({
 
                     {/* Razón */}
                     {entry.reason && (
-                      <div className="mt-3 p-2 bg-gray-800 rounded text-sm text-gray-300">
+                      <div className="mt-3 p-2 bg-muted rounded text-sm text-foreground">
                         {entry.reason}
                       </div>
                     )}
@@ -213,7 +239,9 @@ export function WaitlistManager({
                         {entry.priority}
                       </Badge>
                       {entry.notificationSent && (
-                        <Badge className="bg-purple-600">Notificado</Badge>
+                        <Badge className="bg-[var(--color-state-info-bg)] text-[var(--color-state-info-text)]">
+                          Notificado
+                        </Badge>
                       )}
                     </div>
                   </div>

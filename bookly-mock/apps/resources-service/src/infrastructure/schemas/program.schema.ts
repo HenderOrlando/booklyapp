@@ -19,19 +19,34 @@ export class Program {
   description?: string;
 
   @Prop({ type: String })
-  coordinatorId?: string; // User ID del coordinador
+  ownerId?: string; // User ID del responsable/coordinador del programa
 
   @Prop({ type: String, trim: true })
-  coordinatorName?: string; // Nombre del coordinador (cache)
+  ownerName?: string; // Nombre del responsable (cache)
 
   @Prop({ type: String, trim: true })
-  coordinatorEmail?: string; // Email del coordinador (cache)
+  ownerEmail?: string; // Email del responsable (cache)
+
+  @Prop({ type: String })
+  coordinatorId?: string; // Alias legacy — usar ownerId
 
   @Prop({ type: String, trim: true })
-  faculty?: string; // Facultad a la que pertenece
+  coordinatorName?: string; // Alias legacy (cache)
 
   @Prop({ type: String, trim: true })
-  department?: string; // Departamento
+  coordinatorEmail?: string; // Alias legacy (cache)
+
+  @Prop({ type: String })
+  facultyId?: string; // Referencia a Faculty._id
+
+  @Prop({ type: String })
+  departmentId?: string; // Referencia a Department._id
+
+  @Prop({ type: String, trim: true })
+  faculty?: string; // Legacy — nombre de facultad (cache)
+
+  @Prop({ type: String, trim: true })
+  department?: string; // Legacy — nombre de departamento (cache)
 
   @Prop({ type: Object, default: {} })
   metadata?: Record<string, any>; // Metadatos adicionales
@@ -59,10 +74,12 @@ export class Program {
 
 export const ProgramSchema = SchemaFactory.createForClass(Program);
 
-// Indexes
-ProgramSchema.index({ code: 1 }, { unique: true });
+// Indexes (code already has unique index from @Prop decorator)
 ProgramSchema.index({ name: 1 });
+ProgramSchema.index({ ownerId: 1 });
 ProgramSchema.index({ coordinatorId: 1 });
+ProgramSchema.index({ facultyId: 1 });
+ProgramSchema.index({ departmentId: 1 });
 ProgramSchema.index({ faculty: 1 });
 ProgramSchema.index({ department: 1 });
 ProgramSchema.index({ isActive: 1 });

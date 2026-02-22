@@ -1,0 +1,54 @@
+﻿import { ArgumentsHost, Catch, ExceptionFilter, HttpException, HttpStatus, Logger } from "@nestjs/common";
+import { I18nService } from "nestjs-i18n";
+import { BaseAppException } from "../exceptions/base.exception";
+
+@Catch()
+export class I18nGlobalExceptionFilter implements ExceptionFilter {
+  private readonly logger = new Logger(I18nGlobalExceptionFilter.name);
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  constructor(private readonly i18n: I18nService<any>) {}
+
+  async catch(exception: unknown, host: ArgumentsHost) {
+    const ctx = host.switchToHttp();
+    const response = ctx.getResponse();
+    const request = ctx.getRequest();
+
+    const status = exception instanceof HttpException ? exception.getStatus() : HttpStatus.INTERNAL_SERVER_ERROR;
+    
+    let message = "Internal server error";
+    let code = "GEN-000";
+    let exceptionCode = "INTERNAL_ERROR";
+    let httpExceptionName = exception instanceof HttpException ? exception.name : "InternalServerErrorException";
+
+    const lang = request.i18nLang || "es";
+
+    if (exception instanceof BaseAppException) {
+      code = exception.code;
+      exceptionCode = exception.name;
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      message = await (this.i18n as any).translate(exception.i18nKey, {
+        lang,
+        args: exception.i18nArgs,
+        defaultValue: exception.i18nKey
+      });
+    } else if (exception instanceof HttpException) {
+      const resp = exception.getResponse();
+      message = typeof resp === "string" ? resp : (resp as any).message || exception.message;
+      exceptionCode = (resp as any).error || exception.name;
+    } else {
+      this.logger.error("Unhandled Exception:", exception);
+    }
+
+    response.status(status).json({
+      code,
+      message,
+      type: "error",
+      exception_code: exceptionCode,
+      http_code: status,
+      http_exception: httpExceptionName,
+      timestamp: new Date().toISOString(),
+      path: request.url,
+    });
+  }
+}

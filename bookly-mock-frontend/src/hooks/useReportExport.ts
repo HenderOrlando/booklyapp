@@ -1,6 +1,4 @@
 import { useMutation } from "@tanstack/react-query";
-import jsPDF from "jspdf";
-import * as XLSX from "xlsx";
 
 export interface ExportOptions {
   format: "csv" | "excel" | "pdf";
@@ -34,21 +32,24 @@ export function useReportExport() {
   };
 }
 
-function exportToCSV(data: any[], filename: string) {
+async function exportToCSV(data: any[], filename: string) {
+  const XLSX = await import("xlsx");
   const ws = XLSX.utils.json_to_sheet(data);
   const csv = XLSX.utils.sheet_to_csv(ws);
   const blob = new Blob([csv], { type: "text/csv" });
   downloadBlob(blob, `${filename}.csv`);
 }
 
-function exportToExcel(data: any[], filename: string) {
+async function exportToExcel(data: any[], filename: string) {
+  const XLSX = await import("xlsx");
   const ws = XLSX.utils.json_to_sheet(data);
   const wb = XLSX.utils.book_new();
   XLSX.utils.book_append_sheet(wb, ws, "Reporte");
   XLSX.writeFile(wb, `${filename}.xlsx`);
 }
 
-function exportToPDF(data: any[], filename: string) {
+async function exportToPDF(data: any[], filename: string) {
+  const { default: jsPDF } = await import("jspdf");
   const doc = new jsPDF();
   doc.text("Reporte", 14, 15);
   doc.text(JSON.stringify(data, null, 2), 14, 25);

@@ -1,14 +1,13 @@
 import { ResourceStatus, ResourceType } from "@libs/common/enums";
 import { ConflictException, NotFoundException } from "@nestjs/common";
-import { Test, TestingModule } from "@nestjs/testing";
 import { ResourceService } from "../../../src/application/services/resource.service";
-import { AttributeValidationService } from "../../../src/application/services/attribute-validation.service";
 
 describe("ResourceService", () => {
   let service: ResourceService;
   let resourceRepository: any;
   let eventBusService: any;
   let attributeValidationService: any;
+  let referenceDataRepository: any;
 
   const mockResource = {
     id: "res-123",
@@ -47,10 +46,18 @@ describe("ResourceService", () => {
       validate: jest.fn().mockReturnValue({ isValid: true, errors: [] }),
     };
 
+    referenceDataRepository = {
+      findByGroup: jest.fn().mockResolvedValue([]),
+      findById: jest.fn().mockResolvedValue(null),
+      findByGroupAndCode: jest.fn().mockResolvedValue(null),
+      create: jest.fn(),
+    };
+
     service = new ResourceService(
       resourceRepository,
       eventBusService,
       attributeValidationService,
+      referenceDataRepository,
     );
   });
 
@@ -92,7 +99,7 @@ describe("ResourceService", () => {
           categoryId: "cat-1",
           capacity: 30,
           location: "Edificio A",
-        })
+        }),
       ).rejects.toThrow(ConflictException);
     });
 
@@ -113,7 +120,7 @@ describe("ResourceService", () => {
 
       expect(attributeValidationService.validateOrThrow).toHaveBeenCalledWith(
         ResourceType.CLASSROOM,
-        { capacity: 30 }
+        { capacity: 30 },
       );
     });
   });
@@ -132,7 +139,7 @@ describe("ResourceService", () => {
       resourceRepository.findById.mockResolvedValue(null);
 
       await expect(service.getResourceById("non-existent")).rejects.toThrow(
-        NotFoundException
+        NotFoundException,
       );
     });
   });
@@ -140,9 +147,14 @@ describe("ResourceService", () => {
   describe("updateResource", () => {
     it("Given an existing resource, When updateResource is called with valid data, Then it should update", async () => {
       resourceRepository.findById.mockResolvedValue(mockResource);
-      resourceRepository.update.mockResolvedValue({ ...mockResource, name: "Updated" });
+      resourceRepository.update.mockResolvedValue({
+        ...mockResource,
+        name: "Updated",
+      });
 
-      const result = await service.updateResource("res-123", { name: "Updated" });
+      const result = await service.updateResource("res-123", {
+        name: "Updated",
+      });
 
       expect(result).toBeDefined();
       expect(resourceRepository.update).toHaveBeenCalled();
@@ -152,7 +164,7 @@ describe("ResourceService", () => {
       resourceRepository.findById.mockResolvedValue(null);
 
       await expect(
-        service.updateResource("non-existent", { name: "Test" })
+        service.updateResource("non-existent", { name: "Test" }),
       ).rejects.toThrow(NotFoundException);
     });
   });
@@ -160,7 +172,10 @@ describe("ResourceService", () => {
   describe("deleteResource (soft delete)", () => {
     it("Given an existing resource, When deleteResource is called, Then it should soft-delete", async () => {
       resourceRepository.findById.mockResolvedValue(mockResource);
-      resourceRepository.update.mockResolvedValue({ ...mockResource, isActive: false });
+      resourceRepository.update.mockResolvedValue({
+        ...mockResource,
+        isActive: false,
+      });
 
       const result = await service.deleteResource("res-123", "admin-1");
 
@@ -172,7 +187,7 @@ describe("ResourceService", () => {
       resourceRepository.findById.mockResolvedValue(null);
 
       await expect(
-        service.deleteResource("non-existent", "admin-1")
+        service.deleteResource("non-existent", "admin-1"),
       ).rejects.toThrow(NotFoundException);
     });
   });

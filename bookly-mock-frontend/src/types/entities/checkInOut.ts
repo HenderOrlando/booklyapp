@@ -56,7 +56,7 @@ export interface CheckInOut {
     deviceInfo?: string;
     photoUrl?: string;
     signature?: string;
-    [key: string]: any;
+    [key: string]: string | undefined;
   };
 
   // QR Code extraído de metadata para fácil acceso

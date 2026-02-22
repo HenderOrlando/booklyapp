@@ -78,4 +78,12 @@ export class QueryReservationDto {
   @IsDate()
   @Type(() => Date)
   endDate?: Date;
+
+  @ApiPropertyOptional({
+    description: "Término de búsqueda (por título de reserva o nombre de recurso)",
+    example: "Reunión de equipo",
+  })
+  @IsOptional()
+  @IsString()
+  search?: string;
 }

@@ -31,35 +31,35 @@ export interface ToastProps {
 const toastConfig = {
   success: {
     icon: CheckCircle,
-    bgColor: "bg-green-50 dark:bg-green-900/20",
-    borderColor: "border-green-200 dark:border-green-800",
-    iconColor: "text-green-600 dark:text-green-400",
-    titleColor: "text-green-900 dark:text-green-100",
-    messageColor: "text-green-700 dark:text-green-300",
+    bgColor: "bg-[var(--color-state-success-bg)]",
+    borderColor: "border-[var(--color-state-success-border)]",
+    iconColor: "text-[var(--color-state-success-text)]",
+    titleColor: "text-[var(--color-state-success-text)]",
+    messageColor: "text-[var(--color-state-success-text)]",
   },
   error: {
     icon: AlertCircle,
-    bgColor: "bg-red-50 dark:bg-red-900/20",
-    borderColor: "border-red-200 dark:border-red-800",
-    iconColor: "text-red-600 dark:text-red-400",
-    titleColor: "text-red-900 dark:text-red-100",
-    messageColor: "text-red-700 dark:text-red-300",
+    bgColor: "bg-[var(--color-state-error-bg)]",
+    borderColor: "border-[var(--color-state-error-border)]",
+    iconColor: "text-[var(--color-state-error-text)]",
+    titleColor: "text-[var(--color-state-error-text)]",
+    messageColor: "text-[var(--color-state-error-text)]",
   },
   warning: {
     icon: AlertTriangle,
-    bgColor: "bg-yellow-50 dark:bg-yellow-900/20",
-    borderColor: "border-yellow-200 dark:border-yellow-800",
-    iconColor: "text-yellow-600 dark:text-yellow-400",
-    titleColor: "text-yellow-900 dark:text-yellow-100",
-    messageColor: "text-yellow-700 dark:text-yellow-300",
+    bgColor: "bg-[var(--color-state-warning-bg)]",
+    borderColor: "border-[var(--color-state-warning-border)]",
+    iconColor: "text-[var(--color-state-warning-text)]",
+    titleColor: "text-[var(--color-state-warning-text)]",
+    messageColor: "text-[var(--color-state-warning-text)]",
   },
   info: {
     icon: Info,
-    bgColor: "bg-blue-50 dark:bg-blue-900/20",
-    borderColor: "border-blue-200 dark:border-blue-800",
-    iconColor: "text-blue-600 dark:text-blue-400",
-    titleColor: "text-blue-900 dark:text-blue-100",
-    messageColor: "text-blue-700 dark:text-blue-300",
+    bgColor: "bg-[var(--color-state-info-bg)]",
+    borderColor: "border-[var(--color-state-info-border)]",
+    iconColor: "text-[var(--color-state-info-text)]",
+    titleColor: "text-[var(--color-state-info-text)]",
+    messageColor: "text-[var(--color-state-info-text)]",
   },
 };
 
@@ -98,7 +98,7 @@ export const Toast = React.memo<ToastProps>(
           onClick={() => onClose(id)}
           className={`
             flex-shrink-0 p-1 rounded-md
-            hover:bg-black/5 dark:hover:bg-white/10
+            hover:bg-[var(--color-action-ghost-hover)]
             transition-colors
             ${config.iconColor}
           `}
@@ -108,7 +108,7 @@ export const Toast = React.memo<ToastProps>(
         </button>
       </div>
     );
-  }
+  },
 );
 
 Toast.displayName = "Toast";

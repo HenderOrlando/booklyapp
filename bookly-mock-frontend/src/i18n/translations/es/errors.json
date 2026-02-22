@@ -1,0 +1,45 @@
+{
+  "auth": {
+    "default": "Error de autenticacion",
+    "AUTH-0001": "Credenciales invalidas.",
+    "AUTH-0002": "Token invalido o expirado.",
+    "AUTH-0003": "No tienes permisos para realizar esta accion."
+  },
+  "resources": {
+    "default": "Error en el modulo de recursos",
+    "RSRC-0301": "El recurso solicitado no existe o fue eliminado."
+  },
+  "availability": {
+    "default": "Error en el modulo de disponibilidad",
+    "AVAIL-0001": "La reserva solicitada no existe o fue eliminada."
+  },
+  "stockpile": {
+    "default": "Error en el modulo de aprobaciones",
+    "STCK-0001": "La solicitud de aprobacion solicitada no existe o fue eliminada."
+  },
+  "reports": {
+    "default": "Error en el modulo de reportes"
+  },
+  "gateway": {
+    "default": "Error de comunicacion con API Gateway"
+  },
+  "http": {
+    "bad_request": "Solicitud invalida",
+    "unauthorized": "No autorizado. Inicia sesion nuevamente.",
+    "forbidden": "No tienes permisos para esta accion.",
+    "not_found": "Recurso no encontrado.",
+    "conflict": "Conflicto de datos.",
+    "unprocessable": "No se pudieron procesar los datos enviados.",
+    "rate_limited": "Demasiadas solicitudes. Intenta nuevamente en unos segundos.",
+    "server_error": "Error interno del servidor.",
+    "bad_gateway": "El servicio intermedio no esta disponible.",
+    "unavailable": "Servicio temporalmente no disponible.",
+    "unknown": "Error HTTP desconocido."
+  },
+  "network": {
+    "connection": "No se pudo conectar con el servidor"
+  },
+  "generic": {
+    "unknown": "Ha ocurrido un error inesperado."
+  }
+}

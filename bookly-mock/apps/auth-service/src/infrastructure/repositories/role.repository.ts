@@ -1,11 +1,9 @@
-import { UserRole } from "@libs/common/enums";
-import { PaginationMeta, PaginationQuery } from "@libs/common";
-import { createLogger } from "@libs/common";
+import { RoleEntity } from "@auth/domain/entities/role.entity";
+import { IRoleRepository } from "@auth/domain/repositories/role.repository.interface";
+import { createLogger, PaginationMeta, PaginationQuery } from "@libs/common";
 import { Injectable } from "@nestjs/common";
 import { InjectModel } from "@nestjs/mongoose";
 import { Model } from "mongoose";
-import { RoleEntity } from '@auth/domain/entities/role.entity';
-import { IRoleRepository } from '@auth/domain/repositories/role.repository.interface';
 import { Role, RoleDocument } from "../schemas/role.schema";
 
 /**
@@ -17,7 +15,7 @@ export class RoleRepository implements IRoleRepository {
   private readonly logger = createLogger("RoleRepository");
 
   constructor(
-    @InjectModel(Role.name) private readonly roleModel: Model<RoleDocument>
+    @InjectModel(Role.name) private readonly roleModel: Model<RoleDocument>,
   ) {}
 
   async create(role: RoleEntity): Promise<RoleEntity> {
@@ -37,13 +35,13 @@ export class RoleRepository implements IRoleRepository {
     return role ? RoleEntity.fromObject(role.toObject()) : null;
   }
 
-  async findByName(name: UserRole): Promise<RoleEntity | null> {
+  async findByName(name: string): Promise<RoleEntity | null> {
     const role = await this.roleModel.findOne({ name }).exec();
     return role ? RoleEntity.fromObject(role.toObject()) : null;
   }
 
   async findMany(
-    query: PaginationQuery
+    query: PaginationQuery,
   ): Promise<{ roles: RoleEntity[]; meta: PaginationMeta }> {
     const {
       page = 1,
@@ -112,7 +110,7 @@ export class RoleRepository implements IRoleRepository {
     return !!result;
   }
 
-  async existsByName(name: UserRole): Promise<boolean> {
+  async existsByName(name: string): Promise<boolean> {
     const count = await this.roleModel.countDocuments({ name }).exec();
     return count > 0;
   }

@@ -28,11 +28,19 @@ export class EventStore extends Document {
   @Prop({ type: Object, required: true })
   data: any;
 
+  @Prop({ index: true })
+  correlationId?: string;
+
+  @Prop({ index: true })
+  causationId?: string;
+
+  @Prop({ index: true, sparse: true, unique: true })
+  idempotencyKey?: string;
+
   @Prop({ type: Object })
   metadata?: {
     userId?: string;
-    correlationId?: string;
-    causationId?: string;
+    tenantId?: string;
     [key: string]: any;
   };
 
@@ -49,7 +57,6 @@ export const EventStoreSchema = SchemaFactory.createForClass(EventStore);
 EventStoreSchema.index({ aggregateId: 1, version: 1 }, { unique: true });
 EventStoreSchema.index({ aggregateType: 1, aggregateId: 1 });
 EventStoreSchema.index({ eventType: 1, timestamp: -1 });
-EventStoreSchema.index({ "metadata.correlationId": 1 });
 
 /**
  * Snapshot Schema
@@ -82,5 +89,5 @@ export const AggregateSnapshotSchema =
 // Only keep latest snapshot per aggregate
 AggregateSnapshotSchema.index(
   { aggregateId: 1, aggregateType: 1, version: -1 },
-  { unique: true }
+  { unique: true },
 );

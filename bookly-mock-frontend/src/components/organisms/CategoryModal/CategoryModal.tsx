@@ -9,7 +9,9 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/atoms/Card";
+import { Checkbox } from "@/components/atoms/Checkbox";
 import { Input } from "@/components/atoms/Input";
+import { Textarea } from "@/components/atoms/Textarea";
 import { ButtonWithLoading } from "@/components/molecules/ButtonWithLoading";
 import { Category } from "@/types/entities/resource";
 import * as React from "react";
@@ -125,7 +127,6 @@ export function CategoryModal({
     if (!validate()) return;
 
     onSave(formData);
-    onClose();
   };
 
   const handleColorSelect = (color: string) => {
@@ -137,6 +138,7 @@ export function CategoryModal({
   return (
     <div
       className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4"
+      data-testid="category-modal"
       onClick={(e) => {
         if (e.target === e.currentTarget) {
           onClose();
@@ -159,7 +161,7 @@ export function CategoryModal({
           <form onSubmit={handleSubmit} className="space-y-6">
             {/* Nombre */}
             <div>
-              <label className="block text-sm font-medium text-white mb-2">
+              <label className="block text-sm font-medium text-[var(--color-text-primary)] mb-2">
                 Nombre <span className="text-red-500">*</span>
               </label>
               <Input
@@ -169,6 +171,7 @@ export function CategoryModal({
                 }
                 placeholder="Ej: Laboratorios de Cómputo"
                 className={errors.name ? "border-red-500" : ""}
+                data-testid="category-name-input"
               />
               {errors.name && (
                 <p className="text-xs text-red-500 mt-1">{errors.name}</p>
@@ -177,27 +180,21 @@ export function CategoryModal({
 
             {/* Descripción */}
             <div>
-              <label className="block text-sm font-medium text-white mb-2">
+              <label className="block text-sm font-medium text-[var(--color-text-primary)] mb-2">
                 Descripción
               </label>
-              <textarea
+              <Textarea
                 value={formData.description || ""}
                 onChange={(e) =>
                   setFormData({ ...formData, description: e.target.value })
                 }
                 placeholder="Descripción breve de la categoría..."
                 rows={3}
-                className={`w-full px-3 py-2 bg-gray-800 border rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-brand-primary-500 ${
-                  errors.description
-                    ? "border-red-500"
-                    : "border-[var(--color-border-subtle)]"
-                }`}
+                error={errors.description}
+                data-testid="category-description-input"
               />
               <div className="flex items-center justify-between mt-1">
-                {errors.description && (
-                  <p className="text-xs text-red-500">{errors.description}</p>
-                )}
-                <p className="text-xs text-gray-400 ml-auto">
+                <p className="text-xs text-[var(--color-text-tertiary)] ml-auto">
                   {formData.description?.length || 0}/200
                 </p>
               </div>
@@ -205,7 +202,7 @@ export function CategoryModal({
 
             {/* Color Picker */}
             <div>
-              <label className="block text-sm font-medium text-white mb-2">
+              <label className="block text-sm font-medium text-[var(--color-text-primary)] mb-2">
                 Color <span className="text-red-500">*</span>
               </label>
               <div className="space-y-3">
@@ -214,20 +211,18 @@ export function CategoryModal({
                   <div
                     className="w-16 h-16 rounded-lg border-2 border-white shadow-lg"
                     style={{ backgroundColor: formData.color }}
+                    aria-hidden="true"
                   />
                   <div>
-                    <p className="text-sm text-white font-medium">
+                    <p className="text-sm text-[var(--color-text-primary)] font-medium">
                       Color seleccionado
                     </p>
-                    <p className="text-xs text-gray-400 font-mono">
+                    <p className="text-xs text-[var(--color-text-tertiary)] font-mono">
                       {formData.color}
                     </p>
                     <Badge
-                      style={{
-                        backgroundColor: formData.color,
-                        color: "#fff",
-                        marginTop: "4px",
-                      }}
+                      className="mt-1 text-white"
+                      style={{ backgroundColor: formData.color }}
                     >
                       {formData.name || "Categoría"}
                     </Badge>
@@ -236,7 +231,7 @@ export function CategoryModal({
 
                 {/* Colores predefinidos */}
                 <div>
-                  <p className="text-xs text-gray-400 mb-2">
+                  <p className="text-xs text-[var(--color-text-tertiary)] mb-2">
                     Colores predefinidos
                   </p>
                   <div className="grid grid-cols-6 gap-2">
@@ -259,7 +254,7 @@ export function CategoryModal({
 
                 {/* Selector de color personalizado */}
                 <div>
-                  <p className="text-xs text-gray-400 mb-2">
+                  <p className="text-xs text-[var(--color-text-tertiary)] mb-2">
                     Color personalizado
                   </p>
                   <div className="flex items-center gap-3">
@@ -268,12 +263,15 @@ export function CategoryModal({
                       value={formData.color || "#10b981"}
                       onChange={(e) => handleColorSelect(e.target.value)}
                       className="w-20 h-10 rounded-lg border border-[var(--color-border-subtle)] cursor-pointer"
+                      aria-label="Selector de color personalizado"
+                      title="Selector de color personalizado"
                     />
                     <Input
                       value={formData.color || ""}
                       onChange={(e) => handleColorSelect(e.target.value)}
                       placeholder="#10b981"
                       className="flex-1"
+                      data-testid="category-color-input"
                     />
                   </div>
                 </div>
@@ -284,24 +282,21 @@ export function CategoryModal({
             </div>
 
             {/* Estado */}
-            <div>
-              <label className="flex items-center gap-3 cursor-pointer">
-                <input
-                  type="checkbox"
-                  checked={formData.isActive ?? true}
-                  onChange={(e) =>
-                    setFormData({ ...formData, isActive: e.target.checked })
-                  }
-                  className="w-5 h-5 rounded border-[var(--color-border-subtle)] bg-gray-800 checked:bg-brand-primary-500"
-                />
-                <div>
-                  <p className="text-sm font-medium text-white">
-                    Categoría activa
-                  </p>
-                  <p className="text-xs text-gray-400">
-                    Las categorías inactivas no se mostrarán en los formularios
-                  </p>
-                </div>
+            <div className="flex items-center gap-3">
+              <Checkbox
+                id="isActive"
+                checked={formData.isActive ?? true}
+                onCheckedChange={(checked) =>
+                  setFormData({ ...formData, isActive: !!checked })
+                }
+              />
+              <label htmlFor="isActive" className="cursor-pointer">
+                <p className="text-sm font-medium text-[var(--color-text-primary)]">
+                  Categoría activa
+                </p>
+                <p className="text-xs text-[var(--color-text-tertiary)]">
+                  Las categorías inactivas no se mostrarán en los formularios
+                </p>
               </label>
             </div>
 
@@ -319,6 +314,7 @@ export function CategoryModal({
                 type="submit"
                 isLoading={loading}
                 loadingText={mode === "create" ? "Creando..." : "Guardando..."}
+                data-testid="save-category-button"
               >
                 {mode === "create" ? "Crear Categoría" : "Guardar Cambios"}
               </ButtonWithLoading>

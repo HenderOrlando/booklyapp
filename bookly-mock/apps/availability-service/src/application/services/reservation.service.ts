@@ -140,11 +140,26 @@ export class ReservationService {
       status?: ReservationStatus;
       startDate?: Date;
       endDate?: Date;
+      search?: string;
     },
   ): Promise<{ reservations: ReservationEntity[]; meta: PaginationMeta }> {
     logger.info("Finding reservations", { filters, query });
 
     return await this.reservationRepository.findMany(query, filters);
+  }
+
+  /**
+   * Obtiene estadísticas de reservas
+   */
+  async getReservationStats(filters?: {
+    userId?: string;
+    resourceId?: string;
+    startDate?: Date;
+    endDate?: Date;
+  }): Promise<any> {
+    logger.info("Getting reservation stats", { filters });
+    
+    return await this.reservationRepository.getStats(filters);
   }
 
   /**

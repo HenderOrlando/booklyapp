@@ -10,6 +10,7 @@
   "available": "Available",
   "occupied": "Occupied",
   "maintenance": "Maintenance",
+  "unavailable": "Unavailable",
   "code": "Code",
   "location": "Location",
   "description": "Description",
@@ -21,13 +22,18 @@
   "actions": "Actions",
   "management": "Resource management system",
   "list": "Resource List",
-  "showing_count": "{{count}} of {{total}} resources",
+  "showing_count": "{count} of {total} resources",
   "search_placeholder": "Search by name, code, location...",
+  "loading": "Loading resources...",
+  "error_loading": "Error loading resources",
+  "show_unavailable": "Show unavailable",
+  "restore": "Restore",
   "clear_filters": "Clear Filters",
   "no_results_title": "No resources found",
   "no_results_desc": "No resources match the applied filters. Try adjusting search criteria.",
   "empty_desc": "No resources registered yet. Create the first resource to start.",
   "view_table": "Table View",
+  "view_list": "List View",
   "view_virtual": "Virtual View",
   "delete_title": "Confirm Deletion",
   "delete_confirm": "Are you sure you want to delete this resource?",
@@ -66,5 +72,15 @@
     "total_capacity": "Total Capacity",
     "people": "people",
     "reserved": "reserved"
+  },
+  "type_labels": {
+    "CLASSROOM": "Classroom",
+    "LABORATORY": "Laboratory",
+    "AUDITORIUM": "Auditorium",
+    "MULTIMEDIA_EQUIPMENT": "Multimedia Equipment",
+    "SPORTS_FACILITY": "Sports Facility",
+    "MEETING_ROOM": "Meeting Room",
+    "VEHICLE": "Vehicle",
+    "OTHER": "Other"
   }
 }

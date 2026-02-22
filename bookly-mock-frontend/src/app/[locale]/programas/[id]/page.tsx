@@ -29,25 +29,26 @@ interface User {
   enrollmentDate?: string;
 }
 
-interface ResourceWithPriority extends Resource {
+interface _ResourceWithPriority extends Resource {
   priority?: number;
 }
 
 export default function ProgramaDetallePage({
   params,
 }: {
-  params: { id: string };
+  params: Promise<{ id: string }>;
 }) {
+  const resolvedParams = React.use(params);
   const t = useTranslations("programs");
   const router = useRouter();
 
   // React Query para cargar programa
-  const { data: program, isLoading: loading } = useProgram(params.id);
+  const { data: program, isLoading: loading } = useProgram(resolvedParams.id);
 
   // Estados manuales para recursos y usuarios (mantener por ahora)
   const [allResources, setAllResources] = React.useState<Resource[]>([]);
   const [programResources, setProgramResources] = React.useState<Resource[]>(
-    []
+    [],
   );
   const [allUsers, setAllUsers] = React.useState<User[]>([]);
   const [programUsers, setProgramUsers] = React.useState<User[]>([]);
@@ -64,10 +65,10 @@ export default function ProgramaDetallePage({
       try {
         const [resourcesRes, programResourcesRes, usersRes, programUsersRes] =
           await Promise.all([
-            httpClient.get("resources"),
-            httpClient.get(`program-resources?programId=${params.id}`),
-            httpClient.get("users"),
-            httpClient.get(`program-users?programId=${params.id}`),
+            httpClient.get<{ items?: Resource[] }>("resources"),
+            httpClient.get<{ items?: Resource[] }>(`program-resources?programId=${resolvedParams.id}`),
+            httpClient.get<{ items?: User[] }>("users"),
+            httpClient.get<{ items?: User[] }>(`program-users?programId=${resolvedParams.id}`),
           ]);
 
         if (resourcesRes.success && resourcesRes.data) {
@@ -91,7 +92,7 @@ export default function ProgramaDetallePage({
     };
 
     fetchData();
-  }, [params.id]);
+  }, [resolvedParams.id]);
 
   // Inicializar selección cuando se cargan recursos del programa
   React.useEffect(() => {
@@ -101,13 +102,13 @@ export default function ProgramaDetallePage({
 
   // Usuarios disponibles (no asociados)
   const availableUsers = allUsers.filter(
-    (u) => !programUsers.some((pu: any) => pu.id === u.id)
+    (u) => !programUsers.some((pu: any) => pu.id === u.id),
   );
 
   const filteredAvailableUsers = availableUsers.filter(
     (u) =>
       u.name?.toLowerCase().includes(userFilter.toLowerCase()) ||
-      u.email?.toLowerCase().includes(userFilter.toLowerCase())
+      u.email?.toLowerCase().includes(userFilter.toLowerCase()),
   );
 
   // Iniciar modo edición de recursos
@@ -141,16 +142,16 @@ export default function ProgramaDetallePage({
     try {
       const currentIds = new Set(programResources.map((r) => r.id));
       const toAdd = Array.from(selectedResourceIds).filter(
-        (id) => !currentIds.has(id)
+        (id) => !currentIds.has(id),
       );
       const toRemove = Array.from(currentIds).filter(
-        (id) => !selectedResourceIds.has(id)
+        (id) => !selectedResourceIds.has(id),
       );
 
       // Agregar nuevos recursos
       for (const resourceId of toAdd) {
         await httpClient.post("program-resources", {
-          programId: params.id,
+          programId: resolvedParams.id,
           resourceId,
           priority: 3,
         });
@@ -159,20 +160,19 @@ export default function ProgramaDetallePage({
       // Quitar recursos
       for (const resourceId of toRemove) {
         await httpClient.delete(
-          `program-resources?programId=${params.id}&resourceId=${resourceId}`
+          `program-resources?programId=${resolvedParams.id}&resourceId=${resourceId}`,
         );
       }
 
       // Actualizar lista de recursos del programa
       const newProgramResources = allResources.filter((r) =>
-        selectedResourceIds.has(r.id)
+        selectedResourceIds.has(r.id),
       );
       setProgramResources(newProgramResources);
       setIsEditingResources(false);
       setResourceFilter("");
     } catch (err: any) {
       console.error("Error saving resources:", err);
-      alert(t("save_resources_error"));
     }
   };
 
@@ -180,7 +180,7 @@ export default function ProgramaDetallePage({
   const handleAddUser = async (userId: string, role: string) => {
     try {
       const response = await httpClient.post("program-users", {
-        programId: params.id,
+        programId: resolvedParams.id,
         userId,
         role,
       });
@@ -193,7 +193,6 @@ export default function ProgramaDetallePage({
       }
     } catch (err: any) {
       console.error("Error adding user:", err);
-      alert(t("add_user_error"));
     }
   };
 
@@ -201,21 +200,20 @@ export default function ProgramaDetallePage({
   const handleRemoveUser = async (userId: string) => {
     try {
       await httpClient.delete(
-        `program-users?programId=${params.id}&userId=${userId}`
+        `program-users?programId=${resolvedParams.id}&userId=${userId}`,
       );
       setProgramUsers(programUsers.filter((u: any) => u.id !== userId));
     } catch (err: any) {
       console.error("Error removing user:", err);
-      alert(t("remove_user_error"));
     }
   };
 
-  const header = <AppHeader title={program?.name || t("loading_program")} />;
-  const sidebar = <AppSidebar />;
+  const _header = <AppHeader title={program?.name || t("loading_program")} />;
+  const _sidebar = <AppSidebar />;
 
   if (loading) {
     return (
-      <MainLayout header={header} sidebar={sidebar}>
+      <MainLayout>
         <div className="flex items-center justify-center h-96">
           <div className="text-center">
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-brand-primary-500 mx-auto mb-4"></div>
@@ -230,10 +228,10 @@ export default function ProgramaDetallePage({
 
   if (!program) {
     return (
-      <MainLayout header={header} sidebar={sidebar}>
+      <MainLayout>
         <Card>
           <CardContent className="py-12 text-center">
-            <p className="text-white">{t("not_found")}</p>
+            <p className="text-foreground">{t("not_found")}</p>
             <Button onClick={() => router.push("/programas")} className="mt-4">
               {t("back_list")}
             </Button>
@@ -244,7 +242,7 @@ export default function ProgramaDetallePage({
   }
 
   return (
-    <MainLayout header={header} sidebar={sidebar}>
+    <MainLayout>
       <div className="space-y-6 pb-6">
         {/* Header */}
         <div className="flex items-center justify-between">
@@ -279,48 +277,52 @@ export default function ProgramaDetallePage({
                 <TabsContent value="general">
                   <div className="space-y-4">
                     <div>
-                      <label className="block text-sm font-medium text-gray-400 mb-1">
+                      <label className="block text-sm font-medium text-[var(--color-text-tertiary)] mb-1">
                         {t("code")}
                       </label>
-                      <p className="text-white font-mono">{program.code}</p>
+                      <p className="text-foreground font-mono">
+                        {program.code}
+                      </p>
                     </div>
 
                     <div>
-                      <label className="block text-sm font-medium text-gray-400 mb-1">
+                      <label className="block text-sm font-medium text-[var(--color-text-tertiary)] mb-1">
                         {t("name")}
                       </label>
-                      <p className="text-white">{program.name}</p>
+                      <p className="text-foreground">{program.name}</p>
                     </div>
 
                     {program.description && (
                       <div>
-                        <label className="block text-sm font-medium text-gray-400 mb-1">
+                        <label className="block text-sm font-medium text-[var(--color-text-tertiary)] mb-1">
                           {t("description_label")}
                         </label>
-                        <p className="text-white">{program.description}</p>
+                        <p className="text-foreground">{program.description}</p>
                       </div>
                     )}
 
                     <div className="grid grid-cols-2 gap-4">
                       <div>
-                        <label className="block text-sm font-medium text-gray-400 mb-1">
+                        <label className="block text-sm font-medium text-[var(--color-text-tertiary)] mb-1">
                           {t("faculty")}
                         </label>
-                        <p className="text-white">{program.faculty}</p>
+                        <p className="text-foreground">{program.faculty}</p>
                       </div>
 
                       {program.department && (
                         <div>
-                          <label className="block text-sm font-medium text-gray-400 mb-1">
+                          <label className="block text-sm font-medium text-[var(--color-text-tertiary)] mb-1">
                             {t("department")}
                           </label>
-                          <p className="text-white">{program.department}</p>
+                          <p className="text-foreground">
+                            {program.department}
+                          </p>
                         </div>
                       )}
                     </div>
 
                     <div>
-                      <label className="block text-sm font-medium text-gray-400 mb-1">
+                      <label className="block text-sm font-medium text-[var(--color-text-tertiary)] mb-1">
                         {t("status")}
                       </label>
                       {program.isActive ? (
@@ -338,7 +340,7 @@ export default function ProgramaDetallePage({
                       // Modo Ver: Solo recursos asociados
                       <>
                         <div className="flex items-center justify-between mb-4">
-                          <h3 className="text-xl font-semibold text-white">
+                          <h3 className="text-xl font-semibold text-foreground">
                             {t("program_resources_title")} (
                             {programResources.length})
                           </h3>
@@ -347,7 +349,7 @@ export default function ProgramaDetallePage({
                           </Button>
                         </div>
                         {programResources.length === 0 ? (
-                          <p className="text-center text-gray-400 py-8">
+                          <p className="text-center text-[var(--color-text-tertiary)] py-8">
                             {t("no_resources_program")}
                           </p>
                         ) : (
@@ -355,13 +357,13 @@ export default function ProgramaDetallePage({
                             {programResources.map((resource: any) => (
                               <div
                                 key={resource.id}
-                                className="flex items-center justify-between p-4 bg-gray-800/50 rounded-lg"
+                                className="flex items-center justify-between p-4 bg-[var(--color-bg-primary)]/50 rounded-lg"
                               >
                                 <div>
-                                  <p className="font-medium text-white">
+                                  <p className="font-medium text-foreground">
                                     {resource.name}
                                   </p>
-                                  <p className="text-sm text-gray-400">
+                                  <p className="text-sm text-[var(--color-text-tertiary)]">
                                     {resource.code} - {t("capacity")}:{" "}
                                     {resource.capacity}
                                   </p>
@@ -378,7 +380,7 @@ export default function ProgramaDetallePage({
                       // Modo Editar: Todos los recursos con checkboxes
                       <>
                         <div className="flex items-center justify-between mb-4">
-                          <h3 className="text-xl font-semibold text-white">
+                          <h3 className="text-xl font-semibold text-foreground">
                             {t("select_resources")}
                           </h3>
                           <div className="flex gap-2">
@@ -413,29 +415,29 @@ export default function ProgramaDetallePage({
                                   r.code
                                     .toLowerCase()
                                     .includes(resourceFilter.toLowerCase())
-                                : true
+                                : true,
                             )
                             .map((resource) => (
                               <label
                                 key={resource.id}
-                                className="flex items-center justify-between p-4 bg-gray-800/50 rounded-lg cursor-pointer hover:bg-gray-800"
+                                className="flex items-center justify-between p-4 bg-[var(--color-bg-primary)]/50 rounded-lg cursor-pointer hover:bg-[var(--color-bg-primary)]"
                               >
                                 <div className="flex items-center gap-3">
                                   <input
                                     type="checkbox"
                                     checked={selectedResourceIds.has(
-                                      resource.id
+                                      resource.id,
                                     )}
                                     onChange={() =>
                                       handleToggleResource(resource.id)
                                     }
-                                    className="w-5 h-5 rounded border-gray-600 bg-gray-700 text-brand-primary-500 focus:ring-brand-primary-500 focus:ring-offset-gray-900"
+                                    className="w-5 h-5 rounded border-[var(--color-border-strong)] bg-[var(--color-bg-tertiary)] text-brand-primary-500 focus:ring-brand-primary-500 focus:ring-offset-gray-900"
                                   />
                                   <div>
-                                    <p className="font-medium text-white">
+                                    <p className="font-medium text-foreground">
                                       {resource.name}
                                     </p>
-                                    <p className="text-sm text-gray-400">
+                                    <p className="text-sm text-[var(--color-text-tertiary)]">
                                       {resource.code} - {t("type")}:{" "}
                                       {resource.type} -{t("capacity")}:{" "}
                                       {resource.capacity}
@@ -446,8 +448,8 @@ export default function ProgramaDetallePage({
                             ))}
                         </div>
 
-                        <div className="flex items-center justify-between pt-4 border-t border-gray-700">
-                          <p className="text-sm text-gray-400">
+                        <div className="flex items-center justify-between pt-4 border-t border-[var(--color-border-strong)]">
+                          <p className="text-sm text-[var(--color-text-tertiary)]">
                             {t("selected_resources_count", {
                               count: selectedResourceIds.size,
                             })}
@@ -461,11 +463,11 @@ export default function ProgramaDetallePage({
                 <TabsContent value="users">
                   <div className="space-y-6">
                     <div>
-                      <h3 className="text-xl font-semibold text-white mb-4">
+                      <h3 className="text-xl font-semibold text-foreground mb-4">
                         {t("associated_users_title")}
                       </h3>
                       {programUsers.length === 0 ? (
-                        <p className="text-gray-400">
+                        <p className="text-[var(--color-text-tertiary)]">
                           {t("no_users_associated")}
                         </p>
                       ) : (
@@ -473,13 +475,13 @@ export default function ProgramaDetallePage({
                           {programUsers.map((user: any) => (
                             <div
                               key={user.id}
-                              className="flex items-center justify-between p-4 bg-gray-800/50 rounded-lg"
+                              className="flex items-center justify-between p-4 bg-[var(--color-bg-primary)]/50 rounded-lg"
                             >
                               <div>
-                                <p className="font-medium text-white">
+                                <p className="font-medium text-foreground">
                                   {user.name}
                                 </p>
-                                <p className="text-sm text-gray-400">
+                                <p className="text-sm text-[var(--color-text-tertiary)]">
                                   {user.email}
                                 </p>
                                 {user.programRole && (
@@ -502,7 +504,7 @@ export default function ProgramaDetallePage({
                     </div>
 
                     <div>
-                      <h3 className="text-xl font-semibold text-white mb-4">
+                      <h3 className="text-xl font-semibold text-foreground mb-4">
                         {t("add_users_title")}
                       </h3>
                       <Input
@@ -512,7 +514,7 @@ export default function ProgramaDetallePage({
                         className="mb-4"
                       />
                       {filteredAvailableUsers.length === 0 ? (
-                        <p className="text-gray-400">
+                        <p className="text-[var(--color-text-tertiary)]">
                           {t("no_users_available")}
                         </p>
                       ) : (
@@ -520,13 +522,13 @@ export default function ProgramaDetallePage({
                           {filteredAvailableUsers.map((user) => (
                             <div
                               key={user.id}
-                              className="flex items-center justify-between p-4 bg-gray-800/50 rounded-lg"
+                              className="flex items-center justify-between p-4 bg-[var(--color-bg-primary)]/50 rounded-lg"
                             >
                               <div>
-                                <p className="font-medium text-white">
+                                <p className="font-medium text-foreground">
                                   {user.name}
                                 </p>
-                                <p className="text-sm text-gray-400">
+                                <p className="text-sm text-[var(--color-text-tertiary)]">
                                   {user.email}
                                 </p>
                               </div>

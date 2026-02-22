@@ -1,12 +1,24 @@
 import { ResponseUtil } from "@libs/common";
 import { CurrentUser } from "@libs/decorators";
 import { JwtAuthGuard } from "@libs/guards";
-import { Body, Controller, Get, Post, Query, UseGuards } from "@nestjs/common";
+import {
+  Body,
+  Controller,
+  Get,
+  Param,
+  Post,
+  Put,
+  Query,
+  UseGuards,
+} from "@nestjs/common";
 import { CommandBus, QueryBus } from "@nestjs/cqrs";
 import { ApiBearerAuth, ApiOperation, ApiTags } from "@nestjs/swagger";
-import { CreateCategoryCommand } from '@resources/application/commands';
-import { GetCategoriesQuery } from '@resources/application/queries';
-import { CreateCategoryDto } from "../dto";
+import {
+  CreateCategoryCommand,
+  UpdateCategoryCommand,
+} from "@resources/application/commands";
+import { GetCategoriesQuery } from "@resources/application/queries";
+import { CreateCategoryDto, UpdateCategoryDto } from "../dto";
 
 /**
  * Categories Controller
@@ -19,25 +31,25 @@ import { CreateCategoryDto } from "../dto";
 export class CategoriesController {
   constructor(
     private readonly commandBus: CommandBus,
-    private readonly queryBus: QueryBus
+    private readonly queryBus: QueryBus,
   ) {}
 
   @Post()
   @ApiOperation({ summary: "Crear una nueva categoría" })
   async createCategory(
     @Body() createCategoryDto: CreateCategoryDto,
-    @CurrentUser("sub") userId: string
+    @CurrentUser("sub") userId: string,
   ) {
     const command = new CreateCategoryCommand(
       createCategoryDto.code,
       createCategoryDto.name,
-      createCategoryDto.description,
+      createCategoryDto.description || createCategoryDto.name,
       createCategoryDto.type,
       createCategoryDto.color,
       createCategoryDto.icon,
       createCategoryDto.parentId,
       createCategoryDto.metadata,
-      userId
+      userId,
     );
 
     const category = await this.commandBus.execute(command);
@@ -51,7 +63,7 @@ export class CategoriesController {
     @Query("page") page?: number,
     @Query("limit") limit?: number,
     @Query("sortBy") sortBy?: string,
-    @Query("sortOrder") sortOrder?: "asc" | "desc"
+    @Query("sortOrder") sortOrder?: "asc" | "desc",
   ) {
     const query = new GetCategoriesQuery({
       page: page ? Number(page) : 1,
@@ -63,5 +75,29 @@ export class CategoriesController {
     const result = await this.queryBus.execute(query);
 
     return ResponseUtil.success(result, "Categories retrieved successfully");
+  }
+
+  @Put(":id")
+  @ApiOperation({ summary: "Actualizar una categoría existente" })
+  async updateCategory(
+    @Param("id") id: string,
+    @Body() updateData: UpdateCategoryDto,
+    @CurrentUser("sub") userId: string,
+  ) {
+    const command = new UpdateCategoryCommand(
+      id,
+      userId,
+      updateData.name,
+      updateData.description,
+      updateData.type,
+      updateData.color,
+      updateData.icon,
+      updateData.isActive,
+      updateData.metadata,
+    );
+
+    const category = await this.commandBus.execute(command);
+
+    return ResponseUtil.success(category, "Category updated successfully");
   }
 }

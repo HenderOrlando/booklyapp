@@ -31,15 +31,15 @@ export const FilterTag = React.memo<FilterTagProps>(
   ({ label, value, onRemove, color = "blue", className = "" }) => {
     // Colores disponibles
     const colorClasses = {
-      blue: "bg-blue-50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-300 border-blue-200 dark:border-blue-800",
+      blue: "bg-[var(--color-state-info-bg)] text-[var(--color-state-info-text)] border-[var(--color-state-info-border)]",
       green:
-        "bg-green-50 dark:bg-green-900/20 text-green-700 dark:text-green-300 border-green-200 dark:border-green-800",
+        "bg-[var(--color-state-success-bg)] text-[var(--color-state-success-text)] border-[var(--color-state-success-border)]",
       purple:
-        "bg-purple-50 dark:bg-purple-900/20 text-purple-700 dark:text-purple-300 border-purple-200 dark:border-purple-800",
+        "bg-[var(--color-bg-muted)] text-[var(--color-action-secondary)] border-[var(--color-action-secondary)]",
       orange:
-        "bg-orange-50 dark:bg-orange-900/20 text-orange-700 dark:text-orange-300 border-orange-200 dark:border-orange-800",
-      red: "bg-red-50 dark:bg-red-900/20 text-red-700 dark:text-red-300 border-red-200 dark:border-red-800",
-      gray: "bg-gray-50 dark:bg-gray-800 text-gray-700 dark:text-gray-300 border-gray-200 dark:border-gray-700",
+        "bg-[var(--color-state-warning-bg)] text-[var(--color-state-warning-text)] border-[var(--color-state-warning-border)]",
+      red: "bg-[var(--color-state-error-bg)] text-[var(--color-state-error-text)] border-[var(--color-state-error-border)]",
+      gray: "bg-[var(--color-bg-secondary)] text-[var(--color-text-primary)] border-[var(--color-border-subtle)]",
     };
 
     return (
@@ -69,7 +69,7 @@ export const FilterTag = React.memo<FilterTagProps>(
               inline-flex items-center justify-center
               w-4 h-4
               rounded-full
-              hover:bg-black/10 dark:hover:bg-white/10
+              hover:bg-[var(--color-action-ghost-hover)]
               transition-colors duration-200
               focus:outline-none focus:ring-2 focus:ring-current focus:ring-offset-1
             "
@@ -80,7 +80,7 @@ export const FilterTag = React.memo<FilterTagProps>(
         )}
       </div>
     );
-  }
+  },
 );
 
 FilterTag.displayName = "FilterTag";

@@ -7,28 +7,19 @@
  */
 
 import { useToast } from "@/hooks/useToast";
-import { httpClient } from "@/infrastructure/http/httpClient";
+import {
+  AuthClient,
+  type ChangePasswordDto,
+  type UpdateProfileDto,
+} from "@/infrastructure/api/auth-client";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { UserPreferences } from "../../types/entities/user";
 
 /**
  * DTO para actualizar perfil de usuario
  */
-export interface UpdateUserProfileDto {
-  firstName?: string;
-  lastName?: string;
-  phone?: string;
-  photoUrl?: string;
-  preferences?: Record<string, any>;
-}
-
-/**
- * DTO para cambiar contraseña
- */
-export interface ChangePasswordDto {
-  currentPassword: string;
-  newPassword: string;
-  confirmPassword: string;
-}
+export type UpdateUserProfileDto = UpdateProfileDto;
+export type { ChangePasswordDto };
 
 // ============================================
 // CACHE KEYS
@@ -67,20 +58,28 @@ export function useUpdateUserProfile() {
 
   return useMutation({
     mutationFn: async (data: UpdateUserProfileDto) => {
-      const response = await httpClient.put("/users/profile", data);
-      return response;
+      const response = await AuthClient.updateProfile(data);
+
+      if (!response.success || !response.data) {
+        throw new Error(
+          response.message ||
+            "No se pudo confirmar la actualización del perfil",
+        );
+      }
+
+      return response.data;
     },
     onSuccess: () => {
       showSuccess(
         "Perfil Actualizado",
-        "Tu información se guardó correctamente"
+        "Tu información se guardó correctamente",
       );
       // Invalidar perfil del usuario
       queryClient.invalidateQueries({ queryKey: userKeys.profile });
     },
-    onError: (error: any) => {
+    onError: (error: unknown) => {
       const errorMessage =
-        error?.response?.data?.message || "Error al actualizar perfil";
+        error instanceof Error ? error.message : "Error al actualizar perfil";
       showError("Error al Actualizar", errorMessage);
       console.error("Error al actualizar perfil:", error);
     },
@@ -106,18 +105,17 @@ export function useChangePassword() {
 
   return useMutation({
     mutationFn: async (data: ChangePasswordDto) => {
-      const response = await httpClient.put("/users/change-password", data);
-      return response;
+      return AuthClient.changePassword(data);
     },
     onSuccess: () => {
       showSuccess(
         "Contraseña Actualizada",
-        "Tu contraseña se cambió exitosamente"
+        "Tu contraseña se cambió exitosamente",
       );
     },
-    onError: (error: any) => {
+    onError: (error: unknown) => {
       const errorMessage =
-        error?.response?.data?.message || "Error al cambiar contraseña";
+        error instanceof Error ? error.message : "Error al cambiar contraseña";
       showError("Error al Cambiar Contraseña", errorMessage);
       console.error("Error al cambiar contraseña:", error);
     },
@@ -140,22 +138,18 @@ export function useUploadProfilePhoto() {
 
   return useMutation({
     mutationFn: async (file: File) => {
-      const formData = new FormData();
-      formData.append("photo", file);
-
-      const response = await httpClient.post("/users/profile/photo", formData);
-      return response;
+      return AuthClient.uploadProfilePhoto(file);
     },
     onSuccess: () => {
       showSuccess(
         "Foto Actualizada",
-        "Tu foto de perfil se subió correctamente"
+        "Tu foto de perfil se subió correctamente",
       );
       queryClient.invalidateQueries({ queryKey: userKeys.profile });
     },
-    onError: (error: any) => {
+    onError: (error: unknown) => {
       const errorMessage =
-        error?.response?.data?.message || "Error al subir foto";
+        error instanceof Error ? error.message : "Error al subir foto";
       showError("Error al Subir Foto", errorMessage);
       console.error("Error al subir foto:", error);
     },
@@ -181,22 +175,30 @@ export function useUpdateUserPreferences() {
   const { showSuccess, showError } = useToast();
 
   return useMutation({
-    mutationFn: async (preferences: Record<string, any>) => {
-      const response = await httpClient.put("/users/preferences", {
-        preferences,
-      });
-      return response;
+    mutationFn: async (preferences: Partial<UserPreferences>) => {
+      const response = await AuthClient.updatePreferences(preferences);
+
+      if (!response.success || !response.data) {
+        throw new Error(
+          response.message ||
+            "No se pudo confirmar la actualización de preferencias",
+        );
+      }
+
+      return response.data;
     },
     onSuccess: () => {
       showSuccess(
         "Preferencias Guardadas",
-        "Tus preferencias se han actualizado"
+        "Tus preferencias se han actualizado",
       );
       queryClient.invalidateQueries({ queryKey: userKeys.profile });
     },
-    onError: (error: any) => {
+    onError: (error: unknown) => {
       const errorMessage =
-        error?.response?.data?.message || "Error al actualizar preferencias";
+        error instanceof Error
+          ? error.message
+          : "Error al actualizar preferencias";
       showError("Error al Guardar", errorMessage);
       console.error("Error al actualizar preferencias:", error);
     },

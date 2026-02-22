@@ -6,6 +6,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/atoms/Card";
+import { useTranslations } from "next-intl";
 import * as React from "react";
 
 /**
@@ -44,12 +45,15 @@ export function ConfirmDialog({
   onConfirm,
   title,
   description,
-  confirmText = "Confirmar",
-  cancelText = "Cancelar",
+  confirmText,
+  cancelText,
   variant = "default",
   children,
   loading = false,
 }: ConfirmDialogProps) {
+  const t = useTranslations("common");
+  const resolvedConfirmText = confirmText || t("confirm");
+  const resolvedCancelText = cancelText || t("cancel");
   const [isProcessing, setIsProcessing] = React.useState(false);
 
   const handleConfirm = async () => {
@@ -84,7 +88,7 @@ export function ConfirmDialog({
 
             <div className="flex justify-end gap-3 pt-2">
               <Button variant="outline" onClick={onClose} disabled={isDisabled}>
-                {cancelText}
+                {resolvedCancelText}
               </Button>
               <Button
                 variant={variant === "destructive" ? "default" : "default"}
@@ -99,7 +103,7 @@ export function ConfirmDialog({
                 {isDisabled && (
                   <span className="mr-2 inline-block h-4 w-4 animate-spin rounded-full border-2 border-solid border-current border-r-transparent" />
                 )}
-                {confirmText}
+                {resolvedConfirmText}
               </Button>
             </div>
           </CardContent>

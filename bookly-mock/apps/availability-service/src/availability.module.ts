@@ -1,6 +1,9 @@
-import { DatabaseModule } from "@libs/database";
+import { JWT_SECRET } from "@libs/common/constants";
+import { DatabaseModule, ReferenceDataModule } from "@libs/database";
 import { EventBusModule } from "@libs/event-bus";
+import { IdempotencyModule } from "@libs/idempotency";
 import { RedisModule } from "@libs/redis";
+import { AuthClientModule } from "@libs/security";
 import { Module } from "@nestjs/common";
 import { ConfigModule, ConfigService } from "@nestjs/config";
 import { CqrsModule } from "@nestjs/cqrs";
@@ -9,6 +12,7 @@ import { MongooseModule } from "@nestjs/mongoose";
 import { PassportModule } from "@nestjs/passport";
 import { ScheduleModule } from "@nestjs/schedule";
 import { AuditDecoratorsModule } from "@reports/audit-decorators";
+import { I18nModule } from "@bookly/i18n";
 
 // Schemas
 import {
@@ -30,7 +34,6 @@ import {
   WaitingListSchema,
 } from "./infrastructure/schemas";
 
-// Repositories
 import { AvailabilityExceptionRepository } from "./infrastructure/repositories/availability-exception.repository";
 import { AvailabilityRepository } from "./infrastructure/repositories/availability.repository";
 import { MaintenanceBlockRepository } from "./infrastructure/repositories/maintenance-block.repository";
@@ -40,7 +43,6 @@ import { ReservationRepository } from "./infrastructure/repositories/reservation
 import { ResourceMetadataRepository } from "./infrastructure/repositories/resource-metadata.repository";
 import { WaitingListRepository } from "./infrastructure/repositories/waiting-list.repository";
 
-// Services
 import {
   AvailabilityService,
   RecurringReservationCacheService,
@@ -58,13 +60,11 @@ import { ResourceSimilarityService } from "./application/services/resource-simil
 import { ResourcesEventService } from "./application/services/resources-event.service";
 import { SlotColorService } from "./application/services/slot-color.service";
 
-// Handlers
 import { AllHandlers } from "./application/handlers";
 import { AvailabilityRulesUpdatedHandler } from "./application/handlers/availability-rules-updated.handler";
 import { ResourceStatusChangedHandler } from "./application/handlers/resource-status-changed.handler";
 import { ResourceSyncHandler } from "./application/handlers/resource-sync.handler";
 
-// Controllers
 import {
   AvailabilitiesController,
   HealthController,
@@ -77,8 +77,8 @@ import { HistoryController } from "./infrastructure/controllers/history.controll
 import { MaintenanceBlocksController } from "./infrastructure/controllers/maintenance-blocks.controller";
 import { MetricsController } from "./infrastructure/controllers/metrics.controller";
 import { ReassignmentController } from "./infrastructure/controllers/reassignment.controller";
+import { ReferenceDataController } from "./infrastructure/controllers/reference-data.controller";
 
-// CronJobs
 import { ExceptionsCleanupCron } from "./infrastructure/cron/exceptions-cleanup.cron";
 import { MaintenanceStatusCron } from "./infrastructure/cron/maintenance-status.cron";
 
@@ -97,12 +97,20 @@ import * as InfraEventHandlers from "./infrastructure/event-handlers";
  */
 @Module({
   imports: [
+    // Config
     ConfigModule.forRoot({
       isGlobal: true,
       envFilePath: [".env", "apps/availability-service/.env"],
     }),
+
+    I18nModule,
+
+    // CQRS
+    CqrsModule,
     // DatabaseModule reemplaza MongooseModule.forRoot
     DatabaseModule,
+    // Reference Data (tipos, estados dinámicos del dominio availability)
+    ReferenceDataModule,
     MongooseModule.forFeature([
       { name: Reservation.name, schema: ReservationSchema },
       { name: Availability.name, schema: AvailabilitySchema },
@@ -116,10 +124,18 @@ import * as InfraEventHandlers from "./infrastructure/event-handlers";
     CqrsModule,
     PassportModule,
     JwtModule.register({
-      secret: process.env.JWT_SECRET || "bookly-secret-key",
+      secret: JWT_SECRET,
       signOptions: {
         expiresIn: process.env.JWT_EXPIRATION || "24h",
       },
+    }),
+    // Auth Client (centralized auth via auth-service)
+    AuthClientModule.forRootAsync({
+      useFactory: (configService: ConfigService) => ({
+        authServiceUrl:
+          configService.get("AUTH_SERVICE_URL") || "http://localhost:3001",
+      }),
+      inject: [ConfigService],
     }),
     // Event-Driven Architecture
     EventBusModule.forRootAsync({
@@ -162,6 +178,8 @@ import * as InfraEventHandlers from "./infrastructure/event-handlers";
       inject: [ConfigService],
       serviceName: "availability-service",
     }),
+    // Idempotency + Correlation
+    IdempotencyModule.forRoot({ keyPrefix: "availability" }),
     // Audit Decorators Module (event-driven audit)
     // Los registros de auditoría se emiten como eventos y son persistidos por reports-service
     AuditDecoratorsModule,
@@ -177,6 +195,7 @@ import * as InfraEventHandlers from "./infrastructure/event-handlers";
     AvailabilityExceptionsController,
     MaintenanceBlocksController,
     ReassignmentController,
+    ReferenceDataController,
     HealthController,
     MetricsController,
   ],

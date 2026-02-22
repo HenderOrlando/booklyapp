@@ -1,4 +1,3 @@
-import { CategoryType } from "@libs/common/enums";
 import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
 import { Document } from "mongoose";
 
@@ -19,12 +18,8 @@ export class Category {
   @Prop({ required: true, trim: true })
   description: string;
 
-  @Prop({
-    type: String,
-    enum: Object.values(CategoryType),
-    required: true,
-  })
-  type: CategoryType;
+  @Prop({ type: String, required: true })
+  type: string;
 
   @Prop({ type: String, trim: true })
   color?: string;
@@ -58,8 +53,7 @@ export class Category {
 
 export const CategorySchema = SchemaFactory.createForClass(Category);
 
-// Indexes
-CategorySchema.index({ code: 1 }, { unique: true });
+// Indexes (code already has unique index from @Prop decorator)
 CategorySchema.index({ type: 1 });
 CategorySchema.index({ parentId: 1 });
 CategorySchema.index({ isActive: 1 });

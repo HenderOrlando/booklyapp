@@ -3,7 +3,14 @@
  * Centraliza variables de entorno y configuraciones
  */
 
+import { getDataConfigSnapshot } from "@/lib/data-config";
+
 export type DataMode = "mock" | "serve";
+
+const envDataMode =
+  (process.env.NEXT_PUBLIC_DATA_MODE || "mock") === "mock" ? "mock" : "serve";
+const envUseDirectServices =
+  process.env.NEXT_PUBLIC_USE_DIRECT_SERVICES === "true";
 
 export const config = {
   // URLs de API
@@ -12,7 +19,7 @@ export const config = {
   wsUrl: process.env.NEXT_PUBLIC_WS_URL || "ws://localhost:3000",
 
   // URLs de Microservicios (para bypass del API Gateway)
-  useDirectServices: process.env.NEXT_PUBLIC_USE_DIRECT_SERVICES === "true",
+  useDirectServices: envUseDirectServices,
   serviceUrls: {
     auth: process.env.NEXT_PUBLIC_AUTH_SERVICE_URL || "http://localhost:3001",
     resources:
@@ -27,7 +34,7 @@ export const config = {
   },
 
   // Modo de datos: 'mock' o 'serve'
-  dataMode: (process.env.NEXT_PUBLIC_DATA_MODE || "mock") as DataMode,
+  dataMode: envDataMode as DataMode,
 
   // NextAuth
   nextAuthUrl: process.env.NEXTAUTH_URL || "http://localhost:4200",
@@ -59,14 +66,22 @@ export const config = {
  * Verifica si estamos en modo mock
  */
 export function isMockMode(): boolean {
-  return config.dataMode === "mock";
+  if (typeof window === "undefined") {
+    return config.dataMode === "mock";
+  }
+
+  return getDataConfigSnapshot().dataMode === "MOCK";
 }
 
 /**
  * Verifica si estamos en modo serve
  */
 export function isServeMode(): boolean {
-  return config.dataMode === "serve";
+  if (typeof window === "undefined") {
+    return config.dataMode === "serve";
+  }
+
+  return getDataConfigSnapshot().dataMode === "SERVER";
 }
 
 /**
@@ -75,11 +90,18 @@ export function isServeMode(): boolean {
  * @returns URL base del servicio
  */
 export function getServiceUrl(
-  service: keyof typeof config.serviceUrls
+  service: keyof typeof config.serviceUrls,
 ): string {
-  if (config.useDirectServices) {
+  if (typeof window === "undefined") {
+    return config.useDirectServices
+      ? config.serviceUrls[service]
+      : config.apiGatewayUrl;
+  }
+
+  if (getDataConfigSnapshot().useDirectServices) {
     return config.serviceUrls[service];
   }
+
   return config.apiGatewayUrl;
 }
 
@@ -88,20 +110,44 @@ export function getServiceUrl(
  */
 export function logConfig(): void {
   if (config.isDevelopment) {
+    const runtimeSnapshot =
+      typeof window === "undefined"
+        ? {
+            legacyDataMode: config.dataMode,
+            useDirectServices: config.useDirectServices,
+            wsEnabled:
+              config.features.enableWebSocket &&
+              config.dataMode === "serve" &&
+              !config.useDirectServices,
+            source: "env",
+          }
+        : getDataConfigSnapshot();
+
     console.log("📋 Configuración de la aplicación:");
     console.log("  🌐 API Gateway:", config.apiGatewayUrl);
     console.log("  🔌 WebSocket:", config.wsUrl);
-    console.log("  📦 Modo de datos:", config.dataMode.toUpperCase());
+    console.log(
+      "  📦 Modo de datos:",
+      runtimeSnapshot.legacyDataMode.toUpperCase(),
+    );
     console.log(
       "  🔧 Servicios directos:",
-      config.useDirectServices ? "ACTIVADO" : "DESACTIVADO"
+      runtimeSnapshot.useDirectServices ? "ACTIVADO" : "DESACTIVADO",
     );
-    if (config.useDirectServices) {
+    console.log(
+      "  ⚡ WebSocket activo:",
+      runtimeSnapshot.wsEnabled ? "SI" : "NO",
+    );
+    console.log(
+      "  🧭 Fuente de configuración:",
+      runtimeSnapshot.source.toUpperCase(),
+    );
+    if (runtimeSnapshot.useDirectServices) {
       console.log("  📍 Auth Service:", config.serviceUrls.auth);
       console.log("  📍 Resources Service:", config.serviceUrls.resources);
       console.log(
         "  📍 Availability Service:",
-        config.serviceUrls.availability
+        config.serviceUrls.availability,
       );
       console.log("  📍 Stockpile Service:", config.serviceUrls.stockpile);
       console.log("  📍 Reports Service:", config.serviceUrls.reports);

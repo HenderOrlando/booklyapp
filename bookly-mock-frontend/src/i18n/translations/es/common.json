@@ -16,5 +16,15 @@
   "previous": "Anterior",
   "close": "Cerrar",
   "yes": "Sí",
-  "no": "No"
+  "no": "No",
+  "no_data": "No hay datos para mostrar",
+  "showing_results": "Mostrando {start} - {end} de {total} resultados",
+  "search_placeholder": "Buscar...",
+  "saving": "Guardando...",
+  "retry": "Reintentar",
+  "error_logout": "Error al cerrar sesión",
+  "selected": "seleccionados",
+  "all": "Todos",
+  "select_all": "Seleccionar todos",
+  "deselect_all": "Deseleccionar todos"
 }

@@ -2,10 +2,10 @@
  * Tipos de autenticación basados en Auth Service
  */
 
-import { User } from "./user";
+import { User, UserPreferences } from "./user";
 
 // Re-exportar User para facilitar imports
-export type { User };
+export type { User, UserPreferences };
 
 export interface LoginDto {
   email: string;
@@ -19,9 +19,15 @@ export interface RegisterDto {
   password: string;
   firstName: string;
   lastName: string;
+  phone?: string;
   phoneNumber?: string;
   documentType?: string;
   documentNumber?: string;
+  roles?: string[];
+  permissions?: string[];
+  tenantId?: string;
+  programId?: string;
+  coordinatedProgramId?: string;
 }
 
 export interface LoginResponse {

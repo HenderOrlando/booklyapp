@@ -21,7 +21,8 @@ import { mockResourcesForReservations } from "@/infrastructure/mock/data/reserva
 import type { CreateReservationDto } from "@/types/entities/reservation";
 import { useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import React, { useState } from "react";
+import { useTranslations } from "next-intl";
 
 /**
  * Página de Detalle de Reserva
@@ -33,13 +34,15 @@ import { useState } from "react";
 export default function ReservaDetallePage({
   params,
 }: {
-  params: { id: string };
+  params: Promise<{ id: string }>;
 }) {
+  const resolvedParams = React.use(params);
+  const _t = useTranslations("reservations");
   const router = useRouter();
-  const queryClient = useQueryClient();
+  const _queryClient = useQueryClient();
 
   // React Query para cargar reserva
-  const { data: reservation, isLoading: loading } = useReservation(params.id);
+  const { data: reservation, isLoading: loading } = useReservation(resolvedParams.id);
 
   // Mutations
   const updateReservation = useUpdateReservation();
@@ -86,7 +89,7 @@ export default function ReservaDetallePage({
 
   const handleUpdate = async (data: CreateReservationDto) => {
     updateReservation.mutate(
-      { id: params.id, data },
+      { id: resolvedParams.id, data },
       {
         onSuccess: () => {
           setShowEditModal(false);
@@ -100,7 +103,7 @@ export default function ReservaDetallePage({
   };
 
   const handleCancel = async () => {
-    cancelReservation.mutate(params.id, {
+    cancelReservation.mutate(resolvedParams.id, {
       onSuccess: () => {
         setShowCancelDialog(false);
         // El cache se actualiza automáticamente

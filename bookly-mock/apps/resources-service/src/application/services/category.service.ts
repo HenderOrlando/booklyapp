@@ -1,13 +1,13 @@
+import { createLogger, PaginationMeta, PaginationQuery } from "@libs/common";
 import { CategoryType } from "@libs/common/enums";
-import { PaginationMeta, PaginationQuery } from "@libs/common";
-import { createLogger } from "@libs/common";
 import {
+  BadRequestException,
   ConflictException,
   Injectable,
   NotFoundException,
 } from "@nestjs/common";
-import { CategoryEntity } from '@resources/domain/entities/category.entity';
-import { ICategoryRepository } from '@resources/domain/repositories/category.repository.interface';
+import { CategoryEntity } from "@resources/domain/entities/category.entity";
+import { ICategoryRepository } from "@resources/domain/repositories/category.repository.interface";
 
 /**
  * Category Service
@@ -19,31 +19,52 @@ export class CategoryService {
   private readonly CACHE_TTL = 300; // 5 minutos para categorías
   private readonly CACHE_PREFIX = "category";
 
+  private generateCodeFromName(name: string): string {
+    return name
+      .normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, "")
+      .replace(/[^a-zA-Z0-9]+/g, "_")
+      .replace(/^_+|_+$/g, "")
+      .toUpperCase();
+  }
+
   constructor(
     private readonly categoryRepository: ICategoryRepository,
-    private readonly redisService?: any // RedisService opcional para no romper tests
+    private readonly redisService?: any, // RedisService opcional para no romper tests
   ) {}
 
   /**
    * Crear una nueva categoría
    */
   async createCategory(data: Partial<CategoryEntity>): Promise<CategoryEntity> {
+    const resolvedName = data.name?.trim();
+    if (!resolvedName) {
+      throw new BadRequestException("Category name is required");
+    }
+
+    const resolvedCode = (
+      data.code?.trim() ||
+      this.generateCodeFromName(resolvedName) ||
+      `CAT_${Date.now()}`
+    ).toUpperCase();
+
+    const resolvedType = data.type ?? CategoryType.RESOURCE_TYPE;
+    const resolvedDescription = data.description?.trim() || resolvedName;
+
     // Verificar que no exista una categoría con el mismo código
-    if (data.code) {
-      const exists = await this.categoryRepository.existsByCode(data.code);
-      if (exists) {
-        throw new ConflictException(
-          `Category with code ${data.code} already exists`
-        );
-      }
+    const exists = await this.categoryRepository.existsByCode(resolvedCode);
+    if (exists) {
+      throw new ConflictException(
+        `Category with code ${resolvedCode} already exists`,
+      );
     }
 
     const category = new CategoryEntity(
       "",
-      data.code!,
-      data.name!,
-      data.description!,
-      data.type!,
+      resolvedCode,
+      resolvedName,
+      resolvedDescription,
+      resolvedType,
       data.color,
       data.icon,
       data.parentId,
@@ -51,7 +72,7 @@ export class CategoryService {
       data.metadata || {},
       undefined,
       undefined,
-      data.audit
+      data.audit,
     );
 
     const createdCategory = await this.categoryRepository.create(category);
@@ -73,7 +94,7 @@ export class CategoryService {
       try {
         const cached = await this.redisService.getCachedWithPrefix(
           "cache",
-          `${this.CACHE_PREFIX}:${id}`
+          `${this.CACHE_PREFIX}:${id}`,
         );
         if (cached) {
           this.logger.debug(`Category ${id} found in cache`);
@@ -97,7 +118,7 @@ export class CategoryService {
           "cache",
           `${this.CACHE_PREFIX}:${id}`,
           category,
-          this.CACHE_TTL
+          this.CACHE_TTL,
         );
       } catch (error) {
         this.logger.warn("Cache write error", error as Error);
@@ -161,7 +182,7 @@ export class CategoryService {
    */
   async updateCategory(
     id: string,
-    data: Partial<CategoryEntity>
+    data: Partial<CategoryEntity>,
   ): Promise<CategoryEntity> {
     // Verificar que la categoría existe
     const category = await this.getCategoryById(id);
@@ -171,7 +192,7 @@ export class CategoryService {
       try {
         await this.redisService.deleteCachedWithPrefix(
           "cache",
-          `${this.CACHE_PREFIX}:${id}`
+          `${this.CACHE_PREFIX}:${id}`,
         );
       } catch (error) {
         this.logger.warn("Cache invalidation error", error as Error);
@@ -183,7 +204,7 @@ export class CategoryService {
       const exists = await this.categoryRepository.existsByCode(data.code);
       if (exists) {
         throw new ConflictException(
-          `Category with code ${data.code} already exists`
+          `Category with code ${data.code} already exists`,
         );
       }
     }
@@ -206,7 +227,7 @@ export class CategoryService {
     const children = await this.getCategoriesByParent(id);
     if (children.length > 0) {
       throw new ConflictException(
-        `Cannot delete category with child categories`
+        `Cannot delete category with child categories`,
       );
     }
 

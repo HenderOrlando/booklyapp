@@ -10,6 +10,7 @@ export * from "./get-usage-reports.handler";
 export * from "./get-user-reports.handler";
 
 import {
+  GetDashboardDataHandler,
   GetDashboardOverviewHandler,
   GetMainKPIsHandler,
   GetOccupancyMetricsHandler,
@@ -56,6 +57,7 @@ import { GetUserReportsHandler } from "./get-user-reports.handler";
 
 export const AllHandlers = [
   // Dashboard Handlers
+  GetDashboardDataHandler,
   GetDashboardOverviewHandler,
   GetOccupancyMetricsHandler,
   GetTrendAnalysisHandler,

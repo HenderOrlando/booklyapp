@@ -1,0 +1,53 @@
+{
+  "title": "Características",
+  "subtitle": "Gestiona el catálogo de atributos para los recursos",
+  "create_button": "Crear Característica",
+  "list_title": "Lista de Características",
+  "empty_state": {
+    "title": "No se encontraron características",
+    "description": "Intenta cambiar los filtros o crea una nueva."
+  },
+  "table": {
+    "name_code": "Nombre / Código",
+    "description": "Descripción",
+    "status": "Estado",
+    "actions": "Acciones"
+  },
+  "modal": {
+    "create_title": "Crear Característica",
+    "edit_title": "Editar Característica",
+    "create_description": "Agrega una nueva característica al catálogo global",
+    "edit_description": "Modifica los datos de la característica",
+    "name_label": "Nombre",
+    "code_label": "Código",
+    "description_label": "Descripción",
+    "icon_label": "Icono (nombre Lucide)",
+    "color_label": "Color (Hex)",
+    "status_label": "Característica activa",
+    "status_hint": "Las inactivas no se podrán asignar a nuevos recursos",
+    "code_hint": "Identificador único interno. Solo letras, números y guiones bajos.",
+    "save_button": "Guardar Cambios",
+    "creating_button": "Creando...",
+    "saving_button": "Guardando..."
+  },
+  "errors": {
+    "name_required": "El nombre es obligatorio",
+    "name_min_length": "El nombre debe tener al menos 2 caracteres",
+    "code_required": "El código es obligatorio",
+    "code_invalid_format": "El código solo debe contener mayúsculas, números y guiones bajos",
+    "description_max_length": "La descripción no puede superar 200 caracteres"
+  },
+  "delete_confirm": {
+    "title": "Eliminar Característica",
+    "description": "¿Estás seguro? Esta acción desactivará la característica del catálogo."
+  },
+  "filter": {
+    "all": "Todas",
+    "active": "Activas",
+    "inactive": "Inactivas",
+    "search_label": "Búsqueda",
+    "search_placeholder": "Buscar por nombre, código...",
+    "status_label": "Estado"
+  },
+  "delete_confirm_button": "Eliminar"
+}

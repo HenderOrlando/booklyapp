@@ -20,7 +20,10 @@ export * from "./types";
 export * from "./base-client";
 
 // Clientes HTTP Type-Safe
+export * from "./approvals-client";
 export * from "./auth-client";
+export * from "./check-in-client";
+export * from "./config-client";
 export * from "./notifications-client";
 export * from "./reports-client";
 export * from "./reservations-client";

@@ -10,7 +10,7 @@ import { Document } from "mongoose";
   timestamps: true,
 })
 export class ResourceMetadata {
-  @Prop({ required: true, unique: true, index: true })
+  @Prop({ required: true, unique: true })
   resourceId: string;
 
   @Prop({ required: true })

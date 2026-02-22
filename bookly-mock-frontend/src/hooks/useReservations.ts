@@ -14,7 +14,7 @@
  * ```
  */
 
-import { ReservationsClient } from "@/infrastructure/api";
+import { ReservationsClient, type ReservationSearchFilters } from "@/infrastructure/api";
 import type {
   CreateReservationDto,
   Reservation,
@@ -28,9 +28,10 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 export const reservationKeys = {
   all: ["reservations"] as const,
   lists: () => [...reservationKeys.all, "list"] as const,
-  list: (filters?: any) => [...reservationKeys.lists(), filters] as const,
+  list: (filters?: ReservationSearchFilters) => [...reservationKeys.lists(), filters] as const,
   details: () => [...reservationKeys.all, "detail"] as const,
   detail: (id: string) => [...reservationKeys.details(), id] as const,
+  stats: (filters?: ReservationSearchFilters) => [...reservationKeys.all, "stats", filters] as const,
 };
 
 // ============================================
@@ -38,26 +39,42 @@ export const reservationKeys = {
 // ============================================
 
 /**
- * Hook para obtener todas las reservas
+ * Hook para obtener todas las reservas con filtros
  *
+ * @param filters - Filtros de búsqueda (opcional)
  * @returns Query con lista de reservas
- * @example
- * ```typescript
- * const { data, isLoading, error, refetch } = useReservations();
- *
- * if (isLoading) return <Spinner />;
- * if (error) return <Error message={error.message} />;
- *
- * return <ReservationList reservations={data.items} />;
- * ```
  */
-export function useReservations() {
+export function useReservations(filters?: ReservationSearchFilters) {
   return useQuery({
-    queryKey: reservationKeys.lists(),
+    queryKey: reservationKeys.list(filters),
     queryFn: async () => {
-      const response = await ReservationsClient.getAll();
+      // Usar search si hay filtros, de lo contrario getAll (que también debería soportar filtros idealmente)
+      // Para mantener compatibilidad, si hay filtros usamos search (asumiendo que ReservationsClient.search existe y funciona)
+      // o adaptamos ReservationsClient.getAll para que reciba filtros.
+      // Por ahora usaremos ReservationsClient.search que agregamos en el cliente
+      const response = filters ? await ReservationsClient.search(filters) : await ReservationsClient.getAll();
       if (!response.success) {
         throw new Error(response.message || "Error al cargar reservas");
+      }
+      return response.data;
+    },
+    staleTime: 1000 * 60 * 5, // 5 minutos
+  });
+}
+
+/**
+ * Hook para obtener estadísticas de reservas
+ *
+ * @param filters - Filtros de búsqueda (opcional)
+ * @returns Query con estadísticas
+ */
+export function useReservationStats(filters?: ReservationSearchFilters) {
+  return useQuery({
+    queryKey: reservationKeys.stats(filters),
+    queryFn: async () => {
+      const response = await ReservationsClient.getStats(filters);
+      if (!response.success) {
+        throw new Error(response.message || "Error al cargar estadísticas");
       }
       return response.data;
     },

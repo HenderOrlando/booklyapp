@@ -1,5 +1,5 @@
 import { createLogger } from "@libs/common";
-import { ReservationStatus, WeekDay } from "@libs/common/enums";
+import { ReferenceDataRepository } from "@libs/database";
 import { NestFactory } from "@nestjs/core";
 import { getModelToken } from "@nestjs/mongoose";
 import { Document, Model, Types } from "mongoose";
@@ -9,6 +9,7 @@ import {
   Reservation,
   WaitingList,
 } from "../infrastructure/schemas";
+import { AVAILABILITY_REFERENCE_DATA } from "./reference-data.seed-data";
 
 const logger = createLogger("AvailabilitySeed");
 
@@ -22,13 +23,13 @@ async function seed() {
 
     const app = await NestFactory.createApplicationContext(AvailabilityModule);
     const reservationModel = app.get<Model<Reservation>>(
-      getModelToken(Reservation.name)
+      getModelToken(Reservation.name),
     );
     const availabilityModel = app.get<Model<Availability>>(
-      getModelToken(Availability.name)
+      getModelToken(Availability.name),
     );
     const waitingListModel = app.get<Model<WaitingList>>(
-      getModelToken(WaitingList.name)
+      getModelToken(WaitingList.name),
     );
 
     // Limpiar datos existentes (solo con flag --clean)
@@ -39,9 +40,21 @@ async function seed() {
       await waitingListModel.deleteMany({});
     } else if (process.env.NODE_ENV === "development") {
       logger.info(
-        "ℹ️ Modo desarrollo detectado. Usar --clean para limpiar DB antes del seed."
+        "ℹ️ Modo desarrollo detectado. Usar --clean para limpiar DB antes del seed.",
       );
     }
+
+    // ── Reference Data (tipos, estados dinámicos del dominio availability) ──
+    const refDataRepo = app.get(ReferenceDataRepository);
+    logger.info(
+      `📋 Procesando ${AVAILABILITY_REFERENCE_DATA.length} datos de referencia...`,
+    );
+    for (const rd of AVAILABILITY_REFERENCE_DATA) {
+      await refDataRepo.upsert(rd);
+    }
+    logger.info(
+      `✅ ${AVAILABILITY_REFERENCE_DATA.length} datos de referencia procesados (upsert)`,
+    );
 
     // Disponibilidades (horarios regulares de recursos)
     // Usamos ObjectIds fijos para consistencia entre ejecuciones
@@ -53,7 +66,7 @@ async function seed() {
     const availabilities = [
       {
         resourceId: resourceAuditorioId,
-        dayOfWeek: WeekDay.MONDAY,
+        dayOfWeek: "MONDAY",
         startTime: "06:00",
         endTime: "22:00",
         isAvailable: true,
@@ -65,7 +78,7 @@ async function seed() {
       },
       {
         resourceId: resourceAuditorioId,
-        dayOfWeek: WeekDay.TUESDAY,
+        dayOfWeek: "TUESDAY",
         startTime: "06:00",
         endTime: "22:00",
         isAvailable: true,
@@ -77,7 +90,7 @@ async function seed() {
       },
       {
         resourceId: resourceLabId,
-        dayOfWeek: WeekDay.MONDAY,
+        dayOfWeek: "MONDAY",
         startTime: "06:00",
         endTime: "18:00",
         isAvailable: true,
@@ -89,7 +102,7 @@ async function seed() {
       },
       {
         resourceId: resourceSalaId,
-        dayOfWeek: WeekDay.WEDNESDAY,
+        dayOfWeek: "WEDNESDAY",
         startTime: "08:00",
         endTime: "20:00",
         isAvailable: true,
@@ -108,24 +121,24 @@ async function seed() {
       const doc = await availabilityModel.findOneAndUpdate(
         { resourceId: avail.resourceId, dayOfWeek: avail.dayOfWeek },
         avail,
-        { upsert: true, new: true }
+        { upsert: true, new: true },
       );
       insertedAvailabilities.push(doc as Document & Availability);
     }
 
     // IDs fijos para consistencia cross-service (según SEED_IDS_REFERENCE.md)
     const COORDINADOR_SISTEMAS_ID = new Types.ObjectId(
-      "507f1f77bcf86cd799439021"
+      "507f1f77bcf86cd799439021",
     );
     const ADMIN_GENERAL_ID = new Types.ObjectId("507f1f77bcf86cd799439022");
     const ESTUDIANTE_MARIA_ID = new Types.ObjectId("507f1f77bcf86cd799439023");
     const COORDINADOR_INDUSTRIAL_ID = new Types.ObjectId(
-      "507f1f77bcf86cd799439026"
+      "507f1f77bcf86cd799439026",
     );
 
     const PROGRAMA_SISTEMAS_ID = new Types.ObjectId("507f1f77bcf86cd799439041");
     const PROGRAMA_INDUSTRIAL_ID = new Types.ObjectId(
-      "507f1f77bcf86cd799439042"
+      "507f1f77bcf86cd799439042",
     );
 
     // Fechas para reservas
@@ -150,7 +163,7 @@ async function seed() {
         startDate: new Date(new Date(lastWeek).setHours(10, 0, 0)),
         endDate: new Date(new Date(lastWeek).setHours(12, 0, 0)),
         purpose: "Conferencia sobre Inteligencia Artificial",
-        status: ReservationStatus.COMPLETED,
+        status: "COMPLETED",
         checkInTime: new Date(new Date(lastWeek).setHours(9, 55, 0)),
         checkOutTime: new Date(new Date(lastWeek).setHours(12, 10, 0)),
         audit: {
@@ -167,7 +180,7 @@ async function seed() {
         startDate: new Date(new Date(tomorrow).setHours(9, 0, 0)),
         endDate: new Date(new Date(tomorrow).setHours(11, 0, 0)),
         purpose: "Reunión de Coordinación",
-        status: ReservationStatus.CONFIRMED,
+        status: "CONFIRMED",
         audit: {
           createdBy: ADMIN_GENERAL_ID,
           updatedBy: ADMIN_GENERAL_ID,
@@ -182,7 +195,7 @@ async function seed() {
         startDate: new Date(new Date(nextWeek).setHours(16, 0, 0)),
         endDate: new Date(new Date(nextWeek).setHours(18, 0, 0)),
         purpose: "Evento Estudiantil",
-        status: ReservationStatus.PENDING,
+        status: "PENDING",
         audit: {
           createdBy: ESTUDIANTE_MARIA_ID, // Estudiante solicita
         },
@@ -196,13 +209,97 @@ async function seed() {
         startDate: new Date(new Date(yesterday).setHours(15, 0, 0)),
         endDate: new Date(new Date(yesterday).setHours(17, 0, 0)),
         purpose: "Tutoría Grupal",
-        status: ReservationStatus.CANCELLED,
+        status: "CANCELLED",
         audit: {
           createdBy: COORDINADOR_SISTEMAS_ID,
           updatedBy: COORDINADOR_SISTEMAS_ID,
           cancelledBy: COORDINADOR_SISTEMAS_ID,
           cancelledAt: new Date(new Date(yesterday).setHours(14, 30, 0)),
           cancellationReason: "El docente tuvo una emergencia médica",
+        },
+      },
+      // ── HU-12: Reserva APROBADA (lista para usar) ──
+      {
+        resourceId: resourceLabId,
+        userId: COORDINADOR_INDUSTRIAL_ID,
+        programId: PROGRAMA_INDUSTRIAL_ID,
+        approvalRequestId: undefined,
+        startDate: new Date(new Date(tomorrow).setHours(14, 0, 0)),
+        endDate: new Date(new Date(tomorrow).setHours(16, 0, 0)),
+        purpose: "Práctica de Laboratorio de Producción",
+        status: "APPROVED",
+        audit: {
+          createdBy: COORDINADOR_INDUSTRIAL_ID,
+          updatedBy: ADMIN_GENERAL_ID,
+        },
+      },
+      // ── HU-23: Reserva IN_PROGRESS (check-in realizado, en uso) ──
+      {
+        resourceId: resourceSalaId,
+        userId: COORDINADOR_SISTEMAS_ID,
+        programId: PROGRAMA_SISTEMAS_ID,
+        approvalRequestId: undefined,
+        startDate: new Date(new Date(today).setHours(8, 0, 0)),
+        endDate: new Date(new Date(today).setHours(10, 0, 0)),
+        purpose: "Reunión de Planeación Semestral",
+        status: "IN_PROGRESS",
+        checkInTime: new Date(new Date(today).setHours(7, 55, 0)),
+        audit: {
+          createdBy: COORDINADOR_SISTEMAS_ID,
+          updatedBy: COORDINADOR_SISTEMAS_ID,
+        },
+      },
+      // ── CU-019: Reserva RECHAZADA ──
+      {
+        resourceId: resourceAuditorioId,
+        userId: ESTUDIANTE_MARIA_ID,
+        programId: PROGRAMA_SISTEMAS_ID,
+        approvalRequestId: new Types.ObjectId("507f1f77bcf86cd799439083"),
+        startDate: new Date(new Date(lastWeek).setHours(14, 0, 0)),
+        endDate: new Date(new Date(lastWeek).setHours(18, 0, 0)),
+        purpose: "Fiesta de fin de semestre",
+        status: "REJECTED",
+        audit: {
+          createdBy: ESTUDIANTE_MARIA_ID,
+          updatedBy: ADMIN_GENERAL_ID,
+          rejectionReason: "El propósito no corresponde a actividad académica",
+        },
+      },
+      // ── HU-23: Reserva NO_SHOW (no asistió) ──
+      {
+        resourceId: resourceLabId,
+        userId: ESTUDIANTE_MARIA_ID,
+        programId: PROGRAMA_SISTEMAS_ID,
+        approvalRequestId: undefined,
+        startDate: new Date(new Date(lastWeek).setHours(8, 0, 0)),
+        endDate: new Date(new Date(lastWeek).setHours(10, 0, 0)),
+        purpose: "Práctica de Programación",
+        status: "NO_SHOW",
+        audit: {
+          createdBy: ESTUDIANTE_MARIA_ID,
+          updatedBy: ADMIN_GENERAL_ID,
+        },
+      },
+      // ── HU-13: Reserva periódica / recurrente ──
+      {
+        resourceId: resourceLabId,
+        userId: COORDINADOR_SISTEMAS_ID,
+        programId: PROGRAMA_SISTEMAS_ID,
+        approvalRequestId: undefined,
+        startDate: new Date(new Date(nextWeek).setHours(10, 0, 0)),
+        endDate: new Date(new Date(nextWeek).setHours(12, 0, 0)),
+        purpose: "Clase semanal de Bases de Datos",
+        status: "CONFIRMED",
+        isRecurring: true,
+        recurrencePattern: {
+          type: "WEEKLY",
+          daysOfWeek: ["MONDAY"],
+          interval: 1,
+          endDate: new Date(new Date(nextWeek).getTime() + 90 * 24 * 60 * 60 * 1000),
+        },
+        audit: {
+          createdBy: COORDINADOR_SISTEMAS_ID,
+          updatedBy: COORDINADOR_SISTEMAS_ID,
         },
       },
     ];
@@ -218,7 +315,7 @@ async function seed() {
           startDate: res.startDate,
         },
         res,
-        { upsert: true, new: true }
+        { upsert: true, new: true },
       );
       insertedReservations.push(doc as Document & Reservation);
     }
@@ -254,7 +351,7 @@ async function seed() {
     ];
 
     logger.info(
-      `Procesando ${waitList.length} registros en lista de espera...`
+      `Procesando ${waitList.length} registros en lista de espera...`,
     );
     const insertedWaitList: (Document & WaitingList)[] = [];
 
@@ -266,7 +363,7 @@ async function seed() {
           requestedStartDate: wait.requestedStartDate,
         },
         wait,
-        { upsert: true, new: true }
+        { upsert: true, new: true },
       );
       insertedWaitList.push(doc as Document & WaitingList);
     }
@@ -279,9 +376,13 @@ async function seed() {
     logger.info(`  ✓ ${insertedWaitList.length} registros en lista de espera`);
     logger.info("");
     logger.info("📦 Estados de reservas:");
-    logger.info("  - COMPLETED: 1 (pasada)");
-    logger.info("  - CONFIRMED: 1 (futura)");
+    logger.info("  - COMPLETED: 1 (pasada con check-in/out)");
+    logger.info("  - CONFIRMED: 2 (futura + recurrente)");
     logger.info("  - PENDING: 1 (pendiente aprobación)");
+    logger.info("  - APPROVED: 1 (lista para usar)");
+    logger.info("  - IN_PROGRESS: 1 (check-in realizado)");
+    logger.info("  - REJECTED: 1 (rechazada)");
+    logger.info("  - NO_SHOW: 1 (no asistió)");
     logger.info("  - CANCELLED: 1");
 
     await app.close();

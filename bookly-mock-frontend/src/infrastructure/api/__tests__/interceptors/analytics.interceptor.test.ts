@@ -19,10 +19,11 @@ describe("analyticsInterceptor", () => {
     originalWindow = global.window;
 
     // Mock window con gtag
-    global.window = {
-      ...originalWindow,
-      gtag: mockGtag,
-    } as any;
+    Object.defineProperty(global.window, "gtag", {
+      configurable: true,
+      writable: true,
+      value: mockGtag,
+    });
   });
 
   afterEach(() => {
@@ -59,8 +60,8 @@ describe("analyticsInterceptor", () => {
 
       expect(consoleLogSpy).toHaveBeenCalledWith(
         expect.stringContaining(
-          "[Analytics] Evento enviado: GET /reservations (✓)"
-        )
+          "[Analytics] Evento enviado: GET /reservations (✓)",
+        ),
       );
 
       expect(result).toBe(response);
@@ -91,8 +92,8 @@ describe("analyticsInterceptor", () => {
 
       expect(consoleLogSpy).toHaveBeenCalledWith(
         expect.stringContaining(
-          "[Analytics] Evento enviado: POST /resources (✗)"
-        )
+          "[Analytics] Evento enviado: POST /resources (✗)",
+        ),
       );
     });
 
@@ -117,7 +118,7 @@ describe("analyticsInterceptor", () => {
           expect.objectContaining({
             method,
             event_label: `${method} /test`,
-          })
+          }),
         );
       });
     });
@@ -148,7 +149,7 @@ describe("analyticsInterceptor", () => {
           expect.objectContaining({
             endpoint,
             event_label: `GET ${endpoint}`,
-          })
+          }),
         );
       });
     });
@@ -157,10 +158,11 @@ describe("analyticsInterceptor", () => {
   describe("Sin gtag disponible", () => {
     beforeEach(() => {
       // Window sin gtag
-      global.window = {
-        ...originalWindow,
-        gtag: undefined,
-      } as any;
+      Object.defineProperty(global.window, "gtag", {
+        configurable: true,
+        writable: true,
+        value: undefined,
+      });
     });
 
     it("no debe fallar cuando gtag no existe", () => {
@@ -181,10 +183,11 @@ describe("analyticsInterceptor", () => {
 
     it("no debe enviar evento cuando gtag no es función", () => {
       // Arrange
-      global.window = {
-        ...originalWindow,
-        gtag: "not a function" as any,
-      } as any;
+      Object.defineProperty(global.window, "gtag", {
+        configurable: true,
+        writable: true,
+        value: "not a function",
+      });
 
       const response: ApiResponse<any> = {
         success: true,
@@ -202,7 +205,7 @@ describe("analyticsInterceptor", () => {
 
   describe("SSR (sin window)", () => {
     beforeEach(() => {
-      // @ts-ignore
+      // @ts-expect-error SSR test: remove window to simulate server runtime
       delete global.window;
     });
 
@@ -226,7 +229,7 @@ describe("analyticsInterceptor", () => {
   });
 
   describe("Edge cases", () => {
-    it("debe preservar response original", () => {
+    it("debe preservar response original", async () => {
       // Arrange
       const response: ApiResponse<any> = {
         success: true,
@@ -235,7 +238,7 @@ describe("analyticsInterceptor", () => {
       };
 
       // Act
-      const result = analyticsInterceptor(response, "/test", "GET");
+      const result = await analyticsInterceptor(response, "/test", "GET");
 
       // Assert
       expect(result).toBe(response);
@@ -261,7 +264,7 @@ describe("analyticsInterceptor", () => {
         expect.objectContaining({
           endpoint,
           event_label: `GET ${endpoint}`,
-        })
+        }),
       );
     });
 

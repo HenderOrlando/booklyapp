@@ -3,9 +3,15 @@
 import { ApprovalStatusBadge } from "@/components/atoms/ApprovalStatusBadge";
 import { Badge } from "@/components/atoms/Badge";
 import { Button } from "@/components/atoms/Button";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/atoms/Select";
+import { Input } from "@/components/atoms/Input";
 import { ApprovalTimeline } from "@/components/molecules/ApprovalTimeline";
-import { AppHeader } from "@/components/organisms/AppHeader";
-import { AppSidebar } from "@/components/organisms/AppSidebar";
 import { MainLayout } from "@/components/templates/MainLayout";
 import type { ApprovalRequest } from "@/types/entities/approval";
 import { useQuery } from "@tanstack/react-query";
@@ -20,6 +26,7 @@ import {
   FileText,
   Search,
 } from "lucide-react";
+import { useTranslations } from "next-intl";
 import * as React from "react";
 
 /**
@@ -44,7 +51,7 @@ const getMockApprovalHistory = (): ApprovalRequest[] => [
     categoryName: "Espacios Académicos",
     startDate: new Date(Date.now() + 2 * 24 * 60 * 60 * 1000).toISOString(),
     endDate: new Date(
-      Date.now() + 2 * 24 * 60 * 60 * 1000 + 2 * 60 * 60 * 1000
+      Date.now() + 2 * 24 * 60 * 60 * 1000 + 2 * 60 * 60 * 1000,
     ).toISOString(),
     purpose: "Conferencia magistral sobre IA",
     attendees: 150,
@@ -93,7 +100,7 @@ const getMockApprovalHistory = (): ApprovalRequest[] => [
     categoryName: "Espacios Administrativos",
     startDate: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000).toISOString(),
     endDate: new Date(
-      Date.now() - 1 * 24 * 60 * 60 * 1000 + 1 * 60 * 60 * 1000
+      Date.now() - 1 * 24 * 60 * 60 * 1000 + 1 * 60 * 60 * 1000,
     ).toISOString(),
     purpose: "Reunión de grupo",
     attendees: 8,
@@ -132,8 +139,9 @@ const getMockApprovalHistory = (): ApprovalRequest[] => [
 ];
 
 export default function HistorialAprobacionesPage() {
+  const t = useTranslations("approvals");
   const [expandedItems, setExpandedItems] = React.useState<Set<string>>(
-    new Set()
+    new Set(),
   );
   const [filterStatus, setFilterStatus] = React.useState<string>("all");
   const [searchQuery, setSearchQuery] = React.useState("");
@@ -178,65 +186,110 @@ export default function HistorialAprobacionesPage() {
   }, [history, filterStatus, searchQuery]);
 
   const handleExportCSV = () => {
-    alert("Exportando historial a CSV...");
-    // TODO: Implementar exportación CSV
+    if (!filteredHistory.length) return;
+
+    const headers = [
+      "ID",
+      "Usuario",
+      "Email",
+      "Recurso",
+      "Tipo Recurso",
+      "Propósito",
+      "Estado",
+      "Fecha Solicitud",
+      "Fecha Resolución",
+      "Aprobado Por",
+      "Razón Rechazo",
+    ];
+
+    const rows = filteredHistory.map((item) => [
+      item.id,
+      item.userName,
+      item.userEmail,
+      item.resourceName,
+      item.resourceType,
+      item.purpose,
+      item.status,
+      item.requestedAt ? format(new Date(item.requestedAt), "yyyy-MM-dd HH:mm") : "",
+      item.reviewedAt ? format(new Date(item.reviewedAt), "yyyy-MM-dd HH:mm") : "",
+      item.reviewerName || "",
+      item.rejectionReason || "",
+    ]);
+
+    const csvContent = [
+      headers.join(","),
+      ...rows.map((row) =>
+        row.map((cell) => `"${String(cell).replace(/"/g, '""')}"`).join(",")
+      ),
+    ].join("\n");
+
+    const blob = new Blob(["\uFEFF" + csvContent], { type: "text/csv;charset=utf-8;" });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = `historial-aprobaciones-${format(new Date(), "yyyy-MM-dd")}.csv`;
+    link.click();
+    URL.revokeObjectURL(url);
   };
 
   return (
-    <MainLayout header={<AppHeader />} sidebar={<AppSidebar />}>
+    <MainLayout>
       <div className="space-y-6">
         {/* Header */}
         <div className="flex items-start justify-between">
           <div>
             <div className="flex items-center gap-3 mb-2">
-              <div className="p-2 bg-purple-100 dark:bg-purple-900/20 rounded-lg">
-                <FileText className="h-6 w-6 text-purple-600 dark:text-purple-400" />
+              <div className="p-2 bg-[var(--color-state-info-bg)] rounded-lg">
+                <FileText className="h-6 w-6 text-[var(--color-state-info-text)]" />
               </div>
               <div>
-                <h1 className="text-3xl font-bold text-gray-900 dark:text-gray-100">
-                  Historial de Aprobaciones
+                <h1 className="text-3xl font-bold text-[var(--color-text-primary)] dark:text-[var(--color-text-primary)]">
+                  {t("history_title")}
                 </h1>
-                <p className="text-gray-600 dark:text-gray-400 mt-1">
-                  Registro completo de todas las aprobaciones
+                <p className="text-[var(--color-text-secondary)] dark:text-[var(--color-text-tertiary)] mt-1">
+                  {t("history_description")}
                 </p>
               </div>
             </div>
           </div>
           <Button onClick={handleExportCSV} variant="outline">
             <Download className="h-4 w-4 mr-2" />
-            Exportar CSV
+            {t("export_csv")}
           </Button>
         </div>
 
         {/* Filtros */}
         <div className="flex flex-col sm:flex-row gap-3">
           <div className="flex-1 relative">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
-            <input
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-[var(--color-text-tertiary)]" />
+            <Input
               type="text"
-              placeholder="Buscar por usuario, recurso o propósito..."
+              placeholder={t("search_history_placeholder")}
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-10 pr-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100"
+              className="pl-10"
             />
           </div>
-          <select
-            value={filterStatus}
-            onChange={(e) => setFilterStatus(e.target.value)}
-            className="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100"
-          >
-            <option value="all">Todos los estados</option>
-            <option value="APPROVED">Aprobadas</option>
-            <option value="REJECTED">Rechazadas</option>
-            <option value="CANCELLED">Canceladas</option>
-            <option value="EXPIRED">Expiradas</option>
-          </select>
+          <div className="w-full sm:w-64">
+            <Select value={filterStatus} onValueChange={setFilterStatus}>
+              <SelectTrigger>
+                <SelectValue placeholder={t("all_statuses")} />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">{t("all_statuses")}</SelectItem>
+                <SelectItem value="APPROVED">{t("status.approved")}</SelectItem>
+                <SelectItem value="REJECTED">{t("status.rejected")}</SelectItem>
+                <SelectItem value="CANCELLED">{t("status.cancelled")}</SelectItem>
+                <SelectItem value="EXPIRED">{t("status_expired")}</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
         </div>
 
         {/* Lista de historial */}
         {isLoading ? (
           <div className="flex items-center justify-center py-12">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[var(--color-primary-base)]" />
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[var(--color-action-primary)]" />
           </div>
         ) : filteredHistory.length > 0 ? (
           <div className="space-y-3">
@@ -246,21 +299,21 @@ export default function HistorialAprobacionesPage() {
               return (
                 <div
                   key={item.id}
-                  className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 overflow-hidden"
+                  className="bg-[var(--color-bg-surface)] rounded-lg border border-[var(--color-border-subtle)] overflow-hidden"
                 >
                   {/* Header colapsable */}
                   <button
                     onClick={() => toggleExpanded(item.id)}
-                    className="w-full px-6 py-4 flex items-center justify-between hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors"
+                    className="w-full px-6 py-4 flex items-center justify-between hover:bg-[var(--color-bg-secondary)] dark:hover:bg-[var(--color-bg-tertiary)]/50 transition-colors"
                   >
                     <div className="flex items-center gap-4 flex-1">
                       <ApprovalStatusBadge status={item.status} />
 
                       <div className="text-left flex-1">
-                        <h3 className="font-semibold text-gray-900 dark:text-gray-100">
+                        <h3 className="font-semibold text-[var(--color-text-primary)] dark:text-[var(--color-text-primary)]">
                           {item.resourceName}
                         </h3>
-                        <div className="flex items-center gap-4 mt-1 text-sm text-gray-600 dark:text-gray-400">
+                        <div className="flex items-center gap-4 mt-1 text-sm text-[var(--color-text-secondary)] dark:text-[var(--color-text-tertiary)]">
                           <span>{item.userName}</span>
                           <span>•</span>
                           <span>
@@ -272,13 +325,13 @@ export default function HistorialAprobacionesPage() {
                             <>
                               <span>•</span>
                               <span>
-                                Revisada:{" "}
+                                {t("reviewed_at")}{" "}
                                 {format(
                                   new Date(item.reviewedAt),
                                   "d MMM yyyy",
                                   {
                                     locale: es,
-                                  }
+                                  },
                                 )}
                               </span>
                             </>
@@ -287,100 +340,100 @@ export default function HistorialAprobacionesPage() {
                       </div>
 
                       {item.priority === "URGENT" && (
-                        <Badge variant="error">Urgente</Badge>
+                        <Badge variant="error">{t("priority.urgent")}</Badge>
                       )}
                       {item.priority === "HIGH" && (
-                        <Badge variant="warning">Alta</Badge>
+                        <Badge variant="warning">{t("priority.high")}</Badge>
                       )}
                     </div>
 
                     {isExpanded ? (
-                      <ChevronUp className="h-5 w-5 text-gray-400" />
+                      <ChevronUp className="h-5 w-5 text-[var(--color-text-tertiary)]" />
                     ) : (
-                      <ChevronDown className="h-5 w-5 text-gray-400" />
+                      <ChevronDown className="h-5 w-5 text-[var(--color-text-tertiary)]" />
                     )}
                   </button>
 
                   {/* Contenido expandible */}
                   {isExpanded && (
-                    <div className="px-6 py-4 border-t border-gray-200 dark:border-gray-700 space-y-4">
+                    <div className="px-6 py-4 border-t border-[var(--color-border-subtle)] space-y-4">
                       {/* Información detallada */}
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div>
-                          <p className="text-sm font-medium text-gray-600 dark:text-gray-400 mb-2">
-                            Solicitante
+                          <p className="text-sm font-medium text-[var(--color-text-secondary)] dark:text-[var(--color-text-tertiary)] mb-2">
+                            {t("requester")}
                           </p>
-                          <p className="text-gray-900 dark:text-gray-100">
+                          <p className="text-[var(--color-text-primary)] dark:text-[var(--color-text-primary)]">
                             {item.userName}
                           </p>
-                          <p className="text-sm text-gray-600 dark:text-gray-400">
+                          <p className="text-sm text-[var(--color-text-secondary)] dark:text-[var(--color-text-tertiary)]">
                             {item.userEmail} • {item.userRole}
                           </p>
                         </div>
 
                         <div>
-                          <p className="text-sm font-medium text-gray-600 dark:text-gray-400 mb-2">
-                            Recurso
+                          <p className="text-sm font-medium text-[var(--color-text-secondary)] dark:text-[var(--color-text-tertiary)] mb-2">
+                            {t("resource")}
                           </p>
-                          <p className="text-gray-900 dark:text-gray-100">
+                          <p className="text-[var(--color-text-primary)] dark:text-[var(--color-text-primary)]">
                             {item.resourceName}
                           </p>
-                          <p className="text-sm text-gray-600 dark:text-gray-400">
+                          <p className="text-sm text-[var(--color-text-secondary)] dark:text-[var(--color-text-tertiary)]">
                             {item.resourceType} • {item.categoryName}
                           </p>
                         </div>
 
                         <div>
-                          <p className="text-sm font-medium text-gray-600 dark:text-gray-400 mb-2">
-                            Fecha de Reserva
+                          <p className="text-sm font-medium text-[var(--color-text-secondary)] dark:text-[var(--color-text-tertiary)] mb-2">
+                            {t("reservation_date")}
                           </p>
-                          <div className="flex items-center gap-2 text-gray-900 dark:text-gray-100">
-                            <Calendar className="h-4 w-4 text-gray-500" />
+                          <div className="flex items-center gap-2 text-[var(--color-text-primary)] dark:text-[var(--color-text-primary)]">
+                            <Calendar className="h-4 w-4 text-[var(--color-text-tertiary)]" />
                             {format(
                               new Date(item.startDate),
                               "d 'de' MMMM, yyyy",
                               {
                                 locale: es,
-                              }
+                              },
                             )}
                           </div>
-                          <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400 mt-1">
-                            <Clock className="h-4 w-4 text-gray-500" />
+                          <div className="flex items-center gap-2 text-sm text-[var(--color-text-secondary)] dark:text-[var(--color-text-tertiary)] mt-1">
+                            <Clock className="h-4 w-4 text-[var(--color-text-tertiary)]" />
                             {format(new Date(item.startDate), "HH:mm")} -{" "}
                             {format(new Date(item.endDate), "HH:mm")}
                           </div>
                         </div>
 
                         <div>
-                          <p className="text-sm font-medium text-gray-600 dark:text-gray-400 mb-2">
-                            Propósito
+                          <p className="text-sm font-medium text-[var(--color-text-secondary)] dark:text-[var(--color-text-tertiary)] mb-2">
+                            {t("purpose")}
                           </p>
-                          <p className="text-gray-900 dark:text-gray-100 text-sm">
+                          <p className="text-[var(--color-text-primary)] dark:text-[var(--color-text-primary)] text-sm">
                             {item.purpose}
                           </p>
-                          <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
-                            {item.attendees} asistentes
+                          <p className="text-sm text-[var(--color-text-secondary)] dark:text-[var(--color-text-tertiary)] mt-1">
+                            {t("attendees_count", { count: item.attendees })}
                           </p>
                         </div>
                       </div>
 
                       {/* Comentarios / Razón de rechazo */}
                       {item.comments && (
-                        <div className="p-3 bg-green-50 dark:bg-green-900/20 rounded-lg">
-                          <p className="text-sm font-medium text-green-800 dark:text-green-200 mb-1">
-                            Comentarios
+                        <div className="p-3 bg-[var(--color-state-success-bg)] rounded-lg">
+                          <p className="text-sm font-medium text-[var(--color-state-success-text)] mb-1">
+                            {t("history")}
                           </p>
-                          <p className="text-sm text-green-700 dark:text-green-300">
+                          <p className="text-sm text-[var(--color-state-success-text)]">
                             {item.comments}
                           </p>
                         </div>
                       )}
                       {item.rejectionReason && (
-                        <div className="p-3 bg-red-50 dark:bg-red-900/20 rounded-lg">
-                          <p className="text-sm font-medium text-red-800 dark:text-red-200 mb-1">
-                            Razón de Rechazo
+                        <div className="p-3 bg-[var(--color-state-error-bg)] rounded-lg">
+                          <p className="text-sm font-medium text-[var(--color-state-error-text)] mb-1">
+                            {t("rejection_reason_title")}
                           </p>
-                          <p className="text-sm text-red-700 dark:text-red-300">
+                          <p className="text-sm text-[var(--color-state-error-text)]">
                             {item.rejectionReason}
                           </p>
                         </div>
@@ -389,8 +442,8 @@ export default function HistorialAprobacionesPage() {
                       {/* Timeline de historial */}
                       {item.history && item.history.length > 0 && (
                         <div>
-                          <p className="text-sm font-medium text-gray-900 dark:text-gray-100 mb-3">
-                            Historial de Acciones
+                          <p className="text-sm font-medium text-[var(--color-text-primary)] dark:text-[var(--color-text-primary)] mb-3">
+                            {t("action_history")}
                           </p>
                           <ApprovalTimeline history={item.history} />
                         </div>
@@ -402,19 +455,21 @@ export default function HistorialAprobacionesPage() {
             })}
           </div>
         ) : (
-          <div className="text-center py-12 bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700">
-            <FileText className="h-12 w-12 text-gray-400 dark:text-gray-600 mx-auto mb-3" />
-            <p className="text-gray-600 dark:text-gray-400">
-              No se encontraron registros
+          <div className="text-center py-12 bg-[var(--color-bg-surface)] rounded-lg border border-[var(--color-border-subtle)]">
+            <FileText className="h-12 w-12 text-[var(--color-text-tertiary)] dark:text-[var(--color-text-secondary)] mx-auto mb-3" />
+            <p className="text-[var(--color-text-secondary)] dark:text-[var(--color-text-tertiary)]">
+              {t("no_records_found")}
             </p>
           </div>
         )}
 
         {/* Resumen */}
         {filteredHistory.length > 0 && (
-          <div className="text-center text-sm text-gray-600 dark:text-gray-400">
-            Mostrando {filteredHistory.length} de {history?.length || 0}{" "}
-            registros
+          <div className="text-center text-sm text-[var(--color-text-secondary)] dark:text-[var(--color-text-tertiary)]">
+            {t("showing_records", {
+              count: filteredHistory.length,
+              total: history?.length || 0,
+            })}
           </div>
         )}
       </div>

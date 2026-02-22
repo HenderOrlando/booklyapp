@@ -48,7 +48,7 @@ export const LoadingSpinner = React.memo<LoadingSpinnerProps>(
           aria-label="Cargando..."
         />
         {text && (
-          <p className="text-sm text-gray-500 dark:text-gray-400">{text}</p>
+          <p className="text-sm text-[var(--color-text-secondary)] dark:text-[var(--color-text-tertiary)]">{text}</p>
         )}
       </div>
     );

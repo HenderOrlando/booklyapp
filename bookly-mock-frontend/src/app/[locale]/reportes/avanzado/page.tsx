@@ -1,39 +1,39 @@
 "use client";
 
 import { ExportButton } from "@/components/atoms/ExportButton";
-import { AreaChartCard } from "@/components/molecules/AreaChartCard";
+import { DynamicAreaChartCard as AreaChartCard } from "@/components/molecules/charts-dynamic";
 import { ReportFilters } from "@/components/molecules/ReportFilters";
-import { ScatterChartCard } from "@/components/molecules/ScatterChartCard";
-import { AppHeader } from "@/components/organisms/AppHeader";
-import { AppSidebar } from "@/components/organisms/AppSidebar/AppSidebar";
+import { DynamicScatterChartCard as ScatterChartCard } from "@/components/molecules/charts-dynamic";
 import { PeriodComparison } from "@/components/organisms/PeriodComparison";
 import { SavedFiltersPanel } from "@/components/organisms/SavedFiltersPanel";
 import { MainLayout } from "@/components/templates/MainLayout";
 import { useChartExport } from "@/hooks/useChartExport";
 import { useReportFilters } from "@/hooks/useReportFilters";
 import { useSavedFilters } from "@/hooks/useSavedFilters";
+import { useTranslations } from "next-intl";
 
 export default function ReportesAvanzadoPage() {
+  const t = useTranslations("reports");
   const { filters, setFilters } = useReportFilters();
   const { savedFilters, saveFilter, deleteFilter, toggleFavorite, loadFilter } =
     useSavedFilters();
-  const { exportChartAsPDF, exportDataWithCharts } = useChartExport();
+  const { exportChartAsPDF, exportDataWithCharts: _exportDataWithCharts } = useChartExport();
 
   // Mock data for demonstrations
   const trendData = Array.from({ length: 30 }, (_, i) => ({
-    name: `Día ${i + 1}`,
+    name: `${t("day")} ${i + 1}`,
     actual: Math.floor(Math.random() * 50) + 20,
     anterior: Math.floor(Math.random() * 45) + 18,
   }));
 
-  const scatterData = Array.from({ length: 50 }, (_, i) => ({
+  const scatterData = Array.from({ length: 50 }, (_, _i) => ({
     usage: Math.floor(Math.random() * 100),
     satisfaction: Math.floor(Math.random() * 100),
     size: Math.floor(Math.random() * 50) + 10,
   }));
 
   const period1 = {
-    label: "Mes Actual",
+    label: t("current_month"),
     data: trendData.map((d) => ({ name: d.name, value: d.actual })),
     stats: {
       total: 1234,
@@ -43,7 +43,7 @@ export default function ReportesAvanzadoPage() {
   };
 
   const period2 = {
-    label: "Mes Anterior",
+    label: t("previous_month"),
     data: trendData.map((d) => ({ name: d.name, value: d.anterior })),
     stats: {
       total: 1098,
@@ -56,7 +56,7 @@ export default function ReportesAvanzadoPage() {
     await exportChartAsPDF(
       ["trend-chart", "scatter-chart", "area-chart"],
       "reporte-avanzado",
-      "Reporte Avanzado de Análisis"
+      t("advanced_report_name"),
     );
   };
 
@@ -65,16 +65,16 @@ export default function ReportesAvanzadoPage() {
   };
 
   return (
-    <MainLayout header={<AppHeader />} sidebar={<AppSidebar />}>
+    <MainLayout>
       <div className="space-y-6">
         {/* Header */}
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-3xl font-bold text-gray-900 dark:text-gray-100">
-              Análisis Avanzado
+            <h1 className="text-3xl font-bold text-[var(--color-text-primary)] dark:text-[var(--color-text-primary)]">
+              {t("advanced_title")}
             </h1>
-            <p className="text-gray-600 dark:text-gray-400 mt-1">
-              Gráficos adicionales, comparaciones y filtros guardables
+            <p className="text-[var(--color-text-secondary)] dark:text-[var(--color-text-tertiary)] mt-1">
+              {t("advanced_desc")}
             </p>
           </div>
           <ExportButton
@@ -111,7 +111,7 @@ export default function ReportesAvanzadoPage() {
         <PeriodComparison
           period1={period1}
           period2={period2}
-          metric="Reservas"
+          metric={t("reservations")}
         />
 
         {/* Additional Charts */}
@@ -121,7 +121,7 @@ export default function ReportesAvanzadoPage() {
               data={trendData}
               xKey="name"
               yKey={["actual", "anterior"]}
-              title="Tendencia con Área"
+              title={t("area_trend")}
               color={["#3b82f6", "#10b981"]}
               height={300}
               stacked
@@ -134,7 +134,7 @@ export default function ReportesAvanzadoPage() {
               xKey="usage"
               yKey="satisfaction"
               zKey="size"
-              title="Uso vs Satisfacción"
+              title={t("usage_vs_satisfaction")}
               color="#8b5cf6"
               height={300}
             />
@@ -144,38 +144,38 @@ export default function ReportesAvanzadoPage() {
         {/* Info Panel */}
         <div className="bg-gradient-to-r from-purple-50 to-blue-50 dark:from-purple-900/20 dark:to-blue-900/20 border border-purple-200 dark:border-purple-800 rounded-lg p-6">
           <h3 className="text-lg font-semibold text-purple-900 dark:text-purple-100 mb-3">
-            🎉 Nuevas Funcionalidades Disponibles
+            🎉 {t("new_features_title")}
           </h3>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm text-purple-800 dark:text-purple-200">
             <div>
-              <strong>✨ Gráficos Adicionales:</strong>
+              <strong>✨ {t("additional_charts")}:</strong>
               <ul className="ml-4 mt-1 space-y-1">
-                <li>• Gráficos de área (apilados/no apilados)</li>
-                <li>• Gráficos de dispersión (scatter)</li>
+                <li>• {t("area_charts_desc")}</li>
+                <li>• {t("scatter_charts_desc")}</li>
               </ul>
             </div>
             <div>
-              <strong>💾 Filtros Guardables:</strong>
+              <strong>💾 {t("saveable_filters")}:</strong>
               <ul className="ml-4 mt-1 space-y-1">
-                <li>• Guardar configuraciones de filtros</li>
-                <li>• Marcar filtros como favoritos</li>
-                <li>• Cargar filtros con un click</li>
+                <li>• {t("save_filters_desc")}</li>
+                <li>• {t("favorite_filters_desc")}</li>
+                <li>• {t("load_filters_desc")}</li>
               </ul>
             </div>
             <div>
-              <strong>📊 Comparación de Períodos:</strong>
+              <strong>📊 {t("period_comparison")}:</strong>
               <ul className="ml-4 mt-1 space-y-1">
-                <li>• Comparar mes actual vs anterior</li>
-                <li>• Análisis automático de cambios</li>
-                <li>• Visualización de tendencias</li>
+                <li>• {t("compare_months_desc")}</li>
+                <li>• {t("auto_change_analysis_desc")}</li>
+                <li>• {t("trend_visualization_desc")}</li>
               </ul>
             </div>
             <div>
-              <strong>📥 Exportación Avanzada:</strong>
+              <strong>📥 {t("advanced_export")}:</strong>
               <ul className="ml-4 mt-1 space-y-1">
-                <li>• Exportar con gráficos incluidos</li>
-                <li>• PDF con múltiples páginas</li>
-                <li>• Excel con imágenes embebidas</li>
+                <li>• {t("export_with_charts_desc")}</li>
+                <li>• {t("multi_page_pdf_desc")}</li>
+                <li>• {t("embedded_images_excel_desc")}</li>
               </ul>
             </div>
           </div>

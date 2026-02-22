@@ -1,5 +1,6 @@
 // Array de todos los handlers para fácil importación en módulos
 import { ChangePasswordHandler } from "./change-password.handler";
+import { DeleteUserHandler } from "./delete-user.handler";
 import { Disable2FAHandler } from "./disable-2fa.handler";
 import { Enable2FAHandler } from "./enable-2fa.handler";
 import { ForgotPasswordHandler } from "./forgot-password.handler";
@@ -12,6 +13,8 @@ import { RegenerateBackupCodesHandler } from "./regenerate-backup-codes.handler"
 import { RegisterUserHandler } from "./register-user.handler";
 import { ResetPasswordHandler } from "./reset-password.handler";
 import { Setup2FAHandler } from "./setup-2fa.handler";
+import { UpdateMyProfileHandler } from "./update-my-profile.handler";
+import { UpdateUserHandler } from "./update-user.handler";
 import { ValidateTokenHandler } from "./validate-token.handler";
 import { Verify2FAHandler } from "./verify-2fa.handler";
 
@@ -36,6 +39,13 @@ import { GetPermissionsByModuleHandler } from "./permissions/get-permissions-by-
 import { GetPermissionsHandler } from "./permissions/get-permissions.handler";
 import { UpdatePermissionHandler } from "./permissions/update-permission.handler";
 
+// AppConfig Handlers
+import { AppConfigHandlers } from "./app-config.handlers";
+
+// Internal Contract Handlers (WS1.1)
+import { EvaluatePermissionsHandler } from "./evaluate-permissions.handler";
+import { IntrospectTokenHandler } from "./introspect-token.handler";
+
 export const CommandHandlers = [
   // Users & Auth
   RegisterUserHandler,
@@ -45,6 +55,10 @@ export const CommandHandlers = [
   RefreshTokenHandler,
   ForgotPasswordHandler,
   ResetPasswordHandler,
+  // Users CRUD
+  UpdateUserHandler,
+  UpdateMyProfileHandler,
+  DeleteUserHandler,
   // Two-Factor Authentication
   Setup2FAHandler,
   Enable2FAHandler,
@@ -69,6 +83,9 @@ export const QueryHandlers = [
   GetUserByIdHandler,
   GetUsersHandler,
   ValidateTokenHandler,
+  // Internal Contract (inter-service)
+  IntrospectTokenHandler,
+  EvaluatePermissionsHandler,
   // Roles
   GetRolesHandler,
   GetRoleByIdHandler,
@@ -81,4 +98,8 @@ export const QueryHandlers = [
   GetActivePermissionsHandler,
 ];
 
-export const AllHandlers = [...CommandHandlers, ...QueryHandlers];
+export const AllHandlers = [
+  ...CommandHandlers,
+  ...QueryHandlers,
+  ...AppConfigHandlers,
+];

@@ -31,6 +31,7 @@ export class CancelApprovalRequestHandler
       approvalRequestId: command.approvalRequestId,
       cancelledBy: command.cancelledBy,
       reason: command.reason,
+      securityInfo: command.securityInfo,
     });
 
     // Invalidar cache de aprobaciones activas

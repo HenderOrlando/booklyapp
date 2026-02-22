@@ -15,6 +15,10 @@ export const AUTH_ENDPOINTS = {
   REGISTER: `${API_VERSION}/auth/register`,
   LOGOUT: `${API_VERSION}/auth/logout`,
   PROFILE: `${API_VERSION}/users/me`,
+  PROFILE_DETAILS: `${API_VERSION}/users/me/profile`,
+  PROFILE_UPDATE: `${API_VERSION}/users/me/profile`,
+  PROFILE_PHOTO: `${API_VERSION}/users/me/photo`,
+  PROFILE_PREFERENCES: `${API_VERSION}/users/me/profile`,
   REFRESH_TOKEN: `${API_VERSION}/auth/refresh`,
   VERIFY_EMAIL: `${API_VERSION}/auth/verify-email`,
   FORGOT_PASSWORD: `${API_VERSION}/auth/forgot-password`,
@@ -47,41 +51,63 @@ export const AUTH_ENDPOINTS = {
 } as const;
 
 /**
+ * Endpoints de Configuración Global (Auth Service - Puerto 3001)
+ */
+export const CONFIG_ENDPOINTS = {
+  BASE: `${API_VERSION}/config`,
+  PUBLIC: `${API_VERSION}/config/public`,
+  STORAGE: `${API_VERSION}/config/storage`,
+} as const;
+
+/**
  * Endpoints de Recursos (Resources Service - Puerto 3002)
  */
 export const RESOURCES_ENDPOINTS = {
   // CRUD de Recursos
   BASE: `${API_VERSION}/resources`,
   BY_ID: (id: string) => `${API_VERSION}/resources/${id}`,
+  RESTORE: (id: string) => `${API_VERSION}/resources/${id}/restore`,
+  SEARCH_ADVANCED: `${API_VERSION}/resources/search/advanced`,
 
   // Categorías
   CATEGORIES: `${API_VERSION}/categories`,
   CATEGORY_BY_ID: (id: string) => `${API_VERSION}/categories/${id}`,
 
-  // Programas Académicos
-  PROGRAMS: `${API_VERSION}/resources/programs`,
-  PROGRAM_BY_ID: (id: string) => `${API_VERSION}/resources/programs/${id}`,
+  // Programas Académicos (BE controller: "programs")
+  PROGRAMS: `${API_VERSION}/programs`,
+  PROGRAM_BY_ID: (id: string) => `${API_VERSION}/programs/${id}`,
 
   // Importación/Exportación
-  IMPORT_CSV: `${API_VERSION}/resources/import/csv`,
+  IMPORT_CSV: `${API_VERSION}/resources/import`,
+  IMPORT_ASYNC: `${API_VERSION}/import/async`,
+  IMPORT_VALIDATE: `${API_VERSION}/import/validate`,
+  IMPORT_JOBS: `${API_VERSION}/import/jobs`,
+  IMPORT_JOB_BY_ID: (id: string) => `${API_VERSION}/import/jobs/${id}`,
+  IMPORT_ROLLBACK: `${API_VERSION}/import/rollback`,
+  IMPORT_TEMPLATE: `${API_VERSION}/import/template`,
   EXPORT_CSV: `${API_VERSION}/resources/export/csv`,
   EXPORT_PDF: `${API_VERSION}/resources/export/pdf`,
 
-  // Mantenimiento
-  MAINTENANCE: `${API_VERSION}/resources/maintenance`,
-  MAINTENANCE_BY_ID: (id: string) =>
-    `${API_VERSION}/resources/maintenance/${id}`,
+  // Mantenimiento (BE controller: "maintenances")
+  MAINTENANCE: `${API_VERSION}/maintenances`,
+  MAINTENANCE_BY_ID: (id: string) => `${API_VERSION}/maintenances/${id}`,
   MAINTENANCE_HISTORY: (resourceId: string) =>
-    `${API_VERSION}/resources/${resourceId}/maintenance/history`,
+    `${API_VERSION}/maintenances?resourceId=${resourceId}`,
 
   // Disponibilidad
   AVAILABILITY: `${API_VERSION}/resources/availability`,
   AVAILABILITY_BY_ID: (id: string) =>
     `${API_VERSION}/resources/${id}/availability`,
 
-  // Atributos
+  // Atributos y Características
   ATTRIBUTES: `${API_VERSION}/resources/attributes`,
+  CHARACTERISTICS: `${API_VERSION}/resources/characteristics`,
   EQUIPMENT: `${API_VERSION}/resources/equipment`,
+
+  // Datos de Referencia (BE controller: "reference-data")
+  REFERENCE_DATA: `${API_VERSION}/reference-data`,
+  REFERENCE_DATA_BY_ID: (id: string) => `${API_VERSION}/reference-data/${id}`,
+  REFERENCE_DATA_GROUPS: `${API_VERSION}/reference-data/groups`,
 } as const;
 
 /**
@@ -113,8 +139,8 @@ export const AVAILABILITY_ENDPOINTS = {
   // Espera y Reasignación
   WAITLIST: `${API_VERSION}/waiting-lists`,
   WAITLIST_BY_ID: (id: string) => `${API_VERSION}/waiting-lists/${id}`,
-  REASSIGNMENT: `${API_VERSION}/reassignment`,
-  REASSIGNMENT_BY_ID: (id: string) => `${API_VERSION}/reassignment/${id}`,
+  REASSIGNMENT: `${API_VERSION}/reassignments`,
+  REASSIGNMENT_BY_ID: (id: string) => `${API_VERSION}/reassignments/${id}`,
 
   // Horarios
   SCHEDULES: `${API_VERSION}/schedules`,
@@ -175,46 +201,48 @@ export const STOCKPILE_ENDPOINTS = {
   MY_CHECKIN_HISTORY: `${API_VERSION}/check-in-out/user/me`,
   ACTIVE_CHECKINS: `${API_VERSION}/check-in-out/active/all`,
   OVERDUE_CHECKINS: `${API_VERSION}/check-in-out/overdue/all`,
+
+  // Monitoreo y Vigilancia (Dashboard)
+  MONITORING_ACTIVE: `${API_VERSION}/monitoring/active`,
+  MONITORING_OVERDUE: `${API_VERSION}/monitoring/overdue`,
+  MONITORING_STATS: `${API_VERSION}/monitoring/statistics`,
+  MONITORING_ALERTS: `${API_VERSION}/monitoring/alerts`,
+  RESOLVE_INCIDENT: (id: string) => `${API_VERSION}/monitoring/incident/${id}/resolve`,
 } as const;
 
 /**
- * Endpoints de Reportes y Análisis (Reports Service - Puerto 3005)
+ * Endpoints de Reportes y AnÃ¡lisis (Reports Service - Puerto 3005)
  */
 export const REPORTS_ENDPOINTS = {
   // Dashboard
-  BASE: `${API_VERSION}/reports`,
-  DASHBOARD: `${API_VERSION}/reports/dashboard`,
-  DASHBOARD_ADMIN: `${API_VERSION}/reports/dashboard/admin`,
-  DASHBOARD_USER: `${API_VERSION}/reports/dashboard/user`,
+  BASE: `${API_VERSION}/usage-reports`,
+  DASHBOARD_OVERVIEW: `${API_VERSION}/dashboard/overview`,
+  DASHBOARD_OCCUPANCY: `${API_VERSION}/dashboard/occupancy`,
+  DASHBOARD_TRENDS: `${API_VERSION}/dashboard/trends`,
+  DASHBOARD_KPIS: `${API_VERSION}/dashboard/kpis`,
 
   // Reportes de Uso
-  USAGE: `${API_VERSION}/reports/usage`,
+  USAGE: `${API_VERSION}/usage-reports`,
   USAGE_BY_RESOURCE: (resourceId: string) =>
-    `${API_VERSION}/reports/usage/resource/${resourceId}`,
+    `${API_VERSION}/usage-reports?resourceId=${resourceId}`,
   USAGE_BY_USER: (userId: string) =>
-    `${API_VERSION}/reports/usage/user/${userId}`,
+    `${API_VERSION}/user-reports?userId=${userId}`,
   USAGE_BY_PROGRAM: (programId: string) =>
-    `${API_VERSION}/reports/usage/program/${programId}`,
-
-  // Estadísticas
-  STATISTICS: `${API_VERSION}/reports/statistics`,
-  STATISTICS_SUMMARY: `${API_VERSION}/reports/statistics/summary`,
-  STATISTICS_TRENDS: `${API_VERSION}/reports/statistics/trends`,
+    `${API_VERSION}/usage-reports?programId=${programId}`,
 
   // Exportación
   EXPORT: `${API_VERSION}/reports/export`,
-  EXPORT_CSV: `${API_VERSION}/reports/export/csv`,
-  EXPORT_PDF: `${API_VERSION}/reports/export/pdf`,
-  EXPORT_EXCEL: `${API_VERSION}/reports/export/excel`,
+  EXPORT_STATUS: (id: string) => `${API_VERSION}/reports/export/${id}`,
+  EXPORT_DOWNLOAD: (id: string) => `${API_VERSION}/reports/export/${id}/download`,
 
-  // Demanda Insatisfecha
-  UNSATISFIED_DEMAND: `${API_VERSION}/reports/unsatisfied-demand`,
+  // Demanda Insatisfecha (BE controller: "demand-reports")
+  UNSATISFIED_DEMAND: `${API_VERSION}/demand-reports`,
 
-  // Feedback y Evaluaciones
-  FEEDBACK: `${API_VERSION}/reports/feedback`,
-  FEEDBACK_BY_ID: (id: string) => `${API_VERSION}/reports/feedback/${id}`,
-  EVALUATIONS: `${API_VERSION}/reports/evaluations`,
-  EVALUATION_BY_ID: (id: string) => `${API_VERSION}/reports/evaluations/${id}`,
+  // Feedback y Evaluaciones (BE controllers: "feedback", "evaluation")
+  FEEDBACK: `${API_VERSION}/feedback`,
+  FEEDBACK_BY_ID: (id: string) => `${API_VERSION}/feedback/${id}`,
+  EVALUATIONS: `${API_VERSION}/evaluations`,
+  EVALUATION_BY_ID: (id: string) => `${API_VERSION}/evaluations/${id}`,
 
   // Categorías (compartido con Resources)
   CATEGORIES: `${API_VERSION}/categories`,
@@ -248,7 +276,7 @@ export const SYSTEM_ENDPOINTS = {
  */
 export function buildUrl(
   endpoint: string,
-  params?: Record<string, any>
+  params?: Record<string, unknown>,
 ): string {
   if (!params || Object.keys(params).length === 0) {
     return endpoint;
@@ -256,11 +284,11 @@ export function buildUrl(
 
   const queryString = Object.entries(params)
     .filter(
-      ([_, value]) => value !== undefined && value !== null && value !== ""
+      ([, value]) => value !== undefined && value !== null && value !== "",
     )
     .map(
       ([key, value]) =>
-        `${encodeURIComponent(key)}=${encodeURIComponent(String(value))}`
+        `${encodeURIComponent(key)}=${encodeURIComponent(String(value))}`,
     )
     .join("&");
 
@@ -273,13 +301,21 @@ export function buildUrl(
  */
 export function getServiceFromEndpoint(endpoint: string): string {
   // Auth Service (incluye auditoría)
-  if (endpoint.includes("/auth") || endpoint.includes("/users") || endpoint.includes("/audit")) return "AUTH";
+  if (
+    endpoint.includes("/auth") ||
+    endpoint.includes("/users") ||
+    endpoint.includes("/audit") ||
+    endpoint.includes("/config") ||
+    endpoint.includes("/app-config")
+  )
+    return "AUTH";
 
   // Resources Service
   if (
     endpoint.includes("/resources") ||
     endpoint.includes("/categories") ||
-    endpoint.includes("/programs")
+    endpoint.includes("/programs") ||
+    endpoint.includes("/reference-data")
   )
     return "RESOURCES";
 
@@ -303,7 +339,7 @@ export function getServiceFromEndpoint(endpoint: string): string {
     return "STOCKPILE";
 
   // Reports Service
-  if (endpoint.includes("/reports") || endpoint.includes("/feedback"))
+  if (endpoint.includes("/reports") || endpoint.includes("/usage-reports") || endpoint.includes("/demand-reports") || endpoint.includes("/feedback"))
     return "REPORTS";
 
   if (endpoint.includes("/health")) return "SYSTEM";

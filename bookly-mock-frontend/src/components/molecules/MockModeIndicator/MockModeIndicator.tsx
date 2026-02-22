@@ -13,7 +13,7 @@ import * as React from "react";
  * Siguiendo el sistema de diseño Bookly
  */
 export function MockModeIndicator() {
-  const { isMock, mode } = useMockMode();
+  const { isMock, mode: _mode } = useMockMode();
   const [isVisible, setIsVisible] = React.useState(false);
 
   React.useEffect(() => {
@@ -53,7 +53,7 @@ export function MockModeIndicator() {
         <p className="font-semibold mb-1">Modo de Desarrollo</p>
         <p>Usando datos simulados sin conexión al backend</p>
         <p className="mt-1 text-[10px] opacity-60">
-          Cambiar a modo 'serve' en .env.local
+          Cambiar a modo &apos;serve&apos; en .env.local
         </p>
       </div>
     </div>

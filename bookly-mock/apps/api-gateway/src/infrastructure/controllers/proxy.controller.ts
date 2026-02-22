@@ -1,3 +1,4 @@
+import { ProxyService } from "@gateway/application/services/proxy.service";
 import {
   All,
   Body,
@@ -9,7 +10,6 @@ import {
 } from "@nestjs/common";
 import { ApiOperation, ApiTags } from "@nestjs/swagger";
 import { Audit, AuditAction } from "@reports/audit-decorators";
-import { ProxyService } from '@gateway/application/services/proxy.service';
 
 /**
  * Proxy Controller
@@ -20,7 +20,7 @@ import { ProxyService } from '@gateway/application/services/proxy.service';
 export class ProxyController {
   constructor(private readonly proxyService: ProxyService) {}
 
-  @All("api/v1/:service/*")
+  @All(["api/v1/:service", "api/v1/:service/*"])
   @Audit({
     entityType: "GATEWAY_REQUEST",
     action: AuditAction.ACCESSED,
@@ -34,7 +34,7 @@ export class ProxyController {
     @Req() req: any,
     @Body() body: any,
     @Headers() headers: any,
-    @Query() query: any
+    @Query() query: any,
   ): Promise<any> {
     // Extraer el path después del servicio
     const basePath = `/api/v1/${service}`;
@@ -60,7 +60,7 @@ export class ProxyController {
       headers,
       query,
       userId,
-      userIp
+      userIp,
     );
   }
 }

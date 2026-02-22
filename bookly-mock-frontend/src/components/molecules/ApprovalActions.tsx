@@ -220,7 +220,7 @@ export const ApprovalActions = React.memo<ApprovalActionsProps>(
                 )}
 
                 <div className="space-y-2">
-                  <label className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                  <label className="text-sm font-medium text-[var(--color-text-primary)] dark:text-[var(--color-text-tertiary)]">
                     {dialogContent.label}
                   </label>
                   <textarea
@@ -228,11 +228,11 @@ export const ApprovalActions = React.memo<ApprovalActionsProps>(
                     onChange={(e) => setInputValue(e.target.value)}
                     placeholder={dialogContent.placeholder}
                     rows={4}
-                    className="w-full rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 px-3 py-2 text-sm text-gray-900 dark:text-gray-100 placeholder:text-gray-400 dark:placeholder:text-gray-500 focus:outline-none focus:ring-2 focus:ring-[var(--color-primary-base)] focus:border-transparent"
+                    className="w-full rounded-md border border-[var(--color-border-strong)] dark:border-[var(--color-border-strong)] bg-white dark:bg-[var(--color-bg-inverse)] px-3 py-2 text-sm text-[var(--color-text-primary)] dark:text-[var(--color-text-inverse)] placeholder:text-[var(--color-text-tertiary)] dark:placeholder:text-[var(--color-text-secondary)] focus:outline-none focus:ring-2 focus:ring-[var(--color-primary-base)] focus:border-transparent"
                     required={dialogContent.required}
                   />
                   {dialogContent.required && (
-                    <p className="text-xs text-gray-500 dark:text-gray-400">
+                    <p className="text-xs text-[var(--color-text-secondary)] dark:text-[var(--color-text-tertiary)]">
                       * Campo obligatorio
                     </p>
                   )}

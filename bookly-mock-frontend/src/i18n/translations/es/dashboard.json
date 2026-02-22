@@ -9,12 +9,20 @@
   "most_used_resources": "Recursos Más Usados",
   "most_used_desc": "Top 5 este mes",
   "confirmed": "Confirmada",
+  "status_pending": "Pendiente",
+  "status_confirmed": "Confirmada",
+  "status_in_progress": "En curso",
+  "status_completed": "Completada",
+  "status_cancelled": "Cancelada",
+  "status_rejected": "Rechazada",
   "no_recent_reservations": "No hay reservas próximas",
   "no_data": "No hay datos disponibles",
   "reservations_count": "reservas",
   "total_this_month": "Total este mes",
-  "of_total": "De {{total}} totales",
+  "of_total": "De {total} totales",
   "require_attention": "Requieren atención",
   "monthly_avg": "Promedio mensual",
-  "resource": "Recurso"
+  "resource": "Recurso",
+  "trend_title": "Tendencia de Reservas (Últimos 30 días)",
+  "recent_activity": "Actividad Reciente"
 }

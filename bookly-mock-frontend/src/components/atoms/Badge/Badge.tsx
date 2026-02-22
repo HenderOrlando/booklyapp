@@ -21,17 +21,17 @@ const badgeVariants = cva(
     variants: {
       variant: {
         default:
-          "border-transparent bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-300",
+          "border-transparent bg-[var(--color-bg-secondary)] text-[var(--color-text-primary)]",
         success:
-          "border-state-success-200 bg-[var(--color-state-success-bg)] text-[var(--color-state-success-text)]",
+          "border-[var(--color-state-success-border)] bg-[var(--color-state-success-bg)] text-[var(--color-state-success-text)]",
         warning:
-          "border-state-warning-200 bg-[var(--color-state-warning-bg)] text-[var(--color-state-warning-text)]",
+          "border-[var(--color-state-warning-border)] bg-[var(--color-state-warning-bg)] text-[var(--color-state-warning-text)]",
         error:
-          "border-state-error-200 bg-[var(--color-state-error-bg)] text-[var(--color-state-error-text)]",
+          "border-[var(--color-state-error-border)] bg-[var(--color-state-error-bg)] text-[var(--color-state-error-text)]",
         primary:
-          "border-transparent bg-brand-primary-500 text-white dark:bg-brand-primary-600",
+          "border-transparent bg-[var(--color-action-primary)] text-[var(--color-text-inverse)]",
         secondary:
-          "border-transparent bg-brand-secondary-500 text-white dark:bg-brand-secondary-600",
+          "border-transparent bg-[var(--color-action-secondary)] text-[var(--color-text-inverse)]",
         outline:
           "border-[var(--color-border-strong)] text-[var(--color-text-primary)]",
       },
@@ -39,7 +39,7 @@ const badgeVariants = cva(
     defaultVariants: {
       variant: "default",
     },
-  }
+  },
 );
 
 export interface BadgeProps

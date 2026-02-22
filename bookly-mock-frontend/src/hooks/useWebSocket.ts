@@ -27,6 +27,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 interface UseWebSocketOptions {
   url: string;
   token?: string;
+  enabled?: boolean;
   autoConnect?: boolean;
   reconnect?: boolean;
   maxReconnectAttempts?: number;
@@ -34,7 +35,7 @@ interface UseWebSocketOptions {
   heartbeatInterval?: number;
   onConnected?: () => void;
   onDisconnected?: () => void;
-  onError?: (error: any) => void;
+  onError?: (error: unknown) => void;
   onReconnecting?: (attempt: number) => void;
 }
 
@@ -42,6 +43,7 @@ export function useWebSocket(options: UseWebSocketOptions) {
   const {
     url,
     token,
+    enabled = true,
     autoConnect = true,
     reconnect = true,
     maxReconnectAttempts = 5,
@@ -57,10 +59,29 @@ export function useWebSocket(options: UseWebSocketOptions) {
   const [connectionState, setConnectionState] =
     useState<string>("DISCONNECTED");
   const clientRef = useRef<WebSocketClient | null>(null);
+  const onConnectedRef = useRef(onConnected);
+  const onDisconnectedRef = useRef(onDisconnected);
+  const onErrorRef = useRef(onError);
+  const onReconnectingRef = useRef(onReconnecting);
   const queryClient = useQueryClient();
+
+  useEffect(() => {
+    onConnectedRef.current = onConnected;
+    onDisconnectedRef.current = onDisconnected;
+    onErrorRef.current = onError;
+    onReconnectingRef.current = onReconnecting;
+  }, [onConnected, onDisconnected, onError, onReconnecting]);
 
   // Inicializar cliente
   useEffect(() => {
+    if (!enabled) {
+      clientRef.current?.disconnect();
+      clientRef.current = null;
+      setIsConnected(false);
+      setConnectionState("DISABLED");
+      return;
+    }
+
     const client = new WebSocketClient({
       url,
       token,
@@ -76,18 +97,18 @@ export function useWebSocket(options: UseWebSocketOptions) {
     client.on(wsEvents.connection.connected, () => {
       setIsConnected(true);
       setConnectionState("CONNECTED");
-      onConnected?.();
+      onConnectedRef.current?.();
     });
 
     client.on(wsEvents.connection.disconnected, () => {
       setIsConnected(false);
       setConnectionState("DISCONNECTED");
-      onDisconnected?.();
+      onDisconnectedRef.current?.();
     });
 
     client.on(wsEvents.connection.error, (error) => {
       setConnectionState("ERROR");
-      onError?.(error);
+      onErrorRef.current?.(error);
     });
 
     client.on(wsEvents.connection.stateChange, ({ newState }) => {
@@ -97,7 +118,7 @@ export function useWebSocket(options: UseWebSocketOptions) {
       if (newState === "RECONNECTING" || newState === "CONNECTING") {
         const attemptMatch = newState.match(/(\d+)/);
         const attempt = attemptMatch ? parseInt(attemptMatch[1]) : 1;
-        onReconnecting?.(attempt);
+        onReconnectingRef.current?.(attempt);
       }
     });
 
@@ -132,17 +153,19 @@ export function useWebSocket(options: UseWebSocketOptions) {
       client.disconnect();
     };
   }, [
+    enabled,
     url,
     token,
     autoConnect,
+    reconnect,
+    maxReconnectAttempts,
+    reconnectDelay,
+    heartbeatInterval,
     queryClient,
-    onConnected,
-    onDisconnected,
-    onError,
   ]);
 
   // Método para enviar mensajes
-  const send = useCallback((event: string, data?: any) => {
+  const send = useCallback((event: string, data?: unknown) => {
     clientRef.current?.send(event, data);
   }, []);
 
@@ -155,7 +178,7 @@ export function useWebSocket(options: UseWebSocketOptions) {
       }
       return clientRef.current.on(event, handler);
     },
-    []
+    [],
   );
 
   // Métodos de conexión manual

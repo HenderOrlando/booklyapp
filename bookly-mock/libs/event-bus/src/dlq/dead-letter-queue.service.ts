@@ -55,7 +55,7 @@ export class DeadLetterQueueService implements OnModuleInit {
 
   constructor(
     @InjectModel(DeadLetterQueue.name)
-    private dlqModel: Model<DeadLetterQueueDocument>
+    private dlqModel: Model<DeadLetterQueueDocument>,
   ) {
     // Default: Exponential backoff (1s, 2s, 4s, 8s, ...)
     this.retryStrategy = new ExponentialBackoffStrategy(1000, 60000, 2);
@@ -71,7 +71,7 @@ export class DeadLetterQueueService implements OnModuleInit {
         logger.info("DLQ Service initialized with auto-retry enabled");
       } else {
         logger.warn(
-          "DLQ Service initialized without auto-retry (MongoDB connection not ready)"
+          "DLQ Service initialized without auto-retry (MongoDB connection not ready)",
         );
       }
     } catch (error) {
@@ -82,14 +82,14 @@ export class DeadLetterQueueService implements OnModuleInit {
           "DLQ Service initialized without auto-retry (MongoDB authentication required)",
           {
             error: errorMessage,
-          }
+          },
         );
       } else {
         logger.warn(
           "DLQ Service initialized without auto-retry (MongoDB not available)",
           {
             error: errorMessage,
-          }
+          },
         );
       }
     }
@@ -102,7 +102,7 @@ export class DeadLetterQueueService implements OnModuleInit {
     event: EventPayload,
     topic: string,
     error: Error,
-    maxAttempts: number = 3
+    maxAttempts: number = 3,
   ): Promise<DeadLetterQueue> {
     const dlqEvent = await this.dlqModel.create({
       id: uuidv4(),
@@ -159,7 +159,7 @@ export class DeadLetterQueueService implements OnModuleInit {
       {
         $set: { status: DLQStatus.RETRYING },
         $inc: { attemptCount: 1 },
-      }
+      },
     );
   }
 
@@ -175,7 +175,7 @@ export class DeadLetterQueueService implements OnModuleInit {
           resolvedAt: new Date(),
           resolution: resolution || "Retry successful",
         },
-      }
+      },
     );
 
     logger.info("Event resolved from DLQ", { dlqId });
@@ -194,7 +194,7 @@ export class DeadLetterQueueService implements OnModuleInit {
     if (shouldRetry) {
       // Programar siguiente retry
       const nextRetryAt = this.retryStrategy.calculateNextRetry(
-        dlqEvent.attemptCount
+        dlqEvent.attemptCount,
       );
 
       await this.dlqModel.updateOne(
@@ -206,7 +206,7 @@ export class DeadLetterQueueService implements OnModuleInit {
             error: error.message,
             errorStack: error.stack,
           },
-        }
+        },
       );
 
       logger.warn("Event retry failed, will retry again", {
@@ -224,12 +224,12 @@ export class DeadLetterQueueService implements OnModuleInit {
             error: error.message,
             errorStack: error.stack,
           },
-        }
+        },
       );
 
       logger.error(
         `Event permanently failed after max retries: ${dlqId} (${dlqEvent.attemptCount}/${dlqEvent.maxAttempts})`,
-        error
+        error,
       );
     }
   }
@@ -262,7 +262,7 @@ export class DeadLetterQueueService implements OnModuleInit {
   async resolveManually(
     dlqId: string,
     resolvedBy: string,
-    resolution: string
+    resolution: string,
   ): Promise<DeadLetterQueue> {
     const dlqEvent = await this.dlqModel
       .findOneAndUpdate(
@@ -275,7 +275,7 @@ export class DeadLetterQueueService implements OnModuleInit {
             resolution,
           },
         },
-        { new: true }
+        { new: true },
       )
       .exec();
 
@@ -321,13 +321,13 @@ export class DeadLetterQueueService implements OnModuleInit {
         acc[item._id] = item.count;
         return acc;
       },
-      {} as Record<string, number>
+      {} as Record<string, number>,
     );
 
     return {
       total: (Object.values(statusMap) as number[]).reduce(
         (sum, count) => sum + count,
-        0
+        0,
       ),
       pending: statusMap[DLQStatus.PENDING] || 0,
       retrying: statusMap[DLQStatus.RETRYING] || 0,
@@ -338,21 +338,21 @@ export class DeadLetterQueueService implements OnModuleInit {
           acc[item._id] = item.count;
           return acc;
         },
-        {} as Record<string, number>
+        {} as Record<string, number>,
       ),
       byService: serviceCounts.reduce(
         (acc, item) => {
           acc[item._id || "unknown"] = item.count;
           return acc;
         },
-        {} as Record<string, number>
+        {} as Record<string, number>,
       ),
       byEventType: eventTypeCounts.reduce(
         (acc, item) => {
           acc[item._id || "unknown"] = item.count;
           return acc;
         },
-        {} as Record<string, number>
+        {} as Record<string, number>,
       ),
     };
   }
@@ -456,7 +456,7 @@ export class DeadLetterQueueService implements OnModuleInit {
           "MongoDB authentication error detected, stopping auto-retry",
           {
             error: error.message,
-          }
+          },
         );
         this.stopAutoRetry();
       }

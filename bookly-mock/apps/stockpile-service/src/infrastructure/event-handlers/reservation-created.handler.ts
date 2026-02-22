@@ -1,7 +1,9 @@
-import { Injectable, Logger, OnModuleInit } from "@nestjs/common";
+import { Injectable, Inject, Logger, OnModuleInit } from "@nestjs/common";
 import { EventBusService } from "@libs/event-bus";
 import { EventType } from "@libs/common/enums";
 import { EventPayload } from "@libs/common";
+import { ApprovalFlowService } from "@stockpile/application/services/approval-flow.service";
+import { RedisService } from "@libs/redis";
 
 /**
  * Handler para evento RESERVATION_CREATED
@@ -12,7 +14,11 @@ import { EventPayload } from "@libs/common";
 export class ReservationCreatedHandler implements OnModuleInit {
   private readonly logger = new Logger(ReservationCreatedHandler.name);
 
-  constructor(private readonly eventBus: EventBusService) {}
+  constructor(
+    private readonly eventBus: EventBusService,
+    private readonly approvalFlowService: ApprovalFlowService,
+    private readonly redis: RedisService,
+  ) {}
 
   async onModuleInit() {
     await this.eventBus.subscribe(
@@ -36,36 +42,82 @@ export class ReservationCreatedHandler implements OnModuleInit {
     );
 
     try {
-      // TODO: Implementar lógica de negocio
-      // 1. Verificar si el recurso requiere aprobación
-      // 2. Verificar si el usuario tiene permisos de auto-aprobación
-      // 3. Si requiere aprobación:
-      //    - Crear registro de aprobación
-      //    - Determinar prioridad (low, medium, high)
-      //    - Publicar evento APPROVAL_REQUESTED
-      //    - Notificar a aprobadores
-      // 4. Si no requiere aprobación:
-      //    - Auto-aprobar
-      //    - Publicar evento APPROVAL_GRANTED
-
-      const requiresApproval = true; // TODO: Lógica real de validación
+      const requiresApproval = await this.checkRequiresApproval(resourceId, userId);
 
       if (requiresApproval) {
         this.logger.log(
           `Reservation ${reservationId} requires approval. Initiating approval flow`,
         );
-        // TODO: Publicar APPROVAL_REQUESTED
+
+        await this.eventBus.publish(EventType.APPROVAL_REQUESTED, {
+          eventId: `approval-req-${reservationId}-${Date.now()}`,
+          eventType: EventType.APPROVAL_REQUESTED,
+          service: 'stockpile-service',
+          timestamp: new Date(),
+          data: {
+            reservationId,
+            resourceId,
+            userId,
+            startTime,
+            endTime,
+            purpose,
+            priority: 'NORMAL',
+          },
+          metadata: {
+            correlationId: event.metadata?.correlationId,
+          },
+        });
       } else {
         this.logger.log(
-          `Reservation ${reservationId} auto-approved`,
+          `Reservation ${reservationId} auto-approved (no approval required)`,
         );
-        // TODO: Publicar APPROVAL_GRANTED
+
+        await this.eventBus.publish(EventType.APPROVAL_GRANTED, {
+          eventId: `auto-approve-${reservationId}-${Date.now()}`,
+          eventType: EventType.APPROVAL_GRANTED,
+          service: 'stockpile-service',
+          timestamp: new Date(),
+          data: {
+            reservationId,
+            resourceId,
+            approvedBy: 'system',
+            comments: 'Auto-approved: resource does not require approval',
+          },
+          metadata: {
+            correlationId: event.metadata?.correlationId,
+          },
+        });
       }
     } catch (error) {
       this.logger.error(
         `Error handling RESERVATION_CREATED: ${error.message}`,
         error.stack,
       );
+    }
+  }
+
+  /**
+   * Determina si una reserva requiere aprobación basándose en la configuración
+   * del recurso y los permisos del usuario
+   */
+  private async checkRequiresApproval(resourceId: string, userId: string): Promise<boolean> {
+    try {
+      const cachedConfig = await this.redis.get(`resource:config:${resourceId}`);
+
+      if (cachedConfig) {
+        const config = typeof cachedConfig === 'string' ? JSON.parse(cachedConfig) : cachedConfig;
+        if (config.requiresApproval === false) return false;
+      }
+
+      const userPerms = await this.redis.get(`auth:perms:${userId}`);
+      if (userPerms) {
+        const perms = typeof userPerms === 'string' ? JSON.parse(userPerms) : userPerms;
+        if (perms.autoApprove === true) return false;
+      }
+
+      return true;
+    } catch {
+      return true;
     }
   }
 }

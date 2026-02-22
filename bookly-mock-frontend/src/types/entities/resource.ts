@@ -8,9 +8,9 @@ export enum ResourceType {
   CLASSROOM = "CLASSROOM",
   LABORATORY = "LABORATORY",
   AUDITORIUM = "AUDITORIUM",
-  CONFERENCE_ROOM = "CONFERENCE_ROOM",
-  SPORTS_FIELD = "SPORTS_FIELD",
-  EQUIPMENT = "EQUIPMENT",
+  MULTIMEDIA_EQUIPMENT = "MULTIMEDIA_EQUIPMENT",
+  SPORTS_FACILITY = "SPORTS_FACILITY",
+  MEETING_ROOM = "MEETING_ROOM",
   VEHICLE = "VEHICLE",
   OTHER = "OTHER",
 }
@@ -34,6 +34,7 @@ export interface AvailabilityRules {
   maxAdvanceBookingDays: number;
   minBookingDurationMinutes: number;
   maxBookingDurationMinutes: number;
+  bufferTimeBetweenReservationsMinutes: number;
   allowRecurring: boolean;
 }
 
@@ -55,7 +56,7 @@ export interface Resource {
   location: string;
   floor?: string;
   building?: string;
-  attributes: Record<string, any>;
+  attributes: Record<string, unknown>;
   programIds: string[];
   status: ResourceStatus;
   isActive: boolean;
@@ -104,7 +105,7 @@ export interface CreateResourceDto {
   location: string;
   floor?: string;
   building?: string;
-  attributes?: Record<string, any>;
+  attributes?: Record<string, unknown>;
   programIds?: string[];
   availabilityRules?: AvailabilityRules;
 }
@@ -119,11 +120,17 @@ export interface UpdateResourceDto {
   location?: string;
   floor?: string;
   building?: string;
-  attributes?: Record<string, any>;
+  attributes?: Record<string, unknown>;
   programIds?: string[];
   status?: ResourceStatus;
   isActive?: boolean;
-  availabilityRules?: AvailabilityRules;
+  availabilityRules?: {
+    requiresApproval?: boolean;
+    maxAdvanceBookingDays?: number;
+    minBookingDurationMinutes?: number;
+    maxBookingDurationMinutes?: number;
+    allowRecurring?: boolean;
+  };
 }
 
 export interface SearchResourcesAdvancedDto {

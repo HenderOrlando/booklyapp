@@ -16,6 +16,7 @@ import {
 import { Input } from "@/components/atoms/Input";
 import type { Permission, Role, User } from "@/types/entities/user";
 import { useTranslations } from "next-intl";
+import * as React from "react";
 
 interface RoleFormModalProps {
   show: boolean;
@@ -38,6 +39,7 @@ interface RoleFormModalProps {
   onFilterPermissionChange: (value: string) => void;
   onFilterUserChange: (value: string) => void;
   onPermissionToggle: (permissionId: string) => void;
+  onPermissionBulkChange?: (permissionIds: string[], add: boolean) => void;
   onUserToggle: (userId: string) => void;
 }
 
@@ -62,28 +64,54 @@ export function RoleFormModal({
   onFilterPermissionChange,
   onFilterUserChange,
   onPermissionToggle,
+  onPermissionBulkChange,
   onUserToggle,
 }: RoleFormModalProps) {
   const t = useTranslations("admin.roles");
 
+  const filteredPermissions = React.useMemo(() => {
+    return allPermissions.filter(
+      (p: Permission) =>
+        p.description
+          ?.toLowerCase()
+          .includes(filterPermissionModal.toLowerCase()) ||
+        p.resource.toLowerCase().includes(filterPermissionModal.toLowerCase()) ||
+        p.action.toLowerCase().includes(filterPermissionModal.toLowerCase()),
+    );
+  }, [allPermissions, filterPermissionModal]);
+
+  // Agrupar permisos por recurso
+  const groupedPermissions = React.useMemo(() => {
+    const groups: Record<string, Permission[]> = {};
+    filteredPermissions.forEach((p) => {
+      if (!groups[p.resource]) {
+        groups[p.resource] = [];
+      }
+      groups[p.resource].push(p);
+    });
+    return groups;
+  }, [filteredPermissions]);
+
+  const filteredUsers = React.useMemo(() => {
+    return users.filter(
+      (u: User) =>
+        `${u.firstName} ${u.lastName}`
+          .toLowerCase()
+          .includes(filterUserModal.toLowerCase()) ||
+        u.email.toLowerCase().includes(filterUserModal.toLowerCase()),
+    );
+  }, [users, filterUserModal]);
+
+  const handleSelectAllInResource = (resource: string, perms: Permission[]) => {
+    if (!onPermissionBulkChange) return;
+    
+    const permIds = perms.map(p => p.id);
+    const allSelected = perms.every(p => selectedPermissions.includes(p.id));
+    
+    onPermissionBulkChange(permIds, !allSelected);
+  };
+
   if (!show) return null;
-
-  const filteredPermissions = allPermissions.filter(
-    (p: Permission) =>
-      p.description
-        ?.toLowerCase()
-        .includes(filterPermissionModal.toLowerCase()) ||
-      p.resource.toLowerCase().includes(filterPermissionModal.toLowerCase()) ||
-      p.action.toLowerCase().includes(filterPermissionModal.toLowerCase())
-  );
-
-  const filteredUsers = users.filter(
-    (u: User) =>
-      `${u.firstName} ${u.lastName}`
-        .toLowerCase()
-        .includes(filterUserModal.toLowerCase()) ||
-      u.email.toLowerCase().includes(filterUserModal.toLowerCase())
-  );
 
   return (
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
@@ -109,30 +137,30 @@ export function RoleFormModal({
         <CardContent className="space-y-4">
           {/* Formulario básico */}
           <div>
-            <label className="block text-sm font-medium text-white mb-2">
+            <label className="block text-sm font-medium text-foreground mb-2">
               {t("role_name_label")}
             </label>
             <Input
               placeholder={t("role_placeholder")}
               value={roleName}
               onChange={(e) => onRoleNameChange(e.target.value)}
-              disabled={isLoading}
+              disabled={isLoading || (selectedRole?.isSystem ?? false)}
             />
           </div>
           <div>
-            <label className="block text-sm font-medium text-white mb-2">
+            <label className="block text-sm font-medium text-foreground mb-2">
               {t("role_desc_label")}
             </label>
             <Input
               placeholder={t("desc_placeholder")}
               value={roleDescription}
               onChange={(e) => onRoleDescriptionChange(e.target.value)}
-              disabled={isLoading}
+              disabled={isLoading || (selectedRole?.isSystem ?? false)}
             />
           </div>
 
           {/* Tabs */}
-          <div className="border-b border-gray-700">
+          <div className="border-b border-[var(--color-border-strong)]">
             <nav className="flex gap-4">
               <button
                 onClick={() => onTabChange("permissions")}
@@ -140,7 +168,7 @@ export function RoleFormModal({
                 className={`pb-2 px-1 border-b-2 transition-colors ${
                   activeTab === "permissions"
                     ? "border-brand-primary-500 text-brand-primary-500"
-                    : "border-transparent text-gray-400 hover:text-white"
+                    : "border-transparent text-[var(--color-text-tertiary)] hover:text-foreground"
                 }`}
               >
                 {t("tab_permissions")} ({selectedPermissions.length})
@@ -151,7 +179,7 @@ export function RoleFormModal({
                 className={`pb-2 px-1 border-b-2 transition-colors ${
                   activeTab === "users"
                     ? "border-brand-primary-500 text-brand-primary-500"
-                    : "border-transparent text-gray-400 hover:text-white"
+                    : "border-transparent text-[var(--color-text-tertiary)] hover:text-foreground"
                 }`}
               >
                 {t("tab_users")} ({selectedUsers.length})
@@ -161,11 +189,11 @@ export function RoleFormModal({
 
           {/* Tab Content: Permisos */}
           {activeTab === "permissions" && (
-            <div>
+            <div className="space-y-6">
               <div className="flex items-center justify-between mb-3">
-                <label className="text-sm font-medium text-white">
+                <label className="text-sm font-medium text-foreground">
                   {t("select_permissions")} ({selectedPermissions.length}{" "}
-                  {t("selected")}, {filteredPermissions.length} {t("visible")})
+                  {t("selected")})
                 </label>
                 <Input
                   placeholder={t("filter_permissions")}
@@ -175,40 +203,71 @@ export function RoleFormModal({
                   disabled={isLoading}
                 />
               </div>
-              <div className="grid grid-cols-1 gap-2 max-h-96 overflow-y-auto pr-2">
-                {filteredPermissions.map((perm: Permission) => (
-                  <label
-                    key={perm.id}
-                    className={`flex items-center gap-3 p-3 rounded-lg cursor-pointer border transition-all ${
-                      selectedPermissions.includes(perm.id)
-                        ? "bg-brand-primary-500/10 border-brand-primary-500 hover:bg-brand-primary-500/20"
-                        : "bg-gray-800 border-gray-700 hover:bg-gray-750 hover:border-gray-600"
-                    } ${isLoading ? "opacity-50 cursor-not-allowed" : ""}`}
-                  >
-                    <input
-                      type="checkbox"
-                      checked={selectedPermissions.includes(perm.id)}
-                      onChange={() => onPermissionToggle(perm.id)}
-                      disabled={isLoading}
-                      className="rounded w-4 h-4"
-                    />
-                    <div className="flex items-start gap-2 flex-1">
-                      <div className="flex-shrink-0 w-8 h-8 bg-brand-primary-500 rounded-lg flex items-center justify-center">
-                        <span className="text-white text-xs font-bold">
-                          {perm.resource.charAt(0).toUpperCase()}
-                        </span>
+
+              <div className="max-h-96 overflow-y-auto pr-2 space-y-6">
+                {Object.entries(groupedPermissions).map(([resource, perms]) => {
+                  const allSelectedInResource = perms.every(p => selectedPermissions.includes(p.id));
+                  return (
+                    <div key={resource} className="space-y-3">
+                      <div className="flex items-center gap-2 border-b border-[var(--color-border-strong)] pb-2">
+                        <div className="w-6 h-6 bg-brand-primary-500 rounded flex items-center justify-center">
+                          <span className="text-foreground text-[10px] font-bold">
+                            {resource.charAt(0).toUpperCase()}
+                          </span>
+                        </div>
+                        <h4 className="text-sm font-bold text-foreground uppercase tracking-wider">
+                          {resource}
+                        </h4>
+                        <Badge variant="secondary" className="ml-auto text-[10px]">
+                          {perms.length} {t("available")}
+                        </Badge>
+                        <button
+                          type="button"
+                          onClick={() => handleSelectAllInResource(resource, perms)}
+                          disabled={isLoading || (selectedRole?.isSystem ?? false)}
+                          className="text-[10px] font-bold text-brand-primary-500 hover:underline disabled:opacity-50"
+                        >
+                          {allSelectedInResource ? t("deselect_all") : t("select_all")}
+                        </button>
                       </div>
-                      <div className="flex-1 min-w-0">
-                        <div className="text-white text-sm font-medium">
-                          {perm.description}
-                        </div>
-                        <div className="text-gray-400 text-xs mt-1">
-                          {perm.resource}:{perm.action}
-                        </div>
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+                        {perms.map((perm: Permission) => (
+                          <label
+                            key={perm.id}
+                            className={`flex items-center gap-3 p-3 rounded-lg cursor-pointer border transition-all ${
+                              selectedPermissions.includes(perm.id)
+                                ? "bg-brand-primary-500/10 border-brand-primary-500 hover:bg-brand-primary-500/20 shadow-sm"
+                                : "bg-[var(--color-bg-primary)] border-[var(--color-border-strong)] hover:bg-[var(--color-bg-secondary)]"
+                            } ${isLoading || (selectedRole?.isSystem ?? false) ? "opacity-50 cursor-not-allowed" : ""}`}
+                          >
+                            <input
+                              type="checkbox"
+                              checked={selectedPermissions.includes(perm.id)}
+                              onChange={() => onPermissionToggle(perm.id)}
+                              disabled={isLoading || (selectedRole?.isSystem ?? false)}
+                              className="rounded w-4 h-4 accent-brand-primary-500"
+                            />
+                            <div className="flex-1 min-w-0">
+                              <div className="text-foreground text-sm font-medium">
+                                {perm.description}
+                              </div>
+                              <div className="flex items-center gap-2 mt-1">
+                                <code className="text-[10px] bg-[var(--color-bg-secondary)] px-1.5 py-0.5 rounded text-[var(--color-text-tertiary)]">
+                                  {perm.action}
+                                </code>
+                              </div>
+                            </div>
+                          </label>
+                        ))}
                       </div>
                     </div>
-                  </label>
-                ))}
+                  );
+                })}
+                {Object.keys(groupedPermissions).length === 0 && (
+                  <div className="text-center py-8 text-[var(--color-text-tertiary)]">
+                    {t("no_permissions_found")}
+                  </div>
+                )}
               </div>
             </div>
           )}
@@ -217,7 +276,7 @@ export function RoleFormModal({
           {activeTab === "users" && (
             <div>
               <div className="flex items-center justify-between mb-3">
-                <label className="text-sm font-medium text-white">
+                <label className="text-sm font-medium text-foreground">
                   {t("assign_users")} ({selectedUsers.length} {t("selected")},{" "}
                   {filteredUsers.length} {t("visible")})
                 </label>
@@ -236,7 +295,7 @@ export function RoleFormModal({
                     className={`flex items-center gap-3 p-3 rounded-lg cursor-pointer border transition-all ${
                       selectedUsers.includes(user.id)
                         ? "bg-brand-primary-500/10 border-brand-primary-500"
-                        : "bg-gray-800 border-gray-700 hover:bg-gray-750"
+                        : "bg-[var(--color-bg-primary)] border-[var(--color-border-strong)] hover:bg-[var(--color-bg-secondary)]"
                     } ${isLoading ? "opacity-50 cursor-not-allowed" : ""}`}
                   >
                     <input
@@ -247,16 +306,16 @@ export function RoleFormModal({
                       className="rounded w-4 h-4"
                     />
                     <div className="flex-shrink-0 w-10 h-10 bg-brand-primary-500 rounded-full flex items-center justify-center">
-                      <span className="text-white font-bold">
+                      <span className="text-foreground font-bold">
                         {user.firstName.charAt(0)}
                         {user.lastName.charAt(0)}
                       </span>
                     </div>
                     <div className="flex-1 min-w-0">
-                      <div className="text-white text-sm font-medium">
+                      <div className="text-foreground text-sm font-medium">
                         {user.firstName} {user.lastName}
                       </div>
-                      <div className="text-xs text-gray-400 truncate">
+                      <div className="text-xs text-[var(--color-text-tertiary)] truncate">
                         {user.email}
                       </div>
                       {user.roles.length > 0 && (
@@ -280,11 +339,11 @@ export function RoleFormModal({
           )}
 
           {/* Botones de acción */}
-          <div className="flex gap-2 justify-end pt-4 border-t border-gray-700">
+          <div className="flex gap-2 justify-end pt-4 border-t border-[var(--color-border-strong)]">
             <Button variant="outline" onClick={onClose} disabled={isLoading}>
               {t("cancel")}
             </Button>
-            <Button onClick={onSave} disabled={isLoading}>
+            <Button onClick={onSave} disabled={isLoading || (selectedRole?.isSystem ?? false)}>
               {isLoading ? (
                 <>
                   <span className="animate-spin mr-2">⏳</span>
@@ -295,6 +354,11 @@ export function RoleFormModal({
               )}
             </Button>
           </div>
+          {selectedRole?.isSystem && (
+            <p className="text-xs text-warning-500 mt-2">
+              {t("system_role_edit_warning")}
+            </p>
+          )}
         </CardContent>
       </Card>
     </div>

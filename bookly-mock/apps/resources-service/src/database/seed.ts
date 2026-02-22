@@ -6,6 +6,7 @@ import {
   ResourceStatus,
   ResourceType,
 } from "@libs/common/enums";
+import { ReferenceDataRepository } from "@libs/database";
 import { NestFactory } from "@nestjs/core";
 import { getModelToken } from "@nestjs/mongoose";
 import { Document, Model, Types } from "mongoose";
@@ -15,7 +16,10 @@ import {
   Program,
   Resource,
 } from "../infrastructure/schemas";
+import { Department } from "../infrastructure/schemas/department.schema";
+import { Faculty } from "../infrastructure/schemas/faculty.schema";
 import { ResourcesModule } from "../resources.module";
+import { RESOURCES_REFERENCE_DATA } from "./reference-data.seed-data";
 
 const logger = createLogger("ResourcesSeed");
 
@@ -29,15 +33,19 @@ async function seed() {
 
     const app = await NestFactory.createApplicationContext(ResourcesModule);
     const resourceModel = app.get<Model<Resource>>(
-      getModelToken(Resource.name)
+      getModelToken(Resource.name),
     );
     const categoryModel = app.get<Model<Category>>(
-      getModelToken(Category.name)
+      getModelToken(Category.name),
     );
     const maintenanceModel = app.get<Model<Maintenance>>(
-      getModelToken(Maintenance.name)
+      getModelToken(Maintenance.name),
     );
     const programModel = app.get<Model<Program>>(getModelToken(Program.name));
+    const facultyModel = app.get<Model<Faculty>>(getModelToken(Faculty.name));
+    const departmentModel = app.get<Model<Department>>(
+      getModelToken(Department.name),
+    );
 
     // Limpieza opcional explicita
     if (process.argv.includes("--clean")) {
@@ -48,68 +56,164 @@ async function seed() {
       await programModel.deleteMany({});
     } else if (process.env.NODE_ENV === "development") {
       logger.info(
-        "ℹ️ Modo desarrollo detectado. Usar --clean para limpiar DB antes del seed."
+        "ℹ️ Modo desarrollo detectado. Usar --clean para limpiar DB antes del seed.",
       );
     }
+
+    // ── Reference Data (tipos, estados, categorías dinámicos) ──
+    const refDataRepo = app.get(ReferenceDataRepository);
+    logger.info(
+      `📋 Procesando ${RESOURCES_REFERENCE_DATA.length} datos de referencia...`,
+    );
+    for (const rd of RESOURCES_REFERENCE_DATA) {
+      await refDataRepo.upsert(rd);
+    }
+    logger.info(
+      `✅ ${RESOURCES_REFERENCE_DATA.length} datos de referencia procesados (upsert)`,
+    );
 
     // IDs fijos para consistencia cross-service (según SEED_IDS_REFERENCE.md)
     const ADMIN_GENERAL_ID = "507f1f77bcf86cd799439022";
     const COORDINADOR_SISTEMAS_ID = "507f1f77bcf86cd799439021";
     const COORDINADOR_INDUSTRIAL_ID = "507f1f77bcf86cd799439026";
 
+    const FACULTAD_INGENIERIA_ID = "507f1f77bcf86cd799439051";
+    const DEPTO_SISTEMAS_ID = "507f1f77bcf86cd799439061";
+    const DEPTO_INDUSTRIAL_ID = "507f1f77bcf86cd799439062";
+    const DEPTO_ELECTRONICA_ID = "507f1f77bcf86cd799439063";
+
     const PROGRAMA_SISTEMAS_ID = "507f1f77bcf86cd799439041";
     const PROGRAMA_INDUSTRIAL_ID = "507f1f77bcf86cd799439042";
     const PROGRAMA_ELECTRONICA_ID = "507f1f77bcf86cd799439043";
 
-    // Programas Académicos
+    // ── Facultades ──
+    const faculties = [
+      {
+        _id: new Types.ObjectId(FACULTAD_INGENIERIA_ID),
+        code: "FING",
+        name: "Facultad de Ingeniería",
+        description: "Facultad de Ingeniería de la UFPS",
+        ownerId: ADMIN_GENERAL_ID,
+        ownerName: "Admin Principal",
+        ownerEmail: "admin@ufps.edu.co",
+        isActive: true,
+        audit: { createdBy: ADMIN_GENERAL_ID, updatedBy: ADMIN_GENERAL_ID },
+      },
+    ];
+
+    logger.info(`Procesando ${faculties.length} facultades...`);
+    for (const fac of faculties) {
+      await facultyModel.findOneAndUpdate({ code: fac.code }, fac, {
+        upsert: true,
+        new: true,
+      });
+    }
+    logger.info(`✅ ${faculties.length} facultades procesadas (upsert)`);
+
+    // ── Departamentos ──
+    const departments = [
+      {
+        _id: new Types.ObjectId(DEPTO_SISTEMAS_ID),
+        code: "DSIS",
+        name: "Sistemas e Informática",
+        description: "Departamento de Sistemas e Informática",
+        facultyId: FACULTAD_INGENIERIA_ID,
+        ownerId: COORDINADOR_SISTEMAS_ID,
+        ownerName: "Juan Docente",
+        ownerEmail: "juan.docente@ufps.edu.co",
+        isActive: true,
+        audit: { createdBy: ADMIN_GENERAL_ID, updatedBy: ADMIN_GENERAL_ID },
+      },
+      {
+        _id: new Types.ObjectId(DEPTO_INDUSTRIAL_ID),
+        code: "DIND",
+        name: "Industrial",
+        description: "Departamento de Ingeniería Industrial",
+        facultyId: FACULTAD_INGENIERIA_ID,
+        ownerId: COORDINADOR_INDUSTRIAL_ID,
+        ownerName: "Pedro Coordinador",
+        ownerEmail: "pedro.coordinador@ufps.edu.co",
+        isActive: true,
+        audit: { createdBy: ADMIN_GENERAL_ID, updatedBy: ADMIN_GENERAL_ID },
+      },
+      {
+        _id: new Types.ObjectId(DEPTO_ELECTRONICA_ID),
+        code: "DELE",
+        name: "Electrónica y Telecomunicaciones",
+        description: "Departamento de Electrónica y Telecomunicaciones",
+        facultyId: FACULTAD_INGENIERIA_ID,
+        ownerId: ADMIN_GENERAL_ID,
+        ownerName: "Admin Principal",
+        ownerEmail: "admin@ufps.edu.co",
+        isActive: true,
+        audit: { createdBy: ADMIN_GENERAL_ID, updatedBy: ADMIN_GENERAL_ID },
+      },
+    ];
+
+    logger.info(`Procesando ${departments.length} departamentos...`);
+    for (const dep of departments) {
+      await departmentModel.findOneAndUpdate({ code: dep.code }, dep, {
+        upsert: true,
+        new: true,
+      });
+    }
+    logger.info(`✅ ${departments.length} departamentos procesados (upsert)`);
+
+    // ── Programas Académicos ──
     const programs = [
       {
         _id: new Types.ObjectId(PROGRAMA_SISTEMAS_ID),
         code: "SIS",
         name: "Ingeniería de Sistemas",
         description: "Programa de pregrado en Ingeniería de Sistemas",
+        ownerId: COORDINADOR_SISTEMAS_ID,
+        ownerName: "Juan Docente",
+        ownerEmail: "juan.docente@ufps.edu.co",
         coordinatorId: COORDINADOR_SISTEMAS_ID,
         coordinatorName: "Juan Docente",
         coordinatorEmail: "juan.docente@ufps.edu.co",
-        faculty: "Ingeniería",
+        facultyId: FACULTAD_INGENIERIA_ID,
+        departmentId: DEPTO_SISTEMAS_ID,
+        faculty: "Facultad de Ingeniería",
         department: "Sistemas e Informática",
         isActive: true,
-        audit: {
-          createdBy: ADMIN_GENERAL_ID,
-          updatedBy: ADMIN_GENERAL_ID,
-        },
+        audit: { createdBy: ADMIN_GENERAL_ID, updatedBy: ADMIN_GENERAL_ID },
       },
       {
         _id: new Types.ObjectId(PROGRAMA_INDUSTRIAL_ID),
         code: "IND",
         name: "Ingeniería Industrial",
         description: "Programa de pregrado en Ingeniería Industrial",
+        ownerId: COORDINADOR_INDUSTRIAL_ID,
+        ownerName: "Pedro Coordinador",
+        ownerEmail: "pedro.coordinador@ufps.edu.co",
         coordinatorId: COORDINADOR_INDUSTRIAL_ID,
         coordinatorName: "Pedro Coordinador",
         coordinatorEmail: "pedro.coordinador@ufps.edu.co",
-        faculty: "Ingeniería",
+        facultyId: FACULTAD_INGENIERIA_ID,
+        departmentId: DEPTO_INDUSTRIAL_ID,
+        faculty: "Facultad de Ingeniería",
         department: "Industrial",
         isActive: true,
-        audit: {
-          createdBy: ADMIN_GENERAL_ID,
-          updatedBy: ADMIN_GENERAL_ID,
-        },
+        audit: { createdBy: ADMIN_GENERAL_ID, updatedBy: ADMIN_GENERAL_ID },
       },
       {
         _id: new Types.ObjectId(PROGRAMA_ELECTRONICA_ID),
         code: "ELE",
         name: "Ingeniería Electrónica",
         description: "Programa de pregrado en Ingeniería Electrónica",
+        ownerId: ADMIN_GENERAL_ID,
+        ownerName: "Admin Principal",
+        ownerEmail: "admin@ufps.edu.co",
         coordinatorId: undefined,
         coordinatorName: undefined,
         coordinatorEmail: undefined,
-        faculty: "Ingeniería",
+        facultyId: FACULTAD_INGENIERIA_ID,
+        departmentId: DEPTO_ELECTRONICA_ID,
+        faculty: "Facultad de Ingeniería",
         department: "Electrónica y Telecomunicaciones",
         isActive: true,
-        audit: {
-          createdBy: ADMIN_GENERAL_ID,
-          updatedBy: ADMIN_GENERAL_ID,
-        },
+        audit: { createdBy: ADMIN_GENERAL_ID, updatedBy: ADMIN_GENERAL_ID },
       },
     ];
 
@@ -120,13 +224,13 @@ async function seed() {
       const doc = await programModel.findOneAndUpdate(
         { code: prog.code },
         prog,
-        { upsert: true, new: true }
+        { upsert: true, new: true },
       );
       insertedPrograms.push(doc as Document & Program);
     }
 
     logger.info(
-      `✅ ${insertedPrograms.length} programas procesados (creados/actualizados)`
+      `✅ ${insertedPrograms.length} programas procesados (creados/actualizados)`,
     );
 
     // Categorías
@@ -184,7 +288,7 @@ async function seed() {
       const doc = await categoryModel.findOneAndUpdate(
         { code: cat.code },
         cat,
-        { upsert: true, new: true }
+        { upsert: true, new: true },
       );
       insertedCategories.push(doc as Document & Category);
     }
@@ -327,6 +431,97 @@ async function seed() {
           updatedBy: ADMIN_GENERAL_ID,
         },
       },
+      // ── HU-01: Tipo CLASSROOM (aula regular) ──
+      {
+        code: "RES-AULA-201",
+        name: "Aula 201",
+        description: "Aula de clases estándar con capacidad para 40 estudiantes",
+        type: ResourceType.CLASSROOM,
+        categoryId: catMap.get("Salas de Conferencia"),
+        capacity: 40,
+        location: "Edificio de Ingenierías - Piso 2",
+        floor: "2",
+        building: "Edificio de Ingenierías",
+        attributes: {
+          features: ["Tablero acrílico", "Proyector fijo", "Aire acondicionado"],
+        },
+        programIds: [PROGRAMA_SISTEMAS_ID, PROGRAMA_INDUSTRIAL_ID],
+        isActive: true,
+        status: ResourceStatus.AVAILABLE,
+        availabilityRules: {
+          requiresApproval: false,
+          maxAdvanceBookingDays: 14,
+          minBookingDurationMinutes: 45,
+          maxBookingDurationMinutes: 240,
+          allowRecurring: true,
+        },
+        audit: {
+          createdBy: ADMIN_GENERAL_ID,
+          updatedBy: ADMIN_GENERAL_ID,
+        },
+      },
+      // ── HU-03/HU-08: Recurso en MANTENIMIENTO ──
+      {
+        code: "RES-LAB-ELE-1",
+        name: "Laboratorio de Electrónica 1",
+        description: "Laboratorio de circuitos y electrónica básica - EN MANTENIMIENTO",
+        type: ResourceType.LABORATORY,
+        categoryId: catMap.get("Laboratorios"),
+        capacity: 25,
+        location: "Edificio de Ingenierías - Piso 4",
+        floor: "4",
+        building: "Edificio de Ingenierías",
+        attributes: {
+          features: [
+            "25 estaciones de trabajo",
+            "Osciloscopios",
+            "Generadores de señal",
+          ],
+        },
+        programIds: [PROGRAMA_ELECTRONICA_ID],
+        isActive: true,
+        status: ResourceStatus.MAINTENANCE, // En mantenimiento
+        availabilityRules: {
+          requiresApproval: false,
+          maxAdvanceBookingDays: 30,
+          minBookingDurationMinutes: 90,
+          maxBookingDurationMinutes: 180,
+          allowRecurring: true,
+        },
+        audit: {
+          createdBy: ADMIN_GENERAL_ID,
+          updatedBy: ADMIN_GENERAL_ID,
+        },
+      },
+      // ── HU-03: Recurso NO DISPONIBLE (deshabilitado) ──
+      {
+        code: "RES-AUD-ANTIGUO",
+        name: "Auditorio Antiguo",
+        description: "Auditorio fuera de servicio por remodelación",
+        type: ResourceType.AUDITORIUM,
+        categoryId: catMap.get("Auditorios"),
+        capacity: 200,
+        location: "Edificio Administrativo - Piso 1",
+        floor: "1",
+        building: "Edificio Administrativo",
+        attributes: {
+          features: ["En remodelación"],
+        },
+        programIds: [],
+        isActive: false, // Deshabilitado
+        status: ResourceStatus.UNAVAILABLE, // No disponible
+        availabilityRules: {
+          requiresApproval: true,
+          maxAdvanceBookingDays: 0,
+          minBookingDurationMinutes: 0,
+          maxBookingDurationMinutes: 0,
+          allowRecurring: false,
+        },
+        audit: {
+          createdBy: ADMIN_GENERAL_ID,
+          updatedBy: ADMIN_GENERAL_ID,
+        },
+      },
     ];
 
     logger.info(`Procesando ${resources.length} recursos...`);
@@ -336,7 +531,7 @@ async function seed() {
       const doc = await resourceModel.findOneAndUpdate(
         { code: res.code },
         res,
-        { upsert: true, new: true }
+        { upsert: true, new: true },
       );
       insertedResources.push(doc as Document & Resource);
     }
@@ -421,7 +616,7 @@ async function seed() {
         description: "Inspección rutinaria de sistemas de seguridad",
         scheduledStartDate: new Date(now.getTime() + 14 * 24 * 60 * 60 * 1000),
         scheduledEndDate: new Date(
-          now.getTime() + 14 * 24 * 60 * 60 * 1000 + 3 * 60 * 60 * 1000
+          now.getTime() + 14 * 24 * 60 * 60 * 1000 + 3 * 60 * 60 * 1000,
         ),
         status: MaintenanceStatus.CANCELLED,
         performedBy: "Equipo de Seguridad",
@@ -437,7 +632,7 @@ async function seed() {
     for (const maint of maintenances) {
       if (!maint.resourceId) {
         logger.warn(
-          `⚠️ Saltando mantenimiento "${maint.title}" - Recurso no encontrado`
+          `⚠️ Saltando mantenimiento "${maint.title}" - Recurso no encontrado`,
         );
         continue;
       }
@@ -445,7 +640,7 @@ async function seed() {
       const doc = await maintenanceModel.findOneAndUpdate(
         { title: maint.title },
         maint,
-        { upsert: true, new: true }
+        { upsert: true, new: true },
       );
       insertedMaintenances.push(doc as Document & Maintenance);
     }
@@ -454,7 +649,7 @@ async function seed() {
     logger.info("\n📊 Resumen de datos creados/actualizados:");
     logger.info(`  ✓ ${insertedCategories.length} categorías`);
     logger.info(
-      `  ✓ ${insertedResources.length} recursos con reglas de disponibilidad`
+      `  ✓ ${insertedResources.length} recursos con reglas de disponibilidad`,
     );
     logger.info(`  ✓ ${insertedMaintenances.length} mantenimientos`);
     logger.info("\n📦 Recursos disponibles:");

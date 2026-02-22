@@ -1,9 +1,18 @@
-import { UserRole } from "@libs/common/enums";
-import { PaginationMeta, PaginationQuery } from "@libs/common";
-import { createLogger } from "@libs/common";
+import { UserEntity } from "@auth/domain/entities/user.entity";
+import { IUserRepository } from "@auth/domain/repositories/user.repository.interface";
+import { createLogger, PaginationMeta, PaginationQuery } from "@libs/common";
 import { Inject, Injectable, NotFoundException } from "@nestjs/common";
-import { UserEntity } from '@auth/domain/entities/user.entity';
-import { IUserRepository } from '@auth/domain/repositories/user.repository.interface';
+
+const DEFAULT_USER_PREFERENCES = {
+  language: "es",
+  theme: "system" as const,
+  notifications: {
+    email: true,
+    push: true,
+    sms: false,
+  },
+  timezone: "America/Bogota",
+};
 
 /**
  * User Service
@@ -15,7 +24,7 @@ export class UserService {
 
   constructor(
     @Inject("IUserRepository")
-    private readonly userRepository: IUserRepository
+    private readonly userRepository: IUserRepository,
   ) {}
 
   /**
@@ -49,7 +58,7 @@ export class UserService {
    */
   async getUsers(
     query: PaginationQuery,
-    filters?: Partial<UserEntity>
+    filters?: Partial<UserEntity>,
   ): Promise<{ users: UserEntity[]; meta: PaginationMeta }> {
     return await this.userRepository.findMany(query, filters);
   }
@@ -58,8 +67,8 @@ export class UserService {
    * Obtener usuarios por rol
    */
   async getUsersByRole(
-    role: UserRole,
-    query: PaginationQuery
+    role: string,
+    query: PaginationQuery,
   ): Promise<{ users: UserEntity[]; meta: PaginationMeta }> {
     return await this.userRepository.findByRole(role, query);
   }
@@ -69,7 +78,7 @@ export class UserService {
    */
   async updateUser(
     userId: string,
-    data: Partial<UserEntity>
+    data: Partial<UserEntity>,
   ): Promise<UserEntity> {
     const user = await this.getUserById(userId);
 
@@ -77,6 +86,78 @@ export class UserService {
     const updatedUser = await this.userRepository.update(userId, data);
 
     this.logger.info("User updated successfully", { userId });
+
+    return updatedUser;
+  }
+
+  /**
+   * Actualizar perfil propio del usuario autenticado
+   */
+  async updateMyProfile(
+    userId: string,
+    data: {
+      firstName?: string;
+      lastName?: string;
+      phone?: string;
+      documentType?: string;
+      documentNumber?: string;
+      preferences?: {
+        language?: string;
+        theme?: "light" | "dark" | "system";
+        timezone?: string;
+        notifications?: {
+          email?: boolean;
+          push?: boolean;
+          sms?: boolean;
+        };
+      };
+    },
+  ): Promise<UserEntity> {
+    const user = await this.getUserById(userId);
+
+    const updateData: Record<string, unknown> = {};
+
+    if (data.firstName !== undefined) {
+      updateData.firstName = data.firstName;
+    }
+    if (data.lastName !== undefined) {
+      updateData.lastName = data.lastName;
+    }
+    if (data.phone !== undefined) {
+      updateData.phone = data.phone;
+      // Si cambia el teléfono, requiere reverificación.
+      updateData.isPhoneVerified = false;
+    }
+    if (data.documentType !== undefined) {
+      updateData.documentType = data.documentType;
+    }
+    if (data.documentNumber !== undefined) {
+      updateData.documentNumber = data.documentNumber;
+    }
+    if (data.preferences !== undefined) {
+      const currentPreferences = user.preferences ?? DEFAULT_USER_PREFERENCES;
+      updateData.preferences = {
+        ...currentPreferences,
+        ...data.preferences,
+        notifications: {
+          ...currentPreferences.notifications,
+          ...(data.preferences.notifications ?? {}),
+        },
+      };
+    }
+
+    if (Object.keys(updateData).length === 0) {
+      return user;
+    }
+
+    updateData["audit.updatedBy"] = userId;
+
+    const updatedUser = await this.userRepository.update(
+      userId,
+      updateData as Partial<UserEntity>,
+    );
+
+    this.logger.info("User profile updated successfully", { userId });
 
     return updatedUser;
   }
@@ -108,7 +189,7 @@ export class UserService {
   /**
    * Agregar rol a usuario
    */
-  async addRoleToUser(userId: string, role: UserRole): Promise<UserEntity> {
+  async addRoleToUser(userId: string, role: string): Promise<UserEntity> {
     const user = await this.getUserById(userId);
     user.addRole(role);
 
@@ -124,10 +205,7 @@ export class UserService {
   /**
    * Remover rol de usuario
    */
-  async removeRoleFromUser(
-    userId: string,
-    role: UserRole
-  ): Promise<UserEntity> {
+  async removeRoleFromUser(userId: string, role: string): Promise<UserEntity> {
     const user = await this.getUserById(userId);
     user.removeRole(role);
 

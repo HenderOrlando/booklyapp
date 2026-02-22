@@ -14,6 +14,8 @@ import {
   CardTitle,
 } from "@/components/atoms/Card";
 import { Input } from "@/components/atoms/Input";
+import { Skeleton } from "@/components/atoms/Skeleton";
+import { usePrograms } from "@/hooks/usePrograms";
 import type { Permission, User } from "@/types/entities/user";
 import { UserStatus } from "@/types/entities/user";
 import { useTranslations } from "next-intl";
@@ -23,8 +25,10 @@ interface UserDetailPanelProps {
   show: boolean;
   user: User | null;
   filterPermissions: string;
+  isLoading?: boolean;
   isDeleting?: boolean;
   onClose: () => void;
+  onEdit?: (user: User) => void;
   onDelete?: (userId: string) => void;
   onFilterPermissionsChange: (value: string) => void;
 }
@@ -33,17 +37,19 @@ export function UserDetailPanel({
   show,
   user,
   filterPermissions,
+  isLoading = false,
   isDeleting = false,
   onClose,
+  onEdit,
   onDelete,
   onFilterPermissionsChange,
 }: UserDetailPanelProps) {
   const t = useTranslations("admin.users");
-
-  if (!show || !user) return null;
+  const { data: programs = [] } = usePrograms();
 
   // Obtener permisos efectivos de todos los roles del usuario
   const effectivePermissions = React.useMemo(() => {
+    if (!user) return [];
     const permsMap = new Map<string, Permission>();
     user.roles.forEach((role) => {
       role.permissions.forEach((perm) => {
@@ -53,13 +59,66 @@ export function UserDetailPanel({
       });
     });
     return Array.from(permsMap.values());
-  }, [user.roles]);
+  }, [user]);
+
+  if (!show) return null;
+
+  // Render Skeleton while loading
+  if (isLoading || !user) {
+    return (
+      <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+        <div className="w-full max-w-5xl max-h-[90vh] overflow-y-auto">
+          <Card>
+            <CardHeader>
+              <div className="flex items-center justify-between">
+                <div className="space-y-2">
+                  <Skeleton className="h-8 w-48" />
+                  <Skeleton className="h-4 w-64" />
+                </div>
+                <Button variant="outline" size="sm" onClick={onClose}>✕</Button>
+              </div>
+            </CardHeader>
+            <CardContent className="space-y-8">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <div className="space-y-4">
+                  <Skeleton className="h-6 w-32" />
+                  <div className="grid grid-cols-2 gap-4">
+                    {[...Array(4)].map((_, i) => (
+                      <div key={i} className="space-y-1">
+                        <Skeleton className="h-3 w-16" />
+                        <Skeleton className="h-5 w-full" />
+                      </div>
+                    ))}
+                  </div>
+                </div>
+                <div className="space-y-4">
+                  <Skeleton className="h-6 w-32" />
+                  <div className="flex gap-4">
+                    <Skeleton className="h-10 w-24 rounded-full" />
+                    <Skeleton className="h-10 w-24 rounded-full" />
+                  </div>
+                </div>
+              </div>
+              <div className="space-y-4">
+                <Skeleton className="h-6 w-40" />
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  {[...Array(2)].map((_, i) => (
+                    <Skeleton key={i} className="h-24 w-full rounded-lg" />
+                  ))}
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      </div>
+    );
+  }
 
   const filteredPermissions = effectivePermissions.filter(
     (p: Permission) =>
       p.description?.toLowerCase().includes(filterPermissions.toLowerCase()) ||
       p.resource.toLowerCase().includes(filterPermissions.toLowerCase()) ||
-      p.action.toLowerCase().includes(filterPermissions.toLowerCase())
+      p.action.toLowerCase().includes(filterPermissions.toLowerCase()),
   );
 
   const statusConfig: Record<
@@ -109,30 +168,30 @@ export function UserDetailPanel({
           <CardContent className="space-y-6">
             {/* Información personal */}
             <div>
-              <h3 className="text-lg font-semibold text-white mb-4">
+              <h3 className="text-lg font-semibold text-foreground mb-4">
                 {t("personal_info")}
               </h3>
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="text-sm font-medium text-gray-400">
+                  <label className="text-sm font-medium text-[var(--color-text-tertiary)]">
                     {t("full_name")}
                   </label>
-                  <div className="text-white mt-1">
+                  <div className="text-foreground mt-1">
                     {user.firstName} {user.lastName}
                   </div>
                 </div>
                 <div>
-                  <label className="text-sm font-medium text-gray-400">
+                  <label className="text-sm font-medium text-[var(--color-text-tertiary)]">
                     {t("username")}
                   </label>
-                  <div className="text-white mt-1">{user.username}</div>
+                  <div className="text-foreground mt-1">{user.username}</div>
                 </div>
                 <div>
-                  <label className="text-sm font-medium text-gray-400">
+                  <label className="text-sm font-medium text-[var(--color-text-tertiary)]">
                     {t("email")}
                   </label>
                   <div className="flex items-center gap-2 mt-1">
-                    <span className="text-white">{user.email}</span>
+                    <span className="text-foreground">{user.email}</span>
                     {user.emailVerified && (
                       <Badge variant="success" className="text-xs">
                         {t("verified")}
@@ -141,11 +200,11 @@ export function UserDetailPanel({
                   </div>
                 </div>
                 <div>
-                  <label className="text-sm font-medium text-gray-400">
+                  <label className="text-sm font-medium text-[var(--color-text-tertiary)]">
                     {t("phone_number")}
                   </label>
                   <div className="flex items-center gap-2 mt-1">
-                    <span className="text-white">
+                    <span className="text-foreground">
                       {user.phoneNumber || t("not_provided")}
                     </span>
                     {user.phoneVerified && (
@@ -157,22 +216,48 @@ export function UserDetailPanel({
                 </div>
               </div>
 
+              {/* Información de Programa */}
+              {(user.programId || user.coordinatedProgramId) && (
+                <div className="grid grid-cols-2 gap-4 mt-4">
+                  <div>
+                    <label className="text-sm font-medium text-[var(--color-text-tertiary)]">
+                      {t("program_id") || "Programa Académico"}
+                    </label>
+                    <div className="text-foreground mt-1">
+                      {programs.find((p) => p.id === user.programId)?.name ||
+                        user.programId ||
+                        t("not_provided")}
+                    </div>
+                  </div>
+                  <div>
+                    <label className="text-sm font-medium text-[var(--color-text-tertiary)]">
+                      {t("coordinated_program_id") || "Programa Coordinado"}
+                    </label>
+                    <div className="text-foreground mt-1">
+                      {programs.find((p) => p.id === user.coordinatedProgramId)?.name ||
+                        user.coordinatedProgramId ||
+                        t("not_provided")}
+                    </div>
+                  </div>
+                </div>
+              )}
+
               {/* Documento */}
               {(user.documentType || user.documentNumber) && (
                 <div className="grid grid-cols-2 gap-4 mt-4">
                   <div>
-                    <label className="text-sm font-medium text-gray-400">
+                    <label className="text-sm font-medium text-[var(--color-text-tertiary)]">
                       {t("document_type")}
                     </label>
-                    <div className="text-white mt-1">
+                    <div className="text-foreground mt-1">
                       {user.documentType || t("not_provided")}
                     </div>
                   </div>
                   <div>
-                    <label className="text-sm font-medium text-gray-400">
+                    <label className="text-sm font-medium text-[var(--color-text-tertiary)]">
                       {t("document_number")}
                     </label>
-                    <div className="text-white mt-1">
+                    <div className="text-foreground mt-1">
                       {user.documentNumber || t("not_provided")}
                     </div>
                   </div>
@@ -183,7 +268,7 @@ export function UserDetailPanel({
             {/* Estado y seguridad */}
             <div className="grid grid-cols-3 gap-4">
               <div>
-                <label className="text-sm font-medium text-gray-400">
+                <label className="text-sm font-medium text-[var(--color-text-tertiary)]">
                   {t("account_status")}
                 </label>
                 <div className="mt-1">
@@ -191,7 +276,7 @@ export function UserDetailPanel({
                 </div>
               </div>
               <div>
-                <label className="text-sm font-medium text-gray-400">
+                <label className="text-sm font-medium text-[var(--color-text-tertiary)]">
                   {t("two_factor")}
                 </label>
                 <div className="mt-1">
@@ -203,10 +288,10 @@ export function UserDetailPanel({
                 </div>
               </div>
               <div>
-                <label className="text-sm font-medium text-gray-400">
+                <label className="text-sm font-medium text-[var(--color-text-tertiary)]">
                   {t("last_login")}
                 </label>
-                <div className="text-white mt-1">
+                <div className="text-foreground mt-1">
                   {user.lastLoginAt
                     ? new Date(user.lastLoginAt).toLocaleString("es-ES")
                     : t("never")}
@@ -216,11 +301,11 @@ export function UserDetailPanel({
 
             {/* Roles asignados */}
             <div>
-              <h3 className="text-lg font-semibold text-white mb-4">
+              <h3 className="text-lg font-semibold text-foreground mb-4">
                 {t("assigned_roles")} ({user.roles.length})
               </h3>
               {user.roles.length === 0 ? (
-                <div className="text-center py-8 text-gray-400">
+                <div className="text-center py-8 text-[var(--color-text-tertiary)]">
                   {t("no_roles_assigned")}
                 </div>
               ) : (
@@ -228,10 +313,10 @@ export function UserDetailPanel({
                   {user.roles.map((role) => (
                     <div
                       key={role.id}
-                      className="p-4 bg-gradient-to-r from-gray-800 to-gray-750 rounded-lg border border-gray-700"
+                      className="p-4 bg-gradient-to-r from-gray-800 to-gray-750 rounded-lg border border-[var(--color-border-strong)]"
                     >
                       <div className="flex items-center justify-between mb-2">
-                        <span className="text-white font-medium">
+                        <span className="text-foreground font-medium">
                           {role.name}
                         </span>
                         {role.isSystem && (
@@ -241,11 +326,11 @@ export function UserDetailPanel({
                         )}
                       </div>
                       {role.description && (
-                        <p className="text-xs text-gray-400">
+                        <p className="text-xs text-[var(--color-text-tertiary)]">
                           {role.description}
                         </p>
                       )}
-                      <div className="text-xs text-gray-500 mt-2">
+                      <div className="text-xs text-[var(--color-text-tertiary)] mt-2">
                         {role.permissions.length} {t("permissions")}
                       </div>
                     </div>
@@ -257,7 +342,7 @@ export function UserDetailPanel({
             {/* Permisos efectivos */}
             <div>
               <div className="flex items-center justify-between mb-3">
-                <h3 className="text-lg font-semibold text-white">
+                <h3 className="text-lg font-semibold text-foreground">
                   {t("effective_permissions")} ({filteredPermissions.length} /{" "}
                   {effectivePermissions.length})
                 </h3>
@@ -270,7 +355,7 @@ export function UserDetailPanel({
                 />
               </div>
               {effectivePermissions.length === 0 ? (
-                <div className="text-center py-8 text-gray-400">
+                <div className="text-center py-8 text-[var(--color-text-tertiary)]">
                   {t("no_permissions")}
                 </div>
               ) : (
@@ -278,20 +363,20 @@ export function UserDetailPanel({
                   {filteredPermissions.map((perm: Permission) => (
                     <div
                       key={perm.id}
-                      className="p-3 bg-gray-800 rounded-lg border border-gray-700"
+                      className="p-3 bg-[var(--color-bg-primary)] rounded-lg border border-[var(--color-border-strong)]"
                     >
                       <div className="flex items-start gap-2">
                         <div className="flex-shrink-0 w-8 h-8 bg-brand-primary-500 rounded-lg flex items-center justify-center">
-                          <span className="text-white text-xs font-bold">
+                          <span className="text-foreground text-xs font-bold">
                             {perm.resource.charAt(0).toUpperCase()}
                           </span>
                         </div>
                         <div className="flex-1 min-w-0">
-                          <div className="text-white text-xs font-medium">
+                          <div className="text-foreground text-xs font-medium">
                             {perm.description ||
                               `${perm.resource}:${perm.action}`}
                           </div>
-                          <div className="text-gray-400 text-xs mt-1">
+                          <div className="text-[var(--color-text-tertiary)] text-xs mt-1">
                             {perm.resource}:{perm.action}
                           </div>
                         </div>
@@ -303,32 +388,42 @@ export function UserDetailPanel({
             </div>
 
             {/* Fechas */}
-            <div className="grid grid-cols-2 gap-4 pt-4 border-t border-gray-700">
+            <div className="grid grid-cols-2 gap-4 pt-4 border-t border-[var(--color-border-strong)]">
               <div>
-                <label className="text-sm font-medium text-gray-400">
+                <label className="text-sm font-medium text-[var(--color-text-tertiary)]">
                   {t("created_at")}
                 </label>
-                <div className="text-white mt-1">
+                <div className="text-foreground mt-1">
                   {new Date(user.createdAt).toLocaleString("es-ES")}
                 </div>
               </div>
               <div>
-                <label className="text-sm font-medium text-gray-400">
+                <label className="text-sm font-medium text-[var(--color-text-tertiary)]">
                   {t("updated_at")}
                 </label>
-                <div className="text-white mt-1">
+                <div className="text-foreground mt-1">
                   {new Date(user.updatedAt).toLocaleString("es-ES")}
                 </div>
               </div>
             </div>
 
             {/* Botones de acción */}
-            <div className="flex gap-2 justify-end">
+            <div className="flex gap-3 justify-end pt-6 border-t border-[var(--color-border-strong)]">
+              {onEdit && (
+                <Button
+                  variant="outline"
+                  onClick={() => onEdit(user)}
+                  disabled={isDeleting}
+                >
+                  {t("edit")}
+                </Button>
+              )}
               {onDelete && user.status !== UserStatus.SUSPENDED && (
                 <Button
                   variant="destructive"
                   onClick={() => onDelete(user.id)}
                   disabled={isDeleting}
+                  className="bg-state-error-600 hover:bg-state-error-700 text-white"
                 >
                   {isDeleting ? (
                     <>

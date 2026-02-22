@@ -5,17 +5,59 @@
  */
 
 import { httpClient } from "@/infrastructure/http/httpClient";
-import type { AcademicProgram } from "@/types/entities/resource";
+import type { AcademicProgram, Resource } from "@/types/entities/resource";
 import { useQuery } from "@tanstack/react-query";
+
+interface ProgramCollectionPayload {
+  items?: AcademicProgram[];
+}
+
+interface ResourceCollectionPayload {
+  items?: Resource[];
+  resources?: Resource[];
+}
+
+function extractPrograms(
+  data: ProgramCollectionPayload | AcademicProgram[] | undefined,
+): AcademicProgram[] {
+  if (Array.isArray(data)) {
+    return data;
+  }
+
+  if (data?.items && Array.isArray(data.items)) {
+    return data.items;
+  }
+
+  return [];
+}
+
+function extractResources(
+  data: ResourceCollectionPayload | Resource[] | undefined,
+): Resource[] {
+  if (Array.isArray(data)) {
+    return data;
+  }
+
+  if (data?.resources && Array.isArray(data.resources)) {
+    return data.resources;
+  }
+
+  if (data?.items && Array.isArray(data.items)) {
+    return data.items;
+  }
+
+  return [];
+}
 
 // ============================================
 // CACHE KEYS
 // ============================================
 
 export const programKeys = {
-  all: ["academic-programs"] as const,
+  all: ["programs"] as const,
   lists: () => [...programKeys.all, "list"] as const,
-  list: (filters?: any) => [...programKeys.lists(), filters] as const,
+  list: (filters?: ProgramFilters) =>
+    [...programKeys.lists(), filters] as const,
   details: () => [...programKeys.all, "detail"] as const,
   detail: (id: string) => [...programKeys.details(), id] as const,
   resources: (id: string) => [...programKeys.detail(id), "resources"] as const,
@@ -47,10 +89,12 @@ export function usePrograms(filters?: ProgramFilters) {
   return useQuery({
     queryKey: programKeys.list(filters),
     queryFn: async () => {
-      const response = await httpClient.get("/academic-programs", {
+      const response = await httpClient.get<
+        ProgramCollectionPayload | AcademicProgram[]
+      >("/programs", {
         params: filters,
       });
-      return response.data?.items || [];
+      return extractPrograms(response.data);
     },
     staleTime: 1000 * 60 * 10, // 10 minutos (programas cambian poco)
   });
@@ -70,8 +114,8 @@ export function useProgram(id: string, options?: { enabled?: boolean }) {
   return useQuery<AcademicProgram>({
     queryKey: programKeys.detail(id),
     queryFn: async () => {
-      const response = await httpClient.get(`/academic-programs/${id}`);
-      if (!response.data) {
+      const response = await httpClient.get<AcademicProgram>(`/programs/${id}`);
+      if (!response.success || !response.data) {
         throw new Error("Programa no encontrado");
       }
       return response.data;
@@ -94,10 +138,12 @@ export function useProgramResources(programId: string) {
   return useQuery({
     queryKey: programKeys.resources(programId),
     queryFn: async () => {
-      const response = await httpClient.get(`/program-resources`, {
+      const response = await httpClient.get<
+        ResourceCollectionPayload | Resource[]
+      >("/resources", {
         params: { programId },
       });
-      return response.data?.items || [];
+      return extractResources(response.data);
     },
     enabled: !!programId,
     staleTime: 1000 * 60 * 5, // 5 minutos

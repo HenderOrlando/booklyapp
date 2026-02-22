@@ -12,7 +12,7 @@ import { Document } from "mongoose";
  */
 @Schema({ collection: "reminder_configurations", timestamps: true })
 export class ReminderConfiguration extends Document {
-  @Prop({ required: true, enum: ReminderType, unique: true, index: true })
+  @Prop({ required: true, enum: ReminderType, unique: true })
   type: ReminderType;
 
   @Prop({ required: true, default: true })
@@ -45,10 +45,9 @@ export class ReminderConfiguration extends Document {
 }
 
 export const ReminderConfigurationSchema = SchemaFactory.createForClass(
-  ReminderConfiguration
+  ReminderConfiguration,
 );
 
-// Indexes
-ReminderConfigurationSchema.index({ type: 1 }, { unique: true });
+// Indexes (type already has unique index from @Prop decorator)
 ReminderConfigurationSchema.index({ enabled: 1 });
 ReminderConfigurationSchema.index({ frequency: 1 });

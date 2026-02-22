@@ -1,7 +1,3 @@
-import {
-  ReportsExportFormat,
-  ReportsExportStatus,
-} from "@libs/common/enums";
 import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
 import { Document } from "mongoose";
 
@@ -17,20 +13,11 @@ export class Export extends Document {
   @Prop({ required: true, index: true })
   reportType: string;
 
-  @Prop({
-    required: true,
-    enum: Object.values(ReportsExportFormat),
-    index: true,
-  })
-  format: ReportsExportFormat;
+  @Prop({ required: true, index: true })
+  format: string;
 
-  @Prop({
-    required: true,
-    enum: Object.values(ReportsExportStatus),
-    index: true,
-    default: ReportsExportStatus.PENDING,
-  })
-  status: ReportsExportStatus;
+  @Prop({ required: true, index: true, default: "PENDING" })
+  status: string;
 
   @Prop({ required: true, type: Object })
   filters: Record<string, any>;

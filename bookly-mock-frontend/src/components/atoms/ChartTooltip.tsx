@@ -30,8 +30,8 @@ export const ChartTooltip = React.memo<ChartTooltipProps>(
     return (
       <div
         className={`
-          bg-white dark:bg-gray-800 
-          border border-gray-200 dark:border-gray-700 
+          bg-white dark:bg-[var(--color-bg-inverse)] 
+          border border-[var(--color-border-subtle)] dark:border-[var(--color-border-strong)] 
           rounded-lg shadow-lg 
           p-3
           ${className}
@@ -39,7 +39,7 @@ export const ChartTooltip = React.memo<ChartTooltipProps>(
       >
         {/* Label */}
         {label && (
-          <p className="text-sm font-medium text-gray-900 dark:text-gray-100 mb-2">
+          <p className="text-sm font-medium text-[var(--color-text-primary)] dark:text-[var(--color-text-inverse)] mb-2">
             {labelFormatter ? labelFormatter(label) : label}
           </p>
         )}
@@ -58,12 +58,12 @@ export const ChartTooltip = React.memo<ChartTooltipProps>(
               />
 
               {/* Name */}
-              <span className="text-gray-600 dark:text-gray-400">
+              <span className="text-[var(--color-text-secondary)] dark:text-[var(--color-text-tertiary)]">
                 {entry.name}:
               </span>
 
               {/* Value */}
-              <span className="font-medium text-gray-900 dark:text-gray-100">
+              <span className="font-medium text-[var(--color-text-primary)] dark:text-[var(--color-text-inverse)]">
                 {formatter ? formatter(entry.value, entry.name) : entry.value}
               </span>
             </div>

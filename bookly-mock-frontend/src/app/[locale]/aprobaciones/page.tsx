@@ -2,9 +2,7 @@
 
 import { ApprovalCard } from "@/components/molecules/ApprovalCard";
 import { LoadingState } from "@/components/molecules/LoadingState";
-import { AppHeader } from "@/components/organisms/AppHeader";
 import { ApprovalModal } from "@/components/organisms/ApprovalModal";
-import { AppSidebar } from "@/components/organisms/AppSidebar/AppSidebar";
 import { MainLayout } from "@/components/templates/MainLayout";
 import { useApprovalActions } from "@/hooks/useApprovalActions";
 import {
@@ -38,15 +36,15 @@ import * as React from "react";
  */
 
 export default function AprobacionesPage() {
-  const queryClient = useQueryClient();
-  const { showSuccess, showError } = useToast();
+  const _queryClient = useQueryClient();
+  const { showSuccess, showError: _showError } = useToast();
   const t = useTranslations("approvals");
 
   // Hooks centralizados
-  const { approve, reject, cancel } = useApprovalActions();
+  const { approve, reject, cancel: _cancel } = useApprovalActions();
   const { generate } = useDocumentGeneration();
 
-  const [filters, setFilters] = React.useState<ApprovalFilters>({});
+  const [filters, _setFilters] = React.useState<ApprovalFilters>({});
   const [searchQuery, setSearchQuery] = React.useState("");
   const [selectedRequest, setSelectedRequest] =
     React.useState<ApprovalRequest | null>(null);
@@ -70,7 +68,7 @@ export default function AprobacionesPage() {
       (req) =>
         req.userName?.toLowerCase().includes(query) ||
         req.resourceName?.toLowerCase().includes(query) ||
-        req.purpose?.toLowerCase().includes(query)
+        req.purpose?.toLowerCase().includes(query),
     );
   }, [requests, searchQuery]);
 
@@ -119,7 +117,7 @@ export default function AprobacionesPage() {
         },
         {
           onSuccess: () => handleCloseModal(),
-        }
+        },
       );
     }
   };
@@ -134,19 +132,19 @@ export default function AprobacionesPage() {
         },
         {
           onSuccess: () => handleCloseModal(),
-        }
+        },
       );
     }
   };
 
-  const handleModalComment = (commentText: string) => {
+  const handleModalComment = (_commentText: string) => {
     // Comentarios ahora se manejan como parte de aprobar/rechazar
     console.warn(
-      "handleModalComment deprecated - use approve/reject with comment"
+      "handleModalComment deprecated - use approve/reject with comment",
     );
   };
 
-  const handleModalDelegate = (userId: string, comments: string) => {
+  const handleModalDelegate = (_userId: string, _comments: string) => {
     // Delegación requiere implementación específica en el backend
     console.warn("handleModalDelegate not implemented yet");
   };
@@ -162,7 +160,7 @@ export default function AprobacionesPage() {
 
   const handleShare = async (
     requestId: string,
-    medium: "email" | "sms" | "whatsapp"
+    medium: "email" | "sms" | "whatsapp",
   ) => {
     // Simulación de compartir usando el hook de generación por ahora
     // En el futuro usar useShareReport o similar
@@ -177,22 +175,22 @@ export default function AprobacionesPage() {
         onSuccess: () => {
           showSuccess(
             t("share_success_title"),
-            t("share_success_desc", { medium })
+            t("share_success_desc", { medium }),
           );
         },
-      }
+      },
     );
   };
 
   return (
-    <MainLayout header={<AppHeader />} sidebar={<AppSidebar />}>
+    <MainLayout>
       <div className="space-y-6">
         {/* Header */}
         <div>
-          <h1 className="text-3xl font-bold text-gray-900 dark:text-gray-100">
+          <h1 className="text-3xl font-bold text-[var(--color-text-primary)] dark:text-[var(--color-text-primary)]">
             {t("title")}
           </h1>
-          <p className="mt-2 text-gray-600 dark:text-gray-400">
+          <p className="mt-2 text-[var(--color-text-secondary)] dark:text-[var(--color-text-tertiary)]">
             {t("description")}
           </p>
         </div>
@@ -200,64 +198,64 @@ export default function AprobacionesPage() {
         {/* Estadísticas */}
         {stats && (
           <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-            <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-4">
+            <div className="bg-[var(--color-bg-primary)] dark:bg-[var(--color-bg-secondary)] rounded-lg border border-[var(--color-border-primary)] dark:border-[var(--color-border-primary)] p-4">
               <div className="flex items-center gap-3">
-                <div className="p-2 bg-yellow-100 dark:bg-yellow-900/20 rounded-lg">
-                  <Clock className="h-5 w-5 text-yellow-600 dark:text-yellow-400" />
+                <div className="p-2 bg-state-warning-100 dark:bg-state-warning-900/20 rounded-lg">
+                  <Clock className="h-5 w-5 text-state-warning-600 dark:text-state-warning-400" />
                 </div>
                 <div>
-                  <p className="text-sm text-gray-600 dark:text-gray-400">
+                  <p className="text-sm text-[var(--color-text-secondary)] dark:text-[var(--color-text-tertiary)]">
                     {t("stats.pending")}
                   </p>
-                  <p className="text-2xl font-bold text-gray-900 dark:text-gray-100">
+                  <p className="text-2xl font-bold text-[var(--color-text-primary)] dark:text-[var(--color-text-primary)]">
                     {stats.totalPending || 0}
                   </p>
                 </div>
               </div>
             </div>
 
-            <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-4">
+            <div className="bg-[var(--color-bg-primary)] dark:bg-[var(--color-bg-secondary)] rounded-lg border border-[var(--color-border-primary)] dark:border-[var(--color-border-primary)] p-4">
               <div className="flex items-center gap-3">
-                <div className="p-2 bg-green-100 dark:bg-green-900/20 rounded-lg">
-                  <CheckCircle className="h-5 w-5 text-green-600 dark:text-green-400" />
+                <div className="p-2 bg-state-success-100 dark:bg-state-success-900/20 rounded-lg">
+                  <CheckCircle className="h-5 w-5 text-state-success-600 dark:text-state-success-400" />
                 </div>
                 <div>
-                  <p className="text-sm text-gray-600 dark:text-gray-400">
+                  <p className="text-sm text-[var(--color-text-secondary)] dark:text-[var(--color-text-tertiary)]">
                     {t("stats.approved")}
                   </p>
-                  <p className="text-2xl font-bold text-gray-900 dark:text-gray-100">
+                  <p className="text-2xl font-bold text-[var(--color-text-primary)] dark:text-[var(--color-text-primary)]">
                     {stats.totalApproved || 0}
                   </p>
                 </div>
               </div>
             </div>
 
-            <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-4">
+            <div className="bg-[var(--color-bg-primary)] dark:bg-[var(--color-bg-secondary)] rounded-lg border border-[var(--color-border-primary)] dark:border-[var(--color-border-primary)] p-4">
               <div className="flex items-center gap-3">
-                <div className="p-2 bg-red-100 dark:bg-red-900/20 rounded-lg">
-                  <XCircle className="h-5 w-5 text-red-600 dark:text-red-400" />
+                <div className="p-2 bg-state-error-100 dark:bg-state-error-900/20 rounded-lg">
+                  <XCircle className="h-5 w-5 text-state-error-600 dark:text-state-error-400" />
                 </div>
                 <div>
-                  <p className="text-sm text-gray-600 dark:text-gray-400">
+                  <p className="text-sm text-[var(--color-text-secondary)] dark:text-[var(--color-text-tertiary)]">
                     {t("stats.rejected")}
                   </p>
-                  <p className="text-2xl font-bold text-gray-900 dark:text-gray-100">
+                  <p className="text-2xl font-bold text-[var(--color-text-primary)] dark:text-[var(--color-text-primary)]">
                     {stats.totalRejected || 0}
                   </p>
                 </div>
               </div>
             </div>
 
-            <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-4">
+            <div className="bg-[var(--color-bg-primary)] dark:bg-[var(--color-bg-secondary)] rounded-lg border border-[var(--color-border-primary)] dark:border-[var(--color-border-primary)] p-4">
               <div className="flex items-center gap-3">
-                <div className="p-2 bg-blue-100 dark:bg-blue-900/20 rounded-lg">
-                  <TrendingUp className="h-5 w-5 text-blue-600 dark:text-blue-400" />
+                <div className="p-2 bg-brand-primary-100 dark:bg-brand-primary-900/20 rounded-lg">
+                  <TrendingUp className="h-5 w-5 text-brand-primary-600 dark:text-brand-primary-400" />
                 </div>
                 <div>
-                  <p className="text-sm text-gray-600 dark:text-gray-400">
+                  <p className="text-sm text-[var(--color-text-secondary)] dark:text-[var(--color-text-tertiary)]">
                     {t("stats.average_time")}
                   </p>
-                  <p className="text-2xl font-bold text-gray-900 dark:text-gray-100">
+                  <p className="text-2xl font-bold text-[var(--color-text-primary)] dark:text-[var(--color-text-primary)]">
                     {stats.averageApprovalTime
                       ? (stats.averageApprovalTime / 60).toFixed(1)
                       : "0"}
@@ -272,16 +270,16 @@ export default function AprobacionesPage() {
         {/* Filtros y búsqueda */}
         <div className="flex gap-4">
           <div className="flex-1 relative">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-[var(--color-text-tertiary)]" />
             <input
               type="text"
               placeholder={t("search_placeholder")}
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-10 pr-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 placeholder:text-gray-400"
+              className="w-full pl-10 pr-4 py-2 border border-[var(--color-border-primary)] dark:border-[var(--color-border-primary)] rounded-lg bg-[var(--color-bg-primary)] dark:bg-[var(--color-bg-secondary)] text-[var(--color-text-primary)] dark:text-[var(--color-text-primary)] placeholder:text-[var(--color-text-tertiary)]"
             />
           </div>
-          <button className="flex items-center gap-2 px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800">
+          <button className="flex items-center gap-2 px-4 py-2 border border-[var(--color-border-primary)] dark:border-[var(--color-border-primary)] rounded-lg hover:bg-[var(--color-bg-secondary)] dark:hover:bg-[var(--color-bg-primary)]">
             <Filter className="h-4 w-4" />
             {t("filters")}
           </button>
@@ -306,7 +304,7 @@ export default function AprobacionesPage() {
             ))}
           </div>
         ) : (
-          <div className="text-center py-12 text-gray-500 dark:text-gray-400">
+          <div className="text-center py-12 text-[var(--color-text-tertiary)] dark:text-[var(--color-text-tertiary)]">
             <p>{t("no_requests")}</p>
           </div>
         )}

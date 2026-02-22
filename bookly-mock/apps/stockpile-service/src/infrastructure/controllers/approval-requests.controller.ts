@@ -1,9 +1,6 @@
-import { UserRole } from "@libs/common/enums";
 import { ResponseUtil } from "@libs/common";
-import { CurrentUser } from "@libs/decorators";
-import { Roles } from "@libs/decorators";
-import { JwtAuthGuard } from "@libs/guards";
-import { RolesGuard } from "@libs/guards";
+import { CurrentUser, Roles } from "@libs/decorators";
+import { JwtAuthGuard, RolesGuard } from "@libs/guards";
 import {
   Body,
   Controller,
@@ -12,10 +9,12 @@ import {
   Param,
   Post,
   Query,
+  Req,
   UseGuards,
   UseInterceptors,
 } from "@nestjs/common";
 import { CommandBus, QueryBus } from "@nestjs/cqrs";
+import { Request } from "express";
 import {
   ApiBearerAuth,
   ApiOperation,
@@ -28,13 +27,14 @@ import {
   CancelApprovalRequestCommand,
   CreateApprovalRequestCommand,
   RejectStepCommand,
-} from '@stockpile/application/commands';
+} from "@stockpile/application/commands";
+import { DeleteApprovalRequestCommand } from "@stockpile/application/commands/delete-approval-request.command";
 import {
   GetActiveTodayApprovalsQuery,
   GetApprovalRequestByIdQuery,
   GetApprovalRequestsQuery,
   GetApprovalStatisticsQuery,
-} from '@stockpile/application/queries';
+} from "@stockpile/application/queries";
 import {
   ApproveStepDto,
   CancelApprovalRequestDto,
@@ -57,7 +57,7 @@ import { CacheActiveApprovalsInterceptor } from "../interceptors/cache-active-ap
 export class ApprovalRequestsController {
   constructor(
     private readonly commandBus: CommandBus,
-    private readonly queryBus: QueryBus
+    private readonly queryBus: QueryBus,
   ) {}
 
   @Post()
@@ -76,18 +76,21 @@ export class ApprovalRequestsController {
   })
   async create(
     @Body() dto: CreateApprovalRequestDto,
-    @CurrentUser() user: any
+    @CurrentUser() user: any,
   ): Promise<any> {
     const command = new CreateApprovalRequestCommand(
       dto.reservationId,
       dto.requesterId,
       dto.approvalFlowId,
       dto.metadata,
-      user.sub
+      user.sub,
     );
 
     const result = await this.commandBus.execute(command);
-    return ResponseUtil.success(result, 'Approval request created successfully');
+    return ResponseUtil.success(
+      result,
+      "Approval request created successfully",
+    );
   }
 
   @Get()
@@ -107,22 +110,24 @@ export class ApprovalRequestsController {
         approvalFlowId: query.approvalFlowId,
         status: query.status,
         reservationId: query.reservationId,
-      }
+      },
     );
 
     const result = await this.queryBus.execute(queryCommand);
-    
     if (result.data && result.meta) {
       return ResponseUtil.paginated(
         result.data,
         result.meta.total,
         query.page || 1,
         query.limit || 10,
-        'Approval requests retrieved successfully'
+        "Approval requests retrieved successfully",
       );
     }
-    
-    return ResponseUtil.success(result, 'Approval requests retrieved successfully');
+
+    return ResponseUtil.success(
+      result,
+      "Approval requests retrieved successfully",
+    );
   }
 
   @Get("statistics")
@@ -134,7 +139,7 @@ export class ApprovalRequestsController {
   async getStatistics(
     @Query("startDate") startDate?: string,
     @Query("endDate") endDate?: string,
-    @Query("approvalFlowId") approvalFlowId?: string
+    @Query("approvalFlowId") approvalFlowId?: string,
   ): Promise<any> {
     const query = new GetApprovalStatisticsQuery({
       startDate: startDate ? new Date(startDate) : undefined,
@@ -143,13 +148,16 @@ export class ApprovalRequestsController {
     });
 
     const result = await this.queryBus.execute(query);
-    return ResponseUtil.success(result, 'Approval statistics retrieved successfully');
+    return ResponseUtil.success(
+      result,
+      "Approval statistics retrieved successfully",
+    );
   }
 
   @Get("active-today")
   @UseInterceptors(CacheActiveApprovalsInterceptor)
   @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles(UserRole.SECURITY, UserRole.GENERAL_ADMIN, UserRole.PROGRAM_ADMIN)
+  @Roles("SECURITY", "GENERAL_ADMIN", "PROGRAM_ADMIN")
   @ApiOperation({
     summary: "Obtener aprobaciones activas del día (para vigilantes)",
     description:
@@ -168,9 +176,7 @@ export class ApprovalRequestsController {
     status: 403,
     description: "No tiene permisos para acceder a este recurso",
   })
-  async getActiveToday(
-    @Query() dto: GetActiveTodayApprovalsDto
-  ): Promise<any> {
+  async getActiveToday(@Query() dto: GetActiveTodayApprovalsDto): Promise<any> {
     const query = new GetActiveTodayApprovalsQuery(
       dto.date,
       dto.page,
@@ -179,7 +185,7 @@ export class ApprovalRequestsController {
         resourceId: dto.resourceId,
         programId: dto.programId,
         resourceType: dto.resourceType,
-      }
+      },
     );
 
     const result = await this.queryBus.execute(query);
@@ -190,7 +196,7 @@ export class ApprovalRequestsController {
       result.meta.total,
       dto.page || 1,
       dto.limit || 10,
-      'Active approvals for today retrieved successfully'
+      "Active approvals for today retrieved successfully",
     );
   }
 
@@ -207,7 +213,10 @@ export class ApprovalRequestsController {
   async findOne(@Param("id") id: string): Promise<any> {
     const query = new GetApprovalRequestByIdQuery(id);
     const result = await this.queryBus.execute(query);
-    return ResponseUtil.success(result, 'Approval request retrieved successfully');
+    return ResponseUtil.success(
+      result,
+      "Approval request retrieved successfully",
+    );
   }
 
   @Post(":id/approve")
@@ -228,17 +237,22 @@ export class ApprovalRequestsController {
   async approve(
     @Param("id") id: string,
     @Body() dto: ApproveStepDto,
-    @CurrentUser() user: any
+    @CurrentUser() user: any,
+    @Req() req: Request,
   ): Promise<any> {
     const command = new ApproveStepCommand(
       id,
       user.sub,
       dto.stepName,
-      dto.comment
+      dto.comment,
+      {
+        ipAddress: req.ip,
+        userAgent: req.headers["user-agent"],
+      },
     );
 
     const result = await this.commandBus.execute(command);
-    return ResponseUtil.success(result, 'Step approved successfully');
+    return ResponseUtil.success(result, "Step approved successfully");
   }
 
   @Post(":id/reject")
@@ -259,17 +273,22 @@ export class ApprovalRequestsController {
   async reject(
     @Param("id") id: string,
     @Body() dto: RejectStepDto,
-    @CurrentUser() user: any
+    @CurrentUser() user: any,
+    @Req() req: Request,
   ): Promise<any> {
     const command = new RejectStepCommand(
       id,
       user.sub,
       dto.stepName,
-      dto.comment
+      dto.comment,
+      {
+        ipAddress: req.ip,
+        userAgent: req.headers["user-agent"],
+      },
     );
 
     const result = await this.commandBus.execute(command);
-    return ResponseUtil.success(result, 'Step rejected successfully');
+    return ResponseUtil.success(result, "Step rejected successfully");
   }
 
   @Post(":id/cancel")
@@ -290,12 +309,24 @@ export class ApprovalRequestsController {
   async cancel(
     @Param("id") id: string,
     @Body() dto: CancelApprovalRequestDto,
-    @CurrentUser() user: any
+    @CurrentUser() user: any,
+    @Req() req: Request,
   ): Promise<any> {
-    const command = new CancelApprovalRequestCommand(id, user.sub, dto.reason);
+    const command = new CancelApprovalRequestCommand(
+      id, 
+      user.sub, 
+      dto.reason,
+      {
+        ipAddress: req.ip,
+        userAgent: req.headers["user-agent"],
+      },
+    );
 
     const result = await this.commandBus.execute(command);
-    return ResponseUtil.success(result, 'Approval request cancelled successfully');
+    return ResponseUtil.success(
+      result,
+      "Approval request cancelled successfully",
+    );
   }
 
   @Delete(":id")
@@ -313,9 +344,15 @@ export class ApprovalRequestsController {
     status: 404,
     description: "Solicitud no encontrada",
   })
-  async remove(@Param("id") id: string): Promise<any> {
-    // Implementar DeleteApprovalRequestCommand si es necesario
-    const result = { message: "Delete functionality to be implemented", id };
-    return ResponseUtil.success(result, 'Approval request deleted successfully');
+  async remove(
+    @Param("id") id: string,
+    @CurrentUser("sub") userId: string,
+  ): Promise<any> {
+    const command = new DeleteApprovalRequestCommand(id, userId);
+    const result = await this.commandBus.execute(command);
+    return ResponseUtil.success(
+      result,
+      "Approval request deleted successfully",
+    );
   }
 }

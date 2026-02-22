@@ -8,6 +8,7 @@ export interface ApprovalStep {
   order: number;
   isRequired: boolean;
   allowParallel: boolean;
+  timeoutHours?: number;
 }
 
 /**
@@ -136,7 +137,10 @@ export class ApprovalFlowEntity {
       name: this.name,
       description: this.description,
       resourceTypes: this.resourceTypes,
-      steps: this.steps,
+      steps: this.steps.map(step => ({
+        ...step,
+        timeoutHours: step.timeoutHours
+      })),
       isActive: this.isActive,
       autoApproveConditions: this.autoApproveConditions,
       metadata: this.metadata,
@@ -155,7 +159,14 @@ export class ApprovalFlowEntity {
       obj.name,
       obj.description,
       obj.resourceTypes,
-      obj.steps,
+      obj.steps?.map((step: any) => ({
+        name: step.name,
+        approverRoles: step.approverRoles,
+        order: step.order,
+        isRequired: step.isRequired,
+        allowParallel: step.allowParallel,
+        timeoutHours: step.timeoutHours,
+      })) || [],
       obj.isActive !== undefined ? obj.isActive : true,
       obj.autoApproveConditions,
       obj.metadata,

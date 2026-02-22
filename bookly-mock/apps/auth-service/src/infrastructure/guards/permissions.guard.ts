@@ -18,14 +18,14 @@ import { Reflector } from "@nestjs/core";
 export class PermissionsGuard implements CanActivate {
   constructor(
     private reflector: Reflector,
-    private permissionService: PermissionService
+    private permissionService: PermissionService,
   ) {}
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
     // Obtener permisos requeridos del decorator @RequirePermissions()
     const requiredPermissions = this.reflector.getAllAndOverride<string[]>(
       PERMISSIONS_KEY,
-      [context.getHandler(), context.getClass()]
+      [context.getHandler(), context.getClass()],
     );
 
     // Si no hay permisos requeridos, permitir acceso
@@ -36,18 +36,27 @@ export class PermissionsGuard implements CanActivate {
     // Obtener usuario del request (ya autenticado por JwtAuthGuard)
     const { user } = context.switchToHttp().getRequest();
 
-    if (!user || !user.id) {
+    if (!user) {
+      return false;
+    }
+
+    // GENERAL_ADMIN tiene acceso total — bypass de permisos
+    if (user.roles?.includes("GENERAL_ADMIN")) {
+      return true;
+    }
+
+    const userId = user.id || user.sub;
+    if (!userId) {
       return false;
     }
 
     // Obtener permisos del usuario desde sus roles
-    const userPermissions = await this.permissionService.getUserPermissions(
-      user.id
-    );
+    const userPermissions =
+      await this.permissionService.getUserPermissions(userId);
 
     // Verificar que el usuario tenga TODOS los permisos requeridos
     return requiredPermissions.every((permission) =>
-      userPermissions.includes(permission)
+      userPermissions.includes(permission),
     );
   }
 }

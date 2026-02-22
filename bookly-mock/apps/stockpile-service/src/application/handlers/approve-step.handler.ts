@@ -29,6 +29,7 @@ export class ApproveStepHandler implements ICommandHandler<ApproveStepCommand> {
       approverId: command.approverId,
       stepName: command.stepName,
       comment: command.comment,
+      securityInfo: command.securityInfo,
     });
 
     // Invalidar cache de aprobaciones activas

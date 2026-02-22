@@ -1,11 +1,13 @@
+import { UserEntity } from "@auth/domain/entities/user.entity";
+import { TwoFactorVerificationFailedEvent } from "@auth/domain/events/two-factor-verification-failed.event";
+import { IUserRepository } from "@auth/domain/repositories/user.repository.interface";
+import { createLogger } from "@libs/common";
 import {
   JWT_EXPIRATION,
   JWT_REFRESH_EXPIRATION,
   JWT_SECRET,
   REDIS_PREFIXES,
 } from "@libs/common/constants";
-import { UserRole } from "@libs/common/enums";
-import { createLogger } from "@libs/common";
 import { RedisService } from "@libs/redis";
 import {
   BadRequestException,
@@ -16,9 +18,7 @@ import {
 import { EventBus } from "@nestjs/cqrs";
 import { JwtService } from "@nestjs/jwt";
 import * as bcrypt from "bcryptjs";
-import { UserEntity } from '@auth/domain/entities/user.entity';
-import { TwoFactorVerificationFailedEvent } from '@auth/domain/events/two-factor-verification-failed.event';
-import { IUserRepository } from '@auth/domain/repositories/user.repository.interface';
+import { AppConfigurationService } from "./app-configuration.service";
 
 export interface AuthTokens {
   accessToken: string;
@@ -28,6 +28,8 @@ export interface AuthTokens {
 export interface JwtPayload {
   sub: string;
   email: string;
+  username?: string;
+  tenantId?: string;
   roles: string[];
   permissions: string[];
 }
@@ -53,7 +55,8 @@ export class AuthService {
     private readonly userRepository: IUserRepository,
     private readonly jwtService: JwtService,
     private readonly redisService: RedisService,
-    private readonly eventBus: EventBus
+    private readonly eventBus: EventBus,
+    private readonly appConfigService: AppConfigurationService,
   ) {}
 
   /**
@@ -74,7 +77,7 @@ export class AuthService {
         isEmailVerified: user.isEmailVerified,
       });
       throw new UnauthorizedException(
-        "Account is inactive or email not verified"
+        "Account is inactive or email not verified",
       );
     }
 
@@ -95,7 +98,7 @@ export class AuthService {
       // Generar token temporal con expiración de 5 minutos
       const tempToken = this.jwtService.sign(
         { sub: user.id, email: user.email, temp: true },
-        { secret: JWT_SECRET, expiresIn: "5m" }
+        { secret: JWT_SECRET, expiresIn: "5m" },
       );
 
       this.logger.info("Login pending 2FA verification", {
@@ -188,7 +191,7 @@ export class AuthService {
    */
   async loginWithBackupCode(
     tempToken: string,
-    backupCode: string
+    backupCode: string,
   ): Promise<AuthTokens> {
     try {
       // Verificar token temporal
@@ -222,8 +225,8 @@ export class AuthService {
           TwoFactorVerificationFailedEvent.create({
             userId: user.id,
             email: user.email,
-            reason: "invalid_backup_code"
-          })
+            reason: "invalid_backup_code",
+          }),
         );
 
         throw new UnauthorizedException("Invalid backup code");
@@ -256,14 +259,39 @@ export class AuthService {
   /**
    * Registrar nuevo usuario
    */
-  async register(
-    email: string,
-    password: string,
-    firstName: string,
-    lastName: string,
-    roles: string[],
-    permissions: string[]
-  ): Promise<UserEntity> {
+  async register(data: {
+    email: string;
+    password: string;
+    firstName: string;
+    lastName: string;
+    roles: string[];
+    permissions: string[];
+    username?: string;
+    phone?: string;
+    documentType?: string;
+    documentNumber?: string;
+    tenantId?: string;
+    programId?: string;
+    coordinatedProgramId?: string;
+    createdBy?: string;
+  }): Promise<UserEntity> {
+    const {
+      email,
+      password,
+      firstName,
+      lastName,
+      roles,
+      permissions,
+      username,
+      phone,
+      documentType,
+      documentNumber,
+      tenantId = "UFPS",
+      programId,
+      coordinatedProgramId,
+      createdBy = "system",
+    } = data;
+
     // Verificar si el email ya existe
     const existingUser = await this.userRepository.findByEmail(email);
     if (existingUser) {
@@ -273,6 +301,8 @@ export class AuthService {
 
     // Hash password
     const hashedPassword = await bcrypt.hash(password, this.SALT_ROUNDS);
+
+    const resolvedUsername = username?.trim() || email.split("@")[0];
 
     // Crear usuario
     const user = new UserEntity(
@@ -295,8 +325,18 @@ export class AuthService {
       undefined, // lastLogin
       undefined, // passwordChangedAt
       {
-        createdBy: "system",
-      }
+        createdBy: createdBy,
+      },
+      resolvedUsername, // username
+      false, // isPhoneVerified
+      tenantId, // tenantId
+      undefined, // createdAt
+      undefined, // updatedAt
+      phone,
+      documentType,
+      documentNumber,
+      programId,
+      coordinatedProgramId,
     );
 
     const createdUser = await this.userRepository.create(user);
@@ -315,7 +355,7 @@ export class AuthService {
   async changePassword(
     userId: string,
     oldPassword: string,
-    newPassword: string
+    newPassword: string,
   ): Promise<void> {
     const user = await this.userRepository.findById(userId);
 
@@ -331,7 +371,7 @@ export class AuthService {
     // Verificar contraseña actual
     const isCurrentPasswordValid = await bcrypt.compare(
       oldPassword,
-      user.password
+      user.password,
     );
     if (!isCurrentPasswordValid) {
       this.logger.warn("Password change attempt with invalid old password", {
@@ -353,6 +393,8 @@ export class AuthService {
     const payload: JwtPayload = {
       sub: user.id,
       email: user.email,
+      username: user.username,
+      tenantId: user.tenantId || "UFPS",
       roles: user.roles,
       permissions: user.permissions,
     };
@@ -394,7 +436,7 @@ export class AuthService {
       // Validar refresh token
       const payload = await this.jwtService.verifyAsync<JwtPayload>(
         refreshToken,
-        { secret: JWT_SECRET }
+        { secret: JWT_SECRET },
       );
 
       // Verificar si está en blacklist
@@ -468,7 +510,7 @@ export class AuthService {
         {
           secret: JWT_SECRET,
           expiresIn: "15m",
-        }
+        },
       );
 
       // Guardar token en Redis con TTL de 15 minutos (900 segundos)
@@ -592,7 +634,7 @@ export class AuthService {
       // Buscar usuario por SSO provider
       let user = await this.userRepository.findBySSOProvider(
         ssoData.ssoProvider,
-        ssoData.ssoProviderId
+        ssoData.ssoProviderId,
       );
 
       if (user) {
@@ -601,7 +643,7 @@ export class AuthService {
           ssoData.ssoProvider,
           ssoData.ssoProviderId,
           ssoData.ssoEmail,
-          ssoData.ssoPhotoUrl
+          ssoData.ssoPhotoUrl,
         );
         user.updateLastLogin();
 
@@ -631,7 +673,7 @@ export class AuthService {
           ssoData.ssoProvider,
           ssoData.ssoProviderId,
           ssoData.ssoEmail,
-          ssoData.ssoPhotoUrl
+          ssoData.ssoPhotoUrl,
         );
         user.verifyEmail(); // Auto-verificar email con SSO
         user.updateLastLogin();
@@ -654,7 +696,19 @@ export class AuthService {
         return this.generateTokens(user);
       }
 
-      // Usuario no existe - crear nuevo con SSO
+      // Usuario no existe - verificar si auto-registro por SSO está habilitado
+      const autoRegister =
+        await this.appConfigService.isAutoRegisterOnSSOEnabled();
+      if (!autoRegister) {
+        this.logger.warn("SSO auto-register disabled, user not found", {
+          email: ssoData.email,
+          provider: ssoData.ssoProvider,
+        });
+        throw new UnauthorizedException(
+          "Your account does not exist and automatic registration via SSO is disabled. Contact your administrator.",
+        );
+      }
+
       const roles = this.assignRolesByDomain(ssoData.email);
 
       const newUser = new UserEntity(
@@ -675,7 +729,11 @@ export class AuthService {
         undefined, // twoFactorSecret
         [], // twoFactorBackupCodes
         new Date(), // lastLogin
-        undefined // passwordChangedAt
+        undefined, // passwordChangedAt
+        undefined, // audit
+        ssoData.email.split("@")[0], // username
+        false, // isPhoneVerified
+        "UFPS", // tenantId
       );
 
       const createdUser = await this.userRepository.create(newUser);
@@ -691,7 +749,7 @@ export class AuthService {
     } catch (error) {
       this.logger.error(
         "Failed to validate or create SSO user",
-        error as Error
+        error as Error,
       );
       throw new BadRequestException("Failed to authenticate with SSO");
     }
@@ -700,7 +758,7 @@ export class AuthService {
   /**
    * Asignar roles automáticamente basados en el dominio del email
    */
-  private assignRolesByDomain(email: string): UserRole[] {
+  private assignRolesByDomain(email: string): string[] {
     const domain = email.split("@")[1];
     const allowedDomains = process.env.GOOGLE_ALLOWED_DOMAINS?.split(",") || [
       "ufps.edu.co",
@@ -708,12 +766,12 @@ export class AuthService {
 
     // Verificar que el dominio esté permitido
     if (!allowedDomains.includes(domain)) {
-      return [UserRole.STUDENT]; // Por defecto estudiante si no está en dominio permitido
+      return ["STUDENT"]; // Por defecto estudiante si no está en dominio permitido
     }
 
     // Para @ufps.edu.co, asignar rol basado en patrones comunes
     // Por defecto, todos los usuarios de @ufps.edu.co son estudiantes
     // Los administradores deben ser asignados manualmente
-    return [UserRole.STUDENT];
+    return ["STUDENT"];
   }
 }

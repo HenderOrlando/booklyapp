@@ -1,7 +1,16 @@
+import {
+  DLQFilterDto,
+  EventFilterDto,
+  LogFilterDto,
+  WebSocketEvent,
+  WebSocketSubscribeDto,
+} from "@gateway/application/dto/websocket.dto";
+import { EventsService } from "@gateway/application/services/events.service";
+import { NotificationService } from "@gateway/application/services/notification.service";
 import { createLogger } from "@libs/common";
+import { EventBusService, EventStoreService } from "@libs/event-bus";
 import { DeadLetterQueueService } from "@libs/event-bus/dlq";
-import { EventBusService } from "@libs/event-bus";
-import { EventStoreService } from "@libs/event-bus";
+import { OnModuleInit } from "@nestjs/common";
 import {
   ConnectedSocket,
   MessageBody,
@@ -12,15 +21,6 @@ import {
   WebSocketServer,
 } from "@nestjs/websockets";
 import { Server, Socket } from "socket.io";
-import {
-  DLQFilterDto,
-  EventFilterDto,
-  LogFilterDto,
-  WebSocketEvent,
-  WebSocketSubscribeDto,
-} from '@gateway/application/dto/websocket.dto';
-import { EventsService } from '@gateway/application/services/events.service';
-import { NotificationService } from '@gateway/application/services/notification.service';
 
 const logger = createLogger("WebSocketGateway");
 
@@ -52,7 +52,7 @@ interface ClientSubscriptions {
   namespace: "/api/v1/ws",
 })
 export class BooklyWebSocketGateway
-  implements OnGatewayConnection, OnGatewayDisconnect
+  implements OnGatewayConnection, OnGatewayDisconnect, OnModuleInit
 {
   @WebSocketServer()
   server: Server;
@@ -64,8 +64,16 @@ export class BooklyWebSocketGateway
     private readonly eventStoreService: EventStoreService,
     private readonly dlqService: DeadLetterQueueService,
     private readonly eventsService: EventsService,
-    private readonly notificationService: NotificationService
+    private readonly notificationService: NotificationService,
   ) {
+    // Constructor only initializes dependencies
+  }
+
+  /**
+   * Initialize services after module is ready
+   * This ensures database connections are established before starting monitoring
+   */
+  onModuleInit() {
     this.initializeEventListeners();
     this.startMetricsUpdates();
     this.startDLQMonitoring();
@@ -111,7 +119,7 @@ export class BooklyWebSocketGateway
   @SubscribeMessage("subscribe")
   handleSubscribe(
     @ConnectedSocket() client: Socket,
-    @MessageBody() data: WebSocketSubscribeDto
+    @MessageBody() data: WebSocketSubscribeDto,
   ) {
     const subscription = this.clients.get(client.id);
 
@@ -155,7 +163,7 @@ export class BooklyWebSocketGateway
   @SubscribeMessage("unsubscribe")
   handleUnsubscribe(
     @ConnectedSocket() client: Socket,
-    @MessageBody() data: { channels: string[] }
+    @MessageBody() data: { channels: string[] },
   ) {
     const subscription = this.clients.get(client.id);
 
@@ -191,7 +199,7 @@ export class BooklyWebSocketGateway
     }
 
     const notifications = await this.notificationService.getUserNotifications(
-      subscription.userId
+      subscription.userId,
     );
 
     return {
@@ -206,7 +214,7 @@ export class BooklyWebSocketGateway
   @SubscribeMessage("notifications:read")
   async handleMarkNotificationRead(
     @ConnectedSocket() client: Socket,
-    @MessageBody() data: { notificationId: string }
+    @MessageBody() data: { notificationId: string },
   ) {
     const subscription = this.clients.get(client.id);
 
@@ -216,7 +224,7 @@ export class BooklyWebSocketGateway
 
     const success = await this.notificationService.markAsRead(
       subscription.userId,
-      data.notificationId
+      data.notificationId,
     );
 
     if (success) {
@@ -237,9 +245,26 @@ export class BooklyWebSocketGateway
       const metrics = await this.eventsService.getMetrics();
       client.emit(WebSocketEvent.DASHBOARD_METRICS_UPDATED, metrics);
 
-      // Estadísticas DLQ
-      const dlqStats = await this.dlqService.getStats();
-      client.emit(WebSocketEvent.DLQ_STATS_UPDATED, dlqStats);
+      // Estadísticas DLQ - Handle connection errors gracefully
+      try {
+        const dlqStats = await this.dlqService.getStats();
+        client.emit(WebSocketEvent.DLQ_STATS_UPDATED, dlqStats);
+      } catch (dlqError: any) {
+        if (
+          dlqError.message?.includes("MongoNotConnectedError") ||
+          dlqError.message?.includes("Client must be connected")
+        ) {
+          logger.warn(
+            "DLQ stats not available - waiting for database connection",
+          );
+          client.emit(WebSocketEvent.DLQ_STATS_UPDATED, {
+            stats: null,
+            message: "Database connection pending",
+          });
+        } else {
+          throw dlqError;
+        }
+      }
 
       // Notificaciones pendientes
       const subscription = this.clients.get(client.id);
@@ -247,22 +272,78 @@ export class BooklyWebSocketGateway
         const notifications =
           await this.notificationService.getUserNotifications(
             subscription.userId,
-            true
+            true,
           );
         client.emit("notifications:initial", notifications);
       }
-    } catch (error) {
-      logger.error("Error sending initial state", error);
+    } catch (error: any) {
+      if (
+        error.message?.includes("MongoNotConnectedError") ||
+        error.message?.includes("Client must be connected")
+      ) {
+        logger.warn("Initial state pending - database connection not ready");
+        client.emit("connection:pending", {
+          message: "Services initializing...",
+        });
+      } else {
+        logger.error("Error sending initial state", error);
+      }
     }
   }
 
   /**
    * Inicializar listeners de eventos del Event Bus
+   * Escucha eventos CRUD de todos los microservicios y los reenvía via WebSocket
    */
   private initializeEventListeners() {
-    // Este método se puede extender para escuchar eventos específicos
-    // del Event Bus y reenviarlos via WebSocket
-    logger.info("Event listeners initialized");
+    const crudEvents = [
+      "resource.created",
+      "resource.updated",
+      "resource.deleted",
+      "reservation.created",
+      "reservation.updated",
+      "reservation.cancelled",
+      "reservation.approved",
+      "reservation.rejected",
+      "approval_request.created",
+      "approval_request.approved",
+      "approval_request.rejected",
+      "user.registered",
+      "user.updated",
+      "user.deleted",
+      "category.created",
+      "category.updated",
+      "maintenance.scheduled",
+      "maintenance.completed",
+      "feedback.submitted",
+      "report.generated",
+      "app_config.updated",
+    ];
+
+    for (const eventType of crudEvents) {
+      try {
+        this.eventBusService.subscribe(
+          eventType,
+          "gateway-ws-group",
+          async (eventData: any) => {
+            logger.debug(`Broadcasting event: ${eventType}`, {
+              eventId: eventData?.id,
+            });
+            this.server.emit("crud-event", {
+              type: eventType,
+              data: eventData,
+              timestamp: new Date(),
+            });
+          },
+        );
+      } catch (error) {
+        logger.warn(`Could not subscribe to event ${eventType}`, error);
+      }
+    }
+
+    logger.info(
+      `Event listeners initialized for ${crudEvents.length} CRUD event types`,
+    );
   }
 
   /**
@@ -311,8 +392,16 @@ export class BooklyWebSocketGateway
           stats,
           timestamp: new Date(),
         });
-      } catch (error) {
-        logger.error("Error monitoring DLQ", error);
+      } catch (error: any) {
+        // Handle MongoDB connection errors gracefully
+        if (
+          error.message?.includes("MongoNotConnectedError") ||
+          error.message?.includes("Client must be connected")
+        ) {
+          logger.warn("DLQ monitoring waiting for database connection...");
+        } else {
+          logger.error("Error monitoring DLQ", error);
+        }
       }
     }, 10000); // Cada 10 segundos
   }
@@ -328,9 +417,25 @@ export class BooklyWebSocketGateway
       return userId;
     }
 
-    // TODO: Extraer de JWT token en handshake.auth
-    // const token = client.handshake.auth.token;
-    // Decode JWT y extraer userId
+    // Extraer de JWT token en handshake.auth
+    const token = client.handshake.auth?.token as string;
+    if (token) {
+      try {
+        const base64Payload = token.split(".")[1];
+        if (base64Payload) {
+          const payload = JSON.parse(
+            Buffer.from(base64Payload, "base64").toString(),
+          );
+          if (payload.sub) {
+            return payload.sub;
+          }
+        }
+      } catch (error) {
+        logger.warn("Failed to extract userId from JWT token", {
+          error: (error as Error).message,
+        });
+      }
+    }
 
     return "anonymous";
   }

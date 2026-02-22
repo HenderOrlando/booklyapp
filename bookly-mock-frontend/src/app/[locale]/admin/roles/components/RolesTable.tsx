@@ -46,9 +46,23 @@ export function RolesTable({
       key: "name",
       header: t("role_name"),
       cell: (role: RoleWithStats) => (
-        <div>
-          <div className="font-medium text-white">{role.name}</div>
-          <div className="text-sm text-gray-400">{role.description || ""}</div>
+        <div className="flex items-center gap-3">
+          <div className={`w-8 h-8 rounded-lg flex items-center justify-center text-xs ${role.isSystem ? 'bg-warning-500/20 text-warning-500' : 'bg-brand-primary-500/20 text-brand-primary-500'}`}>
+            {role.isSystem ? '⚙️' : '👤'}
+          </div>
+          <div>
+            <div className="font-bold text-foreground flex items-center gap-2">
+              {role.name}
+              {role.isSystem && (
+                <Badge variant="warning" className="text-[10px] py-0 px-1.5 h-4">
+                  {t("system")}
+                </Badge>
+              )}
+            </div>
+            <div className="text-xs text-[var(--color-text-tertiary)] max-w-xs truncate">
+              {role.description || ""}
+            </div>
+          </div>
         </div>
       ),
     },
@@ -56,16 +70,21 @@ export function RolesTable({
       key: "permissions",
       header: t("permissions"),
       cell: (role: RoleWithStats) => (
-        <div className="flex flex-wrap gap-1">
+        <div className="flex flex-wrap gap-1 max-w-md">
           {role.permissions.slice(0, 3).map((perm) => (
-            <Badge key={perm.id} variant="secondary">
+            <Badge key={perm.id} variant="secondary" className="text-[10px] bg-[var(--color-bg-secondary)] border-[var(--color-border-strong)]">
               {perm.description}
             </Badge>
           ))}
           {role.permissions.length > 3 && (
-            <Badge variant="secondary">
+            <Badge variant="secondary" className="text-[10px]">
               {t("more", { count: role.permissions.length - 3 })}
             </Badge>
+          )}
+          {role.permissions.length === 0 && (
+            <span className="text-xs text-[var(--color-text-tertiary)] italic">
+              {t("no_permissions")}
+            </span>
           )}
         </div>
       ),
@@ -74,7 +93,10 @@ export function RolesTable({
       key: "usersCount",
       header: t("users"),
       cell: (role: RoleWithStats) => (
-        <Badge variant="primary">{role.usersCount}</Badge>
+        <div className="flex items-center gap-2">
+          <div className="w-2 h-2 rounded-full bg-brand-primary-500"></div>
+          <span className="font-medium text-sm">{role.usersCount}</span>
+        </div>
       ),
     },
     {
@@ -82,11 +104,23 @@ export function RolesTable({
       header: t("actions"),
       cell: (role: RoleWithStats) => (
         <div className="flex gap-2">
-          <Button size="sm" variant="outline" onClick={() => onEdit(role)}>
-            {t("edit")}
+          <Button 
+            size="sm" 
+            variant="outline" 
+            onClick={() => onView(role)}
+            className="h-8 w-8 p-0"
+            title={t("view")}
+          >
+            👁️
           </Button>
-          <Button size="sm" variant="outline" onClick={() => onView(role)}>
-            {t("view")}
+          <Button 
+            size="sm" 
+            variant="outline" 
+            onClick={() => onEdit(role)}
+            className="h-8 w-8 p-0"
+            title={t("edit")}
+          >
+            ✏️
           </Button>
         </div>
       ),
@@ -97,7 +131,7 @@ export function RolesTable({
   const filteredRoles = roles.filter(
     (role: RoleWithStats) =>
       role.name.toLowerCase().includes(filter.toLowerCase()) ||
-      (role.description || "").toLowerCase().includes(filter.toLowerCase())
+      (role.description || "").toLowerCase().includes(filter.toLowerCase()),
   );
 
   return (

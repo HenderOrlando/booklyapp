@@ -3,6 +3,7 @@
  * Celda individual de día en el calendario
  */
 
+import { Button } from "@/components/atoms/Button/Button";
 import type { CalendarDay, CalendarEvent } from "@/types/calendar";
 import * as Tooltip from "@radix-ui/react-tooltip";
 import { format } from "date-fns";
@@ -70,42 +71,43 @@ export function CalendarDayCell({
   const eventCount = day.events.length;
 
   const buttonContent = (
-    <button
+    <Button
       type="button"
+      variant="ghost"
       onClick={handleClick}
       onContextMenu={handleContextMenu}
       onDragOver={handleDragOver}
       onDrop={handleDrop}
       disabled={day.isDisabled}
       className={`
-        relative min-h-[80px] p-2 border border-gray-200
-        transition-all duration-200
+        relative min-h-[80px] h-auto w-full p-2 border border-[var(--color-border-subtle)]
+        transition-all duration-200 flex-col items-stretch justify-start rounded-none whitespace-normal
         ${
           !day.isCurrentMonth
-            ? "bg-gray-50 text-gray-400"
-            : "bg-white text-gray-900"
+            ? "bg-[var(--color-bg-secondary)] text-[var(--color-text-tertiary)] hover:bg-[var(--color-bg-secondary)]"
+            : "bg-background text-[var(--color-text-primary)]"
         }
-        ${day.isToday ? "border-2 border-blue-500 ring-1 ring-blue-500" : ""}
-        ${isSelected ? "bg-blue-50 border-blue-400" : ""}
-        ${isDragOver && !day.isDisabled ? "border-2 border-green-500 bg-green-50" : ""}
+        ${day.isToday ? "border-2 border-[var(--color-border-focus)] ring-1 ring-[var(--color-border-focus)]" : ""}
+        ${isSelected ? "bg-[var(--color-state-info-bg)] border-[var(--color-state-info-border)] hover:bg-[var(--color-state-info-bg)]" : ""}
+        ${isDragOver && !day.isDisabled ? "border-2 border-[var(--color-state-success-border)] bg-[var(--color-state-success-bg)] hover:bg-[var(--color-state-success-bg)]" : ""}
         ${day.isPast && day.isCurrentMonth ? "opacity-60" : ""}
         ${
           day.isDisabled
             ? "cursor-not-allowed opacity-40"
-            : "cursor-pointer hover:bg-blue-50 hover:border-blue-300"
+            : "cursor-pointer hover:bg-[var(--color-state-info-bg)] hover:border-[var(--color-state-info-border)]"
         }
-        ${day.isWeekend && day.isCurrentMonth ? "bg-gray-50" : ""}
+        ${day.isWeekend && day.isCurrentMonth ? "bg-[var(--color-bg-secondary)] hover:bg-[var(--color-bg-secondary)]" : ""}
       `}
       aria-label={format(day.date, "d 'de' MMMM", { locale: es })}
       aria-current={day.isToday ? "date" : undefined}
       aria-disabled={day.isDisabled}
     >
       {/* Número del día */}
-      <div className="flex items-center justify-between mb-1">
+      <div className="flex items-center justify-between mb-1 w-full">
         <span
           className={`
             text-sm font-medium
-            ${day.isToday ? "text-blue-600 font-bold" : ""}
+            ${day.isToday ? "text-[var(--color-text-link)] font-bold" : ""}
           `}
         >
           {format(day.date, "d")}
@@ -117,7 +119,7 @@ export function CalendarDayCell({
             className="
               inline-flex items-center justify-center
               w-5 h-5 text-xs font-semibold
-              bg-blue-500 text-white rounded-full
+              bg-[var(--color-action-primary)] text-[var(--color-text-inverse)] rounded-full
             "
             aria-label={`${eventCount} evento${eventCount > 1 ? "s" : ""}`}
           >
@@ -128,8 +130,8 @@ export function CalendarDayCell({
 
       {/* Dots de eventos (máximo 3 visibles) */}
       {hasEvents && (
-        <div className="flex gap-1 flex-wrap">
-          {day.events.slice(0, 3).map((event, index) => (
+        <div className="flex gap-1 flex-wrap w-full">
+          {day.events.slice(0, 3).map((event) => (
             <div
               key={event.id}
               className="w-2 h-2 rounded-full"
@@ -139,7 +141,9 @@ export function CalendarDayCell({
             />
           ))}
           {eventCount > 3 && (
-            <span className="text-xs text-gray-500">+{eventCount - 3}</span>
+            <span className="text-xs text-[var(--color-text-secondary)]">
+              +{eventCount - 3}
+            </span>
           )}
         </div>
       )}
@@ -147,11 +151,11 @@ export function CalendarDayCell({
       {/* Indicador de hoy */}
       {day.isToday && (
         <div
-          className="absolute top-1 right-1 w-2 h-2 bg-blue-500 rounded-full"
+          className="absolute top-1 right-1 w-2 h-2 bg-[var(--color-action-primary)] rounded-full"
           aria-hidden="true"
         />
       )}
-    </button>
+    </Button>
   );
 
   // Si no hay eventos, retornar solo el botón
@@ -166,13 +170,13 @@ export function CalendarDayCell({
         <Tooltip.Trigger asChild>{buttonContent}</Tooltip.Trigger>
         <Tooltip.Portal>
           <Tooltip.Content
-            className="z-50 max-w-sm overflow-hidden rounded-md border border-gray-700 bg-gray-900 px-3 py-2 text-sm shadow-md animate-in fade-in-0 zoom-in-95"
+            className="z-50 max-w-sm overflow-hidden rounded-md border border-[var(--color-border-strong)] bg-[var(--color-bg-inverse)] px-3 py-2 text-sm shadow-md animate-in fade-in-0 zoom-in-95"
             sideOffset={5}
           >
             <div className="space-y-2">
-              <div className="font-semibold text-white border-b border-gray-700 pb-2">
+              <div className="font-semibold text-[var(--color-text-inverse)] border-b border-[var(--color-border-strong)] pb-2">
                 {format(day.date, "d 'de' MMMM 'de' yyyy", { locale: es })}
-                <span className="ml-2 text-xs text-gray-400">
+                <span className="ml-2 text-xs text-[var(--color-text-tertiary)]">
                   ({eventCount} evento{eventCount > 1 ? "s" : ""})
                 </span>
               </div>
@@ -180,27 +184,27 @@ export function CalendarDayCell({
                 {day.events.map((event) => (
                   <div
                     key={event.id}
-                    className="flex items-start gap-2 p-2 rounded bg-gray-800/50"
+                    className="flex items-start gap-2 p-2 rounded bg-[var(--color-bg-inverse)]/50"
                   >
                     <div
                       className="w-3 h-3 rounded-full mt-0.5 flex-shrink-0"
                       style={{ backgroundColor: event.color }}
                     />
                     <div className="flex-1 min-w-0">
-                      <div className="font-medium text-white truncate">
+                      <div className="font-medium text-[var(--color-text-inverse)] truncate">
                         {event.title}
                       </div>
-                      <div className="text-xs text-gray-400">
+                      <div className="text-xs text-[var(--color-text-tertiary)]">
                         {format(new Date(event.start), "HH:mm", { locale: es })}{" "}
                         - {format(new Date(event.end), "HH:mm", { locale: es })}
                       </div>
                       {event.resourceName && (
-                        <div className="text-xs text-gray-500 mt-1">
+                        <div className="text-xs text-[var(--color-text-secondary)] mt-1">
                           📍 {event.resourceName}
                         </div>
                       )}
                       {event.userName && (
-                        <div className="text-xs text-gray-500">
+                        <div className="text-xs text-[var(--color-text-secondary)]">
                           👤 {event.userName}
                         </div>
                       )}
@@ -209,7 +213,7 @@ export function CalendarDayCell({
                 ))}
               </div>
             </div>
-            <Tooltip.Arrow className="fill-gray-700" />
+            <Tooltip.Arrow className="fill-[var(--color-bg-inverse)]" />
           </Tooltip.Content>
         </Tooltip.Portal>
       </Tooltip.Root>

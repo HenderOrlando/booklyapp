@@ -1,7 +1,3 @@
-import {
-  DocumentTemplateFormat,
-  DocumentTemplateType,
-} from "@libs/common/enums";
 import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
 import { Document, Types } from "mongoose";
 
@@ -22,15 +18,11 @@ export class AuditInfoSchema {
  */
 @Schema({ collection: "document_templates", timestamps: true })
 export class DocumentTemplate extends Document {
-  @Prop({ required: true, unique: true, index: true })
+  @Prop({ required: true, unique: true })
   name: string;
 
-  @Prop({
-    required: true,
-    enum: Object.values(DocumentTemplateType),
-    index: true,
-  })
-  type: DocumentTemplateType;
+  @Prop({ required: true, index: true })
+  type: string;
 
   @Prop({ required: true })
   description: string;
@@ -44,11 +36,8 @@ export class DocumentTemplate extends Document {
   @Prop({ required: true, default: true, index: true })
   isActive: boolean;
 
-  @Prop({
-    enum: Object.values(DocumentTemplateFormat),
-    default: DocumentTemplateFormat.PDF,
-  })
-  format: DocumentTemplateFormat;
+  @Prop({ type: String, default: "PDF" })
+  format: string;
 
   @Prop({ type: Object })
   metadata?: Record<string, any>;
@@ -60,8 +49,7 @@ export class DocumentTemplate extends Document {
 export const DocumentTemplateSchema =
   SchemaFactory.createForClass(DocumentTemplate);
 
-// Indexes
-DocumentTemplateSchema.index({ name: 1 }, { unique: true });
+// Indexes (name already has unique index from @Prop decorator)
 DocumentTemplateSchema.index({ type: 1, isActive: 1 });
 DocumentTemplateSchema.index({ isActive: 1 });
 DocumentTemplateSchema.index({ createdAt: -1 });

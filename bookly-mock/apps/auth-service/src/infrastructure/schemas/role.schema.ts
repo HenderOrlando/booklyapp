@@ -1,4 +1,3 @@
-import { UserRole } from "@libs/common/enums";
 import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
 import { Document } from "mongoose";
 
@@ -10,13 +9,8 @@ export type RoleDocument = Role & Document;
  */
 @Schema({ timestamps: true, collection: "roles" })
 export class Role {
-  @Prop({
-    type: String,
-    enum: Object.values(UserRole),
-    required: true,
-    unique: true,
-  })
-  name: UserRole;
+  @Prop({ type: String, required: true, unique: true })
+  name: string;
 
   @Prop({ required: true, trim: true })
   displayName: string;
@@ -53,8 +47,7 @@ export class Role {
 
 export const RoleSchema = SchemaFactory.createForClass(Role);
 
-// Indexes
-RoleSchema.index({ name: 1 }, { unique: true });
+// Indexes (name already has unique index from @Prop decorator)
 RoleSchema.index({ isActive: 1 });
 RoleSchema.index({ isDefault: 1 });
 RoleSchema.index({ permissionIds: 1 });

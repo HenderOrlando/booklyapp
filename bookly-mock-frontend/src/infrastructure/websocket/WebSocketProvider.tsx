@@ -1,89 +1,184 @@
 "use client";
 
+import { useDataMode } from "@/hooks/useDataMode";
+import { useWebSocket as useManagedWebSocket } from "@/hooks/useWebSocket";
+import { config } from "@/lib/config";
 import {
   createContext,
-  ReactNode,
+  type ReactNode,
+  useCallback,
   useContext,
   useEffect,
-  useState,
+  useMemo,
+  useRef,
 } from "react";
-import { io, Socket } from "socket.io-client";
-import { config, isMockMode } from "@/lib/config";
+
+type WebSocketEventHandler<T = unknown> = (payload: T) => void;
+
+interface SocketAdapter {
+  on: <T = unknown>(event: string, handler: WebSocketEventHandler<T>) => void;
+  off: <T = unknown>(event: string, handler?: WebSocketEventHandler<T>) => void;
+  emit: (event: string, payload?: unknown) => void;
+}
 
 interface WebSocketContextType {
-  socket: Socket | null;
+  socket: SocketAdapter | null;
   isConnected: boolean;
-  subscribe: (channels: string[]) => void;
-  unsubscribe: (channels: string[]) => void;
+  connectionState: string;
+  wsEnabled: boolean;
+  subscribe: <T = unknown>(
+    event: string,
+    handler: WebSocketEventHandler<T>,
+  ) => () => void;
+  unsubscribe: <T = unknown>(
+    event: string,
+    handler?: WebSocketEventHandler<T>,
+  ) => void;
+  connect: () => void;
+  disconnect: () => void;
+  send: (event: string, payload?: unknown) => void;
 }
 
 const WebSocketContext = createContext<WebSocketContextType | null>(null);
 
 interface WebSocketProviderProps {
   children: ReactNode;
+  url?: string;
+  enabled?: boolean;
 }
 
-export function WebSocketProvider({ children }: WebSocketProviderProps) {
-  const [socket, setSocket] = useState<Socket | null>(null);
-  const [isConnected, setIsConnected] = useState(false);
+export function WebSocketProvider({
+  children,
+  url = config.wsUrl,
+  enabled = true,
+}: WebSocketProviderProps) {
+  const { wsEnabled } = useDataMode();
+  const shouldEnable = enabled && wsEnabled;
 
-  useEffect(() => {
-    // No inicializar WebSocket en modo mock
-    if (isMockMode() || !config.features.enableWebSocket) {
-      console.log("[WebSocket] Deshabilitado en modo mock o por configuración");
-      return;
-    }
+  const websocket = useManagedWebSocket({
+    url,
+    token:
+      typeof window !== "undefined"
+        ? localStorage.getItem("accessToken") || undefined
+        : undefined,
+    enabled: shouldEnable,
+    autoConnect: shouldEnable,
+    reconnect: shouldEnable,
+    onConnected: () => {
+      if (config.isDevelopment) {
+        console.log("[WebSocketProvider] connected");
+      }
+    },
+    onDisconnected: () => {
+      if (config.isDevelopment) {
+        console.log("[WebSocketProvider] disconnected");
+      }
+    },
+  });
 
-    // Inicializar sin conectar - la conexión se hará después del login
-    const socketInstance = io(config.wsUrl || "", {
-      path: "/api/v1/ws",
-      autoConnect: false,
+  const subscriptionsRef = useRef<
+    Map<string, Map<WebSocketEventHandler<unknown>, () => void>>
+  >(new Map());
+
+  const unsubscribe = useCallback(
+    <T = unknown,>(event: string, handler?: WebSocketEventHandler<T>) => {
+      const eventHandlers = subscriptionsRef.current.get(event);
+      if (!eventHandlers) {
+        return;
+      }
+
+      const typedHandler = handler as
+        | WebSocketEventHandler<unknown>
+        | undefined;
+
+      if (typedHandler) {
+        const cleanup = eventHandlers.get(typedHandler);
+        cleanup?.();
+        eventHandlers.delete(typedHandler);
+      } else {
+        eventHandlers.forEach((cleanup) => cleanup());
+        eventHandlers.clear();
+      }
+
+      if (eventHandlers.size === 0) {
+        subscriptionsRef.current.delete(event);
+      }
+    },
+    [],
+  );
+
+  const subscribe = useCallback(
+    <T = unknown,>(event: string, handler: WebSocketEventHandler<T>) => {
+      if (!shouldEnable) {
+        return () => {};
+      }
+
+      const typedHandler = handler as WebSocketEventHandler<unknown>;
+
+      let eventHandlers = subscriptionsRef.current.get(event);
+      if (!eventHandlers) {
+        eventHandlers = new Map();
+        subscriptionsRef.current.set(event, eventHandlers);
+      }
+
+      const cleanup = websocket.subscribe(event, typedHandler);
+      eventHandlers.set(typedHandler, cleanup);
+
+      return () => {
+        unsubscribe(event, typedHandler);
+      };
+    },
+    [shouldEnable, unsubscribe, websocket],
+  );
+
+  const unsubscribeAll = useCallback(() => {
+    subscriptionsRef.current.forEach((handlers, event) => {
+      handlers.forEach((cleanup) => cleanup());
+      subscriptionsRef.current.delete(event);
     });
-
-    socketInstance.on("connect", () => {
-      setIsConnected(true);
-      console.log("[WebSocket] Connected");
-    });
-
-    socketInstance.on("disconnect", () => {
-      setIsConnected(false);
-      console.log("[WebSocket] Disconnected");
-    });
-
-    socketInstance.on("connect_error", (error) => {
-      console.error("[WebSocket] Connection error:", error);
-    });
-
-    setSocket(socketInstance);
-
-    return () => {
-      socketInstance.disconnect();
-    };
   }, []);
 
-  const subscribe = (channels: string[]) => {
-    if (socket && isConnected) {
-      socket.emit("subscribe", { channels });
-      console.log("[WebSocket] Subscribed to channels:", channels);
-    }
-  };
+  useEffect(() => {
+    return () => {
+      unsubscribeAll();
+    };
+  }, [unsubscribeAll]);
 
-  const unsubscribe = (channels: string[]) => {
-    if (socket && isConnected) {
-      socket.emit("unsubscribe", { channels });
-      console.log("[WebSocket] Unsubscribed from channels:", channels);
+  const socket = useMemo<SocketAdapter | null>(() => {
+    if (!shouldEnable) {
+      return null;
     }
-  };
+
+    return {
+      on: (event, handler) => {
+        subscribe(event, handler);
+      },
+      off: (event, handler) => {
+        unsubscribe(event, handler);
+      },
+      emit: (event, payload) => {
+        websocket.send(event, payload);
+      },
+    };
+  }, [shouldEnable, subscribe, unsubscribe, websocket]);
+
+  const contextValue = useMemo<WebSocketContextType>(
+    () => ({
+      socket,
+      isConnected: shouldEnable ? websocket.isConnected : false,
+      connectionState: shouldEnable ? websocket.connectionState : "DISABLED",
+      wsEnabled: shouldEnable,
+      subscribe,
+      unsubscribe,
+      connect: websocket.connect,
+      disconnect: websocket.disconnect,
+      send: websocket.send,
+    }),
+    [shouldEnable, socket, subscribe, unsubscribe, websocket],
+  );
 
   return (
-    <WebSocketContext.Provider
-      value={{
-        socket,
-        isConnected,
-        subscribe,
-        unsubscribe,
-      }}
-    >
+    <WebSocketContext.Provider value={contextValue}>
       {children}
     </WebSocketContext.Provider>
   );
@@ -96,3 +191,5 @@ export const useWebSocket = () => {
   }
   return context;
 };
+
+export const useWebSocketContext = useWebSocket;

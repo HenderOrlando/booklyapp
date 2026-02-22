@@ -1,35 +1,41 @@
 "use client";
 
 import { ReportFilters } from "@/components/molecules/ReportFilters";
-import { AppHeader } from "@/components/organisms/AppHeader";
-import { AppSidebar } from "@/components/organisms/AppSidebar/AppSidebar";
 import { ExportPanel } from "@/components/organisms/ExportPanel";
 import { ResourceUtilizationChart } from "@/components/organisms/ResourceUtilizationChart";
 import { MainLayout } from "@/components/templates/MainLayout";
+import { useReportByResource } from "@/hooks/useReportData";
 import { useReportExport } from "@/hooks/useReportExport";
 import { useReportFilters } from "@/hooks/useReportFilters";
 import { mockResourceUtilization } from "@/infrastructure/mock/data";
-import * as React from "react";
+import type { ResourceUtilization } from "@/types/entities/report";
+import { useTranslations } from "next-intl";
 
 export default function ReportesRecursosPage() {
+  const t = useTranslations("reports");
   const { filters, setFilters } = useReportFilters();
   const { exportReport } = useReportExport();
-  const [resourceData] = React.useState(mockResourceUtilization);
+  const { data: serverData } = useReportByResource();
+  const resourceData: ResourceUtilization[] =
+    (serverData as ResourceUtilization[]) &&
+    (serverData as ResourceUtilization[]).length > 0
+      ? (serverData as ResourceUtilization[])
+      : mockResourceUtilization;
 
-  const handleExport = (format: "csv" | "excel" | "pdf", options: any) => {
+  const handleExport = (format: "csv" | "excel" | "pdf", _options: any) => {
     exportReport({ format, data: resourceData, filename: "recursos" });
   };
 
   return (
-    <MainLayout header={<AppHeader />} sidebar={<AppSidebar />}>
+    <MainLayout>
       <div className="space-y-6">
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-3xl font-bold text-gray-900 dark:text-gray-100">
-              Reportes por Recurso
+            <h1 className="text-3xl font-bold text-[var(--color-text-primary)] dark:text-[var(--color-text-primary)]">
+              {t("resources_title")}
             </h1>
-            <p className="text-gray-600 dark:text-gray-400 mt-1">
-              Análisis detallado de utilización y ocupación de recursos
+            <p className="text-[var(--color-text-secondary)] dark:text-[var(--color-text-tertiary)] mt-1">
+              {t("resources_desc")}
             </p>
           </div>
         </div>
@@ -50,7 +56,7 @@ export default function ReportesRecursosPage() {
           <div>
             <ExportPanel
               onExport={handleExport}
-              title="Exportar Reporte de Recursos"
+              title={t("export_resources_title")}
               availableFormats={["csv", "excel", "pdf"]}
             />
           </div>

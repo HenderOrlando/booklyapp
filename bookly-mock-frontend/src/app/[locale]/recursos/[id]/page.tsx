@@ -10,6 +10,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/atoms/Card";
+import { Input } from "@/components/atoms/Input";
 import { LoadingSpinner } from "@/components/atoms/LoadingSpinner";
 import { StatusBadge } from "@/components/atoms/StatusBadge";
 import { ConfirmDialog } from "@/components/molecules/ConfirmDialog";
@@ -22,9 +23,209 @@ import { MainLayout } from "@/components/templates/MainLayout";
 import { useResource } from "@/hooks/useResources";
 import { httpClient } from "@/infrastructure/http";
 import { AcademicProgram } from "@/types/entities/resource";
+import { Search, Tag, Users } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { useParams, useRouter } from "next/navigation";
 import * as React from "react";
+
+interface ProgramCollectionPayload {
+  items?: AcademicProgram[];
+}
+
+interface ResourceCharacteristicOption {
+  id?: string;
+  _id?: string;
+  code?: string;
+  name?: string;
+  icon?: string;
+  isActive?: boolean;
+}
+
+interface ResourceCharacteristicsCollectionPayload {
+  items?: ResourceCharacteristicOption[];
+}
+
+const BOOLEAN_ATTRIBUTE_TO_CHARACTERISTIC: Record<string, string> = {
+  hasProjector: "Proyector",
+  hasAirConditioning: "Aire acondicionado",
+  hasWhiteboard: "Tablero/Pizarra",
+  hasComputers: "Computadores",
+};
+
+function normalizeCharacteristicName(value: string): string {
+  return value.trim().replace(/\s+/g, " ");
+}
+
+function toCharacteristicKey(value: string): string {
+  return normalizeCharacteristicName(value).toLowerCase();
+}
+
+function isLikelyCharacteristicIdentifier(value: string): boolean {
+  const normalized = value.trim();
+
+  if (!normalized) {
+    return false;
+  }
+
+  return (
+    /^[a-fA-F0-9]{24}$/.test(normalized) ||
+    /^char[_-][a-zA-Z0-9_-]+$/i.test(normalized)
+  );
+}
+
+function extractCharacteristicOptions(
+  data:
+    | ResourceCharacteristicsCollectionPayload
+    | ResourceCharacteristicOption[]
+    | undefined,
+): ResourceCharacteristicOption[] {
+  const rawItems = Array.isArray(data)
+    ? data
+    : Array.isArray(data?.items)
+      ? data.items
+      : [];
+
+  const normalized: ResourceCharacteristicOption[] = [];
+
+  rawItems.forEach((item) => {
+    const id = String(item.id ?? item._id ?? "").trim();
+    const name = normalizeCharacteristicName(String(item.name ?? ""));
+
+    if (!id || !name) {
+      return;
+    }
+
+    normalized.push({
+      ...item,
+      id,
+      name,
+    });
+  });
+
+  return normalized;
+}
+
+function resolveResourceCharacteristicNames(
+  attributes: Record<string, unknown> | undefined,
+  characteristicsCatalog: ResourceCharacteristicOption[],
+): string[] {
+  if (!attributes) {
+    return [];
+  }
+
+  const catalogById = new Map(
+    characteristicsCatalog
+      .filter((item) => item.id && item.name)
+      .map((item) => [String(item.id), String(item.name)]),
+  );
+
+  const catalogByCode = new Map(
+    characteristicsCatalog
+      .filter((item) => item.code && item.name)
+      .map((item) => [String(item.code).toUpperCase(), String(item.name)]),
+  );
+
+  const catalogByName = new Map(
+    characteristicsCatalog
+      .filter((item) => item.name)
+      .map((item) => [
+        toCharacteristicKey(String(item.name)),
+        String(item.name),
+      ]),
+  );
+
+  const names = new Map<string, string>();
+
+  const addName = (value: string | undefined) => {
+    if (!value) {
+      return;
+    }
+
+    const normalized = normalizeCharacteristicName(value);
+    if (!normalized || isLikelyCharacteristicIdentifier(normalized)) {
+      return;
+    }
+
+    names.set(toCharacteristicKey(normalized), normalized);
+  };
+
+  const rawCharacteristics = Array.isArray(attributes.characteristics)
+    ? attributes.characteristics
+    : [];
+
+  rawCharacteristics.forEach((item) => {
+    const rawId =
+      typeof item === "object" && item !== null
+        ? ((item as { id?: string; _id?: string }).id ??
+          (item as { _id?: string })._id)
+        : typeof item === "string"
+          ? item
+          : undefined;
+    const rawCode =
+      typeof item === "object" && item !== null
+        ? (item as { code?: string }).code
+        : undefined;
+    const rawName =
+      typeof item === "object" && item !== null
+        ? (item as { name?: string }).name
+        : undefined;
+
+    if (rawId && catalogById.has(String(rawId))) {
+      addName(catalogById.get(String(rawId)));
+      return;
+    }
+
+    if (rawCode && catalogByCode.has(String(rawCode).toUpperCase())) {
+      addName(catalogByCode.get(String(rawCode).toUpperCase()));
+      return;
+    }
+
+    if (rawName) {
+      const byName = catalogByName.get(toCharacteristicKey(rawName));
+      addName(byName ?? rawName);
+      return;
+    }
+
+    if (typeof item === "string") {
+      const byId = catalogById.get(item);
+      const byName = catalogByName.get(toCharacteristicKey(item));
+      addName(byId ?? byName ?? item);
+    }
+  });
+
+  const rawFeatures = Array.isArray(attributes.features)
+    ? attributes.features
+    : [];
+  rawFeatures.forEach((feature) => {
+    if (typeof feature === "string") {
+      addName(feature);
+    }
+  });
+
+  Object.entries(BOOLEAN_ATTRIBUTE_TO_CHARACTERISTIC).forEach(
+    ([attribute, name]) => {
+      if (attributes[attribute] === true) {
+        addName(name);
+      }
+    },
+  );
+
+  return Array.from(names.values()).sort((a, b) => a.localeCompare(b, "es"));
+}
+
+function extractPrograms(
+  data: ProgramCollectionPayload | AcademicProgram[] | undefined,
+): AcademicProgram[] {
+  if (Array.isArray(data)) {
+    return data;
+  }
+
+  if (data?.items && Array.isArray(data.items)) {
+    return data.items;
+  }
+
+  return [];
+}
 
 /**
  * Página de Detalle de Recurso - Bookly
@@ -35,6 +236,7 @@ import * as React from "react";
 
 export default function RecursoDetailPage() {
   const t = useTranslations("resource_detail");
+  const tResource = useTranslations("resources");
   const params = useParams();
   const router = useRouter();
   const resourceId = params.id as string;
@@ -49,6 +251,8 @@ export default function RecursoDetailPage() {
 
   const [selectedDate, setSelectedDate] = React.useState<Date>();
   const [showDeleteModal, setShowDeleteModal] = React.useState(false);
+  const [charFilter, setCharFilter] = React.useState("");
+  const [progFilter, setProgFilter] = React.useState("");
   const error = queryError ? String(queryError) : "";
 
   // Estados para programas académicos
@@ -56,38 +260,22 @@ export default function RecursoDetailPage() {
   const [resourcePrograms, setResourcePrograms] = React.useState<
     AcademicProgram[]
   >([]);
-  const [programFilter, setProgramFilter] = React.useState("");
-  const [isEditingPrograms, setIsEditingPrograms] = React.useState(false);
-  const [selectedProgramIds, setSelectedProgramIds] = React.useState<
-    Set<string>
-  >(new Set());
+  const [characteristicsCatalog, setCharacteristicsCatalog] = React.useState<
+    ResourceCharacteristicOption[]
+  >([]);
 
-  // Cargar programas académicos (se mantiene para la asociación)
+  // Cargar programas académicos
   React.useEffect(() => {
     const fetchPrograms = async () => {
       try {
-        const [programsRes, resourceProgramsRes] = await Promise.all([
-          httpClient.get("academic-programs"),
-          httpClient.get(`program-resources?programId=all`),
-        ]);
+        const programsRes = await httpClient.get<
+          ProgramCollectionPayload | AcademicProgram[]
+        >("programs");
 
-        if (programsRes.success && programsRes.data) {
-          setAllPrograms(programsRes.data.items || []);
+        if (programsRes.success) {
+          setAllPrograms(extractPrograms(programsRes.data));
         }
-
-        // Filtrar programas que tienen este recurso
-        if (resourceProgramsRes.success && resourceProgramsRes.data) {
-          const associations = resourceProgramsRes.data.items || [];
-          const programIds = associations
-            .filter((a: any) => a.resourceId === resourceId)
-            .map((a: any) => a.programId);
-
-          const associatedProgs = (programsRes.data?.items || []).filter(
-            (p: AcademicProgram) => programIds.includes(p.id)
-          );
-          setResourcePrograms(associatedProgs);
-        }
-      } catch (err: any) {
+      } catch (err) {
         console.error("Error al cargar programas:", err);
       }
     };
@@ -97,11 +285,69 @@ export default function RecursoDetailPage() {
     }
   }, [resourceId]);
 
-  // Inicializar selección de programas cuando se cargan
   React.useEffect(() => {
-    const ids = new Set(resourcePrograms.map((p) => p.id));
-    setSelectedProgramIds(ids);
-  }, [resourcePrograms]);
+    const fetchCharacteristicsCatalog = async () => {
+      try {
+        const characteristicsResponse = await httpClient.get<
+          | ResourceCharacteristicsCollectionPayload
+          | ResourceCharacteristicOption[]
+        >("resources/characteristics");
+
+        if (characteristicsResponse.success) {
+          setCharacteristicsCatalog(
+            extractCharacteristicOptions(characteristicsResponse.data),
+          );
+        }
+      } catch (err) {
+        console.error("Error al cargar características de recursos:", err);
+      }
+    };
+
+    if (resourceId) {
+      fetchCharacteristicsCatalog();
+    }
+  }, [resourceId]);
+
+  // Calcular programas asociados al recurso a partir de resource.programIds
+  React.useEffect(() => {
+    if (!resource?.programIds?.length) {
+      setResourcePrograms([]);
+      return;
+    }
+
+    const programIds = new Set(resource.programIds);
+    setResourcePrograms(
+      allPrograms.filter((program) => programIds.has(program.id)),
+    );
+  }, [allPrograms, resource]);
+
+  const resourceCharacteristicNames = React.useMemo(
+    () =>
+      resolveResourceCharacteristicNames(
+        (resource?.attributes as Record<string, unknown> | undefined) ??
+          undefined,
+        characteristicsCatalog,
+      ),
+    [characteristicsCatalog, resource],
+  );
+
+  const filteredCharacteristics = React.useMemo(() => {
+    const query = charFilter.toLowerCase().trim();
+    if (!query) return resourceCharacteristicNames;
+    return resourceCharacteristicNames.filter((name) =>
+      name.toLowerCase().includes(query),
+    );
+  }, [resourceCharacteristicNames, charFilter]);
+
+  const filteredPrograms = React.useMemo(() => {
+    const query = progFilter.toLowerCase().trim();
+    if (!query) return resourcePrograms;
+    return resourcePrograms.filter(
+      (p) =>
+        p.name.toLowerCase().includes(query) ||
+        p.code.toLowerCase().includes(query),
+    );
+  }, [resourcePrograms, progFilter]);
 
   // Eliminar recurso
   const handleDelete = async () => {
@@ -109,78 +355,19 @@ export default function RecursoDetailPage() {
 
     try {
       await httpClient.delete(`resources/${resource.id}`);
-      router.push("/recursos");
-    } catch (err: any) {
+      router.push(`/${locale}/recursos`);
+    } catch (err) {
       console.error("Error al eliminar recurso:", err);
-      alert(t("delete_error"));
     }
   };
 
-  // Iniciar modo edición de programas
-  const handleStartEditPrograms = () => {
-    setProgramFilter("");
-  };
+  const _header = <AppHeader title={t("title")} />;
+  const _sidebar = <AppSidebar />;
 
-  // Cancelar edición de programas
-  const handleCancelEditPrograms = () => {
-    // Restaurar selección original
-    const ids = new Set(resourcePrograms.map((p) => p.id));
-    setSelectedProgramIds(ids);
-    setProgramFilter("");
-  };
-
-  // Toggle selección de programa
-  const handleToggleProgram = (programId: string) => {
-    const newSelection = new Set(selectedProgramIds);
-    if (newSelection.has(programId)) {
-      newSelection.delete(programId);
-    } else {
-      newSelection.add(programId);
-    }
-    setSelectedProgramIds(newSelection);
-  };
-
-  // Guardar cambios en programas
-  const handleSavePrograms = async () => {
-    try {
-      const currentIds = new Set(resourcePrograms.map((p) => p.id));
-      const toAdd = Array.from(selectedProgramIds).filter(
-        (id) => !currentIds.has(id)
-      );
-      const toRemove = Array.from(currentIds).filter(
-        (id) => !selectedProgramIds.has(id)
-      );
-
-      // Agregar nuevos programas
-      for (const programId of toAdd) {
-        await httpClient.post("program-resources", {
-          programId,
-          resourceId: resourceId,
-          priority: 3,
-        });
-      }
-
-      // Quitar programas
-      for (const programId of toRemove) {
-        await httpClient.delete(
-          `program-resources?programId=${programId}&resourceId=${resourceId}`
-        );
-      }
-
-      // Actualizar lista de programas del recurso
-      const newResourcePrograms = allPrograms.filter((p) =>
-        selectedProgramIds.has(p.id)
-      );
-      setResourcePrograms(newResourcePrograms);
-      setProgramFilter("");
-    } catch (err: any) {
-      console.error("Error al guardar programas:", err);
-      alert(t("save_programs_error"));
-    }
-  };
-
-  const header = <AppHeader title={t("title")} />;
-  const sidebar = <AppSidebar />;
+  const resourceTypeLabel = React.useMemo(() => {
+    if (!resource) return "";
+    return tResource(`type_labels.${resource.type}` as "type_labels.CLASSROOM" | "type_labels.LABORATORY" | "type_labels.AUDITORIUM" | "type_labels.MULTIMEDIA_EQUIPMENT" | "type_labels.SPORTS_FACILITY" | "type_labels.MEETING_ROOM" | "type_labels.VEHICLE" | "type_labels.OTHER");
+  }, [resource, tResource]);
 
   const sidebarContent = resource ? (
     <div className="space-y-4">
@@ -194,7 +381,7 @@ export default function RecursoDetailPage() {
             label={t("status")}
             value={<StatusBadge type="resource" status={resource.status} />}
           />
-          <InfoField label={t("type")} value={resource.type} />
+          <InfoField label={t("type")} value={resourceTypeLabel} />
           <InfoField
             label={t("capacity")}
             value={`${resource.capacity} ${t("people")}`}
@@ -203,41 +390,23 @@ export default function RecursoDetailPage() {
         </CardContent>
       </Card>
 
-      {/* Reserva Rápida */}
-      <Card>
-        <CardHeader>
-          <CardTitle>{t("quick_reserve")}</CardTitle>
-          <CardDescription>{t("select_date")}</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <DatePicker
-            date={selectedDate}
-            onSelect={setSelectedDate}
-            placeholder={t("select_date_placeholder")}
-          />
-          <Button
-            className="w-full mt-4"
-            disabled={!selectedDate}
-            onClick={() => {
-              if (selectedDate && resource) {
-                const dateStr = selectedDate.toISOString().split("T")[0];
-                router.push(
-                  `/calendario?date=${dateStr}&resourceId=${resource.id}`
-                );
-              }
-            }}
-          >
-            {t("continue_reserve")}
-          </Button>
-        </CardContent>
-      </Card>
+      {/* Botón Reserva Rápida */}
+      <Button
+        className="w-full"
+        onClick={() => {
+          if (resource) {
+            router.push(`/${locale}/recursos/${resource.id}?tab=reserva`);
+          }
+        }}
+      >
+        {t("quick_reserve")}
+      </Button>
     </div>
   ) : null;
 
-  // Loading state
   if (loading) {
     return (
-      <MainLayout header={header} sidebar={sidebar}>
+      <MainLayout>
         <LoadingSpinner />
       </MainLayout>
     );
@@ -246,11 +415,15 @@ export default function RecursoDetailPage() {
   // Error or not found state
   if (error || !resource) {
     return (
-      <MainLayout header={header} sidebar={sidebar}>
+      <MainLayout>
         <div className="max-w-2xl mx-auto mt-12">
           <Alert variant="error">{error || t("not_found")}</Alert>
-          <Button className="mt-4" onClick={() => router.push("/recursos")}>
-            {t("back_list")}
+          <Button
+            variant="outline"
+            className="mt-4"
+            onClick={() => router.push("/recursos")}
+          >
+            {t("back_to_list")}
           </Button>
         </div>
       </MainLayout>
@@ -258,7 +431,7 @@ export default function RecursoDetailPage() {
   }
 
   return (
-    <MainLayout header={header} sidebar={sidebar}>
+    <MainLayout>
       {/* Modal de Confirmación de Eliminación */}
       <ConfirmDialog
         open={showDeleteModal}
@@ -271,11 +444,15 @@ export default function RecursoDetailPage() {
         variant="destructive"
       >
         <div className="space-y-2">
-          <div className="bg-gray-800 p-4 rounded-lg">
-            <p className="font-medium text-white">{resource.name}</p>
-            <p className="text-sm text-gray-400">{resource.code}</p>
+          <div className="bg-[var(--color-bg-primary)] p-4 rounded-lg">
+            <p className="font-medium text-foreground">{resource.name}</p>
+            <p className="text-sm text-[var(--color-text-tertiary)]">
+              {resource.code}
+            </p>
           </div>
-          <p className="text-sm text-gray-400">{t("delete_warning")}</p>
+          <p className="text-sm text-[var(--color-text-tertiary)]">
+            {t("delete_warning")}
+          </p>
         </div>
       </ConfirmDialog>
 
@@ -287,10 +464,11 @@ export default function RecursoDetailPage() {
           variant: "default",
         }}
         breadcrumbs={[
-          { label: t("breadcrumbs.home"), href: "/dashboard" },
-          { label: t("breadcrumbs.resources"), href: "/recursos" },
+          { label: t("breadcrumbs.home"), href: `/${locale}/dashboard` },
+          { label: t("breadcrumbs.resources"), href: `/${locale}/recursos` },
           { label: resource.name },
         ]}
+        defaultTab="reserva"
         tabs={[
           {
             value: "detalles",
@@ -315,7 +493,7 @@ export default function RecursoDetailPage() {
                         {t("type")}
                       </p>
                       <p className="text-sm text-[var(--color-text-primary)]">
-                        {resource.type}
+                        {resourceTypeLabel}
                       </p>
                     </div>
                     <div>
@@ -346,7 +524,7 @@ export default function RecursoDetailPage() {
                       </p>
                       <p className="text-sm text-[var(--color-text-primary)]">
                         {new Date(resource.createdAt).toLocaleDateString(
-                          locale
+                          locale,
                         )}
                       </p>
                     </div>
@@ -393,7 +571,7 @@ export default function RecursoDetailPage() {
             ),
           },
           {
-            value: "disponibilidad",
+            value: "reserva",
             label: t("tabs.availability"),
             content: (
               <Card>
@@ -446,69 +624,62 @@ export default function RecursoDetailPage() {
             content: (
               <Card>
                 <CardHeader>
-                  <CardTitle>{t("features_title")}</CardTitle>
-                  <CardDescription>{t("features_desc")}</CardDescription>
+                  <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                    <div>
+                      <CardTitle>{t("features_title")}</CardTitle>
+                      <CardDescription>{t("features_desc")}</CardDescription>
+                    </div>
+                    <div className="relative w-full md:w-64">
+                      <Search
+                        size={14}
+                        className="absolute left-3 top-1/2 -translate-y-1/2 text-[var(--color-text-tertiary)]"
+                      />
+                      <Input
+                        placeholder="Filtrar características..."
+                        value={charFilter}
+                        onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                          setCharFilter(e.target.value)
+                        }
+                        className="pl-9 h-9 text-sm rounded-xl"
+                      />
+                    </div>
+                  </div>
                 </CardHeader>
                 <CardContent>
-                  <div className="grid gap-4 md:grid-cols-2">
-                    {[
-                      { key: "hasProjector", label: "Proyector", icon: "📽️" },
-                      {
-                        key: "hasAirConditioning",
-                        label: "Aire Acondicionado",
-                        icon: "❄️",
-                      },
-                      {
-                        key: "hasWhiteboard",
-                        label: "Tablero/Pizarra",
-                        icon: "📝",
-                      },
-                      {
-                        key: "hasComputers",
-                        label: "Computadores",
-                        icon: "💻",
-                      },
-                    ].map((attr) => {
-                      const hasAttribute =
-                        resource.attributes?.[
-                          attr.key as keyof typeof resource.attributes
-                        ];
-                      return (
-                        <div
-                          key={attr.key}
-                          className={`flex items-center gap-3 p-4 rounded-lg border ${
-                            hasAttribute
-                              ? "border-green-500/50 bg-green-500/10"
-                              : "border-[var(--color-border-subtle)] bg-gray-800/50"
-                          }`}
-                        >
-                          <span className="text-2xl">{attr.icon}</span>
-                          <div className="flex-1">
-                            <p className="font-medium text-[var(--color-text-primary)]">
-                              {attr.label}
-                            </p>
-                            <p className="text-xs text-[var(--color-text-secondary)]">
-                              {hasAttribute
-                                ? t("available")
-                                : t("not_available")}
-                            </p>
-                          </div>
-                          {hasAttribute ? (
-                            <Badge variant="success">✓</Badge>
-                          ) : (
-                            <Badge variant="secondary">—</Badge>
-                          )}
-                        </div>
-                      );
-                    })}
-                  </div>
-
-                  {resource.attributes &&
-                    Object.keys(resource.attributes).length === 0 && (
-                      <p className="text-center text-[var(--color-text-secondary)] py-8">
-                        {t("no_features")}
+                  {filteredCharacteristics.length === 0 ? (
+                    <div className="flex flex-col items-center justify-center py-12 text-center">
+                      <Tag
+                        size={40}
+                        className="text-[var(--color-text-tertiary)] mb-4 opacity-20"
+                      />
+                      <p className="text-[var(--color-text-secondary)]">
+                        {charFilter.trim()
+                          ? "No se encontraron características que coincidan."
+                          : t("no_features")}
                       </p>
-                    )}
+                    </div>
+                  ) : (
+                    <div className="grid gap-3 md:grid-cols-2">
+                      {filteredCharacteristics.map((name) => (
+                        <div
+                          key={name}
+                          className="flex items-center justify-between rounded-xl border border-[var(--color-border-subtle)] bg-state-success-500/5 p-4 hover:bg-state-success-500/10 transition-colors group"
+                        >
+                          <p className="font-medium text-[var(--color-text-primary)] group-hover:text-state-success-700 transition-colors">
+                            {name}
+                          </p>
+                          <div className="flex h-6 w-6 items-center justify-center rounded-full bg-state-success-100 text-state-success-600">
+                            <Badge
+                              variant="success"
+                              className="p-0 border-none bg-transparent"
+                            >
+                              ✓
+                            </Badge>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
                 </CardContent>
               </Card>
             ),
@@ -610,7 +781,7 @@ export default function RecursoDetailPage() {
                         </p>
                         <p className="text-sm text-[var(--color-text-primary)]">
                           {new Date(resource.updatedAt).toLocaleDateString(
-                            locale
+                            locale,
                           )}
                         </p>
                       </div>
@@ -633,7 +804,7 @@ export default function RecursoDetailPage() {
                             </p>
                             <p className="text-lg font-semibold text-[var(--color-text-primary)]">
                               {new Date(
-                                resource.maintenanceSchedule.lastMaintenanceDate
+                                resource.maintenanceSchedule.lastMaintenanceDate,
                               ).toLocaleDateString(locale)}
                             </p>
                           </div>
@@ -646,7 +817,7 @@ export default function RecursoDetailPage() {
                             </p>
                             <p className="text-lg font-semibold text-[var(--color-text-primary)]">
                               {new Date(
-                                resource.maintenanceSchedule.nextMaintenanceDate
+                                resource.maintenanceSchedule.nextMaintenanceDate,
                               ).toLocaleDateString(locale)}
                             </p>
                           </div>
@@ -680,41 +851,74 @@ export default function RecursoDetailPage() {
             label: t("tabs.programs"),
             content: (
               <div className="space-y-4">
-                <div className="flex items-center justify-between mb-4">
-                  <h3 className="text-xl font-semibold text-white">
+                <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-2">
+                  <h3 className="text-xl font-bold text-foreground flex items-center gap-2">
+                    <Users size={20} className="text-brand-primary-500" />
                     {t("programs_title_prefix")} ({resourcePrograms.length})
                   </h3>
+                  <div className="relative w-full md:w-64">
+                    <Search
+                      size={14}
+                      className="absolute left-3 top-1/2 -translate-y-1/2 text-[var(--color-text-tertiary)]"
+                    />
+                    <Input
+                      placeholder="Buscar por código o nombre..."
+                      value={progFilter}
+                      onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                        setProgFilter(e.target.value)
+                      }
+                      className="pl-9 h-9 text-sm rounded-xl"
+                    />
+                  </div>
                 </div>
-                {resourcePrograms.length === 0 ? (
-                  <p className="text-center text-gray-400 py-8">
-                    {t("no_programs")}
-                  </p>
+                {filteredPrograms.length === 0 ? (
+                  <div className="flex flex-col items-center justify-center py-12 text-center bg-[var(--color-bg-primary)]/30 rounded-2xl border border-dashed border-[var(--color-border-subtle)]">
+                    <Users
+                      size={40}
+                      className="text-[var(--color-text-tertiary)] mb-4 opacity-20"
+                    />
+                    <p className="text-[var(--color-text-secondary)]">
+                      {progFilter.trim()
+                        ? "No se encontraron programas que coincidan."
+                        : t("no_programs")}
+                    </p>
+                  </div>
                 ) : (
-                  <div className="space-y-2">
-                    {resourcePrograms.map((program) => (
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                    {filteredPrograms.map((program) => (
                       <div
                         key={program.id}
-                        className="flex items-center justify-between p-4 bg-gray-800/50 rounded-lg"
+                        className="flex items-center justify-between p-4 bg-[var(--color-bg-primary)]/50 rounded-xl border border-[var(--color-border-subtle)] hover:border-brand-primary-200 hover:bg-[var(--color-bg-primary)] transition-all group"
                       >
-                        <div className="flex-1">
-                          <p className="font-medium text-white">
+                        <div className="flex-1 min-w-0">
+                          <p className="font-bold text-foreground truncate group-hover:text-brand-primary-600 transition-colors">
                             {program.name}
                           </p>
-                          <p className="text-sm text-gray-400">
-                            {program.code} - {program.faculty}
+                          <p className="text-xs font-medium text-[var(--color-text-tertiary)] mt-0.5">
+                            <span className="text-brand-primary-600 uppercase">
+                              {program.code}
+                            </span>{" "}
+                            • {program.faculty}
                           </p>
                         </div>
-                        <div className="flex gap-2">
+                        <div className="flex items-center gap-2 ml-4">
                           <Button
-                            variant="outline"
+                            variant="ghost"
                             size="sm"
+                            className="h-8 w-8 p-0 rounded-full hover:bg-brand-primary-50 hover:text-brand-primary-600"
                             onClick={() =>
-                              router.push(`/programas/${program.id}`)
+                              router.push(`/${locale}/programas/${program.id}`)
                             }
+                            title={t("view_detail")}
                           >
-                            {t("view_detail")}
+                            <Search size={14} />
                           </Button>
-                          <Badge variant="success">{t("associated")}</Badge>
+                          <Badge
+                            variant="success"
+                            className="bg-state-success-500/10 text-state-success-700 border-state-success-200 rounded-lg"
+                          >
+                            {t("associated")}
+                          </Badge>
                         </div>
                       </div>
                     ))}
@@ -725,8 +929,8 @@ export default function RecursoDetailPage() {
           },
         ]}
         sidebar={sidebarContent}
-        onBack={() => router.push("/recursos")}
-        onEdit={() => router.push(`/recursos/${resource.id}/editar`)}
+        onBack={() => router.push(`/${locale}/recursos`)}
+        onEdit={() => router.push(`/${locale}/recursos/${resource.id}/editar`)}
         onDelete={() => setShowDeleteModal(true)}
       />
     </MainLayout>

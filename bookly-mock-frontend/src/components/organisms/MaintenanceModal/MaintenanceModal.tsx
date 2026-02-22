@@ -137,7 +137,7 @@ export function MaintenanceModal({
     onClose();
   };
 
-  const getTypeLabel = (type: string) => {
+  const _getTypeLabel = (type: string) => {
     switch (type) {
       case "PREVENTIVE":
         return "Preventivo";
@@ -150,7 +150,7 @@ export function MaintenanceModal({
     }
   };
 
-  const getStatusLabel = (status: string) => {
+  const _getStatusLabel = (status: string) => {
     switch (status) {
       case "SCHEDULED":
         return "Programado";
@@ -194,7 +194,7 @@ export function MaintenanceModal({
           <form onSubmit={handleSubmit} className="space-y-6">
             {/* Recurso */}
             <div>
-              <label className="block text-sm font-medium text-white mb-2">
+              <label className="block text-sm font-medium text-[var(--color-text-primary)] mb-2">
                 Recurso <span className="text-red-500">*</span>
               </label>
               <Select
@@ -224,7 +224,7 @@ export function MaintenanceModal({
             {/* Tipo y Estado */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <label className="block text-sm font-medium text-white mb-2">
+                <label className="block text-sm font-medium text-[var(--color-text-primary)] mb-2">
                   Tipo <span className="text-red-500">*</span>
                 </label>
                 <Select
@@ -246,7 +246,7 @@ export function MaintenanceModal({
 
               {mode === "edit" && (
                 <div>
-                  <label className="block text-sm font-medium text-white mb-2">
+                  <label className="block text-sm font-medium text-[var(--color-text-primary)] mb-2">
                     Estado
                   </label>
                   <Select
@@ -272,7 +272,7 @@ export function MaintenanceModal({
             {/* Fechas */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <label className="block text-sm font-medium text-white mb-2">
+                <label className="block text-sm font-medium text-[var(--color-text-primary)] mb-2">
                   Fecha Programada <span className="text-red-500">*</span>
                 </label>
                 <Input
@@ -293,7 +293,7 @@ export function MaintenanceModal({
               {mode === "edit" &&
                 (formData.status === "COMPLETED" || formData.completedDate) && (
                   <div>
-                    <label className="block text-sm font-medium text-white mb-2">
+                    <label className="block text-sm font-medium text-[var(--color-text-primary)] mb-2">
                       Fecha de Completado
                     </label>
                     <Input
@@ -312,7 +312,7 @@ export function MaintenanceModal({
 
             {/* Descripción */}
             <div>
-              <label className="block text-sm font-medium text-white mb-2">
+              <label className="block text-sm font-medium text-[var(--color-text-primary)] mb-2">
                 Descripción <span className="text-red-500">*</span>
               </label>
               <textarea
@@ -322,7 +322,7 @@ export function MaintenanceModal({
                 }
                 placeholder="Describe el mantenimiento a realizar..."
                 rows={3}
-                className={`w-full px-3 py-2 bg-gray-800 border rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-brand-primary-500 ${
+                className={`w-full px-3 py-2 bg-background border rounded-lg text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring ${
                   errors.description
                     ? "border-red-500"
                     : "border-[var(--color-border-subtle)]"
@@ -338,7 +338,7 @@ export function MaintenanceModal({
             {/* Técnico y Costo */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <label className="block text-sm font-medium text-white mb-2">
+                <label className="block text-sm font-medium text-[var(--color-text-primary)] mb-2">
                   Técnico Responsable
                 </label>
                 <Input
@@ -351,7 +351,7 @@ export function MaintenanceModal({
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-white mb-2">
+                <label className="block text-sm font-medium text-[var(--color-text-primary)] mb-2">
                   Costo {mode === "edit" && "(Real/Estimado)"}
                 </label>
                 <Input
@@ -378,7 +378,7 @@ export function MaintenanceModal({
 
             {/* Notas */}
             <div>
-              <label className="block text-sm font-medium text-white mb-2">
+              <label className="block text-sm font-medium text-[var(--color-text-primary)] mb-2">
                 Notas Adicionales
               </label>
               <textarea
@@ -388,7 +388,7 @@ export function MaintenanceModal({
                 }
                 placeholder="Notas, observaciones o comentarios..."
                 rows={3}
-                className="w-full px-3 py-2 bg-gray-800 border border-[var(--color-border-subtle)] rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-brand-primary-500"
+                className="w-full px-3 py-2 bg-background border border-[var(--color-border-subtle)] rounded-lg text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring"
               />
             </div>
 

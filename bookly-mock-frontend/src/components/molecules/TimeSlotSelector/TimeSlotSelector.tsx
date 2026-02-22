@@ -52,7 +52,7 @@ export const TimeSlotSelector = React.memo(function TimeSlotSelector({
   selectedSlots = [],
   onSelectSlot,
   onDeselectSlot,
-  mode = "single",
+  mode: _mode = "single",
   disabled = false,
   showIndicator = true,
   className = "",

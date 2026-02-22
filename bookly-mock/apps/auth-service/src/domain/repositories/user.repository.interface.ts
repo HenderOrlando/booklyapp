@@ -1,4 +1,3 @@
-import { UserRole } from "@libs/common/enums";
 import { PaginationMeta, PaginationQuery } from "@libs/common";
 import { UserEntity } from "../entities/user.entity";
 
@@ -27,7 +26,7 @@ export interface IUserRepository {
    */
   findBySSOProvider(
     provider: string,
-    providerId: string
+    providerId: string,
   ): Promise<UserEntity | null>;
 
   /**
@@ -35,15 +34,15 @@ export interface IUserRepository {
    */
   findMany(
     query: PaginationQuery,
-    filters?: Partial<UserEntity>
+    filters?: Partial<UserEntity>,
   ): Promise<{ users: UserEntity[]; meta: PaginationMeta }>;
 
   /**
    * Buscar usuarios por rol
    */
   findByRole(
-    role: UserRole,
-    query: PaginationQuery
+    role: string,
+    query: PaginationQuery,
   ): Promise<{
     users: UserEntity[];
     meta: PaginationMeta;

@@ -74,6 +74,85 @@ export const mockCategories: Category[] = [
   },
 ];
 
+export interface ResourceCharacteristic {
+  id: string;
+  group: string;
+  code: string;
+  name: string;
+  description?: string;
+  icon?: string;
+  isActive: boolean;
+  createdAt?: string;
+  updatedAt?: string;
+}
+
+export const mockResourceCharacteristics: ResourceCharacteristic[] = [
+  {
+    id: "char_001",
+    group: "resource_characteristic",
+    code: "PROYECTOR",
+    name: "Proyector",
+    icon: "projector",
+    isActive: true,
+  },
+  {
+    id: "char_002",
+    group: "resource_characteristic",
+    code: "AIRE_ACONDICIONADO",
+    name: "Aire acondicionado",
+    icon: "air-conditioner",
+    isActive: true,
+  },
+  {
+    id: "char_003",
+    group: "resource_characteristic",
+    code: "TABLERO_PIZARRA",
+    name: "Tablero/Pizarra",
+    icon: "whiteboard",
+    isActive: true,
+  },
+  {
+    id: "char_004",
+    group: "resource_characteristic",
+    code: "COMPUTADORES",
+    name: "Computadores",
+    icon: "computer",
+    isActive: true,
+  },
+  {
+    id: "char_005",
+    group: "resource_characteristic",
+    code: "SISTEMA_SONIDO",
+    name: "Sistema de sonido",
+    icon: "speaker",
+    isActive: true,
+  },
+  {
+    id: "char_006",
+    group: "resource_characteristic",
+    code: "VIDEOCONFERENCIA",
+    name: "Videoconferencia",
+    icon: "video-conference",
+    isActive: true,
+  },
+  {
+    id: "char_007",
+    group: "resource_characteristic",
+    code: "ACCESO_SILLA_RUEDAS",
+    name: "Acceso para silla de ruedas",
+    icon: "wheelchair",
+    isActive: true,
+  },
+  {
+    id: "char_008",
+    group: "resource_characteristic",
+    code: "ILUMINACION_ESPECIAL",
+    name: "Iluminación especial",
+    icon: "lightbulb",
+    isActive: true,
+  },
+];
+
 // ============================================
 // RESOURCES
 // ============================================
@@ -96,7 +175,7 @@ export const mockResources: Resource[] = [
       hasWhiteboard: true,
       hasComputers: false,
     },
-    programIds: ["ING-SIS", "ING-IND"],
+    programIds: ["prog_001", "prog_002", "prog_003", "prog_004", "prog_005"],
     status: ResourceStatus.AVAILABLE,
     isActive: true,
     availabilityRules: {
@@ -104,6 +183,7 @@ export const mockResources: Resource[] = [
       maxAdvanceBookingDays: 30,
       minBookingDurationMinutes: 60,
       maxBookingDurationMinutes: 240,
+      bufferTimeBetweenReservationsMinutes: 15,
       allowRecurring: true,
     },
     createdAt: "2024-01-15T10:00:00Z",
@@ -128,7 +208,7 @@ export const mockResources: Resource[] = [
       computerCount: 30,
       software: ["VS Code", "IntelliJ", "Docker", "MySQL"],
     },
-    programIds: ["ING-SIS"],
+    programIds: ["prog_001", "prog_003", "prog_005"],
     status: ResourceStatus.AVAILABLE,
     isActive: true,
     availabilityRules: {
@@ -136,6 +216,7 @@ export const mockResources: Resource[] = [
       maxAdvanceBookingDays: 60,
       minBookingDurationMinutes: 120,
       maxBookingDurationMinutes: 480,
+      bufferTimeBetweenReservationsMinutes: 15,
       allowRecurring: true,
     },
     maintenanceSchedule: {
@@ -164,7 +245,7 @@ export const mockResources: Resource[] = [
       hasStage: true,
       hasRecordingEquipment: true,
     },
-    programIds: [],
+    programIds: ["prog_004"],
     status: ResourceStatus.AVAILABLE,
     isActive: true,
     availabilityRules: {
@@ -172,6 +253,7 @@ export const mockResources: Resource[] = [
       maxAdvanceBookingDays: 90,
       minBookingDurationMinutes: 120,
       maxBookingDurationMinutes: 480,
+      bufferTimeBetweenReservationsMinutes: 30,
       allowRecurring: false,
     },
     createdAt: "2024-01-15T10:00:00Z",
@@ -182,7 +264,7 @@ export const mockResources: Resource[] = [
     code: "SALA-CONF-A",
     name: "Sala de Conferencias A",
     description: "Sala para videoconferencias con capacidad para 20 personas",
-    type: ResourceType.CONFERENCE_ROOM,
+    type: ResourceType.MULTIMEDIA_EQUIPMENT,
     categoryId: "cat_004",
     capacity: 20,
     location: "Edificio Administrativo - Piso 3",
@@ -203,6 +285,7 @@ export const mockResources: Resource[] = [
       maxAdvanceBookingDays: 15,
       minBookingDurationMinutes: 60,
       maxBookingDurationMinutes: 240,
+      bufferTimeBetweenReservationsMinutes: 10,
       allowRecurring: true,
     },
     createdAt: "2024-01-15T10:00:00Z",
@@ -213,7 +296,7 @@ export const mockResources: Resource[] = [
     code: "CANCHA-FUTBOL",
     name: "Cancha de Fútbol",
     description: "Cancha de fútbol sintético",
-    type: ResourceType.SPORTS_FIELD,
+    type: ResourceType.SPORTS_FACILITY,
     categoryId: "cat_005",
     capacity: 22,
     location: "Zona Deportiva",
@@ -233,6 +316,7 @@ export const mockResources: Resource[] = [
       maxAdvanceBookingDays: 7,
       minBookingDurationMinutes: 90,
       maxBookingDurationMinutes: 180,
+      bufferTimeBetweenReservationsMinutes: 15,
       allowRecurring: true,
     },
     createdAt: "2024-01-15T10:00:00Z",
@@ -256,7 +340,7 @@ export const mockResources: Resource[] = [
       hasComputers: false,
       equipment: ["Osciloscopio", "Multímetro", "Balanza analítica"],
     },
-    programIds: ["ING-MECA", "ING-ELEC"],
+    programIds: ["prog_001", "prog_002"],
     status: ResourceStatus.MAINTENANCE,
     isActive: true,
     maintenanceSchedule: {
@@ -269,6 +353,7 @@ export const mockResources: Resource[] = [
       maxAdvanceBookingDays: 45,
       minBookingDurationMinutes: 120,
       maxBookingDurationMinutes: 360,
+      bufferTimeBetweenReservationsMinutes: 20,
       allowRecurring: true,
     },
     createdAt: "2024-01-15T10:00:00Z",
@@ -291,7 +376,7 @@ export const mockResources: Resource[] = [
       hasWhiteboard: true,
       hasComputers: false,
     },
-    programIds: ["ING-SIS", "ING-IND", "ING-CIVIL"],
+    programIds: ["prog_001"],
     status: ResourceStatus.RESERVED,
     isActive: true,
     availabilityRules: {
@@ -299,6 +384,7 @@ export const mockResources: Resource[] = [
       maxAdvanceBookingDays: 30,
       minBookingDurationMinutes: 60,
       maxBookingDurationMinutes: 240,
+      bufferTimeBetweenReservationsMinutes: 15,
       allowRecurring: true,
     },
     createdAt: "2024-01-15T10:00:00Z",
@@ -309,7 +395,7 @@ export const mockResources: Resource[] = [
     code: "SALA-CONF-B",
     name: "Sala de Conferencias B",
     description: "Sala pequeña para reuniones",
-    type: ResourceType.CONFERENCE_ROOM,
+    type: ResourceType.MULTIMEDIA_EQUIPMENT,
     categoryId: "cat_004",
     capacity: 10,
     location: "Edificio Administrativo - Piso 2",
@@ -321,7 +407,7 @@ export const mockResources: Resource[] = [
       hasWhiteboard: true,
       hasVideoConference: false,
     },
-    programIds: [],
+    programIds: ["prog_002"],
     status: ResourceStatus.UNAVAILABLE,
     isActive: false,
     availabilityRules: {
@@ -329,6 +415,7 @@ export const mockResources: Resource[] = [
       maxAdvanceBookingDays: 15,
       minBookingDurationMinutes: 30,
       maxBookingDurationMinutes: 180,
+      bufferTimeBetweenReservationsMinutes: 10,
       allowRecurring: false,
     },
     createdAt: "2024-01-15T10:00:00Z",

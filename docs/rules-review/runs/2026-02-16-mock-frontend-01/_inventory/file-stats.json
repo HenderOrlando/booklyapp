@@ -1,0 +1,112 @@
+{
+  "runId": "2026-02-16-mock-frontend-01",
+  "scopeRoot": "bookly-mock-frontend",
+  "generatedAt": "2026-02-16T19:58:00.000Z",
+  "summary": {
+    "totalFiles": 356,
+    "tsx": 169,
+    "ts": 157,
+    "css": 1,
+    "json": 28,
+    "other": 1
+  },
+  "tests": {
+    "total": 5,
+    "spec": 0,
+    "test": 5,
+    "e2e": 0,
+    "location": "src/infrastructure/api/__tests__/interceptors/"
+  },
+  "pages": {
+    "total": 30,
+    "auth": [
+      "login",
+      "register",
+      "forgot-password",
+      "reset-password",
+      "profile"
+    ],
+    "admin": ["roles", "usuarios", "templates", "auditoria"],
+    "resources": [
+      "list",
+      "detail",
+      "nuevo",
+      "editar",
+      "categorias",
+      "programas",
+      "mantenimientos"
+    ],
+    "availability": [
+      "reservas-list",
+      "reservas-detail",
+      "reservas-nueva",
+      "calendario",
+      "lista-espera"
+    ],
+    "stockpile": [
+      "aprobaciones-list",
+      "aprobaciones-detail",
+      "check-in",
+      "vigilancia",
+      "historial-aprobaciones"
+    ],
+    "reports": [
+      "reportes",
+      "reportes-recursos",
+      "reportes-usuarios",
+      "reportes-avanzado",
+      "dashboard"
+    ],
+    "other": ["design-system", "recursos-virtual"]
+  },
+  "components": {
+    "atoms": 30,
+    "molecules": 25,
+    "organisms": 20,
+    "templates": 5,
+    "auth": 1,
+    "total": 81
+  },
+  "hooks": {
+    "total": 40,
+    "mutations": 11,
+    "queries": 29
+  },
+  "services": {
+    "total": 6,
+    "files": [
+      "approvalsClient.ts",
+      "checkInOutClient.ts",
+      "documentsClient.ts",
+      "recurringReservations.ts",
+      "reportsClient.ts",
+      "templatesClient.ts"
+    ]
+  },
+  "infrastructure": {
+    "apiClients": 8,
+    "interceptors": 7,
+    "mockData": 6,
+    "websocket": 3
+  },
+  "i18n": {
+    "locales": ["es", "en"],
+    "namespaces": 14,
+    "totalFiles": 28
+  },
+  "dependencies": {
+    "framework": "next@14.2.0",
+    "react": "react@18.3.0",
+    "stateManagement": "@reduxjs/toolkit@2.2.0",
+    "dataFetching": "@tanstack/react-query@5.90.10",
+    "styling": "tailwindcss@3.4.0",
+    "uiLibrary": "radix-ui (multiple packages)",
+    "charts": "recharts@2.12.0",
+    "forms": "react-hook-form@7.51.0 + zod@3.23.0",
+    "i18n": "next-intl@3.15.0",
+    "auth": "next-auth@4.24.0",
+    "websocket": "socket.io-client@4.7.0",
+    "pdf": "@react-pdf/renderer@3.1.14",
+    "export": "xlsx@0.18.5"
+  }
+}

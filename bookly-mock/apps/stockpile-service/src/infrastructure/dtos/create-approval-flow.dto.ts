@@ -52,6 +52,14 @@ export class ApprovalStepDto {
   })
   @IsBoolean()
   allowParallel: boolean;
+
+  @ApiPropertyOptional({
+    description: "Tiempo máximo de espera para este paso (en horas)",
+    example: 48,
+  })
+  @IsOptional()
+  @IsNumber()
+  timeoutHours?: number;
 }
 
 /**

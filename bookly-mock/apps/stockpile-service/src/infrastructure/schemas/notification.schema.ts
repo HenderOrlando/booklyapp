@@ -1,8 +1,3 @@
-import {
-  NotificationChannel,
-  NotificationStatus,
-  NotificationType,
-} from "@libs/common/enums";
 import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
 import { Document, Types } from "mongoose";
 
@@ -40,19 +35,11 @@ export class Notification extends Document {
   @Prop({ required: true })
   recipientName: string;
 
-  @Prop({
-    required: true,
-    enum: Object.values(NotificationType),
-    index: true,
-  })
-  type: NotificationType;
+  @Prop({ required: true, index: true })
+  type: string;
 
-  @Prop({
-    required: true,
-    enum: Object.values(NotificationChannel),
-    index: true,
-  })
-  channel: NotificationChannel;
+  @Prop({ required: true, index: true })
+  channel: string;
 
   @Prop({ required: true })
   subject: string;
@@ -60,13 +47,8 @@ export class Notification extends Document {
   @Prop({ required: true })
   message: string;
 
-  @Prop({
-    required: true,
-    enum: Object.values(NotificationStatus),
-    default: NotificationStatus.PENDING,
-    index: true,
-  })
-  status: NotificationStatus;
+  @Prop({ required: true, default: "PENDING", index: true })
+  status: string;
 
   @Prop({ required: true, index: true })
   relatedEntity: string;

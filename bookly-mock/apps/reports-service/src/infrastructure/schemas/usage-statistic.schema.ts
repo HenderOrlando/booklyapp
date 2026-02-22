@@ -1,4 +1,3 @@
-import { UsageStatisticType } from "@libs/common/enums";
 import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
 import { Document, Types } from "mongoose";
 
@@ -22,12 +21,8 @@ export class MostUsedResourceSchema {
  */
 @Schema({ collection: "usage_statistics", timestamps: true })
 export class UsageStatistic extends Document {
-  @Prop({
-    required: true,
-    enum: Object.values(UsageStatisticType),
-    index: true,
-  })
-  statisticType: UsageStatisticType;
+  @Prop({ required: true, index: true })
+  statisticType: string;
 
   @Prop({ type: Types.ObjectId, required: true, index: true })
   referenceId: Types.ObjectId;

@@ -1,12 +1,18 @@
 // Registrar path aliases para runtime
 import "tsconfig-paths/register";
 
-import { createLogger } from "@libs/common";
-import { DatabaseService } from "@libs/database";
+import { createLogger, GlobalResponseInterceptor, I18nGlobalExceptionFilter, initOtel } from "@libs/common";
 import { ValidationPipe } from "@nestjs/common";
 import { NestFactory } from "@nestjs/core";
 import { DocumentBuilder, SwaggerModule } from "@nestjs/swagger";
+import { I18nService } from "nestjs-i18n";
 import { StockpileModule } from "./stockpile.module";
+
+// Inicializar Telemetría antes de NestJS
+initOtel({
+  serviceName: "stockpile-service",
+  serviceVersion: "1.0.0",
+});
 
 const logger = createLogger("StockpileService");
 
@@ -25,6 +31,11 @@ async function bootstrap() {
     credentials: true,
   });
 
+  // Global Interceptors & Filters
+  app.useGlobalInterceptors(new GlobalResponseInterceptor());
+  const i18nService = app.get(I18nService);
+  app.useGlobalFilters(new I18nGlobalExceptionFilter(i18nService));
+
   // Global validation pipe
   app.useGlobalPipes(
     new ValidationPipe({
@@ -34,22 +45,30 @@ async function bootstrap() {
       transformOptions: {
         enableImplicitConversion: true,
       },
-    })
+    }),
   );
 
   // Swagger configuration
   const config = new DocumentBuilder()
     .setTitle("Bookly Stockpile Service")
     .setDescription(
-      "API de gestión de aprobaciones y flujos de trabajo para el sistema Bookly"
+      "API de gestión de aprobaciones y flujos de trabajo para el sistema Bookly",
     )
     .setVersion("1.0")
     .addBearerAuth()
     .addTag(
       "Approval Requests",
-      "Endpoints para gestión de solicitudes de aprobación"
+      "Endpoints para gestión de solicitudes de aprobación",
     )
     .addTag("Approval Flows", "Endpoints para gestión de flujos de aprobación")
+    .addTag("Check-In/Out", "Endpoints para check-in y check-out digital")
+    .addTag("Documents", "Generación y descarga de documentos de aprobación")
+    .addTag("Monitoring", "Dashboard de vigilancia y control de accesos")
+    .addTag("Notifications", "Configuración y métricas de notificaciones")
+    .addTag(
+      "Reference Data",
+      "Datos de referencia dinámicos del dominio aprobaciones",
+    )
     .build();
 
   const document = SwaggerModule.createDocument(app, config);
@@ -57,9 +76,8 @@ async function bootstrap() {
 
   // Start server
   const port = process.env.STOCKPILE_PORT || 3004;
-  // Habilitar shutdown graceful para base de datos
-  const databaseService = app.get(DatabaseService);
-  await databaseService.enableShutdownHooks(app);
+  // Habilitar shutdown graceful para todos los providers (EventBus, Redis, DB)
+  app.enableShutdownHooks();
 
   await app.listen(port);
 

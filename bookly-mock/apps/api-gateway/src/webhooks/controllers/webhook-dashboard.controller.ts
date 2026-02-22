@@ -1,4 +1,7 @@
+import { ResponseUtil, createLogger } from "@libs/common";
 import { NotificationChannel } from "@libs/common/enums";
+import { CurrentUser, Roles } from "@libs/decorators";
+import { JwtAuthGuard, RolesGuard } from "@libs/guards";
 import {
   ChannelWebhookService,
   FirebaseWebhookHandler,
@@ -12,11 +15,14 @@ import {
   Delete,
   Get,
   Headers,
+  NotFoundException,
   Param,
   Post,
   Put,
   Query,
+  UseGuards,
 } from "@nestjs/common";
+import { InjectModel } from "@nestjs/mongoose";
 import {
   ApiBearerAuth,
   ApiOperation,
@@ -24,30 +30,40 @@ import {
   ApiResponse,
   ApiTags,
 } from "@nestjs/swagger";
+import { Model } from "mongoose";
 import {
   RegisterWebhookDto,
   TestWebhookDto,
   UpdateWebhookDto,
-  WebhookLogDto,
   WebhookResponseDto,
   WebhookStatsDto,
 } from "../dto/webhook.dto";
+import { WebhookLog, WebhookLogDocument } from "../schemas/webhook-log.schema";
+import { Webhook, WebhookDocument } from "../schemas/webhook.schema";
+
+const logger = createLogger("WebhookDashboardController");
 
 /**
  * Webhook Dashboard Controller
  * Controller para administración de webhooks desde el API Gateway
+ * Admin-only: requiere JWT + rol GENERAL_ADMIN
  */
 @ApiTags("Webhook Dashboard")
 @Controller("admin/webhooks")
 @ApiBearerAuth()
-// @UseGuards(JwtAuthGuard, RolesGuard) // TODO: Descomentar cuando se implemente auth
+@UseGuards(JwtAuthGuard, RolesGuard)
+@Roles("GENERAL_ADMIN")
 export class WebhookDashboardController {
   constructor(
+    @InjectModel(Webhook.name)
+    private readonly webhookModel: Model<WebhookDocument>,
+    @InjectModel(WebhookLog.name)
+    private readonly webhookLogModel: Model<WebhookLogDocument>,
     private readonly channelWebhookService: ChannelWebhookService,
     private readonly sendGridHandler: SendGridWebhookHandler,
     private readonly twilioHandler: TwilioWebhookHandler,
     private readonly metaWhatsAppHandler: MetaWhatsAppWebhookHandler,
-    private readonly firebaseHandler: FirebaseWebhookHandler
+    private readonly firebaseHandler: FirebaseWebhookHandler,
   ) {
     this.initializeHandlers();
   }
@@ -56,30 +72,25 @@ export class WebhookDashboardController {
    * Inicializar handlers de webhooks
    */
   private initializeHandlers(): void {
-    // Registrar handlers por canal
     this.channelWebhookService.registerHandler(
       NotificationChannel.EMAIL,
-      this.sendGridHandler
+      this.sendGridHandler,
     );
-
     this.channelWebhookService.registerHandler(
       NotificationChannel.SMS,
-      this.twilioHandler
+      this.twilioHandler,
     );
-
     this.channelWebhookService.registerHandler(
       NotificationChannel.WHATSAPP,
-      this.twilioHandler
+      this.twilioHandler,
     );
-
     this.channelWebhookService.registerHandler(
       NotificationChannel.WHATSAPP,
-      this.metaWhatsAppHandler
+      this.metaWhatsAppHandler,
     );
-
     this.channelWebhookService.registerHandler(
       NotificationChannel.PUSH,
-      this.firebaseHandler
+      this.firebaseHandler,
     );
   }
 
@@ -89,31 +100,21 @@ export class WebhookDashboardController {
   @Get()
   @ApiOperation({ summary: "Listar todos los webhooks" })
   @ApiResponse({ status: 200, type: [WebhookResponseDto] })
-  async listWebhooks(): Promise<any> {
-    // TODO: Implementar con base de datos
-    const channels = this.channelWebhookService.getAvailableChannels();
+  async listWebhooks(
+    @Query("channel") channel?: string,
+    @Query("active") active?: string,
+  ): Promise<any> {
+    const filter: Record<string, any> = {};
+    if (channel) filter.channel = channel;
+    if (active !== undefined) filter.active = active === "true";
 
-    const webhooks = channels.map((channel) => {
-      const providers =
-        this.channelWebhookService.getHandlersByChannel(channel);
+    const webhooks = await this.webhookModel
+      .find(filter)
+      .select("-secret")
+      .sort({ createdAt: -1 })
+      .exec();
 
-      return providers.map((provider) => ({
-        id: `${channel}-${provider}`,
-        channel,
-        provider,
-        url: `/webhooks/${channel.toLowerCase()}/${provider}`,
-        active: true,
-        hasSecret: true,
-        createdAt: new Date(),
-        updatedAt: new Date(),
-      }));
-    });
-
-    return {
-      success: true,
-      data: webhooks.flat(),
-      message: "Webhooks retrieved successfully",
-    };
+    return ResponseUtil.success(webhooks, "Webhooks retrieved successfully");
   }
 
   /**
@@ -123,24 +124,17 @@ export class WebhookDashboardController {
   @ApiOperation({ summary: "Obtener webhooks por canal" })
   @ApiResponse({ status: 200, type: [WebhookResponseDto] })
   async getWebhooksByChannel(
-    @Param("channel") channel: NotificationChannel
+    @Param("channel") channel: NotificationChannel,
   ): Promise<any> {
-    const providers = this.channelWebhookService.getHandlersByChannel(channel);
+    const webhooks = await this.webhookModel
+      .find({ channel })
+      .select("-secret")
+      .exec();
 
-    const webhooks = providers.map((provider) => ({
-      id: `${channel}-${provider}`,
-      channel,
-      provider,
-      url: `/webhooks/${channel.toLowerCase()}/${provider}`,
-      active: true,
-      hasSecret: true,
-    }));
-
-    return {
-      success: true,
-      data: webhooks,
-      message: `Webhooks for channel ${channel} retrieved`,
-    };
+    return ResponseUtil.success(
+      webhooks,
+      `Webhooks for channel ${channel} retrieved`,
+    );
   }
 
   /**
@@ -149,40 +143,42 @@ export class WebhookDashboardController {
   @Post()
   @ApiOperation({ summary: "Registrar nuevo webhook" })
   @ApiResponse({ status: 201, type: WebhookResponseDto })
-  async registerWebhook(@Body() dto: RegisterWebhookDto): Promise<any> {
-    // TODO: Guardar en base de datos
-
-    // Verificar que existe handler para este canal/provider
+  async registerWebhook(
+    @Body() dto: RegisterWebhookDto,
+    @CurrentUser("sub") userId: string,
+  ): Promise<any> {
     const hasHandler = this.channelWebhookService.hasHandler(
       dto.channel,
-      dto.provider
+      dto.provider,
     );
 
     if (!hasHandler) {
-      return {
-        success: false,
-        error: `No handler found for ${dto.provider} in channel ${dto.channel}`,
-        statusCode: 404,
-      };
+      throw new NotFoundException(
+        `No handler found for ${dto.provider} in channel ${dto.channel}`,
+      );
     }
 
-    const webhook = {
-      id: `${dto.channel}-${dto.provider}-${Date.now()}`,
+    const webhook = await this.webhookModel.create({
       channel: dto.channel,
       provider: dto.provider,
       url: dto.url,
-      active: dto.active ?? true,
-      hasSecret: !!dto.secret,
+      secret: dto.secret,
       config: dto.config,
-      createdAt: new Date(),
-      updatedAt: new Date(),
-    };
+      active: dto.active ?? true,
+      createdBy: userId,
+    });
 
-    return {
-      success: true,
-      data: webhook,
-      message: "Webhook registered successfully",
-    };
+    logger.info("Webhook registered", {
+      webhookId: webhook._id,
+      channel: dto.channel,
+      provider: dto.provider,
+      createdBy: userId,
+    });
+
+    const result = webhook.toObject();
+    delete result.secret;
+
+    return ResponseUtil.success(result, "Webhook registered successfully");
   }
 
   /**
@@ -193,19 +189,27 @@ export class WebhookDashboardController {
   @ApiResponse({ status: 200, type: WebhookResponseDto })
   async updateWebhook(
     @Param("id") id: string,
-    @Body() dto: UpdateWebhookDto
+    @Body() dto: UpdateWebhookDto,
+    @CurrentUser("sub") userId: string,
   ): Promise<any> {
-    // TODO: Actualizar en base de datos
+    const updateData: Record<string, any> = { updatedBy: userId };
+    if (dto.url !== undefined) updateData.url = dto.url;
+    if (dto.secret !== undefined) updateData.secret = dto.secret;
+    if (dto.config !== undefined) updateData.config = dto.config;
+    if (dto.active !== undefined) updateData.active = dto.active;
 
-    return {
-      success: true,
-      data: {
-        id,
-        ...dto,
-        updatedAt: new Date(),
-      },
-      message: "Webhook updated successfully",
-    };
+    const webhook = await this.webhookModel
+      .findByIdAndUpdate(id, { $set: updateData }, { new: true })
+      .select("-secret")
+      .exec();
+
+    if (!webhook) {
+      throw new NotFoundException(`Webhook ${id} not found`);
+    }
+
+    logger.info("Webhook updated", { webhookId: id, updatedBy: userId });
+
+    return ResponseUtil.success(webhook, "Webhook updated successfully");
   }
 
   /**
@@ -214,14 +218,24 @@ export class WebhookDashboardController {
   @Delete(":id")
   @ApiOperation({ summary: "Eliminar webhook" })
   @ApiResponse({ status: 200 })
-  async deleteWebhook(@Param("id") id: string): Promise<any> {
-    // TODO: Eliminar de base de datos
+  async deleteWebhook(
+    @Param("id") id: string,
+    @CurrentUser("sub") userId: string,
+  ): Promise<any> {
+    const webhook = await this.webhookModel.findByIdAndDelete(id).exec();
 
-    return {
-      success: true,
-      data: null,
-      message: "Webhook deleted successfully",
-    };
+    if (!webhook) {
+      throw new NotFoundException(`Webhook ${id} not found`);
+    }
+
+    logger.info("Webhook deleted", {
+      webhookId: id,
+      channel: webhook.channel,
+      provider: webhook.provider,
+      deletedBy: userId,
+    });
+
+    return ResponseUtil.success(null, "Webhook deleted successfully");
   }
 
   /**
@@ -231,30 +245,40 @@ export class WebhookDashboardController {
   @ApiOperation({ summary: "Obtener estadísticas de webhook" })
   @ApiResponse({ status: 200, type: WebhookStatsDto })
   async getWebhookStats(@Param("id") id: string): Promise<any> {
-    // TODO: Obtener estadísticas de base de datos
+    const webhook = await this.webhookModel
+      .findById(id)
+      .select("-secret")
+      .exec();
+    if (!webhook) {
+      throw new NotFoundException(`Webhook ${id} not found`);
+    }
+
+    const successRate =
+      webhook.totalEvents > 0
+        ? (webhook.successfulEvents / webhook.totalEvents) * 100
+        : 0;
+
+    const eventsByType = await this.webhookLogModel.aggregate([
+      { $match: { webhookId: id } },
+      { $group: { _id: "$eventType", count: { $sum: 1 } } },
+    ]);
 
     const stats: WebhookStatsDto = {
       webhookId: id,
-      channel: NotificationChannel.EMAIL,
-      provider: "sendgrid",
-      totalEvents: 1000,
-      successfulEvents: 950,
-      failedEvents: 50,
-      successRate: 95.0,
-      averageProcessingTime: 125,
-      lastEventAt: new Date(),
-      eventsByType: {
-        delivered: 800,
-        opened: 100,
-        clicked: 50,
-      },
+      channel: webhook.channel as NotificationChannel,
+      provider: webhook.provider,
+      totalEvents: webhook.totalEvents,
+      successfulEvents: webhook.successfulEvents,
+      failedEvents: webhook.failedEvents,
+      successRate: Math.round(successRate * 100) / 100,
+      averageProcessingTime: 0,
+      lastEventAt: webhook.lastEventAt,
+      eventsByType: Object.fromEntries(
+        eventsByType.map((e: any) => [e._id || "unknown", e.count]),
+      ),
     };
 
-    return {
-      success: true,
-      data: stats,
-      message: "Stats retrieved successfully",
-    };
+    return ResponseUtil.success(stats, "Stats retrieved successfully");
   }
 
   /**
@@ -264,23 +288,31 @@ export class WebhookDashboardController {
   @ApiOperation({ summary: "Obtener logs de webhook" })
   @ApiQuery({ name: "limit", required: false, type: Number })
   @ApiQuery({ name: "offset", required: false, type: Number })
-  @ApiResponse({ status: 200, type: [WebhookLogDto] })
+  @ApiResponse({ status: 200 })
   async getWebhookLogs(
     @Param("id") id: string,
     @Query("limit") limit: number = 50,
-    @Query("offset") offset: number = 0
+    @Query("offset") offset: number = 0,
   ): Promise<any> {
-    // TODO: Obtener logs de base de datos
+    const numLimit = Number(limit) || 50;
+    const numOffset = Number(offset) || 0;
 
-    const logs: WebhookLogDto[] = [];
+    const [logs, total] = await Promise.all([
+      this.webhookLogModel
+        .find({ webhookId: id })
+        .sort({ createdAt: -1 })
+        .skip(numOffset)
+        .limit(numLimit)
+        .exec(),
+      this.webhookLogModel.countDocuments({ webhookId: id }).exec(),
+    ]);
 
-    return {
-      success: true,
-      data: logs,
-      total: logs.length,
-      limit,
-      offset,
-    };
+    return ResponseUtil.paginated(
+      logs,
+      total,
+      Math.floor(numOffset / numLimit) + 1,
+      numLimit,
+    );
   }
 
   /**
@@ -291,9 +323,12 @@ export class WebhookDashboardController {
   @ApiResponse({ status: 200 })
   async testWebhook(
     @Param("id") id: string,
-    @Body() dto: TestWebhookDto
+    @Body() dto: TestWebhookDto,
   ): Promise<any> {
-    // TODO: Generar evento de prueba y enviarlo
+    const webhook = await this.webhookModel.findById(id).exec();
+    if (!webhook) {
+      throw new NotFoundException(`Webhook ${id} not found`);
+    }
 
     const testPayload = {
       eventType: dto.eventType,
@@ -302,15 +337,47 @@ export class WebhookDashboardController {
       testData: dto.testData,
     };
 
-    return {
-      success: true,
-      data: testPayload,
-      message: "Test webhook event sent successfully",
-    };
+    const startTime = Date.now();
+    let success = true;
+    let error: string | undefined;
+
+    try {
+      await this.channelWebhookService.processWebhook(
+        webhook.channel as NotificationChannel,
+        webhook.provider,
+        testPayload,
+        undefined,
+        webhook.secret || "",
+      );
+    } catch (err) {
+      success = false;
+      error = err instanceof Error ? err.message : "Test failed";
+    }
+
+    await this.webhookLogModel.create({
+      webhookId: id,
+      channel: webhook.channel,
+      provider: webhook.provider,
+      eventType: dto.eventType,
+      messageId: testPayload.messageId,
+      success,
+      error,
+      requestBody: testPayload,
+      responseStatus: success ? 200 : 500,
+      processingTime: Date.now() - startTime,
+    });
+
+    return ResponseUtil.success(
+      { ...testPayload, success, error },
+      success
+        ? "Test webhook event sent successfully"
+        : "Test webhook event failed",
+    );
   }
 
   /**
-   * Endpoint para recibir webhooks (público)
+   * Endpoint para recibir webhooks (público — no requiere auth)
+   * NOTE: This specific endpoint bypasses admin guards via route exclusion
    */
   @Post("receive/:channel/:provider")
   @ApiOperation({ summary: "Recibir webhook de proveedor" })
@@ -320,37 +387,66 @@ export class WebhookDashboardController {
     @Param("provider") provider: string,
     @Body() body: any,
     @Headers("x-signature") signature?: string,
-    @Headers("x-twilio-signature") twilioSignature?: string
+    @Headers("x-twilio-signature") twilioSignature?: string,
   ): Promise<any> {
-    // Usar la firma correcta según el proveedor
     const finalSignature = twilioSignature || signature;
 
-    // TODO: Obtener secret desde base de datos
+    // Get secret from DB instead of env
+    const webhook = await this.webhookModel
+      .findOne({ channel, provider, active: true })
+      .exec();
     const secret =
-      process.env[`WEBHOOK_SECRET_${provider.toUpperCase()}`] || "";
+      webhook?.secret ||
+      process.env[`WEBHOOK_SECRET_${provider.toUpperCase()}`] ||
+      "";
+
+    const startTime = Date.now();
+    let success = true;
+    let error: string | undefined;
+    let result: any;
 
     try {
-      const result = await this.channelWebhookService.processWebhook(
+      result = await this.channelWebhookService.processWebhook(
         channel,
         provider,
         body,
         finalSignature,
-        secret
+        secret,
       );
-
-      return {
-        success: true,
-        data: result,
-        message: "Webhook processed successfully",
-      };
-    } catch (error) {
-      return {
-        success: false,
-        error:
-          error instanceof Error ? error.message : "Webhook processing failed",
-        statusCode: 400,
-      };
+    } catch (err) {
+      success = false;
+      error = err instanceof Error ? err.message : "Webhook processing failed";
     }
+
+    // Log event and update stats
+    if (webhook) {
+      await Promise.all([
+        this.webhookLogModel.create({
+          webhookId: webhook._id!.toString(),
+          channel,
+          provider,
+          eventType: body?.event || body?.eventType,
+          messageId: body?.messageId || body?.MessageSid,
+          success,
+          error,
+          requestBody: body,
+          responseStatus: success ? 200 : 400,
+          processingTime: Date.now() - startTime,
+        }),
+        this.webhookModel.findByIdAndUpdate(webhook._id, {
+          $inc: {
+            totalEvents: 1,
+            ...(success ? { successfulEvents: 1 } : { failedEvents: 1 }),
+          },
+          $set: { lastEventAt: new Date() },
+        }),
+      ]);
+    }
+
+    if (!success) {
+      return ResponseUtil.error(error || "Webhook processing failed");
+    }
+    return ResponseUtil.success(result, "Webhook processed successfully");
   }
 
   /**
@@ -361,6 +457,15 @@ export class WebhookDashboardController {
   @ApiResponse({ status: 200 })
   async getDashboardSummary(): Promise<any> {
     const channels = this.channelWebhookService.getAvailableChannels();
+    const [totalWebhooks, activeWebhooks, recentLogs] = await Promise.all([
+      this.webhookModel.countDocuments().exec(),
+      this.webhookModel.countDocuments({ active: true }).exec(),
+      this.webhookLogModel
+        .countDocuments({
+          createdAt: { $gte: new Date(Date.now() - 24 * 60 * 60 * 1000) },
+        })
+        .exec(),
+    ]);
 
     const summary = {
       totalChannels: channels.length,
@@ -370,17 +475,11 @@ export class WebhookDashboardController {
         totalProviders:
           this.channelWebhookService.getHandlersByChannel(channel).length,
       })),
-      totalWebhooks: channels.reduce(
-        (acc, channel) =>
-          acc + this.channelWebhookService.getHandlersByChannel(channel).length,
-        0
-      ),
+      totalWebhooks,
+      activeWebhooks,
+      eventsLast24h: recentLogs,
     };
 
-    return {
-      success: true,
-      data: summary,
-      message: "Dashboard summary retrieved",
-    };
+    return ResponseUtil.success(summary, "Dashboard summary retrieved");
   }
 }

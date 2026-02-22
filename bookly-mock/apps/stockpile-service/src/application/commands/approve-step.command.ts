@@ -7,6 +7,7 @@ export class ApproveStepCommand {
     public readonly approvalRequestId: string,
     public readonly approverId: string,
     public readonly stepName: string,
-    public readonly comment?: string
+    public readonly comment?: string,
+    public readonly securityInfo?: { ipAddress?: string; userAgent?: string }
   ) {}
 }

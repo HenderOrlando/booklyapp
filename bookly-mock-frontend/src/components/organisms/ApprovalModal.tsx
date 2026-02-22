@@ -9,6 +9,7 @@ import {
 } from "@/components/atoms/Dialog";
 import { ApprovalActions } from "@/components/molecules/ApprovalActions";
 import { ApprovalTimeline } from "@/components/molecules/ApprovalTimeline";
+import { ConflictAlert } from "@/components/molecules/ConflictAlert";
 import { DocumentPreview } from "@/components/molecules/DocumentPreview";
 import type { ApprovalRequest } from "@/types/entities/approval";
 import { format } from "date-fns";
@@ -170,18 +171,18 @@ export const ApprovalModal = React.memo<ApprovalModalProps>(
                   <button
                     onClick={handleDownload}
                     disabled={isDownloading}
-                    className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="p-2 rounded-lg hover:bg-[var(--color-bg-secondary)] dark:hover:bg-[var(--color-bg-inverse)] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                     title="Descargar documento"
                   >
-                    <Download className="h-4 w-4 text-gray-600 dark:text-gray-400" />
+                    <Download className="h-4 w-4 text-[var(--color-text-secondary)] dark:text-[var(--color-text-tertiary)]" />
                   </button>
                   <button
                     onClick={handleShare}
                     disabled={isSharing}
-                    className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="p-2 rounded-lg hover:bg-[var(--color-bg-secondary)] dark:hover:bg-[var(--color-bg-inverse)] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                     title="Compartir documento"
                   >
-                    <Share2 className="h-4 w-4 text-gray-600 dark:text-gray-400" />
+                    <Share2 className="h-4 w-4 text-[var(--color-text-secondary)] dark:text-[var(--color-text-tertiary)]" />
                   </button>
 
                   {/* Estados */}
@@ -198,7 +199,7 @@ export const ApprovalModal = React.memo<ApprovalModalProps>(
 
             {/* Alerta de expiración */}
             {isExpiring && request.status === "PENDING" && (
-              <div className="flex items-start gap-2 p-3 rounded-lg bg-yellow-50 dark:bg-yellow-900/20 text-yellow-800 dark:text-yellow-200">
+              <div className="flex items-start gap-2 p-3 rounded-lg bg-[var(--color-state-warning-bg)] text-[var(--color-state-warning-text)]">
                 <AlertCircle className="h-5 w-5 flex-shrink-0 mt-0.5" />
                 <div className="flex-1">
                   <p className="font-medium text-sm">Solicitud por expirar</p>
@@ -213,14 +214,24 @@ export const ApprovalModal = React.memo<ApprovalModalProps>(
               </div>
             )}
 
+            {/* Alerta de conflictos de disponibilidad */}
+            {request.status === "PENDING" && (
+              <ConflictAlert
+                resourceId={request.resourceId}
+                startDate={request.startDate}
+                endDate={request.endDate}
+                excludeReservationId={request.reservationId}
+              />
+            )}
+
             {/* Tabs */}
-            <div className="flex gap-1 border-b border-gray-200 dark:border-gray-700">
+            <div className="flex gap-1 border-b border-[var(--color-border-subtle)] dark:border-[var(--color-border-strong)]">
               <button
                 onClick={() => setActiveTab("details")}
                 className={`px-4 py-2 font-medium text-sm transition-colors ${
                   activeTab === "details"
-                    ? "text-[var(--color-primary-base)] border-b-2 border-[var(--color-primary-base)]"
-                    : "text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100"
+                    ? "text-[var(--color-action-primary)] border-b-2 border-[var(--color-action-primary)]"
+                    : "text-[var(--color-text-secondary)] dark:text-[var(--color-text-tertiary)] hover:text-[var(--color-text-primary)] dark:hover:text-[var(--color-text-inverse)]"
                 }`}
               >
                 Detalles
@@ -229,8 +240,8 @@ export const ApprovalModal = React.memo<ApprovalModalProps>(
                 onClick={() => setActiveTab("timeline")}
                 className={`px-4 py-2 font-medium text-sm transition-colors ${
                   activeTab === "timeline"
-                    ? "text-[var(--color-primary-base)] border-b-2 border-[var(--color-primary-base)]"
-                    : "text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100"
+                    ? "text-[var(--color-action-primary)] border-b-2 border-[var(--color-action-primary)]"
+                    : "text-[var(--color-text-secondary)] dark:text-[var(--color-text-tertiary)] hover:text-[var(--color-text-primary)] dark:hover:text-[var(--color-text-inverse)]"
                 }`}
               >
                 Historial
@@ -240,8 +251,8 @@ export const ApprovalModal = React.memo<ApprovalModalProps>(
                   onClick={() => setActiveTab("document")}
                   className={`px-4 py-2 font-medium text-sm transition-colors ${
                     activeTab === "document"
-                      ? "text-[var(--color-primary-base)] border-b-2 border-[var(--color-primary-base)]"
-                      : "text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100"
+                      ? "text-[var(--color-action-primary)] border-b-2 border-[var(--color-action-primary)]"
+                      : "text-[var(--color-text-secondary)] dark:text-[var(--color-text-tertiary)] hover:text-[var(--color-text-primary)] dark:hover:text-[var(--color-text-inverse)]"
                   }`}
                 >
                   Documento
@@ -256,13 +267,13 @@ export const ApprovalModal = React.memo<ApprovalModalProps>(
                 <div className="space-y-6 py-4">
                   {/* Información del solicitante */}
                   <div>
-                    <h3 className="text-sm font-semibold text-gray-900 dark:text-gray-100 mb-3">
+                    <h3 className="text-sm font-semibold text-[var(--color-text-primary)] dark:text-[var(--color-text-inverse)] mb-3">
                       Solicitante
                     </h3>
                     <div className="space-y-2">
                       <div className="flex items-center gap-2 text-sm">
-                        <User className="h-4 w-4 text-gray-500 dark:text-gray-400" />
-                        <span className="font-medium text-gray-900 dark:text-gray-100">
+                        <User className="h-4 w-4 text-[var(--color-text-secondary)] dark:text-[var(--color-text-tertiary)]" />
+                        <span className="font-medium text-[var(--color-text-primary)] dark:text-[var(--color-text-inverse)]">
                           {request.userName}
                         </span>
                         {request.userRole && (
@@ -271,10 +282,10 @@ export const ApprovalModal = React.memo<ApprovalModalProps>(
                           </Badge>
                         )}
                       </div>
-                      <div className="text-sm text-gray-600 dark:text-gray-400">
+                      <div className="text-sm text-[var(--color-text-secondary)] dark:text-[var(--color-text-tertiary)]">
                         {request.userEmail}
                       </div>
-                      <div className="flex items-center gap-2 text-xs text-gray-500 dark:text-gray-400">
+                      <div className="flex items-center gap-2 text-xs text-[var(--color-text-secondary)] dark:text-[var(--color-text-tertiary)]">
                         <Calendar className="h-3.5 w-3.5" />
                         Solicitado el{" "}
                         {format(requestedDate, "PPpp", { locale: es })}
@@ -284,21 +295,21 @@ export const ApprovalModal = React.memo<ApprovalModalProps>(
 
                   {/* Información del recurso */}
                   <div>
-                    <h3 className="text-sm font-semibold text-gray-900 dark:text-gray-100 mb-3">
+                    <h3 className="text-sm font-semibold text-[var(--color-text-primary)] dark:text-[var(--color-text-inverse)] mb-3">
                       Recurso
                     </h3>
                     <div className="space-y-2">
-                      <div className="flex items-center gap-2 text-sm font-medium text-gray-900 dark:text-gray-100">
-                        <MapPin className="h-4 w-4 text-gray-500 dark:text-gray-400" />
+                      <div className="flex items-center gap-2 text-sm font-medium text-[var(--color-text-primary)] dark:text-[var(--color-text-inverse)]">
+                        <MapPin className="h-4 w-4 text-[var(--color-text-secondary)] dark:text-[var(--color-text-tertiary)]" />
                         {request.resourceName}
                       </div>
                       {request.resourceType && (
-                        <div className="text-sm text-gray-600 dark:text-gray-400">
+                        <div className="text-sm text-[var(--color-text-secondary)] dark:text-[var(--color-text-tertiary)]">
                           Tipo: {request.resourceType}
                         </div>
                       )}
                       {request.categoryName && (
-                        <div className="text-sm text-gray-600 dark:text-gray-400">
+                        <div className="text-sm text-[var(--color-text-secondary)] dark:text-[var(--color-text-tertiary)]">
                           Categoría: {request.categoryName}
                         </div>
                       )}
@@ -307,29 +318,29 @@ export const ApprovalModal = React.memo<ApprovalModalProps>(
 
                   {/* Horario */}
                   <div>
-                    <h3 className="text-sm font-semibold text-gray-900 dark:text-gray-100 mb-3">
+                    <h3 className="text-sm font-semibold text-[var(--color-text-primary)] dark:text-[var(--color-text-inverse)] mb-3">
                       Horario de Reserva
                     </h3>
                     <div className="space-y-2">
                       <div className="flex items-center gap-2 text-sm">
-                        <Calendar className="h-4 w-4 text-gray-500 dark:text-gray-400" />
-                        <span className="text-gray-900 dark:text-gray-100">
+                        <Calendar className="h-4 w-4 text-[var(--color-text-secondary)] dark:text-[var(--color-text-tertiary)]" />
+                        <span className="text-[var(--color-text-primary)] dark:text-[var(--color-text-inverse)]">
                           {format(startDate, "EEEE, d 'de' MMMM 'de' yyyy", {
                             locale: es,
                           })}
                         </span>
                       </div>
                       <div className="flex items-center gap-2 text-sm">
-                        <Clock className="h-4 w-4 text-gray-500 dark:text-gray-400" />
-                        <span className="text-gray-900 dark:text-gray-100">
+                        <Clock className="h-4 w-4 text-[var(--color-text-secondary)] dark:text-[var(--color-text-tertiary)]" />
+                        <span className="text-[var(--color-text-primary)] dark:text-[var(--color-text-inverse)]">
                           {format(startDate, "HH:mm")} -{" "}
                           {format(endDate, "HH:mm")}
                         </span>
-                        <span className="text-xs text-gray-500 dark:text-gray-400">
+                        <span className="text-xs text-[var(--color-text-secondary)] dark:text-[var(--color-text-tertiary)]">
                           (
                           {Math.round(
                             (endDate.getTime() - startDate.getTime()) /
-                              (1000 * 60)
+                              (1000 * 60),
                           )}{" "}
                           minutos)
                         </span>
@@ -339,30 +350,30 @@ export const ApprovalModal = React.memo<ApprovalModalProps>(
 
                   {/* Propósito */}
                   <div>
-                    <h3 className="text-sm font-semibold text-gray-900 dark:text-gray-100 mb-3">
+                    <h3 className="text-sm font-semibold text-[var(--color-text-primary)] dark:text-[var(--color-text-inverse)] mb-3">
                       Propósito
                     </h3>
-                    <p className="text-sm text-gray-700 dark:text-gray-300">
+                    <p className="text-sm text-[var(--color-text-primary)] dark:text-[var(--color-text-tertiary)]">
                       {request.purpose}
                     </p>
                   </div>
 
                   {/* Asistentes */}
                   <div>
-                    <h3 className="text-sm font-semibold text-gray-900 dark:text-gray-100 mb-3">
+                    <h3 className="text-sm font-semibold text-[var(--color-text-primary)] dark:text-[var(--color-text-inverse)] mb-3">
                       Información Adicional
                     </h3>
                     <div className="space-y-2">
                       <div className="flex items-center gap-2 text-sm">
-                        <Users className="h-4 w-4 text-gray-500 dark:text-gray-400" />
-                        <span className="text-gray-900 dark:text-gray-100">
+                        <Users className="h-4 w-4 text-[var(--color-text-secondary)] dark:text-[var(--color-text-tertiary)]" />
+                        <span className="text-[var(--color-text-primary)] dark:text-[var(--color-text-inverse)]">
                           {request.attendees} asistentes esperados
                         </span>
                       </div>
                       {request.requiresEquipment &&
                         request.requiresEquipment.length > 0 && (
                           <div className="text-sm">
-                            <span className="font-medium text-gray-900 dark:text-gray-100">
+                            <span className="font-medium text-[var(--color-text-primary)] dark:text-[var(--color-text-inverse)]">
                               Equipamiento requerido:
                             </span>
                             <div className="flex flex-wrap gap-1 mt-1">
@@ -380,10 +391,10 @@ export const ApprovalModal = React.memo<ApprovalModalProps>(
                         )}
                       {request.specialRequirements && (
                         <div className="text-sm">
-                          <span className="font-medium text-gray-900 dark:text-gray-100">
+                          <span className="font-medium text-[var(--color-text-primary)] dark:text-[var(--color-text-inverse)]">
                             Requisitos especiales:
                           </span>
-                          <p className="text-gray-600 dark:text-gray-400 mt-1">
+                          <p className="text-[var(--color-text-secondary)] dark:text-[var(--color-text-tertiary)] mt-1">
                             {request.specialRequirements}
                           </p>
                         </div>
@@ -393,18 +404,18 @@ export const ApprovalModal = React.memo<ApprovalModalProps>(
 
                   {/* Nivel de aprobación */}
                   <div>
-                    <h3 className="text-sm font-semibold text-gray-900 dark:text-gray-100 mb-3">
+                    <h3 className="text-sm font-semibold text-[var(--color-text-primary)] dark:text-[var(--color-text-inverse)] mb-3">
                       Flujo de Aprobación
                     </h3>
                     <div className="space-y-2">
                       <div className="flex items-center gap-2 text-sm">
-                        <span className="text-gray-600 dark:text-gray-400">
+                        <span className="text-[var(--color-text-secondary)] dark:text-[var(--color-text-tertiary)]">
                           Nivel actual:
                         </span>
                         <Badge variant="default">{request.currentLevel}</Badge>
                       </div>
                       <div className="flex items-center gap-2 text-sm">
-                        <span className="text-gray-600 dark:text-gray-400">
+                        <span className="text-[var(--color-text-secondary)] dark:text-[var(--color-text-tertiary)]">
                           Nivel máximo:
                         </span>
                         <Badge variant="outline">{request.maxLevel}</Badge>
@@ -415,42 +426,42 @@ export const ApprovalModal = React.memo<ApprovalModalProps>(
                   {/* Información de revisión (si existe) */}
                   {request.reviewedAt && (
                     <div>
-                      <h3 className="text-sm font-semibold text-gray-900 dark:text-gray-100 mb-3">
+                      <h3 className="text-sm font-semibold text-[var(--color-text-primary)] dark:text-[var(--color-text-inverse)] mb-3">
                         Revisión
                       </h3>
                       <div className="space-y-2">
                         {request.reviewerName && (
                           <div className="text-sm">
-                            <span className="text-gray-600 dark:text-gray-400">
+                            <span className="text-[var(--color-text-secondary)] dark:text-[var(--color-text-tertiary)]">
                               Revisado por:
                             </span>{" "}
-                            <span className="font-medium text-gray-900 dark:text-gray-100">
+                            <span className="font-medium text-[var(--color-text-primary)] dark:text-[var(--color-text-inverse)]">
                               {request.reviewerName}
                             </span>
                           </div>
                         )}
-                        <div className="text-sm text-gray-600 dark:text-gray-400">
+                        <div className="text-sm text-[var(--color-text-secondary)] dark:text-[var(--color-text-tertiary)]">
                           Fecha:{" "}
                           {format(new Date(request.reviewedAt), "PPpp", {
                             locale: es,
                           })}
                         </div>
                         {request.comments && (
-                          <div className="p-3 bg-gray-50 dark:bg-gray-800 rounded-lg text-sm">
-                            <span className="font-medium text-gray-900 dark:text-gray-100">
+                          <div className="p-3 bg-[var(--color-bg-secondary)] dark:bg-[var(--color-bg-inverse)] rounded-lg text-sm">
+                            <span className="font-medium text-[var(--color-text-primary)] dark:text-[var(--color-text-inverse)]">
                               Comentarios:
                             </span>
-                            <p className="text-gray-700 dark:text-gray-300 mt-1">
+                            <p className="text-[var(--color-text-primary)] dark:text-[var(--color-text-tertiary)] mt-1">
                               {request.comments}
                             </p>
                           </div>
                         )}
                         {request.rejectionReason && (
-                          <div className="p-3 bg-red-50 dark:bg-red-900/20 rounded-lg text-sm">
-                            <span className="font-medium text-red-800 dark:text-red-200">
+                          <div className="p-3 bg-[var(--color-state-error-bg)] rounded-lg text-sm">
+                            <span className="font-medium text-[var(--color-state-error-text)]">
                               Razón de rechazo:
                             </span>
-                            <p className="text-red-700 dark:text-red-300 mt-1">
+                            <p className="text-[var(--color-state-error-text)] mt-1">
                               {request.rejectionReason}
                             </p>
                           </div>
@@ -465,9 +476,13 @@ export const ApprovalModal = React.memo<ApprovalModalProps>(
               {activeTab === "timeline" && (
                 <div className="py-4">
                   {request.history && request.history.length > 0 ? (
-                    <ApprovalTimeline history={request.history} />
+                    <ApprovalTimeline
+                      history={request.history}
+                      currentLevel={request.currentLevel}
+                      maxLevel={request.maxLevel}
+                    />
                   ) : (
-                    <div className="text-center py-12 text-gray-500 dark:text-gray-400">
+                    <div className="text-center py-12 text-[var(--color-text-secondary)] dark:text-[var(--color-text-tertiary)]">
                       <FileText className="h-12 w-12 mx-auto mb-3 opacity-50" />
                       <p>No hay historial disponible</p>
                     </div>
@@ -488,7 +503,7 @@ export const ApprovalModal = React.memo<ApprovalModalProps>(
 
             {/* Footer con acciones */}
             {showActions && request.status === "PENDING" && (
-              <div className="border-t border-gray-200 dark:border-gray-700 pt-4">
+              <div className="border-t border-[var(--color-border-subtle)] dark:border-[var(--color-border-strong)] pt-4">
                 <ApprovalActions
                   onApprove={
                     onApprove ? (comments) => onApprove(comments) : undefined
@@ -509,9 +524,10 @@ export const ApprovalModal = React.memo<ApprovalModalProps>(
             {/* Botón de cerrar */}
             <button
               onClick={onClose}
-              className="absolute top-4 right-4 p-1 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
+              title="Cerrar"
+              className="absolute top-4 right-4 p-1 rounded-lg hover:bg-[var(--color-bg-secondary)] dark:hover:bg-[var(--color-bg-inverse)] transition-colors"
             >
-              <X className="h-5 w-5 text-gray-500 dark:text-gray-400" />
+              <X className="h-5 w-5 text-[var(--color-text-secondary)] dark:text-[var(--color-text-tertiary)]" />
             </button>
           </DialogContent>
         </Dialog>
@@ -532,7 +548,7 @@ export const ApprovalModal = React.memo<ApprovalModalProps>(
             <div className="space-y-4 py-4">
               {/* Selector de medio */}
               <div className="space-y-3">
-                <label className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                <label className="text-sm font-medium text-[var(--color-text-primary)] dark:text-[var(--color-text-tertiary)]">
                   Medio de envío
                 </label>
                 <div className="space-y-2">
@@ -540,19 +556,19 @@ export const ApprovalModal = React.memo<ApprovalModalProps>(
                     onClick={() => setNotificationMedium("email")}
                     className={`w-full flex items-center gap-3 p-3 rounded-lg border-2 transition-colors ${
                       notificationMedium === "email"
-                        ? "border-[var(--color-primary-base)] bg-[var(--color-primary-base)]/5"
-                        : "border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600"
+                        ? "border-[var(--color-action-primary)] bg-[var(--color-state-info-bg)]"
+                        : "border-[var(--color-border-subtle)] dark:border-[var(--color-border-strong)] hover:border-[var(--color-border-strong)] dark:hover:border-[var(--color-border-strong)]"
                     }`}
                   >
                     <Mail className="h-5 w-5" />
                     <div className="flex-1 text-left">
                       <p className="font-medium text-sm">Email</p>
-                      <p className="text-xs text-gray-500 dark:text-gray-400">
+                      <p className="text-xs text-[var(--color-text-secondary)] dark:text-[var(--color-text-tertiary)]">
                         Enviar por correo electrónico
                       </p>
                     </div>
                     {notificationMedium === "email" && (
-                      <div className="h-2 w-2 rounded-full bg-[var(--color-primary-base)]" />
+                      <div className="h-2 w-2 rounded-full bg-[var(--color-action-primary)]" />
                     )}
                   </button>
 
@@ -560,19 +576,19 @@ export const ApprovalModal = React.memo<ApprovalModalProps>(
                     onClick={() => setNotificationMedium("sms")}
                     className={`w-full flex items-center gap-3 p-3 rounded-lg border-2 transition-colors ${
                       notificationMedium === "sms"
-                        ? "border-[var(--color-primary-base)] bg-[var(--color-primary-base)]/5"
-                        : "border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600"
+                        ? "border-[var(--color-action-primary)] bg-[var(--color-state-info-bg)]"
+                        : "border-[var(--color-border-subtle)] dark:border-[var(--color-border-strong)] hover:border-[var(--color-border-strong)] dark:hover:border-[var(--color-border-strong)]"
                     }`}
                   >
                     <MessageSquare className="h-5 w-5" />
                     <div className="flex-1 text-left">
                       <p className="font-medium text-sm">SMS</p>
-                      <p className="text-xs text-gray-500 dark:text-gray-400">
+                      <p className="text-xs text-[var(--color-text-secondary)] dark:text-[var(--color-text-tertiary)]">
                         Enviar mensaje de texto
                       </p>
                     </div>
                     {notificationMedium === "sms" && (
-                      <div className="h-2 w-2 rounded-full bg-[var(--color-primary-base)]" />
+                      <div className="h-2 w-2 rounded-full bg-[var(--color-action-primary)]" />
                     )}
                   </button>
 
@@ -580,41 +596,41 @@ export const ApprovalModal = React.memo<ApprovalModalProps>(
                     onClick={() => setNotificationMedium("whatsapp")}
                     className={`w-full flex items-center gap-3 p-3 rounded-lg border-2 transition-colors ${
                       notificationMedium === "whatsapp"
-                        ? "border-[var(--color-primary-base)] bg-[var(--color-primary-base)]/5"
-                        : "border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600"
+                        ? "border-[var(--color-action-primary)] bg-[var(--color-state-info-bg)]"
+                        : "border-[var(--color-border-subtle)] dark:border-[var(--color-border-strong)] hover:border-[var(--color-border-strong)] dark:hover:border-[var(--color-border-strong)]"
                     }`}
                   >
                     <MessageSquare className="h-5 w-5" />
                     <div className="flex-1 text-left">
                       <p className="font-medium text-sm">WhatsApp</p>
-                      <p className="text-xs text-gray-500 dark:text-gray-400">
+                      <p className="text-xs text-[var(--color-text-secondary)] dark:text-[var(--color-text-tertiary)]">
                         Enviar por WhatsApp
                       </p>
                     </div>
                     {notificationMedium === "whatsapp" && (
-                      <div className="h-2 w-2 rounded-full bg-[var(--color-primary-base)]" />
+                      <div className="h-2 w-2 rounded-full bg-[var(--color-action-primary)]" />
                     )}
                   </button>
                 </div>
               </div>
             </div>
 
-            <div className="flex justify-end gap-2 pt-4 border-t border-gray-200 dark:border-gray-700">
+            <div className="flex justify-end gap-2 pt-4 border-t border-[var(--color-border-subtle)] dark:border-[var(--color-border-strong)]">
               <button
                 onClick={() => setShowNotificationModal(false)}
                 disabled={isSharing}
-                className="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition-colors disabled:opacity-50"
+                className="px-4 py-2 text-sm font-medium text-[var(--color-text-primary)] dark:text-[var(--color-text-tertiary)] hover:bg-[var(--color-bg-secondary)] dark:hover:bg-[var(--color-bg-inverse)] rounded-lg transition-colors disabled:opacity-50"
               >
                 Cancelar
               </button>
               <button
                 onClick={handleSendNotification}
                 disabled={isSharing}
-                className="px-4 py-2 text-sm font-medium text-white bg-[var(--color-primary-base)] hover:bg-[var(--color-primary-dark)] rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+                className="px-4 py-2 text-sm font-medium text-[var(--color-text-inverse)] bg-[var(--color-action-primary)] hover:bg-[var(--color-action-primary-hover)] rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
               >
                 {isSharing ? (
                   <>
-                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white" />
+                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-[var(--color-text-inverse)]" />
                     Enviando...
                   </>
                 ) : (
@@ -626,7 +642,7 @@ export const ApprovalModal = React.memo<ApprovalModalProps>(
         </Dialog>
       </>
     );
-  }
+  },
 );
 
 ApprovalModal.displayName = "ApprovalModal";

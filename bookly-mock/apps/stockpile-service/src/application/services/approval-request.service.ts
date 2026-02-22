@@ -9,6 +9,7 @@ import {
 } from '@stockpile/domain/repositories';
 import { EnrichedApprovalRequestDto } from '@stockpile/infrastructure/dtos';
 import { DataEnrichmentService } from "./data-enrichment.service";
+import { ApprovalAuditService } from "./approval-audit.service";
 
 const logger = createLogger("ApprovalRequestService");
 
@@ -23,7 +24,8 @@ export class ApprovalRequestService {
     private readonly approvalRequestRepository: IApprovalRequestRepository,
     @Inject("IApprovalFlowRepository")
     private readonly approvalFlowRepository: IApprovalFlowRepository,
-    private readonly dataEnrichmentService: DataEnrichmentService
+    private readonly dataEnrichmentService: DataEnrichmentService,
+    private readonly approvalAuditService: ApprovalAuditService
   ) {}
 
   /**
@@ -35,6 +37,7 @@ export class ApprovalRequestService {
     approvalFlowId: string;
     metadata?: Record<string, any>;
     createdBy?: string;
+    securityInfo?: { ipAddress?: string; userAgent?: string };
   }): Promise<ApprovalRequestEntity> {
     logger.info("Creating approval request", {
       reservationId: params.reservationId,
@@ -112,6 +115,18 @@ export class ApprovalRequestService {
 
     const created = await this.approvalRequestRepository.create(request);
 
+    // Auditoría
+    await this.approvalAuditService.logRequestCreation(
+      created.id,
+      params.requesterId,
+      "USER", // Asumiendo rol base si no se provee
+      {
+        reservationId: params.reservationId,
+        approvalFlowId: params.approvalFlowId,
+      },
+      params.securityInfo
+    );
+
     logger.info("Approval request created successfully", {
       requestId: created.id,
     });
@@ -127,6 +142,7 @@ export class ApprovalRequestService {
     approverId: string;
     stepName: string;
     comment?: string;
+    securityInfo?: { ipAddress?: string; userAgent?: string };
   }): Promise<ApprovalRequestEntity> {
     logger.info("Approving step", {
       approvalRequestId: params.approvalRequestId,
@@ -174,9 +190,30 @@ export class ApprovalRequestService {
       params.comment
     );
 
+    // Auditoría del paso
+    await this.approvalAuditService.logStepApproval(
+      request.id,
+      params.approverId,
+      "APPROVER", // Asumiendo rol
+      params.stepName,
+      params.comment,
+      undefined,
+      params.securityInfo
+    );
+
     // Verificar si es el último paso
     if (updated.currentStepIndex >= flow.getTotalSteps()) {
       updated = updated.complete();
+
+      // Auditoría de aprobación final
+      await this.approvalAuditService.logRequestApproval(
+        request.id,
+        params.approverId,
+        "APPROVER",
+        undefined,
+        params.securityInfo
+      );
+
       logger.info("Approval request completed", {
         requestId: updated.id,
       });
@@ -193,6 +230,7 @@ export class ApprovalRequestService {
     approverId: string;
     stepName: string;
     comment?: string;
+    securityInfo?: { ipAddress?: string; userAgent?: string };
   }): Promise<ApprovalRequestEntity> {
     logger.info("Rejecting step", {
       approvalRequestId: params.approvalRequestId,
@@ -220,6 +258,26 @@ export class ApprovalRequestService {
       params.comment
     );
 
+    // Auditoría del rechazo del paso
+    await this.approvalAuditService.logStepRejection(
+      request.id,
+      params.approverId,
+      "APPROVER",
+      params.stepName,
+      params.comment,
+      undefined,
+      params.securityInfo
+    );
+
+    // Auditoría de rechazo final de la solicitud
+    await this.approvalAuditService.logRequestRejection(
+      request.id,
+      params.approverId,
+      "APPROVER",
+      { reason: params.comment },
+      params.securityInfo
+    );
+
     logger.info("Approval request rejected", {
       requestId: updated.id,
     });
@@ -234,6 +292,7 @@ export class ApprovalRequestService {
     approvalRequestId: string;
     cancelledBy: string;
     reason?: string;
+    securityInfo?: { ipAddress?: string; userAgent?: string };
   }): Promise<ApprovalRequestEntity> {
     logger.info("Cancelling approval request", {
       approvalRequestId: params.approvalRequestId,
@@ -255,6 +314,15 @@ export class ApprovalRequestService {
     }
 
     const updated = request.cancel(params.cancelledBy);
+
+    // Auditoría de cancelación
+    await this.approvalAuditService.logRequestCancellation(
+      request.id,
+      params.cancelledBy,
+      "USER",
+      { reason: params.reason },
+      params.securityInfo
+    );
 
     logger.info("Approval request cancelled", {
       requestId: updated.id,

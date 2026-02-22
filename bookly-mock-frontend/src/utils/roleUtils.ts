@@ -11,10 +11,26 @@ import { Role } from "@/types/entities/user";
 /**
  * Mapeo de roles del backend a identificadores internos
  *
- * Backend: Usa nombres descriptivos completos
+ * Backend: Usa códigos como GENERAL_ADMIN, STUDENT, TEACHER, etc.
+ * También soporta nombres descriptivos ("Administrador General", "Estudiante")
  * Frontend: Usa identificadores cortos para validación
  */
 export const ROLE_MAPPER: Record<string, string> = {
+  // Backend enum codes (libs/common/src/enums/index.ts → UserRole)
+  GENERAL_ADMIN: "admin",
+  PROGRAM_ADMIN: "coordinador",
+  STUDENT: "estudiante",
+  TEACHER: "profesor",
+  SECURITY: "vigilancia",
+  ADMINISTRATIVE_STAFF: "admin",
+  // Backend display names (DEFAULT_ROLES in constants)
+  "General Administrator": "admin",
+  "Program Administrator": "coordinador",
+  Student: "estudiante",
+  Teacher: "profesor",
+  Security: "vigilancia",
+  "Administrative Staff": "admin",
+  // Spanish display names (legacy / UI labels)
   "Administrador General": "admin",
   "Administrador de Programa": "coordinador",
   Estudiante: "estudiante",
@@ -25,6 +41,7 @@ export const ROLE_MAPPER: Record<string, string> = {
 
 /**
  * Roles disponibles en el sistema (identificadores internos)
+ * Aligned with backend: libs/common/src/enums/index.ts → UserRole
  */
 export const ROLES = {
   ADMIN: "admin",
@@ -32,6 +49,18 @@ export const ROLES = {
   ESTUDIANTE: "estudiante",
   PROFESOR: "profesor",
   VIGILANCIA: "vigilancia",
+} as const;
+
+/**
+ * Backend role codes for reference (mirror of UserRole enum)
+ */
+export const BACKEND_ROLES = {
+  GENERAL_ADMIN: "GENERAL_ADMIN",
+  PROGRAM_ADMIN: "PROGRAM_ADMIN",
+  STUDENT: "STUDENT",
+  TEACHER: "TEACHER",
+  SECURITY: "SECURITY",
+  ADMINISTRATIVE_STAFF: "ADMINISTRATIVE_STAFF",
 } as const;
 
 export type RoleId = (typeof ROLES)[keyof typeof ROLES];
@@ -270,11 +299,18 @@ export function getHighestRole(
  */
 export function getRoleDisplayName(roleId: string): string {
   const displayNames: Record<string, string> = {
-    admin: "Administrador",
+    admin: "Administrador General",
     coordinador: "Coordinador de Programa",
     estudiante: "Estudiante",
     profesor: "Docente",
     vigilancia: "Personal de Vigilancia",
+    // Also handle backend codes directly
+    GENERAL_ADMIN: "Administrador General",
+    PROGRAM_ADMIN: "Coordinador de Programa",
+    STUDENT: "Estudiante",
+    TEACHER: "Docente",
+    SECURITY: "Personal de Vigilancia",
+    ADMINISTRATIVE_STAFF: "Personal Administrativo",
   };
 
   return displayNames[roleId] || roleId;

@@ -1,8 +1,7 @@
-import { Injectable, OnModuleInit, OnModuleDestroy } from '@nestjs/common';
-import { ConfigService } from '@nestjs/config';
-import { createClient, RedisClientType } from 'redis';
-import { LoggingService } from '@logging/logging.service';
-import { DomainEvent } from './event-bus.service';
+import { LoggingService } from "@logging/logging.service";
+import { Injectable, OnModuleDestroy, OnModuleInit } from "@nestjs/common";
+import { ConfigService } from "@nestjs/config";
+import { createClient, RedisClientType } from "redis";
 
 @Injectable()
 export class RedisService implements OnModuleInit, OnModuleDestroy {
@@ -43,9 +42,9 @@ export class RedisService implements OnModuleInit, OnModuleDestroy {
    * @returns 'ready', 'open', or 'disconnected'
    */
   getConnectionState(): string {
-    if (this.client.isReady) return 'ready';
-    if (this.client.isOpen) return 'open';
-    return 'disconnected';
+    if (this.client.isReady) return "ready";
+    if (this.client.isOpen) return "open";
+    return "disconnected";
   }
 
   zRemRangeByScore(key: string, min: number, max: number) {
@@ -75,8 +74,8 @@ export class RedisService implements OnModuleInit, OnModuleDestroy {
   ) {
     this.client = createClient({
       socket: {
-        host: this.configService.get('REDIS_HOST'),
-        port: this.configService.get('REDIS_PORT'),
+        host: this.configService.get("REDIS_HOST"),
+        port: this.configService.get("REDIS_PORT"),
         // Keep connection alive to prevent disconnections
         keepAlive: 30000, // 30 seconds
         // Increase timeouts for GCP environment
@@ -84,35 +83,50 @@ export class RedisService implements OnModuleInit, OnModuleDestroy {
         // More aggressive reconnection strategy
         reconnectStrategy: (retries) => {
           if (retries > 20) {
-            this.loggingService.error('Redis reconnection failed after 20 attempts', new Error('Max retries reached'), 'RedisService');
-            return new Error('Max reconnection attempts reached');
+            this.loggingService.error(
+              "Redis reconnection failed after 20 attempts",
+              new Error("Max retries reached"),
+              "RedisService",
+            );
+            return new Error("Max reconnection attempts reached");
           }
           // Exponential backoff with jitter
           const baseDelay = Math.min(retries * 200, 5000);
           const jitter = Math.random() * 1000;
           const delay = baseDelay + jitter;
-          this.loggingService.log(`Attempting to reconnect to Redis (attempt ${retries}, delay: ${Math.round(delay)}ms)`, 'RedisService');
+          this.loggingService.log(
+            `Attempting to reconnect to Redis (attempt ${retries}, delay: ${Math.round(delay)}ms)`,
+            "RedisService",
+          );
           return delay;
         },
       },
-      password: this.configService.get('REDIS_PASSWORD'),
-      database: this.configService.get('REDIS_DB'),
+      password: this.configService.get("REDIS_PASSWORD"),
+      database: this.configService.get("REDIS_DB"),
     });
 
-    this.client.on('error', (err) => {
-      this.loggingService.error('Redis Client Error', err, 'RedisService');
+    this.client.on("error", (err) => {
+      this.loggingService.error("Redis Client Error", err, "RedisService");
     });
 
-    this.client.on('connect', () => {
-      this.loggingService.log('✅ Redis connected successfully', 'RedisService');
+    this.client.on("connect", () => {
+      this.loggingService.debug(
+        "RedisService initialized with config:",
+        this.configService.get("REDIS_HOST"),
+        this.configService.get("REDIS_PORT"),
+      );
+      this.loggingService.log(
+        "✅ Redis connected successfully",
+        "RedisService",
+      );
     });
 
-    this.client.on('reconnecting', () => {
-      this.loggingService.log('🔄 Redis reconnecting...', 'RedisService');
+    this.client.on("reconnecting", () => {
+      this.loggingService.log("🔄 Redis reconnecting...", "RedisService");
     });
 
-    this.client.on('ready', () => {
-      this.loggingService.log('✅ Redis client ready', 'RedisService');
+    this.client.on("ready", () => {
+      this.loggingService.log("✅ Redis client ready", "RedisService");
     });
   }
 
@@ -120,14 +134,21 @@ export class RedisService implements OnModuleInit, OnModuleDestroy {
     try {
       // Check if already connected
       if (this.client.isOpen) {
-        this.loggingService.log('Redis client already connected', 'RedisService');
+        this.loggingService.log(
+          "Redis client already connected",
+          "RedisService",
+        );
         return;
       }
-      
+
       await this.client.connect();
-      this.loggingService.log('Redis connection established', 'RedisService');
+      this.loggingService.log("Redis connection established", "RedisService");
     } catch (error) {
-      this.loggingService.error('❌ Failed to connect to Redis', error, 'RedisService');
+      this.loggingService.error(
+        "❌ Failed to connect to Redis",
+        error,
+        "RedisService",
+      );
       // Don't throw - allow service to start even if Redis is temporarily unavailable
       // Health checks will report the issue
     }
@@ -135,7 +156,7 @@ export class RedisService implements OnModuleInit, OnModuleDestroy {
 
   async onModuleDestroy() {
     await this.client.disconnect();
-    this.loggingService.log('📴 Redis disconnected', 'RedisService');
+    this.loggingService.log("📴 Redis disconnected", "RedisService");
   }
 
   async set(key: string, value: any, ttl?: number): Promise<void> {
@@ -178,7 +199,7 @@ export class RedisService implements OnModuleInit, OnModuleDestroy {
       await this.client.lPush(key, JSON.stringify(event));
       await this.client.expire(key, 86400); // 24 hours TTL
     } catch (error) {
-      console.error('Failed to cache event:', error);
+      console.error("Failed to cache event:", error);
     }
   }
 
@@ -186,7 +207,7 @@ export class RedisService implements OnModuleInit, OnModuleDestroy {
     try {
       const pattern = `events:*:${aggregateId}`;
       const keys = await this.client.keys(pattern);
-      
+
       if (keys.length === 0) {
         return [];
       }
@@ -194,29 +215,43 @@ export class RedisService implements OnModuleInit, OnModuleDestroy {
       const events: any[] = [];
       for (const key of keys) {
         const eventStrings = await this.client.lRange(key, 0, -1);
-        const keyEvents = eventStrings.map(eventStr => JSON.parse(eventStr));
+        const keyEvents = eventStrings.map((eventStr) => JSON.parse(eventStr));
         events.push(...keyEvents);
       }
 
       // Sort events by timestamp
-      return events.sort((a, b) => new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime());
+      return events.sort(
+        (a, b) =>
+          new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime(),
+      );
     } catch (error) {
-      console.error('Failed to get event history:', error);
+      console.error("Failed to get event history:", error);
       return [];
     }
   }
 
-  async cacheReservationAvailability(resourceId: string, date: string, availability: any): Promise<void> {
+  async cacheReservationAvailability(
+    resourceId: string,
+    date: string,
+    availability: any,
+  ): Promise<void> {
     const key = `availability:${resourceId}:${date}`;
     await this.set(key, availability, 3600); // Cache for 1 hour
   }
 
-  async getReservationAvailability(resourceId: string, date: string): Promise<any> {
+  async getReservationAvailability(
+    resourceId: string,
+    date: string,
+  ): Promise<any> {
     const key = `availability:${resourceId}:${date}`;
     return await this.get(key);
   }
 
-  async zRangeWithScores(key: string, start: number, stop: number): Promise<Array<{ score: number; value: string }>> {
+  async zRangeWithScores(
+    key: string,
+    start: number,
+    stop: number,
+  ): Promise<Array<{ score: number; value: string }>> {
     return await this.client.zRangeWithScores(key, start, stop);
   }
 }

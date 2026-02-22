@@ -1,9 +1,8 @@
-import { UserRole } from "@libs/common/enums";
 import { ApiProperty } from "@nestjs/swagger";
 import {
   IsArray,
   IsEmail,
-  IsEnum,
+  IsIn,
   IsNotEmpty,
   IsOptional,
   IsString,
@@ -22,6 +21,15 @@ export class RegisterDto {
   @IsEmail({}, { message: "Email debe ser válido" })
   @IsNotEmpty({ message: "Email es requerido" })
   email: string;
+
+  @ApiProperty({
+    description: "Nombre de usuario",
+    example: "juan.perez",
+    required: false,
+  })
+  @IsString({ message: "Username debe ser un string" })
+  @IsOptional()
+  username?: string;
 
   @ApiProperty({
     description: "Contraseña del usuario",
@@ -51,15 +59,14 @@ export class RegisterDto {
 
   @ApiProperty({
     description: "Roles del usuario",
-    example: [UserRole.STUDENT],
-    enum: UserRole,
+    example: ["STUDENT"],
     isArray: true,
     required: false,
   })
   @IsArray({ message: "Roles debe ser un array" })
-  @IsEnum(UserRole, { each: true, message: "Roles inválidos" })
+  @IsString({ each: true, message: "Cada rol debe ser un string" })
   @IsOptional()
-  roles?: UserRole[];
+  roles?: string[];
 
   @ApiProperty({
     description: "Permisos adicionales del usuario",
@@ -70,4 +77,62 @@ export class RegisterDto {
   @IsString({ each: true, message: "Cada permiso debe ser un string" })
   @IsOptional()
   permissions?: string[];
+
+  @ApiProperty({
+    description: "Teléfono del usuario",
+    example: "+573001234567",
+    required: false,
+  })
+  @IsString({ message: "Teléfono debe ser un string" })
+  @IsOptional()
+  phone?: string;
+
+  @ApiProperty({
+    description: "Tipo de documento",
+    enum: ["CC", "TI", "CE", "PASSPORT", "DNI", "OTHER"],
+    example: "CC",
+    required: false,
+  })
+  @IsString({ message: "Tipo de documento debe ser un string" })
+  @IsIn(["CC", "TI", "CE", "PASSPORT", "DNI", "OTHER"], {
+    message: "Tipo de documento inválido",
+  })
+  @IsOptional()
+  documentType?: string;
+
+  @ApiProperty({
+    description: "Número de documento",
+    example: "1098723456",
+    required: false,
+  })
+  @IsString({ message: "Número de documento debe ser un string" })
+  @IsOptional()
+  documentNumber?: string;
+
+  @ApiProperty({
+    description: "Tenant del usuario",
+    example: "UFPS",
+    required: false,
+  })
+  @IsString({ message: "tenantId debe ser un string" })
+  @IsOptional()
+  tenantId?: string;
+
+  @ApiProperty({
+    description: "ID del programa académico",
+    example: "115",
+    required: false,
+  })
+  @IsString({ message: "programId debe ser un string" })
+  @IsOptional()
+  programId?: string;
+
+  @ApiProperty({
+    description: "ID del programa coordinado",
+    example: "115",
+    required: false,
+  })
+  @IsString({ message: "coordinatedProgramId debe ser un string" })
+  @IsOptional()
+  coordinatedProgramId?: string;
 }

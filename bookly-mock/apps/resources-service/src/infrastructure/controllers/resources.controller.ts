@@ -1,10 +1,10 @@
+import { ResponseUtil } from "@libs/common";
 import { RequirePermissions } from "@libs/common/decorators";
 import {
   ImportResourceMode,
   ResourceStatus,
   ResourceType,
 } from "@libs/common/enums";
-import { ResponseUtil } from "@libs/common";
 import { CurrentUser } from "@libs/decorators";
 import { JwtAuthGuard, PermissionsGuard } from "@libs/guards";
 import {
@@ -18,7 +18,9 @@ import {
   Post,
   Query,
   UseGuards,
+  UseInterceptors,
 } from "@nestjs/common";
+import { CacheInterceptor, CacheKey, CacheTTL } from "@nestjs/cache-manager";
 import { CommandBus, QueryBus } from "@nestjs/cqrs";
 import {
   ApiBearerAuth,
@@ -38,6 +40,7 @@ import {
 } from "@resources/application/commands";
 import {
   GetResourceByIdQuery,
+  GetResourceCharacteristicsQuery,
   GetResourcesQuery,
   SearchResourcesAdvancedQuery,
 } from "@resources/application/queries";
@@ -68,7 +71,7 @@ import {
 export class ResourcesController {
   constructor(
     private readonly commandBus: CommandBus,
-    private readonly queryBus: QueryBus
+    private readonly queryBus: QueryBus,
   ) {}
 
   @Post()
@@ -103,7 +106,7 @@ export class ResourcesController {
   @ApiResponse({ status: 401, description: "No autorizado" })
   async createResource(
     @Body() createResourceDto: CreateResourceDto,
-    @CurrentUser("sub") userId: string
+    @CurrentUser("sub") userId: string,
   ) {
     const command = new CreateResourceCommand(
       createResourceDto.code,
@@ -118,7 +121,7 @@ export class ResourcesController {
       createResourceDto.attributes,
       createResourceDto.programIds,
       createResourceDto.availabilityRules,
-      userId
+      userId,
     );
 
     const resource = await this.commandBus.execute(command);
@@ -138,24 +141,26 @@ export class ResourcesController {
   })
   async importResources(
     @Body() importDto: ImportResourcesDto,
-    @CurrentUser("sub") userId: string
+    @CurrentUser("sub") userId: string,
   ) {
     const command = new ImportResourcesCommand(
       importDto.csvContent,
       importDto.mode || ImportResourceMode.CREATE,
       importDto.skipErrors || false,
-      userId
+      userId,
     );
 
     const result = await this.commandBus.execute(command);
 
     return ResponseUtil.success(
       result,
-      `Import completed: ${result.successCount} created, ${result.updatedCount} updated, ${result.errorCount} errors`
+      `Import completed: ${result.successCount} created, ${result.updatedCount} updated, ${result.errorCount} errors`,
     );
   }
 
   @Get("search/advanced")
+  @UseInterceptors(CacheInterceptor)
+  @CacheTTL(60000) // 1 min de caché para búsquedas avanzadas
   @ApiOperation({
     summary: "Búsqueda avanzada de recursos",
     description:
@@ -194,7 +199,7 @@ export class ResourcesController {
   @ApiResponse({ status: 400, description: "Parámetros de búsqueda inválidos" })
   @ApiResponse({ status: 401, description: "No autorizado" })
   async searchResourcesAdvanced(
-    @Query() searchDto: SearchResourcesAdvancedDto
+    @Query() searchDto: SearchResourcesAdvancedDto,
   ) {
     const query = new SearchResourcesAdvancedQuery(
       searchDto.types,
@@ -210,18 +215,20 @@ export class ResourcesController {
       searchDto.page || 1,
       searchDto.limit || 10,
       searchDto.sortBy || "createdAt",
-      searchDto.sortOrder || "desc"
+      searchDto.sortOrder || "desc",
     );
 
     const result = await this.queryBus.execute(query);
 
     return ResponseUtil.success(
       result,
-      "Advanced search completed successfully"
+      "Advanced search completed successfully",
     );
   }
 
   @Get()
+  @UseInterceptors(CacheInterceptor)
+  @CacheTTL(30000) // 30 sec de caché para lista general
   @ApiOperation({
     summary: "Obtener lista de recursos",
     description:
@@ -300,14 +307,26 @@ export class ResourcesController {
     @Query("type") type?: ResourceType,
     @Query("categoryId") categoryId?: string,
     @Query("programId") programId?: string,
-    @Query("status") status?: ResourceStatus,
+    @Query("status") status?: string,
     @Query("isActive") isActive?: string,
     @Query("location") location?: string,
     @Query("building") building?: string,
     @Query("minCapacity") minCapacity?: number,
     @Query("maxCapacity") maxCapacity?: number,
-    @Query("search") search?: string
+    @Query("search") search?: string,
   ) {
+    // Manejar múltiples estados (pueden venir como array o string separado por comas)
+    let statuses: ResourceStatus[] | undefined;
+    if (status) {
+      if (Array.isArray(status)) {
+        statuses = status as ResourceStatus[];
+      } else if (status.includes(",")) {
+        statuses = status.split(",") as ResourceStatus[];
+      } else {
+        statuses = [status as ResourceStatus];
+      }
+    }
+
     const query = new GetResourcesQuery(
       {
         page: page ? Number(page) : 1,
@@ -319,7 +338,7 @@ export class ResourcesController {
         type,
         categoryId,
         programId,
-        status,
+        status: statuses,
         isActive:
           isActive === "true" ? true : isActive === "false" ? false : undefined,
         location,
@@ -327,12 +346,42 @@ export class ResourcesController {
         minCapacity: minCapacity ? Number(minCapacity) : undefined,
         maxCapacity: maxCapacity ? Number(maxCapacity) : undefined,
         search,
-      }
+      },
     );
 
     const result = await this.queryBus.execute(query);
 
     return ResponseUtil.success(result, "Resources retrieved successfully");
+  }
+
+  @Get("characteristics")
+  @ApiOperation({
+    summary: "Listar catálogo de características de recursos",
+    description:
+      "Retorna las características de recurso desde reference_data para su asignación reutilizable",
+  })
+  @ApiQuery({
+    name: "active",
+    required: false,
+    type: Boolean,
+    description: "Filtrar solo características activas (default: true)",
+  })
+  @ApiResponse({
+    status: 200,
+    description: "Características obtenidas exitosamente",
+  })
+  @ApiResponse({ status: 401, description: "No autorizado" })
+  async getResourceCharacteristics(@Query("active") active?: string) {
+    const onlyActive =
+      active === undefined ? true : active === "true" ? true : false;
+
+    const query = new GetResourceCharacteristicsQuery(onlyActive);
+    const characteristics = await this.queryBus.execute(query);
+
+    return ResponseUtil.success(
+      characteristics,
+      "Resource characteristics retrieved successfully",
+    );
   }
 
   @Get(":id")
@@ -360,6 +409,8 @@ export class ResourcesController {
   }
 
   @Get(":id/category")
+  @UseInterceptors(CacheInterceptor)
+  @CacheTTL(3600000) // 1h de caché, la categoría de un recurso cambia poco
   @ApiOperation({
     summary: "Obtener categoría de un recurso",
     description:
@@ -402,7 +453,7 @@ export class ResourcesController {
         id: resource.categoryId,
         // La categoría completa estaría en resource.category si la incluimos en la query
       },
-      "Resource category retrieved successfully"
+      "Resource category retrieved successfully",
     );
   }
 
@@ -429,7 +480,7 @@ export class ResourcesController {
   async updateResource(
     @Param("id") id: string,
     @Body() updateResourceDto: UpdateResourceDto,
-    @CurrentUser("sub") userId: string
+    @CurrentUser("sub") userId: string,
   ) {
     const command = new UpdateResourceCommand(id, updateResourceDto, userId);
 
@@ -463,14 +514,14 @@ export class ResourcesController {
   @ApiResponse({ status: 401, description: "No autorizado" })
   async deleteResource(
     @Param("id") id: string,
-    @CurrentUser("sub") userId: string
+    @CurrentUser("sub") userId: string,
   ) {
     const command = new DeleteResourceCommand(id, userId);
     const result = await this.commandBus.execute(command);
 
     return ResponseUtil.success(
       { deleted: result },
-      "Resource deleted successfully"
+      "Resource deleted successfully",
     );
   }
 
@@ -498,14 +549,14 @@ export class ResourcesController {
   @ApiResponse({ status: 401, description: "No autorizado" })
   async restoreResource(
     @Param("id") id: string,
-    @CurrentUser("sub") userId: string
+    @CurrentUser("sub") userId: string,
   ) {
     const command = new RestoreResourceCommand(id, userId);
     const result = await this.commandBus.execute(command);
 
     return ResponseUtil.success(
       { restored: result },
-      "Resource restored successfully"
+      "Resource restored successfully",
     );
   }
 
@@ -559,7 +610,7 @@ export class ResourcesController {
         resourceId: resource.id,
         ...resource.availabilityRules,
       },
-      "Availability rules retrieved successfully"
+      "Availability rules retrieved successfully",
     );
   }
 }

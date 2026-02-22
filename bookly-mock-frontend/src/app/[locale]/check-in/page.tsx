@@ -3,8 +3,6 @@
 import { Badge } from "@/components/atoms/Badge";
 import { QRCodeDisplay } from "@/components/atoms/QRCodeDisplay";
 import { CheckInOutPanel } from "@/components/molecules/CheckInOutPanel";
-import { AppHeader } from "@/components/organisms/AppHeader";
-import { AppSidebar } from "@/components/organisms/AppSidebar";
 import { MainLayout } from "@/components/templates/MainLayout";
 import {
   useCheckIn,
@@ -14,6 +12,7 @@ import {
 import { useToast } from "@/hooks/useToast";
 import type { CheckInOut } from "@/types/entities/checkInOut";
 import { AlertCircle, Calendar, CheckCircle, Clock } from "lucide-react";
+import { useTranslations } from "next-intl";
 import * as React from "react";
 
 /**
@@ -25,8 +24,9 @@ import * as React from "react";
  */
 
 export default function CheckInPage() {
+  const t = useTranslations("check_in");
   const { showSuccess, showError } = useToast();
-  const [selectedReservation, setSelectedReservation] = React.useState<
+  const [_selectedReservation, _setSelectedReservation] = React.useState<
     string | null
   >(null);
 
@@ -56,7 +56,7 @@ export default function CheckInPage() {
 
       return {
         reservationId: item.reservationId,
-        resourceName: item.resourceName || "Recurso",
+        resourceName: item.resourceName || t("resource"),
         resourceType: item.resourceType || "N/A",
         startTime,
         endTime,
@@ -69,7 +69,7 @@ export default function CheckInPage() {
         canCheckOut: !!item.checkInTime && !item.checkOutTime,
       };
     });
-  }, [checkInHistory]);
+  }, [checkInHistory, t]);
 
   const handleCheckIn = (reservationId: string) => {
     checkInMutation.mutate(
@@ -80,28 +80,28 @@ export default function CheckInPage() {
       {
         onSuccess: () => {
           showSuccess(
-            "Check-in exitoso",
-            "Has realizado check-in correctamente"
+            t("success_check_in_title"),
+            t("success_check_in_desc"),
           );
         },
         onError: (error: any) => {
           showError(
-            "Error en check-in",
-            error?.response?.data?.message || "No se pudo realizar el check-in"
+            t("error_check_in_title"),
+            error?.response?.data?.message || t("error_check_in_desc"),
           );
         },
-      }
+      },
     );
   };
 
   const handleCheckOut = (reservationId: string) => {
     const checkInRecord = checkInHistory?.find(
       (item: CheckInOut) =>
-        item.reservationId === reservationId && item.checkInTime
+        item.reservationId === reservationId && item.checkInTime,
     );
 
     if (!checkInRecord?.id) {
-      showError("Error", "No se encontró el registro de check-in");
+      showError(t("error") || "Error", t("error_no_check_in_record"));
       return;
     }
 
@@ -114,64 +114,63 @@ export default function CheckInPage() {
       {
         onSuccess: () => {
           showSuccess(
-            "Check-out exitoso",
-            "Has realizado check-out correctamente"
+            t("success_check_out_title"),
+            t("success_check_out_desc"),
           );
         },
         onError: (error: any) => {
           showError(
-            "Error en check-out",
-            error?.response?.data?.message || "No se pudo realizar el check-out"
+            t("error_check_out_title"),
+            error?.response?.data?.message ||
+              t("error_check_out_desc"),
           );
         },
-      }
+      },
     );
   };
 
   const activeReservation = userReservations?.find(
-    (r: any) => r.status === "CHECKED_IN"
+    (r: any) => r.status === "CHECKED_IN",
   );
   const upcomingReservations = userReservations?.filter(
-    (r: any) => r.status === "APPROVED"
+    (r: any) => r.status === "APPROVED",
   );
 
   return (
-    <MainLayout header={<AppHeader />} sidebar={<AppSidebar />}>
+    <MainLayout>
       <div className="space-y-6">
         {/* Header */}
         <div>
           <div className="flex items-center gap-3 mb-2">
-            <div className="p-2 bg-blue-100 dark:bg-blue-900/20 rounded-lg">
-              <CheckCircle className="h-6 w-6 text-blue-600 dark:text-blue-400" />
+            <div className="p-2 bg-brand-primary-100 dark:bg-brand-primary-900/20 rounded-lg">
+              <CheckCircle className="h-6 w-6 text-brand-primary-600 dark:text-brand-primary-400" />
             </div>
             <div>
-              <h1 className="text-3xl font-bold text-gray-900 dark:text-gray-100">
-                Check-in / Check-out
+              <h1 className="text-3xl font-bold text-[var(--color-text-primary)] dark:text-[var(--color-text-primary)]">
+                {t("title")}
               </h1>
-              <p className="text-gray-600 dark:text-gray-400 mt-1">
-                Gestiona el acceso a tus reservas
+              <p className="text-[var(--color-text-secondary)] dark:text-[var(--color-text-tertiary)] mt-1">
+                {t("description")}
               </p>
             </div>
           </div>
         </div>
 
         {/* Información */}
-        <div className="bg-blue-50 dark:bg-blue-900/20 rounded-lg p-4 text-sm">
+        <div className="bg-brand-primary-50 dark:bg-brand-primary-900/20 rounded-lg p-4 text-sm">
           <h3 className="font-semibold text-blue-900 dark:text-blue-200 mb-2">
-            ℹ️ Información Importante
+            ℹ️ {t("info_title")}
           </h3>
-          <ul className="space-y-1 text-blue-800 dark:text-blue-300">
+          <ul className="space-y-1 text-brand-primary-800 dark:text-brand-primary-300">
             <li>
-              • El check-in está disponible 15 minutos antes del horario de
-              inicio
+              • {t("info_check_in_window")}
             </li>
-            <li>• Debes realizar check-out al finalizar tu reserva</li>
+            <li>• {t("info_check_out_required")}</li>
             <li>
-              • Puedes usar el código QR en vigilancia para validar el acceso
+              • {t("info_qr_usage")}
             </li>
             <li>
-              • Si llegas tarde (más de 15 minutos), tu reserva puede ser
-              cancelada
+              • {t("info_late_penalty")}
             </li>
           </ul>
         </div>
@@ -182,15 +181,15 @@ export default function CheckInPage() {
             <div className="flex items-start justify-between mb-4">
               <div>
                 <div className="flex items-center gap-2 mb-2">
-                  <Badge variant="success">Activa</Badge>
-                  <span className="text-sm text-gray-600 dark:text-gray-400">
-                    Check-in realizado
+                  <Badge variant="success">{t("status_active")}</Badge>
+                  <span className="text-sm text-[var(--color-text-secondary)] dark:text-[var(--color-text-tertiary)]">
+                    {t("status_checked_in")}
                   </span>
                 </div>
-                <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100">
+                <h2 className="text-2xl font-bold text-[var(--color-text-primary)] dark:text-[var(--color-text-primary)]">
                   {activeReservation.resourceName}
                 </h2>
-                <p className="text-gray-600 dark:text-gray-400">
+                <p className="text-[var(--color-text-secondary)] dark:text-[var(--color-text-tertiary)]">
                   {activeReservation.resourceType}
                 </p>
               </div>
@@ -199,14 +198,14 @@ export default function CheckInPage() {
 
             <div className="grid grid-cols-2 gap-4 mb-4">
               <div className="flex items-center gap-2 text-sm">
-                <Clock className="h-4 w-4 text-gray-500" />
-                <span className="text-gray-700 dark:text-gray-300">
+                <Clock className="h-4 w-4 text-[var(--color-text-tertiary)]" />
+                <span className="text-[var(--color-text-secondary)] dark:text-[var(--color-text-secondary)]">
                   {new Date(activeReservation.startTime).toLocaleTimeString(
                     "es-ES",
                     {
                       hour: "2-digit",
                       minute: "2-digit",
-                    }
+                    },
                   )}{" "}
                   -{" "}
                   {new Date(activeReservation.endTime).toLocaleTimeString(
@@ -214,20 +213,20 @@ export default function CheckInPage() {
                     {
                       hour: "2-digit",
                       minute: "2-digit",
-                    }
+                    },
                   )}
                 </span>
               </div>
               <div className="flex items-center gap-2 text-sm">
-                <Calendar className="h-4 w-4 text-gray-500" />
-                <span className="text-gray-700 dark:text-gray-300">
+                <Calendar className="h-4 w-4 text-[var(--color-text-tertiary)]" />
+                <span className="text-[var(--color-text-secondary)] dark:text-[var(--color-text-secondary)]">
                   {new Date(activeReservation.startTime).toLocaleDateString(
                     "es-ES",
                     {
                       weekday: "long",
                       day: "numeric",
                       month: "long",
-                    }
+                    },
                   )}
                 </span>
               </div>
@@ -241,7 +240,7 @@ export default function CheckInPage() {
                 canCheckOut: activeReservation.canCheckOut,
                 reason: activeReservation.canCheckIn
                   ? undefined
-                  : "Ya realizaste check-in",
+                  : t("already_checked_in"),
                 requiresApproval: false,
                 requiresVigilance: false,
                 timeWindow: {
@@ -259,8 +258,8 @@ export default function CheckInPage() {
 
         {/* Próximas reservas */}
         <div>
-          <h2 className="text-xl font-semibold text-gray-900 dark:text-gray-100 mb-4">
-            Próximas Reservas
+          <h2 className="text-xl font-semibold text-[var(--color-text-primary)] dark:text-[var(--color-text-primary)] mb-4">
+            {t("upcoming_reservations")}
           </h2>
 
           {isLoading ? (
@@ -273,7 +272,7 @@ export default function CheckInPage() {
                 const now = new Date();
                 const start = new Date(reservation.startTime);
                 const minutesUntilStart = Math.floor(
-                  (start.getTime() - now.getTime()) / (1000 * 60)
+                  (start.getTime() - now.getTime()) / (1000 * 60),
                 );
                 const canCheckInNow =
                   minutesUntilStart <= 15 && minutesUntilStart >= -5;
@@ -281,35 +280,35 @@ export default function CheckInPage() {
                 return (
                   <div
                     key={reservation.reservationId}
-                    className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-4 hover:shadow-md transition-shadow"
+                    className="bg-[var(--color-bg-primary)] dark:bg-[var(--color-bg-secondary)] rounded-lg border border-[var(--color-border-primary)] dark:border-[var(--color-border-primary)] p-4 hover:shadow-md transition-shadow"
                   >
                     <div className="flex items-start justify-between mb-3">
                       <div className="flex-1">
-                        <h3 className="font-semibold text-gray-900 dark:text-gray-100">
+                        <h3 className="font-semibold text-[var(--color-text-primary)] dark:text-[var(--color-text-primary)]">
                           {reservation.resourceName}
                         </h3>
-                        <p className="text-sm text-gray-600 dark:text-gray-400">
+                        <p className="text-sm text-[var(--color-text-secondary)] dark:text-[var(--color-text-tertiary)]">
                           {reservation.resourceType}
                         </p>
                       </div>
                       {canCheckInNow ? (
-                        <Badge variant="success">Disponible</Badge>
+                        <Badge variant="success">{t("available")}</Badge>
                       ) : (
                         <Badge variant="default">
-                          En {minutesUntilStart}min
+                          {t("starts_in", { minutes: minutesUntilStart })}
                         </Badge>
                       )}
                     </div>
 
                     <div className="space-y-2 text-sm mb-4">
-                      <div className="flex items-center gap-2 text-gray-700 dark:text-gray-300">
-                        <Clock className="h-4 w-4 text-gray-500" />
+                      <div className="flex items-center gap-2 text-[var(--color-text-secondary)] dark:text-[var(--color-text-secondary)]">
+                        <Clock className="h-4 w-4 text-[var(--color-text-tertiary)]" />
                         {new Date(reservation.startTime).toLocaleTimeString(
                           "es-ES",
                           {
                             hour: "2-digit",
                             minute: "2-digit",
-                          }
+                          },
                         )}{" "}
                         -{" "}
                         {new Date(reservation.endTime).toLocaleTimeString(
@@ -317,17 +316,17 @@ export default function CheckInPage() {
                           {
                             hour: "2-digit",
                             minute: "2-digit",
-                          }
+                          },
                         )}
                       </div>
-                      <div className="flex items-center gap-2 text-gray-700 dark:text-gray-300">
-                        <Calendar className="h-4 w-4 text-gray-500" />
+                      <div className="flex items-center gap-2 text-[var(--color-text-secondary)] dark:text-[var(--color-text-secondary)]">
+                        <Calendar className="h-4 w-4 text-[var(--color-text-tertiary)]" />
                         {new Date(reservation.startTime).toLocaleDateString(
                           "es-ES",
                           {
                             day: "numeric",
                             month: "long",
-                          }
+                          },
                         )}
                       </div>
                     </div>
@@ -340,7 +339,7 @@ export default function CheckInPage() {
                         canCheckOut: false,
                         reason: canCheckInNow
                           ? undefined
-                          : `Disponible en ${minutesUntilStart} minutos`,
+                          : t("available_in", { minutes: minutesUntilStart }),
                         requiresApproval: false,
                         requiresVigilance: false,
                         timeWindow: {
@@ -360,10 +359,10 @@ export default function CheckInPage() {
               })}
             </div>
           ) : (
-            <div className="text-center py-12 bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700">
-              <AlertCircle className="h-12 w-12 text-gray-400 dark:text-gray-600 mx-auto mb-3" />
-              <p className="text-gray-600 dark:text-gray-400">
-                No tienes reservas próximas
+            <div className="text-center py-12 bg-[var(--color-bg-primary)] dark:bg-[var(--color-bg-secondary)] rounded-lg border border-[var(--color-border-primary)] dark:border-[var(--color-border-primary)]">
+              <AlertCircle className="h-12 w-12 text-[var(--color-text-tertiary)] dark:text-[var(--color-text-secondary)] mx-auto mb-3" />
+              <p className="text-[var(--color-text-secondary)] dark:text-[var(--color-text-tertiary)]">
+                {t("no_upcoming")}
               </p>
             </div>
           )}

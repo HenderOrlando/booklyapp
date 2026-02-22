@@ -51,13 +51,17 @@ export class ApprovalAuditService {
     requestId: string,
     actorId: string,
     actorRole: string,
-    metadata?: any
+    metadata?: any,
+    securityInfo?: { ipAddress?: string; userAgent?: string }
   ): Promise<ApprovalAuditLogEntity> {
     const logData = ApprovalAuditLogEntity.createRequestLog(
       requestId,
       actorId,
       actorRole,
-      metadata
+      {
+        ...metadata,
+        ...securityInfo,
+      }
     );
     return this.logAction(logData);
   }
@@ -71,7 +75,8 @@ export class ApprovalAuditService {
     actorRole: string,
     stepName: string,
     comment?: string,
-    metadata?: any
+    metadata?: any,
+    securityInfo?: { ipAddress?: string; userAgent?: string }
   ): Promise<ApprovalAuditLogEntity> {
     const logData = ApprovalAuditLogEntity.createStepApprovalLog(
       requestId,
@@ -79,7 +84,10 @@ export class ApprovalAuditService {
       actorRole,
       stepName,
       comment,
-      metadata
+      {
+        ...metadata,
+        ...securityInfo,
+      }
     );
     return this.logAction(logData);
   }
@@ -93,7 +101,8 @@ export class ApprovalAuditService {
     actorRole: string,
     stepName: string,
     comment?: string,
-    metadata?: any
+    metadata?: any,
+    securityInfo?: { ipAddress?: string; userAgent?: string }
   ): Promise<ApprovalAuditLogEntity> {
     const logData = ApprovalAuditLogEntity.createStepRejectionLog(
       requestId,
@@ -101,7 +110,10 @@ export class ApprovalAuditService {
       actorRole,
       stepName,
       comment,
-      metadata
+      {
+        ...metadata,
+        ...securityInfo,
+      }
     );
     return this.logAction(logData);
   }
@@ -113,7 +125,8 @@ export class ApprovalAuditService {
     requestId: string,
     actorId: string,
     actorRole: string,
-    metadata?: any
+    metadata?: any,
+    securityInfo?: { ipAddress?: string; userAgent?: string }
   ): Promise<ApprovalAuditLogEntity> {
     return this.logAction({
       approvalRequestId: requestId,
@@ -121,7 +134,10 @@ export class ApprovalAuditService {
       actorId,
       actorRole,
       timestamp: new Date(),
-      metadata,
+      metadata: {
+        ...metadata,
+        ...securityInfo,
+      },
     } as any);
   }
 
@@ -132,7 +148,8 @@ export class ApprovalAuditService {
     requestId: string,
     actorId: string,
     actorRole: string,
-    metadata?: any
+    metadata?: any,
+    securityInfo?: { ipAddress?: string; userAgent?: string }
   ): Promise<ApprovalAuditLogEntity> {
     return this.logAction({
       approvalRequestId: requestId,
@@ -140,7 +157,10 @@ export class ApprovalAuditService {
       actorId,
       actorRole,
       timestamp: new Date(),
-      metadata,
+      metadata: {
+        ...metadata,
+        ...securityInfo,
+      },
     } as any);
   }
 
@@ -151,7 +171,8 @@ export class ApprovalAuditService {
     requestId: string,
     actorId: string,
     actorRole: string,
-    metadata?: any
+    metadata?: any,
+    securityInfo?: { ipAddress?: string; userAgent?: string }
   ): Promise<ApprovalAuditLogEntity> {
     return this.logAction({
       approvalRequestId: requestId,
@@ -159,7 +180,10 @@ export class ApprovalAuditService {
       actorId,
       actorRole,
       timestamp: new Date(),
-      metadata,
+      metadata: {
+        ...metadata,
+        ...securityInfo,
+      },
     } as any);
   }
 

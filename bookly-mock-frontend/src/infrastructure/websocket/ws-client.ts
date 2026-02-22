@@ -9,7 +9,8 @@
  * - Gestión de estado de conexión
  */
 
-import { wsEvents, type WSEvent, type WSEventHandler } from "./ws-events";
+import { io, type Socket } from "socket.io-client";
+import { wsEvents, type WSEventHandler } from "./ws-events";
 
 type ConnectionState =
   | "CONNECTING"
@@ -27,21 +28,35 @@ interface WebSocketClientConfig {
   heartbeatInterval?: number;
 }
 
+interface QueuedMessage {
+  event: string;
+  data?: unknown;
+}
+
+interface CrudEventPayload {
+  type?: string;
+  data?: unknown;
+}
+
+const GATEWAY_WS_NAMESPACE = "/api/v1/ws";
+
 export class WebSocketClient {
-  private ws: WebSocket | null = null;
+  private socket: Socket | null = null;
   private config: Required<WebSocketClientConfig>;
+  private readonly reconnectByDefault: boolean;
   private state: ConnectionState = "DISCONNECTED";
   private reconnectAttempts = 0;
-  private heartbeatTimer: NodeJS.Timeout | null = null;
-  private reconnectTimer: NodeJS.Timeout | null = null;
+  private heartbeatTimer: ReturnType<typeof setInterval> | null = null;
+  private reconnectTimer: ReturnType<typeof setTimeout> | null = null;
   private eventHandlers: Map<string, Set<WSEventHandler>> = new Map();
-  private messageQueue: string[] = [];
+  private messageQueue: QueuedMessage[] = [];
 
   constructor(config: WebSocketClientConfig) {
+    this.reconnectByDefault = config.reconnect ?? true;
     this.config = {
       url: config.url,
       token: config.token || "",
-      reconnect: config.reconnect ?? true,
+      reconnect: this.reconnectByDefault,
       maxReconnectAttempts: config.maxReconnectAttempts ?? 5,
       reconnectDelay: config.reconnectDelay ?? 1000,
       heartbeatInterval: config.heartbeatInterval ?? 30000,
@@ -52,22 +67,46 @@ export class WebSocketClient {
    * Conectar al servidor WebSocket
    */
   connect(): void {
-    if (this.ws && this.state === "CONNECTED") {
+    if (
+      this.socket &&
+      (this.state === "CONNECTED" ||
+        this.state === "CONNECTING" ||
+        this.state === "RECONNECTING")
+    ) {
       console.warn("[WebSocket] Ya está conectado");
       return;
     }
 
+    this.config.reconnect = this.reconnectByDefault;
+    this.cancelReconnect();
     this.setState("CONNECTING");
     console.log("[WebSocket] Conectando...");
 
     try {
-      const url = this.buildUrl();
-      this.ws = new WebSocket(url);
+      if (this.socket) {
+        this.socket.removeAllListeners();
+        this.socket.disconnect();
+        this.socket = null;
+      }
 
-      this.ws.onopen = this.handleOpen.bind(this);
-      this.ws.onmessage = this.handleMessage.bind(this);
-      this.ws.onerror = this.handleError.bind(this);
-      this.ws.onclose = this.handleClose.bind(this);
+      const url = this.buildConnectionUrl();
+
+      this.socket = io(`${url}${GATEWAY_WS_NAMESPACE}`, {
+        path: "/socket.io/",
+        autoConnect: false,
+        transports: ["websocket", "polling"],
+        reconnection: false,
+        auth: this.config.token ? { token: this.config.token } : undefined,
+      });
+
+      this.socket.on("connect", this.handleOpen.bind(this));
+      this.socket.on("disconnect", this.handleClose.bind(this));
+      this.socket.on("connect_error", this.handleError.bind(this));
+      this.socket.onAny((event, data) => {
+        this.handleIncomingEvent(event, data);
+      });
+
+      this.socket.connect();
     } catch (error) {
       console.error("[WebSocket] Error al conectar:", error);
       this.setState("ERROR");
@@ -84,9 +123,10 @@ export class WebSocketClient {
     this.stopHeartbeat();
     this.cancelReconnect();
 
-    if (this.ws) {
-      this.ws.close(1000, "Client disconnect");
-      this.ws = null;
+    if (this.socket) {
+      this.socket.removeAllListeners();
+      this.socket.disconnect();
+      this.socket = null;
     }
 
     this.setState("DISCONNECTED");
@@ -95,21 +135,19 @@ export class WebSocketClient {
   /**
    * Enviar mensaje al servidor
    */
-  send(event: string, data?: any): void {
-    const message = JSON.stringify({ event, data, timestamp: Date.now() });
-
-    if (this.state !== "CONNECTED" || !this.ws) {
+  send(event: string, data?: unknown): void {
+    if (this.state !== "CONNECTED" || !this.socket) {
       console.warn("[WebSocket] No conectado, encolando mensaje");
-      this.messageQueue.push(message);
+      this.messageQueue.push({ event, data });
       return;
     }
 
     try {
-      this.ws.send(message);
+      this.socket.emit(event, data);
       console.log(`[WebSocket] Enviado: ${event}`, data);
     } catch (error) {
       console.error("[WebSocket] Error al enviar:", error);
-      this.messageQueue.push(message);
+      this.messageQueue.push({ event, data });
     }
   }
 
@@ -153,18 +191,54 @@ export class WebSocketClient {
    * Verificar si está conectado
    */
   isConnected(): boolean {
-    return this.state === "CONNECTED" && this.ws?.readyState === WebSocket.OPEN;
+    return this.state === "CONNECTED" && this.socket?.connected === true;
   }
 
   // ==================== Métodos Privados ====================
 
-  private buildUrl(): string {
-    const { url, token } = this.config;
-    if (token) {
-      const separator = url.includes("?") ? "&" : "?";
-      return `${url}${separator}token=${token}`;
+  private buildConnectionUrl(): string {
+    const { url } = this.config;
+    const trimmedUrl = url.trim();
+
+    if (!trimmedUrl) {
+      return "http://localhost:3000";
     }
-    return url;
+
+    const [withoutQuery] = trimmedUrl.split("?");
+    const normalized = withoutQuery.replace(/\/+$/, "");
+
+    if (normalized.endsWith(GATEWAY_WS_NAMESPACE)) {
+      return normalized.replace(GATEWAY_WS_NAMESPACE, "");
+    }
+
+    return normalized;
+  }
+
+  private normalizeEventName(eventName: string): string {
+    return eventName.replace(/\./g, ":");
+  }
+
+  private handleIncomingEvent(eventName: string, data: unknown): void {
+    if (
+      eventName === "crud-event" &&
+      typeof data === "object" &&
+      data !== null
+    ) {
+      const payload = data as CrudEventPayload;
+
+      if (typeof payload.type === "string") {
+        const normalizedCrudEvent = this.normalizeEventName(payload.type);
+        this.emit(normalizedCrudEvent, payload.data ?? data);
+        return;
+      }
+    }
+
+    this.emit(eventName, data);
+
+    const normalized = this.normalizeEventName(eventName);
+    if (normalized !== eventName) {
+      this.emit(normalized, data);
+    }
   }
 
   private setState(newState: ConnectionState): void {
@@ -174,7 +248,7 @@ export class WebSocketClient {
     this.emit(wsEvents.connection.stateChange, { oldState, newState });
   }
 
-  private handleOpen(event: Event): void {
+  private handleOpen(): void {
     console.log("[WebSocket] Conectado exitosamente");
     this.setState("CONNECTED");
     this.reconnectAttempts = 0;
@@ -183,40 +257,33 @@ export class WebSocketClient {
     this.emit(wsEvents.connection.connected, null);
   }
 
-  private handleMessage(event: MessageEvent): void {
-    try {
-      const message: WSEvent = JSON.parse(event.data);
-      console.log(
-        `[WebSocket] Mensaje recibido: ${message.event}`,
-        message.data
-      );
-      this.emit(message.event, message.data);
-    } catch (error) {
-      console.error("[WebSocket] Error al parsear mensaje:", error);
-    }
-  }
-
-  private handleError(event: Event): void {
-    console.error("[WebSocket] Error de conexión:", event);
+  private handleError(error: Error | { message?: string }): void {
+    console.error("[WebSocket] Error de conexión:", error);
     this.setState("ERROR");
-    this.emit(wsEvents.connection.error, { error: "Connection error" });
+    this.emit(wsEvents.connection.error, {
+      error: error.message || "Connection error",
+    });
+
+    this.scheduleReconnect();
   }
 
-  private handleClose(event: CloseEvent): void {
-    console.log(`[WebSocket] Desconectado: ${event.code} - ${event.reason}`);
+  private handleClose(reason: string): void {
+    const closeCode = reason === "io client disconnect" ? 1000 : 1006;
+
+    console.log(`[WebSocket] Desconectado: ${closeCode} - ${reason}`);
     this.stopHeartbeat();
     this.setState("DISCONNECTED");
     this.emit(wsEvents.connection.disconnected, {
-      code: event.code,
-      reason: event.reason,
+      code: closeCode,
+      reason,
     });
 
-    if (this.config.reconnect && event.code !== 1000) {
+    if (this.config.reconnect && reason !== "io client disconnect") {
       this.scheduleReconnect();
     }
   }
 
-  private emit(event: string, data: any): void {
+  private emit(event: string, data: unknown): void {
     const handlers = this.eventHandlers.get(event);
     if (handlers) {
       handlers.forEach((handler) => {
@@ -266,7 +333,7 @@ export class WebSocketClient {
     const delay =
       this.config.reconnectDelay * Math.pow(2, this.reconnectAttempts);
     console.log(
-      `[WebSocket] Reintentando conexión en ${delay}ms (intento ${this.reconnectAttempts + 1}/${this.config.maxReconnectAttempts})`
+      `[WebSocket] Reintentando conexión en ${delay}ms (intento ${this.reconnectAttempts + 1}/${this.config.maxReconnectAttempts})`,
     );
 
     this.reconnectTimer = setTimeout(() => {
@@ -286,14 +353,14 @@ export class WebSocketClient {
     if (this.messageQueue.length === 0) return;
 
     console.log(
-      `[WebSocket] Enviando ${this.messageQueue.length} mensajes encolados`
+      `[WebSocket] Enviando ${this.messageQueue.length} mensajes encolados`,
     );
 
     while (this.messageQueue.length > 0) {
       const message = this.messageQueue.shift();
-      if (message && this.ws) {
+      if (message && this.socket) {
         try {
-          this.ws.send(message);
+          this.socket.emit(message.event, message.data);
         } catch (error) {
           console.error("[WebSocket] Error al enviar mensaje encolado:", error);
           this.messageQueue.unshift(message); // Volver a encolar

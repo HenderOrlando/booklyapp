@@ -1,11 +1,9 @@
-import { UserRole } from "@libs/common/enums";
-
 /**
  * Definiciones de roles del sistema con sus permisos asociados
  */
 
 export interface RoleSeedData {
-  name: UserRole;
+  name: string;
   displayName: string;
   description: string;
   permissionCodes: string[];
@@ -18,7 +16,7 @@ export interface RoleSeedData {
  * Acceso completo a todas las funcionalidades
  */
 export const ADMIN_ROLE: RoleSeedData = {
-  name: UserRole.GENERAL_ADMIN,
+  name: "GENERAL_ADMIN",
   displayName: "Administrador General",
   description:
     "Acceso completo al sistema. Puede gestionar usuarios, roles, recursos y todas las funcionalidades.",
@@ -32,7 +30,7 @@ export const ADMIN_ROLE: RoleSeedData = {
  * Gestiona recursos y disponibilidad de su programa académico
  */
 export const PROGRAM_ADMIN_ROLE: RoleSeedData = {
-  name: UserRole.PROGRAM_ADMIN,
+  name: "PROGRAM_ADMIN",
   displayName: "Administrador de Programa",
   description:
     "Gestiona recursos y disponibilidad de su programa académico. Puede aprobar reservas.",
@@ -68,7 +66,7 @@ export const PROGRAM_ADMIN_ROLE: RoleSeedData = {
  * Crea reservas y aprueba solicitudes de estudiantes
  */
 export const TEACHER_ROLE: RoleSeedData = {
-  name: UserRole.TEACHER,
+  name: "TEACHER",
   displayName: "Docente",
   description:
     "Puede crear reservas para sus clases y aprobar solicitudes de estudiantes.",
@@ -96,7 +94,7 @@ export const TEACHER_ROLE: RoleSeedData = {
  * Visualiza disponibilidad y crea reservas (sujetas a aprobación)
  */
 export const STUDENT_ROLE: RoleSeedData = {
-  name: UserRole.STUDENT,
+  name: "STUDENT",
   displayName: "Estudiante",
   description:
     "Puede ver disponibilidad de recursos y crear reservas sujetas a aprobación.",
@@ -119,7 +117,7 @@ export const STUDENT_ROLE: RoleSeedData = {
  * Valida check-in y check-out de usuarios
  */
 export const SECURITY_ROLE: RoleSeedData = {
-  name: UserRole.SECURITY,
+  name: "SECURITY",
   displayName: "Seguridad",
   description:
     "Personal de vigilancia que valida entrada y salida de usuarios en recursos.",
@@ -139,7 +137,7 @@ export const SECURITY_ROLE: RoleSeedData = {
  * Acceso de solo lectura para consultas
  */
 export const STAFF_ROLE: RoleSeedData = {
-  name: UserRole.ADMINISTRATIVE_STAFF,
+  name: "ADMINISTRATIVE_STAFF",
   displayName: "Personal Administrativo",
   description:
     "Personal administrativo con acceso de lectura a recursos, disponibilidad y reportes.",
@@ -179,11 +177,11 @@ export const ROLES_COUNT = ALL_ROLES.length;
 /**
  * Mapeo de roles a permisos para referencia rápida
  */
-export const ROLE_PERMISSIONS_MAP: Record<UserRole, string[]> = {
-  [UserRole.GENERAL_ADMIN]: ADMIN_ROLE.permissionCodes,
-  [UserRole.PROGRAM_ADMIN]: PROGRAM_ADMIN_ROLE.permissionCodes,
-  [UserRole.TEACHER]: TEACHER_ROLE.permissionCodes,
-  [UserRole.STUDENT]: STUDENT_ROLE.permissionCodes,
-  [UserRole.SECURITY]: SECURITY_ROLE.permissionCodes,
-  [UserRole.ADMINISTRATIVE_STAFF]: STAFF_ROLE.permissionCodes,
+export const ROLE_PERMISSIONS_MAP: Record<string, string[]> = {
+  GENERAL_ADMIN: ADMIN_ROLE.permissionCodes,
+  PROGRAM_ADMIN: PROGRAM_ADMIN_ROLE.permissionCodes,
+  TEACHER: TEACHER_ROLE.permissionCodes,
+  STUDENT: STUDENT_ROLE.permissionCodes,
+  SECURITY: SECURITY_ROLE.permissionCodes,
+  ADMINISTRATIVE_STAFF: STAFF_ROLE.permissionCodes,
 };

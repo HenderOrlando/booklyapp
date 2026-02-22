@@ -1,5 +1,5 @@
 import { StatCard } from "@/components/atoms/StatCard";
-import { LineChartCard } from "@/components/molecules/LineChartCard";
+import { DynamicLineChartCard as LineChartCard } from "@/components/molecules/charts-dynamic";
 import { Calendar } from "lucide-react";
 import * as React from "react";
 
@@ -29,11 +29,11 @@ export const PeriodComparison = React.memo<PeriodComparisonProps>(
 
     const totalChange = calculateChange(
       period1.stats.total,
-      period2.stats.total
+      period2.stats.total,
     );
     const averageChange = calculateChange(
       period1.stats.average,
-      period2.stats.average
+      period2.stats.average,
     );
     const peakChange = calculateChange(period1.stats.peak, period2.stats.peak);
 
@@ -48,12 +48,12 @@ export const PeriodComparison = React.memo<PeriodComparisonProps>(
       <div className={`space-y-6 ${className}`}>
         {/* Header */}
         <div className="flex items-center gap-3">
-          <Calendar className="h-6 w-6 text-[var(--color-primary-base)]" />
+          <Calendar className="h-6 w-6 text-[var(--color-action-primary)]" />
           <div>
-            <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100">
+            <h2 className="text-2xl font-bold text-[var(--color-text-primary)]">
               Comparación de Períodos
             </h2>
-            <p className="text-sm text-gray-600 dark:text-gray-400">
+            <p className="text-sm text-[var(--color-text-secondary)]">
               {period1.label} vs {period2.label}
             </p>
           </div>
@@ -94,18 +94,21 @@ export const PeriodComparison = React.memo<PeriodComparisonProps>(
           xKey="name"
           yKey={[period1.label, period2.label]}
           title={`Tendencia Comparativa: ${metric}`}
-          color={["#3b82f6", "#10b981"]}
+          color={[
+            "var(--color-action-primary)",
+            "var(--color-action-secondary)",
+          ]}
           height={350}
           showGrid
           showLegend
         />
 
         {/* Analysis Summary */}
-        <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-4">
-          <h3 className="text-sm font-semibold text-blue-900 dark:text-blue-100 mb-2">
+        <div className="bg-[var(--color-state-info-bg)] border border-[var(--color-state-info-border)] rounded-lg p-4">
+          <h3 className="text-sm font-semibold text-[var(--color-state-info-text)] mb-2">
             Resumen del Análisis
           </h3>
-          <ul className="space-y-1 text-sm text-blue-800 dark:text-blue-200">
+          <ul className="space-y-1 text-sm text-[var(--color-state-info-text)]">
             <li>
               • El total {totalChange >= 0 ? "aumentó" : "disminuyó"} un{" "}
               <strong>{Math.abs(totalChange).toFixed(1)}%</strong>
@@ -122,7 +125,7 @@ export const PeriodComparison = React.memo<PeriodComparisonProps>(
         </div>
       </div>
     );
-  }
+  },
 );
 
 PeriodComparison.displayName = "PeriodComparison";

@@ -42,7 +42,7 @@ export function CalendarEventBadge({
     }
   };
 
-  const handleClick = (e: React.MouseEvent) => {
+  const _handleClick = (e: React.MouseEvent) => {
     e.stopPropagation();
     if (onClick) {
       onClick(event);

@@ -156,7 +156,17 @@ export class RespondReassignmentDto {
   @ApiPropertyOptional({ description: "Feedback del usuario" })
   @IsString()
   @IsOptional()
-  feedback?: string;
+  userFeedback?: string;
+
+  @ApiPropertyOptional({ description: "Detalles adicionales de la razón" })
+  @IsString()
+  @IsOptional()
+  reasonDetails?: string;
+
+  @ApiProperty({ description: "¿Notificar al usuario?" })
+  @IsBoolean()
+  @IsOptional()
+  notifyUser?: boolean = true;
 }
 
 /**

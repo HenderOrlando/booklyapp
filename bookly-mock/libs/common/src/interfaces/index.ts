@@ -157,6 +157,8 @@ export interface CacheOptions {
 export interface JwtPayload {
   sub: string;
   email: string;
+  username?: string;
+  tenantId?: string;
   roles: string[];
   permissions?: string[];
   iat?: number;

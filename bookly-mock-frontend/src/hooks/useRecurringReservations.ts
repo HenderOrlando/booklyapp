@@ -8,7 +8,7 @@ import {
   describeRecurrencePattern,
   generateReservationInstances,
   validateRecurringReservations,
-} from "@/services/recurringReservations";
+} from "@/lib/utils/recurring-reservations";
 import type { RecurrencePattern } from "@/types/entities/recurring";
 import type { CreateReservationDto } from "@/types/entities/reservation";
 import { useState } from "react";
@@ -113,7 +113,7 @@ export function useRecurringReservations() {
         }
 
         // Crear la reserva
-        await createReservation.mutateAsync(instance as any);
+        await createReservation.mutateAsync(instance as unknown as CreateReservationDto);
         results.created.push(instance.id);
         progress.created++;
       } catch (error) {

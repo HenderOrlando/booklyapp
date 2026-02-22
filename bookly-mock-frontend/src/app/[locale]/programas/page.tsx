@@ -9,10 +9,10 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/atoms/Card";
+import { Checkbox } from "@/components/atoms/Checkbox";
 import { Input } from "@/components/atoms/Input";
+import { Textarea } from "@/components/atoms/Textarea";
 import { DataTable } from "@/components/molecules/DataTable";
-import { AppHeader } from "@/components/organisms/AppHeader";
-import { AppSidebar } from "@/components/organisms/AppSidebar";
 import { MainLayout } from "@/components/templates/MainLayout";
 import { useCreateProgram, useUpdateProgram } from "@/hooks/mutations";
 import { usePrograms } from "@/hooks/usePrograms";
@@ -105,13 +105,12 @@ export default function ProgramasPage() {
 
   const handleSave = () => {
     if (modalMode === "create") {
-      createProgram.mutate(formData as any, {
+      createProgram.mutate(formData as Parameters<typeof createProgram.mutate>[0], {
         onSuccess: () => {
           setShowModal(false);
         },
-        onError: (err: any) => {
+        onError: (err: Error) => {
           console.error("Error creating program:", err);
-          alert(t("save_error"));
         },
       });
     } else {
@@ -120,17 +119,16 @@ export default function ProgramasPage() {
       updateProgram.mutate(
         {
           id: selectedProgram.id,
-          data: formData as any,
+          data: formData as Parameters<typeof updateProgram.mutate>[0]["data"],
         },
         {
           onSuccess: () => {
             setShowModal(false);
           },
-          onError: (err: any) => {
+          onError: (err: Error) => {
             console.error("Error updating program:", err);
-            alert(t("save_error"));
           },
-        }
+        },
       );
     }
   };
@@ -139,14 +137,13 @@ export default function ProgramasPage() {
     updateProgram.mutate(
       {
         id: program.id,
-        data: { isActive: !program.isActive } as any,
+        data: { isActive: !program.isActive } as Parameters<typeof updateProgram.mutate>[0]["data"],
       },
       {
-        onError: (err: any) => {
+        onError: (err: Error) => {
           console.error("Error changing program status:", err);
-          alert(t("status_change_error"));
         },
-      }
+      },
     );
   };
 
@@ -156,7 +153,7 @@ export default function ProgramasPage() {
       key: "code",
       header: t("code"),
       cell: (program: AcademicProgram) => (
-        <p className="font-mono text-white">{program.code}</p>
+        <p className="font-mono text-foreground">{program.code}</p>
       ),
     },
     {
@@ -164,8 +161,10 @@ export default function ProgramasPage() {
       header: t("name"),
       cell: (program: AcademicProgram) => (
         <div>
-          <p className="font-medium text-white">{program.name}</p>
-          <p className="text-sm text-gray-400">{program.description}</p>
+          <p className="font-medium text-foreground">{program.name}</p>
+          <p className="text-sm text-[var(--color-text-tertiary)]">
+            {program.description}
+          </p>
         </div>
       ),
     },
@@ -174,9 +173,11 @@ export default function ProgramasPage() {
       header: t("faculty"),
       cell: (program: AcademicProgram) => (
         <div>
-          <p className="text-white">{program.faculty}</p>
+          <p className="text-foreground">{program.faculty}</p>
           {program.department && (
-            <p className="text-sm text-gray-400">{program.department}</p>
+            <p className="text-sm text-[var(--color-text-tertiary)]">
+              {program.department}
+            </p>
           )}
         </div>
       ),
@@ -221,12 +222,9 @@ export default function ProgramasPage() {
     },
   ];
 
-  const header = <AppHeader title={t("title")} />;
-  const sidebar = <AppSidebar />;
-
   if (loading) {
     return (
-      <MainLayout header={header} sidebar={sidebar}>
+      <MainLayout>
         <div className="flex items-center justify-center h-96">
           <div className="text-center">
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-brand-primary-500 mx-auto mb-4"></div>
@@ -238,7 +236,7 @@ export default function ProgramasPage() {
   }
 
   return (
-    <MainLayout header={header} sidebar={sidebar}>
+    <MainLayout>
       <div className="space-y-6 pb-6">
         <div className="flex items-center justify-between">
           <div>
@@ -327,7 +325,7 @@ export default function ProgramasPage() {
                 <div className="space-y-4">
                   <div className="grid grid-cols-2 gap-4">
                     <div>
-                      <label className="block text-sm font-medium text-white mb-2">
+                      <label className="block text-sm font-medium text-[var(--color-text-primary)] mb-2">
                         {t("code")} *
                       </label>
                       <Input
@@ -338,7 +336,7 @@ export default function ProgramasPage() {
                       />
                     </div>
                     <div>
-                      <label className="block text-sm font-medium text-white mb-2">
+                      <label className="block text-sm font-medium text-[var(--color-text-primary)] mb-2">
                         {t("name")} *
                       </label>
                       <Input
@@ -351,10 +349,10 @@ export default function ProgramasPage() {
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-white mb-2">
+                    <label className="block text-sm font-medium text-[var(--color-text-primary)] mb-2">
                       {t("description_label")}
                     </label>
-                    <textarea
+                    <Textarea
                       value={formData.description}
                       onChange={(e) =>
                         setFormData({
@@ -363,13 +361,12 @@ export default function ProgramasPage() {
                         })
                       }
                       rows={3}
-                      className="w-full px-3 py-2 bg-gray-800 border border-[var(--color-border-subtle)] rounded-lg text-white"
                     />
                   </div>
 
                   <div className="grid grid-cols-2 gap-4">
                     <div>
-                      <label className="block text-sm font-medium text-white mb-2">
+                      <label className="block text-sm font-medium text-[var(--color-text-primary)] mb-2">
                         {t("faculty")} *
                       </label>
                       <Input
@@ -380,7 +377,7 @@ export default function ProgramasPage() {
                       />
                     </div>
                     <div>
-                      <label className="block text-sm font-medium text-white mb-2">
+                      <label className="block text-sm font-medium text-[var(--color-text-primary)] mb-2">
                         {t("department")}
                       </label>
                       <Input
@@ -395,17 +392,21 @@ export default function ProgramasPage() {
                     </div>
                   </div>
 
-                  <label className="flex items-center gap-2">
-                    <input
-                      type="checkbox"
+                  <div className="flex items-center gap-2">
+                    <Checkbox
+                      id="isActive"
                       checked={formData.isActive}
-                      onChange={(e) =>
-                        setFormData({ ...formData, isActive: e.target.checked })
+                      onCheckedChange={(checked) =>
+                        setFormData({ ...formData, isActive: !!checked })
                       }
-                      className="w-4 h-4"
                     />
-                    <span className="text-sm text-white">{t("is_active")}</span>
-                  </label>
+                    <label
+                      htmlFor="isActive"
+                      className="text-sm text-[var(--color-text-primary)] cursor-pointer"
+                    >
+                      {t("is_active")}
+                    </label>
+                  </div>
 
                   <div className="flex justify-end gap-3 pt-4">
                     <Button

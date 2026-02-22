@@ -19,7 +19,9 @@ export class RespondReassignmentHandler
       dto.reassignmentId,
       dto.accepted,
       dto.newResourceId,
-      dto.feedback
+      dto.userFeedback,
+      dto.reasonDetails,
+      dto.notifyUser
     );
   }
 }

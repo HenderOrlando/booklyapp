@@ -2,9 +2,6 @@
 
 import {
   ActivityTimeline,
-  MetricCard,
-  MetricsGrid,
-  QuickStats,
   TrendChart,
 } from "@/components/analytics";
 import {
@@ -15,7 +12,6 @@ import {
   CardTitle,
 } from "@/components/atoms/Card";
 import { AppHeader } from "@/components/organisms/AppHeader";
-import { AppSidebar } from "@/components/organisms/AppSidebar";
 import {
   DashboardLayout,
   KPICard,
@@ -24,10 +20,64 @@ import { MainLayout } from "@/components/templates/MainLayout";
 import {
   useDashboardMetrics,
   useUpcomingReservations,
-  useUserStats,
 } from "@/hooks/useDashboard";
 import { useTranslations } from "next-intl";
 import * as React from "react";
+
+type RecentReservationStatus =
+  | "PENDING"
+  | "CONFIRMED"
+  | "IN_PROGRESS"
+  | "COMPLETED"
+  | "CANCELLED"
+  | "REJECTED"
+  | "UNKNOWN";
+
+const DEFAULT_RESERVATION_STATUS: RecentReservationStatus = "CONFIRMED";
+
+const RESERVATION_STATUS_LABEL_KEY: Record<RecentReservationStatus, string> = {
+  PENDING: "status_pending",
+  CONFIRMED: "status_confirmed",
+  IN_PROGRESS: "status_in_progress",
+  COMPLETED: "status_completed",
+  CANCELLED: "status_cancelled",
+  REJECTED: "status_rejected",
+  UNKNOWN: "confirmed",
+};
+
+const RESERVATION_STATUS_CLASS: Record<RecentReservationStatus, string> = {
+  PENDING:
+    "bg-state-warning-100 text-state-warning-700 dark:bg-state-warning-900 dark:text-state-warning-200",
+  CONFIRMED:
+    "bg-state-success-100 text-state-success-700 dark:bg-state-success-900 dark:text-state-success-200",
+  IN_PROGRESS:
+    "bg-brand-primary-100 text-brand-primary-700 dark:bg-brand-primary-900 dark:text-brand-primary-200",
+  COMPLETED:
+    "bg-neutral-100 text-neutral-700 dark:bg-neutral-800 dark:text-neutral-200",
+  CANCELLED:
+    "bg-state-error-100 text-state-error-700 dark:bg-state-error-900 dark:text-state-error-200",
+  REJECTED:
+    "bg-state-error-100 text-state-error-700 dark:bg-state-error-900 dark:text-state-error-200",
+  UNKNOWN:
+    "bg-state-success-100 text-state-success-700 dark:bg-state-success-900 dark:text-state-success-200",
+};
+
+function normalizeReservationStatus(value?: string): RecentReservationStatus {
+  const normalized = String(value || DEFAULT_RESERVATION_STATUS).toUpperCase();
+
+  if (
+    normalized === "PENDING" ||
+    normalized === "CONFIRMED" ||
+    normalized === "IN_PROGRESS" ||
+    normalized === "COMPLETED" ||
+    normalized === "CANCELLED" ||
+    normalized === "REJECTED"
+  ) {
+    return normalized;
+  }
+
+  return "UNKNOWN";
+}
 
 /**
  * Página de Dashboard - Bookly
@@ -41,95 +91,117 @@ export default function DashboardPage() {
   const tCommon = useTranslations("common");
 
   // React Query para datos del dashboard
-  const { data: userStats, isLoading: loadingStats } = useUserStats();
   const { data: metrics, isLoading: loadingMetrics } = useDashboardMetrics();
   const { data: upcomingReservations = [] } = useUpcomingReservations();
 
-  const isLoading = loadingStats || loadingMetrics;
+  const isLoading = loadingMetrics;
 
-  // Usar componentes compartidos de Header y Sidebar
-  const header = <AppHeader title={t("title")} />;
-  const sidebar = <AppSidebar />;
-
-  // Mock data para gráficos y actividades
-  const trendData = React.useMemo(() => {
-    const days = 30;
-    return Array.from({ length: days }, (_, i) => ({
-      label: `${i + 1}`,
-      value: Math.floor(Math.random() * 40) + 10 + i * 0.5,
-    }));
-  }, []);
+  const trendData = React.useMemo(() => metrics?.trend || [], [metrics?.trend]);
 
   const recentActivities = React.useMemo(
-    () => [
-      {
-        id: "1",
-        title: "Nueva reserva confirmada",
-        description: "Sala de juntas - Mañana 10:00 AM",
-        timestamp: new Date(Date.now() - 5 * 60000),
-        type: "success" as const,
-        icon: "✓",
-      },
-      {
-        id: "2",
-        title: "Recurso liberado",
-        description: "Proyector A disponible nuevamente",
-        timestamp: new Date(Date.now() - 25 * 60000),
-        type: "info" as const,
-        icon: "ℹ",
-      },
-      {
-        id: "3",
-        title: "Aprobación pendiente",
-        description: "Auditor io Principal - Requiere revisión",
-        timestamp: new Date(Date.now() - 120 * 60000),
-        type: "warning" as const,
-        icon: "⚠",
-      },
-    ],
-    []
+    () =>
+      (metrics?.recentActivity || []).map((activity) => ({
+        id: activity.id,
+        title: activity.title,
+        description: activity.description,
+        timestamp: activity.timestamp,
+        type:
+          activity.type === "approval"
+            ? ("warning" as const)
+            : activity.type === "reservation"
+              ? ("success" as const)
+              : ("info" as const),
+        icon: activity.icon,
+      })),
+    [metrics?.recentActivity],
   );
 
-  const quickStatsData = React.useMemo(
+  const _quickStatsData = React.useMemo(
     () => [
       {
         label: "Hoy",
-        value: "12",
-        change: { value: 20, isPositive: true },
+        value: metrics?.todayReservations || 0,
+        change: {
+          value: Math.abs(metrics?.delta.totalReservationsPct || 0),
+          isPositive: (metrics?.delta.totalReservationsPct || 0) >= 0,
+        },
         icon: "📅",
       },
       {
         label: "Esta Semana",
-        value: "48",
-        change: { value: 15, isPositive: true },
+        value: metrics?.weekReservations || 0,
+        change: {
+          value: Math.abs(metrics?.delta.activeReservationsPct || 0),
+          isPositive: (metrics?.delta.activeReservationsPct || 0) >= 0,
+        },
         icon: "📊",
       },
       {
         label: "Este Mes",
-        value: "156",
-        change: { value: 8, isPositive: true },
+        value: metrics?.monthReservations || 0,
+        change: {
+          value: Math.abs(metrics?.delta.utilizationRatePct || 0),
+          isPositive: (metrics?.delta.utilizationRatePct || 0) >= 0,
+        },
         icon: "📈",
       },
       {
         label: "Satisfacción",
-        value: "94%",
-        change: { value: 3, isPositive: true },
+        value: `${Math.round(metrics?.satisfactionRate || 0)}%`,
+        change: {
+          value: Math.abs(metrics?.delta.satisfactionRatePct || 0),
+          isPositive: (metrics?.delta.satisfactionRatePct || 0) >= 0,
+        },
         icon: "⭐",
       },
     ],
-    []
+    [
+      metrics?.todayReservations,
+      metrics?.weekReservations,
+      metrics?.monthReservations,
+      metrics?.satisfactionRate,
+      metrics?.delta.totalReservationsPct,
+      metrics?.delta.activeReservationsPct,
+      metrics?.delta.utilizationRatePct,
+      metrics?.delta.satisfactionRatePct,
+    ],
   );
 
+  const recentReservations = React.useMemo(() => {
+    if ((metrics?.recentReservations || []).length > 0) {
+      return (metrics?.recentReservations || []).map((reservation) => ({
+        id: reservation.id,
+        resourceName: reservation.resourceName,
+        startAt: reservation.startAt,
+        endAt: reservation.endAt,
+        status: reservation.status,
+      }));
+    }
+
+    return upcomingReservations.map((reservation) => ({
+      id: reservation.id,
+      resourceName: reservation.resourceName || t("resource"),
+      startAt: reservation.startDate,
+      endAt: reservation.endDate,
+      status: String(reservation.status || "CONFIRMED"),
+    }));
+  }, [metrics?.recentReservations, upcomingReservations, t]);
+
+  // Usar componentes compartidos de Header y Sidebar
+  const _header = <AppHeader title={t("title")} />;
   return (
-    <MainLayout header={header} sidebar={sidebar}>
+    <MainLayout>
       <DashboardLayout
         kpis={
           <>
             <KPICard
               title={t("active_reservations")}
-              value={String(userStats?.activeReservations || 0)}
+              value={String(metrics?.activeReservations || 0)}
               description={t("total_this_month")}
-              trend={{ value: 12, isPositive: true }}
+              trend={{
+                value: Math.abs(metrics?.delta.activeReservationsPct || 0),
+                isPositive: (metrics?.delta.activeReservationsPct || 0) >= 0,
+              }}
               icon={
                 <svg
                   className="w-6 h-6"
@@ -172,9 +244,12 @@ export default function DashboardPage() {
 
             <KPICard
               title={t("pending_approvals")}
-              value={String(userStats?.pendingApprovals || 0)}
+              value={String(metrics?.pendingApprovals || 0)}
               description={t("require_attention")}
-              trend={{ value: 8, isPositive: false }}
+              trend={{
+                value: Math.abs(metrics?.delta.pendingApprovalsPct || 0),
+                isPositive: (metrics?.delta.pendingApprovalsPct || 0) <= 0,
+              }}
               icon={
                 <svg
                   className="w-6 h-6"
@@ -196,7 +271,10 @@ export default function DashboardPage() {
               title={t("utilization_rate")}
               value={`${Math.round(metrics?.utilizationRate || 0)}%`}
               description={t("monthly_avg")}
-              trend={{ value: 5, isPositive: true }}
+              trend={{
+                value: Math.abs(metrics?.delta.utilizationRatePct || 0),
+                isPositive: (metrics?.delta.utilizationRatePct || 0) >= 0,
+              }}
               icon={
                 <svg
                   className="w-6 h-6"
@@ -216,165 +294,112 @@ export default function DashboardPage() {
           </>
         }
       >
-        {/* Analytics Avanzados */}
-        <div className="space-y-6">
-          {/* Métricas en Grid */}
-          <MetricsGrid columns={4} gap="md">
-            <MetricCard
-              title="Reservas Activas"
-              value={userStats?.activeReservations || 0}
-              subtitle="Del total de 156 este mes"
-              trend={{
-                value: 8,
-                isPositive: false,
-                label: "vs semana anterior",
-              }}
-              icon={<span className="text-2xl">📅</span>}
-              color="blue"
-              loading={loadingStats}
+        {/* Grid de Gráficos y Actividad */}
+        <div className="grid gap-6 lg:grid-cols-3">
+          {/* Gráfico de Tendencia */}
+          <div className="lg:col-span-2">
+            <TrendChart
+              title={t("trend_title", { fallback: "Tendencia de Reservas (Últimos 30 días)" })}
+              data={trendData}
+              color="var(--color-action-primary)"
+              height={300}
+              showGrid
             />
-            <MetricCard
-              title="Recursos Disponibles"
-              value={metrics?.availableResources || 0}
-              subtitle={`De ${metrics?.totalResources || 0} totales`}
-              icon={<span className="text-2xl">🏢</span>}
-              color="green"
-              loading={loadingMetrics}
-            />
-            <MetricCard
-              title="Aprobaciones Pendientes"
-              value={userStats?.pendingApprovals || 0}
-              subtitle="Requieren atención"
-              trend={{
-                value: 8,
-                isPositive: false,
-                label: "vs semana anterior",
-              }}
-              icon={<span className="text-2xl">⏰</span>}
-              color="orange"
-              loading={loadingStats}
-            />
-            <MetricCard
-              title="Tasa de Uso"
-              value={`${Math.round(metrics?.utilizationRate || 0)}%`}
-              subtitle="Promedio mensual"
-              trend={{ value: 5, isPositive: true }}
-              icon={<span className="text-2xl">📊</span>}
-              color="purple"
-              loading={loadingMetrics}
-            />
-          </MetricsGrid>
+          </div>
 
-          {/* Estadísticas Rápidas */}
-          <QuickStats
-            title="Resumen de Reservas"
-            stats={quickStatsData}
-            columns={4}
-          />
-
-          {/* Grid de Gráficos y Actividad */}
-          <div className="grid gap-6 lg:grid-cols-3">
-            {/* Gráfico de Tendencia */}
-            <div className="lg:col-span-2">
-              <TrendChart
-                title="Tendencia de Reservas (Últimos 30 días)"
-                data={trendData}
-                color="#3b82f6"
-                height={250}
-                showGrid
-              />
-            </div>
-
-            {/* Actividad Reciente */}
-            <div>
-              <ActivityTimeline
-                title="Actividad Reciente"
-                activities={recentActivities}
-                maxItems={5}
-              />
-            </div>
+          {/* Actividad Reciente */}
+          <div>
+            <ActivityTimeline
+              title={t("recent_activity", { fallback: "Actividad Reciente" })}
+              activities={recentActivities}
+              maxItems={6}
+            />
           </div>
         </div>
 
-        {/* Contenido del dashboard (original) */}
+        {/* Reservas y Recursos */}
         <div className="grid gap-6 md:grid-cols-2 mt-6">
           {/* Reservas Recientes */}
-          <Card>
+          <Card className="border-[var(--color-border-subtle)] shadow-sm">
             <CardHeader>
-              <CardTitle>{t("recent_reservations")}</CardTitle>
-              <CardDescription>{t("recent_reservations_desc")}</CardDescription>
+              <CardTitle className="text-lg text-[var(--color-text-primary)]">{t("recent_reservations")}</CardTitle>
+              <CardDescription className="text-sm text-[var(--color-text-secondary)]">{t("recent_reservations_desc")}</CardDescription>
             </CardHeader>
             <CardContent>
               <div className="space-y-4">
                 {isLoading ? (
-                  <p className="text-gray-400">{tCommon("loading")}</p>
-                ) : upcomingReservations.length === 0 ? (
-                  <p className="text-gray-400">{t("no_recent_reservations")}</p>
+                  <p className="text-[var(--color-text-tertiary)]">
+                    {tCommon("loading")}
+                  </p>
+                ) : recentReservations.length === 0 ? (
+                  <p className="text-[var(--color-text-tertiary)]">
+                    {t("no_recent_reservations")}
+                  </p>
                 ) : (
-                  upcomingReservations
-                    .slice(0, 3)
-                    .map((reserva: any, i: number) => (
-                      <div
-                        key={i}
-                        className="flex items-center justify-between py-2 border-b last:border-0 border-[var(--color-border-subtle)]"
-                      >
-                        <div>
-                          <p className="font-medium text-[var(--color-text-primary)]">
-                            {reserva.resourceName ||
-                              reserva.recurso ||
-                              t("resource")}
-                          </p>
-                          <p className="text-sm text-[var(--color-text-secondary)]">
-                            {reserva.fecha ||
-                              new Date(
-                                reserva.startTime
-                              ).toLocaleDateString()}{" "}
-                            •{" "}
-                            {reserva.hora ||
-                              `${new Date(reserva.startTime).toLocaleTimeString()} - ${new Date(reserva.endTime).toLocaleTimeString()}`}
-                          </p>
-                        </div>
-                        <span className="px-2 py-1 text-xs rounded-md bg-state-success-100 text-state-success-700 dark:bg-state-success-900 dark:text-state-success-200">
-                          {t("confirmed")}
-                        </span>
+                  recentReservations.slice(0, 5).map((reserva) => (
+                    <div
+                      key={reserva.id}
+                      className="flex items-center justify-between py-3 border-b last:border-0 border-[var(--color-border-subtle)]"
+                    >
+                      <div>
+                        <p className="font-medium text-[var(--color-text-primary)]">
+                          {reserva.resourceName || t("resource")}
+                        </p>
+                        <p className="text-sm text-[var(--color-text-secondary)]">
+                          {new Date(reserva.startAt).toLocaleDateString()} •{" "}
+                          {`${new Date(reserva.startAt).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})} - ${new Date(reserva.endAt).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}`}
+                        </p>
                       </div>
-                    ))
+                      <span
+                        className={`px-2.5 py-1 text-xs font-semibold rounded-full ${RESERVATION_STATUS_CLASS[normalizeReservationStatus(reserva.status)]}`}
+                      >
+                        {t(
+                          RESERVATION_STATUS_LABEL_KEY[
+                            normalizeReservationStatus(reserva.status)
+                          ],
+                        )}
+                      </span>
+                    </div>
+                  ))
                 )}
               </div>
             </CardContent>
           </Card>
 
           {/* Recursos Más Usados */}
-          <Card>
+          <Card className="border-[var(--color-border-subtle)] shadow-sm">
             <CardHeader>
-              <CardTitle>{t("most_used_resources")}</CardTitle>
-              <CardDescription>{t("most_used_desc")}</CardDescription>
+              <CardTitle className="text-lg text-[var(--color-text-primary)]">{t("most_used_resources")}</CardTitle>
+              <CardDescription className="text-sm text-[var(--color-text-secondary)]">{t("most_used_desc")}</CardDescription>
             </CardHeader>
             <CardContent>
-              <div className="space-y-4">
+              <div className="space-y-5">
                 {isLoading ? (
-                  <p className="text-gray-400">{tCommon("loading")}</p>
+                  <p className="text-[var(--color-text-tertiary)]">
+                    {tCommon("loading")}
+                  </p>
                 ) : (metrics?.mostUsedResources || []).length === 0 ? (
-                  <p className="text-gray-400">{t("no_data")}</p>
+                  <p className="text-[var(--color-text-tertiary)]">
+                    {t("no_data")}
+                  </p>
                 ) : (
                   (metrics?.mostUsedResources || [])
                     .slice(0, 5)
-                    .map((recurso: any, i: number) => (
-                      <div key={i}>
-                        <div className="flex items-center justify-between mb-1">
+                    .map((recurso) => (
+                      <div key={recurso.id}>
+                        <div className="flex items-center justify-between mb-2">
                           <span className="text-sm font-medium text-[var(--color-text-primary)]">
-                            {recurso.name || recurso.nombre}
+                            {recurso.name}
                           </span>
-                          <span className="text-sm text-[var(--color-text-secondary)]">
-                            {recurso.usageCount || recurso.reservas}{" "}
-                            {t("reservations_count")}
+                          <span className="text-sm font-semibold text-[var(--color-text-secondary)]">
+                            {recurso.usageCount} {t("reservations_count")}
                           </span>
                         </div>
-                        <div className="w-full bg-gray-200 rounded-full h-2 dark:bg-gray-700">
+                        <div className="w-full bg-[var(--color-bg-muted)] rounded-full h-2.5 dark:bg-[var(--color-bg-tertiary)] overflow-hidden">
                           <div
-                            className="bg-brand-primary-500 h-2 rounded-full"
+                            className="bg-[var(--color-action-primary)] h-full rounded-full transition-all duration-500"
                             style={{
-                              width: `${recurso.porcentaje || Math.min(100, (recurso.usageCount / 30) * 100)}%`,
+                              width: `${recurso.share > 0 ? recurso.share : Math.min(100, (recurso.usageCount / 30) * 100)}%`,
                             }}
                           ></div>
                         </div>

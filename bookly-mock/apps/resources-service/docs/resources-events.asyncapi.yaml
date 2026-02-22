@@ -1,0 +1,310 @@
+asyncapi: "2.6.0"
+info:
+  title: Resources Service Events API
+  version: "1.0.0"
+  description: |
+    Eventos asincrónicos publicados y consumidos por el Resources Service de Bookly.
+    Broker: RabbitMQ (exchange: bookly-events, type: topic)
+  contact:
+    name: Bookly Development Team
+  license:
+    name: MIT
+
+servers:
+  production:
+    url: amqps://horse.lmq.cloudamqp.com/iadjmjao
+    protocol: amqps
+    description: RabbitMQ en CloudAMQP (producción)
+  development:
+    url: amqp://bookly:bookly123@localhost:5672/bookly
+    protocol: amqp
+    description: RabbitMQ local (desarrollo)
+
+channels:
+  # ===== EVENTOS PUBLICADOS =====
+  bookly.resource.created:
+    description: Recurso creado en el sistema
+    publish:
+      operationId: publishResourceCreated
+      summary: Publicado al crear un nuevo recurso
+      message:
+        $ref: "#/components/messages/ResourceCreated"
+
+  bookly.resource.updated:
+    description: Recurso actualizado
+    publish:
+      operationId: publishResourceUpdated
+      summary: Publicado al actualizar un recurso
+      message:
+        $ref: "#/components/messages/ResourceUpdated"
+
+  bookly.resource.deleted:
+    description: Recurso eliminado (soft delete)
+    publish:
+      operationId: publishResourceDeleted
+      summary: Publicado al eliminar un recurso
+      message:
+        $ref: "#/components/messages/ResourceDeleted"
+
+  bookly.resource.restored:
+    description: Recurso restaurado
+    publish:
+      operationId: publishResourceRestored
+      summary: Publicado al restaurar un recurso eliminado
+      message:
+        $ref: "#/components/messages/ResourceRestored"
+
+  bookly.resource.status.changed:
+    description: Estado del recurso cambiado (mantenimiento, disponibilidad)
+    publish:
+      operationId: publishResourceStatusChanged
+      summary: Publicado cuando cambia el estado operativo de un recurso
+      message:
+        $ref: "#/components/messages/ResourceStatusChanged"
+
+  bookly.resource.category.changed:
+    description: Categoría del recurso cambiada
+    publish:
+      operationId: publishResourceCategoryChanged
+      summary: Publicado cuando se cambia la categoría de un recurso
+      message:
+        $ref: "#/components/messages/ResourceCategoryChanged"
+
+  bookly.availability.rules.updated:
+    description: Reglas de disponibilidad actualizadas para un recurso
+    publish:
+      operationId: publishAvailabilityRulesUpdated
+      summary: Publicado cuando se actualizan las reglas de disponibilidad
+      message:
+        $ref: "#/components/messages/AvailabilityRulesUpdated"
+
+  # ===== EVENTOS CONSUMIDOS (Request-Reply) =====
+  bookly.resources.check-resource-availability:
+    description: Solicitud para verificar disponibilidad de un recurso
+    subscribe:
+      operationId: handleCheckResourceAvailability
+      summary: Consumido para verificar si un recurso está disponible
+      message:
+        $ref: "#/components/messages/CheckResourceAvailabilityRequest"
+
+  bookly.resources.query-resource-by-id:
+    description: Solicitud para obtener datos de un recurso por ID
+    subscribe:
+      operationId: handleQueryResourceById
+      summary: Consumido para obtener detalles de un recurso
+      message:
+        $ref: "#/components/messages/QueryResourceByIdRequest"
+
+  bookly.resources.query-resources-by-ids:
+    description: Solicitud para obtener múltiples recursos por IDs
+    subscribe:
+      operationId: handleQueryResourcesByIds
+      summary: Consumido para obtener detalles de múltiples recursos
+      message:
+        $ref: "#/components/messages/QueryResourcesByIdsRequest"
+
+  bookly.resources.query-candidate-resources:
+    description: Solicitud para obtener recursos candidatos para reasignación
+    subscribe:
+      operationId: handleQueryCandidateResources
+      summary: Consumido para obtener recursos similares disponibles
+      message:
+        $ref: "#/components/messages/QueryCandidateResourcesRequest"
+
+  # ===== EVENTOS CONSUMIDOS (de otros servicios) =====
+  bookly.reservation.created:
+    description: Reserva creada (de availability-service)
+    subscribe:
+      operationId: handleReservationCreated
+      summary: Actualiza contadores de uso del recurso
+      message:
+        $ref: "#/components/messages/GenericEvent"
+
+  bookly.reservation.cancelled:
+    description: Reserva cancelada (de availability-service)
+    subscribe:
+      operationId: handleReservationCancelled
+      summary: Actualiza contadores de uso del recurso
+      message:
+        $ref: "#/components/messages/GenericEvent"
+
+  bookly.checkout.completed:
+    description: Check-out completado (de stockpile-service)
+    subscribe:
+      operationId: handleCheckOutCompleted
+      summary: Actualiza estado de ocupación del recurso
+      message:
+        $ref: "#/components/messages/GenericEvent"
+
+components:
+  messages:
+    ResourceCreated:
+      name: resource.created
+      title: Recurso Creado
+      contentType: application/json
+      payload:
+        $ref: "#/components/schemas/ResourceEventPayload"
+
+    ResourceUpdated:
+      name: resource.updated
+      title: Recurso Actualizado
+      contentType: application/json
+      payload:
+        $ref: "#/components/schemas/ResourceEventPayload"
+
+    ResourceDeleted:
+      name: resource.deleted
+      title: Recurso Eliminado
+      contentType: application/json
+      payload:
+        $ref: "#/components/schemas/ResourceEventPayload"
+
+    ResourceRestored:
+      name: resource.restored
+      title: Recurso Restaurado
+      contentType: application/json
+      payload:
+        $ref: "#/components/schemas/ResourceEventPayload"
+
+    ResourceStatusChanged:
+      name: resource.status.changed
+      title: Estado de Recurso Cambiado
+      contentType: application/json
+      payload:
+        $ref: "#/components/schemas/ResourceStatusChangedPayload"
+
+    ResourceCategoryChanged:
+      name: resource.category.changed
+      title: Categoría de Recurso Cambiada
+      contentType: application/json
+      payload:
+        $ref: "#/components/schemas/ResourceEventPayload"
+
+    AvailabilityRulesUpdated:
+      name: availability.rules.updated
+      title: Reglas de Disponibilidad Actualizadas
+      contentType: application/json
+      payload:
+        $ref: "#/components/schemas/ResourceEventPayload"
+
+    CheckResourceAvailabilityRequest:
+      name: check-resource-availability
+      title: Verificar Disponibilidad de Recurso
+      contentType: application/json
+      payload:
+        $ref: "#/components/schemas/GenericEventPayload"
+
+    QueryResourceByIdRequest:
+      name: query-resource-by-id
+      title: Consultar Recurso por ID
+      contentType: application/json
+      payload:
+        $ref: "#/components/schemas/GenericEventPayload"
+
+    QueryResourcesByIdsRequest:
+      name: query-resources-by-ids
+      title: Consultar Recursos por IDs
+      contentType: application/json
+      payload:
+        $ref: "#/components/schemas/GenericEventPayload"
+
+    QueryCandidateResourcesRequest:
+      name: query-candidate-resources
+      title: Consultar Recursos Candidatos
+      contentType: application/json
+      payload:
+        $ref: "#/components/schemas/GenericEventPayload"
+
+    GenericEvent:
+      name: generic-event
+      title: Evento Genérico
+      contentType: application/json
+      payload:
+        $ref: "#/components/schemas/GenericEventPayload"
+
+  schemas:
+    ResourceEventPayload:
+      type: object
+      required: [eventId, eventType, service, timestamp, data]
+      properties:
+        eventId:
+          type: string
+        eventType:
+          type: string
+        service:
+          type: string
+          example: resources-service
+        timestamp:
+          type: string
+          format: date-time
+        data:
+          type: object
+          properties:
+            resourceId:
+              type: string
+            name:
+              type: string
+            type:
+              type: string
+            status:
+              type: string
+            categoryId:
+              type: string
+        metadata:
+          type: object
+          properties:
+            aggregateId:
+              type: string
+            reason:
+              type: string
+            userId:
+              type: string
+
+    ResourceStatusChangedPayload:
+      type: object
+      required: [eventId, eventType, service, timestamp, data]
+      properties:
+        eventId:
+          type: string
+        eventType:
+          type: string
+          example: resource.status.changed
+        service:
+          type: string
+          example: resources-service
+        timestamp:
+          type: string
+          format: date-time
+        data:
+          type: object
+          properties:
+            resourceId:
+              type: string
+            previousStatus:
+              type: string
+            newStatus:
+              type: string
+            reason:
+              type: string
+
+    GenericEventPayload:
+      type: object
+      required: [eventId, eventType, service, timestamp]
+      properties:
+        eventId:
+          type: string
+        eventType:
+          type: string
+        service:
+          type: string
+        timestamp:
+          type: string
+          format: date-time
+        data:
+          type: object
+
+tags:
+  - name: resources
+    description: Eventos de gestión de recursos físicos
+  - name: maintenance
+    description: Eventos de mantenimiento de recursos

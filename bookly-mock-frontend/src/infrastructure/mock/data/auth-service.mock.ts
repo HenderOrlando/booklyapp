@@ -137,7 +137,9 @@ export const mockRoles: Role[] = [
     name: "coordinador",
     description: "Coordinador de programa académico",
     permissions: mockPermissions.filter((p) =>
-      ["resources", "reservations", "approvals", "reports"].includes(p.resource)
+      ["resources", "reservations", "approvals", "reports"].includes(
+        p.resource,
+      ),
     ),
     isSystem: true,
     createdAt: "2024-01-01T00:00:00.000Z",
@@ -151,14 +153,14 @@ export const mockRoles: Role[] = [
       .filter(
         (p) =>
           ["resources", "reservations"].includes(p.resource) &&
-          p.action === "read"
+          p.action === "read",
       )
       .concat(
         mockPermissions.filter(
           (p) =>
             p.resource === "reservations" &&
-            ["create", "update", "delete"].includes(p.action)
-        )
+            ["create", "update", "delete"].includes(p.action),
+        ),
       ),
     isSystem: true,
     createdAt: "2024-01-01T00:00:00.000Z",
@@ -171,7 +173,20 @@ export const mockRoles: Role[] = [
     permissions: mockPermissions.filter(
       (p) =>
         ["resources", "reservations"].includes(p.resource) &&
-        ["read", "create"].includes(p.action)
+        ["read", "create"].includes(p.action),
+    ),
+    isSystem: true,
+    createdAt: "2024-01-01T00:00:00.000Z",
+    updatedAt: "2024-01-01T00:00:00.000Z",
+  },
+  {
+    id: "role_5",
+    name: "vigilancia",
+    description: "Personal de vigilancia y control de acceso",
+    permissions: mockPermissions.filter(
+      (p) =>
+        (p.resource === "reservations" && p.action === "read") ||
+        (p.resource === "resources" && p.action === "read"),
     ),
     isSystem: true,
     createdAt: "2024-01-01T00:00:00.000Z",
@@ -322,6 +337,37 @@ export const mockUsers: User[] = [
     createdAt: "2024-03-01T00:00:00.000Z",
     updatedAt: new Date().toISOString(),
   },
+  {
+    id: "user_5",
+    email: "vigilante@ufps.edu.co",
+    username: "vigilante",
+    firstName: "Pedro",
+    lastName: "López",
+    fullName: "Pedro López",
+    phoneNumber: "+57 304 567 8901",
+    documentType: "CC",
+    documentNumber: "6677889900",
+    profilePicture: "https://api.dicebear.com/7.x/avataaars/svg?seed=pedro",
+    status: UserStatus.ACTIVE,
+    emailVerified: true,
+    phoneVerified: true,
+    twoFactorEnabled: false,
+    roles: [mockRoles[4]],
+    permissions: mockRoles[4].permissions,
+    preferences: {
+      language: "es",
+      theme: "light",
+      notifications: {
+        email: true,
+        push: true,
+        sms: false,
+      },
+      timezone: "America/Bogota",
+    },
+    lastLoginAt: new Date(Date.now() - 43200000).toISOString(),
+    createdAt: "2024-04-01T00:00:00.000Z",
+    updatedAt: new Date().toISOString(),
+  },
 ];
 
 // ============================================
@@ -340,6 +386,7 @@ export const mockCredentials = {
   "coordinador@ufps.edu.co": { password: "coord123", user: mockUsers[1] },
   "profesor@ufps.edu.co": { password: "prof123", user: mockUsers[2] },
   "estudiante@ufps.edu.co": { password: "est123", user: mockUsers[3] },
+  "vigilante@ufps.edu.co": { password: "vig123", user: mockUsers[4] },
 };
 
 // ============================================
@@ -347,7 +394,7 @@ export const mockCredentials = {
 // ============================================
 export function getMockLoginResponse(
   email: string,
-  password: string
+  password: string,
 ): LoginResponse | null {
   const credential = mockCredentials[email as keyof typeof mockCredentials];
 

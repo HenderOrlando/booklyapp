@@ -1,4 +1,3 @@
-import { UserRole } from "@libs/common/enums";
 import { AuditInfo } from "@libs/common";
 
 /**
@@ -8,13 +7,13 @@ import { AuditInfo } from "@libs/common";
 export class RoleEntity {
   constructor(
     public readonly id: string,
-    public name: UserRole,
+    public name: string,
     public displayName: string,
     public description: string,
     public permissions: string[],
     public isActive: boolean,
     public isDefault: boolean,
-    public audit?: AuditInfo
+    public audit?: AuditInfo,
   ) {}
 
   /**
@@ -93,7 +92,7 @@ export class RoleEntity {
       data.permissions || [],
       data.isActive ?? true,
       data.isDefault ?? false,
-      data.audit
+      data.audit,
     );
   }
 }

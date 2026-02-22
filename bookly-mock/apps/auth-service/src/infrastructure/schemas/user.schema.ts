@@ -1,4 +1,3 @@
-import { UserRole } from "@libs/common/enums";
 import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
 import { Document } from "mongoose";
 
@@ -13,6 +12,15 @@ export class User {
   @Prop({ required: true, unique: true, lowercase: true, trim: true })
   email: string;
 
+  @Prop({
+    required: false,
+    unique: true,
+    sparse: true,
+    lowercase: true,
+    trim: true,
+  })
+  username?: string;
+
   @Prop({ required: false })
   password?: string;
 
@@ -22,12 +30,8 @@ export class User {
   @Prop({ required: true, trim: true })
   lastName: string;
 
-  @Prop({
-    type: [String],
-    enum: Object.values(UserRole),
-    default: [UserRole.STUDENT],
-  })
-  roles: UserRole[];
+  @Prop({ type: [String], default: ["STUDENT"] })
+  roles: string[];
 
   @Prop({ type: [String], default: [] })
   roleIds: string[]; // ObjectIds de documentos Role
@@ -41,8 +45,14 @@ export class User {
   @Prop({ default: false })
   isEmailVerified: boolean;
 
+  @Prop({ default: false })
+  isPhoneVerified: boolean;
+
+  @Prop({ required: true, default: "UFPS", trim: true })
+  tenantId: string;
+
   // Document Information
-  @Prop({ type: String, enum: ["CC", "TI", "CE", "PASSPORT"] })
+  @Prop({ type: String, enum: ["CC", "TI", "CE", "PASSPORT", "DNI", "OTHER"] })
   documentType?: string;
 
   @Prop({ type: String, trim: true })
@@ -50,6 +60,34 @@ export class User {
 
   @Prop({ type: String, trim: true })
   phone?: string;
+
+  @Prop({
+    type: {
+      language: { type: String, default: "es" },
+      theme: {
+        type: String,
+        enum: ["light", "dark", "system"],
+        default: "system",
+      },
+      notifications: {
+        email: { type: Boolean, default: true },
+        push: { type: Boolean, default: true },
+        sms: { type: Boolean, default: false },
+      },
+      timezone: { type: String, default: "America/Bogota" },
+    },
+    _id: false,
+  })
+  preferences?: {
+    language: string;
+    theme: "light" | "dark" | "system";
+    notifications: {
+      email: boolean;
+      push: boolean;
+      sms: boolean;
+    };
+    timezone?: string;
+  };
 
   // Academic Program Relations
   @Prop({ type: String })
@@ -104,16 +142,16 @@ export class User {
 
 export const UserSchema = SchemaFactory.createForClass(User);
 
-// Indexes
-UserSchema.index({ email: 1 }, { unique: true });
+// Indexes (email and username already have unique indexes from @Prop decorators)
 UserSchema.index({ roles: 1 });
 UserSchema.index({ roleIds: 1 });
 UserSchema.index({ isActive: 1 });
+UserSchema.index({ tenantId: 1 });
 UserSchema.index({ createdAt: -1 });
 UserSchema.index({ ssoProviderId: 1, ssoProvider: 1 }, { sparse: true });
 UserSchema.index({ programId: 1 });
 UserSchema.index({ coordinatedProgramId: 1 });
 UserSchema.index(
   { documentType: 1, documentNumber: 1 },
-  { sparse: true, unique: true }
+  { sparse: true, unique: true },
 );

@@ -57,8 +57,8 @@ export {
   mockApprovalRequests,
   mockApprovalStats,
   mockApproveRequest,
-  mockCheckInOuts,
   mockCheckInOutStats,
+  mockCheckInOuts,
   mockPerformCheckIn,
   mockPerformCheckOut,
   mockRejectRequest,
@@ -73,6 +73,7 @@ export {
 // REPORTS SERVICE
 // ============================================
 export {
+  mockDashboardAggregatedResponse,
   mockDashboardData,
   mockDemandReport,
   mockKPIs,

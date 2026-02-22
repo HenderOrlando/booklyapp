@@ -10,35 +10,56 @@ import {
   CardTitle,
 } from "@/components/atoms/Card";
 import { Input } from "@/components/atoms/Input";
+import { i18nConfig } from "@/i18n/config";
+import {
+  capturePostAuthRedirectFromLocation,
+  consumePostAuthRedirect,
+  resolveDashboardFallbackPath,
+  resolvePostAuthRedirect,
+} from "@/lib/auth/post-auth-redirect";
 import { signIn } from "next-auth/react";
-import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useTranslations } from "next-intl";
+import { useRouter, useSearchParams } from "next/navigation";
+import { useEffect, useState } from "react";
 import { toast } from "sonner";
 
 export default function LoginPage() {
+  const t = useTranslations("auth");
   const router = useRouter();
+  const searchParams = useSearchParams();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [errors, setErrors] = useState({ email: "", password: "" });
+
+  useEffect(() => {
+    if (typeof window === "undefined") {
+      return;
+    }
+
+    capturePostAuthRedirectFromLocation(
+      window.location.pathname,
+      window.location.search,
+    );
+  }, []);
 
   const validateForm = () => {
     const newErrors = { email: "", password: "" };
     let isValid = true;
 
     if (!email) {
-      newErrors.email = "El email es requerido";
+      newErrors.email = t("email_required");
       isValid = false;
     } else if (!/\S+@\S+\.\S+/.test(email)) {
-      newErrors.email = "Email inválido";
+      newErrors.email = t("email_invalid_format");
       isValid = false;
     }
 
     if (!password) {
-      newErrors.password = "La contraseña es requerida";
+      newErrors.password = t("password_required");
       isValid = false;
     } else if (password.length < 6) {
-      newErrors.password = "La contraseña debe tener al menos 6 caracteres";
+      newErrors.password = t("password_min_length");
       isValid = false;
     }
 
@@ -65,11 +86,28 @@ export default function LoginPage() {
       if (result?.error) {
         toast.error(result.error);
       } else if (result?.ok) {
-        toast.success("¡Bienvenido!");
-        router.push("/dashboard");
+        toast.success(t("welcome_toast"));
+
+        const fallbackPath = resolveDashboardFallbackPath(
+          window.location.pathname,
+          i18nConfig.locales,
+          i18nConfig.defaultLocale,
+        );
+
+        const redirectTarget = resolvePostAuthRedirect({
+          pathname: window.location.pathname,
+          search: searchParams.toString()
+            ? `?${searchParams.toString()}`
+            : window.location.search,
+          storageRedirect: consumePostAuthRedirect(),
+          origin: window.location.origin,
+          locales: i18nConfig.locales,
+        });
+
+        router.replace(redirectTarget ?? fallbackPath);
       }
     } catch (error) {
-      toast.error("Error al iniciar sesión");
+      toast.error(t("login_error_generic"));
       console.error(error);
     } finally {
       setIsLoading(false);
@@ -81,7 +119,7 @@ export default function LoginPage() {
     try {
       await signIn("google", { callbackUrl: "/dashboard" });
     } catch (error) {
-      toast.error("Error al iniciar sesión con Google");
+      toast.error(t("login_error_google"));
       console.error(error);
     } finally {
       setIsLoading(false);
@@ -93,17 +131,17 @@ export default function LoginPage() {
       <Card className="w-full max-w-md">
         <CardHeader className="space-y-1">
           <CardTitle className="text-2xl font-bold text-center">
-            Iniciar Sesión
+            {t("login")}
           </CardTitle>
           <CardDescription className="text-center">
-            Ingresa tus credenciales para acceder a Bookly
+            {t("description")}
           </CardDescription>
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="space-y-2">
               <label htmlFor="email" className="text-sm font-medium">
-                Email
+                {t("email")}
               </label>
               <Input
                 id="email"
@@ -117,7 +155,7 @@ export default function LoginPage() {
             </div>
             <div className="space-y-2">
               <label htmlFor="password" className="text-sm font-medium">
-                Contraseña
+                {t("password")}
               </label>
               <Input
                 id="password"
@@ -130,7 +168,7 @@ export default function LoginPage() {
               />
             </div>
             <Button type="submit" className="w-full" disabled={isLoading}>
-              {isLoading ? "Iniciando sesión..." : "Iniciar Sesión"}
+              {isLoading ? t("logging_in") : t("login")}
             </Button>
           </form>
 
@@ -140,7 +178,7 @@ export default function LoginPage() {
             </div>
             <div className="relative flex justify-center text-xs uppercase">
               <span className="bg-card px-2 text-muted-foreground">
-                O continuar con
+                {t("or_continue_with")}
               </span>
             </div>
           </div>
@@ -174,18 +212,18 @@ export default function LoginPage() {
         </CardContent>
         <CardFooter className="flex flex-col space-y-2">
           <div className="text-sm text-center text-muted-foreground">
-            ¿Olvidaste tu contraseña?{" "}
+            {t("forgot_password")}{" "}
             <a
               href="/auth/forgot-password"
               className="text-primary hover:underline"
             >
-              Recupérala aquí
+              {t("recover_here")}
             </a>
           </div>
           <div className="text-sm text-center text-muted-foreground">
-            ¿No tienes cuenta?{" "}
+            {t("no_account")}{" "}
             <a href="/auth/register" className="text-primary hover:underline">
-              Regístrate
+              {t("register_link")}
             </a>
           </div>
         </CardFooter>

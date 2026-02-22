@@ -3,10 +3,35 @@
  * Se activa automáticamente cuando DATA_MODE=mock
  */
 
+import type {
+  CreateCategoryDto,
+  UpdateCategoryDto,
+} from "@/hooks/mutations/useCategoryMutations";
 import { isMockMode } from "@/lib/config";
 import { ApiResponse } from "@/types/api/response";
+import type { ApprovalRequest } from "@/types/entities/approval";
+import type {
+  CreateReservationDto,
+  Reservation,
+  UpdateReservationDto,
+} from "@/types/entities/reservation";
+import type {
+  AcademicProgram,
+  Category,
+  CreateAcademicProgramDto,
+  CreateResourceDto,
+  Maintenance,
+  Resource,
+  UpdateAcademicProgramDto,
+  UpdateResourceDto,
+} from "@/types/entities/resource";
+import type { User as AuthUser, UserPreferences } from "@/types/entities/user";
 import {
+  getApprovalHistory,
+  getApprovalRequestById,
   getMockLoginResponse,
+  mockApprovalRequests,
+  mockApprovalStats,
   mockAuditLogs,
   mockCredentials,
   mockDelay,
@@ -15,28 +40,111 @@ import {
   mockUsers,
 } from "./data";
 import { mockReservations } from "./data/reservations-service.mock";
+import type {
+  ProgramResourceAssociation,
+  ProgramUserAssociation,
+  ResourceCharacteristic,
+  User as ResourceUser,
+} from "./data/resources-service.mock";
 import {
   mockAcademicPrograms,
   mockCategories,
   mockMaintenances,
   mockProgramResourceAssociations,
   mockProgramUserAssociations,
+  mockResourceCharacteristics,
   mockResources,
   mockUsers as mockResourceUsers,
 } from "./data/resources-service.mock";
 
+type RequestPayload = Record<string, unknown>;
+
+interface LoginPayload {
+  email: string;
+  password: string;
+}
+
+interface ForgotPasswordPayload {
+  email: string;
+}
+
+interface ResetPasswordPayload {
+  token: string;
+  newPassword: string;
+}
+
+interface ChangePasswordPayload {
+  currentPassword: string;
+  newPassword: string;
+}
+
+interface ProgramResourceAssociationInput {
+  programId: string;
+  resourceId: string;
+  priority?: number;
+}
+
+interface ProgramUserAssociationInput {
+  programId: string;
+  userId: string;
+  role?: ProgramUserAssociation["role"];
+}
+
+interface ApprovalRequestInput {
+  reservationId?: string;
+  userId?: string;
+  userName?: string;
+  userEmail?: string;
+  userRole?: string;
+  resourceId?: string;
+  resourceName?: string;
+  resourceType?: string;
+  categoryName?: string;
+  startDate?: string;
+  endDate?: string;
+  purpose?: string;
+  attendees?: number;
+  priority?: ApprovalRequest["priority"];
+  currentLevel?: ApprovalRequest["currentLevel"];
+  maxLevel?: ApprovalRequest["maxLevel"];
+}
+
+interface ApprovalActionInput {
+  comment?: string;
+  reason?: string;
+}
+
+const BOOLEAN_ATTRIBUTE_TO_CHARACTERISTIC: Record<string, string> = {
+  hasProjector: "Proyector",
+  hasAirConditioning: "Aire acondicionado",
+  hasWhiteboard: "Tablero/Pizarra",
+  hasComputers: "Computadores",
+};
+
 export class MockService {
   // Copias mutables de los datos mock
-  private static resourcesData = [...mockResources];
-  private static categoriesData = [...mockCategories];
-  private static maintenancesData = [...mockMaintenances];
-  private static academicProgramsData = [...mockAcademicPrograms];
-  private static programResourceAssociationsData = [
-    ...mockProgramResourceAssociations,
+  private static resourcesData: Resource[] = [...mockResources];
+  private static categoriesData: Category[] = [...mockCategories];
+  private static resourceCharacteristicsData: ResourceCharacteristic[] = [
+    ...mockResourceCharacteristics,
   ];
-  private static programUserAssociationsData = [...mockProgramUserAssociations];
-  private static resourceUsersData = [...mockResourceUsers];
-  private static reservationsData = [...mockReservations];
+  private static maintenancesData: Maintenance[] = [...mockMaintenances];
+  private static academicProgramsData: AcademicProgram[] = [
+    ...mockAcademicPrograms,
+  ];
+  private static programResourceAssociationsData: ProgramResourceAssociation[] =
+    [...mockProgramResourceAssociations];
+  private static programUserAssociationsData: ProgramUserAssociation[] = [
+    ...mockProgramUserAssociations,
+  ];
+  private static resourceUsersData: ResourceUser[] = [...mockResourceUsers];
+  private static reservationsData: Reservation[] = [...mockReservations];
+
+  private static castResponse<T>(
+    response: ApiResponse<unknown>,
+  ): ApiResponse<T> {
+    return response as ApiResponse<T>;
+  }
 
   /**
    * Simula una llamada HTTP con datos mock
@@ -44,77 +152,180 @@ export class MockService {
   static async mockRequest<T>(
     endpoint: string,
     method: string = "GET",
-    data?: any
+    data?: unknown,
   ): Promise<ApiResponse<T>> {
     // Simular delay de red
     await mockDelay(300);
 
+    const payload = data as unknown;
+
     // Simular diferentes endpoints
     if (endpoint.includes("/auth/login") && method === "POST") {
-      return this.mockLogin(data) as any;
+      return this.castResponse<T>(this.mockLogin(payload as LoginPayload));
     }
 
     if (endpoint.includes("/auth/register") && method === "POST") {
-      return this.mockRegister(data) as any;
+      return this.castResponse<T>(this.mockRegister(payload as RequestPayload));
     }
 
     if (endpoint.includes("/auth/forgot-password") && method === "POST") {
-      return this.mockForgotPassword(data) as any;
+      return this.castResponse<T>(
+        this.mockForgotPassword(payload as ForgotPasswordPayload),
+      );
     }
 
     if (endpoint.includes("/auth/reset-password") && method === "POST") {
-      return this.mockResetPassword(data) as any;
+      return this.castResponse<T>(
+        this.mockResetPassword(payload as ResetPasswordPayload),
+      );
     }
 
     if (endpoint.includes("/auth/me") && method === "GET") {
-      return this.mockGetCurrentUser() as any;
+      return this.castResponse<T>(this.mockGetCurrentUser());
     }
 
     if (endpoint.includes("/auth/profile") && method === "GET") {
-      return this.mockGetCurrentUser() as any;
+      return this.castResponse<T>(this.mockGetCurrentUser());
+    }
+
+    if (endpoint.includes("/users/me/profile") && method === "GET") {
+      return this.castResponse<T>(this.mockGetCurrentUser());
+    }
+
+    if (endpoint.includes("/users/me/photo") && method === "POST") {
+      return this.castResponse<T>(this.mockUploadProfilePhoto(payload));
+    }
+
+    if (
+      endpoint.includes("/users/me/preferences") &&
+      (method === "PUT" || method === "PATCH")
+    ) {
+      return this.castResponse<T>(
+        this.mockUpdatePreferences(payload as RequestPayload),
+      );
+    }
+
+    if (endpoint.includes("/users/me/profile") && method === "PATCH") {
+      return this.castResponse<T>(
+        this.mockUpdateProfile(payload as RequestPayload),
+      );
     }
 
     if (endpoint.includes("/users/me") && method === "GET") {
-      return this.mockGetCurrentUser() as any;
+      return this.castResponse<T>(this.mockGetCurrentUser());
     }
 
     if (endpoint.includes("/users/me") && method === "PUT") {
-      return this.mockUpdateProfile(data) as any;
+      return this.castResponse<T>(
+        this.mockUpdateProfile(payload as RequestPayload),
+      );
     }
 
-    if (endpoint.includes("/auth/profile") && method === "PUT") {
-      return this.mockUpdateProfile(data) as any;
+    if (
+      endpoint.includes("/auth/profile") &&
+      (method === "PUT" || method === "PATCH")
+    ) {
+      return this.castResponse<T>(
+        this.mockUpdateProfile(payload as RequestPayload),
+      );
     }
 
     if (endpoint.includes("/auth/change-password") && method === "POST") {
-      return this.mockChangePassword(data) as any;
+      return this.castResponse<T>(
+        this.mockChangePassword(payload as ChangePasswordPayload),
+      );
     }
 
     if (endpoint.includes("/users") && method === "GET") {
-      return this.mockGetUsers() as any;
+      return this.castResponse<T>(this.mockGetUsers());
     }
 
     if (endpoint.includes("/roles") && method === "GET") {
-      return this.mockGetRoles() as any;
+      return this.castResponse<T>(this.mockGetRoles());
     }
 
     if (endpoint.includes("/permissions") && method === "GET") {
-      return this.mockGetPermissions() as any;
+      return this.castResponse<T>(this.mockGetPermissions());
     }
 
     if (endpoint.includes("/audit/logs") && method === "GET") {
-      return this.mockGetAuditLogs() as any;
+      return this.castResponse<T>(this.mockGetAuditLogs());
     }
 
     // ============================================
     // RESOURCES SERVICE ENDPOINTS
     // ============================================
 
+    if (endpoint.includes("/resources/characteristics") && method === "GET") {
+      const queryString = endpoint.split("?")[1] || "";
+      const params = new URLSearchParams(queryString);
+      const active = params.get("active");
+      const onlyActive = active === null ? true : active === "true";
+
+      return this.castResponse<T>(
+        this.mockGetResourceCharacteristics(onlyActive),
+      );
+    }
+
+    if (endpoint.includes("/reference-data")) {
+      const idMatch = endpoint.match(/\/reference-data\/([^/?]+)$/);
+
+      if (method === "GET") {
+        const queryString = endpoint.split("?")[1] || "";
+        const params = new URLSearchParams(queryString);
+        const group = params.get("group");
+        const active = params.get("active");
+
+        if (group === "resource_characteristic") {
+          const onlyActive = active === null ? true : active === "true";
+          return this.castResponse<T>(
+            this.mockGetResourceCharacteristics(onlyActive),
+          );
+        }
+
+        if (idMatch) {
+          return this.castResponse<T>(
+            this.mockGetReferenceDataById(idMatch[1]),
+          );
+        }
+      }
+
+      if (method === "POST") {
+        return this.castResponse<T>(
+          this.mockCreateReferenceData(
+            payload as {
+              group: string;
+              code: string;
+              name: string;
+              description?: string;
+            },
+          ),
+        );
+      }
+
+      if (method === "PATCH" && idMatch) {
+        return this.castResponse<T>(
+          this.mockUpdateReferenceData(
+            idMatch[1],
+            payload as Partial<{
+              name: string;
+              description: string;
+              isActive: boolean;
+            }>,
+          ),
+        );
+      }
+
+      if (method === "DELETE" && idMatch) {
+        return this.castResponse<T>(this.mockDeleteReferenceData(idMatch[1]));
+      }
+    }
+
     if (endpoint.includes("/resources") && method === "GET") {
       // Verificar si es un ID específico
       const idMatch = endpoint.match(/\/resources\/([^/]+)$/);
       if (idMatch && idMatch[1] !== "search") {
-        return this.mockGetResourceById(idMatch[1]) as any;
+        return this.castResponse<T>(this.mockGetResourceById(idMatch[1]));
       }
 
       // Extraer query params sin usar URL externa
@@ -122,122 +333,351 @@ export class MockService {
       const params = new URLSearchParams(queryString);
       const page = parseInt(params.get("page") || "1");
       const limit = parseInt(params.get("limit") || "20");
+      const programId = params.get("programId") || undefined;
 
-      return this.mockGetResources(page, limit) as any;
+      return this.castResponse<T>(
+        this.mockGetResources(page, limit, programId),
+      );
     }
 
     if (endpoint.includes("/resources") && method === "POST") {
-      return this.mockCreateResource(data) as any;
+      return this.castResponse<T>(
+        this.mockCreateResource(payload as CreateResourceDto),
+      );
     }
 
     if (endpoint.includes("/resources") && method === "PATCH") {
       const idMatch = endpoint.match(/\/resources\/([^/]+)$/);
       if (idMatch) {
-        return this.mockUpdateResource(idMatch[1], data) as any;
+        return this.castResponse<T>(
+          this.mockUpdateResource(idMatch[1], payload as UpdateResourceDto),
+        );
       }
     }
 
     if (endpoint.includes("/resources") && method === "DELETE") {
       const idMatch = endpoint.match(/\/resources\/([^/]+)$/);
       if (idMatch) {
-        return this.mockDeleteResource(idMatch[1]) as any;
+        return this.castResponse<T>(this.mockDeleteResource(idMatch[1]));
       }
     }
 
     if (endpoint.includes("/categories") && method === "GET") {
-      return this.mockGetCategories() as any;
+      return this.castResponse<T>(this.mockGetCategories());
+    }
+
+    if (endpoint.includes("/categories") && method === "POST") {
+      return this.castResponse<T>(
+        this.mockCreateCategory(payload as CreateCategoryDto),
+      );
+    }
+
+    if (endpoint.includes("/categories") && method === "PUT") {
+      const idMatch = endpoint.match(/\/categories\/([^/?]+)$/);
+      if (idMatch) {
+        return this.castResponse<T>(
+          this.mockUpdateCategory(idMatch[1], payload as UpdateCategoryDto),
+        );
+      }
+    }
+
+    if (endpoint.includes("/categories") && method === "DELETE") {
+      const idMatch = endpoint.match(/\/categories\/([^/?]+)$/);
+      if (idMatch) {
+        return this.castResponse<T>(this.mockDeleteCategory(idMatch[1]));
+      }
     }
 
     if (endpoint.includes("/maintenances") && method === "GET") {
-      return this.mockGetMaintenances() as any;
+      return this.castResponse<T>(this.mockGetMaintenances());
     }
 
-    if (endpoint.includes("/academic-programs") && method === "GET") {
-      const idMatch = endpoint.match(/\/academic-programs\/([^/]+)$/);
+    if (
+      (endpoint.includes("/programs") ||
+        endpoint.includes("/academic-programs")) &&
+      method === "GET"
+    ) {
+      const idMatch = endpoint.match(
+        /\/(?:programs|academic-programs)\/([^/?]+)$/,
+      );
       if (idMatch) {
-        return this.mockGetAcademicProgramById(idMatch[1]) as any;
+        return this.castResponse<T>(
+          this.mockGetAcademicProgramById(idMatch[1]),
+        );
       }
-      return this.mockGetAcademicPrograms() as any;
+      return this.castResponse<T>(this.mockGetAcademicPrograms());
     }
 
-    if (endpoint.includes("/academic-programs") && method === "POST") {
-      return this.mockCreateAcademicProgram(data) as any;
+    if (
+      (endpoint.includes("/programs") ||
+        endpoint.includes("/academic-programs")) &&
+      method === "POST"
+    ) {
+      return this.castResponse<T>(
+        this.mockCreateAcademicProgram(payload as CreateAcademicProgramDto),
+      );
     }
 
-    if (endpoint.includes("/academic-programs") && method === "PUT") {
-      const idMatch = endpoint.match(/\/academic-programs\/([^/]+)$/);
+    if (
+      (endpoint.includes("/programs") ||
+        endpoint.includes("/academic-programs")) &&
+      method === "PUT"
+    ) {
+      const idMatch = endpoint.match(
+        /\/(?:programs|academic-programs)\/([^/?]+)$/,
+      );
       if (idMatch) {
-        return this.mockUpdateAcademicProgram(idMatch[1], data) as any;
+        return this.castResponse<T>(
+          this.mockUpdateAcademicProgram(
+            idMatch[1],
+            payload as UpdateAcademicProgramDto,
+          ),
+        );
       }
     }
 
     if (endpoint.includes("/program-resources") && method === "GET") {
       const programIdMatch = endpoint.match(/programId=([^&]+)/);
       if (programIdMatch) {
-        return this.mockGetProgramResources(programIdMatch[1]) as any;
+        return this.castResponse<T>(
+          this.mockGetProgramResources(programIdMatch[1]),
+        );
       }
-      return this.mockGetProgramResourceAssociations() as any;
+      return this.castResponse<T>(this.mockGetProgramResourceAssociations());
     }
 
     if (endpoint.includes("/program-resources") && method === "POST") {
-      return this.mockAddResourceToProgram(data) as any;
+      return this.castResponse<T>(
+        this.mockAddResourceToProgram(
+          payload as ProgramResourceAssociationInput,
+        ),
+      );
     }
 
     if (endpoint.includes("/program-resources") && method === "DELETE") {
       const match = endpoint.match(/programId=([^&]+)&resourceId=([^&]+)/);
       if (match) {
-        return this.mockRemoveResourceFromProgram(match[1], match[2]) as any;
+        return this.castResponse<T>(
+          this.mockRemoveResourceFromProgram(match[1], match[2]),
+        );
       }
     }
 
     if (endpoint.includes("/program-users") && method === "GET") {
       const programIdMatch = endpoint.match(/programId=([^&]+)/);
       if (programIdMatch) {
-        return this.mockGetProgramUsers(programIdMatch[1]) as any;
+        return this.castResponse<T>(
+          this.mockGetProgramUsers(programIdMatch[1]),
+        );
       }
-      return this.mockGetProgramUserAssociations() as any;
+      return this.castResponse<T>(this.mockGetProgramUserAssociations());
     }
 
     if (endpoint.includes("/program-users") && method === "POST") {
-      return this.mockAddUserToProgram(data) as any;
+      return this.castResponse<T>(
+        this.mockAddUserToProgram(payload as ProgramUserAssociationInput),
+      );
     }
 
     if (endpoint.includes("/program-users") && method === "DELETE") {
       const match = endpoint.match(/programId=([^&]+)&userId=([^&]+)/);
       if (match) {
-        return this.mockRemoveUserFromProgram(match[1], match[2]) as any;
+        return this.castResponse<T>(
+          this.mockRemoveUserFromProgram(match[1], match[2]),
+        );
       }
+    }
+
+    // ============================================
+    // STOCKPILE SERVICE ENDPOINTS
+    // ============================================
+
+    if (
+      endpoint.includes("/approval-requests/statistics") &&
+      method === "GET"
+    ) {
+      return this.castResponse<T>(this.mockGetApprovalStatistics());
+    }
+
+    if (
+      endpoint.includes("/approval-requests/active-today") &&
+      method === "GET"
+    ) {
+      return this.castResponse<T>(this.mockGetApprovalRequests());
+    }
+
+    if (endpoint.includes("/approval-requests") && method === "GET") {
+      const idMatch = endpoint.match(/\/approval-requests\/([^/?]+)$/);
+      if (idMatch && !["active-today", "statistics"].includes(idMatch[1])) {
+        return this.castResponse<T>(
+          this.mockGetApprovalRequestById(idMatch[1]),
+        );
+      }
+      return this.castResponse<T>(this.mockGetApprovalRequests());
+    }
+
+    if (endpoint.includes("/approval-requests") && method === "POST") {
+      const approveMatch = endpoint.match(
+        /\/approval-requests\/([^/]+)\/approve$/,
+      );
+      if (approveMatch) {
+        return this.castResponse<T>(
+          this.mockApproveApprovalRequest(
+            approveMatch[1],
+            payload as ApprovalActionInput,
+          ),
+        );
+      }
+
+      const rejectMatch = endpoint.match(
+        /\/approval-requests\/([^/]+)\/reject$/,
+      );
+      if (rejectMatch) {
+        return this.castResponse<T>(
+          this.mockRejectApprovalRequest(
+            rejectMatch[1],
+            payload as ApprovalActionInput,
+          ),
+        );
+      }
+
+      const cancelMatch = endpoint.match(
+        /\/approval-requests\/([^/]+)\/cancel$/,
+      );
+      if (cancelMatch) {
+        return this.castResponse<T>(
+          this.mockCancelApprovalRequest(
+            cancelMatch[1],
+            payload as ApprovalActionInput,
+          ),
+        );
+      }
+
+      return this.castResponse<T>(
+        this.mockCreateApprovalRequest(payload as ApprovalRequestInput),
+      );
     }
 
     // ============================================
     // RESERVATIONS SERVICE ENDPOINTS
     // ============================================
 
+    if (endpoint.includes("/reports/dashboard") && method === "GET") {
+      return this.castResponse<T>(this.mockGetAggregatedDashboard(endpoint));
+    }
+
+    if (endpoint.includes("/dashboard/kpis") && method === "GET") {
+      return this.castResponse<T>(this.mockGetDashboardKPIs());
+    }
+
+    if (endpoint.includes("/dashboard/overview") && method === "GET") {
+      return this.castResponse<T>(this.mockGetDashboardOverview());
+    }
+
+    if (endpoint.includes("/dashboard/occupancy") && method === "GET") {
+      return this.castResponse<T>(this.mockGetDashboardOccupancy());
+    }
+
+    if (endpoint.includes("/dashboard/trends") && method === "GET") {
+      return this.castResponse<T>(this.mockGetDashboardTrends());
+    }
+
+    if (endpoint.includes("/user-reports") && method === "GET") {
+      const queryString = endpoint.split("?")[1] || "";
+      const params = new URLSearchParams(queryString);
+      const userId = params.get("userId") || undefined;
+      return this.castResponse<T>(this.mockGetUserReportSummary(userId));
+    }
+
     if (endpoint.includes("/reservations") && method === "GET") {
       // Verificar si es un ID específico
       const idMatch = endpoint.match(/\/reservations\/([^/]+)$/);
       if (idMatch) {
-        return this.mockGetReservationById(idMatch[1]) as any;
+        return this.castResponse<T>(this.mockGetReservationById(idMatch[1]));
       }
-      return this.mockGetReservations() as any;
+
+      const queryString = endpoint.split("?")[1] || "";
+      const params = new URLSearchParams(queryString);
+      const status = params.get("status") || undefined;
+      const limit = Number.parseInt(params.get("limit") || "50", 10);
+
+      return this.castResponse<T>(
+        this.mockGetReservations({
+          status,
+          limit: Number.isFinite(limit) ? limit : 50,
+        }),
+      );
     }
 
     if (endpoint.includes("/reservations") && method === "POST") {
-      return this.mockCreateReservation(data) as any;
+      return this.castResponse<T>(
+        this.mockCreateReservation(payload as CreateReservationDto),
+      );
     }
 
     if (endpoint.includes("/reservations") && method === "PATCH") {
       const idMatch = endpoint.match(/\/reservations\/([^/]+)$/);
       if (idMatch) {
-        return this.mockUpdateReservation(idMatch[1], data) as any;
+        return this.castResponse<T>(
+          this.mockUpdateReservation(
+            idMatch[1],
+            payload as UpdateReservationDto,
+          ),
+        );
       }
     }
 
     if (endpoint.includes("/reservations") && method === "DELETE") {
       const idMatch = endpoint.match(/\/reservations\/([^/]+)$/);
       if (idMatch) {
-        return this.mockCancelReservation(idMatch[1]) as any;
+        return this.castResponse<T>(this.mockCancelReservation(idMatch[1]));
       }
+    }
+
+    // ============================================
+    // CONFIG ENDPOINTS
+    // ============================================
+
+    if (
+      (endpoint.includes("/config/public") ||
+        endpoint.includes("/app-config/public")) &&
+      method === "GET"
+    ) {
+      return this.castResponse<T>(this.mockGetPublicConfig());
+    }
+
+    if (
+      (endpoint.includes("/config/storage") ||
+        endpoint.includes("/app-config/storage")) &&
+      method === "GET"
+    ) {
+      return this.castResponse<T>(this.mockGetStorageConfig());
+    }
+
+    if (
+      (endpoint.includes("/config/storage") ||
+        endpoint.includes("/app-config/storage")) &&
+      method === "PUT"
+    ) {
+      return this.castResponse<T>(
+        this.mockUpdateStorageConfig(payload as RequestPayload),
+      );
+    }
+
+    if (
+      (endpoint.includes("/config") || endpoint.includes("/app-config")) &&
+      method === "GET"
+    ) {
+      return this.castResponse<T>(this.mockGetFullConfig());
+    }
+
+    if (
+      (endpoint.includes("/config") || endpoint.includes("/app-config")) &&
+      method === "PUT"
+    ) {
+      return this.castResponse<T>(
+        this.mockUpdateConfig(payload as RequestPayload),
+      );
     }
 
     // Endpoint no implementado en mock
@@ -251,10 +691,10 @@ export class MockService {
   private static mockLogin(credentials: {
     email: string;
     password: string;
-  }): ApiResponse<any> {
+  }): ApiResponse<unknown> {
     const result = getMockLoginResponse(
       credentials.email,
-      credentials.password
+      credentials.password,
     );
 
     if (!result) {
@@ -263,7 +703,7 @@ export class MockService {
           status: 401,
           data: {
             success: false,
-            code: "AUTH-001",
+            code: "AUTH-0001",
             message: "Credenciales inválidas",
             type: "error",
             http_code: 401,
@@ -280,7 +720,110 @@ export class MockService {
     };
   }
 
-  private static mockRegister(userData: any): ApiResponse<any> {
+  private static mockUploadProfilePhoto(
+    payload: unknown,
+  ): ApiResponse<unknown> {
+    let profilePicture = mockUsers[0].profilePicture;
+
+    if (typeof FormData !== "undefined" && payload instanceof FormData) {
+      const rawPhoto = payload.get("photo");
+
+      if (typeof rawPhoto === "string" && rawPhoto.length > 0) {
+        profilePicture = rawPhoto;
+      } else if (
+        rawPhoto &&
+        typeof rawPhoto === "object" &&
+        "name" in rawPhoto
+      ) {
+        const fileName = String(
+          (rawPhoto as { name?: string }).name || "profile-photo",
+        );
+        profilePicture =
+          "https://api.dicebear.com/7.x/avataaars/svg?seed=" +
+          encodeURIComponent(fileName);
+      }
+    }
+
+    if (!profilePicture) {
+      profilePicture =
+        "https://api.dicebear.com/7.x/avataaars/svg?seed=profile-" + Date.now();
+    }
+
+    const updatedUser: AuthUser = {
+      ...mockUsers[0],
+      profilePicture,
+      updatedAt: new Date().toISOString(),
+    };
+
+    mockUsers[0] = updatedUser;
+
+    return {
+      success: true,
+      data: updatedUser,
+      message: "Foto de perfil actualizada correctamente",
+      timestamp: new Date().toISOString(),
+    };
+  }
+
+  private static mockUpdatePreferences(
+    data: RequestPayload,
+  ): ApiResponse<unknown> {
+    const incomingPreferences =
+      typeof data.preferences === "object" && data.preferences !== null
+        ? (data.preferences as Partial<UserPreferences>)
+        : {};
+
+    const currentPreferences = mockUsers[0].preferences ?? {
+      language: "es",
+      theme: "light" as const,
+      notifications: {
+        email: true,
+        push: true,
+        sms: false,
+      },
+      timezone: "America/Bogota",
+    };
+
+    const currentNotifications = currentPreferences.notifications ?? {
+      email: true,
+      push: true,
+      sms: false,
+    };
+
+    const incomingNotifications =
+      typeof incomingPreferences.notifications === "object" &&
+      incomingPreferences.notifications !== null
+        ? incomingPreferences.notifications
+        : undefined;
+
+    const updatedPreferences: UserPreferences = {
+      language: incomingPreferences.language ?? currentPreferences.language,
+      theme: incomingPreferences.theme ?? currentPreferences.theme,
+      timezone: incomingPreferences.timezone ?? currentPreferences.timezone,
+      notifications: {
+        email: incomingNotifications?.email ?? currentNotifications.email,
+        push: incomingNotifications?.push ?? currentNotifications.push,
+        sms: incomingNotifications?.sms ?? currentNotifications.sms,
+      },
+    };
+
+    const updatedUser: AuthUser = {
+      ...mockUsers[0],
+      preferences: updatedPreferences,
+      updatedAt: new Date().toISOString(),
+    };
+
+    mockUsers[0] = updatedUser;
+
+    return {
+      success: true,
+      data: updatedUser,
+      message: "Preferencias actualizadas correctamente",
+      timestamp: new Date().toISOString(),
+    };
+  }
+
+  private static mockRegister(userData: RequestPayload): ApiResponse<unknown> {
     // Simular registro exitoso
     const newUser = {
       id: `user_${Date.now()}`,
@@ -308,7 +851,9 @@ export class MockService {
     };
   }
 
-  private static mockForgotPassword(data: { email: string }): ApiResponse<any> {
+  private static mockForgotPassword(data: {
+    email: string;
+  }): ApiResponse<unknown> {
     const { email } = data;
 
     // Validar email
@@ -342,7 +887,7 @@ export class MockService {
 
     // En un sistema real, aquí se enviaría el email
     console.log(
-      `[MOCK] Enlace de recuperación: /reset-password?token=${resetToken}`
+      `[MOCK] Enlace de recuperación: /reset-password?token=${resetToken}`,
     );
 
     return {
@@ -362,7 +907,7 @@ export class MockService {
   private static mockResetPassword(data: {
     token: string;
     newPassword: string;
-  }): ApiResponse<any> {
+  }): ApiResponse<unknown> {
     const { token, newPassword } = data;
 
     // Validaciones
@@ -405,7 +950,7 @@ export class MockService {
     };
   }
 
-  private static mockGetCurrentUser(): ApiResponse<any> {
+  private static mockGetCurrentUser(): ApiResponse<unknown> {
     return {
       success: true,
       data: mockUsers[0], // Admin por defecto
@@ -413,13 +958,52 @@ export class MockService {
     };
   }
 
-  private static mockUpdateProfile(data: any): ApiResponse<any> {
+  private static mockUpdateProfile(data: RequestPayload): ApiResponse<unknown> {
+    const nextPhone =
+      typeof data.phone === "string"
+        ? data.phone
+        : typeof data.phoneNumber === "string"
+          ? data.phoneNumber
+          : undefined;
+
+    const incomingPreferences =
+      typeof data.preferences === "object" && data.preferences !== null
+        ? (data.preferences as Partial<UserPreferences>)
+        : undefined;
+
+    const currentPreferences = mockUsers[0].preferences ?? {
+      language: "es",
+      theme: "system" as const,
+      notifications: {
+        email: true,
+        push: true,
+        sms: false,
+      },
+      timezone: "America/Bogota",
+    };
+
+    const mergedPreferences = incomingPreferences
+      ? {
+          ...currentPreferences,
+          ...incomingPreferences,
+          notifications: {
+            ...currentPreferences.notifications,
+            ...(incomingPreferences.notifications ?? {}),
+          },
+        }
+      : currentPreferences;
+
     // Simular actualización de perfil exitosa
-    const updatedUser = {
+    const updatedUser: AuthUser = {
       ...mockUsers[0],
       ...data,
+      phone: nextPhone ?? mockUsers[0].phone,
+      phoneNumber: nextPhone ?? mockUsers[0].phoneNumber,
+      preferences: mergedPreferences,
       updatedAt: new Date().toISOString(),
     };
+
+    mockUsers[0] = updatedUser;
 
     return {
       success: true,
@@ -435,7 +1019,7 @@ export class MockService {
   private static mockChangePassword(data: {
     currentPassword: string;
     newPassword: string;
-  }): ApiResponse<any> {
+  }): ApiResponse<unknown> {
     const { currentPassword, newPassword } = data;
 
     // Validaciones
@@ -474,7 +1058,7 @@ export class MockService {
   // USERS ENDPOINTS
   // ============================================
 
-  private static mockGetUsers(): ApiResponse<any> {
+  private static mockGetUsers(): ApiResponse<unknown> {
     // Extender usuarios con roles como strings para UI de admin
     const usersExtended = mockUsers.map((user) => ({
       ...user,
@@ -502,7 +1086,7 @@ export class MockService {
   // ROLES ENDPOINTS
   // ============================================
 
-  private static mockGetRoles(): ApiResponse<any> {
+  private static mockGetRoles(): ApiResponse<unknown> {
     // Extender roles con usersCount para UI de admin
     const rolesExtended = mockRoles.map((role, index) => ({
       ...role,
@@ -530,7 +1114,7 @@ export class MockService {
   // PERMISSIONS ENDPOINTS
   // ============================================
 
-  private static mockGetPermissions(): ApiResponse<any> {
+  private static mockGetPermissions(): ApiResponse<unknown> {
     return {
       success: true,
       data: {
@@ -552,7 +1136,7 @@ export class MockService {
   // AUDIT ENDPOINTS
   // ============================================
 
-  private static mockGetAuditLogs(): ApiResponse<any> {
+  private static mockGetAuditLogs(): ApiResponse<unknown> {
     // Usar logs de auditoría importados desde ./data/audit.mock.ts
     return {
       success: true,
@@ -575,15 +1159,353 @@ export class MockService {
   // RESOURCES SERVICE ENDPOINTS
   // ============================================
 
+  private static normalizeCharacteristicName(value: string): string {
+    return value.trim().replace(/\s+/g, " ");
+  }
+
+  private static toCharacteristicCode(value: string): string {
+    return this.normalizeCharacteristicName(value)
+      .normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, "")
+      .replace(/[^a-zA-Z0-9]+/g, "_")
+      .replace(/^_+|_+$/g, "")
+      .toUpperCase();
+  }
+
+  private static isLikelyCharacteristicId(value: string): boolean {
+    const normalized = value.trim();
+
+    if (!normalized) {
+      return false;
+    }
+
+    return (
+      /^[a-fA-F0-9]{24}$/.test(normalized) ||
+      /^char[_-][a-zA-Z0-9_-]+$/i.test(normalized)
+    );
+  }
+
+  private static getNextCharacteristicId(): string {
+    const maxCurrent = this.resourceCharacteristicsData.reduce((max, item) => {
+      const numeric = Number.parseInt(item.id.replace(/^char[_-]/i, ""), 10);
+      if (Number.isFinite(numeric)) {
+        return Math.max(max, numeric);
+      }
+      return max;
+    }, 0);
+
+    return `char_${String(maxCurrent + 1).padStart(3, "0")}`;
+  }
+
+  private static createResourceCharacteristic(
+    name: string,
+  ): ResourceCharacteristic {
+    const normalizedName = this.normalizeCharacteristicName(name);
+    const created: ResourceCharacteristic = {
+      id: this.getNextCharacteristicId(),
+      group: "resource_characteristic",
+      code: this.toCharacteristicCode(normalizedName),
+      name: normalizedName,
+      isActive: true,
+    };
+
+    this.resourceCharacteristicsData.push(created);
+    return created;
+  }
+
+  private static resolveCharacteristicInput(
+    input: unknown,
+  ): ResourceCharacteristic | null {
+    const findById = (id: string) =>
+      this.resourceCharacteristicsData.find(
+        (item) => String(item.id) === String(id),
+      );
+
+    const findByCode = (code: string) =>
+      this.resourceCharacteristicsData.find(
+        (item) => String(item.code).toUpperCase() === code.toUpperCase(),
+      );
+
+    const findByName = (name: string) => {
+      const normalizedName =
+        this.normalizeCharacteristicName(name).toLowerCase();
+      return this.resourceCharacteristicsData.find(
+        (item) =>
+          this.normalizeCharacteristicName(item.name).toLowerCase() ===
+          normalizedName,
+      );
+    };
+
+    if (typeof input === "string") {
+      const trimmed = input.trim();
+      if (!trimmed) {
+        return null;
+      }
+
+      const byId = findById(trimmed);
+      if (byId) {
+        return byId;
+      }
+
+      const byCode = findByCode(this.toCharacteristicCode(trimmed));
+      if (byCode) {
+        return byCode;
+      }
+
+      const byName = findByName(trimmed);
+      if (byName) {
+        return byName;
+      }
+
+      if (this.isLikelyCharacteristicId(trimmed)) {
+        return null;
+      }
+
+      return this.createResourceCharacteristic(trimmed);
+    }
+
+    if (typeof input === "object" && input !== null) {
+      const candidate = input as {
+        id?: string;
+        _id?: string;
+        code?: string;
+        name?: string;
+      };
+
+      if (candidate.id || candidate._id) {
+        const byId = findById(String(candidate.id ?? candidate._id));
+        if (byId) {
+          return byId;
+        }
+      }
+
+      if (candidate.code) {
+        const byCode = findByCode(String(candidate.code));
+        if (byCode) {
+          return byCode;
+        }
+      }
+
+      if (candidate.name) {
+        const byName = findByName(candidate.name);
+        if (byName) {
+          return byName;
+        }
+
+        return this.createResourceCharacteristic(candidate.name);
+      }
+    }
+
+    return null;
+  }
+
+  private static normalizeResourceAttributes(
+    attributes: Record<string, unknown> | undefined,
+  ): Record<string, unknown> | undefined {
+    if (!attributes) {
+      return attributes;
+    }
+
+    const rawCharacteristics = Array.isArray(attributes.characteristics)
+      ? attributes.characteristics
+      : [];
+    const rawFeatures = Array.isArray(attributes.features)
+      ? attributes.features
+      : [];
+
+    const source =
+      rawCharacteristics.length > 0
+        ? rawCharacteristics
+        : rawFeatures.filter(
+            (item): item is string => typeof item === "string",
+          );
+
+    if (source.length === 0) {
+      return attributes;
+    }
+
+    const resolved = source
+      .map((item) => this.resolveCharacteristicInput(item))
+      .filter((item): item is ResourceCharacteristic => Boolean(item));
+
+    const uniqueResolved = Array.from(
+      new Map(resolved.map((item) => [item.id, item])).values(),
+    );
+
+    const names = uniqueResolved.map((item) => item.name);
+    const normalizedNameSet = new Set(
+      names.map((item) => this.normalizeCharacteristicName(item).toLowerCase()),
+    );
+
+    const normalizedAttributes: Record<string, unknown> = {
+      ...attributes,
+      characteristics: uniqueResolved.map((item) => item.id),
+      features: names,
+    };
+
+    Object.entries(BOOLEAN_ATTRIBUTE_TO_CHARACTERISTIC).forEach(
+      ([attribute, characteristicName]) => {
+        normalizedAttributes[attribute] = normalizedNameSet.has(
+          this.normalizeCharacteristicName(characteristicName).toLowerCase(),
+        );
+      },
+    );
+
+    return normalizedAttributes;
+  }
+
+  private static mockGetReferenceDataById(id: string): ApiResponse<unknown> {
+    const item = this.resourceCharacteristicsData.find(
+      (char) => char.id === id,
+    );
+    if (!item) {
+      throw {
+        response: {
+          status: 404,
+          data: {
+            success: false,
+            message: `Reference data with ID ${id} not found`,
+            http_code: 404,
+          },
+        },
+      };
+    }
+    return {
+      success: true,
+      data: item,
+      message: "Reference data retrieved successfully",
+      timestamp: new Date().toISOString(),
+    };
+  }
+
+  private static mockCreateReferenceData(data: {
+    group: string;
+    code: string;
+    name: string;
+    description?: string;
+  }): ApiResponse<unknown> {
+    const newItem: ResourceCharacteristic = {
+      id: `char_${Date.now()}`,
+      group: data.group,
+      code: data.code,
+      name: data.name,
+      description: data.description,
+      isActive: true,
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+    };
+
+    if (data.group === "resource_characteristic") {
+      this.resourceCharacteristicsData.push(newItem);
+    }
+
+    return {
+      success: true,
+      data: newItem,
+      message: "Reference data created successfully",
+      timestamp: new Date().toISOString(),
+    };
+  }
+
+  private static mockUpdateReferenceData(
+    id: string,
+    data: Partial<{ name: string; description: string; isActive: boolean }>,
+  ): ApiResponse<unknown> {
+    const index = this.resourceCharacteristicsData.findIndex(
+      (char) => char.id === id,
+    );
+    if (index === -1) {
+      throw {
+        response: {
+          status: 404,
+          data: {
+            success: false,
+            message: `Reference data with ID ${id} not found`,
+            http_code: 404,
+          },
+        },
+      };
+    }
+
+    const current = this.resourceCharacteristicsData[index];
+    this.resourceCharacteristicsData[index] = {
+      ...current,
+      ...data,
+      updatedAt: new Date().toISOString(),
+    };
+
+    return {
+      success: true,
+      data: this.resourceCharacteristicsData[index],
+      message: "Reference data updated successfully",
+      timestamp: new Date().toISOString(),
+    };
+  }
+
+  private static mockDeleteReferenceData(id: string): ApiResponse<unknown> {
+    const index = this.resourceCharacteristicsData.findIndex(
+      (char) => char.id === id,
+    );
+    if (index === -1) {
+      throw {
+        response: {
+          status: 404,
+          data: {
+            success: false,
+            message: `Reference data with ID ${id} not found`,
+            http_code: 404,
+          },
+        },
+      };
+    }
+
+    this.resourceCharacteristicsData.splice(index, 1);
+
+    return {
+      success: true,
+      data: { deleted: true },
+      message: "Reference data deleted successfully",
+      timestamp: new Date().toISOString(),
+    };
+  }
+
+  private static mockGetResourceCharacteristics(
+    onlyActive: boolean,
+  ): ApiResponse<unknown> {
+    const items = onlyActive
+      ? this.resourceCharacteristicsData.filter((item) => item.isActive)
+      : this.resourceCharacteristicsData;
+
+    return {
+      success: true,
+      data: items,
+      message: "Resource characteristics retrieved successfully",
+      timestamp: new Date().toISOString(),
+    };
+  }
+
   private static mockGetResources(
     page: number = 1,
-    limit: number = 20
-  ): ApiResponse<any> {
-    const total = this.resourcesData.length;
+    limit: number = 20,
+    programId?: string,
+  ): ApiResponse<unknown> {
+    const normalizedProgramId = programId?.trim().toLowerCase();
+    const filteredResources = normalizedProgramId
+      ? this.resourcesData.filter(
+          (resource) =>
+            Array.isArray(resource.programIds) &&
+            resource.programIds.some(
+              (resourceProgramId) =>
+                String(resourceProgramId).toLowerCase() === normalizedProgramId,
+            ),
+        )
+      : this.resourcesData;
+
+    const total = filteredResources.length;
     const totalPages = Math.ceil(total / limit);
     const startIndex = (page - 1) * limit;
     const endIndex = startIndex + limit;
-    const paginatedItems = this.resourcesData.slice(startIndex, endIndex);
+    const paginatedItems = filteredResources.slice(startIndex, endIndex);
 
     return {
       success: true,
@@ -603,8 +1525,10 @@ export class MockService {
     };
   }
 
-  private static mockGetResourceById(id: string): ApiResponse<any> {
-    const resource = this.resourcesData.find((r: any) => r.id === id);
+  private static mockGetResourceById(id: string): ApiResponse<unknown> {
+    const resource = this.resourcesData.find(
+      (resourceItem) => resourceItem.id === id,
+    );
 
     if (!resource) {
       throw {
@@ -612,7 +1536,7 @@ export class MockService {
           status: 404,
           data: {
             success: false,
-            code: "RSRC-001",
+            code: "RSRC-0301",
             message: `Resource with ID ${id} not found`,
             type: "error",
             http_code: 404,
@@ -629,17 +1553,24 @@ export class MockService {
     };
   }
 
-  private static mockCreateResource(data: any): ApiResponse<any> {
+  private static mockCreateResource(
+    data: CreateResourceDto,
+  ): ApiResponse<unknown> {
+    const normalizedAttributes = this.normalizeResourceAttributes(
+      data.attributes as Record<string, unknown> | undefined,
+    );
+
     const newResource = {
       id: `res_${Date.now()}`,
       ...data,
+      attributes: normalizedAttributes ?? data.attributes,
       status: "AVAILABLE",
       isActive: true,
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString(),
     };
 
-    this.resourcesData.push(newResource);
+    this.resourcesData.push(newResource as Resource);
 
     return {
       success: true,
@@ -649,8 +1580,13 @@ export class MockService {
     };
   }
 
-  private static mockUpdateResource(id: string, data: any): ApiResponse<any> {
-    const index = this.resourcesData.findIndex((r: any) => r.id === id);
+  private static mockUpdateResource(
+    id: string,
+    data: UpdateResourceDto,
+  ): ApiResponse<unknown> {
+    const index = this.resourcesData.findIndex(
+      (resourceItem) => resourceItem.id === id,
+    );
 
     if (index === -1) {
       throw {
@@ -658,7 +1594,7 @@ export class MockService {
           status: 404,
           data: {
             success: false,
-            code: "RSRC-001",
+            code: "RSRC-0301",
             message: `Resource with ID ${id} not found`,
             type: "error",
             http_code: 404,
@@ -667,11 +1603,23 @@ export class MockService {
       };
     }
 
+    const normalizedAttributes = this.normalizeResourceAttributes(
+      data.attributes as Record<string, unknown> | undefined,
+    );
+
     this.resourcesData[index] = {
       ...this.resourcesData[index],
       ...data,
+      availabilityRules: {
+        ...this.resourcesData[index].availabilityRules,
+        ...(data.availabilityRules || {}),
+      },
+      attributes:
+        normalizedAttributes ??
+        data.attributes ??
+        this.resourcesData[index].attributes,
       updatedAt: new Date().toISOString(),
-    };
+    } as typeof this.resourcesData[number];
 
     return {
       success: true,
@@ -681,8 +1629,10 @@ export class MockService {
     };
   }
 
-  private static mockDeleteResource(id: string): ApiResponse<any> {
-    const index = this.resourcesData.findIndex((r: any) => r.id === id);
+  private static mockDeleteResource(id: string): ApiResponse<unknown> {
+    const index = this.resourcesData.findIndex(
+      (resourceItem) => resourceItem.id === id,
+    );
 
     if (index === -1) {
       throw {
@@ -690,7 +1640,7 @@ export class MockService {
           status: 404,
           data: {
             success: false,
-            code: "RSRC-001",
+            code: "RSRC-0301",
             message: `Resource with ID ${id} not found`,
             type: "error",
             http_code: 404,
@@ -709,7 +1659,7 @@ export class MockService {
     };
   }
 
-  private static mockGetCategories(): ApiResponse<any> {
+  private static mockGetCategories(): ApiResponse<unknown> {
     return {
       success: true,
       data: {
@@ -728,7 +1678,90 @@ export class MockService {
     };
   }
 
-  private static mockGetMaintenances(): ApiResponse<any> {
+  private static mockCreateCategory(
+    data: CreateCategoryDto,
+  ): ApiResponse<unknown> {
+    const newCategory: Category = {
+      id: `cat_${Date.now()}`,
+      code: data.name.toUpperCase().replace(/\s+/g, "_"),
+      name: data.name,
+      description: data.description,
+      color: data.color || "#3b82f6",
+      icon: data.icon,
+      isActive: true,
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+    };
+
+    this.categoriesData.push(newCategory);
+
+    return {
+      success: true,
+      data: newCategory,
+      message: "Category created successfully",
+      timestamp: new Date().toISOString(),
+    };
+  }
+
+  private static mockUpdateCategory(
+    id: string,
+    data: UpdateCategoryDto,
+  ): ApiResponse<unknown> {
+    const categoryIndex = this.categoriesData.findIndex(
+      (category) => category.id === id,
+    );
+
+    if (categoryIndex === -1) {
+      return {
+        success: false,
+        data: null,
+        message: "Category not found",
+        timestamp: new Date().toISOString(),
+      };
+    }
+
+    const updatedCategory = {
+      ...this.categoriesData[categoryIndex],
+      ...data,
+      updatedAt: new Date().toISOString(),
+    };
+
+    this.categoriesData[categoryIndex] = updatedCategory;
+
+    return {
+      success: true,
+      data: updatedCategory,
+      message: "Category updated successfully",
+      timestamp: new Date().toISOString(),
+    };
+  }
+
+  private static mockDeleteCategory(id: string): ApiResponse<unknown> {
+    const categoryIndex = this.categoriesData.findIndex(
+      (category) => category.id === id,
+    );
+
+    if (categoryIndex === -1) {
+      return {
+        success: false,
+        data: null,
+        message: "Category not found",
+        timestamp: new Date().toISOString(),
+      };
+    }
+
+    const deletedCategory = this.categoriesData[categoryIndex];
+    this.categoriesData.splice(categoryIndex, 1);
+
+    return {
+      success: true,
+      data: deletedCategory,
+      message: "Category deleted successfully",
+      timestamp: new Date().toISOString(),
+    };
+  }
+
+  private static mockGetMaintenances(): ApiResponse<unknown> {
     return {
       success: true,
       data: {
@@ -751,7 +1784,7 @@ export class MockService {
   // ACADEMIC PROGRAMS ENDPOINTS
   // ============================================
 
-  private static mockGetAcademicPrograms(): ApiResponse<any> {
+  private static mockGetAcademicPrograms(): ApiResponse<unknown> {
     return {
       success: true,
       data: {
@@ -770,8 +1803,10 @@ export class MockService {
     };
   }
 
-  private static mockGetAcademicProgramById(id: string): ApiResponse<any> {
-    const program = this.academicProgramsData.find((p: any) => p.id === id);
+  private static mockGetAcademicProgramById(id: string): ApiResponse<unknown> {
+    const program = this.academicProgramsData.find(
+      (academicProgram) => academicProgram.id === id,
+    );
 
     if (!program) {
       throw {
@@ -793,12 +1828,15 @@ export class MockService {
     };
   }
 
-  private static mockCreateAcademicProgram(data: any): ApiResponse<any> {
-    const newProgram = {
+  private static mockCreateAcademicProgram(
+    data: CreateAcademicProgramDto,
+  ): ApiResponse<unknown> {
+    const newProgram: AcademicProgram = {
       id: `prog_${Date.now()}`,
       ...data,
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString(),
+      isActive: true,
     };
 
     this.academicProgramsData.push(newProgram);
@@ -813,9 +1851,11 @@ export class MockService {
 
   private static mockUpdateAcademicProgram(
     id: string,
-    data: any
-  ): ApiResponse<any> {
-    const index = this.academicProgramsData.findIndex((p: any) => p.id === id);
+    data: UpdateAcademicProgramDto,
+  ): ApiResponse<unknown> {
+    const index = this.academicProgramsData.findIndex(
+      (academicProgram) => academicProgram.id === id,
+    );
 
     if (index === -1) {
       throw {
@@ -833,6 +1873,7 @@ export class MockService {
       ...this.academicProgramsData[index],
       ...data,
       updatedAt: new Date().toISOString(),
+      isActive: true,
     };
 
     return {
@@ -847,7 +1888,7 @@ export class MockService {
   // PROGRAM-RESOURCE ASSOCIATIONS
   // ============================================
 
-  private static mockGetProgramResourceAssociations(): ApiResponse<any> {
+  private static mockGetProgramResourceAssociations(): ApiResponse<unknown> {
     return {
       success: true,
       data: {
@@ -858,19 +1899,24 @@ export class MockService {
     };
   }
 
-  private static mockGetProgramResources(programId: string): ApiResponse<any> {
+  private static mockGetProgramResources(
+    programId: string,
+  ): ApiResponse<unknown> {
     const associations = this.programResourceAssociationsData.filter(
-      (a: any) => a.programId === programId
+      (association) => association.programId === programId,
     );
 
-    const resources = associations
-      .map((assoc: any) => {
-        const resource = this.resourcesData.find(
-          (r: any) => r.id === assoc.resourceId
-        );
-        return resource ? { ...resource, priority: assoc.priority } : null;
-      })
-      .filter(Boolean);
+    const resources = associations.flatMap((association) => {
+      const resource = this.resourcesData.find(
+        (resourceItem) => resourceItem.id === association.resourceId,
+      );
+
+      if (!resource) {
+        return [];
+      }
+
+      return [{ ...resource, priority: association.priority }];
+    });
 
     return {
       success: true,
@@ -882,8 +1928,10 @@ export class MockService {
     };
   }
 
-  private static mockAddResourceToProgram(data: any): ApiResponse<any> {
-    const newAssociation = {
+  private static mockAddResourceToProgram(
+    data: ProgramResourceAssociationInput,
+  ): ApiResponse<unknown> {
+    const newAssociation: ProgramResourceAssociation = {
       programId: data.programId,
       resourceId: data.resourceId,
       priority: data.priority || 3,
@@ -902,10 +1950,12 @@ export class MockService {
 
   private static mockRemoveResourceFromProgram(
     programId: string,
-    resourceId: string
-  ): ApiResponse<any> {
+    resourceId: string,
+  ): ApiResponse<unknown> {
     const index = this.programResourceAssociationsData.findIndex(
-      (a: any) => a.programId === programId && a.resourceId === resourceId
+      (association) =>
+        association.programId === programId &&
+        association.resourceId === resourceId,
     );
 
     if (index === -1) {
@@ -934,7 +1984,7 @@ export class MockService {
   // PROGRAM-USER ASSOCIATIONS
   // ============================================
 
-  private static mockGetProgramUserAssociations(): ApiResponse<any> {
+  private static mockGetProgramUserAssociations(): ApiResponse<unknown> {
     return {
       success: true,
       data: {
@@ -945,25 +1995,28 @@ export class MockService {
     };
   }
 
-  private static mockGetProgramUsers(programId: string): ApiResponse<any> {
+  private static mockGetProgramUsers(programId: string): ApiResponse<unknown> {
     const associations = this.programUserAssociationsData.filter(
-      (a: any) => a.programId === programId
+      (association) => association.programId === programId,
     );
 
-    const users = associations
-      .map((assoc: any) => {
-        const user = this.resourceUsersData.find(
-          (u: any) => u.id === assoc.userId
-        );
-        return user
-          ? {
-              ...user,
-              programRole: assoc.role,
-              enrollmentDate: assoc.enrollmentDate,
-            }
-          : null;
-      })
-      .filter(Boolean);
+    const users = associations.flatMap((association) => {
+      const user = this.resourceUsersData.find(
+        (resourceUser) => resourceUser.id === association.userId,
+      );
+
+      if (!user) {
+        return [];
+      }
+
+      return [
+        {
+          ...user,
+          programRole: association.role,
+          enrollmentDate: association.enrollmentDate,
+        },
+      ];
+    });
 
     return {
       success: true,
@@ -975,8 +2028,10 @@ export class MockService {
     };
   }
 
-  private static mockAddUserToProgram(data: any): ApiResponse<any> {
-    const newAssociation = {
+  private static mockAddUserToProgram(
+    data: ProgramUserAssociationInput,
+  ): ApiResponse<unknown> {
+    const newAssociation: ProgramUserAssociation = {
       programId: data.programId,
       userId: data.userId,
       role: data.role || "STUDENT",
@@ -995,10 +2050,11 @@ export class MockService {
 
   private static mockRemoveUserFromProgram(
     programId: string,
-    userId: string
-  ): ApiResponse<any> {
+    userId: string,
+  ): ApiResponse<unknown> {
     const index = this.programUserAssociationsData.findIndex(
-      (a: any) => a.programId === programId && a.userId === userId
+      (association) =>
+        association.programId === programId && association.userId === userId,
     );
 
     if (index === -1) {
@@ -1024,18 +2080,1037 @@ export class MockService {
   }
 
   // ============================================
-  // RESERVATIONS SERVICE ENDPOINTS
+  // STOCKPILE SERVICE ENDPOINTS
   // ============================================
 
-  private static mockGetReservations(): ApiResponse<any> {
+  private static mockGetApprovalRequests(): ApiResponse<unknown> {
+    const items = mockApprovalRequests.map((request) => ({
+      ...request,
+      history: getApprovalHistory(request.id),
+    }));
+
     return {
       success: true,
       data: {
-        items: this.reservationsData,
+        items,
         meta: {
-          total: this.reservationsData.length,
+          total: items.length,
           page: 1,
-          limit: 50,
+          limit: items.length || 10,
+          totalPages: 1,
+          hasNextPage: false,
+          hasPreviousPage: false,
+        },
+      },
+      message: "Approval requests retrieved successfully",
+      timestamp: new Date().toISOString(),
+    };
+  }
+
+  private static mockGetApprovalStatistics(): ApiResponse<unknown> {
+    return {
+      success: true,
+      data: mockApprovalStats,
+      message: "Approval statistics retrieved successfully",
+      timestamp: new Date().toISOString(),
+    };
+  }
+
+  private static mockGetApprovalRequestById(id: string): ApiResponse<unknown> {
+    const request = getApprovalRequestById(id);
+
+    if (!request) {
+      throw {
+        response: {
+          status: 404,
+          data: {
+            success: false,
+            code: "STCK-0001",
+            message: `Approval request with ID ${id} not found`,
+            type: "error",
+            http_code: 404,
+          },
+        },
+      };
+    }
+
+    return {
+      success: true,
+      data: {
+        ...request,
+        history: getApprovalHistory(id),
+      },
+      message: "Approval request retrieved successfully",
+      timestamp: new Date().toISOString(),
+    };
+  }
+
+  private static mockCreateApprovalRequest(
+    data: ApprovalRequestInput,
+  ): ApiResponse<unknown> {
+    const now = new Date().toISOString();
+
+    const newRequest: ApprovalRequest = {
+      id: `apr_${Date.now()}`,
+      reservationId: data?.reservationId || "res_unknown",
+      userId: data?.userId || "user_1",
+      userName: data?.userName || "Usuario Mock",
+      userEmail: data?.userEmail || "mock@ufps.edu.co",
+      userRole: data?.userRole || "Profesor",
+      resourceId: data?.resourceId || "res_001",
+      resourceName: data?.resourceName || "Recurso Mock",
+      resourceType: data?.resourceType || "Aula",
+      categoryName: data?.categoryName || "General",
+      startDate: data?.startDate || now,
+      endDate: data?.endDate || now,
+      purpose: data?.purpose || "Solicitud generada en mock",
+      attendees: data?.attendees || 1,
+      status: "PENDING",
+      priority: data?.priority || "NORMAL",
+      currentLevel: data?.currentLevel || "FIRST_LEVEL",
+      maxLevel: data?.maxLevel || "FIRST_LEVEL",
+      requestedAt: now,
+      createdAt: now,
+      updatedAt: now,
+    };
+
+    mockApprovalRequests.unshift(newRequest);
+
+    return {
+      success: true,
+      data: newRequest,
+      message: "Approval request created successfully",
+      timestamp: now,
+    };
+  }
+
+  private static mockApproveApprovalRequest(
+    id: string,
+    data: ApprovalActionInput,
+  ): ApiResponse<unknown> {
+    const request = getApprovalRequestById(id);
+
+    if (!request) {
+      throw {
+        response: {
+          status: 404,
+          data: {
+            success: false,
+            code: "STCK-0001",
+            message: `Approval request with ID ${id} not found`,
+            type: "error",
+            http_code: 404,
+          },
+        },
+      };
+    }
+
+    const now = new Date().toISOString();
+    request.status = "APPROVED";
+    request.reviewedAt = now;
+    request.reviewerName = "Admin Sistema";
+    request.comments = data?.comment || "Aprobado";
+    request.updatedAt = now;
+
+    return {
+      success: true,
+      data: request,
+      message: "Approval request approved successfully",
+      timestamp: now,
+    };
+  }
+
+  private static mockRejectApprovalRequest(
+    id: string,
+    data: ApprovalActionInput,
+  ): ApiResponse<unknown> {
+    const request = getApprovalRequestById(id);
+
+    if (!request) {
+      throw {
+        response: {
+          status: 404,
+          data: {
+            success: false,
+            code: "STCK-0001",
+            message: `Approval request with ID ${id} not found`,
+            type: "error",
+            http_code: 404,
+          },
+        },
+      };
+    }
+
+    const now = new Date().toISOString();
+    request.status = "REJECTED";
+    request.reviewedAt = now;
+    request.reviewerName = "Admin Sistema";
+    request.rejectionReason = data?.comment || "Rechazado";
+    request.updatedAt = now;
+
+    return {
+      success: true,
+      data: request,
+      message: "Approval request rejected successfully",
+      timestamp: now,
+    };
+  }
+
+  private static mockCancelApprovalRequest(
+    id: string,
+    data: ApprovalActionInput,
+  ): ApiResponse<unknown> {
+    const request = getApprovalRequestById(id);
+
+    if (!request) {
+      throw {
+        response: {
+          status: 404,
+          data: {
+            success: false,
+            code: "STCK-0001",
+            message: `Approval request with ID ${id} not found`,
+            type: "error",
+            http_code: 404,
+          },
+        },
+      };
+    }
+
+    const now = new Date().toISOString();
+    request.status = "CANCELLED";
+    request.rejectionReason = data?.reason || "Cancelado";
+    request.updatedAt = now;
+
+    return {
+      success: true,
+      data: request,
+      message: "Approval request cancelled successfully",
+      timestamp: now,
+    };
+  }
+
+  // ============================================
+  // REPORTS SERVICE ENDPOINTS
+  // ============================================
+
+  private static mockGetAggregatedDashboard(
+    endpoint: string,
+  ): ApiResponse<unknown> {
+    const queryString = endpoint.split("?")[1] || "";
+    const params = new URLSearchParams(queryString);
+
+    const includeValues = params.getAll("include");
+    const normalizedInclude = (
+      includeValues.length > 0
+        ? includeValues
+        : ["kpis,summary,trend,activity,recentReservations,topResources"]
+    )
+      .flatMap((value) => value.split(","))
+      .map((value) => value.trim())
+      .filter(Boolean);
+
+    const includeSet = new Set(normalizedInclude);
+    const period = (params.get("period") || "last30").toLowerCase();
+    const tz = params.get("tz") || "America/Bogota";
+    const resourceTypeId = params.get("resourceTypeId") || undefined;
+    const locationId = params.get("locationId") || undefined;
+    const programId = params.get("programId") || undefined;
+
+    const parseDate = (value: string | null): Date | null => {
+      if (!value) {
+        return null;
+      }
+
+      const parsed = new Date(value);
+      return Number.isNaN(parsed.getTime()) ? null : parsed;
+    };
+
+    const now = new Date();
+    const startOfToday = new Date(now);
+    startOfToday.setHours(0, 0, 0, 0);
+
+    let from = parseDate(params.get("from"));
+    let to = parseDate(params.get("to"));
+
+    if (!from || !to || from > to) {
+      to = now;
+
+      if (period === "today") {
+        from = startOfToday;
+      } else if (period === "week") {
+        from = new Date(startOfToday.getTime() - 7 * 24 * 60 * 60 * 1000);
+      } else if (period === "month") {
+        from = new Date(now.getFullYear(), now.getMonth(), 1);
+      } else {
+        from = new Date(startOfToday.getTime() - 30 * 24 * 60 * 60 * 1000);
+      }
+    }
+
+    const hasResourceFilters = Boolean(
+      resourceTypeId || locationId || programId,
+    );
+    const normalizedResourceType = resourceTypeId?.toLowerCase();
+    const normalizedLocation = locationId?.toLowerCase();
+    const normalizedProgram = programId?.toLowerCase();
+
+    const filteredResources = this.resourcesData.filter((resource) => {
+      const matchesType =
+        !normalizedResourceType ||
+        String(resource.type || "").toLowerCase() === normalizedResourceType;
+
+      const matchesLocation =
+        !normalizedLocation ||
+        String(resource.location || "")
+          .toLowerCase()
+          .includes(normalizedLocation);
+
+      const matchesProgram =
+        !normalizedProgram ||
+        (Array.isArray(resource.programIds) &&
+          resource.programIds.some(
+            (program) => String(program).toLowerCase() === normalizedProgram,
+          ));
+
+      return matchesType && matchesLocation && matchesProgram;
+    });
+
+    const allowedResourceIds = new Set(
+      filteredResources.map((resource) => resource.id),
+    );
+
+    const fromMs = from.getTime();
+    const toMs = to.getTime();
+
+    const filteredReservations = this.reservationsData.filter((reservation) => {
+      const reservationDate = new Date(
+        reservation.startDate || reservation.createdAt || now.toISOString(),
+      );
+      const reservationTime = reservationDate.getTime();
+
+      if (
+        Number.isNaN(reservationTime) ||
+        reservationTime < fromMs ||
+        reservationTime > toMs
+      ) {
+        return false;
+      }
+
+      if (
+        hasResourceFilters &&
+        reservation.resourceId &&
+        !allowedResourceIds.has(reservation.resourceId)
+      ) {
+        return false;
+      }
+
+      return true;
+    });
+
+    const buildSummary = (items: Reservation[]) => {
+      return items.reduce(
+        (acc, reservation) => {
+          const status = String(reservation.status || "").toUpperCase();
+
+          if (status === "PENDING") {
+            acc.pending += 1;
+          }
+
+          if (status === "CONFIRMED") {
+            acc.confirmed += 1;
+          }
+
+          if (status === "CANCELLED") {
+            acc.cancelled += 1;
+          }
+
+          if (status === "COMPLETED") {
+            acc.completed += 1;
+          }
+
+          if (status === "IN_PROGRESS") {
+            acc.inProgress += 1;
+          }
+
+          return acc;
+        },
+        {
+          pending: 0,
+          confirmed: 0,
+          cancelled: 0,
+          completed: 0,
+          inProgress: 0,
+        },
+      );
+    };
+
+    const currentSummary = buildSummary(filteredReservations);
+
+    const periodMs = Math.max(toMs - fromMs, 24 * 60 * 60 * 1000);
+    const previousTo = new Date(fromMs - 1);
+    const previousFrom = new Date(previousTo.getTime() - periodMs);
+
+    const previousReservations = this.reservationsData.filter((reservation) => {
+      const reservationDate = new Date(
+        reservation.startDate || reservation.createdAt || now.toISOString(),
+      );
+      const reservationTime = reservationDate.getTime();
+
+      if (
+        Number.isNaN(reservationTime) ||
+        reservationTime < previousFrom.getTime() ||
+        reservationTime > previousTo.getTime()
+      ) {
+        return false;
+      }
+
+      if (
+        hasResourceFilters &&
+        reservation.resourceId &&
+        !allowedResourceIds.has(reservation.resourceId)
+      ) {
+        return false;
+      }
+
+      return true;
+    });
+
+    const previousSummary = buildSummary(previousReservations);
+
+    const toPct = (current: number, previous: number): number => {
+      if (previous === 0) {
+        return current > 0 ? 100 : 0;
+      }
+
+      return Number((((current - previous) / previous) * 100).toFixed(2));
+    };
+
+    const resourcesInScope = hasResourceFilters
+      ? filteredResources
+      : this.resourcesData;
+    const totalResources = resourcesInScope.length;
+
+    const activeStatuses = new Set(["PENDING", "CONFIRMED", "IN_PROGRESS"]);
+
+    const activeReservations = filteredReservations.filter((reservation) =>
+      activeStatuses.has(String(reservation.status || "").toUpperCase()),
+    );
+
+    const activeResourceIds = new Set(
+      activeReservations
+        .map((reservation) => reservation.resourceId)
+        .filter((resourceId): resourceId is string => Boolean(resourceId)),
+    );
+
+    const availableResources = Math.max(
+      totalResources - activeResourceIds.size,
+      0,
+    );
+    const utilizationRate =
+      totalResources > 0
+        ? Number(((activeResourceIds.size / totalResources) * 100).toFixed(2))
+        : 0;
+
+    const satisfactionRate =
+      filteredReservations.length > 0
+        ? Number(
+            (
+              ((currentSummary.confirmed + currentSummary.completed) /
+                filteredReservations.length) *
+              100
+            ).toFixed(2),
+          )
+        : 0;
+
+    const pendingApprovals = mockApprovalRequests.filter((request) =>
+      ["PENDING", "IN_REVIEW"].includes(
+        String(request.status || "").toUpperCase(),
+      ),
+    ).length;
+
+    const summaryPayload = {
+      total: filteredReservations.length,
+      pending: currentSummary.pending,
+      confirmed: currentSummary.confirmed,
+      cancelled: currentSummary.cancelled,
+      completed: currentSummary.completed,
+    };
+
+    const toIsoDate = (date: Date): string => date.toISOString().slice(0, 10);
+
+    const trendDays = Math.min(
+      Math.max(Math.ceil(periodMs / (24 * 60 * 60 * 1000)), 1),
+      30,
+    );
+    const trendStart = new Date(toMs - (trendDays - 1) * 24 * 60 * 60 * 1000);
+
+    const reservationsByDate = filteredReservations.reduce<
+      Record<string, number>
+    >((acc, reservation) => {
+      const reservationDate = new Date(
+        reservation.startDate || reservation.createdAt || now.toISOString(),
+      );
+      const key = toIsoDate(reservationDate);
+      acc[key] = (acc[key] || 0) + 1;
+      return acc;
+    }, {});
+
+    const trend = Array.from({ length: trendDays }, (_, index) => {
+      const day = new Date(trendStart.getTime() + index * 24 * 60 * 60 * 1000);
+      const date = toIsoDate(day);
+      const reservations = reservationsByDate[date] || 0;
+
+      return {
+        date,
+        reservations,
+        utilizationRate:
+          totalResources > 0
+            ? Number(
+                Math.min(100, (reservations / totalResources) * 100).toFixed(2),
+              )
+            : null,
+      };
+    });
+
+    const recentActivity = filteredReservations
+      .slice()
+      .sort((a, b) => {
+        const dateA = new Date(a.updatedAt || a.createdAt || 0).getTime();
+        const dateB = new Date(b.updatedAt || b.createdAt || 0).getTime();
+        return dateB - dateA;
+      })
+      .slice(0, 10)
+      .map((reservation) => ({
+        id: `activity-${reservation.id}`,
+        type: `reservation.${String(reservation.status || "").toLowerCase()}`,
+        title: reservation.title || "Reserva actualizada",
+        description: `${reservation.userName || reservation.userId || "Usuario"} en ${reservation.resourceName || "Recurso"}`,
+        at:
+          reservation.updatedAt ||
+          reservation.createdAt ||
+          new Date().toISOString(),
+        source: "availability-service",
+        metadata: {
+          reservationId: reservation.id,
+          userName: reservation.userName,
+          resourceId: reservation.resourceId,
+          resourceName: reservation.resourceName,
+        },
+      }));
+
+    const recentReservations = filteredReservations
+      .slice()
+      .sort((a, b) => {
+        const dateA = new Date(a.createdAt || 0).getTime();
+        const dateB = new Date(b.createdAt || 0).getTime();
+        return dateB - dateA;
+      })
+      .slice(0, 10)
+      .map((reservation) => ({
+        id: reservation.id,
+        reservationId: reservation.id,
+        resourceId: reservation.resourceId,
+        resourceName: reservation.resourceName || "Recurso",
+        userId: reservation.userId,
+        status: String(reservation.status || "PENDING"),
+        startAt: reservation.startDate,
+        endAt: reservation.endDate,
+        createdAt: reservation.createdAt,
+      }));
+
+    const usageByResource = filteredReservations.reduce<
+      Record<string, { reservations: number; hoursUsed: number }>
+    >((acc, reservation) => {
+      if (!reservation.resourceId) {
+        return acc;
+      }
+
+      const startAt = new Date(reservation.startDate).getTime();
+      const endAt = new Date(reservation.endDate).getTime();
+      const durationHours =
+        Number.isFinite(startAt) && Number.isFinite(endAt) && endAt > startAt
+          ? (endAt - startAt) / (1000 * 60 * 60)
+          : 0;
+
+      const current = acc[reservation.resourceId] || {
+        reservations: 0,
+        hoursUsed: 0,
+      };
+
+      current.reservations += 1;
+      current.hoursUsed += durationHours;
+      acc[reservation.resourceId] = current;
+
+      return acc;
+    }, {});
+
+    const topResources = Object.entries(usageByResource)
+      .map(([resourceId, usage]) => {
+        const resource = this.resourcesData.find(
+          (item) => item.id === resourceId,
+        );
+
+        return {
+          resourceId,
+          name: resource?.name || "Recurso",
+          type: String(resource?.type || "UNKNOWN"),
+          reservations: usage.reservations,
+          utilizationRate:
+            filteredReservations.length > 0
+              ? Number(
+                  (
+                    (usage.reservations / filteredReservations.length) *
+                    100
+                  ).toFixed(2),
+                )
+              : null,
+          hoursUsed: Number(usage.hoursUsed.toFixed(2)),
+          share:
+            filteredReservations.length > 0
+              ? Number(
+                  (
+                    (usage.reservations / filteredReservations.length) *
+                    100
+                  ).toFixed(2),
+                )
+              : 0,
+        };
+      })
+      .sort((a, b) => b.reservations - a.reservations)
+      .slice(0, 10);
+
+    const isIncluded = (section: string): boolean => includeSet.has(section);
+
+    return {
+      success: true,
+      data: {
+        generatedAt: new Date().toISOString(),
+        filters: {
+          from: from.toISOString(),
+          to: to.toISOString(),
+          period,
+          tz,
+          include: normalizedInclude,
+          resourceTypeId,
+          locationId,
+          programId,
+        },
+        refresh: {
+          intervalSeconds: 15,
+          websocketEvent: "dashboard:metrics:updated",
+        },
+        kpis: isIncluded("kpis")
+          ? {
+              totalReservations: filteredReservations.length,
+              activeReservations:
+                currentSummary.pending +
+                currentSummary.confirmed +
+                currentSummary.inProgress,
+              pendingApprovals,
+              totalResources,
+              availableResources,
+              utilizationRate,
+              satisfactionRate,
+              delta: {
+                totalReservationsPct: toPct(
+                  filteredReservations.length,
+                  previousReservations.length,
+                ),
+                activeReservationsPct: toPct(
+                  currentSummary.pending +
+                    currentSummary.confirmed +
+                    currentSummary.inProgress,
+                  previousSummary.pending +
+                    previousSummary.confirmed +
+                    previousSummary.inProgress,
+                ),
+                pendingApprovalsPct: 0,
+                utilizationRatePct: toPct(
+                  utilizationRate,
+                  totalResources > 0
+                    ? Number(
+                        (
+                          ((previousSummary.pending +
+                            previousSummary.confirmed +
+                            previousSummary.inProgress) /
+                            totalResources) *
+                          100
+                        ).toFixed(2),
+                      )
+                    : 0,
+                ),
+                satisfactionRatePct: toPct(
+                  satisfactionRate,
+                  previousReservations.length > 0
+                    ? Number(
+                        (
+                          ((previousSummary.confirmed +
+                            previousSummary.completed) /
+                            previousReservations.length) *
+                          100
+                        ).toFixed(2),
+                      )
+                    : 0,
+                ),
+              },
+            }
+          : null,
+        reservationSummary: isIncluded("summary") ? summaryPayload : null,
+        trend: isIncluded("trend") ? trend : [],
+        recentActivity: isIncluded("activity") ? recentActivity : [],
+        recentReservations: isIncluded("recentReservations")
+          ? recentReservations
+          : [],
+        topResources: isIncluded("topResources") ? topResources : [],
+        access: {
+          canViewFullOccupancy: true,
+          maskedSections: [],
+        },
+      },
+      message: "Dashboard data retrieved successfully",
+      timestamp: new Date().toISOString(),
+    };
+  }
+
+  private static mockGetDashboardKPIs(): ApiResponse<unknown> {
+    const totalResources = this.resourcesData.length;
+    const maintenanceResources = this.resourcesData.filter((resource) =>
+      ["MAINTENANCE", "IN_MAINTENANCE"].includes(
+        String(resource.status || "").toUpperCase(),
+      ),
+    ).length;
+
+    const activeReservations = this.reservationsData.filter((reservation) =>
+      ["CONFIRMED", "PENDING", "IN_PROGRESS"].includes(
+        String(reservation.status || "").toUpperCase(),
+      ),
+    );
+
+    const usedResourceIds = new Set(
+      activeReservations
+        .map((reservation) => reservation.resourceId)
+        .filter((resourceId): resourceId is string => Boolean(resourceId)),
+    );
+
+    const resourcesInUse = usedResourceIds.size;
+    const availableResources = Math.max(
+      0,
+      totalResources - resourcesInUse - maintenanceResources,
+    );
+
+    const now = new Date();
+    const todayStart = new Date(
+      now.getFullYear(),
+      now.getMonth(),
+      now.getDate(),
+    );
+    const weekStart = new Date(todayStart);
+    weekStart.setDate(todayStart.getDate() - 7);
+    const monthStart = new Date(now.getFullYear(), now.getMonth(), 1);
+
+    const getReservationDate = (reservation: Reservation): Date | null => {
+      if (!reservation.startDate) {
+        return null;
+      }
+
+      const parsed = new Date(reservation.startDate);
+      return Number.isNaN(parsed.getTime()) ? null : parsed;
+    };
+
+    const todayReservations = this.reservationsData.filter((reservation) => {
+      const reservationDate = getReservationDate(reservation);
+      return reservationDate ? reservationDate >= todayStart : false;
+    }).length;
+
+    const weekReservations = this.reservationsData.filter((reservation) => {
+      const reservationDate = getReservationDate(reservation);
+      return reservationDate ? reservationDate >= weekStart : false;
+    }).length;
+
+    const monthReservations = this.reservationsData.filter((reservation) => {
+      const reservationDate = getReservationDate(reservation);
+      return reservationDate ? reservationDate >= monthStart : false;
+    }).length;
+
+    const usageMap = new Map<
+      string,
+      { resourceId: string; name: string; usageCount: number }
+    >();
+
+    this.reservationsData.forEach((reservation) => {
+      if (!reservation.resourceId) {
+        return;
+      }
+
+      const current = usageMap.get(reservation.resourceId);
+      const resourceName =
+        reservation.resourceName ||
+        this.resourcesData.find(
+          (resource) => resource.id === reservation.resourceId,
+        )?.name ||
+        "Recurso";
+
+      if (!current) {
+        usageMap.set(reservation.resourceId, {
+          resourceId: reservation.resourceId,
+          name: resourceName,
+          usageCount: 1,
+        });
+        return;
+      }
+
+      current.usageCount += 1;
+    });
+
+    const mostUsedResources = Array.from(usageMap.values())
+      .sort((a, b) => b.usageCount - a.usageCount)
+      .slice(0, 5)
+      .map((item) => ({
+        id: item.resourceId,
+        name: item.name,
+        usageCount: item.usageCount,
+      }));
+
+    const recentActivity = this.reservationsData
+      .slice()
+      .sort((a, b) => {
+        const dateA = new Date(a.updatedAt || a.createdAt || 0).getTime();
+        const dateB = new Date(b.updatedAt || b.createdAt || 0).getTime();
+        return dateB - dateA;
+      })
+      .slice(0, 5)
+      .map((reservation) => ({
+        id: reservation.id,
+        type: "reservation",
+        title: reservation.title || reservation.resourceName || "Reserva",
+        timestamp:
+          reservation.updatedAt ||
+          reservation.createdAt ||
+          new Date().toISOString(),
+        user: reservation.userName || reservation.userId || "Usuario",
+      }));
+
+    return {
+      success: true,
+      data: {
+        totalResources,
+        availableResources,
+        resourcesInUse,
+        resourcesInMaintenance: maintenanceResources,
+        todayReservations,
+        weekReservations,
+        monthReservations,
+        utilizationRate:
+          totalResources > 0
+            ? Number(((resourcesInUse / totalResources) * 100).toFixed(2))
+            : 0,
+        mostUsedResources,
+        recentActivity,
+      },
+      message: "Dashboard KPIs retrieved successfully",
+      timestamp: new Date().toISOString(),
+    };
+  }
+
+  private static mockGetDashboardOverview(): ApiResponse<unknown> {
+    const byCategory: Record<string, number> = {};
+    const byStatus: Record<string, number> = {};
+
+    this.resourcesData.forEach((resource) => {
+      const category =
+        resource.category?.name ||
+        this.categoriesData.find(
+          (categoryItem) => categoryItem.id === resource.categoryId,
+        )?.name ||
+        "Sin categoría";
+      byCategory[category] = (byCategory[category] || 0) + 1;
+
+      const status = String(resource.status || "UNKNOWN").toUpperCase();
+      byStatus[status] = (byStatus[status] || 0) + 1;
+    });
+
+    const usageMap = new Map<string, number>();
+    this.reservationsData.forEach((reservation) => {
+      if (!reservation.resourceId) {
+        return;
+      }
+
+      usageMap.set(
+        reservation.resourceId,
+        (usageMap.get(reservation.resourceId) || 0) + 1,
+      );
+    });
+
+    const maxUsage = Math.max(1, ...Array.from(usageMap.values()));
+    const utilizationByResource = Array.from(usageMap.entries()).map(
+      ([resourceId, count]) => ({
+        resourceId,
+        resourceName:
+          this.resourcesData.find((resource) => resource.id === resourceId)
+            ?.name || "Recurso",
+        utilizationRate: Number(((count / maxUsage) * 100).toFixed(2)),
+      }),
+    );
+
+    return {
+      success: true,
+      data: {
+        byCategory,
+        byStatus,
+        utilizationByResource,
+      },
+      message: "Dashboard overview retrieved successfully",
+      timestamp: new Date().toISOString(),
+    };
+  }
+
+  private static mockGetDashboardOccupancy(): ApiResponse<unknown> {
+    return {
+      success: true,
+      data: {
+        byStatus: this.reservationsData.reduce<Record<string, number>>(
+          (acc, reservation) => {
+            const status = String(
+              reservation.status || "UNKNOWN",
+            ).toUpperCase();
+            acc[status] = (acc[status] || 0) + 1;
+            return acc;
+          },
+          {},
+        ),
+        byProgram: {},
+        peakHours: [],
+        averageDuration: 0,
+      },
+      message: "Dashboard occupancy retrieved successfully",
+      timestamp: new Date().toISOString(),
+    };
+  }
+
+  private static mockGetDashboardTrends(): ApiResponse<unknown> {
+    return {
+      success: true,
+      data: {
+        items: [],
+      },
+      message: "Dashboard trends retrieved successfully",
+      timestamp: new Date().toISOString(),
+    };
+  }
+
+  private static mockGetUserReportSummary(
+    userId?: string,
+  ): ApiResponse<unknown> {
+    const userReservations = userId
+      ? this.reservationsData.filter(
+          (reservation) => reservation.userId === userId,
+        )
+      : this.reservationsData;
+
+    const totalReservations = userReservations.length;
+    const activeReservations = userReservations.filter((reservation) =>
+      ["CONFIRMED", "PENDING", "IN_PROGRESS"].includes(
+        String(reservation.status || "").toUpperCase(),
+      ),
+    ).length;
+    const canceledReservations = userReservations.filter(
+      (reservation) =>
+        String(reservation.status || "").toUpperCase() === "CANCELLED",
+    ).length;
+
+    const totalHours = userReservations.reduce((acc, reservation) => {
+      const start = reservation.startDate;
+      const end = reservation.endDate;
+
+      if (!start || !end) {
+        return acc;
+      }
+
+      const startDate = new Date(start);
+      const endDate = new Date(end);
+
+      if (
+        Number.isNaN(startDate.getTime()) ||
+        Number.isNaN(endDate.getTime()) ||
+        endDate <= startDate
+      ) {
+        return acc;
+      }
+
+      return acc + (endDate.getTime() - startDate.getTime()) / 3600000;
+    }, 0);
+
+    const favoriteResourceSet = new Set<string>();
+    userReservations.forEach((reservation) => {
+      if (reservation.resourceName) {
+        favoriteResourceSet.add(reservation.resourceName);
+      }
+    });
+
+    return {
+      success: true,
+      data: {
+        totalReservations,
+        activeReservations,
+        canceledReservations,
+        pendingApprovals: Math.max(
+          0,
+          activeReservations - canceledReservations,
+        ),
+        hoursBooked: Number(totalHours.toFixed(2)),
+        favoriteResources: Array.from(favoriteResourceSet).slice(0, 5),
+      },
+      message: "User report summary retrieved successfully",
+      timestamp: new Date().toISOString(),
+    };
+  }
+
+  // ============================================
+  // RESERVATIONS SERVICE ENDPOINTS
+  // ============================================
+
+  private static mockGetReservations(filters?: {
+    status?: string;
+    limit?: number;
+  }): ApiResponse<unknown> {
+    const normalizedStatus = filters?.status?.toLowerCase();
+    const now = new Date();
+
+    let items = [...this.reservationsData];
+
+    if (normalizedStatus) {
+      items = items.filter((reservation) => {
+        const status = String(reservation.status || "").toLowerCase();
+
+        if (normalizedStatus === "upcoming") {
+          const startDate = reservation.startDate
+            ? new Date(reservation.startDate)
+            : null;
+
+          return (
+            !!startDate &&
+            !Number.isNaN(startDate.getTime()) &&
+            startDate >= now &&
+            status !== "cancelled"
+          );
+        }
+
+        return status === normalizedStatus;
+      });
+    }
+
+    if (filters?.limit && filters.limit > 0) {
+      items = items.slice(0, filters.limit);
+    }
+
+    return {
+      success: true,
+      data: {
+        items,
+        meta: {
+          total: items.length,
+          page: 1,
+          limit: filters?.limit || 50,
           totalPages: 1,
           hasNextPage: false,
           hasPreviousPage: false,
@@ -1046,8 +3121,10 @@ export class MockService {
     };
   }
 
-  private static mockGetReservationById(id: string): ApiResponse<any> {
-    const reservation = this.reservationsData.find((r: any) => r.id === id);
+  private static mockGetReservationById(id: string): ApiResponse<unknown> {
+    const reservation = this.reservationsData.find(
+      (reservationItem) => reservationItem.id === id,
+    );
 
     if (!reservation) {
       throw {
@@ -1055,7 +3132,7 @@ export class MockService {
           status: 404,
           data: {
             success: false,
-            code: "RSVN-001",
+            code: "AVAIL-0001",
             message: `Reservation with ID ${id} not found`,
             type: "error",
             http_code: 404,
@@ -1072,13 +3149,27 @@ export class MockService {
     };
   }
 
-  private static mockCreateReservation(data: any): ApiResponse<any> {
-    const newReservation = {
+  private static mockCreateReservation(
+    data: CreateReservationDto,
+  ): ApiResponse<unknown> {
+    const now = new Date().toISOString();
+    const newReservation: Reservation = {
       id: `rsv_${Date.now()}`,
-      ...data,
+      resourceId: data.resourceId,
+      title: data.title || data.purpose || "Reserva",
+      description: data.description,
+      startDate: data.startDate,
+      endDate: data.endDate,
+      recurrenceType: data.recurrenceType,
+      recurrenceEndDate: data.recurrenceEndDate,
+      attendees: data.attendees,
+      notes: data.notes,
+      userId: data.userId || "user_1",
+      userName: "Usuario Mock",
+      userEmail: "mock@ufps.edu.co",
       status: "PENDING",
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
+      createdAt: now,
+      updatedAt: now,
     };
 
     this.reservationsData.push(newReservation);
@@ -1093,9 +3184,11 @@ export class MockService {
 
   private static mockUpdateReservation(
     id: string,
-    data: any
-  ): ApiResponse<any> {
-    const index = this.reservationsData.findIndex((r: any) => r.id === id);
+    data: UpdateReservationDto,
+  ): ApiResponse<unknown> {
+    const index = this.reservationsData.findIndex(
+      (reservationItem) => reservationItem.id === id,
+    );
 
     if (index === -1) {
       throw {
@@ -1103,7 +3196,7 @@ export class MockService {
           status: 404,
           data: {
             success: false,
-            code: "RSVN-001",
+            code: "AVAIL-0001",
             message: `Reservation with ID ${id} not found`,
             type: "error",
             http_code: 404,
@@ -1126,8 +3219,10 @@ export class MockService {
     };
   }
 
-  private static mockCancelReservation(id: string): ApiResponse<any> {
-    const index = this.reservationsData.findIndex((r: any) => r.id === id);
+  private static mockCancelReservation(id: string): ApiResponse<unknown> {
+    const index = this.reservationsData.findIndex(
+      (reservationItem) => reservationItem.id === id,
+    );
 
     if (index === -1) {
       throw {
@@ -1135,7 +3230,7 @@ export class MockService {
           status: 404,
           data: {
             success: false,
-            code: "RSVN-001",
+            code: "AVAIL-0001",
             message: `Reservation with ID ${id} not found`,
             type: "error",
             http_code: 404,
@@ -1159,6 +3254,151 @@ export class MockService {
   }
 
   // ============================================
+  // CONFIG ENDPOINTS
+  // ============================================
+
+  private static appConfigData: Record<string, unknown> = {
+    registrationEnabled: true,
+    corporateAuthEnabled: true,
+    allowedDomains: ["ufps.edu.co"],
+    autoRegisterOnSSO: true,
+    themeMode: "system",
+    primaryColor: "#2563eb",
+    secondaryColor: "#14b8a6",
+    defaultLocale: "es",
+    supportedLocales: ["es", "en"],
+    appName: "Bookly UFPS",
+    logoLightUrl: "/images/bookly_imagotipo_light.png",
+    logoDarkUrl: "/images/bookly_logotipo_dark-vertical.png",
+    faviconUrl: "",
+    timezone: "America/Bogota",
+    features: {
+      enableNotifications: true,
+      enableRealtime: true,
+    },
+    maintenanceMode: false,
+    storageProvider: "local",
+    storageS3Config: undefined,
+    storageGcsConfig: undefined,
+  };
+
+  private static mockGetPublicConfig(): ApiResponse<unknown> {
+    const storageKeys = new Set([
+      "storageProvider",
+      "storageS3Config",
+      "storageGcsConfig",
+    ]);
+    const publicConfig = Object.fromEntries(
+      Object.entries(this.appConfigData).filter(
+        ([key]) => !storageKeys.has(key),
+      ),
+    );
+
+    return {
+      success: true,
+      data: publicConfig,
+      message: "Public configuration retrieved successfully",
+      timestamp: new Date().toISOString(),
+    };
+  }
+
+  private static mockGetFullConfig(): ApiResponse<unknown> {
+    return {
+      success: true,
+      data: { ...this.appConfigData },
+      message: "Configuration retrieved successfully",
+      timestamp: new Date().toISOString(),
+    };
+  }
+
+  private static mockUpdateConfig(
+    payload: RequestPayload,
+  ): ApiResponse<unknown> {
+    const allowedKeys = [
+      "registrationEnabled",
+      "corporateAuthEnabled",
+      "allowedDomains",
+      "autoRegisterOnSSO",
+      "themeMode",
+      "primaryColor",
+      "secondaryColor",
+      "defaultLocale",
+      "supportedLocales",
+      "appName",
+      "logoLightUrl",
+      "logoDarkUrl",
+      "faviconUrl",
+      "timezone",
+      "maintenanceMode",
+      "features",
+    ];
+
+    for (const key of allowedKeys) {
+      if (payload[key] !== undefined) {
+        if (
+          key === "features" &&
+          typeof payload[key] === "object" &&
+          payload[key] !== null
+        ) {
+          const currentFeatures =
+            (this.appConfigData.features as Record<string, unknown>) || {};
+          this.appConfigData.features = {
+            ...currentFeatures,
+            ...(payload[key] as Record<string, unknown>),
+          };
+        } else {
+          this.appConfigData[key] = payload[key];
+        }
+      }
+    }
+
+    return {
+      success: true,
+      data: { ...this.appConfigData },
+      message: "Configuration updated successfully",
+      timestamp: new Date().toISOString(),
+    };
+  }
+
+  private static mockGetStorageConfig(): ApiResponse<unknown> {
+    return {
+      success: true,
+      data: {
+        storageProvider: this.appConfigData.storageProvider,
+        storageS3Config: this.appConfigData.storageS3Config,
+        storageGcsConfig: this.appConfigData.storageGcsConfig,
+      },
+      message: "Storage configuration retrieved successfully",
+      timestamp: new Date().toISOString(),
+    };
+  }
+
+  private static mockUpdateStorageConfig(
+    payload: RequestPayload,
+  ): ApiResponse<unknown> {
+    if (payload.storageProvider !== undefined) {
+      this.appConfigData.storageProvider = payload.storageProvider;
+    }
+    if (payload.storageS3Config !== undefined) {
+      this.appConfigData.storageS3Config = payload.storageS3Config;
+    }
+    if (payload.storageGcsConfig !== undefined) {
+      this.appConfigData.storageGcsConfig = payload.storageGcsConfig;
+    }
+
+    return {
+      success: true,
+      data: {
+        storageProvider: this.appConfigData.storageProvider,
+        storageS3Config: this.appConfigData.storageS3Config,
+        storageGcsConfig: this.appConfigData.storageGcsConfig,
+      },
+      message: "Storage configuration updated successfully",
+      timestamp: new Date().toISOString(),
+    };
+  }
+
+  // ============================================
   // HELPER: Verificar si debe usar mock
   // ============================================
 
@@ -1171,7 +3411,7 @@ export class MockService {
   // ============================================
 
   static simulateNetworkError(
-    message: string = "No se pudo conectar con el backend"
+    message: string = "No se pudo conectar con el backend",
   ): never {
     throw {
       code: "NETWORK_ERROR",

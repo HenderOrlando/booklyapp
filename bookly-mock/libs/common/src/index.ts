@@ -24,5 +24,11 @@ export {
 export * from "./decorators";
 export * from "./enums";
 export * from "./events";
+export * from "./exceptions/index";
+export * from "./filters/index";
 export * from "./interfaces";
+export * from "./telemetry";
 export * from "./utils";
+export * from "./interceptors/global-response.interceptor";
+export * from "./guards/permissions.guard";
+export * from "./guards/idempotency.guard";

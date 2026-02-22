@@ -32,7 +32,7 @@ export interface Notification {
   actionUrl?: string; // URL para navegar al hacer click
   actionLabel?: string; // Texto del botón de acción
   imageUrl?: string;
-  metadata?: Record<string, any>;
+  metadata?: Record<string, unknown>;
   createdAt: string;
   readAt?: string;
   expiresAt?: string;

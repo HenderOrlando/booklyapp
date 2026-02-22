@@ -1,0 +1,25 @@
+{
+  "AUTH": {
+    "001": "Invalid credentials",
+    "002": "User not found",
+    "003": "Expired or invalid token",
+    "004": "Insufficient permissions"
+  },
+  "RSRC": {
+    "001": "Resource not found",
+    "002": "Resource already exists",
+    "003": "Resource is inactive"
+  },
+  "AVAL": {
+    "001": "Time slot not available",
+    "002": "Reservation conflict"
+  },
+  "STCK": {
+    "001": "Request not found",
+    "002": "Invalid status for action"
+  },
+  "GEN": {
+    "000": "Internal server error",
+    "001": "Data validation error"
+  }
+}

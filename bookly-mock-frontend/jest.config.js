@@ -19,6 +19,7 @@ const customJestConfig = {
     "!src/**/__tests__/**",
   ],
   testMatch: ["**/__tests__/**/*.[jt]s?(x)", "**/?(*.)+(spec|test).[jt]s?(x)"],
+  testPathIgnorePatterns: ["/node_modules/", "/e2e/"],
   coverageThreshold: {
     global: {
       branches: 70,

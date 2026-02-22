@@ -43,17 +43,17 @@ export const ExportButton = React.memo<ExportButtonProps>(
       csv: {
         label: "CSV",
         icon: FileText,
-        color: "text-green-600 dark:text-green-400",
+        color: "text-[var(--color-state-success-text)]",
       },
       excel: {
         label: "Excel",
         icon: FileSpreadsheet,
-        color: "text-green-700 dark:text-green-300",
+        color: "text-[var(--color-state-success-text)]",
       },
       pdf: {
         label: "PDF",
         icon: FileDown,
-        color: "text-red-600 dark:text-red-400",
+        color: "text-[var(--color-state-error-text)]",
       },
     };
 
@@ -76,22 +76,22 @@ export const ExportButton = React.memo<ExportButtonProps>(
     // Variantes
     const variantClasses = {
       default: `
-        bg-[var(--color-primary-base)] 
-        text-white 
-        hover:bg-[var(--color-primary-dark)] 
+        bg-[var(--color-action-primary)] 
+        text-[var(--color-text-inverse)] 
+        hover:bg-[var(--color-action-primary-hover)] 
         border-transparent
       `,
       outline: `
         bg-transparent 
-        border-gray-300 dark:border-gray-600 
-        text-gray-700 dark:text-gray-300 
-        hover:bg-gray-50 dark:hover:bg-gray-800
+        border-[var(--color-border-strong)] 
+        text-[var(--color-text-primary)] 
+        hover:bg-[var(--color-bg-secondary)]
       `,
       ghost: `
         bg-transparent 
         border-transparent 
-        text-gray-700 dark:text-gray-300 
-        hover:bg-gray-100 dark:hover:bg-gray-800
+        text-[var(--color-text-primary)] 
+        hover:bg-[var(--color-action-ghost-hover)]
       `,
     };
 
@@ -106,7 +106,7 @@ export const ExportButton = React.memo<ExportButtonProps>(
           border
           transition-all duration-200
           disabled:opacity-50 disabled:cursor-not-allowed
-          focus:outline-none focus:ring-2 focus:ring-[var(--color-primary-base)] focus:ring-offset-2
+          focus:outline-none focus:ring-2 focus:ring-[var(--color-border-focus)] focus:ring-offset-2
           ${sizeClasses[size]}
           ${variantClasses[variant]}
           ${className}
@@ -131,7 +131,7 @@ export const ExportButton = React.memo<ExportButtonProps>(
         )}
       </button>
     );
-  }
+  },
 );
 
 ExportButton.displayName = "ExportButton";

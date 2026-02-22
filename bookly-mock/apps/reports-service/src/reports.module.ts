@@ -1,6 +1,11 @@
-import { DatabaseModule } from "@libs/database";
+import { I18nModule } from "@bookly/i18n";
+import { JWT_SECRET } from "@libs/common/constants";
+import { DatabaseModule, ReferenceDataModule } from "@libs/database";
 import { EventBusModule } from "@libs/event-bus";
+import { IdempotencyModule } from "@libs/idempotency";
 import { NotificationsModule } from "@libs/notifications";
+import { RedisModule } from "@libs/redis";
+import { AuthClientModule } from "@libs/security";
 import { Module } from "@nestjs/common";
 import { ConfigModule, ConfigService } from "@nestjs/config";
 import { CqrsModule } from "@nestjs/cqrs";
@@ -13,6 +18,8 @@ import { AuditModule } from "./modules/audit/audit.module";
 
 // Schemas
 import {
+  ConflictReport,
+  ConflictReportSchema,
   DashboardMetric,
   DashboardMetricSchema,
   DemandReport,
@@ -34,6 +41,10 @@ import {
   AuditEvent,
   AuditEventSchema,
 } from "./infrastructure/schemas/audit-event.schema";
+import {
+  ComplianceReport,
+  ComplianceReportSchema,
+} from "./infrastructure/schemas/compliance-report.schema";
 import { Export, ExportSchema } from "./infrastructure/schemas/export.schema";
 import {
   ResourceCache,
@@ -42,6 +53,9 @@ import {
 
 // Services
 import {
+  AuditAlertService,
+  AuditAnalyticsService,
+  ConflictReportService,
   CsvGeneratorService,
   DashboardService,
   DemandReportService,
@@ -56,11 +70,12 @@ import {
   UserEvaluationService,
   UserReportService,
 } from "./application/services";
-import { AuditAlertService } from "./application/services/audit-alert.service";
-import { AuditAnalyticsService } from "./application/services/audit-analytics.service";
+import { ComplianceReportService } from "./application/services/compliance-report.service";
 
 // Repositories
 import {
+  ComplianceReportRepository,
+  ConflictReportRepository,
   DashboardMetricRepository,
   DemandReportRepository,
   ExportRepository,
@@ -86,6 +101,8 @@ import { DashboardController } from "./infrastructure/controllers/dashboard.cont
 import { EvaluationController } from "./infrastructure/controllers/evaluation.controller";
 import { ExportController } from "./infrastructure/controllers/export.controller";
 import { FeedbackController } from "./infrastructure/controllers/feedback.controller";
+import { ReferenceDataController } from "./infrastructure/controllers/reference-data.controller";
+import { ReportsDashboardController } from "./infrastructure/controllers/reports-dashboard.controller";
 
 // Consumers
 import { AuditEventsConsumer } from "./infrastructure/consumers/audit-events.consumer";
@@ -106,6 +123,7 @@ import { JwtStrategy } from "./infrastructure/strategies/jwt.strategy";
       isGlobal: true,
       envFilePath: [".env", "apps/reports-service/.env"],
     }),
+    I18nModule,
     EventBusModule.forRootAsync({
       useFactory: (configService: ConfigService) => ({
         brokerType:
@@ -135,9 +153,24 @@ import { JwtStrategy } from "./infrastructure/strategies/jwt.strategy";
       }),
       inject: [ConfigService],
     }),
+    // Redis (required by IdempotencyModule)
+    RedisModule.forRootAsync({
+      useFactory: (configService: ConfigService) => ({
+        host: configService.get("REDIS_HOST", "localhost"),
+        port: configService.get("REDIS_PORT", 6379),
+        password: configService.get("REDIS_PASSWORD"),
+        db: configService.get("REDIS_DB", 0),
+      }),
+      inject: [ConfigService],
+      serviceName: "reports-service",
+    }),
     // MongoDB - Conexión global con librería estandarizada
     DatabaseModule,
+    // Reference Data (tipos, estados dinámicos del dominio reports)
+    ReferenceDataModule,
     MongooseModule.forFeature([
+      { name: ComplianceReport.name, schema: ComplianceReportSchema },
+      { name: ConflictReport.name, schema: ConflictReportSchema },
       { name: UsageReport.name, schema: UsageReportSchema },
       { name: DemandReport.name, schema: DemandReportSchema },
       { name: UserReport.name, schema: UserReportSchema },
@@ -153,10 +186,17 @@ import { JwtStrategy } from "./infrastructure/strategies/jwt.strategy";
     CqrsModule,
     PassportModule,
     JwtModule.register({
-      secret: process.env.JWT_SECRET || "bookly-secret-key",
+      secret: JWT_SECRET,
       signOptions: {
         expiresIn: process.env.JWT_EXPIRATION || "24h",
       },
+    }),
+    AuthClientModule.forRootAsync({
+      useFactory: (configService: ConfigService) => ({
+        authServiceUrl:
+          configService.get("AUTH_SERVICE_URL") || "http://localhost:3001",
+      }),
+      inject: [ConfigService],
     }),
     NotificationsModule.forRoot({
       brokerType: "rabbitmq",
@@ -171,6 +211,9 @@ import { JwtStrategy } from "./infrastructure/strategies/jwt.strategy";
       enableEventStore: false,
     }),
 
+    // Idempotency + Correlation
+    IdempotencyModule.forRoot({ keyPrefix: "reports" }),
+
     // Módulo de auditoría (escucha eventos de todos los microservicios)
     AuditModule,
   ],
@@ -181,9 +224,11 @@ import { JwtStrategy } from "./infrastructure/strategies/jwt.strategy";
     AuditDashboardController,
     AuditRecordsController,
     DashboardController,
+    ReportsDashboardController,
     EvaluationController,
     ExportController,
     FeedbackController,
+    ReferenceDataController,
     HealthController,
   ],
   providers: [
@@ -195,6 +240,8 @@ import { JwtStrategy } from "./infrastructure/strategies/jwt.strategy";
     DemandReportService,
     UserReportService,
     UserEvaluationService,
+    ComplianceReportService,
+    ConflictReportService, // Temporarily commented to test ComplianceReportService
     AuditAnalyticsService,
     AuditAlertService,
     DashboardService,
@@ -225,6 +272,14 @@ import { JwtStrategy } from "./infrastructure/strategies/jwt.strategy";
     {
       provide: "IUserReportRepository",
       useClass: UserReportRepository,
+    },
+    {
+      provide: "IComplianceReportRepository",
+      useClass: ComplianceReportRepository,
+    },
+    {
+      provide: "IConflictReportRepository",
+      useClass: ConflictReportRepository,
     },
     {
       provide: "IDashboardMetricRepository",

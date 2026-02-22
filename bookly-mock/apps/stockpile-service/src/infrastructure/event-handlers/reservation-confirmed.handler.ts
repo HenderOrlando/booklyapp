@@ -2,6 +2,8 @@ import { Injectable, Logger, OnModuleInit } from "@nestjs/common";
 import { EventBusService } from "@libs/event-bus";
 import { EventType } from "@libs/common/enums";
 import { EventPayload } from "@libs/common";
+import { RedisService } from "@libs/redis";
+import { randomBytes } from "crypto";
 
 /**
  * Handler para evento RESERVATION_CONFIRMED
@@ -12,7 +14,10 @@ import { EventPayload } from "@libs/common";
 export class ReservationConfirmedHandler implements OnModuleInit {
   private readonly logger = new Logger(ReservationConfirmedHandler.name);
 
-  constructor(private readonly eventBus: EventBusService) {}
+  constructor(
+    private readonly eventBus: EventBusService,
+    private readonly redis: RedisService,
+  ) {}
 
   async onModuleInit() {
     await this.eventBus.subscribe(
@@ -36,20 +41,64 @@ export class ReservationConfirmedHandler implements OnModuleInit {
     );
 
     try {
-      // TODO: Implementar lógica de negocio
-      // 1. Crear registro de check-in pendiente
-      // 2. Generar código QR o token para check-in
-      // 3. Preparar documento de confirmación
-      // 4. Publicar evento DOCUMENT_GENERATED
-      // 5. Notificar al usuario con instrucciones de check-in
-      // 6. Notificar a vigilancia sobre la reserva confirmada
+      const qrToken = randomBytes(16).toString("hex");
+      const tokenKey = `checkin:token:${reservationId}`;
+      const TTL_24H = 86400;
+
+      await this.redis.set(tokenKey, JSON.stringify({
+        reservationId,
+        resourceId,
+        userId,
+        token: qrToken,
+        createdAt: new Date().toISOString(),
+        used: false,
+      }), { key: tokenKey, ttl: TTL_24H });
 
       this.logger.log(
-        `Reservation ${reservationId} confirmed. Preparing check-in process`,
+        `Check-in token generated for reservation ${reservationId}`,
       );
 
-      // TODO: Generar documento de confirmación
-      // TODO: Publicar DOCUMENT_GENERATED
+      await this.eventBus.publish(EventType.DOCUMENT_GENERATED, {
+        eventId: `doc-${reservationId}-${Date.now()}`,
+        eventType: EventType.DOCUMENT_GENERATED,
+        service: 'stockpile-service',
+        timestamp: new Date(),
+        data: {
+          reservationId,
+          resourceId,
+          userId,
+          documentType: 'confirmation',
+          qrToken,
+          confirmedAt: confirmedAt || new Date().toISOString(),
+        },
+        metadata: {
+          correlationId: event.metadata?.correlationId,
+        },
+      });
+
+      await this.eventBus.publish(EventType.NOTIFICATION_SENT, {
+        eventId: `notif-${reservationId}-${Date.now()}`,
+        eventType: EventType.NOTIFICATION_SENT,
+        service: 'stockpile-service',
+        timestamp: new Date(),
+        data: {
+          userId,
+          channel: 'email',
+          template: 'reservation_confirmed',
+          context: {
+            reservationId,
+            resourceId,
+            qrToken,
+          },
+        },
+        metadata: {
+          correlationId: event.metadata?.correlationId,
+        },
+      });
+
+      this.logger.log(
+        `Reservation ${reservationId} confirmed. Check-in prepared, document generated, notifications queued.`,
+      );
     } catch (error) {
       this.logger.error(
         `Error handling RESERVATION_CONFIRMED: ${error.message}`,

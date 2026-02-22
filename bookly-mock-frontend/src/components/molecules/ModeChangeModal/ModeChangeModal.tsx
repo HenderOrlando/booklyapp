@@ -1,0 +1,297 @@
+"use client";
+
+import { Button } from "@/components/atoms/Button/Button";
+import { cn } from "@/lib/utils";
+import {
+  AlertTriangle,
+  Database,
+  Globe,
+  Monitor,
+  Server,
+  Wifi,
+  WifiOff,
+  X,
+  Zap,
+} from "lucide-react";
+import * as React from "react";
+
+export type ModeChangeType = "data" | "routing";
+
+interface ModeChangeModalProps {
+  open: boolean;
+  onClose: () => void;
+  onConfirm: () => void;
+  changeType: ModeChangeType;
+  currentMode: string;
+  newMode: string;
+  currentRouting: string;
+  newRouting: string;
+}
+
+interface EffectItem {
+  icon: React.ReactNode;
+  label: string;
+  description: string;
+  type: "info" | "warning" | "success";
+}
+
+function getDataModeEffects(
+  newMode: string,
+  currentRouting: string,
+): EffectItem[] {
+  if (newMode === "serve") {
+    const isGateway = currentRouting === "gateway";
+    return [
+      {
+        icon: <Server className="h-4 w-4" />,
+        label: "Fuente de datos: Backend real",
+        description:
+          "Todas las consultas se ejecutarán contra los servicios reales (localhost:3000-3005).",
+        type: "info",
+      },
+      {
+        icon: <Zap className="h-4 w-4" />,
+        label: "Cache invalidado",
+        description:
+          "Todos los datos en cache se borrarán y se recargarán desde el servidor.",
+        type: "warning",
+      },
+      {
+        icon: isGateway ? (
+          <Wifi className="h-4 w-4" />
+        ) : (
+          <WifiOff className="h-4 w-4" />
+        ),
+        label: isGateway
+          ? "WebSocket: Se activará"
+          : "WebSocket: Desactivado (requiere Gateway)",
+        description: isGateway
+          ? "Recibirás notificaciones en tiempo real del servidor via WebSocket."
+          : "Para WebSocket, cambia el routing a GATEWAY.",
+        type: isGateway ? "success" : "warning",
+      },
+      {
+        icon: <AlertTriangle className="h-4 w-4" />,
+        label: "Requiere backend activo",
+        description:
+          "Si los servicios no están corriendo, las páginas mostrarán errores de conexión.",
+        type: "warning",
+      },
+    ];
+  }
+  return [
+    {
+      icon: <Database className="h-4 w-4" />,
+      label: "Fuente de datos: Datos locales (Mock)",
+      description:
+        "Todas las consultas usarán datos simulados locales. No se contactará ningún servidor.",
+      type: "info",
+    },
+    {
+      icon: <Zap className="h-4 w-4" />,
+      label: "Cache invalidado",
+      description:
+        "Todos los datos en cache se borrarán y se recargarán desde datos mock.",
+      type: "warning",
+    },
+    {
+      icon: <WifiOff className="h-4 w-4" />,
+      label: "WebSocket: Desactivado",
+      description:
+        "No habrá notificaciones en tiempo real. Los datos se actualizan solo al navegar.",
+      type: "info",
+    },
+    {
+      icon: <Monitor className="h-4 w-4" />,
+      label: "Sin dependencia de backend",
+      description:
+        "La aplicación funciona completamente offline con datos de ejemplo.",
+      type: "success",
+    },
+  ];
+}
+
+function getRoutingEffects(
+  newRouting: string,
+  currentMode: string,
+): EffectItem[] {
+  const isServe = currentMode === "serve";
+  if (newRouting === "gateway") {
+    return [
+      {
+        icon: <Globe className="h-4 w-4" />,
+        label: "Routing: API Gateway (localhost:3000)",
+        description:
+          "Todas las peticiones pasan por el Gateway que las enruta al microservicio correcto.",
+        type: "info",
+      },
+      {
+        icon: isServe ? (
+          <Wifi className="h-4 w-4" />
+        ) : (
+          <WifiOff className="h-4 w-4" />
+        ),
+        label: isServe
+          ? "WebSocket: Se activará"
+          : "WebSocket: Inactivo (modo Mock)",
+        description: isServe
+          ? "El Gateway gestiona la conexión WebSocket para notificaciones en tiempo real."
+          : "WebSocket solo funciona en modo SERVER + GATEWAY.",
+        type: isServe ? "success" : "info",
+      },
+      {
+        icon: <Zap className="h-4 w-4" />,
+        label: "Cache invalidado",
+        description:
+          "Se borran los datos en cache para refrescar desde la nueva ruta.",
+        type: "warning",
+      },
+    ];
+  }
+  return [
+    {
+      icon: <Server className="h-4 w-4" />,
+      label: "Routing: Servicios directos",
+      description:
+        "Las peticiones van directamente a cada microservicio (auth:3001, resources:3002, etc.).",
+      type: "info",
+    },
+    {
+      icon: <WifiOff className="h-4 w-4" />,
+      label: "WebSocket: Desactivado",
+      description:
+        "WebSocket solo funciona via Gateway. En modo directo no hay notificaciones en tiempo real.",
+      type: "warning",
+    },
+    {
+      icon: <Zap className="h-4 w-4" />,
+      label: "Cache invalidado",
+      description:
+        "Se borran los datos en cache para refrescar desde la nueva ruta.",
+      type: "warning",
+    },
+  ];
+}
+
+export function ModeChangeModal({
+  open,
+  onClose,
+  onConfirm,
+  changeType,
+  currentMode,
+  newMode,
+  currentRouting,
+  newRouting,
+}: ModeChangeModalProps) {
+  if (!open) return null;
+
+  const effects =
+    changeType === "data"
+      ? getDataModeEffects(newMode, currentRouting)
+      : getRoutingEffects(newRouting, currentMode);
+
+  const title =
+    changeType === "data"
+      ? `Cambiar a modo ${newMode === "serve" ? "SERVER" : "MOCK"}`
+      : `Cambiar routing a ${newRouting === "gateway" ? "GATEWAY" : "DIRECTO"}`;
+
+  const typeColors = {
+    info: "text-[var(--color-state-info-text)] bg-[var(--color-state-info-bg)] border-[var(--color-state-info-border)]",
+    warning:
+      "text-[var(--color-state-warning-text)] bg-[var(--color-state-warning-bg)] border-[var(--color-state-warning-border)]",
+    success:
+      "text-[var(--color-state-success-text)] bg-[var(--color-state-success-bg)] border-[var(--color-state-success-border)]",
+  };
+
+  const modeBadgeClass = (value: string) =>
+    value === "mock"
+      ? "bg-[var(--color-state-warning-bg)] text-[var(--color-state-warning-text)]"
+      : "bg-[var(--color-state-success-bg)] text-[var(--color-state-success-text)]";
+
+  const routingBadgeClass = (value: string) =>
+    value === "gateway"
+      ? "bg-[var(--color-state-info-bg)] text-[var(--color-state-info-text)]"
+      : "bg-[var(--color-bg-muted)] text-[var(--color-text-secondary)]";
+
+  return (
+    <div className="fixed inset-0 z-[100] flex items-center justify-center bg-[var(--color-bg-overlay)]">
+      <div className="relative mx-4 w-full max-w-md rounded-xl border border-[var(--color-border-subtle)] bg-[var(--color-bg-primary)] p-6 shadow-2xl">
+        {/* Header */}
+        <div className="flex items-center justify-between mb-4">
+          <h2 className="text-lg font-bold text-[var(--color-text-primary)]">
+            {title}
+          </h2>
+          <button
+            onClick={onClose}
+            className="rounded-lg p-1 text-[var(--color-text-tertiary)] hover:bg-[var(--color-bg-muted)] transition-colors"
+          >
+            <X className="h-5 w-5" />
+          </button>
+        </div>
+
+        {/* Summary badges */}
+        <div className="flex items-center gap-2 mb-4">
+          <span
+            className={cn(
+              "rounded-full px-3 py-1 text-xs font-semibold",
+              changeType === "data"
+                ? modeBadgeClass(currentMode)
+                : routingBadgeClass(currentRouting),
+            )}
+          >
+            {changeType === "data"
+              ? currentMode.toUpperCase()
+              : currentRouting.toUpperCase()}
+          </span>
+          <span className="text-[var(--color-text-tertiary)]">→</span>
+          <span
+            className={cn(
+              "rounded-full px-3 py-1 text-xs font-semibold",
+              changeType === "data"
+                ? modeBadgeClass(newMode)
+                : routingBadgeClass(newRouting),
+            )}
+          >
+            {changeType === "data"
+              ? newMode.toUpperCase()
+              : newRouting.toUpperCase()}
+          </span>
+        </div>
+
+        {/* Effects list */}
+        <div className="space-y-2 mb-6">
+          <p className="text-xs font-medium text-[var(--color-text-secondary)] uppercase tracking-wider mb-2">
+            Efectos del cambio
+          </p>
+          {effects.map((effect, i) => (
+            <div
+              key={i}
+              className={cn(
+                "flex items-start gap-3 rounded-lg border p-3",
+                typeColors[effect.type],
+              )}
+            >
+              <div className="mt-0.5 shrink-0">{effect.icon}</div>
+              <div>
+                <p className="text-sm font-medium">{effect.label}</p>
+                <p className="text-xs mt-0.5 opacity-80">
+                  {effect.description}
+                </p>
+              </div>
+            </div>
+          ))}
+        </div>
+
+        {/* Actions */}
+        <div className="flex gap-3">
+          <Button variant="outline" className="flex-1" onClick={onClose}>
+            Cancelar
+          </Button>
+          <Button className="flex-1" onClick={onConfirm}>
+            Confirmar cambio
+          </Button>
+        </div>
+      </div>
+    </div>
+  );
+}

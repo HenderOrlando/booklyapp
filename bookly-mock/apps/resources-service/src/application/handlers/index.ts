@@ -7,6 +7,7 @@ export * from "./restore-resource.handler";
 export * from "./rollback-import.handler";
 export * from "./schedule-maintenance.handler";
 export * from "./start-async-import.handler";
+export * from "./update-category.handler";
 export * from "./update-maintenance-status.handlers";
 export * from "./update-resource.handler";
 export * from "./validate-import.handler";
@@ -17,6 +18,7 @@ export * from "./get-categories.handler";
 export * from "./get-import-job.handlers";
 export * from "./get-maintenances.handler";
 export * from "./get-resource-by-id.handler";
+export * from "./get-resource-characteristics.handler";
 export * from "./get-resources.handler";
 export * from "./search-resources-advanced.handler";
 
@@ -32,6 +34,7 @@ import {
 } from "./get-import-job.handlers";
 import { GetMaintenancesHandler } from "./get-maintenances.handler";
 import { GetResourceByIdHandler } from "./get-resource-by-id.handler";
+import { GetResourceCharacteristicsHandler } from "./get-resource-characteristics.handler";
 import { GetResourcesHandler } from "./get-resources.handler";
 import { ImportResourcesHandler } from "./import-resources.handler";
 import { RestoreResourceHandler } from "./restore-resource.handler";
@@ -39,6 +42,7 @@ import { RollbackImportHandler } from "./rollback-import.handler";
 import { ScheduleMaintenanceHandler } from "./schedule-maintenance.handler";
 import { SearchResourcesAdvancedHandler } from "./search-resources-advanced.handler";
 import { StartAsyncImportHandler } from "./start-async-import.handler";
+import { UpdateCategoryHandler } from "./update-category.handler";
 import {
   CancelMaintenanceHandler,
   CompleteMaintenanceHandler,
@@ -61,6 +65,7 @@ export const CommandHandlers = [
   CompleteMaintenanceHandler,
   CancelMaintenanceHandler,
   CreateCategoryHandler,
+  UpdateCategoryHandler,
 ];
 
 export const QueryHandlers = [
@@ -69,6 +74,7 @@ export const QueryHandlers = [
   SearchResourcesAdvancedHandler,
   GetCategoriesHandler,
   GetMaintenancesHandler,
+  GetResourceCharacteristicsHandler,
   GetImportJobHandler,
   GetUserImportJobsHandler,
   GenerateImportTemplateHandler,

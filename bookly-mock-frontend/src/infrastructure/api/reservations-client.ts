@@ -33,6 +33,69 @@ import type {
 import { AVAILABILITY_ENDPOINTS, buildUrl } from "./endpoints";
 import type { PaginatedResponse } from "./types";
 
+const BACKEND_RESERVATION_STATUSES = [
+  "PENDING",
+  "CONFIRMED",
+  "APPROVED",
+  "REJECTED",
+  "CHECKED_IN",
+  "ACTIVE",
+  "COMPLETED",
+  "CANCELLED",
+] as const;
+
+export type BackendReservationStatus =
+  (typeof BACKEND_RESERVATION_STATUSES)[number];
+
+export interface ReservationSearchFilters {
+  resourceId?: string;
+  userId?: string;
+  status?: BackendReservationStatus;
+  startDate?: string;
+  endDate?: string;
+  search?: string;
+  page?: number;
+  limit?: number;
+}
+
+const backendReservationStatusSet: ReadonlySet<string> = new Set(
+  BACKEND_RESERVATION_STATUSES,
+);
+
+export function sanitizeReservationSearchFilters(
+  filters: ReservationSearchFilters,
+): ReservationSearchFilters {
+  const normalizedFilters = {
+    ...filters,
+  } as ReservationSearchFilters & { status?: string };
+
+  if (!normalizedFilters.status) {
+    return normalizedFilters;
+  }
+
+  const normalizedStatus = normalizedFilters.status.toUpperCase();
+
+  if (backendReservationStatusSet.has(normalizedStatus)) {
+    normalizedFilters.status = normalizedStatus as BackendReservationStatus;
+    return normalizedFilters;
+  }
+
+  if (process.env.NODE_ENV !== "production") {
+    console.warn(
+      `[ReservationsClient.search] Ignorando status no soportado por backend: ${normalizedFilters.status}`,
+    );
+  }
+
+  delete normalizedFilters.status;
+
+  // "upcoming" es semántica de frontend; se traduce al contrato real del backend.
+  if (normalizedStatus === "UPCOMING" && !normalizedFilters.startDate) {
+    normalizedFilters.startDate = new Date().toISOString();
+  }
+
+  return normalizedFilters;
+}
+
 /**
  * Cliente HTTP para operaciones de reservas
  */
@@ -49,7 +112,7 @@ export class ReservationsClient {
    */
   static async getAll(): Promise<ApiResponse<PaginatedResponse<Reservation>>> {
     return await httpClient.get<PaginatedResponse<Reservation>>(
-      AVAILABILITY_ENDPOINTS.RESERVATIONS
+      AVAILABILITY_ENDPOINTS.RESERVATIONS,
     );
   }
 
@@ -68,7 +131,7 @@ export class ReservationsClient {
    */
   static async getById(id: string): Promise<ApiResponse<Reservation>> {
     return await httpClient.get<Reservation>(
-      AVAILABILITY_ENDPOINTS.RESERVATION_BY_ID(id)
+      AVAILABILITY_ENDPOINTS.RESERVATION_BY_ID(id),
     );
   }
 
@@ -89,11 +152,11 @@ export class ReservationsClient {
    * ```
    */
   static async create(
-    data: CreateReservationDto
+    data: CreateReservationDto,
   ): Promise<ApiResponse<Reservation>> {
     return await httpClient.post<Reservation>(
       AVAILABILITY_ENDPOINTS.RESERVATIONS,
-      data
+      data,
     );
   }
 
@@ -113,11 +176,11 @@ export class ReservationsClient {
    */
   static async update(
     id: string,
-    data: Partial<UpdateReservationDto>
+    data: Partial<UpdateReservationDto>,
   ): Promise<ApiResponse<Reservation>> {
     return await httpClient.patch<Reservation>(
       AVAILABILITY_ENDPOINTS.RESERVATION_BY_ID(id),
-      data
+      data,
     );
   }
 
@@ -134,7 +197,225 @@ export class ReservationsClient {
    */
   static async cancel(id: string): Promise<ApiResponse<Reservation>> {
     return await httpClient.delete<Reservation>(
-      AVAILABILITY_ENDPOINTS.RESERVATION_BY_ID(id)
+      AVAILABILITY_ENDPOINTS.RESERVATION_BY_ID(id),
+    );
+  }
+
+  /**
+   * Obtiene estadísticas de reservas
+   *
+   * @param filters - Filtros de búsqueda (opcional)
+   * @returns Estadísticas de reservas
+   */
+  static async getStats(filters?: ReservationSearchFilters): Promise<
+    ApiResponse<{
+      total: number;
+      pending: number;
+      confirmed: number;
+      inProgress: number;
+      completed: number;
+      cancelled: number;
+      active: number;
+      upcoming: number;
+      today: number;
+    }>
+  > {
+    const sanitizedFilters = filters
+      ? sanitizeReservationSearchFilters(filters)
+      : {};
+    return await httpClient.get(
+      buildUrl(`${AVAILABILITY_ENDPOINTS.RESERVATIONS}/stats`, sanitizedFilters as Record<string, unknown>),
+    );
+  }
+
+  // ============================================
+  // RESERVAS RECURRENTES
+  // ============================================
+
+  /**
+   * Crea una serie de reservas recurrentes
+   *
+   * @param data - Datos de la reserva recurrente
+   * @returns Serie creada con instancias
+   * @example
+   * ```typescript
+   * const series = await ReservationsClient.createRecurring({
+   *   baseReservation: {
+   *     resourceId: "res_001",
+   *     startDate: "2025-11-26T10:00:00",
+   *     endDate: "2025-11-26T12:00:00",
+   *     purpose: "Reunión semanal"
+   *   },
+   *   recurringPattern: {
+   *     type: "WEEKLY",
+   *     interval: 1,
+   *     daysOfWeek: [1, 3, 5], // Lunes, Miércoles, Viernes
+   *     endDate: "2026-02-26T23:59:59"
+   *   }
+   * });
+   * ```
+   */
+  static async createRecurring(data: any): Promise<ApiResponse<any>> {
+    return await httpClient.post<any>(AVAILABILITY_ENDPOINTS.RECURRING, data);
+  }
+
+  /**
+   * Previsualiza una serie recurrente sin crear reservas
+   *
+   * @param data - Datos para previsualizar
+   * @returns Preview de instancias y validación
+   */
+  static async previewRecurring(data: any): Promise<ApiResponse<any>> {
+    return await httpClient.post<any>(
+      `${AVAILABILITY_ENDPOINTS.RECURRING}/preview`,
+      data,
+    );
+  }
+
+  /**
+   * Obtiene series recurrentes del usuario
+   *
+   * @param filters - Filtros opcionales
+   * @returns Lista de series recurrentes
+   */
+  static async getRecurringSeries(filters?: any): Promise<ApiResponse<any[]>> {
+    return await httpClient.get<any[]>(AVAILABILITY_ENDPOINTS.RECURRING, {
+      params: filters,
+    });
+  }
+
+  /**
+   * Obtiene una serie recurrente específica
+   *
+   * @param seriesId - ID de la serie
+   * @param includeInstances - Incluir instancias individuales
+   * @returns Serie con sus instancias
+   */
+  static async getRecurringSeriesById(
+    seriesId: string,
+    includeInstances: boolean = true,
+  ): Promise<ApiResponse<any>> {
+    return await httpClient.get<any>(
+      `${AVAILABILITY_ENDPOINTS.RECURRING_BY_ID(seriesId)}?includeInstances=${includeInstances}`,
+    );
+  }
+
+  /**
+   * Actualiza una serie recurrente completa
+   *
+   * @param seriesId - ID de la serie
+   * @param data - Datos de actualización
+   * @returns Serie actualizada
+   */
+  static async updateRecurringSeries(
+    seriesId: string,
+    data: any,
+  ): Promise<ApiResponse<any>> {
+    return await httpClient.patch<any>(
+      AVAILABILITY_ENDPOINTS.RECURRING_BY_ID(seriesId),
+      data,
+    );
+  }
+
+  /**
+   * Cancela una serie recurrente completa
+   *
+   * @param seriesId - ID de la serie
+   * @param reason - Motivo de cancelación
+   * @returns Confirmación de cancelación
+   */
+  static async cancelRecurringSeries(
+    seriesId: string,
+    reason: string,
+  ): Promise<ApiResponse<any>> {
+    return await httpClient.delete<any>(
+      `${AVAILABILITY_ENDPOINTS.RECURRING_BY_ID(seriesId)}/cancel`,
+      { data: { reason } },
+    );
+  }
+
+  /**
+   * Cancela una instancia individual de una serie
+   *
+   * @param instanceId - ID de la instancia
+   * @param reason - Motivo de cancelación
+   * @returns Confirmación de cancelación
+   */
+  static async cancelRecurringInstance(
+    instanceId: string,
+    reason: string,
+  ): Promise<ApiResponse<any>> {
+    return await httpClient.post<any>(
+      `${AVAILABILITY_ENDPOINTS.RECURRING}/series/instances/${instanceId}/cancel`,
+      { reason },
+    );
+  }
+
+  /**
+   * Modifica una instancia individual de una serie
+   *
+   * @param instanceId - ID de la instancia
+   * @param data - Datos de modificación
+   * @returns Instancia modificada
+   */
+  static async modifyRecurringInstance(
+    instanceId: string,
+    data: any,
+  ): Promise<ApiResponse<any>> {
+    return await httpClient.patch<any>(
+      `${AVAILABILITY_ENDPOINTS.RECURRING}/series/instances/${instanceId}`,
+      data,
+    );
+  }
+
+  /**
+   * Obtiene analytics de series recurrentes
+   *
+   * @param filters - Filtros para analytics
+   * @returns Métricas y estadísticas
+   */
+  static async getRecurringAnalytics(filters?: any): Promise<ApiResponse<any>> {
+    return await httpClient.get<any>(
+      `${AVAILABILITY_ENDPOINTS.RECURRING}/analytics`,
+      { params: filters },
+    );
+  }
+
+  // ============================================
+  // CHECK-IN / CHECK-OUT
+  // ============================================
+
+  /**
+   * Realiza check-in de una reserva
+   *
+   * @param id - ID de la reserva
+   * @returns Confirmación de check-in
+   * @example
+   * ```typescript
+   * const checkin = await ReservationsClient.checkIn("rsv_001");
+   * console.log(checkin.data.message); // "Check-in completed successfully"
+   * ```
+   */
+  static async checkIn(id: string): Promise<ApiResponse<any>> {
+    return await httpClient.post<any>(
+      `${AVAILABILITY_ENDPOINTS.RESERVATION_BY_ID(id)}/check-in`,
+    );
+  }
+
+  /**
+   * Realiza check-out de una reserva
+   *
+   * @param id - ID de la reserva
+   * @returns Confirmación de check-out
+   * @example
+   * ```typescript
+   * const checkout = await ReservationsClient.checkOut("rsv_001");
+   * console.log(checkout.data.message); // "Check-out completed successfully"
+   * ```
+   */
+  static async checkOut(id: string): Promise<ApiResponse<any>> {
+    return await httpClient.post<any>(
+      `${AVAILABILITY_ENDPOINTS.RESERVATION_BY_ID(id)}/check-out`,
     );
   }
 
@@ -149,17 +430,13 @@ export class ReservationsClient {
    * @returns Lista filtrada de reservas
    * @future Implementar cuando backend esté disponible
    */
-  static async search(filters: {
-    resourceId?: string;
-    userId?: string;
-    status?: string;
-    startDate?: string;
-    endDate?: string;
-    page?: number;
-    limit?: number;
-  }): Promise<ApiResponse<PaginatedResponse<Reservation>>> {
+  static async search(
+    filters: ReservationSearchFilters,
+  ): Promise<ApiResponse<PaginatedResponse<Reservation>>> {
+    const sanitizedFilters = sanitizeReservationSearchFilters(filters);
+
     return await httpClient.get<PaginatedResponse<Reservation>>(
-      buildUrl(AVAILABILITY_ENDPOINTS.RESERVATIONS, filters)
+      buildUrl(AVAILABILITY_ENDPOINTS.RESERVATIONS, sanitizedFilters as unknown as Record<string, unknown>),
     );
   }
 
@@ -171,10 +448,10 @@ export class ReservationsClient {
    * @future Implementar cuando backend esté disponible
    */
   static async getByResource(
-    resourceId: string
+    resourceId: string,
   ): Promise<ApiResponse<PaginatedResponse<Reservation>>> {
     return await httpClient.get<PaginatedResponse<Reservation>>(
-      buildUrl(AVAILABILITY_ENDPOINTS.RESERVATIONS, { resourceId })
+      buildUrl(AVAILABILITY_ENDPOINTS.RESERVATIONS, { resourceId }),
     );
   }
 
@@ -186,10 +463,10 @@ export class ReservationsClient {
    * @future Implementar cuando backend esté disponible
    */
   static async getByUser(
-    userId: string
+    userId: string,
   ): Promise<ApiResponse<PaginatedResponse<Reservation>>> {
     return await httpClient.get<PaginatedResponse<Reservation>>(
-      buildUrl(AVAILABILITY_ENDPOINTS.RESERVATIONS, { userId })
+      buildUrl(AVAILABILITY_ENDPOINTS.RESERVATIONS, { userId }),
     );
   }
 
@@ -205,7 +482,7 @@ export class ReservationsClient {
   static async checkConflicts(
     resourceId: string,
     startDate: string,
-    endDate: string
+    endDate: string,
   ): Promise<
     ApiResponse<{
       hasConflict: boolean;
@@ -220,7 +497,7 @@ export class ReservationsClient {
         resourceId,
         startDate,
         endDate,
-      })
+      }),
     );
   }
 }

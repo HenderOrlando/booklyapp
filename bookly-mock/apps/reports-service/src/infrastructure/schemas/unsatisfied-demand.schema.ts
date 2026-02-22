@@ -1,8 +1,3 @@
-import {
-  UnsatisfiedDemandPriority,
-  UnsatisfiedDemandReason,
-  UnsatisfiedDemandStatus,
-} from "@libs/common/enums";
 import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
 import { Document, Types } from "mongoose";
 
@@ -56,27 +51,14 @@ export class UnsatisfiedDemand extends Document {
   @Prop({ required: true })
   duration: number;
 
-  @Prop({
-    required: true,
-    enum: Object.values(UnsatisfiedDemandReason),
-    index: true,
-  })
-  reason: UnsatisfiedDemandReason;
+  @Prop({ required: true, index: true })
+  reason: string;
 
-  @Prop({
-    required: true,
-    enum: Object.values(UnsatisfiedDemandPriority),
-    index: true,
-  })
-  priority: UnsatisfiedDemandPriority;
+  @Prop({ required: true, index: true })
+  priority: string;
 
-  @Prop({
-    required: true,
-    enum: Object.values(UnsatisfiedDemandStatus),
-    index: true,
-    default: UnsatisfiedDemandStatus.PENDING,
-  })
-  status: UnsatisfiedDemandStatus;
+  @Prop({ required: true, index: true, default: "PENDING" })
+  status: string;
 
   @Prop()
   reasonDetails?: string;

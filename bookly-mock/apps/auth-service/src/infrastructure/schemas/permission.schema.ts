@@ -44,7 +44,6 @@ export class Permission {
 
 export const PermissionSchema = SchemaFactory.createForClass(Permission);
 
-// Indexes
-PermissionSchema.index({ code: 1 }, { unique: true });
+// Indexes (code already has unique index from @Prop decorator)
 PermissionSchema.index({ resource: 1, action: 1 });
 PermissionSchema.index({ isActive: 1 });

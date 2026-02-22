@@ -147,7 +147,7 @@ export function useCreateMaintenance() {
  */
 export function useUpdateMaintenance() {
   const queryClient = useQueryClient();
-  const { showSuccess, showError } = useToast();
+  const { showSuccess: _showSuccess, showError } = useToast();
 
   return useMutation({
     mutationFn: async ({
@@ -199,7 +199,7 @@ export function useUpdateMaintenance() {
  */
 export function useCompleteMaintenance() {
   const queryClient = useQueryClient();
-  const { showSuccess, showError } = useToast();
+  const { showSuccess: _showSuccess, showError: _showError } = useToast();
 
   return useMutation({
     mutationFn: async (data: CompleteMaintenanceDto) => {

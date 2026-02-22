@@ -1,7 +1,4 @@
-import html2canvas from "html2canvas";
-import jsPDF from "jspdf";
 import { useCallback } from "react";
-import * as XLSX from "xlsx";
 
 export interface ChartExportOptions {
   filename?: string;
@@ -18,6 +15,7 @@ export function useChartExport() {
         throw new Error(`Chart element with id "${chartId}" not found`);
       }
 
+      const { default: html2canvas } = await import("html2canvas");
       const canvas = await html2canvas(element, {
         backgroundColor: "#ffffff",
         scale: 2,
@@ -35,6 +33,10 @@ export function useChartExport() {
 
   const exportChartAsPDF = useCallback(
     async (chartIds: string[], filename: string = "report", title?: string) => {
+      const [{ default: html2canvas }, { default: jsPDF }] = await Promise.all([
+        import("html2canvas"),
+        import("jspdf"),
+      ]);
       const pdf = new jsPDF("p", "mm", "a4");
       const pageWidth = pdf.internal.pageSize.getWidth();
       const pageHeight = pdf.internal.pageSize.getHeight();
@@ -82,6 +84,10 @@ export function useChartExport() {
 
   const exportDataWithCharts = useCallback(
     async (data: any[], chartIds: string[], filename: string = "report") => {
+      const [{ default: html2canvas }, XLSX] = await Promise.all([
+        import("html2canvas"),
+        import("xlsx"),
+      ]);
       // Create workbook
       const wb = XLSX.utils.book_new();
 

@@ -18,8 +18,6 @@ import {
   type FilterChip,
 } from "@/components/molecules/FilterChips";
 import { SearchBar } from "@/components/molecules/SearchBar";
-import { AppHeader } from "@/components/organisms/AppHeader";
-import { AppSidebar } from "@/components/organisms/AppSidebar";
 import { MaintenanceModal } from "@/components/organisms/MaintenanceModal";
 import { MainLayout } from "@/components/templates/MainLayout";
 import {
@@ -32,7 +30,7 @@ import { resourceKeys } from "@/hooks/useResources";
 import { httpClient } from "@/infrastructure/http";
 import { Maintenance, Resource } from "@/types/entities/resource";
 import { useQuery } from "@tanstack/react-query";
-import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 import * as React from "react";
 
 /**
@@ -42,13 +40,13 @@ import * as React from "react";
  */
 
 export default function MantenimientosPage() {
-  const router = useRouter();
+  const t = useTranslations("maintenance");
 
   // React Query para cargar mantenimientos
   const { data: maintenances = [], isLoading: loading } = useQuery({
     queryKey: maintenanceKeys.lists(),
     queryFn: async () => {
-      const response = await httpClient.get("maintenances");
+      const response = await httpClient.get<{ items?: Maintenance[] }>("maintenances");
       return response.data?.items || [];
     },
     staleTime: 1000 * 60 * 3, // 3 minutos
@@ -58,7 +56,7 @@ export default function MantenimientosPage() {
   const { data: resources = [] } = useQuery({
     queryKey: resourceKeys.lists(),
     queryFn: async () => {
-      const response = await httpClient.get("resources");
+      const response = await httpClient.get<{ items?: Resource[] }>("resources");
       return response.data?.items || [];
     },
     staleTime: 1000 * 60 * 5,
@@ -86,7 +84,7 @@ export default function MantenimientosPage() {
     (maintenance: Maintenance) => {
       if (filter !== "") {
         const resource = resources.find(
-          (r: Resource) => r.id === maintenance.resourceId
+          (r: Resource) => r.id === maintenance.resourceId,
         );
         const searchTerm = filter.toLowerCase();
         const matchesText =
@@ -101,7 +99,7 @@ export default function MantenimientosPage() {
       }
 
       return true;
-    }
+    },
   );
 
   // Handlers
@@ -125,7 +123,6 @@ export default function MantenimientosPage() {
         },
         onError: (err: any) => {
           console.error("Error al crear mantenimiento:", err);
-          alert("Error al guardar el mantenimiento");
         },
       });
     } else {
@@ -142,9 +139,8 @@ export default function MantenimientosPage() {
           },
           onError: (err: any) => {
             console.error("Error al actualizar mantenimiento:", err);
-            alert("Error al guardar el mantenimiento");
           },
-        }
+        },
       );
     }
   };
@@ -155,7 +151,7 @@ export default function MantenimientosPage() {
     cancelMaintenance.mutate(
       {
         id: maintenanceToDelete.id,
-        reason: "Cancelado por el usuario",
+        reason: t("cancel_reason_user"),
       },
       {
         onSuccess: () => {
@@ -164,9 +160,8 @@ export default function MantenimientosPage() {
         },
         onError: (err: any) => {
           console.error("Error al cancelar mantenimiento:", err);
-          alert("Error al cancelar el mantenimiento");
         },
-      }
+      },
     );
   };
 
@@ -176,54 +171,56 @@ export default function MantenimientosPage() {
   const columns = [
     {
       key: "resource",
-      header: "Recurso",
+      header: t("resource"),
       cell: (maintenance: Maintenance) => {
         const resource = resources.find(
-          (r: Resource) => r.id === maintenance.resourceId
+          (r: Resource) => r.id === maintenance.resourceId,
         );
         return resource ? (
           <div>
-            <p className="font-medium text-white">{resource.name}</p>
-            <p className="text-sm text-gray-400">{resource.code}</p>
+            <p className="font-medium text-foreground">{resource.name}</p>
+            <p className="text-sm text-[var(--color-text-tertiary)]">
+              {resource.code}
+            </p>
           </div>
         ) : (
-          <p className="text-gray-400">-</p>
+          <p className="text-[var(--color-text-tertiary)]">-</p>
         );
       },
     },
     {
       key: "type",
-      header: "Tipo",
+      header: t("type"),
       cell: (maintenance: Maintenance) => (
         <StatusBadge type="maintenanceType" status={maintenance.type} />
       ),
     },
     {
       key: "status",
-      header: "Estado",
+      header: t("status"),
       cell: (maintenance: Maintenance) => (
         <StatusBadge type="maintenance" status={maintenance.status} />
       ),
     },
     {
       key: "scheduledDate",
-      header: "Fecha Programada",
+      header: t("scheduled_date"),
       cell: (maintenance: Maintenance) => (
-        <p className="text-white">
+        <p className="text-foreground">
           {new Date(maintenance.scheduledDate).toLocaleString()}
         </p>
       ),
     },
     {
       key: "technician",
-      header: "Técnico",
+      header: t("technician"),
       cell: (maintenance: Maintenance) => (
-        <p className="text-white">{maintenance.technician || "-"}</p>
+        <p className="text-foreground">{maintenance.technician || "-"}</p>
       ),
     },
     {
       key: "actions",
-      header: "Acciones",
+      header: t("actions"),
       cell: (maintenance: Maintenance) => (
         <div className="flex gap-2">
           <Button
@@ -231,7 +228,7 @@ export default function MantenimientosPage() {
             size="sm"
             onClick={() => handleEdit(maintenance)}
           >
-            Editar
+            {t("edit")}
           </Button>
           <Button
             variant="outline"
@@ -241,54 +238,53 @@ export default function MantenimientosPage() {
               setShowDeleteModal(true);
             }}
           >
-            Eliminar
+            {t("delete")}
           </Button>
         </div>
       ),
     },
   ];
 
-  const header = <AppHeader title="Mantenimientos" />;
-  const sidebar = <AppSidebar />;
-
   if (loading) {
     return (
-      <MainLayout header={header} sidebar={sidebar}>
-        <LoadingSpinner fullScreen text="Cargando mantenimientos..." />
+      <MainLayout>
+        <LoadingSpinner fullScreen text={t("loading")} />
       </MainLayout>
     );
   }
 
   return (
-    <MainLayout header={header} sidebar={sidebar}>
+    <MainLayout>
       <div className="space-y-6 pb-6">
         <div className="flex items-center justify-between">
           <div>
             <h2 className="text-3xl font-bold text-[var(--color-text-primary)]">
-              Mantenimientos
+              {t("title")}
             </h2>
             <p className="text-[var(--color-text-secondary)] mt-2">
-              Programación y gestión de mantenimientos
+              {t("description")}
             </p>
           </div>
-          <Button onClick={handleCreate}>Programar Mantenimiento</Button>
+          <Button onClick={handleCreate}>{t("program_maintenance")}</Button>
         </div>
 
         <Card>
           <CardHeader>
             <div className="flex items-center justify-between mb-4">
               <div>
-                <CardTitle>Lista de Mantenimientos</CardTitle>
+                <CardTitle>{t("maintenance_list")}</CardTitle>
                 <CardDescription>
-                  {filteredMaintenances.length} de {maintenances.length}{" "}
-                  mantenimientos
+                  {t("showing_count", {
+                    count: filteredMaintenances.length,
+                    total: maintenances.length,
+                  })}
                 </CardDescription>
               </div>
             </div>
 
             <div className="flex items-center gap-3">
               <SearchBar
-                placeholder="Buscar por recurso, descripción o técnico..."
+                placeholder={t("search_placeholder")}
                 value={filter}
                 onChange={setFilter}
                 onClear={() => setFilter("")}
@@ -301,14 +297,14 @@ export default function MantenimientosPage() {
                   size="sm"
                   onClick={() => setStatusFilter("all")}
                 >
-                  Todos
+                  {t("all")}
                 </Button>
                 <Button
                   variant={statusFilter === "SCHEDULED" ? "default" : "outline"}
                   size="sm"
                   onClick={() => setStatusFilter("SCHEDULED")}
                 >
-                  Programados
+                  {t("scheduled_plural")}
                 </Button>
                 <Button
                   variant={
@@ -317,14 +313,14 @@ export default function MantenimientosPage() {
                   size="sm"
                   onClick={() => setStatusFilter("IN_PROGRESS")}
                 >
-                  En Progreso
+                  {t("in_progress_plural")}
                 </Button>
                 <Button
                   variant={statusFilter === "COMPLETED" ? "default" : "outline"}
                   size="sm"
                   onClick={() => setStatusFilter("COMPLETED")}
                 >
-                  Completados
+                  {t("completed_plural")}
                 </Button>
               </div>
             </div>
@@ -337,20 +333,20 @@ export default function MantenimientosPage() {
                   if (filter) {
                     chips.push({
                       key: "search",
-                      label: "Búsqueda",
+                      label: t("search_filter"),
                       value: filter,
                     });
                   }
                   if (statusFilter !== "all") {
                     const statusLabels: Record<string, string> = {
-                      SCHEDULED: "Programados",
-                      IN_PROGRESS: "En Progreso",
-                      COMPLETED: "Completados",
-                      CANCELLED: "Cancelados",
+                      SCHEDULED: t("scheduled_plural"),
+                      IN_PROGRESS: t("in_progress_plural"),
+                      COMPLETED: t("completed_plural"),
+                      CANCELLED: t("cancelled"),
                     };
                     chips.push({
                       key: "status",
-                      label: "Estado",
+                      label: t("status_filter"),
                       value: statusLabels[statusFilter] || statusFilter,
                     });
                   }
@@ -370,11 +366,11 @@ export default function MantenimientosPage() {
           <CardContent>
             {filteredMaintenances.length === 0 ? (
               <EmptyState
-                title="No se encontraron mantenimientos"
+                title={t("no_results_title")}
                 description={
                   filter || statusFilter !== "all"
-                    ? "No hay mantenimientos que coincidan con los filtros aplicados."
-                    : "Aún no hay mantenimientos programados. Programa el primer mantenimiento."
+                    ? t("no_results_desc")
+                    : t("empty_desc")
                 }
                 action={
                   filter || statusFilter !== "all" ? (
@@ -384,11 +380,11 @@ export default function MantenimientosPage() {
                         setStatusFilter("all");
                       }}
                     >
-                      Limpiar Filtros
+                      {t("clear_filters")}
                     </Button>
                   ) : (
                     <Button onClick={handleCreate}>
-                      Programar Mantenimiento
+                      {t("program_maintenance")}
                     </Button>
                   )
                 }
@@ -415,18 +411,18 @@ export default function MantenimientosPage() {
             setMaintenanceToDelete(null);
           }}
           onConfirm={handleDelete}
-          title="Confirmar Eliminación"
-          description="¿Estás seguro que deseas eliminar este mantenimiento?"
-          confirmText="Eliminar"
-          cancelText="Cancelar"
+          title={t("delete_title")}
+          description={t("delete_confirm")}
+          confirmText={t("delete_button")}
+          cancelText={t("cancel_button")}
           variant="destructive"
         >
           {maintenanceToDelete && (
-            <div className="bg-gray-800 p-4 rounded-lg">
-              <p className="font-medium text-white">
+            <div className="bg-[var(--color-bg-primary)] p-4 rounded-lg">
+              <p className="font-medium text-foreground">
                 {maintenanceToDelete.description}
               </p>
-              <p className="text-sm text-gray-400">
+              <p className="text-sm text-[var(--color-text-tertiary)]">
                 {new Date(maintenanceToDelete.scheduledDate).toLocaleString()}
               </p>
             </div>
