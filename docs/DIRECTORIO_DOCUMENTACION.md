@@ -52,7 +52,8 @@ Documentación transversal, requisitos de negocio, alineación entre equipos y r
   * [`BACKEND_FRONTEND_ENDPOINTS_AUDIT.md`](./api-alignment/BACKEND_FRONTEND_ENDPOINTS_AUDIT.md) - Auditoría de contratos.
   * `inventories/` - Inventario de endpoints por microservicio (.md y .csv).
   * `missing-definitions/` - Definiciones faltantes identificadas en auditorías (MD-002 a MD-011).
-  * **Plan Activo:** Alineación sistemática de endpoints en páginas del frontend (Skills requeridos: `web-app`, `ux-ui`, `backend`, `align-front-back`, `qa-calidad`, `operacion-interna-equipo`, `gestion-ingenieria-delivery`).
+  * [`PLAN_100_PERCENT_ENDPOINTS.md`](./api-alignment/PLAN_100_PERCENT_ENDPOINTS.md) - Plan maestro para llevar todos los endpoints a 100% backend funcional + 100% frontend implementado.
+  * **Plan Activo:** Ejecución del plan 100% endpoints (10 fases, 6 semanas). Skills: `web-app`, `ux-ui`, `backend`, `data-reporting`, `qa-calidad`, `seguridad-avanzada`, `gestion-datos-calidad`, `plataforma-build-deploy-operate-observe`, `operacion-interna-equipo`, `gestion-ingenieria-delivery`.
 
 * **Gestión de Proyecto (`project-management/`):**
   * [`PROGRESO_IMPLEMENTACION.md`](./project-management/PROGRESO_IMPLEMENTACION.md) - Estado y avance general.
