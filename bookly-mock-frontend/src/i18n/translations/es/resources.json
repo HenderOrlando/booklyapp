@@ -82,5 +82,6 @@
     "MEETING_ROOM": "Sala de Juntas",
     "VEHICLE": "Vehículo",
     "OTHER": "Otro"
-  }
+  },
+  "filter_by_type": "Filtrar por Tipo"
 }

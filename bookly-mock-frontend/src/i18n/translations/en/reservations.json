@@ -71,6 +71,11 @@
       "CANCELLED": "Cancelled",
       "REJECTED": "Rejected",
       "CONFLICT": "Conflict"
+    },
+    "T": "T",
+    "recurring_preview": {
+      "success_message": "Recurring reservations successfully created.",
+      "success_title": "Success"
     }
   },
   "recurring_selector": {
@@ -124,7 +129,8 @@
     "confirm_all_btn": "Confirm {count} Reservations",
     "cancel_btn": "Cancel",
     "success_title": "Recurring Reservations Created",
-    "success_message": "{total} reservations were created successfully."
+    "success_message": "{total} reservations were created successfully.",
+    "T": "T"
   },
   "view_grid": "Grid View",
   "view_virtual": "Virtual View",
@@ -145,7 +151,10 @@
     "completed": "Completed",
     "cancelled": "Cancelled",
     "rejected": "Rejected",
-    "utilization": "Usage Rate"
+    "utilization": "Usage Rate",
+    "active": "Active",
+    "today": "Today",
+    "upcoming": "Upcoming"
   },
   "statuses": {
     "PENDING": "Pending",
@@ -153,6 +162,18 @@
     "IN_PROGRESS": "In Progress",
     "COMPLETED": "Completed",
     "CANCELLED": "Cancelled",
-    "REJECTED": "Rejected"
+    "REJECTED": "Rejected",
+    "ACTIVE": "Active",
+    "CONFLICT": "Conflict"
+  },
+  "reasignacion": {
+    "titulo": "Reservation Reassignment",
+    "descripcion": "Manage reservations that need to be reassigned to other resources.",
+    "pendientes": "Pending",
+    "sin_pendientes_titulo": "Sin Pendientes Titulo",
+    "sin_pendientes_desc": "Sin Pendientes Desc",
+    "historial_titulo": "Historial Titulo",
+    "historial_desc": "Historial Desc",
+    "sin_historial": "Sin Historial"
   }
 }

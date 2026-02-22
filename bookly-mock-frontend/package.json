@@ -73,6 +73,7 @@
     "zod": "^3.23.0"
   },
   "devDependencies": {
+    "@axe-core/playwright": "^4.11.1",
     "@chromatic-com/storybook": "^3.2.7",
     "@next/bundle-analyzer": "^15.1.0",
     "@playwright/test": "^1.44.0",

@@ -10,5 +10,9 @@
   },
   "legend": "Status Legend",
   "tip": "💡 Tip: Hover over a reservation to see all details",
-  "reschedule_error": "Error rescheduling reservation. Please try again."
+  "reschedule_error": "Error rescheduling reservation. Please try again.",
+  "date": "Date",
+  "resourceId": "Resource ID",
+  "T": "T",
+  "create_reservation": "Create Reservation"
 }

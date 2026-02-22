@@ -59,5 +59,7 @@
   "status_change_error": "Error changing program status",
   "save_resources_error": "Error saving resource changes",
   "add_user_error": "Error adding user to program",
-  "remove_user_error": "Error removing user from program"
+  "remove_user_error": "Error removing user from program",
+  "program-resources": "Program Resources",
+  "program-users": "Program Users"
 }

@@ -40,5 +40,6 @@
   "success_check_out_title": "Check-out exitoso",
   "success_check_out_desc": "Has realizado check-out correctamente",
   "error_check_out_title": "Error en check-out",
-  "error_check_out_desc": "No se pudo realizar el check-out"
+  "error_check_out_desc": "No se pudo realizar el check-out",
+  "error": "Error"
 }

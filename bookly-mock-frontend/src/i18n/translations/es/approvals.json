@@ -77,5 +77,7 @@
   "rejection_reason_title": "Razón de Rechazo",
   "action_history": "Historial de Acciones",
   "no_records_found": "No se encontraron registros",
-  "showing_records": "Mostrando {count} de {total} registros"
+  "showing_records": "Mostrando {count} de {total} registros",
+  "not_found": "Aprobación no encontrada",
+  "a": "a"
 }

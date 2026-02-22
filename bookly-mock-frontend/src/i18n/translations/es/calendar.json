@@ -10,5 +10,9 @@
   },
   "legend": "Leyenda de Estados",
   "tip": "💡 Tip: Pasa el cursor sobre una reserva para ver todos los detalles",
-  "reschedule_error": "Error al reasignar la reserva. Por favor intenta de nuevo."
+  "reschedule_error": "Error al reasignar la reserva. Por favor intenta de nuevo.",
+  "date": "Fecha",
+  "resourceId": "ID Recurso",
+  "T": "T",
+  "create_reservation": "Crear Reserva"
 }

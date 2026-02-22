@@ -82,5 +82,6 @@
     "MEETING_ROOM": "Meeting Room",
     "VEHICLE": "Vehicle",
     "OTHER": "Other"
-  }
+  },
+  "filter_by_type": "Filter by Type"
 }

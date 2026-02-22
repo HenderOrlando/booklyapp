@@ -49,5 +49,6 @@
     "search_placeholder": "Search by name, code...",
     "status_label": "Status"
   },
-  "delete_confirm_button": "Delete"
+  "delete_confirm_button": "Delete",
+  "search_placeholder": "Search characteristics..."
 }

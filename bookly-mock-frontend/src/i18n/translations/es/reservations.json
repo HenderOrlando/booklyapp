@@ -71,6 +71,11 @@
       "CANCELLED": "Cancelada",
       "REJECTED": "Rechazada",
       "CONFLICT": "Conflicto"
+    },
+    "T": "T",
+    "recurring_preview": {
+      "success_message": "Reservas recurrentes creadas con éxito.",
+      "success_title": "Éxito"
     }
   },
   "recurring_selector": {
@@ -124,7 +129,8 @@
     "confirm_all_btn": "Confirmar {count} Reservas",
     "cancel_btn": "Cancelar",
     "success_title": "Reservas Recurrentes Creadas",
-    "success_message": "Se crearon {total} reservas exitosamente."
+    "success_message": "Se crearon {total} reservas exitosamente.",
+    "T": "T"
   },
   "view_grid": "Vista Grid",
   "view_virtual": "Vista Virtual",
@@ -145,7 +151,10 @@
     "completed": "Completadas",
     "cancelled": "Canceladas",
     "rejected": "Rechazadas",
-    "utilization": "Tasa de Uso"
+    "utilization": "Tasa de Uso",
+    "active": "Activas",
+    "today": "Hoy",
+    "upcoming": "Próximas"
   },
   "statuses": {
     "PENDING": "Pendiente",
@@ -153,6 +162,18 @@
     "IN_PROGRESS": "En Progreso",
     "COMPLETED": "Completada",
     "CANCELLED": "Cancelada",
-    "REJECTED": "Rechazada"
+    "REJECTED": "Rechazada",
+    "ACTIVE": "Activa",
+    "CONFLICT": "Conflicto"
+  },
+  "reasignacion": {
+    "titulo": "Reasignación de Reservas",
+    "descripcion": "Gestiona las reservas que requieren ser reasignadas a otros recursos.",
+    "pendientes": "Pendientes",
+    "sin_pendientes_titulo": "Sin reservas pendientes",
+    "sin_pendientes_desc": "No hay reservas pendientes de reasignación.",
+    "historial_titulo": "Historial de Reasignaciones",
+    "historial_desc": "Últimas reservas reasignadas.",
+    "sin_historial": "No hay historial de reasignaciones."
   }
 }

@@ -26,5 +26,6 @@
   "selected": "seleccionados",
   "all": "Todos",
   "select_all": "Seleccionar todos",
-  "deselect_all": "Deseleccionar todos"
+  "deselect_all": "Deseleccionar todos",
+  "clear_search": "Limpiar Búsqueda"
 }

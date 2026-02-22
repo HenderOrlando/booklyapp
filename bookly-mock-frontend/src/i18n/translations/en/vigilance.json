@@ -69,5 +69,8 @@
   "empty_alerts_title": "Sin incidencias",
   "empty_alerts_desc": "El sistema no ha generado alertas de seguridad o uso indebido.",
   "empty_approvals_title": "No pending approvals",
-  "empty_approvals_desc": "There are currently no requests waiting for your approval."
+  "empty_approvals_desc": "There are currently no requests waiting for your approval.",
+  "contacting_user": "Contacting user...",
+  "enter_resolution": "Enter resolution",
+  "filter": "Filter"
 }

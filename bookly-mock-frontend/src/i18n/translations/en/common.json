@@ -26,5 +26,6 @@
   "selected": "selected",
   "all": "All",
   "select_all": "Select all",
-  "deselect_all": "Deselect all"
+  "deselect_all": "Deselect all",
+  "clear_search": "Clear Search"
 }

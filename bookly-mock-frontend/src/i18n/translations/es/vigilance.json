@@ -69,5 +69,8 @@
   "empty_alerts_title": "Sin incidencias",
   "empty_alerts_desc": "El sistema no ha generado alertas de seguridad o uso indebido.",
   "empty_approvals_title": "Sin aprobaciones pendientes",
-  "empty_approvals_desc": "Todas las reservas aprobadas para hoy ya han realizado su ingreso al sitio."
+  "empty_approvals_desc": "Todas las reservas aprobadas para hoy ya han realizado su ingreso al sitio.",
+  "contacting_user": "Contactando al usuario...",
+  "enter_resolution": "Ingresar resolución",
+  "filter": "Filtrar"
 }

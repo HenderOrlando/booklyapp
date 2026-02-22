@@ -49,5 +49,6 @@
     "search_placeholder": "Buscar por nombre, código...",
     "status_label": "Estado"
   },
-  "delete_confirm_button": "Eliminar"
+  "delete_confirm_button": "Eliminar",
+  "search_placeholder": "Buscar características..."
 }

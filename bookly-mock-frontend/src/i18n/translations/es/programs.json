@@ -59,5 +59,7 @@
   "add_student": "+ Estudiante",
   "add_professor": "+ Profesor",
   "capacity": "Capacidad",
-  "type": "Tipo"
+  "type": "Tipo",
+  "program-resources": "Recursos del Programa",
+  "program-users": "Usuarios del Programa"
 }
