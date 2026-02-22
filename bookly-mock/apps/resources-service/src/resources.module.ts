@@ -19,7 +19,6 @@ import { AuditDecoratorsModule } from "@reports/audit-decorators";
 import { I18nModule } from "@bookly/i18n";
 import { ResourceImportService } from "./application/services/resource-import.service";
 import { JwtStrategy } from "./infrastructure/strategies/jwt.strategy";
-import { ResourceImportService } from "./application/services/resource-import.service";
 
 // Application Layer
 import * as EventHandlers from "./application/event-handlers";

@@ -25,7 +25,7 @@ export class ResourceCondition {
  */
 @Schema({ collection: "check_in_outs", timestamps: true })
 export class CheckInOut extends Document {
-  @Prop({ type: Types.ObjectId, required: true, index: true, unique: true })
+  @Prop({ type: Types.ObjectId, required: true })
   reservationId: Types.ObjectId;
 
   @Prop({ type: Types.ObjectId, required: true, index: true })

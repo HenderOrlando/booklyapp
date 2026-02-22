@@ -33,7 +33,7 @@ export class DocumentTemplate extends Document {
   @Prop({ type: [String], required: true })
   variables: string[];
 
-  @Prop({ required: true, default: true, index: true })
+  @Prop({ required: true, default: true })
   isActive: boolean;
 
   @Prop({ type: String, default: "PDF" })

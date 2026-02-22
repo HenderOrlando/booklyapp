@@ -36,13 +36,13 @@ export class ApprovalFlow extends Document {
   @Prop({ required: true })
   description: string;
 
-  @Prop({ type: [String], required: true, index: true })
+  @Prop({ type: [String], required: true })
   resourceTypes: string[];
 
   @Prop({ type: [ApprovalStepSchema], required: true })
   steps: ApprovalStepSchema[];
 
-  @Prop({ required: true, default: true, index: true })
+  @Prop({ required: true, default: true })
   isActive: boolean;
 
   @Prop({ type: Object })

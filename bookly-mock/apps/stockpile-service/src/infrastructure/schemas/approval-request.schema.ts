@@ -31,7 +31,7 @@ export class ApprovalHistoryItem {
  */
 @Schema({ collection: "approval_requests", timestamps: true })
 export class ApprovalRequest extends Document {
-  @Prop({ type: Types.ObjectId, required: true, index: true })
+  @Prop({ type: Types.ObjectId, required: true })
   reservationId: Types.ObjectId;
 
   @Prop({ type: Types.ObjectId, required: true, index: true })
