@@ -1,0 +1,92 @@
+{
+  "runId": "2026-02-21-bookly-mock-01",
+  "scopeRoot": "bookly-mock",
+  "generated": "2026-02-21T21:25:00-05:00",
+  "totalRules": 52,
+  "auditableRules": 47,
+  "metaRules": 5,
+  "domains": {
+    "auth": {
+      "service": "apps/auth-service",
+      "rfRules": ["RF-41","RF-42","RF-43","RF-44","RF-45"],
+      "flowRule": "bookly-flujos-auth"
+    },
+    "resources": {
+      "service": "apps/resources-service",
+      "rfRules": ["RF-01","RF-02"],
+      "otherRules": ["resource-characteristics"],
+      "flowRule": "bookly-flujos-resources"
+    },
+    "availability": {
+      "service": "apps/availability-service",
+      "rfRules": ["RF-07","RF-08","RF-09","RF-10","RF-11","RF-12","RF-13","RF-14","RF-15","RF-16","RF-17","RF-18","RF-19"],
+      "flowRule": "bookly-flujos-availability"
+    },
+    "stockpile": {
+      "service": "apps/stockpile-service",
+      "rfRules": ["RF-20","RF-21","RF-22","RF-23","RF-24","RF-25","RF-26","RF-27","RF-28","RF-29","RF-30"],
+      "flowRule": "bookly-flujos-stockpile"
+    },
+    "reports": {
+      "service": "apps/reports-service",
+      "rfRules": ["RF-31","RF-32","RF-33","RF-34","RF-35","RF-36","RF-37","RF-38","RF-39","RF-40"],
+      "flowRule": "bookly-flujos-reports"
+    }
+  },
+  "metaRuleIds": [
+    "bookly-base",
+    "bookly-modules",
+    "bookly-documentacion-estandar",
+    "bookly-planificacion",
+    "bookly-resource-characteristics"
+  ],
+  "rules": [
+    {"id":"RF-01","file":"bookly-resource-rf01-crear-editar-eliminar-recursos.md","domain":"resources","title":"CRUD Recursos","trigger":"manual"},
+    {"id":"RF-02","file":"bookly-resource-rf02-asociar-recurso-a-categorias-o-programas.md","domain":"resources","title":"Asociar recurso a categorías/programas","trigger":"manual"},
+    {"id":"CHAR","file":"bookly-resource-characteristics.md","domain":"resources","title":"Resource Characteristics Management","trigger":"description"},
+    {"id":"RF-07","file":"bookly-availability-rf07-horarios-disponibles.md","domain":"availability","title":"Horarios disponibles","trigger":"manual"},
+    {"id":"RF-08","file":"bookly-availability-rf08-integra-calendars.md","domain":"availability","title":"Integración calendarios","trigger":"manual"},
+    {"id":"RF-09","file":"bookly-availability-rf09-busqueda-disponibilidad.md","domain":"availability","title":"Búsqueda avanzada disponibilidad","trigger":"manual"},
+    {"id":"RF-10","file":"bookly-availability-rf10-visualizacion-en-calendar.md","domain":"availability","title":"Visualización calendario","trigger":"manual"},
+    {"id":"RF-11","file":"bookly-availability-rf11-registro-historial-uso.md","domain":"availability","title":"Historial de uso","trigger":"manual"},
+    {"id":"RF-12","file":"bookly-availability-rf12-permite-reserva-periodica.md","domain":"availability","title":"Reservas periódicas","trigger":"manual"},
+    {"id":"RF-13","file":"bookly-availability-rf13-solicitud-reserva-vobo-docente.md","domain":"availability","title":"VoBo docente para estudiantes","trigger":"manual"},
+    {"id":"RF-14","file":"bookly-availability-rf14-lista-espera-para-sobrecarga.md","domain":"availability","title":"Lista de espera","trigger":"manual"},
+    {"id":"RF-15","file":"bookly-availability-rf15-reasignacion-reserva.md","domain":"availability","title":"Reasignación reservas","trigger":"manual"},
+    {"id":"RF-16","file":"bookly-availability-rf16-restricciones-reserva-basada-en-categorias.md","domain":"availability","title":"Restricciones por categoría","trigger":"manual"},
+    {"id":"RF-17","file":"bookly-availability-rf17-configure-tiempo-entre-reservas.md","domain":"availability","title":"Tiempo entre reservas","trigger":"manual"},
+    {"id":"RF-18","file":"bookly-availability-rf18-cancelar-modificar-con-reglas.md","domain":"availability","title":"Cancelar/modificar con reglas","trigger":"manual"},
+    {"id":"RF-19","file":"bookly-availability-rf19-reservas-multiples-en-una-solicitud.md","domain":"availability","title":"Reservas múltiples","trigger":"manual"},
+    {"id":"RF-20","file":"bookly-stockpile-rf20-solicitudes-validadas-por-responsable.md","domain":"stockpile","title":"Solicitudes validadas por responsable","trigger":"manual"},
+    {"id":"RF-21","file":"bookly-stockpile-rf21-generacion-automatica-documento-accept-reject-reserva.md","domain":"stockpile","title":"Generación documento aprobación/rechazo","trigger":"manual"},
+    {"id":"RF-22","file":"bookly-stockpile-rf22-notificacion-a-solicitante-con-carta.md","domain":"stockpile","title":"Notificación con carta al solicitante","trigger":"manual"},
+    {"id":"RF-23","file":"bookly-stockpile-rf23-visualizacion-reservas-aprobadas-vigilante.md","domain":"stockpile","title":"Pantalla vigilancia reservas aprobadas","trigger":"manual"},
+    {"id":"RF-24","file":"bookly-stockpile-rf24-configuracion-flujo-segun-tipo-de-usuario.md","domain":"stockpile","title":"Flujos aprobación según tipo usuario","trigger":"manual"},
+    {"id":"RF-25","file":"bookly-stockpile-rf25-registro-trazabilidad-auditable.md","domain":"stockpile","title":"Registro y trazabilidad auditable","trigger":"manual"},
+    {"id":"RF-26","file":"bookly-stockpile-rf26-checkin-checkout-digital.md","domain":"stockpile","title":"Check-in/check-out digital","trigger":"manual"},
+    {"id":"RF-27","file":"bookly-stockpile-rf27-integracion-emails-whatsapp.md","domain":"stockpile","title":"Integración email/WhatsApp","trigger":"manual"},
+    {"id":"RF-28","file":"bookly-stockpile-rf28-notificaciones-automaticas-email-whatsapp-confirma-cancela-modifica-reserva.md","domain":"stockpile","title":"Notificaciones automáticas confirma/cancela/modifica","trigger":"manual"},
+    {"id":"RF-29","file":"bookly-stockpile-rf29-recordatorios-reserva-personalizables.md","domain":"stockpile","title":"Recordatorios reserva personalizables","trigger":"manual"},
+    {"id":"RF-30","file":"bookly-stockpile-rf30-notificacion-tiempo-real-recurso-disponible-por-cancelacion.md","domain":"stockpile","title":"Alerta tiempo real recurso disponible por cancelación","trigger":"manual"},
+    {"id":"RF-31","file":"bookly-reports-rf31-uso-programa-periodo-tipo-recurso.md","domain":"reports","title":"Reportes uso/programa/periodo","trigger":"manual"},
+    {"id":"RF-32","file":"bookly-reports-rf32-reservas-por-usuario.md","domain":"reports","title":"Reservas por usuario","trigger":"manual"},
+    {"id":"RF-33","file":"bookly-reports-rf33-exportar-en-csv.md","domain":"reports","title":"Exportar CSV","trigger":"manual"},
+    {"id":"RF-34","file":"bookly-reports-rf34-registro-feedbck-calidad-servicio.md","domain":"reports","title":"Feedback calidad servicio","trigger":"manual"},
+    {"id":"RF-35","file":"bookly-reports-rf35-registro-feedback-administrativo.md","domain":"reports","title":"Evaluación usuarios por admin","trigger":"manual"},
+    {"id":"RF-36","file":"bookly-reports-rf36-dashboard-interactivo-tiempo-real.md","domain":"reports","title":"Dashboard interactivo","trigger":"manual"},
+    {"id":"RF-37","file":"bookly-reports-rf37-demanda-insatisfecha.md","domain":"reports","title":"Demanda insatisfecha","trigger":"manual"},
+    {"id":"RF-38","file":"bookly-reports-rf38-conflictos-reserva.md","domain":"reports","title":"Conflictos de reserva","trigger":"manual"},
+    {"id":"RF-39","file":"bookly-reports-rf39-cumplimiento-reserva.md","domain":"reports","title":"Cumplimiento reservas","trigger":"manual"},
+    {"id":"RF-40","file":"bookly-reports-rf40-cancelaciones-ausencias.md","domain":"reports","title":"Cancelaciones y ausencias","trigger":"manual"},
+    {"id":"RF-41","file":"bookly-auth-rf41-gestion-de-roles.md","domain":"auth","title":"Gestión roles y permisos","trigger":"manual"},
+    {"id":"RF-42","file":"bookly-auth-rf42-restriccion-de-modificacion.md","domain":"auth","title":"Restricción modificaciones a admins","trigger":"manual"},
+    {"id":"RF-43","file":"bookly-auth-rf43-autenticacion-y-sso.md","domain":"auth","title":"Autenticación y SSO","trigger":"manual"},
+    {"id":"RF-44","file":"bookly-auth-rf44-auditoria.md","domain":"auth","title":"Auditoría de accesos","trigger":"manual"},
+    {"id":"RF-45","file":"bookly-auth-rf45-verificacion-2fa-solicitudes-criticas.md","domain":"auth","title":"2FA solicitudes críticas","trigger":"manual"},
+    {"id":"FLOW-AUTH","file":"bookly-flujos-auth.md","domain":"auth","title":"Flujos Auth","trigger":"manual"},
+    {"id":"FLOW-AVAIL","file":"bookly-flujos-availability.md","domain":"availability","title":"Flujos Availability","trigger":"manual"},
+    {"id":"FLOW-RES","file":"bookly-flujos-resources.md","domain":"resources","title":"Flujos Resources","trigger":"manual"},
+    {"id":"FLOW-STOCK","file":"bookly-flujos-stockpile.md","domain":"stockpile","title":"Flujos Stockpile","trigger":"manual"},
+    {"id":"FLOW-REP","file":"bookly-flujos-reports.md","domain":"reports","title":"Flujos Reports","trigger":"manual"}
+  ]
+}

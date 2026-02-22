@@ -1,0 +1,47 @@
+{
+  "runId": "2026-02-21-bookly-mock-01",
+  "scopeRoot": "bookly-mock",
+  "generated": "2026-02-21T21:25:00-05:00",
+  "summary": {
+    "totalFiles": 1538,
+    "totalApps": 6,
+    "totalLibs": 14,
+    "totalTests": 27,
+    "extensions": {
+      ".ts": 1004,
+      ".md": 447,
+      ".json": 32,
+      ".example": 12,
+      ".sh": 12,
+      ".js": 9,
+      ".env": 7,
+      ".yaml": 6,
+      ".yml": 4,
+      ".csv": 1
+    }
+  },
+  "apps": {
+    "api-gateway": { "files": 49, "domain": "gateway", "controllers": ["auth-proxy","health","websocket"] },
+    "auth-service": { "files": 218, "domain": "auth", "controllers": ["auth","roles","permissions","users","audit"], "tests": 5 },
+    "availability-service": { "files": 244, "domain": "availability", "controllers": ["availabilities","availability-exceptions","calendar-view","health","history","maintenance-blocks","metrics","reassignment","reference-data","reservations","waiting-lists"], "tests": 5 },
+    "resources-service": { "files": 158, "domain": "resources", "controllers": ["resources","categories","maintenances","import"], "tests": 5 },
+    "stockpile-service": { "files": 199, "domain": "stockpile", "controllers": ["approval-flows","approval-requests","check-in-out","document","health","location-analytics","metrics","monitoring","notification-metrics","proximity-notification","reference-data","tenant-notification-config"], "tests": 4 },
+    "reports-service": { "files": 189, "domain": "reports", "controllers": ["audit-dashboard","audit-records","dashboard","demand-reports","evaluation","export","feedback","health","reference-data","reports-dashboard","usage-reports","user-reports"], "tests": 7 }
+  },
+  "libs": {
+    "common": { "files": 23, "purpose": "Guards, events, telemetry, utils, response" },
+    "database": { "files": 17, "purpose": "Reference data module, repositories" },
+    "decorators": { "files": 6, "purpose": "Permissions, roles, current-user, public" },
+    "event-bus": { "files": 26, "purpose": "RabbitMQ/Kafka adapters, DLQ, event-store, request-reply" },
+    "filters": { "files": 4, "purpose": "Exception filters" },
+    "guards": { "files": 6, "purpose": "Auth/permission guards" },
+    "i18n": { "files": 4, "purpose": "Internacionalización" },
+    "idempotency": { "files": 12, "purpose": "Idempotency guard/service" },
+    "interceptors": { "files": 4, "purpose": "Global interceptors" },
+    "kafka": { "files": 4, "purpose": "Kafka integration" },
+    "notifications": { "files": 58, "purpose": "Notification services" },
+    "redis": { "files": 5, "purpose": "Redis cache module" },
+    "security": { "files": 4, "purpose": "Security utilities" },
+    "storage": { "files": 6, "purpose": "File storage module" }
+  }
+}
