@@ -1,7 +1,0 @@
-export enum WaitingEntryStatus {
-  WAITING = 'WAITING',
-  NOTIFIED = 'NOTIFIED',
-  CONFIRMED = 'CONFIRMED',
-  EXPIRED = 'EXPIRED',
-  CANCELLED = 'CANCELLED'
-}

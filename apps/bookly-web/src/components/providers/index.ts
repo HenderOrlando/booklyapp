@@ -1,1 +1,0 @@
-export { TenantProvider } from './TenantProvider';
