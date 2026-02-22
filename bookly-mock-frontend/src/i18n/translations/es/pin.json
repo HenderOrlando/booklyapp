@@ -1,0 +1,41 @@
+{
+  "title": "Verificación de Seguridad",
+  "description": "Ingresa tu PIN para confirmar esta acción",
+  "pin_input_label": "Ingreso de PIN de seguridad",
+  "digit": "Dígito",
+  "verifying": "Verificando PIN...",
+  "confirm": "Confirmar",
+  "cancel": "Cancelar",
+  "close": "Cerrar",
+  "forgot_pin": "¿Olvidaste tu PIN?",
+  "reset_pin": "Restablecer PIN",
+  "attempts_left": "{count, plural, one {# intento restante} other {# intentos restantes}}",
+  "account_locked": "Cuenta bloqueada temporalmente. Contacta al administrador.",
+  "actions": {
+    "delete_resource": "Eliminar recurso",
+    "delete_user": "Eliminar usuario",
+    "delete_role": "Eliminar rol",
+    "change_permissions": "Cambiar permisos",
+    "revoke_role": "Revocar rol",
+    "batch_approve": "Aprobación masiva",
+    "batch_reject": "Rechazo masivo",
+    "change_pin": "Cambiar PIN",
+    "reset_system_config": "Restablecer configuración"
+  },
+  "setup": {
+    "title": "Configurar PIN de Seguridad",
+    "description": "Configura un PIN de {length} dígitos para proteger acciones críticas",
+    "enter_pin": "Ingresa tu nuevo PIN",
+    "confirm_pin": "Confirma tu PIN",
+    "pins_dont_match": "Los PINs no coinciden",
+    "pin_set_success": "PIN configurado exitosamente",
+    "setup_required": "Debes configurar un PIN para realizar esta acción"
+  },
+  "change": {
+    "title": "Cambiar PIN",
+    "current_pin": "PIN actual",
+    "new_pin": "Nuevo PIN",
+    "confirm_new_pin": "Confirmar nuevo PIN",
+    "success": "PIN cambiado exitosamente"
+  }
+}

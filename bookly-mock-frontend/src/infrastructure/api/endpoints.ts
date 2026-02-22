@@ -45,6 +45,12 @@ export const AUTH_ENDPOINTS = {
   ACTIVE_PERMISSIONS: `${API_VERSION}/permissions/active`,
   BULK_PERMISSIONS: `${API_VERSION}/permissions/bulk`,
 
+  // PIN / 2FA
+  PIN_SETUP: `${API_VERSION}/auth/pin/setup`,
+  PIN_VERIFY: `${API_VERSION}/auth/pin/verify`,
+  PIN_CHANGE: `${API_VERSION}/auth/pin/change`,
+  PIN_RESET: `${API_VERSION}/auth/pin/reset`,
+
   // OAuth
   GOOGLE_LOGIN: `${API_VERSION}/auth/oauth/google`,
   GOOGLE_CALLBACK: `${API_VERSION}/auth/oauth/google/callback`,
@@ -237,6 +243,12 @@ export const REPORTS_ENDPOINTS = {
 
   // Demanda Insatisfecha (BE controller: "demand-reports")
   UNSATISFIED_DEMAND: `${API_VERSION}/demand-reports`,
+
+  // Cumplimiento de Reservas (RF-39)
+  COMPLIANCE: `${API_VERSION}/compliance-reports`,
+
+  // Cancelaciones y Ausencias (RF-40)
+  CANCELLATIONS: `${API_VERSION}/cancellation-reports`,
 
   // Feedback y Evaluaciones (BE controllers: "feedback", "evaluation")
   FEEDBACK: `${API_VERSION}/feedback`,

@@ -5,6 +5,10 @@ export type AppStorageProvider = "local" | "s3" | "gcs";
 export interface AppConfigFeatures {
   enableNotifications: boolean;
   enableRealtime: boolean;
+  enablePinVerification?: boolean;
+  minTimeBetweenReservationsMinutes?: number;
+  maxReservationDurationMinutes?: number;
+  minReservationDurationMinutes?: number;
 }
 
 export interface AppConfigStorageS3 {

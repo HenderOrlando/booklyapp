@@ -32,6 +32,8 @@ const namespaces = [
   "check_in",
   "vigilance",
   "waitlist",
+  "pin",
+  "landing",
 ];
 
 export default getRequestConfig(async ({ requestLocale }) => {

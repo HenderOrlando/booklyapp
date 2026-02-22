@@ -31,6 +31,7 @@ import { DEFAULT_APP_CONFIG } from "@/infrastructure/api/config-client";
 import { cn } from "@/lib/utils";
 import type {
   AppConfig,
+  AppConfigFeatures,
   AppStorageProvider,
   AppThemeMode,
 } from "@/types/entities/app-config";
@@ -816,11 +817,12 @@ function FeaturesTab({
   config: AppConfig;
   updateField: <K extends keyof AppConfig>(key: K, value: AppConfig[K]) => void;
 }) {
-  const updateFeature = (key: string, value: boolean) => {
-    updateField("features", { ...config.features, [key]: value });
+  const updateFeature = (key: string, value: boolean | number) => {
+    updateField("features", { ...config.features, [key]: value } as AppConfigFeatures);
   };
 
   return (
+    <>
     <Card>
       <CardHeader>
         <CardTitle>Funcionalidades del Sistema</CardTitle>
@@ -852,8 +854,102 @@ function FeaturesTab({
             onCheckedChange={(val) => updateFeature("enableRealtime", !!val)}
           />
         </SettingRow>
+
+        <SettingRow
+          id="enablePinVerification"
+          title="Verificación PIN (RF-45)"
+          description="Requiere PIN de seguridad para acciones críticas (eliminar, cambiar permisos)"
+        >
+          <Checkbox
+            id="enablePinVerification"
+            checked={config.features.enablePinVerification ?? false}
+            onCheckedChange={(val) => updateFeature("enablePinVerification", !!val)}
+          />
+        </SettingRow>
       </CardContent>
     </Card>
+
+    <Card>
+      <CardHeader>
+        <CardTitle>Configuración de Reservas (RF-17)</CardTitle>
+        <CardDescription>
+          Define tiempos mínimos y máximos para las reservas del sistema
+        </CardDescription>
+      </CardHeader>
+      <CardContent className="space-y-4">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div className="space-y-2">
+            <label
+              htmlFor="minTimeBetween"
+              className="text-sm font-medium text-[var(--color-text-primary)]"
+            >
+              Tiempo mínimo entre reservas (min)
+            </label>
+            <Input
+              id="minTimeBetween"
+              type="number"
+              min={0}
+              max={120}
+              value={config.features.minTimeBetweenReservationsMinutes ?? 15}
+              onChange={(e) =>
+                updateFeature(
+                  "minTimeBetweenReservationsMinutes",
+                  Math.max(0, parseInt(e.target.value) || 0),
+                )
+              }
+            />
+            <p className="text-xs text-[var(--color-text-tertiary)]">
+              Intervalo obligatorio entre el fin de una reserva y el inicio de la siguiente
+            </p>
+          </div>
+
+          <div className="space-y-2">
+            <label
+              htmlFor="minDuration"
+              className="text-sm font-medium text-[var(--color-text-primary)]"
+            >
+              Duración mínima de reserva (min)
+            </label>
+            <Input
+              id="minDuration"
+              type="number"
+              min={5}
+              max={480}
+              value={config.features.minReservationDurationMinutes ?? 30}
+              onChange={(e) =>
+                updateFeature(
+                  "minReservationDurationMinutes",
+                  Math.max(5, parseInt(e.target.value) || 30),
+                )
+              }
+            />
+          </div>
+
+          <div className="space-y-2">
+            <label
+              htmlFor="maxDuration"
+              className="text-sm font-medium text-[var(--color-text-primary)]"
+            >
+              Duración máxima de reserva (min)
+            </label>
+            <Input
+              id="maxDuration"
+              type="number"
+              min={30}
+              max={1440}
+              value={config.features.maxReservationDurationMinutes ?? 240}
+              onChange={(e) =>
+                updateFeature(
+                  "maxReservationDurationMinutes",
+                  Math.max(30, parseInt(e.target.value) || 240),
+                )
+              }
+            />
+          </div>
+        </div>
+      </CardContent>
+    </Card>
+    </>
   );
 }
 

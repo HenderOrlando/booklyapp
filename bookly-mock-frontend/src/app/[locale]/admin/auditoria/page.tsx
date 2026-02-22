@@ -18,105 +18,82 @@ import {
   SelectValue,
 } from "@/components/atoms/Select";
 import { DataTable } from "@/components/molecules/DataTable";
-import { AppHeader } from "@/components/organisms/AppHeader";
-import { AppSidebar } from "@/components/organisms/AppSidebar";
 import { VirtualizedList } from "@/components/organisms/VirtualizedList";
 import { MainLayout } from "@/components/templates/MainLayout";
-import { httpClient } from "@/infrastructure/http";
+import {
+  useAuditLogs,
+  getAuditExportUrl,
+  type AuditLog,
+  type AuditFilters,
+  auditKeys,
+} from "@/hooks/useAuditLogs";
+import { AlertTriangle, Download, RefreshCw } from "lucide-react";
 import { useTranslations } from "next-intl";
 import * as React from "react";
+import { useQueryClient } from "@tanstack/react-query";
 
 /**
- * Página de Auditoría - Bookly
+ * Página de Auditoría - Bookly (RF-44)
  *
- * Visualiza logs del sistema:
- * - Acciones de usuarios
- * - Cambios en recursos
- * - Inicios de sesión
- * - Errores y excepciones
- * - Filtros y búsqueda
+ * Mejoras respecto a versión anterior:
+ * - React Query para gestión de datos (cache, refetch, stale)
+ * - Filtros de rango de fechas (startDate / endDate)
+ * - Paginación server-side
+ * - Alerta de seguridad para intentos fallidos
+ * - Exportación CSV server-side
  */
-
-interface AuditLog {
-  id: string;
-  timestamp: string;
-  user: string;
-  action: string;
-  entity: string;
-  entityId?: string;
-  details: string;
-  ipAddress: string;
-  status: "success" | "error" | "warning";
-}
 
 export default function AuditoriaPage() {
   const t = useTranslations("admin.audit");
-  const [logs, setLogs] = React.useState<AuditLog[]>([]);
-  const [loading, setLoading] = React.useState(true);
+  const queryClient = useQueryClient();
+
   const [useVirtualScrolling, setUseVirtualScrolling] = React.useState(true);
   const [searchTerm, setSearchTerm] = React.useState("");
   const [filterAction, setFilterAction] = React.useState("");
   const [filterStatus, setFilterStatus] = React.useState("");
+  const [startDate, setStartDate] = React.useState("");
+  const [endDate, setEndDate] = React.useState("");
+  const [page, setPage] = React.useState(1);
   const [selectedLog, setSelectedLog] = React.useState<AuditLog | null>(null);
   const [showLogDetail, setShowLogDetail] = React.useState(false);
-  const [filterLogTable, _setFilterLogTable] = React.useState("");
 
-  // Cargar logs de auditoría
-  React.useEffect(() => {
-    const fetchLogs = async () => {
-      try {
-        const response: any = await httpClient.get("audit/logs");
+  const filters: AuditFilters = {
+    ...(searchTerm ? { search: searchTerm } : {}),
+    ...(filterAction && filterAction !== "all" ? { action: filterAction } : {}),
+    ...(filterStatus && filterStatus !== "all" ? { status: filterStatus } : {}),
+    ...(startDate ? { startDate } : {}),
+    ...(endDate ? { endDate } : {}),
+    page,
+    limit: 50,
+  };
 
-        if (response.success && response.data) {
-          const data =
-            response.data?.items || response.data?.data || response.data;
-          setLogs(Array.isArray(data) ? data : []);
-        }
-      } catch (err: any) {
-        console.error("Error al cargar logs:", err);
-      } finally {
-        setLoading(false);
-      }
-    };
+  const { data: logsData, isLoading: loading, isRefetching } = useAuditLogs(filters);
+  const logs = logsData?.items || [];
+  const meta = logsData?.meta;
+  const totalPages = meta?.totalPages || 1;
 
-    fetchLogs();
-  }, []);
+  // Server-side filters handle the filtering now, but we keep local reference
+  const filteredLogs = logs;
 
-  const _header = <AppHeader title={t("title")} />;
-  const _sidebar = <AppSidebar />;
+  // Security alert: count recent failed logins
+  const failedLoginCount = logs.filter(
+    (l) => l.action === "login" && l.status === "error",
+  ).length;
 
-  // Filtrar logs (para la sección de filtros de búsqueda)
-  const filteredLogs = logs.filter((log) => {
-    const matchesSearch =
-      searchTerm === "" ||
-      log.user.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      log.action.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      log.details.toLowerCase().includes(searchTerm.toLowerCase());
+  const handleRefresh = () => {
+    queryClient.invalidateQueries({ queryKey: auditKeys.all });
+  };
 
-    const matchesAction =
-      filterAction === "" ||
-      filterAction === "all" ||
-      log.action === filterAction;
-    const matchesStatus =
-      filterStatus === "" ||
-      filterStatus === "all" ||
-      log.status === filterStatus;
-
-    return matchesSearch && matchesAction && matchesStatus;
-  });
-
-  // Filtrar logs adicional para la tabla
-  const _tableFilteredLogs = filteredLogs.filter((log) => {
-    if (filterLogTable === "") return true;
-
-    return (
-      log.user.toLowerCase().includes(filterLogTable.toLowerCase()) ||
-      log.action.toLowerCase().includes(filterLogTable.toLowerCase()) ||
-      log.entity.toLowerCase().includes(filterLogTable.toLowerCase()) ||
-      log.details.toLowerCase().includes(filterLogTable.toLowerCase()) ||
-      log.status.toLowerCase().includes(filterLogTable.toLowerCase())
-    );
-  });
+  const handleExportCsv = async () => {
+    const exportUrl = getAuditExportUrl({
+      search: searchTerm || undefined,
+      action: filterAction && filterAction !== "all" ? filterAction : undefined,
+      status: filterStatus && filterStatus !== "all" ? filterStatus : undefined,
+      startDate: startDate || undefined,
+      endDate: endDate || undefined,
+    });
+    window.open(exportUrl, "_blank");
+  };
 
   // Columnas de la tabla
   const columns = [
@@ -260,6 +237,18 @@ export default function AuditoriaPage() {
           </p>
         </div>
 
+        {/* Security Alert Banner */}
+        {failedLoginCount > 0 && (
+          <div className="flex items-center gap-3 p-4 rounded-lg border border-state-warning-300 bg-state-warning-50 dark:bg-state-warning-900/10 dark:border-state-warning-700">
+            <AlertTriangle className="h-5 w-5 text-state-warning-600 dark:text-state-warning-400 flex-shrink-0" />
+            <div className="flex-1">
+              <p className="text-sm font-medium text-state-warning-800 dark:text-state-warning-200">
+                {t("security_alert") || `${failedLoginCount} intentos de login fallidos detectados en este periodo`}
+              </p>
+            </div>
+          </div>
+        )}
+
         {/* Estadísticas */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
           <Card>
@@ -383,16 +372,55 @@ export default function AuditoriaPage() {
                   setSearchTerm("");
                   setFilterAction("all");
                   setFilterStatus("all");
+                  setStartDate("");
+                  setEndDate("");
+                  setPage(1);
                 }}
               >
                 {t("clear_filters")}
               </Button>
             </div>
 
+            {/* Date Range Filters */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4">
+              <div>
+                <label className="text-xs font-medium text-[var(--color-text-tertiary)] mb-1 block">
+                  {t("date_from") || "Desde"}
+                </label>
+                <Input
+                  type="date"
+                  value={startDate}
+                  onChange={(e) => { setStartDate(e.target.value); setPage(1); }}
+                />
+              </div>
+              <div>
+                <label className="text-xs font-medium text-[var(--color-text-tertiary)] mb-1 block">
+                  {t("date_to") || "Hasta"}
+                </label>
+                <Input
+                  type="date"
+                  value={endDate}
+                  onChange={(e) => { setEndDate(e.target.value); setPage(1); }}
+                />
+              </div>
+              <div className="flex items-end">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={handleRefresh}
+                  disabled={isRefetching}
+                  className="flex items-center gap-2"
+                >
+                  <RefreshCw className={`h-4 w-4 ${isRefetching ? "animate-spin" : ""}`} />
+                  {t("refresh") || "Actualizar"}
+                </Button>
+              </div>
+            </div>
+
             <div className="mt-4 text-sm text-[var(--color-text-tertiary)]">
               {t("showing_count", {
                 count: filteredLogs.length,
-                total: totalLogs,
+                total: meta?.total || totalLogs,
               })}
             </div>
           </CardContent>
@@ -416,42 +444,10 @@ export default function AuditoriaPage() {
                 </Button>
                 <Button
                   variant="outline"
-                  onClick={() => {
-                    const headers = [
-                      "Timestamp",
-                      "Usuario",
-                      "Acción",
-                      "Entidad",
-                      "Entity ID",
-                      "Detalles",
-                      "Estado",
-                      "IP",
-                    ];
-                    const rows = filteredLogs.map((log) => [
-                      new Date(log.timestamp).toISOString(),
-                      log.user,
-                      log.action,
-                      log.entity,
-                      log.entityId || "",
-                      `"${log.details.replace(/"/g, '""')}"`,
-                      log.status,
-                      log.ipAddress,
-                    ]);
-                    const csv = [
-                      headers.join(","),
-                      ...rows.map((r) => r.join(",")),
-                    ].join("\n");
-                    const blob = new Blob([csv], {
-                      type: "text/csv;charset=utf-8;",
-                    });
-                    const url = URL.createObjectURL(blob);
-                    const link = document.createElement("a");
-                    link.href = url;
-                    link.download = `audit_logs_${new Date().toISOString().slice(0, 10)}.csv`;
-                    link.click();
-                    URL.revokeObjectURL(url);
-                  }}
+                  onClick={handleExportCsv}
+                  className="flex items-center gap-2"
                 >
+                  <Download className="h-4 w-4" />
                   {t("export_csv")}
                 </Button>
               </div>
@@ -546,6 +542,33 @@ export default function AuditoriaPage() {
             )}
           </CardContent>
         </Card>
+
+        {/* Pagination */}
+        {totalPages > 1 && (
+          <div className="flex items-center justify-between">
+            <p className="text-sm text-[var(--color-text-tertiary)]">
+              {t("page_info") || `Página ${page} de ${totalPages}`}
+            </p>
+            <div className="flex gap-2">
+              <Button
+                variant="outline"
+                size="sm"
+                disabled={page <= 1}
+                onClick={() => setPage((p) => Math.max(1, p - 1))}
+              >
+                {t("prev_page") || "Anterior"}
+              </Button>
+              <Button
+                variant="outline"
+                size="sm"
+                disabled={page >= totalPages}
+                onClick={() => setPage((p) => p + 1)}
+              >
+                {t("next_page") || "Siguiente"}
+              </Button>
+            </div>
+          </div>
+        )}
 
         {/* Modal de Detalle de Log */}
         {showLogDetail && selectedLog && (

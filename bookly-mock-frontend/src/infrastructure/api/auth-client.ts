@@ -1095,6 +1095,73 @@ export class AuthClient {
   }
 
   // ============================================
+  // PIN / 2FA (RF-45)
+  // ============================================
+
+  /**
+   * Configura el PIN de seguridad del usuario
+   *
+   * @param pin - PIN de 4-6 dígitos
+   * @returns Confirmación de configuración
+   */
+  static async setupPin(
+    pin: string,
+  ): Promise<ApiResponse<{ message: string; pinEnabled: boolean }>> {
+    return httpClient.post<{ message: string; pinEnabled: boolean }>(
+      AUTH_ENDPOINTS.PIN_SETUP,
+      { pin },
+    );
+  }
+
+  /**
+   * Verifica el PIN del usuario para autorizar acción crítica
+   *
+   * @param pin - PIN ingresado
+   * @param action - Acción que se está autorizando
+   * @param entityId - ID de la entidad afectada (opcional)
+   * @returns Token temporal de autorización
+   */
+  static async verifyPin(
+    pin: string,
+    action: string,
+    entityId?: string,
+  ): Promise<
+    ApiResponse<{ authorized: boolean; challengeToken: string; expiresIn: number }>
+  > {
+    return httpClient.post<{
+      authorized: boolean;
+      challengeToken: string;
+      expiresIn: number;
+    }>(AUTH_ENDPOINTS.PIN_VERIFY, { pin, action, entityId });
+  }
+
+  /**
+   * Cambia el PIN de seguridad
+   *
+   * @param currentPin - PIN actual
+   * @param newPin - Nuevo PIN
+   * @returns Confirmación
+   */
+  static async changePin(
+    currentPin: string,
+    newPin: string,
+  ): Promise<ApiResponse<{ message: string }>> {
+    return httpClient.post<{ message: string }>(AUTH_ENDPOINTS.PIN_CHANGE, {
+      currentPin,
+      newPin,
+    });
+  }
+
+  /**
+   * Solicita reset del PIN (envía código por email)
+   *
+   * @returns Confirmación de envío
+   */
+  static async resetPin(): Promise<ApiResponse<{ message: string }>> {
+    return httpClient.post<{ message: string }>(AUTH_ENDPOINTS.PIN_RESET);
+  }
+
+  // ============================================
   // AUDITORÍA (AUDIT LOGS)
   // ============================================
 

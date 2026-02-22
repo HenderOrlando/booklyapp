@@ -8,7 +8,9 @@ export type ReportType =
   | "USER"
   | "DEMAND"
   | "OCCUPANCY"
-  | "ANALYTICS";
+  | "ANALYTICS"
+  | "COMPLIANCE"
+  | "CANCELLATION";
 
 export type ReportFormat = "CSV" | "PDF" | "EXCEL" | "JSON";
 
@@ -28,7 +30,9 @@ export type Report =
   | ResourceReport
   | UserReport
   | DemandReport
-  | OccupancyReport;
+  | OccupancyReport
+  | ComplianceReport
+  | CancellationReport;
 
 /**
  * Reporte de uso
@@ -397,4 +401,108 @@ export interface ResourceUtilization {
   rejectedRequests: number;
   cancelledRequests: number;
   peakUsageTime: string;
+}
+
+/**
+ * Reporte de cumplimiento de reservas (RF-39)
+ */
+export interface ComplianceReport {
+  id: string;
+  type: "COMPLIANCE";
+  period: TimePeriod;
+  startDate: string;
+  endDate: string;
+  totalReservations: number;
+  completedOnTime: number;
+  completedLate: number;
+  noShows: number;
+  complianceRate: number;
+  averageCheckInDelay: number;
+  byResource: Array<{
+    resourceId: string;
+    resourceName: string;
+    total: number;
+    onTime: number;
+    late: number;
+    noShow: number;
+    complianceRate: number;
+  }>;
+  byUser: Array<{
+    userId: string;
+    userName: string;
+    total: number;
+    onTime: number;
+    late: number;
+    noShow: number;
+    complianceRate: number;
+  }>;
+  byDayOfWeek: Array<{
+    dayOfWeek: string;
+    total: number;
+    complianceRate: number;
+  }>;
+  createdAt: string;
+}
+
+/**
+ * Reporte de cancelaciones y ausencias (RF-40)
+ */
+export interface CancellationReport {
+  id: string;
+  type: "CANCELLATION";
+  period: TimePeriod;
+  startDate: string;
+  endDate: string;
+  totalReservations: number;
+  totalCancellations: number;
+  totalNoShows: number;
+  cancellationRate: number;
+  noShowRate: number;
+  averageCancelLeadTime: number;
+  cancelReasons: Array<{
+    reason: string;
+    count: number;
+    percentage: number;
+  }>;
+  byResource: Array<{
+    resourceId: string;
+    resourceName: string;
+    cancellations: number;
+    noShows: number;
+    cancellationRate: number;
+  }>;
+  byUser: Array<{
+    userId: string;
+    userName: string;
+    cancellations: number;
+    noShows: number;
+    cancellationRate: number;
+  }>;
+  trend: Array<{
+    date: string;
+    cancellations: number;
+    noShows: number;
+  }>;
+  peakCancellationTimes: Array<{
+    dayOfWeek: string;
+    hour: number;
+    count: number;
+  }>;
+  createdAt: string;
+}
+
+export interface ComplianceFilters {
+  startDate?: string;
+  endDate?: string;
+  resourceId?: string;
+  userId?: string;
+  programId?: string;
+}
+
+export interface CancellationFilters {
+  startDate?: string;
+  endDate?: string;
+  resourceId?: string;
+  userId?: string;
+  reason?: string;
 }

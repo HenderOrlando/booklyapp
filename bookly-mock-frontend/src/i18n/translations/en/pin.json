@@ -1,0 +1,41 @@
+{
+  "title": "Security Verification",
+  "description": "Enter your PIN to confirm this action",
+  "pin_input_label": "Security PIN input",
+  "digit": "Digit",
+  "verifying": "Verifying PIN...",
+  "confirm": "Confirm",
+  "cancel": "Cancel",
+  "close": "Close",
+  "forgot_pin": "Forgot your PIN?",
+  "reset_pin": "Reset PIN",
+  "attempts_left": "{count, plural, one {# attempt left} other {# attempts left}}",
+  "account_locked": "Account temporarily locked. Contact your administrator.",
+  "actions": {
+    "delete_resource": "Delete resource",
+    "delete_user": "Delete user",
+    "delete_role": "Delete role",
+    "change_permissions": "Change permissions",
+    "revoke_role": "Revoke role",
+    "batch_approve": "Batch approve",
+    "batch_reject": "Batch reject",
+    "change_pin": "Change PIN",
+    "reset_system_config": "Reset system configuration"
+  },
+  "setup": {
+    "title": "Set Up Security PIN",
+    "description": "Set up a {length}-digit PIN to protect critical actions",
+    "enter_pin": "Enter your new PIN",
+    "confirm_pin": "Confirm your PIN",
+    "pins_dont_match": "PINs don't match",
+    "pin_set_success": "PIN set up successfully",
+    "setup_required": "You must set up a PIN to perform this action"
+  },
+  "change": {
+    "title": "Change PIN",
+    "current_pin": "Current PIN",
+    "new_pin": "New PIN",
+    "confirm_new_pin": "Confirm new PIN",
+    "success": "PIN changed successfully"
+  }
+}
