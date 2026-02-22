@@ -355,7 +355,7 @@ export default function RecursoDetailPage() {
 
     try {
       await httpClient.delete(`resources/${resource.id}`);
-      router.push(`/${locale}/recursos`);
+      router.push("/recursos");
     } catch (err) {
       console.error("Error al eliminar recurso:", err);
     }
@@ -395,7 +395,7 @@ export default function RecursoDetailPage() {
         className="w-full"
         onClick={() => {
           if (resource) {
-            router.push(`/${locale}/recursos/${resource.id}?tab=reserva`);
+            router.push(`/recursos/${resource.id}?tab=reserva`);
           }
         }}
       >
@@ -907,7 +907,7 @@ export default function RecursoDetailPage() {
                             size="sm"
                             className="h-8 w-8 p-0 rounded-full hover:bg-brand-primary-50 hover:text-brand-primary-600"
                             onClick={() =>
-                              router.push(`/${locale}/programas/${program.id}`)
+                              router.push(`/programas/${program.id}`)
                             }
                             title={t("view_detail")}
                           >
@@ -929,8 +929,8 @@ export default function RecursoDetailPage() {
           },
         ]}
         sidebar={sidebarContent}
-        onBack={() => router.push(`/${locale}/recursos`)}
-        onEdit={() => router.push(`/${locale}/recursos/${resource.id}/editar`)}
+        onBack={() => router.push("/recursos")}
+        onEdit={() => router.push(`/recursos/${resource.id}/editar`)}
         onDelete={() => setShowDeleteModal(true)}
       />
     </MainLayout>

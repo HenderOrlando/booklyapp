@@ -183,10 +183,15 @@ export function ResourceFiltersSection({
       advancedFilters.characteristicIds &&
       advancedFilters.characteristicIds.length > 0
     ) {
+      const selectedNames = advancedFilters.characteristicIds
+        .map((id) => characteristics.find((c) => c.id === id)?.name)
+        .filter(Boolean)
+        .join(", ");
+
       chips.push({
         key: "characteristics",
         label: "Características",
-        value: advancedFilters.characteristicIds.length.toString(),
+        value: selectedNames || advancedFilters.characteristicIds.length.toString(),
       });
     }
 

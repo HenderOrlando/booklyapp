@@ -37,7 +37,6 @@ import {
 } from "@/types/entities/resource";
 import { AlertCircle, Plus, Search, Tag, X } from "lucide-react";
 import { DynamicIcon } from "@/components/atoms/DynamicIcon";
-import { useParams } from "next/navigation";
 import * as React from "react";
 
 interface ProgramCollectionPayload {
@@ -171,9 +170,7 @@ function extractPrograms(
 }
 
 export default function CreateResourcePage() {
-  const params = useParams();
   const router = useRouter();
-  const locale = (params.locale as string) || "es";
   const [loading, setLoading] = React.useState(false);
 
   // Hooks de datos dinámicos
@@ -592,7 +589,7 @@ export default function CreateResourcePage() {
       if (response.success) {
         setSuccess(true);
         setTimeout(() => {
-          router.push(`/${locale}/recursos`);
+          router.push("/recursos");
         }, 2000);
       }
     } catch (err) {
@@ -621,7 +618,7 @@ export default function CreateResourcePage() {
             <Button
               type="button"
               variant="outline"
-              onClick={() => router.push(`/${locale}/recursos`)}
+              onClick={() => router.push("/recursos")}
               disabled={loading}
               className="min-w-[100px]"
             >

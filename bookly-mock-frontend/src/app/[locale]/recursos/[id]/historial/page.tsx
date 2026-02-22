@@ -147,7 +147,6 @@ export default function RecursoHistorialPage() {
   const params = useParams();
   const router = useRouter();
   const resourceId = params.id as string;
-  const locale = (params.locale as string) || "es";
 
   const [history, setHistory] = React.useState<UsageHistoryEntry[]>([]);
   const [loading, setLoading] = React.useState(true);
@@ -255,7 +254,7 @@ export default function RecursoHistorialPage() {
             <Button
               variant="ghost"
               size="sm"
-              onClick={() => router.push(`/${locale}/recursos/${resourceId}`)}
+              onClick={() => router.push(`/recursos/${resourceId}`)}
             >
               <ArrowLeft className="h-4 w-4" />
             </Button>

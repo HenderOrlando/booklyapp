@@ -28,6 +28,8 @@
     "programs": "Academic Programs"
   },
   "general_info": "General Information",
+  "back_to_list": "Back to list",
+  "basic_info": "Basic Information",
   "code": "Code",
   "category": "Category",
   "created_at": "Created At",

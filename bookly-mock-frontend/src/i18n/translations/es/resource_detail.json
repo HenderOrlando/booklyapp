@@ -7,6 +7,7 @@
   "delete_title": "Confirmar Eliminación",
   "delete_confirm": "¿Estás seguro que deseas eliminar este recurso?",
   "delete_warning": "Esta acción no se puede deshacer. El recurso será eliminado permanentemente.",
+  "back_to_list": "Volver a la lista",
   "quick_info": "Información Rápida",
   "status": "Estado",
   "type": "Tipo",

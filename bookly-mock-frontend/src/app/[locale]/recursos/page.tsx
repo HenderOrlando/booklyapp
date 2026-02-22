@@ -144,10 +144,16 @@ export default function RecursosPage() {
   }, [categoriesData]);
 
   const characteristics = React.useMemo(() => {
-    return extractArray<{ id: string; name: string; icon?: string }>(
+    const items = extractArray<{ id?: string; _id?: string; code?: string; name?: string; icon?: string }>(
       characteristicsData,
-      "items",
+      "items"
     );
+    return items.map((item) => ({
+      id: item.id || item._id || item.code || Math.random().toString(36).substring(7),
+      name: item.name || "Sin nombre",
+      icon: item.icon,
+      code: item.code,
+    }));
   }, [characteristicsData]);
 
   const allPrograms = React.useMemo(() => {

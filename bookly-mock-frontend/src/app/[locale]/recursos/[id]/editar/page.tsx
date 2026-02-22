@@ -265,7 +265,6 @@ export default function EditResourcePage() {
   const params = useParams();
   const router = useRouter();
   const resourceId = params.id as string;
-  const locale = (params.locale as string) || "es";
 
   const [loading, setLoading] = React.useState(true);
   const [saving, setSaving] = React.useState(false);
@@ -651,7 +650,7 @@ export default function EditResourcePage() {
       if (response.success) {
         setSuccess(true);
         setTimeout(() => {
-          router.push(`/${locale}/recursos/${resourceId}`);
+          router.push(`/recursos/${resourceId}`);
         }, 2000);
       }
     } catch (err) {
@@ -703,7 +702,7 @@ export default function EditResourcePage() {
           </div>
           <Button
             variant="outline"
-            onClick={() => router.push(`/${locale}/recursos/${resourceId}`)}
+            onClick={() => router.push(`/recursos/${resourceId}`)}
           >
             Cancelar
           </Button>
@@ -1164,7 +1163,7 @@ export default function EditResourcePage() {
             <Button
               type="button"
               variant="outline"
-              onClick={() => router.push(`/${locale}/recursos/${resourceId}`)}
+              onClick={() => router.push(`/recursos/${resourceId}`)}
               disabled={saving}
             >
               Cancelar

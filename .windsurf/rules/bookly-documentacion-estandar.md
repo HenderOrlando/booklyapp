@@ -1,9 +1,9 @@
 ---
 description: Reglas y estándares para la creación, actualización y mantenimiento de la documentación en Bookly (Frontend, Backend y Global)
-globs:
   - "docs/**/*.md"
   - "bookly-mock/docs/**/*.md"
   - "bookly-mock-frontend/docs/**/*.md"
+trigger: always_on
 ---
 
 # Estándares de Documentación Bookly
