@@ -56,8 +56,6 @@ export default function RecursosPage() {
       ),
       [ResourceType.SPORTS_FACILITY]: t("type_labels.SPORTS_FACILITY"),
       [ResourceType.MEETING_ROOM]: t("type_labels.MEETING_ROOM"),
-      [ResourceType.VEHICLE]: t("type_labels.VEHICLE"),
-      [ResourceType.OTHER]: t("type_labels.OTHER"),
     }),
     [t],
   );

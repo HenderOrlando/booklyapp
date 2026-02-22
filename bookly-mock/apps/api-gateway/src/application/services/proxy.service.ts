@@ -60,6 +60,7 @@ export class ProxyService {
       departments: "resources",
       faculties: "resources",
       programs: "resources",
+      import: "resources",
       // availability-service controllers
       reservations: "availability",
       availabilities: "availability",
@@ -255,7 +256,14 @@ export class ProxyService {
     const cleanedHeaders: any = {};
 
     // Mantener solo headers necesarios
-    const allowedHeaders = ["authorization", "content-type", "accept"];
+    const allowedHeaders = [
+      "authorization",
+      "content-type",
+      "accept",
+      "accept-language",
+      "x-correlation-id",
+      "idempotency-key",
+    ];
 
     for (const key of Object.keys(headers)) {
       if (allowedHeaders.includes(key.toLowerCase())) {

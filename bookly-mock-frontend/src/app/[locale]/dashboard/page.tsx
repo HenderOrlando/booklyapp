@@ -27,10 +27,12 @@ import * as React from "react";
 type RecentReservationStatus =
   | "PENDING"
   | "CONFIRMED"
-  | "IN_PROGRESS"
+  | "APPROVED"
+  | "REJECTED"
+  | "CHECKED_IN"
+  | "ACTIVE"
   | "COMPLETED"
   | "CANCELLED"
-  | "REJECTED"
   | "UNKNOWN";
 
 const DEFAULT_RESERVATION_STATUS: RecentReservationStatus = "CONFIRMED";
@@ -38,10 +40,12 @@ const DEFAULT_RESERVATION_STATUS: RecentReservationStatus = "CONFIRMED";
 const RESERVATION_STATUS_LABEL_KEY: Record<RecentReservationStatus, string> = {
   PENDING: "status_pending",
   CONFIRMED: "status_confirmed",
-  IN_PROGRESS: "status_in_progress",
+  APPROVED: "status_approved",
+  REJECTED: "status_rejected",
+  CHECKED_IN: "status_checked_in",
+  ACTIVE: "status_active",
   COMPLETED: "status_completed",
   CANCELLED: "status_cancelled",
-  REJECTED: "status_rejected",
   UNKNOWN: "confirmed",
 };
 
@@ -50,13 +54,17 @@ const RESERVATION_STATUS_CLASS: Record<RecentReservationStatus, string> = {
     "bg-state-warning-100 text-state-warning-700 dark:bg-state-warning-900 dark:text-state-warning-200",
   CONFIRMED:
     "bg-state-success-100 text-state-success-700 dark:bg-state-success-900 dark:text-state-success-200",
-  IN_PROGRESS:
+  APPROVED:
+    "bg-state-success-100 text-state-success-700 dark:bg-state-success-900 dark:text-state-success-200",
+  REJECTED:
+    "bg-state-error-100 text-state-error-700 dark:bg-state-error-900 dark:text-state-error-200",
+  CHECKED_IN:
+    "bg-brand-primary-100 text-brand-primary-700 dark:bg-brand-primary-900 dark:text-brand-primary-200",
+  ACTIVE:
     "bg-brand-primary-100 text-brand-primary-700 dark:bg-brand-primary-900 dark:text-brand-primary-200",
   COMPLETED:
     "bg-neutral-100 text-neutral-700 dark:bg-neutral-800 dark:text-neutral-200",
   CANCELLED:
-    "bg-state-error-100 text-state-error-700 dark:bg-state-error-900 dark:text-state-error-200",
-  REJECTED:
     "bg-state-error-100 text-state-error-700 dark:bg-state-error-900 dark:text-state-error-200",
   UNKNOWN:
     "bg-state-success-100 text-state-success-700 dark:bg-state-success-900 dark:text-state-success-200",
@@ -68,10 +76,12 @@ function normalizeReservationStatus(value?: string): RecentReservationStatus {
   if (
     normalized === "PENDING" ||
     normalized === "CONFIRMED" ||
-    normalized === "IN_PROGRESS" ||
+    normalized === "APPROVED" ||
+    normalized === "REJECTED" ||
+    normalized === "CHECKED_IN" ||
+    normalized === "ACTIVE" ||
     normalized === "COMPLETED" ||
-    normalized === "CANCELLED" ||
-    normalized === "REJECTED"
+    normalized === "CANCELLED"
   ) {
     return normalized;
   }

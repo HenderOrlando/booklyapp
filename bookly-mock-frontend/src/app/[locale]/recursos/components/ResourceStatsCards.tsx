@@ -48,8 +48,6 @@ export function ResourceStatsCards({ resources }: ResourceStatsCardsProps) {
       MULTIMEDIA_EQUIPMENT: tResource("type_labels.MULTIMEDIA_EQUIPMENT"),
       SPORTS_FACILITY: tResource("type_labels.SPORTS_FACILITY"),
       MEETING_ROOM: tResource("type_labels.MEETING_ROOM"),
-      VEHICLE: tResource("type_labels.VEHICLE"),
-      OTHER: tResource("type_labels.OTHER"),
     };
 
     const typeCountText = Array.from(resourceTypes)

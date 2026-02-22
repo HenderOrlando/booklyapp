@@ -27,10 +27,12 @@ export type ApprovalStatus = "PENDING" | "APPROVED" | "REJECTED";
 export type ReservationStatus =
   | "PENDING"
   | "CONFIRMED"
-  | "IN_PROGRESS"
+  | "APPROVED"
+  | "REJECTED"
+  | "CHECKED_IN"
+  | "ACTIVE"
   | "COMPLETED"
-  | "CANCELLED"
-  | "REJECTED";
+  | "CANCELLED";
 
 export interface StatusBadgeProps {
   /** Tipo de entidad (determina el esquema de colores) */
@@ -155,8 +157,20 @@ export const StatusBadge = React.memo(function StatusBadge({
             text: tReservations("status.confirmed"),
             variant: "success",
           },
-          IN_PROGRESS: {
-            text: tReservations("status.in_progress"),
+          APPROVED: {
+            text: tReservations("status.approved"),
+            variant: "success",
+          },
+          REJECTED: {
+            text: tReservations("status.rejected"),
+            variant: "error",
+          },
+          CHECKED_IN: {
+            text: tReservations("status.checked_in"),
+            variant: "default",
+          },
+          ACTIVE: {
+            text: tReservations("status.active"),
             variant: "default",
           },
           COMPLETED: {
@@ -166,10 +180,6 @@ export const StatusBadge = React.memo(function StatusBadge({
           CANCELLED: {
             text: tReservations("status.cancelled"),
             variant: "secondary",
-          },
-          REJECTED: {
-            text: tReservations("status.rejected"),
-            variant: "error",
           },
         };
         return (

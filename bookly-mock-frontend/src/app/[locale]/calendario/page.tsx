@@ -365,7 +365,7 @@ export default function CalendarioPage() {
             <div className="flex items-center gap-2">
               <div className="w-4 h-4 rounded bg-state-success-500"></div>
               <span className="text-sm text-[var(--color-text-secondary)]">
-                {tReservations("statuses.IN_PROGRESS")}
+                {tReservations("statuses.ACTIVE")}
               </span>
             </div>
             <div className="flex items-center gap-2">

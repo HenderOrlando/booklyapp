@@ -9,10 +9,12 @@
     "all": "All statuses",
     "pending": "Pending",
     "confirmed": "Confirmed",
-    "in_progress": "In Progress",
+    "approved": "Approved",
+    "rejected": "Rejected",
+    "checked_in": "Checked In",
+    "active": "Active",
     "completed": "Completed",
-    "cancelled": "Cancelled",
-    "rejected": "Rejected"
+    "cancelled": "Cancelled"
   },
   "clear_filters": "Clear filters",
   "modal": {

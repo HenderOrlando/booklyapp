@@ -24,7 +24,7 @@ const API_V1 = "/api/v1";
  */
 const BE_CONTROLLERS = {
   auth: ["auth", "users", "roles", "permissions", "audit"],
-  resources: ["resources", "categories", "programs", "maintenances"],
+  resources: ["resources", "categories", "programs", "maintenances", "import"],
   availability: [
     "reservations",
     "availabilities",

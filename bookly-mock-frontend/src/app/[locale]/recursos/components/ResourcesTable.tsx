@@ -49,8 +49,6 @@ export function ResourcesTable({
     [ResourceType.MULTIMEDIA_EQUIPMENT]: t("type_labels.MULTIMEDIA_EQUIPMENT"),
     [ResourceType.SPORTS_FACILITY]: t("type_labels.SPORTS_FACILITY"),
     [ResourceType.MEETING_ROOM]: t("type_labels.MEETING_ROOM"),
-    [ResourceType.VEHICLE]: t("type_labels.VEHICLE"),
-    [ResourceType.OTHER]: t("type_labels.OTHER"),
   };
   const columns = [
     {

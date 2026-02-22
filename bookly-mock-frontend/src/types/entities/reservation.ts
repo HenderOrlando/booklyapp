@@ -5,10 +5,12 @@
 export type ReservationStatus =
   | "PENDING"
   | "CONFIRMED"
-  | "IN_PROGRESS"
+  | "APPROVED"
+  | "REJECTED"
+  | "CHECKED_IN"
+  | "ACTIVE"
   | "COMPLETED"
-  | "CANCELLED"
-  | "REJECTED";
+  | "CANCELLED";
 
 export type RecurrenceType = "NONE" | "DAILY" | "WEEKLY" | "MONTHLY";
 

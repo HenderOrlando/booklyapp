@@ -11,8 +11,6 @@ export enum ResourceType {
   MULTIMEDIA_EQUIPMENT = "MULTIMEDIA_EQUIPMENT",
   SPORTS_FACILITY = "SPORTS_FACILITY",
   MEETING_ROOM = "MEETING_ROOM",
-  VEHICLE = "VEHICLE",
-  OTHER = "OTHER",
 }
 
 export enum ResourceStatus {
@@ -84,7 +82,7 @@ export interface Maintenance {
   resource?: Resource;
   scheduledDate: string;
   completedDate?: string;
-  type: "PREVENTIVE" | "CORRECTIVE" | "EMERGENCY";
+  type: "PREVENTIVE" | "CORRECTIVE" | "EMERGENCY" | "CLEANING" | "UPGRADE" | "INSPECTION";
   status: "SCHEDULED" | "IN_PROGRESS" | "COMPLETED" | "CANCELLED";
   description: string;
   technician?: string;
@@ -197,6 +195,9 @@ export enum MaintenanceType {
   PREVENTIVE = "PREVENTIVE",
   CORRECTIVE = "CORRECTIVE",
   EMERGENCY = "EMERGENCY",
+  CLEANING = "CLEANING",
+  UPGRADE = "UPGRADE",
+  INSPECTION = "INSPECTION",
 }
 
 export enum MaintenanceStatus {

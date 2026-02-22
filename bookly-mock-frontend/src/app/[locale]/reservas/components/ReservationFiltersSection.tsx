@@ -56,10 +56,12 @@ export function ReservationFiltersSection({
       const statusLabels: Record<ReservationStatus, string> = {
         PENDING: t("status.pending") || "Pendiente",
         CONFIRMED: t("status.confirmed") || "Confirmada",
-        IN_PROGRESS: t("status.in_progress") || "En Progreso",
+        APPROVED: t("status.approved") || "Aprobada",
+        REJECTED: t("status.rejected") || "Rechazada",
+        CHECKED_IN: t("status.checked_in") || "Recibida",
+        ACTIVE: t("status.active") || "Activa",
         COMPLETED: t("status.completed") || "Completada",
         CANCELLED: t("status.cancelled") || "Cancelada",
-        REJECTED: t("status.rejected") || "Rechazada",
       };
 
       chips.push({
@@ -86,7 +88,8 @@ export function ReservationFiltersSection({
     { value: "all", label: t("status.all") || "Todos" },
     { value: "PENDING", label: t("status.pending") || "Pendiente" },
     { value: "CONFIRMED", label: t("status.confirmed") || "Confirmada" },
-    { value: "IN_PROGRESS", label: t("status.in_progress") || "En Progreso" },
+    { value: "APPROVED", label: t("status.approved") || "Aprobada" },
+    { value: "ACTIVE", label: t("status.active") || "Activa" },
     { value: "COMPLETED", label: t("status.completed") || "Completada" },
     { value: "CANCELLED", label: t("status.cancelled") || "Cancelada" },
   ];

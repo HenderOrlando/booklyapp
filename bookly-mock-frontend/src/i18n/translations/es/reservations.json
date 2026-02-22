@@ -9,10 +9,12 @@
     "all": "Todos los estados",
     "pending": "Pendiente",
     "confirmed": "Confirmada",
-    "in_progress": "En Progreso",
+    "approved": "Aprobada",
+    "rejected": "Rechazada",
+    "checked_in": "Recibida",
+    "active": "Activa",
     "completed": "Completada",
-    "cancelled": "Cancelada",
-    "rejected": "Rechazada"
+    "cancelled": "Cancelada"
   },
   "clear_filters": "Limpiar filtros",
   "modal": {
