@@ -46,18 +46,39 @@ export class CheckOutCompletedHandler implements OnModuleInit {
       // 3. Registrar notas de condición
       // 4. Actualizar historial de uso
 
-      if (resourceCondition === 'damaged' || resourceCondition === 'needs_maintenance') {
-        // Invalidar cache del recurso y su estado
-        await this.cacheService.invalidateResource(resourceId);
-        await this.cacheService.invalidateResourceStatus(resourceId);
+      await this.cacheService.invalidateResource(resourceId);
+      await this.cacheService.invalidateResourceStatus(resourceId);
 
-        this.logger.log(
-          `Resource ${resourceId} condition after check-out: ${resourceCondition}. Cache invalidated.`,
-        );
+      if (resourceCondition === 'damaged' || resourceCondition === 'needs_maintenance') {
         this.logger.warn(
           `Resource ${resourceId} needs attention. Condition: ${resourceCondition}. Notes: ${notes}`,
         );
-        // TODO: Publicar evento MAINTENANCE_SCHEDULED automáticamente
+
+        const maintenancePriority = resourceCondition === 'damaged' ? 'high' : 'normal';
+        const scheduledStartDate = new Date();
+        const scheduledEndDate = new Date(Date.now() + 24 * 60 * 60 * 1000);
+
+        await this.eventBus.publish(EventType.MAINTENANCE_SCHEDULED, {
+          eventId: `maint-auto-${resourceId}-${Date.now()}`,
+          eventType: EventType.MAINTENANCE_SCHEDULED,
+          service: 'resources-service',
+          timestamp: new Date(),
+          data: {
+            resourceId,
+            checkOutId,
+            priority: maintenancePriority,
+            scheduledStartDate: scheduledStartDate.toISOString(),
+            scheduledEndDate: scheduledEndDate.toISOString(),
+            reason: `Auto-scheduled after check-out. Condition: ${resourceCondition}. Notes: ${notes || 'None'}`,
+          },
+          metadata: {
+            correlationId: event.metadata?.correlationId,
+          },
+        });
+
+        this.logger.log(
+          `Maintenance scheduled for resource ${resourceId} due to condition: ${resourceCondition}`,
+        );
       } else {
         this.logger.log(`Resource ${resourceId} checked out in good condition`);
       }

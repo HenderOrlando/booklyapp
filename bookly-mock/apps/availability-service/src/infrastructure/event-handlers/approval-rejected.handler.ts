@@ -1,7 +1,8 @@
-import { Injectable, Logger, OnModuleInit } from '@nestjs/common';
+import { Injectable, Inject, Logger, OnModuleInit } from '@nestjs/common';
 import { EventBusService } from '@libs/event-bus';
-import { EventType } from '@libs/common/enums';
+import { EventType, ReservationStatus } from '@libs/common/enums';
 import { EventPayload } from '@libs/common';
+import { IReservationRepository } from '@availability/domain/repositories/reservation.repository.interface';
 import { AvailabilityCacheService } from '../cache';
 
 /**
@@ -16,6 +17,8 @@ export class ApprovalRejectedHandler implements OnModuleInit {
   constructor(
     private readonly eventBus: EventBusService,
     private readonly cacheService: AvailabilityCacheService,
+    @Inject('IReservationRepository')
+    private readonly reservationRepository: IReservationRepository,
   ) {}
 
   async onModuleInit() {
@@ -40,30 +43,65 @@ export class ApprovalRejectedHandler implements OnModuleInit {
     );
 
     try {
-      // TODO: Implementar lógica de negocio
-      // 1. Buscar la reserva por reservationId
-      // 2. Actualizar estado a 'rejected'
-      // 3. Registrar quién rechazó y la razón
-      // 4. Liberar el slot de tiempo
-      // 5. Publicar evento RESERVATION_REJECTED
-      // 6. Notificar al usuario solicitante
-      // 7. Verificar lista de espera para ese recurso/horario
+      const reservation = await this.reservationRepository.findById(reservationId);
 
-      this.logger.warn(
-        `Reservation ${reservationId} rejected by ${rejectedBy}. Reason: ${reason}`,
-      );
+      if (!reservation) {
+        this.logger.warn(`Reservation ${reservationId} not found, skipping rejection`);
+        return;
+      }
 
-      // Invalidar cache de la reserva y disponibilidad del recurso
+      if (reservation.status !== ReservationStatus.PENDING) {
+        this.logger.warn(
+          `Reservation ${reservationId} is not pending (status: ${reservation.status}), skipping`,
+        );
+        return;
+      }
+
+      await this.reservationRepository.updateStatus(reservationId, ReservationStatus.REJECTED);
+
       await this.cacheService.invalidateReservation(reservationId);
       await this.cacheService.invalidateResourceAvailability(resourceId);
       await this.cacheService.invalidateWaitingList(resourceId);
 
       this.logger.log(
-        `Reservation ${reservationId} rejected. Slot freed for resource ${resourceId}. Cache invalidated.`,
+        `Reservation ${reservationId} rejected by ${rejectedBy}. Reason: ${reason}. Slot freed for resource ${resourceId}.`,
       );
 
-      // TODO: Publicar RESERVATION_REJECTED
-      // TODO: Verificar y notificar lista de espera
+      await this.eventBus.publish(EventType.RESERVATION_REJECTED, {
+        eventId: `reject-${reservationId}-${Date.now()}`,
+        eventType: EventType.RESERVATION_REJECTED,
+        service: 'availability-service',
+        timestamp: new Date(),
+        data: {
+          reservationId,
+          resourceId,
+          approvalId,
+          rejectedBy,
+          reason,
+          userId: reservation.userId,
+          startDate: reservation.startDate,
+          endDate: reservation.endDate,
+        },
+        metadata: {
+          correlationId: event.metadata?.correlationId,
+        },
+      });
+
+      await this.eventBus.publish(EventType.WAITING_LIST_NOTIFIED, {
+        eventId: `waitlist-${resourceId}-${Date.now()}`,
+        eventType: EventType.WAITING_LIST_NOTIFIED,
+        service: 'availability-service',
+        timestamp: new Date(),
+        data: {
+          resourceId,
+          startDate: reservation.startDate,
+          endDate: reservation.endDate,
+          reason: 'slot_freed_after_rejection',
+        },
+        metadata: {
+          correlationId: event.metadata?.correlationId,
+        },
+      });
     } catch (error) {
       this.logger.error(
         `Error handling APPROVAL_REJECTED: ${error.message}`,

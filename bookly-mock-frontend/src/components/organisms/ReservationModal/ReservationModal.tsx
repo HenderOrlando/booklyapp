@@ -131,8 +131,10 @@ export const ReservationModal = React.memo(function ReservationModal({
   // Estado del formulario
   const [formData, setFormData] = React.useState<CreateReservationDto>({
     resourceId: reservation?.resourceId || initialResourceId || "",
+    userId: user?.id || "",
     title: reservation?.title || "",
     description: reservation?.description || "",
+    purpose: reservation?.description || "",
     startDate: reservation?.startDate.split("T")[0] || initialDate || "",
     endDate: reservation?.endDate.split("T")[0] || initialDate || "",
     recurrenceType: reservation?.recurrenceType || "NONE",

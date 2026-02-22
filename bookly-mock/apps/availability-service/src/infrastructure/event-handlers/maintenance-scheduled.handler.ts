@@ -1,7 +1,8 @@
-import { Injectable, Logger, OnModuleInit } from '@nestjs/common';
+import { Injectable, Inject, Logger, OnModuleInit } from '@nestjs/common';
 import { EventBusService } from '@libs/event-bus';
-import { EventType } from '@libs/common/enums';
+import { EventType, ReservationStatus } from '@libs/common/enums';
 import { EventPayload } from '@libs/common';
+import { IReservationRepository } from '@availability/domain/repositories/reservation.repository.interface';
 import { AvailabilityCacheService } from '../cache';
 
 /**
@@ -16,6 +17,8 @@ export class MaintenanceScheduledHandler implements OnModuleInit {
   constructor(
     private readonly eventBus: EventBusService,
     private readonly cacheService: AvailabilityCacheService,
+    @Inject('IReservationRepository')
+    private readonly reservationRepository: IReservationRepository,
   ) {}
 
   async onModuleInit() {
@@ -40,27 +43,77 @@ export class MaintenanceScheduledHandler implements OnModuleInit {
     );
 
     try {
-      // TODO: Implementar lógica de negocio
-      // 1. Bloquear recurso en el calendario para el período de mantenimiento
-      // 2. Verificar reservas existentes en ese período
-      // 3. Si hay conflictos:
-      //    - Si priority es 'critical', cancelar reservas y notificar
-      //    - Si priority es 'low', sugerir reprogramar mantenimiento
-      // 4. Actualizar cache de disponibilidad
+      const conflicts = await this.reservationRepository.findConflicts(
+        resourceId,
+        new Date(scheduledStartDate),
+        new Date(scheduledEndDate),
+      );
 
-      if (priority === 'critical' || priority === 'high') {
+      if (conflicts.length > 0) {
         this.logger.warn(
-          `Critical maintenance scheduled for resource ${resourceId} from ${scheduledStartDate} to ${scheduledEndDate}`,
+          `Found ${conflicts.length} conflicting reservations for maintenance on resource ${resourceId}`,
         );
-        // TODO: Verificar y manejar conflictos con reservas
+
+        if (priority === 'critical' || priority === 'high') {
+          for (const reservation of conflicts) {
+            await this.reservationRepository.updateStatus(
+              reservation.id,
+              ReservationStatus.CANCELLED,
+            );
+
+            await this.eventBus.publish(EventType.RESERVATION_CANCELLED, {
+              eventId: `maint-cancel-${reservation.id}-${Date.now()}`,
+              eventType: EventType.RESERVATION_CANCELLED,
+              service: 'availability-service',
+              timestamp: new Date(),
+              data: {
+                reservationId: reservation.id,
+                resourceId,
+                userId: reservation.userId,
+                reason: `${priority} maintenance scheduled from ${scheduledStartDate} to ${scheduledEndDate}`,
+                cancelledBy: 'system',
+                maintenanceId,
+              },
+              metadata: {
+                correlationId: event.metadata?.correlationId,
+              },
+            });
+          }
+
+          this.logger.log(
+            `Cancelled ${conflicts.length} reservations due to ${priority} maintenance on resource ${resourceId}`,
+          );
+        } else {
+          await this.eventBus.publish(EventType.SCHEDULE_CONFLICT_DETECTED, {
+            eventId: `maint-conflict-${resourceId}-${Date.now()}`,
+            eventType: EventType.SCHEDULE_CONFLICT_DETECTED,
+            service: 'availability-service',
+            timestamp: new Date(),
+            data: {
+              resourceId,
+              maintenanceId,
+              affectedReservations: conflicts.map((r) => ({
+                reservationId: r.id,
+                userId: r.userId,
+                startDate: r.startDate,
+                endDate: r.endDate,
+              })),
+              reason: 'maintenance_scheduled',
+              scheduledStartDate,
+              scheduledEndDate,
+            },
+            metadata: {
+              correlationId: event.metadata?.correlationId,
+            },
+          });
+        }
       }
 
-      // Invalidar cache de disponibilidad y horarios
       await this.cacheService.invalidateResourceAvailability(resourceId);
       await this.cacheService.invalidateAllResourceCache(resourceId);
 
       this.logger.log(
-        `Resource ${resourceId} blocked for maintenance from ${scheduledStartDate} to ${scheduledEndDate}. Cache invalidated.`,
+        `Resource ${resourceId} blocked for maintenance (${priority}) from ${scheduledStartDate} to ${scheduledEndDate}. Cache invalidated.`,
       );
     } catch (error) {
       this.logger.error(

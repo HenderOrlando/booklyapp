@@ -1,7 +1,8 @@
-import { Injectable, Logger, OnModuleInit } from '@nestjs/common';
+import { Injectable, Inject, Logger, OnModuleInit } from '@nestjs/common';
 import { EventBusService } from '@libs/event-bus';
-import { EventType } from '@libs/common/enums';
+import { EventType, ReservationStatus } from '@libs/common/enums';
 import { EventPayload } from '@libs/common';
+import { IReservationRepository } from '@availability/domain/repositories/reservation.repository.interface';
 import { AvailabilityCacheService } from '../cache';
 
 /**
@@ -16,6 +17,8 @@ export class ResourceDeletedHandler implements OnModuleInit {
   constructor(
     private readonly eventBus: EventBusService,
     private readonly cacheService: AvailabilityCacheService,
+    @Inject('IReservationRepository')
+    private readonly reservationRepository: IReservationRepository,
   ) {}
 
   async onModuleInit() {
@@ -40,24 +43,45 @@ export class ResourceDeletedHandler implements OnModuleInit {
     );
 
     try {
-      // Invalidar todo el cache del recurso
+      const activeReservations = await this.reservationRepository.findActiveByResource(resourceId);
+
+      let cancelledCount = 0;
+      for (const reservation of activeReservations) {
+        try {
+          await this.reservationRepository.updateStatus(
+            reservation.id,
+            ReservationStatus.CANCELLED,
+          );
+          cancelledCount++;
+
+          await this.eventBus.publish(EventType.RESERVATION_CANCELLED, {
+            eventId: `cancel-${reservation.id}-${Date.now()}`,
+            eventType: EventType.RESERVATION_CANCELLED,
+            service: 'availability-service',
+            timestamp: new Date(),
+            data: {
+              reservationId: reservation.id,
+              resourceId,
+              userId: reservation.userId,
+              reason: `Resource "${name}" has been deleted: ${reason || 'No reason specified'}`,
+              cancelledBy: 'system',
+            },
+            metadata: {
+              correlationId: event.metadata?.correlationId,
+            },
+          });
+        } catch (err) {
+          this.logger.error(
+            `Failed to cancel reservation ${reservation.id}: ${err.message}`,
+          );
+        }
+      }
+
       await this.cacheService.invalidateAllResourceCache(resourceId);
 
       this.logger.log(
-        `Cancelled all future reservations for deleted resource ${resourceId}. Cache invalidated.`,
+        `Resource ${resourceId} deleted (softDelete: ${softDelete}). Cancelled ${cancelledCount} active reservations. Cache invalidated.`,
       );
-
-      // TODO: Implementar lógica de negocio
-      // 1. Buscar todas las reservas futuras del recurso
-      // 2. Cancelar cada reserva
-      // 3. Notificar a los usuarios afectados
-      // 4. Publicar eventos RESERVATION_CANCELLED para cada reserva
-
-      this.logger.warn(
-        `Resource ${resourceId} deleted. Reason: ${reason || 'Not specified'}. SoftDelete: ${softDelete}`,
-      );
-
-      // TODO: Publicar eventos de cancelación masiva
     } catch (error) {
       this.logger.error(
         `Error handling RESOURCE_DELETED: ${error.message}`,

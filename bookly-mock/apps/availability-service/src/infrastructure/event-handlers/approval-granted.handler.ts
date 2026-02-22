@@ -1,7 +1,8 @@
-import { Injectable, Logger, OnModuleInit } from '@nestjs/common';
+import { Injectable, Inject, Logger, OnModuleInit } from '@nestjs/common';
 import { EventBusService } from '@libs/event-bus';
-import { EventType } from '@libs/common/enums';
+import { EventType, ReservationStatus } from '@libs/common/enums';
 import { EventPayload } from '@libs/common';
+import { IReservationRepository } from '@availability/domain/repositories/reservation.repository.interface';
 import { AvailabilityCacheService } from '../cache';
 
 /**
@@ -16,6 +17,8 @@ export class ApprovalGrantedHandler implements OnModuleInit {
   constructor(
     private readonly eventBus: EventBusService,
     private readonly cacheService: AvailabilityCacheService,
+    @Inject('IReservationRepository')
+    private readonly reservationRepository: IReservationRepository,
   ) {}
 
   async onModuleInit() {
@@ -40,25 +43,45 @@ export class ApprovalGrantedHandler implements OnModuleInit {
     );
 
     try {
-      // TODO: Implementar lógica de negocio
-      // 1. Buscar la reserva por reservationId
-      // 2. Actualizar estado a 'confirmed'
-      // 3. Registrar quién aprobó y comentarios
-      // 4. Publicar evento RESERVATION_CONFIRMED
-      // 5. Notificar al usuario solicitante
+      const reservation = await this.reservationRepository.findById(reservationId);
 
-      // Invalidar cache de la reserva
+      if (!reservation) {
+        this.logger.warn(`Reservation ${reservationId} not found, skipping approval confirmation`);
+        return;
+      }
+
+      if (reservation.status !== ReservationStatus.PENDING) {
+        this.logger.warn(
+          `Reservation ${reservationId} is not pending (status: ${reservation.status}), skipping`,
+        );
+        return;
+      }
+
+      await this.reservationRepository.updateStatus(reservationId, ReservationStatus.CONFIRMED);
+
       await this.cacheService.invalidateReservation(reservationId);
 
       this.logger.log(
-        `Reservation ${reservationId} confirmed after approval. Cache invalidated.`,
+        `Reservation ${reservationId} confirmed after approval by ${approvedBy}. Comments: ${comments || 'None'}`,
       );
 
-      this.logger.log(
-        `Reservation ${reservationId} approved by ${approvedBy}. Comments: ${comments || 'None'}`,
-      );
-
-      // TODO: Publicar RESERVATION_CONFIRMED
+      await this.eventBus.publish(EventType.RESERVATION_CONFIRMED, {
+        eventId: `confirm-${reservationId}-${Date.now()}`,
+        eventType: EventType.RESERVATION_CONFIRMED,
+        service: 'availability-service',
+        timestamp: new Date(),
+        data: {
+          reservationId,
+          resourceId,
+          approvalId,
+          approvedBy,
+          comments,
+          userId: reservation.userId,
+        },
+        metadata: {
+          correlationId: event.metadata?.correlationId,
+        },
+      });
     } catch (error) {
       this.logger.error(
         `Error handling APPROVAL_GRANTED: ${error.message}`,

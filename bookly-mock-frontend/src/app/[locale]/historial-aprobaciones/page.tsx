@@ -186,8 +186,50 @@ export default function HistorialAprobacionesPage() {
   }, [history, filterStatus, searchQuery]);
 
   const handleExportCSV = () => {
-    console.log("Exportando historial a CSV...");
-    // TODO: Implementar exportación CSV
+    if (!filteredHistory.length) return;
+
+    const headers = [
+      "ID",
+      "Usuario",
+      "Email",
+      "Recurso",
+      "Tipo Recurso",
+      "Propósito",
+      "Estado",
+      "Fecha Solicitud",
+      "Fecha Resolución",
+      "Aprobado Por",
+      "Razón Rechazo",
+    ];
+
+    const rows = filteredHistory.map((item) => [
+      item.id,
+      item.userName,
+      item.userEmail,
+      item.resourceName,
+      item.resourceType,
+      item.purpose,
+      item.status,
+      item.requestedAt ? format(new Date(item.requestedAt), "yyyy-MM-dd HH:mm") : "",
+      item.reviewedAt ? format(new Date(item.reviewedAt), "yyyy-MM-dd HH:mm") : "",
+      item.reviewerName || "",
+      item.rejectionReason || "",
+    ]);
+
+    const csvContent = [
+      headers.join(","),
+      ...rows.map((row) =>
+        row.map((cell) => `"${String(cell).replace(/"/g, '""')}"`).join(",")
+      ),
+    ].join("\n");
+
+    const blob = new Blob(["\uFEFF" + csvContent], { type: "text/csv;charset=utf-8;" });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = `historial-aprobaciones-${format(new Date(), "yyyy-MM-dd")}.csv`;
+    link.click();
+    URL.revokeObjectURL(url);
   };
 
   return (

@@ -1,7 +1,8 @@
-import { Injectable, Logger, OnModuleInit } from '@nestjs/common';
+import { Injectable, Inject, Logger, OnModuleInit } from '@nestjs/common';
 import { EventBusService } from '@libs/event-bus';
 import { EventType } from '@libs/common/enums';
 import { EventPayload } from '@libs/common';
+import { IReservationRepository } from '@availability/domain/repositories/reservation.repository.interface';
 import { AvailabilityCacheService } from '../cache';
 
 /**
@@ -16,6 +17,8 @@ export class ResourceAvailabilityChangedHandler implements OnModuleInit {
   constructor(
     private readonly eventBus: EventBusService,
     private readonly cacheService: AvailabilityCacheService,
+    @Inject('IReservationRepository')
+    private readonly reservationRepository: IReservationRepository,
   ) {}
 
   async onModuleInit() {
@@ -40,28 +43,53 @@ export class ResourceAvailabilityChangedHandler implements OnModuleInit {
     );
 
     try {
-      // TODO: Implementar lógica de negocio
-      // 1. Actualizar cache de disponibilidad del recurso
-      // 2. Si newAvailability es false, verificar reservas en affectedTimeSlots
-      // 3. Notificar conflictos si existen reservas en slots bloqueados
-      // 4. Actualizar calendario visual
-
       if (!newAvailability && affectedTimeSlots?.length > 0) {
         this.logger.warn(
           `Resource ${resourceId} became unavailable. Checking ${affectedTimeSlots.length} affected time slots`,
         );
-        // TODO: Verificar y notificar conflictos
+
+        for (const slot of affectedTimeSlots) {
+          const conflicts = await this.reservationRepository.findConflicts(
+            resourceId,
+            new Date(slot.startDate),
+            new Date(slot.endDate),
+          );
+
+          if (conflicts.length > 0) {
+            this.logger.warn(
+              `Found ${conflicts.length} conflicting reservations for resource ${resourceId} in slot ${slot.startDate} - ${slot.endDate}`,
+            );
+
+            await this.eventBus.publish(EventType.SCHEDULE_CONFLICT_DETECTED, {
+              eventId: `conflict-${resourceId}-${Date.now()}`,
+              eventType: EventType.SCHEDULE_CONFLICT_DETECTED,
+              service: 'availability-service',
+              timestamp: new Date(),
+              data: {
+                resourceId,
+                affectedReservations: conflicts.map((r) => ({
+                  reservationId: r.id,
+                  userId: r.userId,
+                  startDate: r.startDate,
+                  endDate: r.endDate,
+                })),
+                reason: 'resource_availability_changed',
+                slotStart: slot.startDate,
+                slotEnd: slot.endDate,
+              },
+              metadata: {
+                correlationId: event.metadata?.correlationId,
+              },
+            });
+          }
+        }
       }
 
-      // Invalidar cache de disponibilidad del recurso
       await this.cacheService.invalidateResourceAvailability(resourceId);
       await this.cacheService.invalidateAllResourceCache(resourceId);
 
       this.logger.log(
-        `Updated availability for resource ${resourceId}. Cache invalidated.`,
-      );
-      this.logger.log(
-        `Resource ${resourceId} availability updated: ${previousAvailability} -> ${newAvailability}`,
+        `Resource ${resourceId} availability updated: ${previousAvailability} -> ${newAvailability}. Cache invalidated.`,
       );
     } catch (error) {
       this.logger.error(

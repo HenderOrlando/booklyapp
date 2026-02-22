@@ -1610,12 +1610,16 @@ export class MockService {
     this.resourcesData[index] = {
       ...this.resourcesData[index],
       ...data,
+      availabilityRules: {
+        ...this.resourcesData[index].availabilityRules,
+        ...(data.availabilityRules || {}),
+      },
       attributes:
         normalizedAttributes ??
         data.attributes ??
         this.resourcesData[index].attributes,
       updatedAt: new Date().toISOString(),
-    };
+    } as typeof this.resourcesData[number];
 
     return {
       success: true,
@@ -3152,7 +3156,7 @@ export class MockService {
     const newReservation: Reservation = {
       id: `rsv_${Date.now()}`,
       resourceId: data.resourceId,
-      title: data.title,
+      title: data.title || data.purpose || "Reserva",
       description: data.description,
       startDate: data.startDate,
       endDate: data.endDate,
@@ -3160,7 +3164,7 @@ export class MockService {
       recurrenceEndDate: data.recurrenceEndDate,
       attendees: data.attendees,
       notes: data.notes,
-      userId: "user_1",
+      userId: data.userId || "user_1",
       userName: "Usuario Mock",
       userEmail: "mock@ufps.edu.co",
       status: "PENDING",
