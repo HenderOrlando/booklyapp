@@ -1,0 +1,90 @@
+{
+  "run_id": "2026-02-21-frontend-01",
+  "scope_root": "bookly-mock-frontend",
+  "total_rules": 41,
+  "applicable_to_frontend": 41,
+  "domains": {
+    "design-system": {
+      "rules": [
+        { "id": "DS-COLORES", "file": "design-system-colores-tokens.md", "title": "Sistema de Colores y Tokens", "trigger": "model_decision", "frontend_relevance": "direct" },
+        { "id": "DS-COMPONENTES", "file": "design-system-componentes.md", "title": "Sistema de Componentes y Estados", "trigger": "model_decision", "frontend_relevance": "direct" },
+        { "id": "DS-LAYOUTS", "file": "design-system-layouts-pages.md", "title": "Layouts y Patrones de Página", "trigger": "model_decision", "frontend_relevance": "direct" }
+      ]
+    },
+    "auth": {
+      "rules": [
+        { "id": "RF-41", "file": "bookly-auth-rf41-gestion-de-roles.md", "title": "Gestión de roles y permisos", "trigger": "manual", "frontend_relevance": "direct" },
+        { "id": "RF-42", "file": "bookly-auth-rf42-restriccion-de-modificacion.md", "title": "Restricción de modificaciones a administradores", "trigger": "manual", "frontend_relevance": "direct" },
+        { "id": "RF-43", "file": "bookly-auth-rf43-autenticacion-y-sso.md", "title": "Autenticación y SSO", "trigger": "manual", "frontend_relevance": "direct" },
+        { "id": "RF-44", "file": "bookly-auth-rf44-auditoria.md", "title": "Registro de accesos y actividades para auditoría", "trigger": "manual", "frontend_relevance": "indirect" },
+        { "id": "RF-45", "file": "bookly-auth-rf45-verificacion-2fa-solicitudes-criticas.md", "title": "Verificación 2FA en solicitudes críticas", "trigger": "manual", "frontend_relevance": "direct" }
+      ]
+    },
+    "resources": {
+      "rules": [
+        { "id": "RF-01", "file": "bookly-resource-rf01-crear-editar-eliminar-recursos.md", "title": "CRUD de recursos", "trigger": "manual", "frontend_relevance": "direct" },
+        { "id": "RF-02", "file": "bookly-resource-rf02-asociar-recurso-a-categorias-o-programas.md", "title": "Asociar recurso a categorías y programas", "trigger": "manual", "frontend_relevance": "direct" },
+        { "id": "CHAR", "file": "bookly-resource-characteristics.md", "title": "Gestión de características de recursos", "trigger": "always", "frontend_relevance": "direct" }
+      ]
+    },
+    "availability": {
+      "rules": [
+        { "id": "RF-07", "file": "bookly-availability-rf07-horarios-disponibles.md", "title": "Horarios disponibles con restricciones", "trigger": "manual", "frontend_relevance": "direct" },
+        { "id": "RF-08", "file": "bookly-availability-rf08-integra-calendars.md", "title": "Integración con calendarios", "trigger": "manual", "frontend_relevance": "direct" },
+        { "id": "RF-09", "file": "bookly-availability-rf09-busqueda-disponibilidad.md", "title": "Búsqueda avanzada de disponibilidad", "trigger": "manual", "frontend_relevance": "direct" },
+        { "id": "RF-10", "file": "bookly-availability-rf10-visualizacion-en-calendar.md", "title": "Visualización en calendario", "trigger": "manual", "frontend_relevance": "direct" },
+        { "id": "RF-11", "file": "bookly-availability-rf11-registro-historial-uso.md", "title": "Registro historial de uso", "trigger": "manual", "frontend_relevance": "direct" },
+        { "id": "RF-12", "file": "bookly-availability-rf12-permite-reserva-periodica.md", "title": "Reservas periódicas", "trigger": "manual", "frontend_relevance": "direct" },
+        { "id": "RF-13", "file": "bookly-availability-rf13-solicitud-reserva-vobo-docente.md", "title": "Solicitud reserva con VoBo docente", "trigger": "manual", "frontend_relevance": "direct" },
+        { "id": "RF-14", "file": "bookly-availability-rf14-lista-espera-para-sobrecarga.md", "title": "Lista de espera", "trigger": "manual", "frontend_relevance": "direct" },
+        { "id": "RF-15", "file": "bookly-availability-rf15-reasignacion-reserva.md", "title": "Reasignación de reservas", "trigger": "manual", "frontend_relevance": "direct" },
+        { "id": "RF-16", "file": "bookly-availability-rf16-restricciones-reserva-basada-en-categorias.md", "title": "Restricciones por categorías", "trigger": "manual", "frontend_relevance": "direct" },
+        { "id": "RF-17", "file": "bookly-availability-rf17-configure-tiempo-entre-reservas.md", "title": "Tiempo entre reservas", "trigger": "manual", "frontend_relevance": "indirect" },
+        { "id": "RF-18", "file": "bookly-availability-rf18-cancelar-modificar-con-reglas.md", "title": "Cancelar/modificar con reglas", "trigger": "manual", "frontend_relevance": "direct" },
+        { "id": "RF-19", "file": "bookly-availability-rf19-reservas-multiples-en-una-solicitud.md", "title": "Reservas múltiples en una solicitud", "trigger": "manual", "frontend_relevance": "direct" }
+      ]
+    },
+    "stockpile": {
+      "rules": [
+        { "id": "RF-20", "file": "bookly-stockpile-rf20-solicitudes-validadas-por-responsable.md", "title": "Solicitudes validadas por responsable", "trigger": "manual", "frontend_relevance": "direct" },
+        { "id": "RF-21", "file": "bookly-stockpile-rf21-generacion-automatica-documento-accept-reject-reserva.md", "title": "Generación automática documentos", "trigger": "manual", "frontend_relevance": "direct" },
+        { "id": "RF-22", "file": "bookly-stockpile-rf22-notificacion-a-solicitante-con-carta.md", "title": "Notificación a solicitante", "trigger": "manual", "frontend_relevance": "direct" },
+        { "id": "RF-23", "file": "bookly-stockpile-rf23-visualizacion-reservas-aprobadas-vigilante.md", "title": "Pantalla de vigilancia", "trigger": "manual", "frontend_relevance": "direct" },
+        { "id": "RF-24", "file": "bookly-stockpile-rf24-configuracion-flujo-segun-tipo-de-usuario.md", "title": "Configuración flujo por tipo usuario", "trigger": "manual", "frontend_relevance": "direct" },
+        { "id": "RF-25", "file": "bookly-stockpile-rf25-registro-trazabilidad-auditable.md", "title": "Registro trazabilidad auditable", "trigger": "manual", "frontend_relevance": "direct" },
+        { "id": "RF-26", "file": "bookly-stockpile-rf26-checkin-checkout-digital.md", "title": "Check-in/check-out digital", "trigger": "manual", "frontend_relevance": "direct" },
+        { "id": "RF-27", "file": "bookly-stockpile-rf27-integracion-emails-whatsapp.md", "title": "Integración emails/WhatsApp", "trigger": "manual", "frontend_relevance": "indirect" },
+        { "id": "RF-28", "file": "bookly-stockpile-rf28-notificaciones-automaticas-email-whatsapp-confirma-cancela-modifica-reserva.md", "title": "Notificaciones automáticas", "trigger": "manual", "frontend_relevance": "direct" },
+        { "id": "RF-29", "file": "bookly-stockpile-rf29-recordatorios-reserva-personalizables.md", "title": "Recordatorios personalizables", "trigger": "manual", "frontend_relevance": "direct" },
+        { "id": "RF-30", "file": "bookly-stockpile-rf30-notificacion-tiempo-real-recurso-disponible-por-cancelacion.md", "title": "Notificación tiempo real disponibilidad", "trigger": "manual", "frontend_relevance": "direct" }
+      ]
+    },
+    "reports": {
+      "rules": [
+        { "id": "RF-31", "file": "bookly-reports-rf31-uso-programa-periodo-tipo-recurso.md", "title": "Reporte uso por programa/periodo/tipo", "trigger": "manual", "frontend_relevance": "direct" },
+        { "id": "RF-32", "file": "bookly-reports-rf32-reservas-por-usuario.md", "title": "Reporte reservas por usuario", "trigger": "manual", "frontend_relevance": "direct" },
+        { "id": "RF-33", "file": "bookly-reports-rf33-exportar-en-csv.md", "title": "Exportar en CSV", "trigger": "manual", "frontend_relevance": "direct" },
+        { "id": "RF-34", "file": "bookly-reports-rf34-registro-feedbck-calidad-servicio.md", "title": "Registro feedback calidad servicio", "trigger": "manual", "frontend_relevance": "direct" },
+        { "id": "RF-35", "file": "bookly-reports-rf35-registro-feedback-administrativo.md", "title": "Registro feedback administrativo", "trigger": "manual", "frontend_relevance": "direct" },
+        { "id": "RF-36", "file": "bookly-reports-rf36-dashboard-interactivo-tiempo-real.md", "title": "Dashboard interactivo tiempo real", "trigger": "manual", "frontend_relevance": "direct" },
+        { "id": "RF-37", "file": "bookly-reports-rf37-demanda-insatisfecha.md", "title": "Demanda insatisfecha", "trigger": "manual", "frontend_relevance": "direct" },
+        { "id": "RF-38", "file": "bookly-reports-rf38-conflictos-reserva.md", "title": "Conflictos de reserva", "trigger": "manual", "frontend_relevance": "direct" },
+        { "id": "RF-39", "file": "bookly-reports-rf39-cumplimiento-reserva.md", "title": "Cumplimiento reserva", "trigger": "manual", "frontend_relevance": "direct" },
+        { "id": "RF-40", "file": "bookly-reports-rf40-cancelaciones-ausencias.md", "title": "Cancelaciones y ausencias", "trigger": "manual", "frontend_relevance": "direct" }
+      ]
+    },
+    "cross-cutting": {
+      "rules": [
+        { "id": "BASE", "file": "bookly-base.md", "title": "Arquitectura base Bookly", "trigger": "always", "frontend_relevance": "indirect" },
+        { "id": "MODULES", "file": "bookly-modules.md", "title": "Módulos del sistema", "trigger": "always", "frontend_relevance": "indirect" },
+        { "id": "DOC-STD", "file": "bookly-documentacion-estandar.md", "title": "Documentación estándar", "trigger": "manual", "frontend_relevance": "indirect" },
+        { "id": "PLAN", "file": "bookly-planificacion.md", "title": "Planificación e hitos", "trigger": "manual", "frontend_relevance": "indirect" },
+        { "id": "FLUJO-AUTH", "file": "bookly-flujos-auth.md", "title": "Flujos de autenticación", "trigger": "manual", "frontend_relevance": "direct" },
+        { "id": "FLUJO-RESOURCES", "file": "bookly-flujos-resources.md", "title": "Flujos de recursos", "trigger": "manual", "frontend_relevance": "direct" },
+        { "id": "FLUJO-AVAIL", "file": "bookly-flujos-availability.md", "title": "Flujos de disponibilidad", "trigger": "manual", "frontend_relevance": "direct" },
+        { "id": "FLUJO-STOCKPILE", "file": "bookly-flujos-stockpile.md", "title": "Flujos de aprobaciones", "trigger": "manual", "frontend_relevance": "direct" },
+        { "id": "FLUJO-REPORTS", "file": "bookly-flujos-reports.md", "title": "Flujos de reportes", "trigger": "manual", "frontend_relevance": "direct" }
+      ]
+    }
+  }
+}

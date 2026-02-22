@@ -1,0 +1,123 @@
+{
+  "run_id": "2026-02-21-frontend-01",
+  "scope_root": "bookly-mock-frontend",
+  "generated_at": "2026-02-21T21:26:00-05:00",
+  "summary": {
+    "total_source_files": 491,
+    "by_extension": {
+      ".tsx": 248,
+      ".ts": 196,
+      ".json": 44,
+      ".tmp": 2,
+      ".md": 1
+    }
+  },
+  "directories": {
+    "app_routes": {
+      "path": "src/app/[locale]",
+      "route_count": 24,
+      "routes": [
+        "(auth)", "admin", "aprobaciones", "calendario", "caracteristicas",
+        "categorias", "check-in", "dashboard", "design-system",
+        "forgot-password", "historial-aprobaciones", "lista-espera",
+        "login", "mantenimientos", "profile", "programas", "recursos",
+        "recursos-virtual", "register", "reportes", "reservas",
+        "reset-password", "vigilancia"
+      ]
+    },
+    "components": {
+      "path": "src/components",
+      "atoms": 44,
+      "molecules": 36,
+      "organisms": 42,
+      "templates": 10,
+      "analytics": 7,
+      "auth": 3
+    },
+    "hooks": {
+      "path": "src/hooks",
+      "total": 44,
+      "mutations_dir": 13
+    },
+    "infrastructure": {
+      "path": "src/infrastructure",
+      "api_clients": 15,
+      "data_providers": 8,
+      "http": 4,
+      "mock": 11,
+      "websocket": 4
+    },
+    "i18n": {
+      "path": "src/i18n",
+      "languages": ["en", "es"],
+      "namespaces_per_language": 22
+    },
+    "types": {
+      "path": "src/types",
+      "entity_types": 14,
+      "api_types": 1
+    },
+    "store": {
+      "path": "src/store",
+      "has_slices": true
+    }
+  },
+  "testing": {
+    "unit_tests": {
+      "count": 7,
+      "locations": [
+        "src/__tests__/contracts/endpoint-contract.test.ts",
+        "src/contexts/__tests__/AuthContext.redirect.test.tsx",
+        "src/lib/__tests__/utils.test.ts",
+        "src/lib/auth/__tests__/post-auth-redirect.test.ts",
+        "src/lib/data-config/__tests__/store.test.ts",
+        "src/app/[locale]/reservas/reasignacion/__tests__/page.test.tsx",
+        "src/infrastructure/api/__tests__/reservations-client.contract.test.ts"
+      ]
+    },
+    "e2e_tests": {
+      "count": 8,
+      "files": [
+        "e2e/admin.spec.ts",
+        "e2e/auth.spec.ts",
+        "e2e/characteristics.spec.ts",
+        "e2e/reports.spec.ts",
+        "e2e/reservations.spec.ts",
+        "e2e/resources.spec.ts",
+        "e2e/users-admin.spec.ts"
+      ]
+    },
+    "smoke_tests": {
+      "count": 9,
+      "files": [
+        "e2e/smoke/approvals.smoke.spec.ts",
+        "e2e/smoke/auth.smoke.spec.ts",
+        "e2e/smoke/data-config.smoke.spec.ts",
+        "e2e/smoke/login-ui.smoke.spec.ts",
+        "e2e/smoke/navigation.smoke.spec.ts",
+        "e2e/smoke/reports.smoke.spec.ts",
+        "e2e/smoke/reservations.smoke.spec.ts",
+        "e2e/smoke/resources.smoke.spec.ts",
+        "e2e/smoke/waitlist.smoke.spec.ts"
+      ]
+    },
+    "regression_tests": {
+      "count": 2,
+      "files": [
+        "e2e/regression/resource-edit-selectors.spec.ts",
+        "e2e/regression/profile.spec.ts"
+      ]
+    },
+    "contract_tests": {
+      "count": 2,
+      "files": [
+        "src/__tests__/contracts/endpoint-contract.test.ts",
+        "src/infrastructure/api/__tests__/reservations-client.contract.test.ts"
+      ]
+    },
+    "interceptor_tests": {
+      "count": 5,
+      "path": "src/infrastructure/api/__tests__/interceptors/"
+    }
+  }
+}
