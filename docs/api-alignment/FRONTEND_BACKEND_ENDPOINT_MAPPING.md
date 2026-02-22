@@ -74,9 +74,9 @@
 | **POST** | `auth/register` | `authClient.post('auth/register')` | ✅ **EXISTE** | `/auth/register` | **ADAPTAR URL** |
 | **POST** | `auth/logout` | `authClient.post('auth/logout')` | ✅ **EXISTE** | `/auth/logout` | **ADAPTAR URL** |
 | **GET** | `auth/profile` | `authClient.get('auth/profile')` | ✅ **EXISTE** | `/auth/profile` | **ADAPTAR URL** |
-| **PUT** | `auth/profile` | `authClient.put('auth/profile')` | ❌ **NO EXISTE** | - | **CREAR ENDPOINT** |
-| **POST** | `auth/password-reset` | `authClient.post('auth/password-reset')` | ❌ **NO EXISTE** | - | **CREAR ENDPOINT** |
-| **POST** | `auth/password-reset/confirm` | - | ❌ **NO EXISTE** | - | **CREAR ENDPOINT** |
+| **PUT** | `auth/profile` | `authClient.put('auth/profile')` | ✅ **EXISTE** | `/users/me/profile` | **OK** |
+| **POST** | `auth/password-reset` | `authClient.post('auth/password-reset')` | ✅ **EXISTE** | `/auth/forgot-password` | **ADAPTAR URL** |
+| **POST** | `auth/password-reset/confirm` | - | ✅ **EXISTE** | `/auth/reset-password` | **ADAPTAR URL** |
 | **GET** | `oauth/google` | `window.location.href = /oauth/google` | ✅ **EXISTE** | `/auth/oauth/google` | **ADAPTAR URL** |
 | **GET** | `oauth/callback` | `authClient.get(oauth/callback?token=)` | ✅ **EXISTE** | `/auth/oauth/google/callback` | **ADAPTAR URL** |
 
@@ -152,17 +152,17 @@
 
 | Método | Backend Endpoint | Frontend Equivalente | Estado |
 |--------|------------------|---------------------|--------|
-| **GET** | `/search/resources` | Buscar recursos disponibles | ⚠️ **FALTA FRONTEND** |
-| **GET** | `/search/availability` | Buscar horarios disponibles | ⚠️ **FALTA FRONTEND** |
-| **POST** | `/search/advanced` | Búsqueda avanzada | ⚠️ **FALTA FRONTEND** |
+| **GET** | `/search/resources` | Buscar recursos disponibles | ✅ **IMPLEMENTADO** |
+| **GET** | `/search/availability` | Buscar horarios disponibles | ✅ **IMPLEMENTADO** |
+| **POST** | `/search/advanced` | Búsqueda avanzada | ✅ **IMPLEMENTADO** |
 | **POST** | `/waiting-lists` | Lista de espera | ✅ **IMPLEMENTADO** |
 | **GET** | `/waiting-lists/resource/:id` | Obtener lista espera | ✅ **IMPLEMENTADO** |
 | **DELETE** | `/waiting-lists/:id` | Remover de lista | ✅ **IMPLEMENTADO** |
 | **POST** | `/waiting-lists/notify` | Notificar siguientes | ✅ **IMPLEMENTADO** |
 | **PATCH** | `/waiting-lists/:id/priority` | Actualizar prioridad | ✅ **IMPLEMENTADO** |
 | **POST** | `/waiting-lists/:id/accept` | Aceptar oferta | ✅ **IMPLEMENTADO** |
-| **POST** | `/recurring-reservations` | Reservas recurrentes | ⚠️ **FALTA FRONTEND** |
-| **GET** | `/availability/:resourceId/calendar` | Vista calendario | ⚠️ **FALTA FRONTEND** |
+| **POST** | `/recurring-reservations` | Reservas recurrentes | ✅ **IMPLEMENTADO** |
+| **GET** | `/availability/:resourceId/calendar` | Vista calendario | ✅ **IMPLEMENTADO** |
 
 ---
 
@@ -286,12 +286,12 @@
 
 | Método | Backend Endpoint | Descripción | Estado |
 |--------|------------------|-------------|--------|
-| **GET** | `/approval-flows/pending` | Solicitudes pendientes | ⚠️ **FALTA FRONTEND** |
-| **POST** | `/approval-flows/:id/approve` | Aprobar solicitud | ⚠️ **FALTA FRONTEND** |
-| **POST** | `/approval-flows/:id/reject` | Rechazar solicitud | ⚠️ **FALTA FRONTEND** |
-| **GET** | `/document-templates/:id/preview` | Vista previa documento | ⚠️ **FALTA FRONTEND** |
-| **POST** | `/documents/generate` | Generar documento | ⚠️ **FALTA FRONTEND** |
-| **GET** | `/notifications/templates` | Plantillas notificación | ⚠️ **FALTA FRONTEND** |
+| **GET** | `/approval-flows/pending` | Solicitudes pendientes | ✅ **IMPLEMENTADO** |
+| **POST** | `/approval-flows/:id/approve` | Aprobar solicitud | ✅ **IMPLEMENTADO** |
+| **POST** | `/approval-flows/:id/reject` | Rechazar solicitud | ✅ **IMPLEMENTADO** |
+| **GET** | `/document-templates/:id/preview` | Vista previa documento | ✅ **IMPLEMENTADO** |
+| **POST** | `/documents/generate` | Generar documento | ✅ **IMPLEMENTADO** |
+| **GET** | `/notifications/templates` | Plantillas notificación | ✅ **IMPLEMENTADO** |
 
 ---
 
@@ -522,13 +522,11 @@ await http.get('resource-categories', { searchParams })
    - Performance Monitoring (4 endpoints)
    - Data Processing (5 endpoints)
 
-2. **🟡 MEDIO**: Corregir URLs desalineadas (impacto: 4 horas)
+2. **🟡 MEDIO**: Frontend para nuevas funcionalidades Reports (impacto: 2-3 semanas)
 
-3. **🟡 MEDIO**: Frontend para nuevas funcionalidades Reports (impacto: 2-3 semanas)
-
-4. **🟢 BAJO**: Import Service independiente (impacto: 1-2 semanas)
+3. **🟢 BAJO**: Import Service independiente (impacto: 1-2 semanas)
 
 ---
 
-*Inventario actualizado: 2025-09-03*  
+*Inventario actualizado: 2026-02-22*  
 *Estado: Backend robusto - Ajustes menores requeridos*

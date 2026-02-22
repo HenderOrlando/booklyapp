@@ -74,23 +74,23 @@ Este documento mapea los endpoints disponibles en el backend (bookly-mock) con s
 
 | Método | Endpoint     | Descripción             | Frontend Client | Hook     | Status                  |
 | ------ | ------------ | ----------------------- | --------------- | -------- | ----------------------- |
-| GET    | `/users/me`  | Perfil propio           | ❌ Falta        | ❌ Falta | ⚠️ USAR `/auth/profile` |
-| GET    | `/users`     | Listar usuarios (admin) | ❌ Falta        | ❌ Falta | ⚠️ Falta                |
-| GET    | `/users/:id` | Obtener usuario por ID  | ❌ Falta        | ❌ Falta | ⚠️ Falta                |
-| PATCH  | `/users/:id` | Actualizar usuario      | ❌ Falta        | ❌ Falta | ⚠️ Falta                |
-| DELETE | `/users/:id` | Eliminar usuario        | ❌ Falta        | ❌ Falta | ⚠️ Falta                |
+| GET    | `/users/me`  | Perfil propio           | ✅ `AuthClient.getProfile()`    | ✅ `useCurrentUser()` | ✅ OK  |
+| GET    | `/users`     | Listar usuarios (admin) | ✅ `AuthClient.getUsers()`      | ❌ Falta            | ⚠️ Falta hook |
+| GET    | `/users/:id` | Obtener usuario por ID  | ✅ `AuthClient.getUserById()`   | ❌ Falta            | ⚠️ Falta hook |
+| PATCH  | `/users/:id` | Actualizar usuario      | ✅ `AuthClient.updateUser()`    | ❌ Falta            | ⚠️ Falta hook |
+| DELETE | `/users/:id` | Eliminar usuario        | ✅ `AuthClient.deleteUser()`    | ❌ Falta            | ⚠️ Falta hook |
 
 ### 1.4 Roles y Permisos (`/api/v1/roles`, `/api/v1/permissions`)
 
 | Método | Endpoint                 | Descripción        | Frontend Client | Hook     | Status   |
 | ------ | ------------------------ | ------------------ | --------------- | -------- | -------- |
-| GET    | `/roles`                 | Listar roles       | ❌ Falta        | ❌ Falta | ⚠️ Falta |
-| POST   | `/roles`                 | Crear rol          | ❌ Falta        | ❌ Falta | ⚠️ Falta |
-| GET    | `/roles/:id`             | Obtener rol por ID | ❌ Falta        | ❌ Falta | ⚠️ Falta |
-| PUT    | `/roles/:id`             | Actualizar rol     | ❌ Falta        | ❌ Falta | ⚠️ Falta |
-| DELETE | `/roles/:id`             | Eliminar rol       | ❌ Falta        | ❌ Falta | ⚠️ Falta |
-| POST   | `/roles/:id/permissions` | Asignar permisos   | ❌ Falta        | ❌ Falta | ⚠️ Falta |
-| GET    | `/permissions`           | Listar permisos    | ❌ Falta        | ❌ Falta | ⚠️ Falta |
+| GET    | `/roles`                 | Listar roles       | ✅ `AuthClient.getRoles()` | ❌ Falta     | ⚠️ Falta hook |
+| POST   | `/roles`                 | Crear rol          | ✅ `AuthClient.createRole()` | ❌ Falta     | ⚠️ Falta hook |
+| GET    | `/roles/:id`             | Obtener rol por ID | ✅ `AuthClient.getRoleById()` | ❌ Falta    | ⚠️ Falta hook |
+| PUT    | `/roles/:id`             | Actualizar rol     | ✅ `AuthClient.updateRole()` | ❌ Falta    | ⚠️ Falta hook |
+| DELETE | `/roles/:id`             | Eliminar rol       | ✅ `AuthClient.deleteRole()` | ❌ Falta    | ⚠️ Falta hook |
+| POST   | `/roles/:id/permissions` | Asignar permisos   | ✅ `AuthClient.assignPermissionsToRole()` | ❌ Falta | ⚠️ Falta hook |
+| GET    | `/permissions`           | Listar permisos    | ✅ `AuthClient.getPermissions()` | ❌ Falta | ⚠️ Falta hook |
 
 ---
 
@@ -105,8 +105,8 @@ Este documento mapea los endpoints disponibles en el backend (bookly-mock) con s
 | GET    | `/resources/:id`             | Obtener recurso por ID | ✅ `ResourcesClient.getById()`        | ✅ `useResource(id)`     | ✅ OK         |
 | PATCH  | `/resources/:id`             | Actualizar recurso     | ✅ `ResourcesClient.update()`         | ✅ `useUpdateResource()` | ✅ OK         |
 | DELETE | `/resources/:id`             | Eliminar recurso       | ✅ `ResourcesClient.delete()`         | ✅ `useDeleteResource()` | ✅ OK         |
-| POST   | `/resources/:id/restore`     | Restaurar recurso      | ❌ Falta                              | ❌ Falta                 | ⚠️ Falta      |
-| POST   | `/resources/import`          | Importar recursos CSV  | ❌ Falta                              | ❌ Falta                 | ⚠️ Falta      |
+| POST   | `/resources/:id/restore`     | Restaurar recurso      | ✅ `ResourcesClient.restoreResource()` | ❌ Falta                 | ⚠️ Falta hook |
+| POST   | `/resources/import`          | Importar recursos CSV  | ✅ `ResourcesClient.importResources()` | ❌ Falta                 | ⚠️ Falta hook |
 | POST   | `/resources/search/advanced` | Búsqueda avanzada      | ✅ `ResourcesClient.searchAdvanced()` | ❌ Falta                 | ⚠️ Falta hook |
 
 ### 2.2 Categorías (`/api/v1/categories`)
@@ -142,18 +142,18 @@ Este documento mapea los endpoints disponibles en el backend (bookly-mock) con s
 | GET    | `/reservations/:id`           | Obtener reserva    | ✅ `ReservationsClient.getById()` | ✅ `useReservation(id)`     | ✅ OK    |
 | PATCH  | `/reservations/:id`           | Actualizar reserva | ✅ `ReservationsClient.update()`  | ✅ `useUpdateReservation()` | ✅ OK    |
 | DELETE | `/reservations/:id/cancel`    | Cancelar reserva   | ✅ `ReservationsClient.cancel()`  | ✅ `useCancelReservation()` | ✅ OK    |
-| POST   | `/reservations/:id/check-in`  | Check-in           | ❌ Falta                          | ❌ Falta                    | ⚠️ Falta |
-| POST   | `/reservations/:id/check-out` | Check-out          | ❌ Falta                          | ❌ Falta                    | ⚠️ Falta |
+| POST   | `/reservations/:id/check-in`  | Check-in           | ✅ `ReservationsClient.checkIn()`  | ❌ Falta                    | ⚠️ Falta hook |
+| POST   | `/reservations/:id/check-out` | Check-out          | ✅ `ReservationsClient.checkOut()` | ❌ Falta                    | ⚠️ Falta hook |
 
 ### 3.2 Reservas Recurrentes (`/api/v1/reservations/recurring`)
 
 | Método | Endpoint                                   | Descripción              | Frontend Client                           | Hook     | Status        |
 | ------ | ------------------------------------------ | ------------------------ | ----------------------------------------- | -------- | ------------- |
 | POST   | `/reservations/recurring`                  | Crear reserva recurrente | ✅ `ReservationsClient.createRecurring()` | ❌ Falta | ⚠️ Falta hook |
-| GET    | `/reservations/recurring/:seriesId`        | Obtener serie            | ❌ Falta                                  | ❌ Falta | ⚠️ Falta      |
-| PATCH  | `/reservations/recurring/:seriesId`        | Actualizar serie         | ❌ Falta                                  | ❌ Falta | ⚠️ Falta      |
-| DELETE | `/reservations/recurring/:seriesId/cancel` | Cancelar serie           | ❌ Falta                                  | ❌ Falta | ⚠️ Falta      |
-| POST   | `/reservations/recurring/preview`          | Preview de recurrencias  | ❌ Falta                                  | ❌ Falta | ⚠️ Falta      |
+| GET    | `/reservations/recurring/:seriesId`        | Obtener serie            | ✅ `ReservationsClient.getRecurringSeriesById()` | ❌ Falta | ⚠️ Falta hook |
+| PATCH  | `/reservations/recurring/:seriesId`        | Actualizar serie         | ✅ `ReservationsClient.updateRecurringSeries()`  | ❌ Falta | ⚠️ Falta hook |
+| DELETE | `/reservations/recurring/:seriesId/cancel` | Cancelar serie           | ✅ `ReservationsClient.cancelRecurringSeries()`  | ❌ Falta | ⚠️ Falta hook |
+| POST   | `/reservations/recurring/preview`          | Preview de recurrencias  | ✅ `ReservationsClient.previewRecurring()`       | ❌ Falta | ⚠️ Falta hook |
 
 ### 3.3 Disponibilidad (`/api/v1/availabilities`)
 
@@ -182,19 +182,19 @@ Este documento mapea los endpoints disponibles en el backend (bookly-mock) con s
 
 | Método | Endpoint                              | Descripción         | Frontend Client | Hook     | Status   |
 | ------ | ------------------------------------- | ------------------- | --------------- | -------- | -------- |
-| GET    | `/approval-requests`                  | Listar solicitudes  | ❌ Falta        | ❌ Falta | ⚠️ Falta |
-| POST   | `/approval-requests`                  | Crear solicitud     | ❌ Falta        | ❌ Falta | ⚠️ Falta |
-| GET    | `/approval-requests/:id`              | Obtener solicitud   | ❌ Falta        | ❌ Falta | ⚠️ Falta |
-| PATCH  | `/approval-requests/:id/approve`      | Aprobar solicitud   | ❌ Falta        | ❌ Falta | ⚠️ Falta |
-| PATCH  | `/approval-requests/:id/reject`       | Rechazar solicitud  | ❌ Falta        | ❌ Falta | ⚠️ Falta |
+| GET    | `/approval-requests`                  | Listar solicitudes  | ✅ `ApprovalsClient.getApprovalRequests()` | ❌ Falta | ⚠️ Falta hook |
+| POST   | `/approval-requests`                  | Crear solicitud     | ✅ `ApprovalsClient.createApprovalRequest()`| ❌ Falta | ⚠️ Falta hook |
+| GET    | `/approval-requests/:id`              | Obtener solicitud   | ✅ `ApprovalsClient.getApprovalRequestById()` | ❌ Falta | ⚠️ Falta hook |
+| PATCH  | `/approval-requests/:id/approve`      | Aprobar solicitud   | ✅ `ApprovalsClient.approveRequest()`      | ❌ Falta | ⚠️ Falta hook |
+| PATCH  | `/approval-requests/:id/reject`       | Rechazar solicitud  | ✅ `ApprovalsClient.rejectRequest()`       | ❌ Falta | ⚠️ Falta hook |
 | POST   | `/approval-requests/:id/notification` | Enviar notificación | ❌ Falta        | ❌ Falta | ⚠️ Falta |
 
 ### 4.2 Check-In/Check-Out (`/api/v1/check-in-out`)
 
 | Método | Endpoint                             | Descripción             | Frontend Client | Hook     | Status   |
 | ------ | ------------------------------------ | ----------------------- | --------------- | -------- | -------- |
-| POST   | `/check-in-out/check-in`             | Registrar check-in      | ❌ Falta        | ❌ Falta | ⚠️ Falta |
-| POST   | `/check-in-out/check-out`            | Registrar check-out     | ❌ Falta        | ❌ Falta | ⚠️ Falta |
+| POST   | `/check-in-out/check-in`             | Registrar check-in      | ✅ `CheckInClient.checkIn()` | ❌ Falta | ⚠️ Falta hook |
+| POST   | `/check-in-out/check-out`            | Registrar check-out     | ✅ `CheckInClient.checkOut()` | ❌ Falta | ⚠️ Falta hook |
 | GET    | `/check-in-out/location/:locationId` | Check-ins por ubicación | ❌ Falta        | ❌ Falta | ⚠️ Falta |
 
 ---
@@ -214,9 +214,9 @@ Este documento mapea los endpoints disponibles en el backend (bookly-mock) con s
 
 | Método | Endpoint                  | Descripción          | Frontend Client                         | Hook     | Status        |
 | ------ | ------------------------- | -------------------- | --------------------------------------- | -------- | ------------- |
-| GET    | `/reports/usage/resource` | Reporte por recurso  | ✅ `ReportsClient.getUsageByResource()` | ❌ Falta | ⚠️ Falta hook |
-| GET    | `/reports/usage/program`  | Reporte por programa | ✅ `ReportsClient.getUsageByProgram()`  | ❌ Falta | ⚠️ Falta hook |
-| GET    | `/reports/usage/period`   | Reporte por período  | ✅ `ReportsClient.getUsageByPeriod()`   | ❌ Falta | ⚠️ Falta hook |
+| GET    | `/reports/usage/resource` | Reporte por recurso  | ✅ `ReportsClient.getUsageReport()` | ❌ Falta | ⚠️ Falta hook |
+| GET    | `/reports/usage/program`  | Reporte por programa | ✅ `ReportsClient.getUsageReport()`  | ❌ Falta | ⚠️ Falta hook |
+| GET    | `/reports/usage/period`   | Reporte por período  | ✅ `ReportsClient.getUsageReport()`   | ❌ Falta | ⚠️ Falta hook |
 | POST   | `/reports/export/csv`     | Exportar a CSV       | ✅ `ReportsClient.exportToCSV()`        | ❌ Falta | ⚠️ Falta hook |
 
 ### 5.3 Reportes de Usuario (`/api/v1/reports/user`)
