@@ -230,8 +230,8 @@ Este documento mapea los endpoints disponibles en el backend (bookly-mock) con s
 
 | Método | Endpoint    | Descripción     | Frontend Client | Hook     | Status   |
 | ------ | ----------- | --------------- | --------------- | -------- | -------- |
-| POST   | `/feedback` | Crear feedback  | ❌ Falta        | ❌ Falta | ⚠️ Falta |
-| GET    | `/feedback` | Listar feedback | ❌ Falta        | ❌ Falta | ⚠️ Falta |
+| POST   | `/feedback` | Crear feedback  | ✅ `FeedbackClient.create()` | ✅ `useCreateFeedback()` | ✅ OK |
+| GET    | `/feedback` | Listar feedback | ✅ `FeedbackClient.getAll()` | ✅ `useFeedbackList()` | ✅ OK |
 
 ---
 
@@ -297,7 +297,7 @@ Este documento mapea los endpoints disponibles en el backend (bookly-mock) con s
 
 - [x] Implementar sistema de aprobaciones
 - [x] Agregar check-in/check-out
-- [ ] Crear sistema de feedback
+- [x] Crear sistema de feedback
 
 ### Prioridad Baja (Semana 4+)
 

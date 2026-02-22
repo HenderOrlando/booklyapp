@@ -170,6 +170,19 @@ export {
 } from "./useNotificationMutations";
 
 // ============================================
+// FEEDBACK DOMAIN
+// ============================================
+
+export {
+  feedbackKeys,
+  useCreateEvaluation,
+  useCreateFeedback,
+  useDeleteFeedback,
+  useUpdateEvaluation,
+  useUpdateFeedback,
+} from "./useFeedbackMutations";
+
+// ============================================
 // ROLES DOMAIN
 // ============================================
 
