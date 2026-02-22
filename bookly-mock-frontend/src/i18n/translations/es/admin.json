@@ -20,7 +20,7 @@
     "actions": "Acciones",
     "edit": "Editar",
     "view": "Ver",
-    "more": "+{{count}} más",
+    "more": "+{count} m\u00e1s",
     "permission": "Permiso",
     "roles_with_perm": "Roles con este Permiso",
     "no_roles": "Sin roles asignados",

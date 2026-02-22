@@ -6,240 +6,105 @@
 
 ---
 
-## Inventario de Brechas
+## Inventario de Brechas (Verificado 2026-02-22)
 
-### Resumen de Gaps por Capa
+> **NOTA**: Tras verificar el código fuente real (`src/hooks/`, `src/infrastructure/api/`),
+> se descubrió que **Fases 1-4 están completadas**. El frontend ya tiene ~60 hooks
+> y ~15 clientes HTTP implementados cubriendo Auth, Resources, Availability y Stockpile.
+
+### Resumen de Gaps REALES por Capa
 
 | Capa | Tipo de Gap | Cantidad |
 |------|-------------|----------|
 | **Backend** | Endpoints STUB (Reports Service) | 31 endpoints |
-| **Backend** | Endpoints faltantes (otros servicios) | ~15 endpoints |
-| **Frontend** | Clientes HTTP faltantes | ~20 métodos |
-| **Frontend** | Hooks SWR/React faltantes | ~35 hooks |
-| **Frontend** | Páginas/vistas faltantes | ~6 páginas |
-| **Alineación** | URLs desalineadas frontend↔backend | ~8 URLs |
+| **Backend** | Endpoints menores faltantes | 5 endpoints |
+| **Frontend** | Clientes + hooks para stubs tras implementación | 31 métodos + hooks |
+| **Frontend** | Páginas nuevas para Reports avanzados | ~5 páginas |
 
 ---
 
-## Fase 1: Auth Service — 100% Cobertura
+## ✅ Fase 1: Auth Service — COMPLETADA
 
-**Duración estimada**: 3-4 días
-**Prioridad**: 🔴 Alta
-
-### Tarea 1.1: Hooks faltantes para Gestión de Usuarios
-
-**Gap**: Clientes `AuthClient.getUsers()`, `.getUserById()`, `.updateUser()`, `.deleteUser()` existen pero NO tienen hooks React.
-
-**Entregables**:
-
-- [ ] `useUsers()` — Lista paginada de usuarios (admin)
-- [ ] `useUser(id)` — Obtener usuario por ID
-- [ ] `useUpdateUser()` — Mutación para actualizar usuario
-- [ ] `useDeleteUser()` — Mutación para eliminar usuario
-
-**Skills**: `web-app`, `backend`
-**Rules**: `bookly-auth-rf41-gestion-de-roles`, `bookly-auth-rf42-restriccion-de-modificacion`, `bookly-flujos-auth`
+> Verificado contra código real. Todos los hooks existen en:
+> - `src/hooks/useUsers.ts` — `useUsers()`, `useUser(id)`, `useCreateUser()`, `useUpdateUser()`, `useDeleteUser()`, `useAssignRole()`
+> - `src/hooks/useRoles.ts` — `useRoles()`, `useRole(id)`, `useCreateRole()`, `useUpdateRole()`, `useDeleteRole()`, `useAssignPermissionsToRole()`, `useRemovePermissionsFromRole()`
+> - `src/hooks/usePermissions.ts` — `usePermissions()`, `usePermissionsByModule()`, `useCreatePermission()`, `useUpdatePermission()`, `useDeletePermission()`
+> - `src/hooks/useAuditLogs.ts` — `useAuditLogs()`, `useAuditStats()`, `getAuditExportUrl()`
+> - `src/hooks/useCurrentUser.ts` — `useCurrentUser()`, `useCurrentUserPermissions()`, `useCurrentUserRoles()`, `useLogin()`, `useLogout()`, `useUpdateCurrentUser()`, `useIsAuthenticated()`, `useHasPermission()`, `useHasRole()`
+> - `src/hooks/mutations/useUserMutations.ts` — `useUpdateUserProfile()`, `useChangePassword()`, `useUploadProfilePhoto()`, `useUpdateUserPreferences()`
 
 ---
 
-### Tarea 1.2: Hooks faltantes para Roles y Permisos
+## ✅ Fase 2: Resources Service — COMPLETADA
 
-**Gap**: Clientes `AuthClient.getRoles()`, `.createRole()`, `.updateRole()`, `.deleteRole()`, `.assignPermissionsToRole()`, `.getPermissions()` existen pero NO tienen hooks.
-
-**Entregables**:
-
-- [ ] `useRoles()` — Lista de roles
-- [ ] `useRole(id)` — Rol por ID
-- [ ] `useCreateRole()` — Mutación crear rol
-- [ ] `useUpdateRole()` — Mutación actualizar rol
-- [ ] `useDeleteRole()` — Mutación eliminar rol
-- [ ] `useAssignPermissions()` — Mutación asignar permisos a rol
-- [ ] `usePermissions()` — Lista de permisos
-- [ ] `usePermissionsByModule(resource)` — Permisos filtrados por módulo
-
-**Skills**: `web-app`, `backend`
-**Rules**: `bookly-auth-rf41-gestion-de-roles`, `bookly-auth-rf42-restriccion-de-modificacion`
+> Verificado contra código real. Todos los hooks existen en:
+>
+> - `src/hooks/useResources.ts` — `useResources()`, `useResource(id)`, `useResourcesSearch()`, `useResourceCategories()`, `useAcademicPrograms()`, `useResourceCharacteristics()`, `useResourceTypes()`, `useMaintenanceHistory()`, `useCreateResource()`, `useUpdateResource()`, `useDeleteResource()`, `useCreateMaintenance()`
+> - `src/hooks/mutations/useResourceMutations.ts` — `useImportResources()`, `useScheduleMaintenance()`
+> - `src/hooks/mutations/useCategoryMutations.ts` — `useCreateCategory()`, `useUpdateCategory()`, `useDeleteCategory()`
+> - `src/hooks/mutations/useMaintenanceMutations.ts` — `useCompleteMaintenance()`, `useCancelMaintenance()`, `useUpdateMaintenance()`, `useAssignTechnician()`, `useRescheduleMaintenance()`, `useReportMaintenanceIncident()`
+> - `src/hooks/mutations/useProgramMutations.ts` — `useCreateProgram()`, `useUpdateProgram()`, `useDeleteProgram()`, `useAssignResourcesToProgram()`
 
 ---
 
-### Tarea 1.3: Endpoints avanzados de Auth (backend + frontend)
+## ✅ Fase 3: Availability Service — COMPLETADA
 
-**Gap**: Endpoints del backend listados en MAPPING como "FALTA FRONTEND": sesiones activas, audit logs, usuarios bloqueados.
-
-**Entregables Backend**:
-
-- [ ] Verificar que `GET /auth/sessions/active` esté funcional en backend
-- [ ] Verificar que `DELETE /auth/sessions/:sessionId` esté funcional
-- [ ] Verificar que `GET /auth/audit-logs` esté funcional
-- [ ] Verificar que `GET /users/blocked` esté funcional
-- [ ] Verificar que `POST /users/:id/unblock` esté funcional
-
-**Entregables Frontend**:
-
-- [ ] Agregar métodos en `auth-client.ts`: `getActiveSessions()`, `closeSession()`, `getAuditLogs()`, `getBlockedUsers()`, `unblockUser()`
-- [ ] Agregar a `endpoints.ts`: `ACTIVE_SESSIONS`, `SESSION_BY_ID`, `AUDIT_LOGS`, `BLOCKED_USERS`, `UNBLOCK_USER`
-- [ ] Hooks: `useActiveSessions()`, `useAuditLogs()`, `useBlockedUsers()`, `useUnblockUser()`
-
-**Skills**: `backend`, `web-app`, `seguridad-avanzada`
-**Rules**: `bookly-auth-rf43-autenticacion-y-sso`, `bookly-auth-rf44-auditoria`, `bookly-auth-rf45-verificacion-2fa-solicitudes-criticas`
+> Verificado contra código real. Todos los hooks existen en:
+>
+> - `src/hooks/useReservations.ts` — `useReservations()`, `useReservation(id)`, `useReservationStats()`, `useCreateReservation()`, `useUpdateReservation()`, `useCancelReservation()`
+> - `src/hooks/useCheckIn.ts` — `useActiveCheckIns()`, `useOverdueCheckIns()`, `useMyCheckInHistory()`, `useCheckInByReservation()`, `useCheckIn()`, `useCheckOut()`
+> - `src/hooks/useCheckInOut.ts` — `useCheckInOut()` (versión con validaciones y toast)
+> - `src/hooks/useCalendarReservations.ts` — `useCalendarReservations()`
+> - `src/hooks/useConflictValidator.ts` — `useConflictValidator()`, `useEventConflictValidator()`, `useDragConflictValidator()`
+> - `src/hooks/useInfiniteReservations.ts` — Reservas con scroll infinito
+> - `src/hooks/mutations/useReservationMutations.ts` — Mutations adicionales
+> - `src/hooks/mutations/useWaitlistMutations.ts` — `useAddToWaitlist()`, `useRemoveFromWaitlist()`, `useNotifyWaitlist()`, `useUpdateWaitlistPriority()`, `useAcceptWaitlistOffer()`
+>
+> **Pendiente menor** (2 endpoints sin cliente frontend):
+> - `POST /availabilities` — Configurar disponibilidad
+> - `GET /availabilities/calendar` — Vista calendario dedicada
 
 ---
 
-### Tarea 1.4: Página Admin de Sesiones y Auditoría
+## ✅ Fase 4: Stockpile Service — COMPLETADA
 
-**Gap**: No existe página frontend para gestionar sesiones ni ver logs de auditoría.
-
-**Entregables**:
-
-- [ ] Página `src/app/(dashboard)/admin/sessions/page.tsx`
-- [ ] Página `src/app/(dashboard)/admin/audit/page.tsx`
-- [ ] Integrar hooks de Tarea 1.3
-
-**Skills**: `web-app`, `ux-ui`
-**Rules**: `bookly-auth-rf44-auditoria`, `bookly-flujos-auth`
-**Rules condicionales (frontend)**: `design-system-colores-tokens`, `design-system-componentes`, `design-system-layouts-pages`
-
----
-
-## Fase 2: Resources Service — 100% Cobertura
-
-**Duración estimada**: 3-4 días
-**Prioridad**: 🔴 Alta
-
-### Tarea 2.1: Hooks faltantes para Resources
-
-**Gap**: Clientes existen sin hooks: `restoreResource()`, `importResources()`, `advancedSearch()`, `getCategories()`, `getCategoryById()`.
-
-**Entregables**:
-
-- [ ] `useRestoreResource()` — Mutación restaurar recurso soft-deleted
-- [ ] `useImportResources()` — Mutación importar CSV
-- [ ] `useAdvancedSearch(filters)` — Búsqueda avanzada con filtros
-- [ ] `useCategories()` — Lista de categorías (sin mutación)
-- [ ] `useCategoryById(id)` — Categoría por ID
-
-**Skills**: `web-app`
-**Rules**: `bookly-resource-rf01-crear-editar-eliminar-recursos`, `bookly-resource-rf02-asociar-recurso-a-categorias-o-programas`, `bookly-flujos-resources`
+> Verificado contra código real. Todos los hooks existen en:
+>
+> - `src/hooks/useApprovalRequests.ts` — `useApprovalRequests()`, `useActiveApprovalsToday()`, `useApprovalRequest(id)`, `useApprovalStatistics()`, `useCreateApprovalRequest()`, `useApproveRequest()`, `useRejectRequest()`, `useCancelRequest()`
+> - `src/hooks/useApprovalFlows.ts` — `useApprovalFlows()`, `useApprovalFlow(id)`, `useCreateApprovalFlow()`, `useUpdateApprovalFlow()`, `useDeleteApprovalFlow()`, `useActivateApprovalFlow()`, `useDeactivateApprovalFlow()`
+> - `src/hooks/useApprovalActions.ts` — `useApprovalActions()` (versión integrada con toast)
+> - `src/hooks/useDocumentGeneration.ts` — Generación de documentos
+> - `src/hooks/mutations/useApprovalMutations.ts` — `useApproveReservation()`, `useRejectReservation()`, `useBatchApprove()`, `useReassignApproval()`, `useRequestAdditionalInfo()`
+> - `src/hooks/mutations/useNotificationMutations.ts` — `useMarkAsRead()`, `useMarkAllAsRead()`, `useDeleteNotification()`, `useSendNotification()`
+>
+> **Pendiente menor** (2 endpoints sin cliente frontend):
+> - `POST /approval-requests/:id/notification` — Enviar notificación por solicitud
+> - `GET /check-in-out/location/:locationId` — Check-ins por ubicación
 
 ---
 
-### Tarea 2.2: Hooks faltantes para Mantenimientos
+## ⚠️ Fase 5: Reports Service — TRABAJO PENDIENTE PRINCIPAL
 
-**Gap**: Clientes `getMaintenances()`, `getMaintenanceById()` existen sin hooks. Endpoint `PATCH /maintenances/:id/complete` no tiene cliente ni hook.
+> Esta es la fase crítica. El 87% de los controladores son STUB (definidos pero no implementados).
+> Los hooks de dashboard, feedback y evaluaciones YA existen:
+>
+> - `src/hooks/useDashboard.ts` — `useDashboardMetrics()`, `useUserStats()`, `useResourceStats()`, `useReservationStats()`, `useRecentActivity()`, `useUpcomingReservations()`
+> - `src/hooks/useFeedback.ts` — `useFeedbackList()`, `useFeedbackDetail()`, `useEvaluationList()`, `useEvaluationDetail()`
+> - `src/hooks/useEvaluations.ts` — `useEvaluations()`, `useEvaluation()`, `useSaveEvaluation()`
+> - `src/hooks/useCancellationReport.ts` — `useCancellationReport()`
+> - `src/hooks/useComplianceReport.ts` — `useComplianceReport()`
+> - `src/hooks/mutations/useReportMutations.ts` — `useGenerateReport()`, `useExportReport()`, `useScheduleReport()`, `useUpdateScheduledReport()`, `useDeleteScheduledReport()`, `useShareReport()`, `useDeleteReport()`
+> - `src/hooks/mutations/useFeedbackMutations.ts` — `useCreateFeedback()`, `useUpdateFeedback()`, `useDeleteFeedback()`, `useCreateEvaluation()`, `useUpdateEvaluation()`
 
-**Entregables Backend**:
+### Tarea 5.1: (YA NO NECESARIA — Hooks de endpoints funcionales ya existen)
 
-- [ ] Verificar que `PATCH /maintenances/:id/complete` esté funcional en backend
+### Tarea 5.2-5.7: Implementar controladores STUB en backend
 
-**Entregables Frontend**:
-
-- [ ] Agregar `completeMaintenance(id)` en `resources-client.ts`
-- [ ] `useMaintenances(resourceId)` — Lista de mantenimientos
-- [ ] `useMaintenanceById(id)` — Mantenimiento por ID
-- [ ] `useCompleteMaintenance()` — Mutación completar mantenimiento
-
-**Skills**: `web-app`, `backend`
-**Rules**: `bookly-flujos-resources`, `bookly-resource-rf01-crear-editar-eliminar-recursos`
-
----
-
-### Tarea 2.3: Endpoints avanzados de Resources (backend + frontend)
-
-**Gap**: Endpoints en MAPPING marcados "FALTA FRONTEND": statistics, maintenance/pending, categories/statistics, bulk-update.
-
-**Entregables Backend**:
-
-- [ ] Verificar que `GET /resources/statistics` esté funcional
-- [ ] Verificar que `GET /resources/maintenance/pending` esté funcional
-- [ ] Verificar que `GET /resource-categories/statistics` esté funcional
-- [ ] Verificar que `POST /resources/bulk-update` esté funcional
-
-**Entregables Frontend**:
-
-- [ ] Agregar métodos en `resources-client.ts`: `getStatistics()`, `getPendingMaintenances()`, `getCategoryStatistics()`, `bulkUpdate()`
-- [ ] Agregar endpoints en `endpoints.ts`
-- [ ] Hooks: `useResourceStatistics()`, `usePendingMaintenances()`, `useCategoryStatistics()`, `useBulkUpdateResources()`
-
-**Skills**: `web-app`, `backend`
-**Rules**: `bookly-resource-rf01-crear-editar-eliminar-recursos`, `bookly-flujos-resources`
+> Estas tareas siguen siendo necesarias. Ver detalles originales más abajo.
 
 ---
 
-### Tarea 2.4: Página de Mantenimiento de Recursos
-
-**Gap**: Según MAPPING, página "Resources/Maintenance" es prioridad ALTO.
-
-**Entregables**:
-
-- [ ] Página `src/app/(dashboard)/resources/maintenance/page.tsx`
-- [ ] Vista de mantenimientos pendientes y completados
-- [ ] Formulario para crear/completar mantenimiento
-
-**Skills**: `web-app`, `ux-ui`
-**Rules**: `bookly-flujos-resources`
-**Rules condicionales (frontend)**: `design-system-colores-tokens`, `design-system-componentes`, `design-system-layouts-pages`
-
----
-
-## Fase 3: Availability Service — 100% Cobertura
-
-**Duración estimada**: 4-5 días
-**Prioridad**: 🔴 Alta
-
-### Tarea 3.1: Hooks faltantes para Reservas
-
-**Gap**: Clientes `checkIn()`, `checkOut()` en `ReservationsClient` existen sin hooks.
-
-**Entregables**:
-
-- [ ] `useReservationCheckIn()` — Mutación check-in de reserva
-- [ ] `useReservationCheckOut()` — Mutación check-out de reserva
-
-**Skills**: `web-app`
-**Rules**: `bookly-flujos-availability`, `bookly-availability-rf11-registro-historial-uso`
-
----
-
-### Tarea 3.2: Hooks faltantes para Reservas Recurrentes
-
-**Gap**: Todos los métodos de recurrencia en `ReservationsClient` carecen de hooks.
-
-**Entregables**:
-
-- [ ] `useCreateRecurring()` — Crear serie recurrente
-- [ ] `useRecurringSeries(seriesId)` — Obtener serie por ID
-- [ ] `useUpdateRecurringSeries()` — Actualizar serie
-- [ ] `useCancelRecurringSeries()` — Cancelar serie
-- [ ] `usePreviewRecurring()` — Preview sin crear
-- [ ] `useRecurringAnalytics()` — Analytics de series
-
-**Skills**: `web-app`
-**Rules**: `bookly-availability-rf12-permite-reserva-periodica`, `bookly-flujos-availability`
-
----
-
-### Tarea 3.3: Clientes y hooks faltantes para Disponibilidad
-
-**Gap**: `POST /availabilities` (configurar) y `GET /availabilities/calendar` (vista calendario) no tienen cliente ni hook.
-
-**Entregables Backend**:
-
-- [ ] Verificar que `POST /availabilities` esté funcional
-- [ ] Verificar que `GET /availabilities/calendar` esté funcional
-
-**Entregables Frontend**:
-
-- [ ] Agregar métodos en `reservations-client.ts` o nuevo `availability-client.ts`: `configureAvailability()`, `getAvailabilityCalendar()`
-- [ ] Agregar endpoints en `endpoints.ts` si faltan
-- [ ] `useConfigureAvailability()` — Mutación
-- [ ] `useAvailabilityCalendar(resourceId)` — Query calendario
-
-**Skills**: `web-app`, `backend`
-**Rules**: `bookly-availability-rf07-horarios-disponibles`, `bookly-availability-rf10-visualizacion-en-calendar`, `bookly-flujos-availability`
-
----
-
-### Tarea 3.4: Endpoints avanzados de Availability (backend + frontend)
+### Tarea 3.4 (renumerada como Tarea pendiente menor): Endpoints avanzados de Availability (backend + frontend)
 
 **Gap**: Endpoints en MAPPING marcados "FALTA FRONTEND": search/suggestions, waiting-lists/position, calendar/conflicts, calendar/optimize.
 

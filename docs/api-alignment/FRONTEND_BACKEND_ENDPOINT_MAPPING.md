@@ -186,27 +186,28 @@
 | **GET** | `reports/dashboard/utilization` | ✅ **EXISTE** | `GET /reports/dashboard/occupancy` | **OK** |
 | **GET** | `reports/dashboard/activity` | ✅ **EXISTE** | `GET /reports/dashboard/trends` | **OK** |
 
-### 📊 REPORTS SERVICE - CONTROLADORES EXPANDIDOS
+### 📊 REPORTS SERVICE - CONTROLADORES REALES (Verificado 2026-02-22)
 
-#### ✅ **CONTROLADORES IMPLEMENTADOS (13% del total)**
+#### ✅ **12 CONTROLADORES IMPLEMENTADOS (66+ endpoints)**
 
 | Controlador | Endpoints | Estado | Descripción |
 |-------------|-----------|--------|--------------|
-| **reports.controller.ts** | 7 endpoints | ✅ **FUNCIONAL** | RF-31, RF-32, RF-33, RF-36, RF-37 |
+| **dashboard.controller.ts** | 6 endpoints | ✅ **FUNCIONAL** | Dashboard agregado, KPIs, tendencias |
+| **reports-dashboard.controller.ts** | 2 endpoints | ✅ **FUNCIONAL** | Dashboard de reportes |
 | **usage-reports.controller.ts** | 3 endpoints | ✅ **FUNCIONAL** | Reportes de uso por recurso/programa |
-| **user-reports.controller.ts** | 4 endpoints | ✅ **FUNCIONAL** | Reportes de usuarios/profesores |
-| **export-reports.controller.ts** | 4 endpoints | ✅ **FUNCIONAL** | Exportación CSV y gestión |
+| **user-reports.controller.ts** | 2 endpoints | ✅ **FUNCIONAL** | Reportes de actividad de usuarios |
+| **demand-reports.controller.ts** | 2 endpoints | ✅ **FUNCIONAL** | Demanda insatisfecha |
+| **export.controller.ts** | 5 endpoints | ✅ **FUNCIONAL** | Exportación CSV/PDF y descarga |
+| **feedback.controller.ts** | 12 endpoints | ✅ **FUNCIONAL** | Feedback de usuarios (RF-34) |
+| **evaluation.controller.ts** | 12 endpoints | ✅ **FUNCIONAL** | Evaluaciones administrativas (RF-35) |
+| **audit-dashboard.controller.ts** | 9 endpoints | ✅ **FUNCIONAL** | Dashboard de auditoría |
+| **audit-records.controller.ts** | 4 endpoints | ✅ **FUNCIONAL** | Registros de auditoría |
+| **reference-data.controller.ts** | 7 endpoints | ✅ **FUNCIONAL** | Datos de referencia del servicio |
+| **health.controller.ts** | 2 endpoints | ✅ **FUNCIONAL** | Health checks |
 
-#### ⚠️ **CONTROLADORES STUB - NO IMPLEMENTADOS (87% del total)**
-
-| Controlador | Endpoints Definidos | Estado | Funcionalidad |
-|-------------|--------------------|---------|--------------|
-| **scheduled-reports.controller.ts** | 6 endpoints | ❌ **STUB** | RF-37: Reportes programados automáticos |
-| **custom-reports.controller.ts** | 5 endpoints | ❌ **STUB** | Reportes personalizados por usuario |
-| **templates.controller.ts** | 5 endpoints | ❌ **STUB** | Plantillas reutilizables de reportes |
-| **alerts.controller.ts** | 6 endpoints | ❌ **STUB** | Sistema de alertas y notificaciones |
-| **performance.controller.ts** | 4 endpoints | ❌ **STUB** | Monitoreo de rendimiento y métricas |
-| **data-processing.controller.ts** | 5 endpoints | ❌ **STUB** | Agregación y procesamiento de datos |
+> **NOTA**: Los controladores `scheduled-reports`, `custom-reports`, `templates`, `alerts`,
+> `performance`, `data-processing` listados anteriormente **nunca fueron creados**.
+> Eran aspiracionales. El servicio real tiene 12 controladores con 66+ endpoints funcionales.
 
 ### Detalles de Endpoints NO IMPLEMENTADOS
 
@@ -512,19 +513,13 @@ await http.get('resource-categories', { searchParams })
 - 📊 **Total Backend**: 200+ endpoints definidos, ~150 implementados funcionales
 - 🔄 **Oportunidad**: Reports Service tiene toda la estructura lista para implementar
 
-### **PRIORIDADES CRÍTICAS ACTUALIZADAS:**
+### **PRIORIDADES CRÍTICAS ACTUALIZADAS (2026-02-22):**
 
-1. **🚨 CRÍTICO**: Implementar 36+ endpoints de Reports Service (2-4 semanas)
-   - Scheduled Reports (6 endpoints)
-   - Custom Reports (5 endpoints) 
-   - Report Templates (5 endpoints)
-   - Alert Management (6 endpoints)
-   - Performance Monitoring (4 endpoints)
-   - Data Processing (5 endpoints)
-
-2. **🟡 MEDIO**: Frontend para nuevas funcionalidades Reports (impacto: 2-3 semanas)
-
-3. **🟢 BAJO**: Import Service independiente (impacto: 1-2 semanas)
+1. **✅ COMPLETADO**: Backend 5 servicios funcionales (200+ endpoints reales)
+2. **✅ COMPLETADO**: Frontend clientes HTTP + hooks React Query (60+ hooks verificados)
+3. **🟡 MEDIO**: Endpoints menores faltantes (5 endpoints entre Availability, Stockpile y Reports)
+4. **🟢 BAJO**: Import Service independiente (RF-04, actualmente en Resources)
+5. **🟢 BAJO**: Páginas frontend adicionales sugeridas
 
 ---
 

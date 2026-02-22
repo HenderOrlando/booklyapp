@@ -71,8 +71,8 @@ export function RolesTable({
       header: t("permissions"),
       cell: (role: RoleWithStats) => (
         <div className="flex flex-wrap gap-1 max-w-md">
-          {role.permissions.slice(0, 3).map((perm) => (
-            <Badge key={perm.id} variant="secondary" className="text-[10px] bg-[var(--color-bg-secondary)] border-[var(--color-border-strong)]">
+          {role.permissions.slice(0, 3).map((perm, index) => (
+            <Badge key={perm.id || `perm-${index}`} variant="secondary" className="text-[10px] bg-[var(--color-bg-secondary)] border-[var(--color-border-strong)]">
               {perm.description}
             </Badge>
           ))}
