@@ -32,7 +32,7 @@ export const UserActivityTable = React.memo<UserActivityTableProps>(
     };
 
     const filteredData = data.filter((user) =>
-      user.userName.toLowerCase().includes(search.toLowerCase())
+      (user.userName ?? "").toLowerCase().includes(search.toLowerCase())
     );
 
     const sortedData = [...filteredData].sort((a, b) => {
