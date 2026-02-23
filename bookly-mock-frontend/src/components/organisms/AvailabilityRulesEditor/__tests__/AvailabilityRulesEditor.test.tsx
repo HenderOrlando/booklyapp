@@ -49,8 +49,8 @@ describe("AvailabilityRulesEditor", () => {
     render(
       <AvailabilityRulesEditor value={defaultRules} onChange={onChange} />
     );
-    const switches = screen.getAllByRole("switch");
-    await user.click(switches[0]);
+    const checkboxes = screen.getAllByRole("checkbox");
+    await user.click(checkboxes[0]);
     expect(onChange).toHaveBeenCalledWith({
       ...defaultRules,
       requiresApproval: true,
@@ -63,8 +63,8 @@ describe("AvailabilityRulesEditor", () => {
     render(
       <AvailabilityRulesEditor value={defaultRules} onChange={onChange} />
     );
-    const switches = screen.getAllByRole("switch");
-    await user.click(switches[1]);
+    const checkboxes = screen.getAllByRole("checkbox");
+    await user.click(checkboxes[1]);
     expect(onChange).toHaveBeenCalledWith({
       ...defaultRules,
       allowRecurring: false,
@@ -75,8 +75,8 @@ describe("AvailabilityRulesEditor", () => {
     render(
       <AvailabilityRulesEditor value={defaultRules} onChange={jest.fn()} />
     );
-    const switches = screen.getAllByRole("switch");
-    expect(switches[0]).toHaveAttribute("aria-checked", "false");
-    expect(switches[1]).toHaveAttribute("aria-checked", "true");
+    const checkboxes = screen.getAllByRole("checkbox");
+    expect(checkboxes[0]).toHaveAttribute("data-state", "unchecked");
+    expect(checkboxes[1]).toHaveAttribute("data-state", "checked");
   });
 });

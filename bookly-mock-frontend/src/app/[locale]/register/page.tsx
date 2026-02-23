@@ -3,6 +3,13 @@
 import { Alert, AlertDescription } from "@/components/atoms/Alert";
 import { Button } from "@/components/atoms/Button";
 import { Input } from "@/components/atoms/Input";
+import { 
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/atoms/Select";
 import { AuthLayout } from "@/components/templates/AuthLayout";
 import { useLocale, useTranslations } from "next-intl";
 import * as React from "react";
@@ -263,18 +270,23 @@ export default function RegisterPage() {
               <label className="block text-sm font-medium text-content-primary mb-1">
                 {t("doc_type")}
               </label>
-              <select
-                name="documentType"
+              <Select
                 value={formData.documentType}
-                onChange={handleChange}
+                onValueChange={(value) =>
+                  setFormData({ ...formData, documentType: value })
+                }
                 disabled={loading}
-                className="flex h-10 w-full rounded-md border border-line-subtle bg-surface px-3 py-2 text-sm text-content-primary focus:border-line-focus focus:ring-1 focus:ring-line-focus outline-none disabled:bg-app disabled:opacity-50"
               >
-                <option value="CC">{t("document_types.cc")}</option>
-                <option value="TI">{t("document_types.ti")}</option>
-                <option value="CE">{t("document_types.ce")}</option>
-                <option value="PA">{t("document_types.pa")}</option>
-              </select>
+                <SelectTrigger>
+                  <SelectValue placeholder={t("doc_type")} />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="CC">{t("document_types.cc")}</SelectItem>
+                  <SelectItem value="TI">{t("document_types.ti")}</SelectItem>
+                  <SelectItem value="CE">{t("document_types.ce")}</SelectItem>
+                  <SelectItem value="PA">{t("document_types.pa")}</SelectItem>
+                </SelectContent>
+              </Select>
             </div>
 
             <div>

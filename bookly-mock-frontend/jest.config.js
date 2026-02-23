@@ -8,9 +8,11 @@ const createJestConfig = nextJest({
 // Add any custom config to be passed to Jest
 const customJestConfig = {
   setupFilesAfterEnv: ["<rootDir>/jest.setup.js"],
-  testEnvironment: "jest-environment-jsdom",
+  testEnvironment: "<rootDir>/jest-environment-jsdom-custom.js",
   moduleNameMapper: {
     "^@/(.*)$": "<rootDir>/src/$1",
+    "\\.(css|less|scss|sass)$": "<rootDir>/src/__mocks__/styleMock.js",
+    "^canvas$": "jest-canvas-mock",
   },
   collectCoverageFrom: [
     "src/**/*.{js,jsx,ts,tsx}",

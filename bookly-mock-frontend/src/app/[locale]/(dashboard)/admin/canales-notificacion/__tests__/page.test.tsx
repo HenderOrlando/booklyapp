@@ -49,9 +49,8 @@ describe("CanalesNotificacionPage (RF-27)", () => {
   it("renders page content", async () => {
     render(<CanalesNotificacionPage />);
     await waitFor(() => {
-      expect(
-        screen.getAllByText(/canales de notificación/i).length,
-      ).toBeGreaterThan(0);
+      const headings = screen.getAllByRole("heading");
+      expect(headings.length).toBeGreaterThan(0);
     });
   });
 

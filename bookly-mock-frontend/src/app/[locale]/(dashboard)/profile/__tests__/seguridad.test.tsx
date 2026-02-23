@@ -47,6 +47,12 @@ jest.mock("@/hooks/mutations/useUserMutations", () => ({
     isLoading: false,
   }),
 }));
+jest.mock("@/hooks/mutations", () => ({
+  useChangePassword: () => ({ mutateAsync: jest.fn(), isPending: false }),
+  useUpdateUserProfile: () => ({ mutateAsync: jest.fn(), isPending: false }),
+  useUpdateUserPreferences: () => ({ mutateAsync: jest.fn(), isPending: false }),
+  useUploadProfilePhoto: () => ({ mutateAsync: jest.fn(), isPending: false }),
+}));
 
 import ProfilePage from "../../profile/page";
 

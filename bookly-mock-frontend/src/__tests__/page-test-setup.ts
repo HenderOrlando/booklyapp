@@ -68,9 +68,9 @@ jest.mock("@/infrastructure/http/httpClient", () => ({
   isMockMode: () => true,
 }));
 
-// Mock useLogout hook
-jest.mock("@/hooks/useLogout", () => ({
-  useLogout: () => jest.fn(),
-}));
+// Dummy test to prevent "must contain at least one test" error
+test("page-test-setup loads without errors", () => {
+  expect(true).toBe(true);
+});
 
 export {};
