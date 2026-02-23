@@ -284,6 +284,7 @@ export enum CheckInStatus {
 }
 
 export enum CheckInOutStatus {
+  PENDING = "PENDING", // Pendiente de realizar check-in
   CHECKED_IN = "CHECKED_IN", // Usuario recibe el recurso a tiempo
   CHECKED_OUT = "CHECKED_OUT", // Usuario devuelve el recurso a tiempo
   LATE = "LATE", // Usuario recibe el recurso tarde
