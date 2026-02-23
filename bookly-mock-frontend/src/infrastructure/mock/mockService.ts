@@ -30,14 +30,17 @@ import {
   getApprovalHistory,
   getApprovalRequestById,
   getMockLoginResponse,
+  mockActiveReservations,
   mockApprovalRequests,
   mockApprovalStats,
   mockAuditLogs,
+  mockCheckInOutStats,
   mockCredentials,
   mockDelay,
   mockPermissions,
   mockRoles,
   mockUsers,
+  mockVigilanceAlerts,
 } from "./data";
 import { mockReservations } from "./data/reservations-service.mock";
 import type {
@@ -678,6 +681,30 @@ export class MockService {
       return this.castResponse<T>(
         this.mockUpdateConfig(payload as RequestPayload),
       );
+    }
+
+    // ============================================
+    // MONITORING / VIGILANCIA ENDPOINTS
+    // ============================================
+
+    if (endpoint.includes("/monitoring/active") && method === "GET") {
+      return this.castResponse<T>(this.mockGetMonitoringActive());
+    }
+
+    if (endpoint.includes("/monitoring/overdue") && method === "GET") {
+      return this.castResponse<T>(this.mockGetMonitoringOverdue());
+    }
+
+    if (endpoint.includes("/monitoring/statistics") && method === "GET") {
+      return this.castResponse<T>(this.mockGetMonitoringStats());
+    }
+
+    if (endpoint.includes("/monitoring/alerts") && method === "GET") {
+      return this.castResponse<T>(this.mockGetMonitoringAlerts());
+    }
+
+    if (endpoint.includes("/monitoring/incident") && method === "POST") {
+      return this.castResponse<T>(this.mockResolveIncident());
     }
 
     // Endpoint no implementado en mock
@@ -3394,6 +3421,62 @@ export class MockService {
         storageGcsConfig: this.appConfigData.storageGcsConfig,
       },
       message: "Storage configuration updated successfully",
+      timestamp: new Date().toISOString(),
+    };
+  }
+
+  // ============================================
+  // MONITORING / VIGILANCIA ENDPOINTS
+  // ============================================
+
+  private static mockGetMonitoringActive(): ApiResponse<unknown> {
+    return {
+      success: true,
+      data: mockActiveReservations.filter(
+        (r) => r.status === "CHECKED_IN" || r.status === "WAITING",
+      ),
+      message: "Check-ins activos obtenidos",
+      timestamp: new Date().toISOString(),
+    };
+  }
+
+  private static mockGetMonitoringOverdue(): ApiResponse<unknown> {
+    const now = new Date();
+    const overdueReservations = mockActiveReservations.filter((r) => {
+      const start = new Date(r.startTime);
+      return r.status === "WAITING" && now > start;
+    });
+    return {
+      success: true,
+      data: overdueReservations,
+      message: "Check-ins vencidos obtenidos",
+      timestamp: new Date().toISOString(),
+    };
+  }
+
+  private static mockGetMonitoringStats(): ApiResponse<unknown> {
+    return {
+      success: true,
+      data: mockCheckInOutStats,
+      message: "Estadísticas de monitoreo obtenidas",
+      timestamp: new Date().toISOString(),
+    };
+  }
+
+  private static mockGetMonitoringAlerts(): ApiResponse<unknown> {
+    return {
+      success: true,
+      data: mockVigilanceAlerts,
+      message: "Alertas activas obtenidas",
+      timestamp: new Date().toISOString(),
+    };
+  }
+
+  private static mockResolveIncident(): ApiResponse<unknown> {
+    return {
+      success: true,
+      data: { resolved: true },
+      message: "Incidencia resuelta",
       timestamp: new Date().toISOString(),
     };
   }

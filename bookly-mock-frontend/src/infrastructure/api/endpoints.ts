@@ -353,6 +353,7 @@ export function getServiceFromEndpoint(endpoint: string): string {
   if (
     endpoint.includes("/approval") ||
     endpoint.includes("/check-in-out") ||
+    endpoint.includes("/monitoring") ||
     endpoint.includes("/documents") ||
     endpoint.includes("/notifications")
   )

@@ -161,6 +161,7 @@ export default function VigilanciaPage() {
           <VigilancePanel
             activeReservations={data.active}
             overdueReservations={data.overdue}
+            todayApprovals={data.todayApprovals}
             alerts={data.alerts}
             onContact={handleContact}
             onResolveAlert={handleResolveAlert}
