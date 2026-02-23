@@ -784,7 +784,7 @@
       "specs": [],
       "suites": [
         {
-          "title": "Navigation Smoke — Admin",
+          "title": "Navigation Smoke \u2014 Admin",
           "file": "smoke/navigation.smoke.spec.ts",
           "line": 12,
           "column": 6,
@@ -860,7 +860,7 @@
           ]
         },
         {
-          "title": "Navigation Smoke — Estudiante",
+          "title": "Navigation Smoke \u2014 Estudiante",
           "file": "smoke/navigation.smoke.spec.ts",
           "line": 39,
           "column": 6,

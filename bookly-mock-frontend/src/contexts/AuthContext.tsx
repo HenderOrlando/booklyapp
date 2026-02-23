@@ -129,8 +129,8 @@ export function AuthProvider({ children }: AuthProviderProps) {
 
     postAuthRedirectHandledRef.current = true;
     clearPostAuthRedirect();
-    router.replace(destination);
-  }, [router]);
+    window.location.replace(destination);
+  }, []);
 
   const schedulePostAuthRedirectRetry = useCallback(() => {
     if (typeof window === "undefined") {

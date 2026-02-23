@@ -3,13 +3,29 @@ import { AuthClient } from "@/infrastructure/api/auth-client";
 import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 
-const replaceMock = jest.fn();
+const locationReplaceSpy = jest.fn();
+
+// Replace window.location to allow mocking replace() (which is read-only in jsdom)
+Object.defineProperty(window, "location", {
+  configurable: true,
+  writable: true,
+  value: {
+    pathname: "/es/login",
+    search: "",
+    origin: "http://localhost",
+    href: "http://localhost/es/login",
+    replace: locationReplaceSpy,
+    assign: jest.fn(),
+    reload: jest.fn(),
+  },
+});
+
 const pushMock = jest.fn();
 
 jest.mock("next/navigation", () => ({
   useRouter: () => ({
     push: pushMock,
-    replace: replaceMock,
+    replace: jest.fn(),
     back: jest.fn(),
     prefetch: jest.fn(),
     refresh: jest.fn(),
@@ -57,8 +73,8 @@ function LoginHarness() {
 
 describe("AuthContext post-auth redirect", () => {
   beforeEach(() => {
-    replaceMock.mockReset();
     pushMock.mockReset();
+    locationReplaceSpy.mockReset();
 
     window.localStorage.clear();
     window.sessionStorage.clear();
@@ -84,7 +100,10 @@ describe("AuthContext post-auth redirect", () => {
 
   it("redirects to callback when login succeeds with callback query", async () => {
     const user = userEvent.setup();
-    window.history.replaceState({}, "", "/es/login?callback=/es/recursos");
+    // Set mock location URL for this test
+    const mockLoc = window.location as unknown as Record<string, unknown>;
+    mockLoc.pathname = "/es/login";
+    mockLoc.search = "?callback=/es/recursos";
 
     render(
       <AuthProvider>
@@ -95,15 +114,18 @@ describe("AuthContext post-auth redirect", () => {
     await user.click(screen.getByTestId("auth-context-login-trigger"));
 
     await waitFor(() => {
-      expect(replaceMock).toHaveBeenCalledWith("/es/recursos");
+      expect(locationReplaceSpy).toHaveBeenCalledWith("/es/recursos");
     });
 
-    expect(replaceMock).toHaveBeenCalledTimes(1);
+    expect(locationReplaceSpy).toHaveBeenCalledTimes(1);
   });
 
   it("redirects to dashboard when login succeeds without callback", async () => {
     const user = userEvent.setup();
-    window.history.replaceState({}, "", "/es/login");
+    // Set mock location URL for this test (no callback)
+    const mockLoc = window.location as unknown as Record<string, unknown>;
+    mockLoc.pathname = "/es/login";
+    mockLoc.search = "";
 
     render(
       <AuthProvider>
@@ -114,9 +136,9 @@ describe("AuthContext post-auth redirect", () => {
     await user.click(screen.getByTestId("auth-context-login-trigger"));
 
     await waitFor(() => {
-      expect(replaceMock).toHaveBeenCalledWith("/es/dashboard");
+      expect(locationReplaceSpy).toHaveBeenCalledWith("/es/dashboard");
     });
 
-    expect(replaceMock).toHaveBeenCalledTimes(1);
+    expect(locationReplaceSpy).toHaveBeenCalledTimes(1);
   });
 });
