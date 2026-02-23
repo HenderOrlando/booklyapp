@@ -44,6 +44,9 @@ export class ReservationRepository implements IReservationRepository {
       instanceNumber: reservation.instanceNumber,
       exceptions: reservation.exceptions,
       audit: reservation.audit,
+      resourceName: reservation.resourceName,
+      userName: reservation.userName,
+      userEmail: reservation.userEmail,
     });
 
     const saved = await created.save();
@@ -490,6 +493,9 @@ export class ReservationRepository implements IReservationRepository {
       createdAt: doc.createdAt,
       updatedAt: doc.updatedAt,
       audit: doc.audit,
+      resourceName: doc.resourceName,
+      userName: doc.userName,
+      userEmail: doc.userEmail,
     });
   }
 }

@@ -35,6 +35,7 @@ import {
   GetApprovalRequestsQuery,
   GetApprovalStatisticsQuery,
 } from "@stockpile/application/queries";
+import { ApprovalRequestEntity } from "@stockpile/domain/entities";
 import {
   ApproveStepDto,
   CancelApprovalRequestDto,
@@ -114,10 +115,17 @@ export class ApprovalRequestsController {
     );
 
     const result = await this.queryBus.execute(queryCommand);
-    if (result.data && result.meta) {
+    const requests = result.requests || result.data || [];
+    const meta = result.meta;
+
+    const enrichedRequests = requests.map((r: ApprovalRequestEntity) =>
+      this.mapEntityToFrontendDto(r),
+    );
+
+    if (meta) {
       return ResponseUtil.paginated(
-        result.data,
-        result.meta.total,
+        enrichedRequests,
+        meta.total,
         query.page || 1,
         query.limit || 10,
         "Approval requests retrieved successfully",
@@ -125,7 +133,7 @@ export class ApprovalRequestsController {
     }
 
     return ResponseUtil.success(
-      result,
+      enrichedRequests,
       "Approval requests retrieved successfully",
     );
   }
@@ -148,8 +156,19 @@ export class ApprovalRequestsController {
     });
 
     const result = await this.queryBus.execute(query);
+    const mappedStats = {
+      totalPending: result.pending || 0,
+      totalInReview: result.inReview || 0,
+      totalApproved: result.approved || 0,
+      totalRejected: result.rejected || 0,
+      totalCancelled: result.cancelled || 0,
+      totalExpired: result.expired || 0,
+      averageApprovalTime: result.averageApprovalTime || 0,
+      approvalRate: result.total > 0 ? Math.round((result.approved / result.total) * 100) : 0,
+      rejectionRate: result.total > 0 ? Math.round((result.rejected / result.total) * 100) : 0,
+    };
     return ResponseUtil.success(
-      result,
+      mappedStats,
       "Approval statistics retrieved successfully",
     );
   }
@@ -213,8 +232,9 @@ export class ApprovalRequestsController {
   async findOne(@Param("id") id: string): Promise<any> {
     const query = new GetApprovalRequestByIdQuery(id);
     const result = await this.queryBus.execute(query);
+    const enriched = this.mapEntityToFrontendDto(result);
     return ResponseUtil.success(
-      result,
+      enriched,
       "Approval request retrieved successfully",
     );
   }
@@ -354,5 +374,60 @@ export class ApprovalRequestsController {
       result,
       "Approval request deleted successfully",
     );
+  }
+
+  /**
+   * Mapea ApprovalRequestEntity al shape que espera el frontend.
+   * Usa metadata para enriquecer con datos de usuario, recurso y reserva.
+   */
+  private mapEntityToFrontendDto(entity: ApprovalRequestEntity): Record<string, any> {
+    const meta = entity.metadata || {};
+    const lastApproval = entity.approvalHistory?.length
+      ? entity.approvalHistory[entity.approvalHistory.length - 1]
+      : undefined;
+
+    return {
+      id: entity.id,
+      reservationId: entity.reservationId,
+      userId: entity.requesterId,
+      userName: meta.userName || "",
+      userEmail: meta.userEmail || "",
+      userRole: meta.userRole,
+      resourceId: meta.resourceId || "",
+      resourceName: meta.resourceName || "",
+      resourceType: meta.resourceType,
+      categoryName: meta.categoryName,
+      programId: entity.metadata?.programId,
+      programName: meta.programName,
+      startDate: meta.reservationStartDate || null,
+      endDate: meta.reservationEndDate || null,
+      purpose: meta.purpose || "",
+      attendees: meta.attendees || 0,
+      requiresEquipment: meta.requiresEquipment,
+      specialRequirements: meta.specialRequirements,
+      status: entity.status,
+      priority: meta.priority || "NORMAL",
+      currentLevel: meta.currentLevel || "FIRST_LEVEL",
+      maxLevel: meta.maxLevel || "FIRST_LEVEL",
+      requestedAt: entity.submittedAt?.toISOString?.() || entity.submittedAt,
+      reviewedAt: entity.completedAt?.toISOString?.() || entity.completedAt,
+      reviewedBy: lastApproval?.approverId,
+      reviewerName: lastApproval?.stepName,
+      comments: lastApproval?.comment,
+      rejectionReason: meta.rejectionReason || (entity.status === "REJECTED" ? lastApproval?.comment : undefined),
+      expiresAt: meta.expiresAt,
+      history: entity.approvalHistory?.map((h) => ({
+        id: `${entity.id}_${h.stepName}`,
+        approvalRequestId: entity.id,
+        action: h.decision,
+        performedBy: h.approverId,
+        performerName: h.stepName,
+        level: meta.currentLevel || "FIRST_LEVEL",
+        comments: h.comment,
+        timestamp: h.approvedAt?.toISOString?.() || h.approvedAt,
+      })),
+      createdAt: entity.createdAt?.toISOString?.() || entity.createdAt,
+      updatedAt: entity.updatedAt?.toISOString?.() || entity.updatedAt,
+    };
   }
 }

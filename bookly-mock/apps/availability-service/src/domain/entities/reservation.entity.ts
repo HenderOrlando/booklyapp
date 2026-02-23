@@ -48,7 +48,10 @@ export class ReservationEntity {
       cancelledBy?: string;
       cancelledAt?: Date;
       cancellationReason?: string;
-    }
+    },
+    public readonly resourceName?: string,
+    public readonly userName?: string,
+    public readonly userEmail?: string,
   ) {}
 
   /**
@@ -264,6 +267,10 @@ export class ReservationEntity {
       createdAt: this.createdAt,
       updatedAt: this.updatedAt,
       audit: this.audit,
+      title: this.purpose,
+      resourceName: this.resourceName,
+      userName: this.userName,
+      userEmail: this.userEmail,
     };
   }
 
@@ -301,7 +308,10 @@ export class ReservationEntity {
       obj.exceptions,
       obj.createdAt,
       obj.updatedAt,
-      obj.audit
+      obj.audit,
+      obj.resourceName,
+      obj.userName,
+      obj.userEmail,
     );
   }
 }

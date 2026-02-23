@@ -134,18 +134,22 @@ export class ReservationsController {
 
     const result = await this.queryBus.execute(queryObj);
     
-    // Si el resultado ya tiene estructura de paginación
-    if (result.data && result.meta) {
-      return ResponseUtil.paginated(
-        result.data,
-        result.meta.total,
-        query.page || 1,
-        query.limit || 10,
-        'Reservations retrieved successfully'
-      );
-    }
-    
-    return ResponseUtil.success(result, 'Reservations retrieved successfully');
+    // El handler retorna { reservations: ReservationEntity[], meta }
+    const reservations = result.reservations || result.data || [];
+    const meta = result.meta;
+
+    // Convertir entidades a objetos planos (incluye title, resourceName, userName)
+    const items = reservations.map((r: any) =>
+      typeof r.toObject === 'function' ? r.toObject() : r,
+    );
+
+    return ResponseUtil.paginated(
+      items,
+      meta?.total || items.length,
+      query.page || 1,
+      query.limit || 10,
+      'Reservations retrieved successfully'
+    );
   }
 
   /**
@@ -218,7 +222,8 @@ export class ReservationsController {
   async findOne(@Param("id") id: string): Promise<any> {
     const query = new GetReservationByIdQuery(id);
     const reservation = await this.queryBus.execute(query);
-    return ResponseUtil.success(reservation, 'Reservation retrieved successfully');
+    const item = typeof reservation?.toObject === 'function' ? reservation.toObject() : reservation;
+    return ResponseUtil.success(item, 'Reservation retrieved successfully');
   }
 
   @Patch(":id")

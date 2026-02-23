@@ -122,6 +122,20 @@ async function seed() {
     const PROGRAMA_SISTEMAS_ID = new Types.ObjectId(SEED_IDS.PROGRAMA_SISTEMAS_ID);
     const PROGRAMA_INDUSTRIAL_ID = new Types.ObjectId(SEED_IDS.PROGRAMA_INDUSTRIAL_ID);
 
+    // Mapas de nombres denormalizados (cross-service, coinciden con auth-service y resources-service seeds)
+    const RESOURCE_NAMES: Record<string, string> = {
+      [SEED_IDS.RECURSO_AUDITORIO_ID]: "Auditorio Principal",
+      [SEED_IDS.RECURSO_LAB_SIS_1_ID]: "Laboratorio de Sistemas 1",
+      [SEED_IDS.RECURSO_SALA_CONF_A_ID]: "Sala de Conferencias A",
+      [SEED_IDS.RECURSO_AULA_201_ID]: "Aula 201",
+    };
+    const USER_INFO: Record<string, { name: string; email: string }> = {
+      [SEED_IDS.COORDINADOR_SISTEMAS_ID]: { name: "Juan Docente", email: "juan.docente@ufps.edu.co" },
+      [SEED_IDS.ADMIN_GENERAL_ID]: { name: "Admin Principal", email: "admin@ufps.edu.co" },
+      [SEED_IDS.ESTUDIANTE_MARIA_ID]: { name: "María Estudiante", email: "maria.estudiante@ufps.edu.co" },
+      [SEED_IDS.COORDINADOR_INDUSTRIAL_ID]: { name: "Pedro Coordinador", email: "pedro.coordinador@ufps.edu.co" },
+    };
+
     // Fechas para reservas
     const today = new Date();
     const lastWeek = new Date(today);
@@ -147,6 +161,9 @@ async function seed() {
         purpose: "Conferencia sobre Inteligencia Artificial",
         status: "COMPLETED",
         tenantId: TENANT_ID,
+        resourceName: RESOURCE_NAMES[SEED_IDS.RECURSO_AUDITORIO_ID],
+        userName: USER_INFO[SEED_IDS.COORDINADOR_SISTEMAS_ID].name,
+        userEmail: USER_INFO[SEED_IDS.COORDINADOR_SISTEMAS_ID].email,
         checkInTime: new Date(new Date(lastWeek).setHours(9, 55, 0)),
         checkOutTime: new Date(new Date(lastWeek).setHours(12, 10, 0)),
         audit: {
@@ -166,6 +183,9 @@ async function seed() {
         purpose: "Reunión de Coordinación",
         status: "CONFIRMED",
         tenantId: TENANT_ID,
+        resourceName: RESOURCE_NAMES[SEED_IDS.RECURSO_SALA_CONF_A_ID],
+        userName: USER_INFO[SEED_IDS.ADMIN_GENERAL_ID].name,
+        userEmail: USER_INFO[SEED_IDS.ADMIN_GENERAL_ID].email,
         audit: {
           createdBy: ADMIN_GENERAL_ID,
           updatedBy: ADMIN_GENERAL_ID,
@@ -183,6 +203,9 @@ async function seed() {
         purpose: "Evento Estudiantil",
         status: "PENDING",
         tenantId: TENANT_ID,
+        resourceName: RESOURCE_NAMES[SEED_IDS.RECURSO_AUDITORIO_ID],
+        userName: USER_INFO[SEED_IDS.ESTUDIANTE_MARIA_ID].name,
+        userEmail: USER_INFO[SEED_IDS.ESTUDIANTE_MARIA_ID].email,
         audit: {
           createdBy: ESTUDIANTE_MARIA_ID,
         },
@@ -199,6 +222,9 @@ async function seed() {
         purpose: "Tutoría Grupal",
         status: "CANCELLED",
         tenantId: TENANT_ID,
+        resourceName: RESOURCE_NAMES[SEED_IDS.RECURSO_SALA_CONF_A_ID],
+        userName: USER_INFO[SEED_IDS.COORDINADOR_SISTEMAS_ID].name,
+        userEmail: USER_INFO[SEED_IDS.COORDINADOR_SISTEMAS_ID].email,
         audit: {
           createdBy: COORDINADOR_SISTEMAS_ID,
           updatedBy: COORDINADOR_SISTEMAS_ID,
@@ -219,6 +245,9 @@ async function seed() {
         purpose: "Práctica de Laboratorio de Producción",
         status: "APPROVED",
         tenantId: TENANT_ID,
+        resourceName: RESOURCE_NAMES[SEED_IDS.RECURSO_LAB_SIS_1_ID],
+        userName: USER_INFO[SEED_IDS.COORDINADOR_INDUSTRIAL_ID].name,
+        userEmail: USER_INFO[SEED_IDS.COORDINADOR_INDUSTRIAL_ID].email,
         audit: {
           createdBy: COORDINADOR_INDUSTRIAL_ID,
           updatedBy: ADMIN_GENERAL_ID,
@@ -236,6 +265,9 @@ async function seed() {
         purpose: "Reunión de Planeación Semestral",
         status: "IN_PROGRESS",
         tenantId: TENANT_ID,
+        resourceName: RESOURCE_NAMES[SEED_IDS.RECURSO_SALA_CONF_A_ID],
+        userName: USER_INFO[SEED_IDS.COORDINADOR_SISTEMAS_ID].name,
+        userEmail: USER_INFO[SEED_IDS.COORDINADOR_SISTEMAS_ID].email,
         checkInTime: new Date(new Date(today).setHours(7, 55, 0)),
         audit: {
           createdBy: COORDINADOR_SISTEMAS_ID,
@@ -254,6 +286,9 @@ async function seed() {
         purpose: "Fiesta de fin de semestre",
         status: "REJECTED",
         tenantId: TENANT_ID,
+        resourceName: RESOURCE_NAMES[SEED_IDS.RECURSO_AUDITORIO_ID],
+        userName: USER_INFO[SEED_IDS.ESTUDIANTE_MARIA_ID].name,
+        userEmail: USER_INFO[SEED_IDS.ESTUDIANTE_MARIA_ID].email,
         audit: {
           createdBy: ESTUDIANTE_MARIA_ID,
           updatedBy: ADMIN_GENERAL_ID,
@@ -272,6 +307,9 @@ async function seed() {
         purpose: "Práctica de Programación",
         status: "NO_SHOW",
         tenantId: TENANT_ID,
+        resourceName: RESOURCE_NAMES[SEED_IDS.RECURSO_LAB_SIS_1_ID],
+        userName: USER_INFO[SEED_IDS.ESTUDIANTE_MARIA_ID].name,
+        userEmail: USER_INFO[SEED_IDS.ESTUDIANTE_MARIA_ID].email,
         audit: {
           createdBy: ESTUDIANTE_MARIA_ID,
           updatedBy: ADMIN_GENERAL_ID,
@@ -289,6 +327,9 @@ async function seed() {
         purpose: "Clase semanal de Bases de Datos",
         status: "CONFIRMED",
         tenantId: TENANT_ID,
+        resourceName: RESOURCE_NAMES[SEED_IDS.RECURSO_LAB_SIS_1_ID],
+        userName: USER_INFO[SEED_IDS.COORDINADOR_SISTEMAS_ID].name,
+        userEmail: USER_INFO[SEED_IDS.COORDINADOR_SISTEMAS_ID].email,
         isRecurring: true,
         recurrencePattern: {
           type: "WEEKLY",

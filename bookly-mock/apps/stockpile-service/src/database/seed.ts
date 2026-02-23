@@ -322,6 +322,12 @@ async function seed() {
     const lastWeek = new Date(today);
     lastWeek.setDate(lastWeek.getDate() - 7);
 
+    // Fechas de reservas (deben coincidir con availability-service seed)
+    const tomorrow = new Date(today);
+    tomorrow.setDate(tomorrow.getDate() + 1);
+    const nextWeek = new Date(today);
+    nextWeek.setDate(nextWeek.getDate() + 7);
+
     const approvalRequests = [
       // Solicitud aprobada
       {
@@ -334,6 +340,23 @@ async function seed() {
         currentStepIndex: 2,
         submittedAt: new Date(new Date(lastWeek).setHours(9, 0, 0)),
         completedAt: new Date(new Date(lastWeek).setHours(15, 0, 0)),
+        metadata: {
+          requesterId: SEED_IDS.COORDINADOR_SISTEMAS_ID,
+          resourceId: SEED_IDS.RECURSO_AUDITORIO_ID,
+          reservationStartDate: new Date(new Date(lastWeek).setHours(10, 0, 0)).toISOString(),
+          reservationEndDate: new Date(new Date(lastWeek).setHours(12, 0, 0)).toISOString(),
+          purpose: "Conferencia sobre Inteligencia Artificial",
+          userName: "Coordinador Sistemas",
+          userEmail: "coord.sistemas@ufps.edu.co",
+          userRole: "Coordinador",
+          resourceName: "Auditorio Principal",
+          resourceType: "AUDITORIUM",
+          programName: "Ingeniería de Sistemas",
+          attendees: 100,
+          priority: "HIGH",
+          currentLevel: "FINAL_LEVEL",
+          maxLevel: "FINAL_LEVEL",
+        },
         approvalHistory: [
           {
             stepName: "Revisión por Coordinador de Programa",
@@ -363,6 +386,23 @@ async function seed() {
         status: "PENDING",
         currentStepIndex: 0,
         submittedAt: new Date(today),
+        metadata: {
+          requesterId: SEED_IDS.ESTUDIANTE_MARIA_ID,
+          resourceId: SEED_IDS.RECURSO_AUDITORIO_ID,
+          reservationStartDate: new Date(new Date(nextWeek).setHours(16, 0, 0)).toISOString(),
+          reservationEndDate: new Date(new Date(nextWeek).setHours(18, 0, 0)).toISOString(),
+          purpose: "Evento Estudiantil",
+          userName: "María Estudiante",
+          userEmail: "maria.estudiante@ufps.edu.co",
+          userRole: "Estudiante",
+          resourceName: "Auditorio Principal",
+          resourceType: "AUDITORIUM",
+          programName: "Ingeniería de Sistemas",
+          attendees: 50,
+          priority: "NORMAL",
+          currentLevel: "FIRST_LEVEL",
+          maxLevel: "SECOND_LEVEL",
+        },
         approvalHistory: [],
         createdBy: ESTUDIANTE_MARIA_ID,
       },
@@ -377,6 +417,24 @@ async function seed() {
         currentStepIndex: 1,
         submittedAt: new Date(new Date(lastWeek).setHours(8, 0, 0)),
         completedAt: new Date(new Date(lastWeek).setHours(12, 0, 0)),
+        metadata: {
+          requesterId: SEED_IDS.ESTUDIANTE_MARIA_ID,
+          resourceId: SEED_IDS.RECURSO_AUDITORIO_ID,
+          reservationStartDate: new Date(new Date(lastWeek).setHours(14, 0, 0)).toISOString(),
+          reservationEndDate: new Date(new Date(lastWeek).setHours(18, 0, 0)).toISOString(),
+          purpose: "Fiesta de fin de semestre",
+          userName: "María Estudiante",
+          userEmail: "maria.estudiante@ufps.edu.co",
+          userRole: "Estudiante",
+          resourceName: "Auditorio Principal",
+          resourceType: "AUDITORIUM",
+          programName: "Ingeniería de Sistemas",
+          attendees: 200,
+          priority: "NORMAL",
+          currentLevel: "FIRST_LEVEL",
+          maxLevel: "SECOND_LEVEL",
+          rejectionReason: "El propósito no corresponde a actividad académica",
+        },
         approvalHistory: [
           {
             stepName: "Revisión por Coordinador de Programa",
@@ -399,6 +457,23 @@ async function seed() {
         status: "IN_REVIEW",
         currentStepIndex: 1,
         submittedAt: new Date(new Date(today).setHours(7, 0, 0)),
+        metadata: {
+          requesterId: SEED_IDS.COORDINADOR_INDUSTRIAL_ID,
+          resourceId: SEED_IDS.RECURSO_LAB_SIS_1_ID,
+          reservationStartDate: new Date(new Date(tomorrow).setHours(14, 0, 0)).toISOString(),
+          reservationEndDate: new Date(new Date(tomorrow).setHours(16, 0, 0)).toISOString(),
+          purpose: "Práctica de Laboratorio de Producción",
+          userName: "Coordinador Industrial",
+          userEmail: "coord.industrial@ufps.edu.co",
+          userRole: "Coordinador",
+          resourceName: "Laboratorio de Sistemas 1",
+          resourceType: "LAB",
+          programName: "Ingeniería Industrial",
+          attendees: 30,
+          priority: "NORMAL",
+          currentLevel: "SECOND_LEVEL",
+          maxLevel: "FINAL_LEVEL",
+        },
         approvalHistory: [
           {
             stepName: "VoBo del docente responsable",
@@ -422,6 +497,23 @@ async function seed() {
         currentStepIndex: 0,
         submittedAt: new Date(new Date(lastWeek).setHours(10, 0, 0)),
         completedAt: new Date(new Date(lastWeek).setHours(11, 0, 0)),
+        metadata: {
+          requesterId: SEED_IDS.ESTUDIANTE_MARIA_ID,
+          resourceId: SEED_IDS.RECURSO_SALA_CONF_A_ID,
+          reservationStartDate: new Date(new Date(lastWeek).setHours(15, 0, 0)).toISOString(),
+          reservationEndDate: new Date(new Date(lastWeek).setHours(17, 0, 0)).toISOString(),
+          purpose: "Tutoría Grupal",
+          userName: "María Estudiante",
+          userEmail: "maria.estudiante@ufps.edu.co",
+          userRole: "Estudiante",
+          resourceName: "Sala de Conferencias A",
+          resourceType: "MEETING_ROOM",
+          programName: "Ingeniería de Sistemas",
+          attendees: 10,
+          priority: "LOW",
+          currentLevel: "FIRST_LEVEL",
+          maxLevel: "FIRST_LEVEL",
+        },
         approvalHistory: [],
         createdBy: ESTUDIANTE_MARIA_ID,
         updatedBy: ESTUDIANTE_MARIA_ID,

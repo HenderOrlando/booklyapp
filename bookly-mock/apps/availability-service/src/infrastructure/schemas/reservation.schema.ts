@@ -119,6 +119,15 @@ export class Reservation {
   @Prop()
   externalCalendarEventId?: string;
 
+  @Prop({ type: String })
+  resourceName?: string;
+
+  @Prop({ type: String })
+  userName?: string;
+
+  @Prop({ type: String })
+  userEmail?: string;
+
   @Prop({
     type: {
       createdBy: Types.ObjectId,
