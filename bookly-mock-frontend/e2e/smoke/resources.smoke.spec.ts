@@ -47,15 +47,17 @@ test.describe("Resources Smoke", () => {
   // E2E-RES-004 | Navigate to edit resource
   test("navigates to edit resource page", async ({ page }) => {
     await page.goto("/es/recursos/res_001");
-    await page.waitForLoadState("networkidle");
+
+    // Wait for the detail page to render content
+    await expect(page.locator("main").first()).toBeVisible({ timeout: 15000 });
 
     const editLink = page
       .locator("a[href*='editar'], button")
       .filter({ hasText: /editar/i })
       .first();
-    if (await editLink.isVisible()) {
+    if (await editLink.isVisible({ timeout: 10000 })) {
       await editLink.click();
-      await expect(page).toHaveURL(/editar/);
+      await expect(page).toHaveURL(/editar/, { timeout: 15000 });
     }
   });
 });

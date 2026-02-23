@@ -5,7 +5,7 @@
  * RF: RF-41, RF-42, RF-36
  */
 
-import { test, expect } from "@playwright/test";
+import { test, expect } from "../fixtures/base-test";
 import { authStatePath } from "../fixtures/test-users";
 import { SidebarPage } from "../pages/sidebar.page";
 
@@ -16,9 +16,11 @@ test.describe("Navigation Smoke — Admin", () => {
   test("dashboard page loads with content", async ({ page }) => {
     await page.goto("/es/dashboard");
     await expect(page).toHaveURL(/dashboard/);
+    // Dashboard renders KPI cards (h3) — verify main content area with data
+    await expect(page.locator("main").first()).toBeVisible({ timeout: 15000 });
     await expect(
-      page.locator("h1, h2").filter({ hasText: /dashboard|panel|inicio/i })
-    ).toBeVisible({ timeout: 10000 });
+      page.locator("h3").filter({ hasText: /reservas|recursos|ocupación|aprobación/i }).first()
+    ).toBeVisible({ timeout: 15000 });
   });
 
   // E2E-NAV-002 | Admin sidebar shows all main links
