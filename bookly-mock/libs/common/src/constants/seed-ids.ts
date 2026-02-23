@@ -1,0 +1,87 @@
+/**
+ * 🔑 Constantes centralizadas de ObjectIds para Seeds
+ * Single Source of Truth para garantizar integridad referencial cross-service.
+ *
+ * Convención de rangos:
+ *   000       → Sistema
+ *   021-030   → Usuarios
+ *   031-040   → Reservas
+ *   041-043   → Programas Académicos
+ *   051       → Facultades
+ *   061-063   → Departamentos
+ *   071-074   → Categorías
+ *   011-017   → Recursos
+ *   081-089   → Approval Requests
+ *
+ * Uso: import { SEED_IDS } from "@libs/common";
+ */
+
+export const SEED_IDS = {
+  // ─── Tenant ───
+  TENANT_ID: "UFPS",
+
+  // ─── Sistema ───
+  SYSTEM_USER_ID: "507f1f77bcf86cd799439000",
+
+  // ─── Usuarios ───
+  COORDINADOR_SISTEMAS_ID: "507f1f77bcf86cd799439021",
+  ADMIN_GENERAL_ID: "507f1f77bcf86cd799439022",
+  ESTUDIANTE_MARIA_ID: "507f1f77bcf86cd799439023",
+  STAFF_VIGILANTE_ID: "507f1f77bcf86cd799439024",
+  ADMIN_TI_ID: "507f1f77bcf86cd799439025",
+  COORDINADOR_INDUSTRIAL_ID: "507f1f77bcf86cd799439026",
+  DOCENTE_AUXILIAR_ID: "507f1f77bcf86cd799439027",
+  ESTUDIANTE_CARLOS_ID: "507f1f77bcf86cd799439028",
+  STAFF_ANA_ID: "507f1f77bcf86cd799439029",
+  USUARIO_SUSPENDIDO_ID: "507f1f77bcf86cd799439030",
+  USUARIO_NO_VERIFICADO_ID: "507f1f77bcf86cd79943902a",
+  DOCENTE_2FA_ID: "507f1f77bcf86cd79943902b",
+
+  // ─── Programas Académicos ───
+  PROGRAMA_SISTEMAS_ID: "507f1f77bcf86cd799439041",
+  PROGRAMA_INDUSTRIAL_ID: "507f1f77bcf86cd799439042",
+  PROGRAMA_ELECTRONICA_ID: "507f1f77bcf86cd799439043",
+
+  // ─── Facultades ───
+  FACULTAD_INGENIERIA_ID: "507f1f77bcf86cd799439051",
+
+  // ─── Departamentos ───
+  DEPTO_SISTEMAS_ID: "507f1f77bcf86cd799439061",
+  DEPTO_INDUSTRIAL_ID: "507f1f77bcf86cd799439062",
+  DEPTO_ELECTRONICA_ID: "507f1f77bcf86cd799439063",
+
+  // ─── Categorías ───
+  CATEGORIA_SALAS_ID: "507f1f77bcf86cd799439071",
+  CATEGORIA_LABS_ID: "507f1f77bcf86cd799439072",
+  CATEGORIA_AUDITORIOS_ID: "507f1f77bcf86cd799439073",
+  CATEGORIA_EQUIPOS_AV_ID: "507f1f77bcf86cd799439074",
+
+  // ─── Recursos ───
+  RECURSO_AUDITORIO_ID: "507f1f77bcf86cd799439011",
+  RECURSO_LAB_SIS_1_ID: "507f1f77bcf86cd799439012",
+  RECURSO_SALA_CONF_A_ID: "507f1f77bcf86cd799439013",
+  RECURSO_PROYECTOR_1_ID: "507f1f77bcf86cd799439014",
+  RECURSO_AULA_201_ID: "507f1f77bcf86cd799439015",
+  RECURSO_LAB_ELE_1_ID: "507f1f77bcf86cd799439016",
+  RECURSO_AUD_ANTIGUO_ID: "507f1f77bcf86cd799439017",
+
+  // ─── Reservas ───
+  RESERVA_COMPLETADA_ID: "507f1f77bcf86cd799439031",
+  RESERVA_CONFIRMADA_ID: "507f1f77bcf86cd799439032",
+  RESERVA_PENDIENTE_ID: "507f1f77bcf86cd799439033",
+  RESERVA_CANCELADA_ID: "507f1f77bcf86cd799439034",
+  RESERVA_APROBADA_ID: "507f1f77bcf86cd799439035",
+  RESERVA_IN_PROGRESS_ID: "507f1f77bcf86cd799439036",
+  RESERVA_RECHAZADA_ID: "507f1f77bcf86cd799439037",
+  RESERVA_NO_SHOW_ID: "507f1f77bcf86cd799439038",
+  RESERVA_RECURRENTE_ID: "507f1f77bcf86cd799439039",
+
+  // ─── Approval Requests ───
+  APPROVAL_REQ_APROBADA_ID: "507f1f77bcf86cd799439081",
+  APPROVAL_REQ_PENDIENTE_ID: "507f1f77bcf86cd799439082",
+  APPROVAL_REQ_RECHAZADA_ID: "507f1f77bcf86cd799439083",
+  APPROVAL_REQ_IN_REVIEW_ID: "507f1f77bcf86cd799439084",
+  APPROVAL_REQ_CANCELADA_ID: "507f1f77bcf86cd799439085",
+} as const;
+
+export type SeedIdKey = keyof typeof SEED_IDS;

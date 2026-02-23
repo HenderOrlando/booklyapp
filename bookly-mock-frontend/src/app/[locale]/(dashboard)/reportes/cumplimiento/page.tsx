@@ -1,11 +1,13 @@
 "use client";
 
-import { Badge } from "@/components/atoms/Badge/Badge";
-import { Button } from "@/components/atoms/Button/Button";
-import { Card } from "@/components/atoms/Card/Card";
+import { Badge } from "@/components/atoms/Badge";
+import { Card } from "@/components/atoms/Card";
+import { ReportPageLayout } from "@/components/templates/ReportPageLayout";
 import { useComplianceReport } from "@/hooks/useReportData";
+import { useReportExport } from "@/hooks/useReportExport";
+import { useReportFilters } from "@/hooks/useReportFilters";
 import { cn } from "@/lib/utils";
-import { CheckCircle2, Clock, Download, PieChart, XCircle } from "lucide-react";
+import { CheckCircle2, Clock, PieChart, XCircle } from "lucide-react";
 import { useTranslations } from "next-intl";
 
 /**
@@ -63,8 +65,10 @@ const mockData: ComplianceData[] = [
 ];
 
 export default function CumplimientoPage() {
-  const _t = useTranslations("reports");
-  const { data: serverData } = useComplianceReport();
+  const t = useTranslations("reports");
+  const { filters, setFilters } = useReportFilters();
+  const { exportReport } = useReportExport();
+  const { data: serverData, isLoading, error } = useComplianceReport(filters);
   const complianceData = (
     serverData && serverData.length > 0 ? serverData : mockData
   ) as ComplianceData[];
@@ -77,162 +81,120 @@ export default function CumplimientoPage() {
     }),
     { reservations: 0, checkedIn: 0, noShows: 0, lateArrivals: 0 },
   );
-  const avgCompliance = (
-    (totals.checkedIn / totals.reservations) *
-    100
-  ).toFixed(1);
+  const avgCompliance =
+    totals.reservations > 0
+      ? ((totals.checkedIn / totals.reservations) * 100).toFixed(1)
+      : "0.0";
+
+  const handleExport = (format: "csv" | "excel" | "pdf") => {
+    exportReport({ format, data: complianceData, filename: "reporte-cumplimiento" });
+  };
 
   return (
-    <>
-      <div className="space-y-6">
-        {/* Header */}
-        <div className="flex items-center justify-between">
-          <div>
-            <h1 className="text-2xl font-bold text-content-primary">
-              Cumplimiento de Reservas
-            </h1>
-            <p className="mt-1 text-sm text-content-secondary">
-              Tasa de asistencia y check-in de reservas confirmadas
-            </p>
-          </div>
-          <Button variant="outline" className="gap-2">
-            <Download className="h-4 w-4" />
-            Exportar
-          </Button>
-        </div>
-
-        {/* KPIs */}
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-4">
-          <Card className="p-4">
-            <div className="flex items-center gap-3">
-              <div className="rounded-lg bg-brand-primary-100 p-2">
-                <PieChart className="h-5 w-5 text-brand-primary-600" />
-              </div>
-              <div>
-                <p className="text-2xl font-bold text-content-primary">
-                  {avgCompliance}%
-                </p>
-                <p className="text-xs text-content-secondary">
-                  Tasa de cumplimiento
-                </p>
-              </div>
-            </div>
-          </Card>
-          <Card className="p-4">
-            <div className="flex items-center gap-3">
-              <div className="rounded-lg bg-state-success-100 p-2">
-                <CheckCircle2 className="h-5 w-5 text-state-success-600" />
-              </div>
-              <div>
-                <p className="text-2xl font-bold text-content-primary">
-                  {totals.checkedIn}
-                </p>
-                <p className="text-xs text-content-secondary">
-                  Check-ins realizados
-                </p>
-              </div>
-            </div>
-          </Card>
-          <Card className="p-4">
-            <div className="flex items-center gap-3">
-              <div className="rounded-lg bg-state-error-100 p-2">
-                <XCircle className="h-5 w-5 text-state-error-600" />
-              </div>
-              <div>
-                <p className="text-2xl font-bold text-content-primary">
-                  {totals.noShows}
-                </p>
-                <p className="text-xs text-content-secondary">
-                  No-shows
-                </p>
-              </div>
-            </div>
-          </Card>
-          <Card className="p-4">
-            <div className="flex items-center gap-3">
-              <div className="rounded-lg bg-state-warning-100 p-2">
-                <Clock className="h-5 w-5 text-state-warning-600" />
-              </div>
-              <div>
-                <p className="text-2xl font-bold text-content-primary">
-                  {totals.lateArrivals}
-                </p>
-                <p className="text-xs text-content-secondary">
-                  Llegadas tardías
-                </p>
-              </div>
-            </div>
-          </Card>
-        </div>
-
-        {/* Table */}
-        <Card className="overflow-hidden">
-          <div className="overflow-x-auto">
-            <table className="w-full text-sm">
-              <thead>
-                <tr className="border-b bg-app">
-                  <th className="px-4 py-3 text-left font-medium text-content-secondary">
-                    Período
-                  </th>
-                  <th className="px-4 py-3 text-center font-medium text-content-secondary">
-                    Total reservas
-                  </th>
-                  <th className="px-4 py-3 text-center font-medium text-content-secondary">
-                    Check-ins
-                  </th>
-                  <th className="px-4 py-3 text-center font-medium text-content-secondary">
-                    No-shows
-                  </th>
-                  <th className="px-4 py-3 text-center font-medium text-content-secondary">
-                    Tardías
-                  </th>
-                  <th className="px-4 py-3 text-center font-medium text-content-secondary">
-                    Cumplimiento
-                  </th>
+    <ReportPageLayout
+      title={t("compliance_title")}
+      description={t("compliance_desc")}
+      filters={filters}
+      onFiltersChange={setFilters}
+      onExport={handleExport}
+      exportTitle={t("export")}
+      loading={isLoading}
+      error={error ? String(error) : null}
+      isEmpty={complianceData.length === 0}
+      kpiColumns={4}
+      kpis={[
+        {
+          label: t("compliance_rate"),
+          value: `${avgCompliance}%`,
+          icon: <PieChart className="h-5 w-5 text-[var(--color-action-primary)]" />,
+          iconBgClass: "bg-[var(--color-action-primary)]/10",
+        },
+        {
+          label: t("checkins_done"),
+          value: totals.checkedIn,
+          icon: <CheckCircle2 className="h-5 w-5 text-[var(--color-state-success-text)]" />,
+          iconBgClass: "bg-[var(--color-state-success-bg)]",
+        },
+        {
+          label: t("no_shows"),
+          value: totals.noShows,
+          icon: <XCircle className="h-5 w-5 text-[var(--color-state-error-text)]" />,
+          iconBgClass: "bg-[var(--color-state-error-bg)]",
+        },
+        {
+          label: t("late_arrivals"),
+          value: totals.lateArrivals,
+          icon: <Clock className="h-5 w-5 text-[var(--color-state-warning-text)]" />,
+          iconBgClass: "bg-[var(--color-state-warning-bg)]",
+        },
+      ]}
+    >
+      <Card className="overflow-hidden">
+        <div className="overflow-x-auto">
+          <table className="w-full text-sm">
+            <thead>
+              <tr className="border-b bg-[var(--color-bg-muted)] dark:bg-[var(--color-bg-inverse)]">
+                <th className="px-4 py-3 text-left font-medium text-[var(--color-text-secondary)] dark:text-[var(--color-text-tertiary)]">
+                  {t("period")}
+                </th>
+                <th className="px-4 py-3 text-center font-medium text-[var(--color-text-secondary)] dark:text-[var(--color-text-tertiary)]">
+                  {t("total_reservations")}
+                </th>
+                <th className="px-4 py-3 text-center font-medium text-[var(--color-text-secondary)] dark:text-[var(--color-text-tertiary)]">
+                  {t("checkins")}
+                </th>
+                <th className="px-4 py-3 text-center font-medium text-[var(--color-text-secondary)] dark:text-[var(--color-text-tertiary)]">
+                  {t("no_shows")}
+                </th>
+                <th className="px-4 py-3 text-center font-medium text-[var(--color-text-secondary)] dark:text-[var(--color-text-tertiary)]">
+                  {t("late")}
+                </th>
+                <th className="px-4 py-3 text-center font-medium text-[var(--color-text-secondary)] dark:text-[var(--color-text-tertiary)]">
+                  {t("compliance")}
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              {complianceData.map((row) => (
+                <tr
+                  key={row.period}
+                  className="border-b last:border-0 hover:bg-[var(--color-bg-muted)]/50 dark:hover:bg-[var(--color-bg-inverse)]/50"
+                >
+                  <td className="px-4 py-3 font-medium text-[var(--color-text-primary)] dark:text-[var(--color-text-primary)]">
+                    {row.period}
+                  </td>
+                  <td className="px-4 py-3 text-center text-[var(--color-text-secondary)]">
+                    {row.totalReservations}
+                  </td>
+                  <td className="px-4 py-3 text-center">
+                    <Badge variant="success">{row.checkedIn}</Badge>
+                  </td>
+                  <td className="px-4 py-3 text-center">
+                    <Badge variant="error">{row.noShows}</Badge>
+                  </td>
+                  <td className="px-4 py-3 text-center">
+                    <Badge variant="warning">{row.lateArrivals}</Badge>
+                  </td>
+                  <td className="px-4 py-3 text-center">
+                    <span
+                      className={cn(
+                        "font-semibold",
+                        row.complianceRate >= 85
+                          ? "text-[var(--color-state-success-text)]"
+                          : row.complianceRate >= 70
+                            ? "text-[var(--color-state-warning-text)]"
+                            : "text-[var(--color-state-error-text)]",
+                      )}
+                    >
+                      {row.complianceRate}%
+                    </span>
+                  </td>
                 </tr>
-              </thead>
-              <tbody>
-                {mockData.map((row) => (
-                  <tr
-                    key={row.period}
-                    className="border-b last:border-0 hover:bg-app/50"
-                  >
-                    <td className="px-4 py-3 font-medium text-content-primary">
-                      {row.period}
-                    </td>
-                    <td className="px-4 py-3 text-center">
-                      {row.totalReservations}
-                    </td>
-                    <td className="px-4 py-3 text-center">
-                      <Badge variant="success">{row.checkedIn}</Badge>
-                    </td>
-                    <td className="px-4 py-3 text-center">
-                      <Badge variant="error">{row.noShows}</Badge>
-                    </td>
-                    <td className="px-4 py-3 text-center">
-                      <Badge variant="warning">{row.lateArrivals}</Badge>
-                    </td>
-                    <td className="px-4 py-3 text-center">
-                      <span
-                        className={cn(
-                          "font-semibold",
-                          row.complianceRate >= 85
-                            ? "text-state-success-600"
-                            : row.complianceRate >= 70
-                              ? "text-state-warning-600"
-                              : "text-state-error-600",
-                        )}
-                      >
-                        {row.complianceRate}%
-                      </span>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        </Card>
-      </div>
-    </>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </Card>
+    </ReportPageLayout>
   );
 }

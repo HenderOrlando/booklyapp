@@ -17,7 +17,8 @@ export const REPORTS_REFERENCE_DATA: CreateReferenceDataDto[] = [
   { group: "feedback_category", code: "EQUIPMENT", name: "Equipamiento", order: 2, createdBy: "system" },
   { group: "feedback_category", code: "CLEANLINESS", name: "Limpieza", order: 3, createdBy: "system" },
   { group: "feedback_category", code: "AVAILABILITY", name: "Disponibilidad", order: 4, createdBy: "system" },
-  { group: "feedback_category", code: "OTHER", name: "Otro", order: 5, createdBy: "system" },
+  { group: "feedback_category", code: "ACCESSIBILITY", name: "Accesibilidad", order: 5, createdBy: "system" },
+  { group: "feedback_category", code: "OTHER", name: "Otro", order: 6, createdBy: "system" },
 
   // ─── feedback_sentiment ───
   { group: "feedback_sentiment", code: "POSITIVE", name: "Positivo", color: "#4CAF50", order: 0, createdBy: "system" },

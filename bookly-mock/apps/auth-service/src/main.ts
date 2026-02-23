@@ -77,8 +77,8 @@ async function bootstrap() {
   app.enableShutdownHooks();
 
   // Start server
-  const port = process.env.AUTH_PORT || 3001;
-  await app.listen(port);
+  const port = process.env.PORT || process.env.AUTH_PORT || 3001;
+  await app.listen(port, "0.0.0.0");
 
   logger.info(`Auth Service started on port ${port}`);
   logger.info(`Swagger docs available at http://localhost:${port}/api/docs`);

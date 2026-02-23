@@ -75,11 +75,11 @@ async function bootstrap() {
   SwaggerModule.setup("api/docs", app, document);
 
   // Start server
-  const port = process.env.STOCKPILE_PORT || 3004;
+  const port = process.env.PORT || process.env.STOCKPILE_PORT || 3004;
   // Habilitar shutdown graceful para todos los providers (EventBus, Redis, DB)
   app.enableShutdownHooks();
 
-  await app.listen(port);
+  await app.listen(port, "0.0.0.0");
 
   logger.info(`Stockpile Service started on port ${port}`);
   logger.info(`Swagger docs available at http://localhost:${port}/api/docs`);

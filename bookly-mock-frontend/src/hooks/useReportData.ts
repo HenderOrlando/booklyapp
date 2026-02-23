@@ -6,7 +6,7 @@
 
 import { ReportsClient } from "@/infrastructure/api/reports-client";
 import { httpClient } from "@/infrastructure/http/httpClient";
-import type { DashboardData } from "@/types/entities/report";
+import type { DashboardData, UserReport } from "@/types/entities/report";
 import { useQuery } from "@tanstack/react-query";
 
 export const reportKeys = {
@@ -184,13 +184,36 @@ export function useReportByResource(filters?: ReportFilters) {
 }
 
 export function useReportByUser(filters?: ReportFilters) {
-  return useQuery<unknown[]>({
+  return useQuery<UserReport[]>({
     queryKey: reportKeys.byUser(filters),
     queryFn: async () => {
       const response = await httpClient.get("user-reports", {
         params: filters,
       });
-      return extractItems(response.data);
+      const items = extractItems(response.data) as Record<string, unknown>[];
+      return items.map((item) => ({
+        id: String(item.id ?? ""),
+        type: "USER" as const,
+        userId: String(item.userId ?? item.id ?? ""),
+        userName: String(item.userName ?? item.name ?? "Sin nombre"),
+        period: (item.period as UserReport["period"]) ?? "CUSTOM",
+        startDate: String(item.startDate ?? ""),
+        endDate: String(item.endDate ?? ""),
+        totalReservations: Number(item.totalReservations ?? 0),
+        totalHours: Number(item.totalHours ?? 0),
+        cancelledReservations: Number(item.cancelledReservations ?? 0),
+        noShowCount: Number(item.noShowCount ?? 0),
+        favoriteResources: Array.isArray(item.favoriteResources)
+          ? item.favoriteResources
+          : [],
+        reservationsByStatus: (item.reservationsByStatus as UserReport["reservationsByStatus"]) ?? {
+          pending: 0,
+          confirmed: 0,
+          completed: 0,
+          cancelled: 0,
+        },
+        createdAt: String(item.createdAt ?? new Date().toISOString()),
+      }));
     },
     staleTime: 1000 * 60 * 5,
   });

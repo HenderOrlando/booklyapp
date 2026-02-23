@@ -1,0 +1,85 @@
+name: GCP Manual Cleanup (Cloud Run)
+
+on:
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Environment to clean up (e.g., production, staging)'
+        required: true
+        default: 'staging'
+        type: choice
+        options:
+          - staging
+          - production
+      delete_images:
+        description: 'Delete images from Artifact Registry? (Warning: deletes all versions of the images)'
+        required: true
+        default: false
+        type: boolean
+
+env:
+  PROJECT_ID: ${{ secrets.GCP_PROJECT_ID }}
+  REGION: us-central1
+  GAR_LOCATION: us-central1
+  REPOSITORY: bookly-repo
+
+jobs:
+  cleanup-services:
+    name: Clean up ${{ matrix.service.name }}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        service:
+          - name: api-gateway
+          - name: auth-service
+          - name: availability-service
+          - name: resources-service
+          - name: reports-service
+          - name: stockpile-service
+          - name: bookly-web
+
+    permissions:
+      contents: 'read'
+      id-token: 'write'
+
+    steps:
+      - name: Google Auth
+        id: auth
+        uses: google-github-actions/auth@v2
+        with:
+          workload_identity_provider: '${{ secrets.GCP_WIF_PROVIDER }}'
+          service_account: '${{ secrets.GCP_SA_EMAIL }}'
+
+      - name: Set up Cloud SDK
+        uses: google-github-actions/setup-gcloud@v2
+
+      - name: Delete Cloud Run Service
+        run: |
+          SERVICE_NAME="${{ matrix.service.name }}-${{ inputs.environment }}"
+          echo "Attempting to delete Cloud Run service: $SERVICE_NAME"
+          
+          if gcloud run services describe $SERVICE_NAME --region=${{ env.REGION }} > /dev/null 2>&1; then
+            gcloud run services delete $SERVICE_NAME \
+              --region=${{ env.REGION }} \
+              --quiet
+            echo "✅ Service $SERVICE_NAME deleted successfully."
+          else
+            echo "ℹ️ Service $SERVICE_NAME does not exist or already deleted."
+          fi
+
+      - name: Delete Images from Artifact Registry
+        if: ${{ inputs.delete_images == true }}
+        run: |
+          PACKAGE_NAME="${{ matrix.service.name }}"
+          echo "Attempting to delete package $PACKAGE_NAME from Artifact Registry..."
+          
+          if gcloud artifacts packages describe $PACKAGE_NAME --repository=${{ env.REPOSITORY }} --location=${{ env.GAR_LOCATION }} > /dev/null 2>&1; then
+            gcloud artifacts packages delete $PACKAGE_NAME \
+              --repository=${{ env.REPOSITORY }} \
+              --location=${{ env.GAR_LOCATION }} \
+              --quiet
+            echo "✅ Package $PACKAGE_NAME deleted successfully."
+          else
+            echo "ℹ️ Package $PACKAGE_NAME does not exist or already deleted."
+          fi

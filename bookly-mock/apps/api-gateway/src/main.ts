@@ -82,7 +82,7 @@ async function bootstrap() {
   SwaggerModule.setup("api/docs", app, document);
 
   // Start server
-  const port = process.env.GATEWAY_PORT || 3000;
+  const port = process.env.PORT || process.env.GATEWAY_PORT || 3000;
 
   // Endpoint to list all service docs (JSON)
   const httpAdapter = app.getHttpAdapter();
@@ -136,7 +136,7 @@ async function bootstrap() {
 
   // Habilitar shutdown graceful para todos los providers (EventBus, Redis, DB)
   app.enableShutdownHooks();
-  await app.listen(port);
+  await app.listen(port, "0.0.0.0");
 
   logger.info(`API Gateway started on port ${port}`);
   logger.info(`Swagger docs available at http://localhost:${port}/api/docs`);

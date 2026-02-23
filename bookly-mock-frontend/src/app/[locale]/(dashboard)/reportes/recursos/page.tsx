@@ -1,66 +1,75 @@
 "use client";
 
-import { ReportFilters } from "@/components/molecules/ReportFilters";
-import { ExportPanel } from "@/components/organisms/ExportPanel";
+import { ReportPageLayout } from "@/components/templates/ReportPageLayout";
 import { ResourceUtilizationChart } from "@/components/organisms/ResourceUtilizationChart";
 import { useReportByResource } from "@/hooks/useReportData";
 import { useReportExport } from "@/hooks/useReportExport";
 import { useReportFilters } from "@/hooks/useReportFilters";
 import { mockResourceUtilization } from "@/infrastructure/mock/data";
 import type { ResourceUtilization } from "@/types/entities/report";
+import { BarChart3, Percent, TrendingUp } from "lucide-react";
 import { useTranslations } from "next-intl";
 
 export default function ReportesRecursosPage() {
   const t = useTranslations("reports");
   const { filters, setFilters } = useReportFilters();
   const { exportReport } = useReportExport();
-  const { data: serverData } = useReportByResource();
+  const { data: serverData, isLoading, error } = useReportByResource(filters);
   const resourceData: ResourceUtilization[] =
-    (serverData as ResourceUtilization[]) &&
-    (serverData as ResourceUtilization[]).length > 0
+    Array.isArray(serverData) && serverData.length > 0
       ? (serverData as ResourceUtilization[])
       : mockResourceUtilization;
 
-  const handleExport = (format: "csv" | "excel" | "pdf", _options: any) => {
-    exportReport({ format, data: resourceData, filename: "recursos" });
+  const avgOccupancy =
+    resourceData.length > 0
+      ? (
+          resourceData.reduce((sum, r) => sum + r.occupancyRate, 0) /
+          resourceData.length
+        ).toFixed(1)
+      : "0.0";
+  const totalRequests = resourceData.reduce(
+    (sum, r) => sum + r.totalRequests,
+    0,
+  );
+
+  const handleExport = (format: "csv" | "excel" | "pdf") => {
+    exportReport({ format, data: resourceData, filename: "reporte-recursos" });
   };
 
   return (
-    <>
-      <div className="space-y-6">
-        <div className="flex items-center justify-between">
-          <div>
-            <h1 className="text-3xl font-bold text-[var(--color-text-primary)] dark:text-[var(--color-text-primary)]">
-              {t("resources_title")}
-            </h1>
-            <p className="text-[var(--color-text-secondary)] dark:text-[var(--color-text-tertiary)] mt-1">
-              {t("resources_desc")}
-            </p>
-          </div>
-        </div>
-
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          <div className="lg:col-span-2 space-y-6">
-            <ReportFilters
-              filters={filters}
-              onFiltersChange={setFilters}
-              categories={[]}
-              programs={[]}
-              showDateRange
-            />
-
-            <ResourceUtilizationChart data={resourceData} />
-          </div>
-
-          <div>
-            <ExportPanel
-              onExport={handleExport}
-              title={t("export_resources_title")}
-              availableFormats={["csv", "excel", "pdf"]}
-            />
-          </div>
-        </div>
-      </div>
-    </>
+    <ReportPageLayout
+      title={t("resources_title")}
+      description={t("resources_desc")}
+      filters={filters}
+      onFiltersChange={setFilters}
+      onExport={handleExport}
+      exportTitle={t("export_resources_title")}
+      loading={isLoading}
+      error={error ? String(error) : null}
+      isEmpty={resourceData.length === 0}
+      kpiColumns={3}
+      kpis={[
+        {
+          label: t("total_resources"),
+          value: resourceData.length,
+          icon: <BarChart3 className="h-5 w-5 text-[var(--color-action-primary)]" />,
+          iconBgClass: "bg-[var(--color-action-primary)]/10",
+        },
+        {
+          label: t("avg_occupancy"),
+          value: `${avgOccupancy}%`,
+          icon: <Percent className="h-5 w-5 text-[var(--color-action-secondary)]" />,
+          iconBgClass: "bg-[var(--color-action-secondary)]/10",
+        },
+        {
+          label: t("total_requests"),
+          value: totalRequests,
+          icon: <TrendingUp className="h-5 w-5 text-[var(--color-state-success-text)]" />,
+          iconBgClass: "bg-[var(--color-state-success-bg)]",
+        },
+      ]}
+    >
+      <ResourceUtilizationChart data={resourceData} />
+    </ReportPageLayout>
   );
 }
