@@ -1,4 +1,4 @@
-import { expect, test } from "@playwright/test";
+import { expect, test } from "../fixtures/base-test";
 
 test.describe("Login UI smoke", () => {
   test("login submit button is visible and clickable in light mode", async ({

@@ -1,14 +1,15 @@
-import { expect, test } from "@playwright/test";
+import { expect, test } from "../fixtures/base-test";
+import { authStatePath } from "../fixtures/test-users";
 
 test.describe("Waitlist E2E Flow", () => {
-  test.beforeEach(async ({ page }) => {
+  test.use({ storageState: authStatePath("admin") });
+
+  test("Allows user to join the waitlist when resource is unavailable", async ({ page }) => {
     // Ir a la página de recursos
     await page.goto("/es/recursos");
     // Seleccionar el primer recurso
     await page.getByText("Ver detalles").first().click();
-  });
 
-  test("Allows user to join the waitlist when resource is unavailable", async ({ page }) => {
     // 1. Simular intento de reserva en horario ocupado
     await page.getByRole("button", { name: /Reservar/i }).click();
     

@@ -10,6 +10,16 @@ import * as fs from "fs";
 import * as path from "path";
 import { AUTH_STATE_DIR, TEST_USERS } from "./fixtures/test-users";
 
+/**
+ * Playwright Global Setup
+ *
+ * Runs once before all tests.
+ * 1. Creates a browser context
+ * 2. Logs in with each test user role (admin, coordinador, profesor, etc.)
+ * 3. Saves the storage state (cookies, localStorage) for each role into files
+ *
+ * These state files are then used by individual tests to start already logged in.
+ */
 async function globalSetup(config: FullConfig) {
   const baseURL = config.projects[0]?.use?.baseURL || "http://localhost:4200";
 
@@ -25,12 +35,14 @@ async function globalSetup(config: FullConfig) {
     const page = await context.newPage();
 
     try {
+      // Login flow
       await page.goto(`${baseURL}/es/login`, { waitUntil: "networkidle" });
 
       await page.fill('[data-testid="login-email-input"]', creds.email);
       await page.fill('[data-testid="login-password-input"]', creds.password);
       await page.click('[data-testid="login-submit-btn"]');
 
+      // Esperar redirección exitosa
       await page.waitForURL(/dashboard/, { timeout: 15000 });
 
       const statePath = path.resolve(`${AUTH_STATE_DIR}/${role}.json`);

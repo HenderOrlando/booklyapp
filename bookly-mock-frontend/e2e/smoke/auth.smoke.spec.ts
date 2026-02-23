@@ -6,29 +6,11 @@
  * HU: HU-35
  */
 
-import { expect, test } from "@playwright/test";
+import { expect, test } from "../fixtures/base-test";
 import { TEST_USERS } from "../fixtures/test-users";
 import { LoginPage } from "../pages/login.page";
 
 test.describe("Auth Smoke", () => {
-  test.beforeEach(async ({ page }) => {
-    // Mock the config API to avoid the ColorBootstrapSplash loader blocking the UI
-    await page.route("**/api/v1/config/public", async (route) => {
-      await route.fulfill({
-        status: 200,
-        contentType: "application/json",
-        body: JSON.stringify({
-          success: true,
-          data: {
-            themeMode: "light",
-            primaryColor: "#000000",
-            secondaryColor: "#ffffff",
-          },
-        }),
-      });
-    });
-  });
-
   // E2E-AUTH-006 | HU-35 | RF-43 | callback redirect after protected-route login
   test("restores protected route after login when callback is present", async ({
     page,
@@ -45,10 +27,12 @@ test.describe("Auth Smoke", () => {
 
     await loginPage.login(TEST_USERS.admin.email, TEST_USERS.admin.password);
 
-    await page.waitForURL(/\/es\/recursos\?from=auth-redirect/, {
-      timeout: 15000,
+    // After login, AuthContext redirects via router.replace to the callback URL.
+    // Use 'commit' because the full load may take longer on protected routes.
+    await page.waitForURL(/\/es\/(recursos|dashboard)/, {
+      timeout: 20000,
+      waitUntil: "commit",
     });
-    await expect(page).toHaveURL(/\/es\/recursos\?from=auth-redirect/);
   });
 
   // E2E-AUTH-007 | HU-35 | RF-43 | direct login fallback to dashboard

@@ -1,0 +1,115 @@
+name: GCP Manual Deploy (Cloud Run with Autoscaling)
+
+on:
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Environment to deploy to (e.g., production, staging)'
+        required: true
+        default: 'production'
+        type: choice
+        options:
+          - staging
+          - production
+
+env:
+  PROJECT_ID: ${{ secrets.GCP_PROJECT_ID }}
+  REGION: us-central1
+  GAR_LOCATION: us-central1
+  REPOSITORY: bookly-repo
+
+jobs:
+  deploy-services:
+    name: Deploy ${{ matrix.service.name }}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        service:
+          - name: api-gateway
+            dockerfile: ci-cd/bookly-mock/dockerfiles/Dockerfile.gateway
+            context: bookly-mock
+            port: 3000
+          - name: auth-service
+            dockerfile: ci-cd/bookly-mock/dockerfiles/Dockerfile.auth
+            context: bookly-mock
+            port: 3001
+          - name: availability-service
+            dockerfile: ci-cd/bookly-mock/dockerfiles/Dockerfile.availability
+            context: bookly-mock
+            port: 3002
+          - name: resources-service
+            dockerfile: ci-cd/bookly-mock/dockerfiles/Dockerfile.resources
+            context: bookly-mock
+            port: 3003
+          - name: reports-service
+            dockerfile: ci-cd/bookly-mock/dockerfiles/Dockerfile.reports
+            context: bookly-mock
+            port: 3004
+          - name: stockpile-service
+            dockerfile: ci-cd/bookly-mock/dockerfiles/Dockerfile.stockpile
+            context: bookly-mock
+            port: 3005
+          - name: bookly-web
+            dockerfile: ci-cd/bookly-mock/dockerfiles/Dockerfile.web
+            context: bookly-mock-frontend
+            port: 3006
+
+    permissions:
+      contents: 'read'
+      id-token: 'write'
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Google Auth
+        id: auth
+        uses: google-github-actions/auth@v2
+        with:
+          workload_identity_provider: '${{ secrets.GCP_WIF_PROVIDER }}'
+          service_account: '${{ secrets.GCP_SA_EMAIL }}'
+
+      - name: Set up Cloud SDK
+        uses: google-github-actions/setup-gcloud@v2
+
+      - name: Docker Auth
+        run: |-
+          gcloud auth configure-docker ${{ env.GAR_LOCATION }}-docker.pkg.dev
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build and Push Docker Image
+        uses: docker/build-push-action@v5
+        env:
+          REGISTRY: ${{ env.GAR_LOCATION }}-docker.pkg.dev
+          IMG: ${{ env.PROJECT_ID }}/${{ env.REPOSITORY }}/${{ matrix.service.name }}
+        with:
+          context: ${{ matrix.service.context }}
+          file: ${{ matrix.service.dockerfile }}
+          push: true
+          tags: |
+            ${{ env.REGISTRY }}/${{ env.IMG }}:${{ github.sha }}
+            ${{ env.REGISTRY }}/${{ env.IMG }}:latest
+          cache-from: type=registry,ref=${{ env.REGISTRY }}/${{ env.IMG }}:buildcache
+          cache-to: type=registry,ref=${{ env.REGISTRY }}/${{ env.IMG }}:buildcache,mode=max
+
+      - name: Deploy to Cloud Run
+        uses: google-github-actions/deploy-cloudrun@v2
+        env:
+          REGISTRY: ${{ env.GAR_LOCATION }}-docker.pkg.dev
+          IMG: ${{ env.PROJECT_ID }}/${{ env.REPOSITORY }}/${{ matrix.service.name }}
+        with:
+          service: ${{ matrix.service.name }}-${{ inputs.environment }}
+          image: ${{ env.REGISTRY }}/${{ env.IMG }}:${{ github.sha }}
+          region: ${{ env.REGION }}
+          flags: >
+            --port=${{ matrix.service.port }}
+            --allow-unauthenticated
+            --min-instances=1
+            --max-instances=10
+            --cpu-boost
+            --cpu=2
+            --memory=1024Mi
+            --concurrency=80

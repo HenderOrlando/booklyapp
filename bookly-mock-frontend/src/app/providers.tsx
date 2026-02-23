@@ -129,7 +129,7 @@ function hexToHslToken(hexColor: string): string {
   return `${normalizedHue} ${normalizedSaturation}% ${normalizedLightness}%`;
 }
 
-function ColorBootstrapSplash() {
+function _ColorBootstrapSplash() {
   return (
     <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-[var(--color-bg-app)]">
       <div className="pointer-events-none absolute inset-0 overflow-hidden">
@@ -184,8 +184,8 @@ function ColorBootstrapSplash() {
 function AppConfigColorVariables({ children }: AppConfigColorVariablesProps) {
   const {
     data: publicConfig,
-    isLoading: isPublicConfigLoading,
-    isFetching: isPublicConfigFetching,
+    isLoading: _isPublicConfigLoading,
+    isFetching: _isPublicConfigFetching,
   } = usePublicConfig();
 
   const runtimeStyles = React.useMemo(() => {
@@ -254,22 +254,6 @@ function AppConfigColorVariables({ children }: AppConfigColorVariablesProps) {
 }
 `;
   }, [publicConfig?.primaryColor, publicConfig?.secondaryColor]);
-
-  const isBootstrappingColors =
-    !publicConfig && (isPublicConfigLoading || isPublicConfigFetching);
-
-  if (isBootstrappingColors) {
-    return (
-      <>
-        <style
-          id="app-config-color-variables"
-          suppressHydrationWarning
-          dangerouslySetInnerHTML={{ __html: runtimeStyles }}
-        />
-        <ColorBootstrapSplash />
-      </>
-    );
-  }
 
   return (
     <>

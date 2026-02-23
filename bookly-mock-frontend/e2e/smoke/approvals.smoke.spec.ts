@@ -6,7 +6,7 @@
  * HU: HU-17
  */
 
-import { expect, test } from "@playwright/test";
+import { expect, test } from "../fixtures/base-test";
 import { authStatePath } from "../fixtures/test-users";
 
 test.describe("Approvals Smoke", () => {
@@ -39,6 +39,9 @@ test.describe("Approvals Smoke", () => {
   test("approval detail shows action buttons", async ({ page }) => {
     await page.goto("/es/aprobaciones/apr_001");
     await page.waitForLoadState("networkidle");
+
+    // Wait for the main container to be visible so we know the loader is gone
+    await expect(page.locator("main").first()).toBeVisible({ timeout: 15000 });
 
     const approveBtn = page.locator("button").filter({ hasText: /aprobar/i });
     const rejectBtn = page.locator("button").filter({ hasText: /rechazar/i });

@@ -77,7 +77,7 @@ jobs:
             podman run -d \
               --name bookly-availability-service \
               --restart unless-stopped \
-              -p ${PORT_3}:3003 \
+              -p 1066:3003 \
               --network bookly-network \
               $ENV_FILE_OPTION \
               "$IMAGE"
