@@ -6,7 +6,7 @@
  * HU: HU-01, HU-02
  */
 
-import { expect, test } from "@playwright/test";
+import { expect, test } from "../fixtures/base-test";
 import { authStatePath } from "../fixtures/test-users";
 
 test.describe("Resources Smoke", () => {

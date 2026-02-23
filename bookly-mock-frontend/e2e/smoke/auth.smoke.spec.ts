@@ -6,7 +6,7 @@
  * HU: HU-35
  */
 
-import { expect, test } from "@playwright/test";
+import { expect, test } from "../fixtures/base-test";
 import { TEST_USERS } from "../fixtures/test-users";
 import { LoginPage } from "../pages/login.page";
 

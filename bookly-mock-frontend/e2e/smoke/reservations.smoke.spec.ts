@@ -6,7 +6,7 @@
  * HU: HU-09, HU-11
  */
 
-import { expect, test } from "@playwright/test";
+import { expect, test } from "../fixtures/base-test";
 import { authStatePath } from "../fixtures/test-users";
 
 test.describe("Reservations Smoke", () => {
