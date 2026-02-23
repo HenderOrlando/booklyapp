@@ -25,7 +25,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        service: 
+        service:
           - name: api-gateway
             dockerfile: ci-cd/bookly-mock/dockerfiles/Dockerfile.gateway
             context: bookly-mock
@@ -82,21 +82,27 @@ jobs:
 
       - name: Build and Push Docker Image
         uses: docker/build-push-action@v5
+        env:
+          REGISTRY: ${{ env.GAR_LOCATION }}-docker.pkg.dev
+          IMG: ${{ env.PROJECT_ID }}/${{ env.REPOSITORY }}/${{ matrix.service.name }}
         with:
           context: ${{ matrix.service.context }}
           file: ${{ matrix.service.dockerfile }}
           push: true
           tags: |
-            ${{ env.GAR_LOCATION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.REPOSITORY }}/${{ matrix.service.name }}:${{ github.sha }}
-            ${{ env.GAR_LOCATION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.REPOSITORY }}/${{ matrix.service.name }}:latest
-          cache-from: type=registry,ref=${{ env.GAR_LOCATION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.REPOSITORY }}/${{ matrix.service.name }}:buildcache
-          cache-to: type=registry,ref=${{ env.GAR_LOCATION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.REPOSITORY }}/${{ matrix.service.name }}:buildcache,mode=max
+            ${{ env.REGISTRY }}/${{ env.IMG }}:${{ github.sha }}
+            ${{ env.REGISTRY }}/${{ env.IMG }}:latest
+          cache-from: type=registry,ref=${{ env.REGISTRY }}/${{ env.IMG }}:buildcache
+          cache-to: type=registry,ref=${{ env.REGISTRY }}/${{ env.IMG }}:buildcache,mode=max
 
       - name: Deploy to Cloud Run
         uses: google-github-actions/deploy-cloudrun@v2
+        env:
+          REGISTRY: ${{ env.GAR_LOCATION }}-docker.pkg.dev
+          IMG: ${{ env.PROJECT_ID }}/${{ env.REPOSITORY }}/${{ matrix.service.name }}
         with:
           service: ${{ matrix.service.name }}-${{ inputs.environment }}
-          image: ${{ env.GAR_LOCATION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.REPOSITORY }}/${{ matrix.service.name }}:${{ github.sha }}
+          image: ${{ env.REGISTRY }}/${{ env.IMG }}:${{ github.sha }}
           region: ${{ env.REGION }}
           flags: >
             --port=${{ matrix.service.port }}

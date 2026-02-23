@@ -23,7 +23,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        service: 
+        service:
           - name: api-gateway
             dockerfile: ci-cd/bookly-mock/dockerfiles/Dockerfile.gateway
             context: bookly-mock

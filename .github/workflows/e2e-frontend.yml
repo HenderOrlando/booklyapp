@@ -24,7 +24,9 @@ permissions:
 
 jobs:
   e2e-smoke:
-    if: github.event_name == 'pull_request' || (github.event_name == 'workflow_dispatch' && (inputs.suite == 'smoke' || inputs.suite == 'all'))
+    if: >
+      github.event_name == 'pull_request' ||
+      (github.event_name == 'workflow_dispatch' && (inputs.suite == 'smoke' || inputs.suite == 'all'))
     runs-on: ubuntu-latest
     timeout-minutes: 15
     steps:
@@ -53,7 +55,9 @@ jobs:
           retention-days: 7
 
   e2e-regression:
-    if: github.event_name == 'schedule' || (github.event_name == 'workflow_dispatch' && (inputs.suite == 'regression' || inputs.suite == 'all'))
+    if: >
+      github.event_name == 'schedule' ||
+      (github.event_name == 'workflow_dispatch' && (inputs.suite == 'regression' || inputs.suite == 'all'))
     runs-on: ubuntu-latest
     timeout-minutes: 45
     steps:
@@ -84,7 +88,9 @@ jobs:
           retention-days: 30
 
   e2e-visual:
-    if: github.event_name == 'schedule' || (github.event_name == 'workflow_dispatch' && (inputs.suite == 'visual' || inputs.suite == 'all'))
+    if: >
+      github.event_name == 'schedule' ||
+      (github.event_name == 'workflow_dispatch' && (inputs.suite == 'visual' || inputs.suite == 'all'))
     runs-on: ubuntu-latest
     timeout-minutes: 15
     steps:
