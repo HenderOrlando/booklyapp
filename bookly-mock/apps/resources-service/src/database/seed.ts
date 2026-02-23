@@ -1,4 +1,4 @@
-import { createLogger } from "@libs/common";
+import { createLogger, SEED_IDS } from "@libs/common";
 import {
   CategoryType,
   MaintenanceStatus,
@@ -54,6 +54,8 @@ async function seed() {
       await categoryModel.deleteMany({});
       await maintenanceModel.deleteMany({});
       await programModel.deleteMany({});
+      await facultyModel.deleteMany({});
+      await departmentModel.deleteMany({});
     } else if (process.env.NODE_ENV === "development") {
       logger.info(
         "ℹ️ Modo desarrollo detectado. Usar --clean para limpiar DB antes del seed.",
@@ -72,19 +74,20 @@ async function seed() {
       `✅ ${RESOURCES_REFERENCE_DATA.length} datos de referencia procesados (upsert)`,
     );
 
-    // IDs fijos para consistencia cross-service (según SEED_IDS_REFERENCE.md)
-    const ADMIN_GENERAL_ID = "507f1f77bcf86cd799439022";
-    const COORDINADOR_SISTEMAS_ID = "507f1f77bcf86cd799439021";
-    const COORDINADOR_INDUSTRIAL_ID = "507f1f77bcf86cd799439026";
+    // IDs fijos para consistencia cross-service (desde SEED_IDS)
+    const ADMIN_GENERAL_ID = SEED_IDS.ADMIN_GENERAL_ID;
+    const COORDINADOR_SISTEMAS_ID = SEED_IDS.COORDINADOR_SISTEMAS_ID;
+    const COORDINADOR_INDUSTRIAL_ID = SEED_IDS.COORDINADOR_INDUSTRIAL_ID;
 
-    const FACULTAD_INGENIERIA_ID = "507f1f77bcf86cd799439051";
-    const DEPTO_SISTEMAS_ID = "507f1f77bcf86cd799439061";
-    const DEPTO_INDUSTRIAL_ID = "507f1f77bcf86cd799439062";
-    const DEPTO_ELECTRONICA_ID = "507f1f77bcf86cd799439063";
+    const FACULTAD_INGENIERIA_ID = SEED_IDS.FACULTAD_INGENIERIA_ID;
+    const DEPTO_SISTEMAS_ID = SEED_IDS.DEPTO_SISTEMAS_ID;
+    const DEPTO_INDUSTRIAL_ID = SEED_IDS.DEPTO_INDUSTRIAL_ID;
+    const DEPTO_ELECTRONICA_ID = SEED_IDS.DEPTO_ELECTRONICA_ID;
 
-    const PROGRAMA_SISTEMAS_ID = "507f1f77bcf86cd799439041";
-    const PROGRAMA_INDUSTRIAL_ID = "507f1f77bcf86cd799439042";
-    const PROGRAMA_ELECTRONICA_ID = "507f1f77bcf86cd799439043";
+    const PROGRAMA_SISTEMAS_ID = SEED_IDS.PROGRAMA_SISTEMAS_ID;
+    const PROGRAMA_INDUSTRIAL_ID = SEED_IDS.PROGRAMA_INDUSTRIAL_ID;
+    const PROGRAMA_ELECTRONICA_ID = SEED_IDS.PROGRAMA_ELECTRONICA_ID;
+    const TENANT_ID = SEED_IDS.TENANT_ID;
 
     // ── Facultades ──
     const faculties = [
@@ -96,6 +99,7 @@ async function seed() {
         ownerId: ADMIN_GENERAL_ID,
         ownerName: "Admin Principal",
         ownerEmail: "admin@ufps.edu.co",
+        tenantId: TENANT_ID,
         isActive: true,
         audit: { createdBy: ADMIN_GENERAL_ID, updatedBy: ADMIN_GENERAL_ID },
       },
@@ -121,6 +125,7 @@ async function seed() {
         ownerId: COORDINADOR_SISTEMAS_ID,
         ownerName: "Juan Docente",
         ownerEmail: "juan.docente@ufps.edu.co",
+        tenantId: TENANT_ID,
         isActive: true,
         audit: { createdBy: ADMIN_GENERAL_ID, updatedBy: ADMIN_GENERAL_ID },
       },
@@ -133,6 +138,7 @@ async function seed() {
         ownerId: COORDINADOR_INDUSTRIAL_ID,
         ownerName: "Pedro Coordinador",
         ownerEmail: "pedro.coordinador@ufps.edu.co",
+        tenantId: TENANT_ID,
         isActive: true,
         audit: { createdBy: ADMIN_GENERAL_ID, updatedBy: ADMIN_GENERAL_ID },
       },
@@ -145,6 +151,7 @@ async function seed() {
         ownerId: ADMIN_GENERAL_ID,
         ownerName: "Admin Principal",
         ownerEmail: "admin@ufps.edu.co",
+        tenantId: TENANT_ID,
         isActive: true,
         audit: { createdBy: ADMIN_GENERAL_ID, updatedBy: ADMIN_GENERAL_ID },
       },
@@ -176,6 +183,7 @@ async function seed() {
         departmentId: DEPTO_SISTEMAS_ID,
         faculty: "Facultad de Ingeniería",
         department: "Sistemas e Informática",
+        tenantId: TENANT_ID,
         isActive: true,
         audit: { createdBy: ADMIN_GENERAL_ID, updatedBy: ADMIN_GENERAL_ID },
       },
@@ -194,6 +202,7 @@ async function seed() {
         departmentId: DEPTO_INDUSTRIAL_ID,
         faculty: "Facultad de Ingeniería",
         department: "Industrial",
+        tenantId: TENANT_ID,
         isActive: true,
         audit: { createdBy: ADMIN_GENERAL_ID, updatedBy: ADMIN_GENERAL_ID },
       },
@@ -212,6 +221,7 @@ async function seed() {
         departmentId: DEPTO_ELECTRONICA_ID,
         faculty: "Facultad de Ingeniería",
         department: "Electrónica y Telecomunicaciones",
+        tenantId: TENANT_ID,
         isActive: true,
         audit: { createdBy: ADMIN_GENERAL_ID, updatedBy: ADMIN_GENERAL_ID },
       },
@@ -233,13 +243,15 @@ async function seed() {
       `✅ ${insertedPrograms.length} programas procesados (creados/actualizados)`,
     );
 
-    // Categorías
+    // Categorías con IDs fijos
     const categories = [
       {
+        _id: new Types.ObjectId(SEED_IDS.CATEGORIA_SALAS_ID),
         code: "CAT-CONF-ROOMS",
         name: "Salas de Conferencia",
         description: "Salas para conferencias y presentaciones",
         type: CategoryType.RESOURCE_TYPE,
+        tenantId: TENANT_ID,
         isActive: true,
         audit: {
           createdBy: "system",
@@ -247,10 +259,12 @@ async function seed() {
         },
       },
       {
+        _id: new Types.ObjectId(SEED_IDS.CATEGORIA_LABS_ID),
         code: "CAT-LABS",
         name: "Laboratorios",
         description: "Laboratorios de computación y prácticas",
         type: CategoryType.RESOURCE_TYPE,
+        tenantId: TENANT_ID,
         isActive: true,
         audit: {
           createdBy: "system",
@@ -258,10 +272,12 @@ async function seed() {
         },
       },
       {
+        _id: new Types.ObjectId(SEED_IDS.CATEGORIA_AUDITORIOS_ID),
         code: "CAT-AUDITORIUMS",
         name: "Auditorios",
         description: "Auditorios para eventos masivos",
         type: CategoryType.RESOURCE_TYPE,
+        tenantId: TENANT_ID,
         isActive: true,
         audit: {
           createdBy: "system",
@@ -269,10 +285,12 @@ async function seed() {
         },
       },
       {
+        _id: new Types.ObjectId(SEED_IDS.CATEGORIA_EQUIPOS_AV_ID),
         code: "CAT-AV-EQUIPMENT",
         name: "Equipos Audiovisuales",
         description: "Proyectores, parlantes, micrófonos",
         type: CategoryType.RESOURCE_TYPE,
+        tenantId: TENANT_ID,
         isActive: true,
         audit: {
           createdBy: "system",
@@ -293,12 +311,12 @@ async function seed() {
       insertedCategories.push(doc as Document & Category);
     }
 
-    // Recursos con reglas de disponibilidad
-    // Mapear IDs de categorías por nombre para facilitar referencia
+    // Recursos con IDs fijos y tenantId
     const catMap = new Map(insertedCategories.map((c) => [c.name, c._id]));
 
     const resources = [
       {
+        _id: new Types.ObjectId(SEED_IDS.RECURSO_AUDITORIO_ID),
         code: "RES-AUD-PRINCIPAL",
         name: "Auditorio Principal",
         description: "Auditorio principal con capacidad para 500 personas",
@@ -321,6 +339,7 @@ async function seed() {
           PROGRAMA_INDUSTRIAL_ID,
           PROGRAMA_ELECTRONICA_ID,
         ], // Usado por todos los programas
+        tenantId: TENANT_ID,
         isActive: true,
         status: ResourceStatus.AVAILABLE,
         availabilityRules: {
@@ -331,11 +350,12 @@ async function seed() {
           allowRecurring: true,
         },
         audit: {
-          createdBy: ADMIN_GENERAL_ID, // Admin crea recursos globales
+          createdBy: ADMIN_GENERAL_ID,
           updatedBy: ADMIN_GENERAL_ID,
         },
       },
       {
+        _id: new Types.ObjectId(SEED_IDS.RECURSO_LAB_SIS_1_ID),
         code: "RES-LAB-SIS-1",
         name: "Laboratorio de Sistemas 1",
         description: "Laboratorio de computación con 30 equipos",
@@ -354,6 +374,7 @@ async function seed() {
           ],
         },
         programIds: [PROGRAMA_SISTEMAS_ID], // Solo para Sistemas
+        tenantId: TENANT_ID,
         isActive: true,
         status: ResourceStatus.AVAILABLE,
         availabilityRules: {
@@ -364,11 +385,12 @@ async function seed() {
           allowRecurring: true,
         },
         audit: {
-          createdBy: COORDINADOR_SISTEMAS_ID, // Coordinador crea recurso de su programa
+          createdBy: COORDINADOR_SISTEMAS_ID,
           updatedBy: COORDINADOR_SISTEMAS_ID,
         },
       },
       {
+        _id: new Types.ObjectId(SEED_IDS.RECURSO_SALA_CONF_A_ID),
         code: "RES-CONF-A",
         name: "Sala de Conferencias A",
         description: "Sala para reuniones y presentaciones pequeñas",
@@ -382,6 +404,7 @@ async function seed() {
           features: ["Proyector", "Videoconferencia", "Pizarra digital"],
         },
         programIds: [PROGRAMA_SISTEMAS_ID, PROGRAMA_INDUSTRIAL_ID], // Usado por Sistemas e Industrial
+        tenantId: TENANT_ID,
         isActive: true,
         status: ResourceStatus.AVAILABLE,
         availabilityRules: {
@@ -392,11 +415,12 @@ async function seed() {
           allowRecurring: true,
         },
         audit: {
-          createdBy: ADMIN_GENERAL_ID, // Admin crea recursos compartidos
+          createdBy: ADMIN_GENERAL_ID,
           updatedBy: ADMIN_GENERAL_ID,
         },
       },
       {
+        _id: new Types.ObjectId(SEED_IDS.RECURSO_PROYECTOR_1_ID),
         code: "RES-PROJ-PORT-1",
         name: "Proyector Portátil 1",
         description: "Proyector HD portátil con control remoto",
@@ -417,6 +441,7 @@ async function seed() {
           PROGRAMA_INDUSTRIAL_ID,
           PROGRAMA_ELECTRONICA_ID,
         ], // Disponible para todos los programas
+        tenantId: TENANT_ID,
         isActive: true,
         status: ResourceStatus.AVAILABLE,
         availabilityRules: {
@@ -427,12 +452,13 @@ async function seed() {
           allowRecurring: false,
         },
         audit: {
-          createdBy: ADMIN_GENERAL_ID, // Admin crea equipos compartidos
+          createdBy: ADMIN_GENERAL_ID,
           updatedBy: ADMIN_GENERAL_ID,
         },
       },
       // ── HU-01: Tipo CLASSROOM (aula regular) ──
       {
+        _id: new Types.ObjectId(SEED_IDS.RECURSO_AULA_201_ID),
         code: "RES-AULA-201",
         name: "Aula 201",
         description: "Aula de clases estándar con capacidad para 40 estudiantes",
@@ -446,6 +472,7 @@ async function seed() {
           features: ["Tablero acrílico", "Proyector fijo", "Aire acondicionado"],
         },
         programIds: [PROGRAMA_SISTEMAS_ID, PROGRAMA_INDUSTRIAL_ID],
+        tenantId: TENANT_ID,
         isActive: true,
         status: ResourceStatus.AVAILABLE,
         availabilityRules: {
@@ -462,6 +489,7 @@ async function seed() {
       },
       // ── HU-03/HU-08: Recurso en MANTENIMIENTO ──
       {
+        _id: new Types.ObjectId(SEED_IDS.RECURSO_LAB_ELE_1_ID),
         code: "RES-LAB-ELE-1",
         name: "Laboratorio de Electrónica 1",
         description: "Laboratorio de circuitos y electrónica básica - EN MANTENIMIENTO",
@@ -479,6 +507,7 @@ async function seed() {
           ],
         },
         programIds: [PROGRAMA_ELECTRONICA_ID],
+        tenantId: TENANT_ID,
         isActive: true,
         status: ResourceStatus.MAINTENANCE, // En mantenimiento
         availabilityRules: {
@@ -495,6 +524,7 @@ async function seed() {
       },
       // ── HU-03: Recurso NO DISPONIBLE (deshabilitado) ──
       {
+        _id: new Types.ObjectId(SEED_IDS.RECURSO_AUD_ANTIGUO_ID),
         code: "RES-AUD-ANTIGUO",
         name: "Auditorio Antiguo",
         description: "Auditorio fuera de servicio por remodelación",
@@ -508,6 +538,7 @@ async function seed() {
           features: ["En remodelación"],
         },
         programIds: [],
+        tenantId: TENANT_ID,
         isActive: false, // Deshabilitado
         status: ResourceStatus.UNAVAILABLE, // No disponible
         availabilityRules: {

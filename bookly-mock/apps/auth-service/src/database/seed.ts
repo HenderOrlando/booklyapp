@@ -1,9 +1,9 @@
-import { createLogger } from "@libs/common";
+import { createLogger, SEED_IDS } from "@libs/common";
 import { ReferenceDataRepository } from "@libs/database";
 import { NestFactory } from "@nestjs/core";
 import { getModelToken } from "@nestjs/mongoose";
 import * as bcrypt from "bcryptjs";
-import { Model } from "mongoose";
+import { Model, Types } from "mongoose";
 import { AuthModule } from "../auth.module";
 import { Permission } from "../infrastructure/schemas/permission.schema";
 import { Role } from "../infrastructure/schemas/role.schema";
@@ -105,12 +105,9 @@ async function seedUsers(
 ) {
   logger.info("👤 Sembrando usuarios...");
 
-  // IDs fijos para consistencia cross-service (según SEED_IDS_REFERENCE.md)
-  const PROGRAMA_SISTEMAS_ID = "507f1f77bcf86cd799439041";
-  const PROGRAMA_INDUSTRIAL_ID = "507f1f77bcf86cd799439042";
-
   const users = [
     {
+      _id: new Types.ObjectId(SEED_IDS.ADMIN_GENERAL_ID),
       email: "admin@ufps.edu.co",
       password: defaultPasswordHash,
       firstName: "Admin",
@@ -119,12 +116,13 @@ async function seedUsers(
       documentNumber: "1000000001",
       phone: "+573001234567",
       roles: ["GENERAL_ADMIN"],
-      programId: undefined, // Admin general no pertenece a programa específico
-      coordinatedProgramId: undefined, // No coordina ningún programa
+      programId: undefined,
+      coordinatedProgramId: undefined,
       isActive: true,
       isEmailVerified: true,
     },
     {
+      _id: new Types.ObjectId(SEED_IDS.ADMIN_TI_ID),
       email: "admin.ti@ufps.edu.co",
       password: defaultPasswordHash,
       firstName: "Admin",
@@ -133,12 +131,13 @@ async function seedUsers(
       documentNumber: "1000000002",
       phone: "+573001234568",
       roles: ["GENERAL_ADMIN"],
-      programId: undefined, // Admin TI no pertenece a programa específico
+      programId: undefined,
       coordinatedProgramId: undefined,
       isActive: true,
       isEmailVerified: true,
     },
     {
+      _id: new Types.ObjectId(SEED_IDS.COORDINADOR_SISTEMAS_ID),
       email: "juan.docente@ufps.edu.co",
       password: defaultPasswordHash,
       firstName: "Juan",
@@ -147,12 +146,13 @@ async function seedUsers(
       documentNumber: "1000000003",
       phone: "+573001234569",
       roles: ["TEACHER", "PROGRAM_ADMIN"], // Es docente Y coordinador
-      programId: PROGRAMA_SISTEMAS_ID, // Pertenece a Sistemas
-      coordinatedProgramId: PROGRAMA_SISTEMAS_ID, // Coordina Sistemas
+      programId: SEED_IDS.PROGRAMA_SISTEMAS_ID,
+      coordinatedProgramId: SEED_IDS.PROGRAMA_SISTEMAS_ID,
       isActive: true,
       isEmailVerified: true,
     },
     {
+      _id: new Types.ObjectId(SEED_IDS.ESTUDIANTE_MARIA_ID),
       email: "maria.estudiante@ufps.edu.co",
       password: defaultPasswordHash,
       firstName: "María",
@@ -161,12 +161,13 @@ async function seedUsers(
       documentNumber: "1000000004",
       phone: "+573001234570",
       roles: ["STUDENT"],
-      programId: PROGRAMA_SISTEMAS_ID, // Pertenece a Sistemas
-      coordinatedProgramId: undefined, // No coordina
+      programId: SEED_IDS.PROGRAMA_SISTEMAS_ID,
+      coordinatedProgramId: undefined,
       isActive: true,
       isEmailVerified: true,
     },
     {
+      _id: new Types.ObjectId(SEED_IDS.STAFF_VIGILANTE_ID),
       email: "vigilante@ufps.edu.co",
       password: defaultPasswordHash,
       firstName: "Jorge",
@@ -175,12 +176,13 @@ async function seedUsers(
       documentNumber: "1000000005",
       phone: "+573001234571",
       roles: ["SECURITY"],
-      programId: undefined, // Personal no pertenece a programa
+      programId: undefined,
       coordinatedProgramId: undefined,
       isActive: true,
       isEmailVerified: true,
     },
     {
+      _id: new Types.ObjectId(SEED_IDS.STAFF_ANA_ID),
       email: "staff@ufps.edu.co",
       password: defaultPasswordHash,
       firstName: "Ana",
@@ -189,12 +191,13 @@ async function seedUsers(
       documentNumber: "1000000006",
       phone: "+573001234572",
       roles: ["ADMINISTRATIVE_STAFF"],
-      programId: undefined, // Personal no pertenece a programa
+      programId: undefined,
       coordinatedProgramId: undefined,
       isActive: true,
       isEmailVerified: true,
     },
     {
+      _id: new Types.ObjectId(SEED_IDS.COORDINADOR_INDUSTRIAL_ID),
       email: "pedro.coordinador@ufps.edu.co",
       password: defaultPasswordHash,
       firstName: "Pedro",
@@ -203,12 +206,13 @@ async function seedUsers(
       documentNumber: "1000000007",
       phone: "+573001234573",
       roles: ["TEACHER", "PROGRAM_ADMIN"],
-      programId: PROGRAMA_INDUSTRIAL_ID, // Pertenece a Industrial
-      coordinatedProgramId: PROGRAMA_INDUSTRIAL_ID, // Coordina Industrial
+      programId: SEED_IDS.PROGRAMA_INDUSTRIAL_ID,
+      coordinatedProgramId: SEED_IDS.PROGRAMA_INDUSTRIAL_ID,
       isActive: true,
       isEmailVerified: true,
     },
     {
+      _id: new Types.ObjectId(SEED_IDS.DOCENTE_AUXILIAR_ID),
       email: "auxiliar@ufps.edu.co",
       password: defaultPasswordHash,
       firstName: "Carlos",
@@ -217,12 +221,13 @@ async function seedUsers(
       documentNumber: "1000000008",
       phone: "+573001234574",
       roles: ["TEACHER"],
-      programId: PROGRAMA_SISTEMAS_ID, // Pertenece a Sistemas
-      coordinatedProgramId: undefined, // No coordina (es docente auxiliar)
+      programId: SEED_IDS.PROGRAMA_SISTEMAS_ID,
+      coordinatedProgramId: undefined,
       isActive: true,
       isEmailVerified: true,
     },
     {
+      _id: new Types.ObjectId(SEED_IDS.ESTUDIANTE_CARLOS_ID),
       email: "carlos.estudiante@ufps.edu.co",
       password: defaultPasswordHash,
       firstName: "Carlos",
@@ -231,13 +236,14 @@ async function seedUsers(
       documentNumber: "1000000009",
       phone: "+573001234575",
       roles: ["STUDENT"],
-      programId: PROGRAMA_INDUSTRIAL_ID, // Pertenece a Industrial
+      programId: SEED_IDS.PROGRAMA_INDUSTRIAL_ID,
       coordinatedProgramId: undefined,
       isActive: true,
       isEmailVerified: true,
     },
     // ── Casos edge: usuario deshabilitado (HU-33) ──
     {
+      _id: new Types.ObjectId(SEED_IDS.USUARIO_SUSPENDIDO_ID),
       email: "suspendido@ufps.edu.co",
       password: defaultPasswordHash,
       firstName: "Luis",
@@ -246,13 +252,14 @@ async function seedUsers(
       documentNumber: "1000000010",
       phone: "+573001234576",
       roles: ["STUDENT"],
-      programId: PROGRAMA_SISTEMAS_ID,
+      programId: SEED_IDS.PROGRAMA_SISTEMAS_ID,
       coordinatedProgramId: undefined,
       isActive: false, // Usuario suspendido/deshabilitado
       isEmailVerified: true,
     },
     // ── Caso edge: email no verificado (HU-35) ──
     {
+      _id: new Types.ObjectId(SEED_IDS.USUARIO_NO_VERIFICADO_ID),
       email: "nuevo.registro@ufps.edu.co",
       password: defaultPasswordHash,
       firstName: "Diana",
@@ -261,13 +268,14 @@ async function seedUsers(
       documentNumber: "1000000011",
       phone: "+573001234577",
       roles: ["STUDENT"],
-      programId: PROGRAMA_INDUSTRIAL_ID,
+      programId: SEED_IDS.PROGRAMA_INDUSTRIAL_ID,
       coordinatedProgramId: undefined,
       isActive: true,
       isEmailVerified: false, // Email pendiente de verificación
     },
     // ── Caso edge: 2FA habilitado (HU-37) ──
     {
+      _id: new Types.ObjectId(SEED_IDS.DOCENTE_2FA_ID),
       email: "seguro.docente@ufps.edu.co",
       password: defaultPasswordHash,
       firstName: "Roberto",
@@ -276,7 +284,7 @@ async function seedUsers(
       documentNumber: "1000000012",
       phone: "+573001234578",
       roles: ["TEACHER"],
-      programId: PROGRAMA_SISTEMAS_ID,
+      programId: SEED_IDS.PROGRAMA_SISTEMAS_ID,
       coordinatedProgramId: undefined,
       isActive: true,
       isEmailVerified: true,
@@ -297,7 +305,6 @@ async function seedUsers(
       .filter((id): id is string => id !== undefined);
 
     if (existingUser) {
-      // Actualizar datos si es necesario, pero preservar contraseña si no es la default
       await userModel.updateOne(
         { _id: existingUser._id },
         {
@@ -309,13 +316,13 @@ async function seedUsers(
           programId: userData.programId,
           coordinatedProgramId: userData.coordinatedProgramId,
           roles: userData.roles,
-          roleIds: roleIds, // Asignar ObjectIds de roles
+          roleIds: roleIds,
           isActive: userData.isActive,
           isEmailVerified: userData.isEmailVerified,
           isPhoneVerified: false,
           twoFactorEnabled: (userData as any).twoFactorEnabled || false,
           username,
-          tenantId: "UFPS",
+          tenantId: SEED_IDS.TENANT_ID,
         },
       );
       updatedCount++;
@@ -324,8 +331,8 @@ async function seedUsers(
         ...userData,
         username,
         isPhoneVerified: false,
-        tenantId: "UFPS",
-        roleIds: roleIds, // Asignar ObjectIds de roles
+        tenantId: SEED_IDS.TENANT_ID,
+        roleIds: roleIds,
         audit: {
           createdBy: "system",
           updatedBy: "system",

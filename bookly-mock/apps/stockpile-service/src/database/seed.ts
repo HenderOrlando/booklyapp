@@ -1,4 +1,4 @@
-import { createLogger } from "@libs/common";
+import { createLogger, SEED_IDS } from "@libs/common";
 import { ReferenceDataRepository } from "@libs/database";
 import { NestFactory } from "@nestjs/core";
 import { getModelToken } from "@nestjs/mongoose";
@@ -70,8 +70,8 @@ async function seed() {
       `✅ ${STOCKPILE_REFERENCE_DATA.length} datos de referencia procesados (upsert)`,
     );
 
-    // ObjectIds fijos para consistencia
-    const systemUserId = new Types.ObjectId("507f1f77bcf86cd799439000");
+    // ObjectIds fijos desde SEED_IDS
+    const systemUserId = new Types.ObjectId(SEED_IDS.SYSTEM_USER_ID);
 
     // Flujos de aprobación (RF-24)
     const approvalFlows = [
@@ -286,19 +286,14 @@ async function seed() {
     }
 
     // Solicitudes de aprobación (RF-20, RF-25)
-    // IDs fijos para consistencia cross-service (según SEED_IDS_REFERENCE.md)
-    const reservation1Id = new Types.ObjectId("507f1f77bcf86cd799439031");
-    const reservation2Id = new Types.ObjectId("507f1f77bcf86cd799439032");
-    const COORDINADOR_SISTEMAS_ID = new Types.ObjectId(
-      "507f1f77bcf86cd799439021",
-    );
-    const ESTUDIANTE_MARIA_ID = new Types.ObjectId("507f1f77bcf86cd799439023");
-    const ADMIN_GENERAL_ID = new Types.ObjectId("507f1f77bcf86cd799439022");
-
-    const COORDINADOR_INDUSTRIAL_ID = new Types.ObjectId(
-      "507f1f77bcf86cd799439026",
-    );
-    const PROGRAMA_SISTEMAS_ID = new Types.ObjectId("507f1f77bcf86cd799439041");
+    // IDs fijos desde SEED_IDS
+    const reservation1Id = new Types.ObjectId(SEED_IDS.RESERVA_COMPLETADA_ID);
+    const reservation2Id = new Types.ObjectId(SEED_IDS.RESERVA_PENDIENTE_ID);
+    const COORDINADOR_SISTEMAS_ID = new Types.ObjectId(SEED_IDS.COORDINADOR_SISTEMAS_ID);
+    const ESTUDIANTE_MARIA_ID = new Types.ObjectId(SEED_IDS.ESTUDIANTE_MARIA_ID);
+    const ADMIN_GENERAL_ID = new Types.ObjectId(SEED_IDS.ADMIN_GENERAL_ID);
+    const COORDINADOR_INDUSTRIAL_ID = new Types.ObjectId(SEED_IDS.COORDINADOR_INDUSTRIAL_ID);
+    const PROGRAMA_SISTEMAS_ID = new Types.ObjectId(SEED_IDS.PROGRAMA_SISTEMAS_ID);
 
     // Usamos el primer flow creado (Flujo Multi-nivel (Auditorios))
     const auditoriumFlowId = insertedFlows.find(f => f.name === "Flujo Multi-nivel (Auditorios)")?._id || insertedFlows[0]._id;
@@ -310,6 +305,7 @@ async function seed() {
     const approvalRequests = [
       // Solicitud aprobada
       {
+        _id: new Types.ObjectId(SEED_IDS.APPROVAL_REQ_APROBADA_ID),
         reservationId: reservation1Id,
         requesterId: COORDINADOR_SISTEMAS_ID,
         programId: PROGRAMA_SISTEMAS_ID, // Programa del recurso
@@ -339,6 +335,7 @@ async function seed() {
       },
       // Solicitud pendiente
       {
+        _id: new Types.ObjectId(SEED_IDS.APPROVAL_REQ_PENDIENTE_ID),
         reservationId: reservation2Id,
         requesterId: ESTUDIANTE_MARIA_ID,
         programId: PROGRAMA_SISTEMAS_ID,
@@ -351,7 +348,8 @@ async function seed() {
       },
       // ── CU-019: Solicitud RECHAZADA ──
       {
-        reservationId: new Types.ObjectId("507f1f77bcf86cd799439083"),
+        _id: new Types.ObjectId(SEED_IDS.APPROVAL_REQ_RECHAZADA_ID),
+        reservationId: new Types.ObjectId(SEED_IDS.RESERVA_RECHAZADA_ID),
         requesterId: ESTUDIANTE_MARIA_ID,
         programId: PROGRAMA_SISTEMAS_ID,
         approvalFlowId: auditoriumFlowId,
@@ -373,7 +371,8 @@ async function seed() {
       },
       // ── Solicitud EN REVISIÓN (en proceso) ──
       {
-        reservationId: new Types.ObjectId("507f1f77bcf86cd799439084"),
+        _id: new Types.ObjectId(SEED_IDS.APPROVAL_REQ_IN_REVIEW_ID),
+        reservationId: new Types.ObjectId(SEED_IDS.RESERVA_APROBADA_ID),
         requesterId: COORDINADOR_INDUSTRIAL_ID,
         programId: PROGRAMA_SISTEMAS_ID,
         approvalFlowId: auditoriumFlowId,
@@ -394,7 +393,8 @@ async function seed() {
       },
       // ── Solicitud CANCELADA ──
       {
-        reservationId: new Types.ObjectId("507f1f77bcf86cd799439085"),
+        _id: new Types.ObjectId(SEED_IDS.APPROVAL_REQ_CANCELADA_ID),
+        reservationId: new Types.ObjectId(SEED_IDS.RESERVA_CANCELADA_ID),
         requesterId: ESTUDIANTE_MARIA_ID,
         programId: PROGRAMA_SISTEMAS_ID,
         approvalFlowId: auditoriumFlowId,
@@ -423,8 +423,8 @@ async function seed() {
     }
 
     // Notificaciones (RF-22, RF-28) - Todos los canales, estados y tipos
-    const resourceAuditorioId = new Types.ObjectId("507f1f77bcf86cd799439011");
-    const resourceLabId = new Types.ObjectId("507f1f77bcf86cd799439012");
+    const resourceAuditorioId = new Types.ObjectId(SEED_IDS.RECURSO_AUDITORIO_ID);
+    const resourceLabId = new Types.ObjectId(SEED_IDS.RECURSO_LAB_SIS_1_ID);
 
     const notifications = [
       // EMAIL - SENT - APPROVAL
@@ -551,7 +551,7 @@ async function seed() {
     }
 
     // ── Check-in/Check-out Records (HU-23, RF-26) ──
-    const STAFF_VIGILANTE_ID = new Types.ObjectId("507f1f77bcf86cd799439024");
+    const STAFF_VIGILANTE_ID = new Types.ObjectId(SEED_IDS.STAFF_VIGILANTE_ID);
 
     const checkInOuts = [
       // Check-in + Check-out completado (reserva pasada)
@@ -578,8 +578,8 @@ async function seed() {
       },
       // Check-in sin check-out aún (reserva en progreso)
       {
-        reservationId: new Types.ObjectId("507f1f77bcf86cd799439035"),
-        resourceId: new Types.ObjectId("507f1f77bcf86cd799439013"),
+        reservationId: new Types.ObjectId(SEED_IDS.RESERVA_IN_PROGRESS_ID),
+        resourceId: new Types.ObjectId(SEED_IDS.RECURSO_SALA_CONF_A_ID),
         userId: COORDINADOR_SISTEMAS_ID,
         status: CheckInOutStatus.CHECKED_IN,
         checkInTime: new Date(new Date(today).setHours(7, 55, 0)),
@@ -594,7 +594,7 @@ async function seed() {
       },
       // Check-out tardío (LATE)
       {
-        reservationId: new Types.ObjectId("507f1f77bcf86cd799439036"),
+        reservationId: new Types.ObjectId(SEED_IDS.RESERVA_NO_SHOW_ID),
         resourceId: resourceLabId,
         userId: ESTUDIANTE_MARIA_ID,
         status: CheckInOutStatus.LATE,

@@ -1,4 +1,4 @@
-import { createLogger } from "@libs/common";
+import { createLogger, SEED_IDS } from "@libs/common";
 import { ReferenceDataRepository } from "@libs/database";
 import { NestFactory } from "@nestjs/core";
 import { getModelToken } from "@nestjs/mongoose";
@@ -64,18 +64,18 @@ async function seed() {
       `✅ ${REPORTS_REFERENCE_DATA.length} datos de referencia procesados (upsert)`,
     );
 
-    // ObjectIds fijos para consistencia
-    const systemUserId = new Types.ObjectId("507f1f77bcf86cd799439000");
-    const userDocenteId = new Types.ObjectId("507f1f77bcf86cd799439021");
-    const userEstudianteId = new Types.ObjectId("507f1f77bcf86cd799439023");
-    const userAdminId = new Types.ObjectId("507f1f77bcf86cd799439022");
+    // ObjectIds fijos desde SEED_IDS
+    const systemUserId = new Types.ObjectId(SEED_IDS.SYSTEM_USER_ID);
+    const userDocenteId = new Types.ObjectId(SEED_IDS.COORDINADOR_SISTEMAS_ID);
+    const userEstudianteId = new Types.ObjectId(SEED_IDS.ESTUDIANTE_MARIA_ID);
+    const userAdminId = new Types.ObjectId(SEED_IDS.ADMIN_GENERAL_ID);
 
-    const auditorioId = new Types.ObjectId("507f1f77bcf86cd799439011");
-    const laboratorioId = new Types.ObjectId("507f1f77bcf86cd799439012");
-    const salaId = new Types.ObjectId("507f1f77bcf86cd799439013");
+    const auditorioId = new Types.ObjectId(SEED_IDS.RECURSO_AUDITORIO_ID);
+    const laboratorioId = new Types.ObjectId(SEED_IDS.RECURSO_LAB_SIS_1_ID);
+    const salaId = new Types.ObjectId(SEED_IDS.RECURSO_SALA_CONF_A_ID);
 
-    const reservation1Id = new Types.ObjectId("507f1f77bcf86cd799439031");
-    const reservation2Id = new Types.ObjectId("507f1f77bcf86cd799439032");
+    const reservation1Id = new Types.ObjectId(SEED_IDS.RESERVA_COMPLETADA_ID);
+    const reservation2Id = new Types.ObjectId(SEED_IDS.RESERVA_NO_SHOW_ID);
 
     // Fechas
     const today = new Date();
@@ -120,7 +120,7 @@ async function seed() {
       {
         userId: userEstudianteId,
         userName: "Anónimo",
-        reservationId: new Types.ObjectId("507f1f77bcf86cd799439035"),
+        reservationId: new Types.ObjectId(SEED_IDS.RESERVA_APROBADA_ID),
         resourceId: salaId,
         resourceName: "Sala de Conferencias A",
         rating: 2,
@@ -137,7 +137,7 @@ async function seed() {
       {
         userId: userDocenteId,
         userName: "Juan Docente",
-        reservationId: new Types.ObjectId("507f1f77bcf86cd799439036"),
+        reservationId: new Types.ObjectId(SEED_IDS.RESERVA_IN_PROGRESS_ID),
         resourceId: auditorioId,
         resourceName: "Auditorio Principal",
         rating: 3,
@@ -154,7 +154,7 @@ async function seed() {
       {
         userId: userEstudianteId,
         userName: "María Estudiante",
-        reservationId: new Types.ObjectId("507f1f77bcf86cd799439037"),
+        reservationId: new Types.ObjectId(SEED_IDS.RESERVA_RECURRENTE_ID),
         resourceId: auditorioId,
         resourceName: "Auditorio Principal",
         rating: 4,
@@ -382,7 +382,7 @@ async function seed() {
         resourceId: auditorioId,
         resourceName: "Auditorio Principal",
         resourceType: "AUDITORIUM",
-        requestedBy: new Types.ObjectId("507f1f77bcf86cd799439026"),
+        requestedBy: new Types.ObjectId(SEED_IDS.COORDINADOR_INDUSTRIAL_ID),
         requesterName: "Pedro Coordinador",
         requesterEmail: "pedro.coordinador@ufps.edu.co",
         requestedDate: new Date(new Date(lastWeek).setDate(lastWeek.getDate() + 1)),
