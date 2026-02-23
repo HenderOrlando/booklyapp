@@ -151,10 +151,11 @@ export const VigilancePanel = React.memo<VigilancePanelProps>(
     // Filtros aplicados
     const filteredActive = React.useMemo(() => {
       return activeReservations.filter((res) => {
+        const search = searchQuery.toLowerCase();
         const matchesSearch =
-          res.userName.toLowerCase().includes(searchQuery.toLowerCase()) ||
-          res.resourceName.toLowerCase().includes(searchQuery.toLowerCase()) ||
-          res.reservationId.toLowerCase().includes(searchQuery.toLowerCase());
+          (res.userName?.toLowerCase() || "").includes(search) ||
+          (res.resourceName?.toLowerCase() || "").includes(search) ||
+          (res.reservationId?.toLowerCase() || "").includes(search);
         const matchesType = filterType === "all" || res.resourceType === filterType;
         return matchesSearch && matchesType;
       });
@@ -162,10 +163,11 @@ export const VigilancePanel = React.memo<VigilancePanelProps>(
 
     const filteredOverdue = React.useMemo(() => {
       return overdueReservations.filter((res) => {
+        const search = searchQuery.toLowerCase();
         const matchesSearch =
-          res.userName.toLowerCase().includes(searchQuery.toLowerCase()) ||
-          res.resourceName.toLowerCase().includes(searchQuery.toLowerCase()) ||
-          res.reservationId.toLowerCase().includes(searchQuery.toLowerCase());
+          (res.userName?.toLowerCase() || "").includes(search) ||
+          (res.resourceName?.toLowerCase() || "").includes(search) ||
+          (res.reservationId?.toLowerCase() || "").includes(search);
         const matchesType = filterType === "all" || res.resourceType === filterType;
         return matchesSearch && matchesType;
       });
@@ -173,10 +175,11 @@ export const VigilancePanel = React.memo<VigilancePanelProps>(
 
     const filteredApprovals = React.useMemo(() => {
       return todayApprovals.filter((req) => {
+        const search = searchQuery.toLowerCase();
         const matchesSearch =
-          req.userName.toLowerCase().includes(searchQuery.toLowerCase()) ||
-          req.resourceName.toLowerCase().includes(searchQuery.toLowerCase()) ||
-          req.reservationId.toLowerCase().includes(searchQuery.toLowerCase());
+          (req.userName?.toLowerCase() || "").includes(search) ||
+          (req.resourceName?.toLowerCase() || "").includes(search) ||
+          (req.reservationId?.toLowerCase() || "").includes(search);
         const matchesType = filterType === "all" || req.resourceType === filterType;
         return matchesSearch && matchesType;
       });
@@ -225,7 +228,7 @@ export const VigilancePanel = React.memo<VigilancePanelProps>(
                 <div className="flex flex-col items-end gap-1">
                   <Badge variant="primary">
                     <Clock className="h-3 w-3 mr-1" />
-                    {format(start, "HH:mm")}
+                    {Number.isNaN(start.getTime()) ? "N/A" : format(start, "HH:mm")}
                   </Badge>
                 </div>
               </div>
@@ -339,10 +342,10 @@ export const VigilancePanel = React.memo<VigilancePanelProps>(
                     </div>
                     <div>
                       <p className="text-sm font-semibold text-slate-800 dark:text-slate-200 truncate max-w-[120px]">
-                        {reservation.userName}
+                        {reservation.userName || t("unknown_user", { fallback: "Usuario Desconocido" })}
                       </p>
                       <p className="text-[10px] text-slate-500 truncate max-w-[120px]">
-                        {reservation.userEmail}
+                        {reservation.userEmail || "Sin email"}
                       </p>
                     </div>
                   </div>
@@ -356,7 +359,7 @@ export const VigilancePanel = React.memo<VigilancePanelProps>(
                     </div>
                     <div>
                       <p className="text-sm font-bold text-slate-800 dark:text-slate-200">
-                        {format(start, "HH:mm")} - {format(end, "HH:mm")}
+                        {Number.isNaN(start.getTime()) ? "N/A" : format(start, "HH:mm")} - {Number.isNaN(end.getTime()) ? "N/A" : format(end, "HH:mm")}
                       </p>
                       <p className="text-[10px] text-slate-500">
                         {isActive ? t("in_progress") : t("today")}
@@ -386,7 +389,9 @@ export const VigilancePanel = React.memo<VigilancePanelProps>(
                 {reservation.checkInTime ? (
                   <div className="flex items-center gap-1.5 text-slate-500">
                     <CheckCircle className="h-3.5 w-3.5 text-green-500" />
-                    <span>{t("checkin_at")} <span className="font-semibold text-slate-700 dark:text-slate-300">{format(new Date(reservation.checkInTime), "HH:mm:ss")}</span></span>
+                    <span>{t("checkin_at")} <span className="font-semibold text-slate-700 dark:text-slate-300">
+                      {Number.isNaN(new Date(reservation.checkInTime).getTime()) ? "N/A" : format(new Date(reservation.checkInTime), "HH:mm:ss")}
+                    </span></span>
                   </div>
                 ) : (
                   <div className="flex items-center gap-1.5 text-slate-400 italic">
@@ -475,7 +480,9 @@ export const VigilancePanel = React.memo<VigilancePanelProps>(
                 </div>
                 <div className="flex items-center gap-1.5 text-slate-500 justify-end">
                   <Clock className="h-3 w-3" />
-                  <span>{format(new Date(alert.timestamp), "HH:mm:ss")}</span>
+                  <span>
+                    {Number.isNaN(new Date(alert.timestamp).getTime()) ? "N/A" : format(new Date(alert.timestamp), "HH:mm:ss")}
+                  </span>
                 </div>
               </div>
 

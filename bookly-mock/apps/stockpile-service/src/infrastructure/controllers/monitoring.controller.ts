@@ -23,16 +23,41 @@ import {
   MonitoringService,
 } from "@stockpile/application/services/monitoring.service";
 import { IncidentSeverity } from "@stockpile/domain/entities/incident.entity";
+import {
+  IsBoolean,
+  IsEnum,
+  IsNotEmpty,
+  IsObject,
+  IsOptional,
+  IsString,
+} from "class-validator";
 
 /**
  * DTO para reportar incidencia
  */
 export class ReportIncidentDto {
+  @IsOptional()
+  @IsString()
   checkInOutId?: string;
+
+  @IsNotEmpty()
+  @IsString()
   resourceId: string;
+
+  @IsNotEmpty()
+  @IsEnum(IncidentSeverity)
   severity: IncidentSeverity;
+
+  @IsNotEmpty()
+  @IsString()
   description: string;
+
+  @IsOptional()
+  @IsString()
   location?: string;
+
+  @IsOptional()
+  @IsObject()
   metadata?: Record<string, any>;
 }
 
@@ -40,6 +65,8 @@ export class ReportIncidentDto {
  * DTO para resolver incidencia
  */
 export class ResolveIncidentDto {
+  @IsNotEmpty()
+  @IsString()
   resolution: string;
 }
 
@@ -47,11 +74,28 @@ export class ResolveIncidentDto {
  * DTO para filtros de monitoreo
  */
 export class MonitoringFiltersDto {
+  @IsOptional()
+  @IsString()
   resourceId?: string;
+
+  @IsOptional()
+  @IsString()
   userId?: string;
+
+  @IsOptional()
+  @IsString()
   status?: string;
+
+  @IsOptional()
+  @IsString()
   startDate?: string;
+
+  @IsOptional()
+  @IsString()
   endDate?: string;
+
+  @IsOptional()
+  @IsBoolean()
   includeIncidents?: boolean;
 }
 

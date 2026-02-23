@@ -25,20 +25,30 @@ export default function VigilanciaPage() {
   const { data, isLoading, refetch } = useQuery({
     queryKey: ["vigilance-data"],
     queryFn: async () => {
-      const [activeRes, overdueRes, statsRes, alertsRes, approvalsRes] = await Promise.all([
+      const [activeRes, overdueRes, statsRes, alertsRes, approvalsRes] = await Promise.allSettled([
         MonitoringClient.getActiveCheckIns(),
         MonitoringClient.getOverdueCheckIns(),
         MonitoringClient.getStatistics(),
         MonitoringClient.getActiveAlerts(),
-        ApprovalsClient.getActiveToday({ limit: 100 }), // Cargar aprobaciones de hoy
+        ApprovalsClient.getActiveToday({ limit: 100 }),
       ]);
 
       return {
-        active: activeRes.data || [],
-        overdue: overdueRes.data || [],
-        stats: statsRes.data,
-        alerts: alertsRes.data || [],
-        todayApprovals: approvalsRes.data?.items || [],
+        active: activeRes.status === "fulfilled" 
+          ? (Array.isArray(activeRes.value.data) ? activeRes.value.data : (activeRes.value.data as any)?.data || []) 
+          : [],
+        overdue: overdueRes.status === "fulfilled" 
+          ? (Array.isArray(overdueRes.value.data) ? overdueRes.value.data : (overdueRes.value.data as any)?.data || []) 
+          : [],
+        stats: statsRes.status === "fulfilled" 
+          ? ((statsRes.value.data as any)?.data || statsRes.value.data) 
+          : undefined,
+        alerts: alertsRes.status === "fulfilled" 
+          ? (Array.isArray(alertsRes.value.data) ? alertsRes.value.data : (alertsRes.value.data as any)?.data || []) 
+          : [],
+        todayApprovals: approvalsRes.status === "fulfilled" 
+          ? (approvalsRes.value.data?.items || (approvalsRes.value.data as any)?.data?.items || []) 
+          : [],
       };
     },
     refetchInterval: autoRefresh ? 30000 : false,
