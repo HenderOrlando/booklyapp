@@ -21,6 +21,7 @@ import {
   SelectValue,
 } from "@/components/atoms/Select";
 import type { WaitlistEntry, WaitlistStats } from "@/types/entities/waitlist";
+import { Bell, CheckCircle, Clock, XCircle, Hourglass } from "lucide-react";
 import React from "react";
 
 interface WaitlistManagerProps {
@@ -31,24 +32,51 @@ interface WaitlistManagerProps {
   onCancel?: (entryId: string) => void;
 }
 
-const PRIORITY_COLORS: Record<string, string> = {
-  LOW: "bg-[var(--color-bg-muted)] text-[var(--color-text-secondary)]",
-  NORMAL: "bg-[var(--color-state-info-bg)] text-[var(--color-state-info-text)]",
-  HIGH: "bg-[var(--color-state-warning-bg)] text-[var(--color-state-warning-text)]",
-  URGENT:
-    "bg-[var(--color-state-error-bg)] text-[var(--color-state-error-text)]",
+const PRIORITY_CONFIG: Record<string, { label: string; className: string }> = {
+  LOW: {
+    label: "Baja",
+    className: "bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-300 border border-gray-200 dark:border-gray-700",
+  },
+  NORMAL: {
+    label: "Normal",
+    className: "bg-blue-50 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300 border border-blue-200 dark:border-blue-800",
+  },
+  HIGH: {
+    label: "Alta",
+    className: "bg-orange-50 text-orange-700 dark:bg-orange-900/30 dark:text-orange-300 border border-orange-200 dark:border-orange-800",
+  },
+  URGENT: {
+    label: "Urgente",
+    className: "bg-red-50 text-red-700 dark:bg-red-900/30 dark:text-red-300 border border-red-200 dark:border-red-800",
+  },
 };
 
-const STATUS_COLORS: Record<string, string> = {
-  WAITING:
-    "bg-[var(--color-state-warning-bg)] text-[var(--color-state-warning-text)]",
-  NOTIFIED:
-    "bg-[var(--color-state-info-bg)] text-[var(--color-state-info-text)]",
-  ASSIGNED:
-    "bg-[var(--color-state-success-bg)] text-[var(--color-state-success-text)]",
-  EXPIRED: "bg-[var(--color-bg-muted)] text-[var(--color-text-secondary)]",
-  CANCELLED:
-    "bg-[var(--color-state-error-bg)] text-[var(--color-state-error-text)]",
+const STATUS_CONFIG: Record<string, { label: string; className: string; accent: string }> = {
+  WAITING: {
+    label: "En Espera",
+    className: "bg-amber-50 text-amber-800 dark:bg-amber-900/30 dark:text-amber-300 border border-amber-200 dark:border-amber-800",
+    accent: "border-l-amber-500",
+  },
+  NOTIFIED: {
+    label: "Notificado",
+    className: "bg-blue-50 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300 border border-blue-200 dark:border-blue-800",
+    accent: "border-l-blue-500",
+  },
+  ASSIGNED: {
+    label: "Asignado",
+    className: "bg-green-50 text-green-800 dark:bg-green-900/30 dark:text-green-300 border border-green-200 dark:border-green-800",
+    accent: "border-l-green-500",
+  },
+  EXPIRED: {
+    label: "Expirado",
+    className: "bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-400 border border-gray-200 dark:border-gray-700",
+    accent: "border-l-gray-400",
+  },
+  CANCELLED: {
+    label: "Cancelado",
+    className: "bg-red-50 text-red-700 dark:bg-red-900/30 dark:text-red-300 border border-red-200 dark:border-red-800",
+    accent: "border-l-red-500",
+  },
 };
 
 export function WaitlistManager({
@@ -72,15 +100,18 @@ export function WaitlistManager({
     <div className="space-y-6">
       {/* Estadísticas */}
       {stats && (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-          <Card className="group hover:shadow-md transition-all duration-200 bg-gradient-to-br from-brand-primary-500/5 to-brand-primary-600/5 border-brand-primary-500/20">
-            <CardContent className="p-6">
-              <div className="flex items-center justify-between">
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+          <Card className="hover:shadow-md transition-all duration-200 border-l-4 border-l-amber-500">
+            <CardContent className="p-5">
+              <div className="flex items-center gap-3">
+                <div className="flex items-center justify-center w-10 h-10 rounded-lg bg-amber-50 dark:bg-amber-900/20">
+                  <Clock className="w-5 h-5 text-amber-600 dark:text-amber-400" />
+                </div>
                 <div>
-                  <p className="text-[10px] font-bold uppercase tracking-wider text-brand-primary-600/80 mb-1">
+                  <p className="text-xs font-semibold uppercase tracking-wide text-[var(--color-text-secondary)] mb-0.5">
                     En Espera
                   </p>
-                  <h3 className="text-3xl font-black text-brand-primary-800 dark:text-brand-primary-200 leading-none">
+                  <h3 className="text-2xl font-bold text-[var(--color-text-primary)] leading-none">
                     {stats.totalWaiting}
                   </h3>
                 </div>
@@ -88,14 +119,17 @@ export function WaitlistManager({
             </CardContent>
           </Card>
 
-          <Card className="group hover:shadow-md transition-all duration-200 bg-gradient-to-br from-state-success-500/5 to-state-success-700/5 border-state-success-500/20">
-            <CardContent className="p-6">
-              <div className="flex items-center justify-between">
+          <Card className="hover:shadow-md transition-all duration-200 border-l-4 border-l-green-500">
+            <CardContent className="p-5">
+              <div className="flex items-center gap-3">
+                <div className="flex items-center justify-center w-10 h-10 rounded-lg bg-green-50 dark:bg-green-900/20">
+                  <CheckCircle className="w-5 h-5 text-green-600 dark:text-green-400" />
+                </div>
                 <div>
-                  <p className="text-[10px] font-bold uppercase tracking-wider text-state-success-700/80 dark:text-state-success-200/80 mb-1">
+                  <p className="text-xs font-semibold uppercase tracking-wide text-[var(--color-text-secondary)] mb-0.5">
                     Asignados
                   </p>
-                  <h3 className="text-3xl font-black text-state-success-900 dark:text-state-success-200 leading-none">
+                  <h3 className="text-2xl font-bold text-[var(--color-text-primary)] leading-none">
                     {stats.totalAssigned}
                   </h3>
                 </div>
@@ -103,14 +137,17 @@ export function WaitlistManager({
             </CardContent>
           </Card>
 
-          <Card className="group hover:shadow-md transition-all duration-200 bg-gradient-to-br from-state-warning-500/5 to-state-warning-700/5 border-state-warning-500/20">
-            <CardContent className="p-6">
-              <div className="flex items-center justify-between">
+          <Card className="hover:shadow-md transition-all duration-200 border-l-4 border-l-blue-500">
+            <CardContent className="p-5">
+              <div className="flex items-center gap-3">
+                <div className="flex items-center justify-center w-10 h-10 rounded-lg bg-blue-50 dark:bg-blue-900/20">
+                  <Bell className="w-5 h-5 text-blue-600 dark:text-blue-400" />
+                </div>
                 <div>
-                  <p className="text-[10px] font-bold uppercase tracking-wider text-state-warning-700/80 dark:text-state-warning-200/80 mb-1">
+                  <p className="text-xs font-semibold uppercase tracking-wide text-[var(--color-text-secondary)] mb-0.5">
                     Notificados
                   </p>
-                  <h3 className="text-3xl font-black text-state-warning-900 dark:text-state-warning-200 leading-none">
+                  <h3 className="text-2xl font-bold text-[var(--color-text-primary)] leading-none">
                     {stats.totalNotified}
                   </h3>
                 </div>
@@ -118,14 +155,17 @@ export function WaitlistManager({
             </CardContent>
           </Card>
 
-          <Card className="group hover:shadow-md transition-all duration-200 bg-gradient-to-br from-state-error-500/5 to-state-error-700/5 border-state-error-500/20">
-            <CardContent className="p-6">
-              <div className="flex items-center justify-between">
+          <Card className="hover:shadow-md transition-all duration-200 border-l-4 border-l-gray-400">
+            <CardContent className="p-5">
+              <div className="flex items-center gap-3">
+                <div className="flex items-center justify-center w-10 h-10 rounded-lg bg-gray-100 dark:bg-gray-800">
+                  <Hourglass className="w-5 h-5 text-gray-500 dark:text-gray-400" />
+                </div>
                 <div>
-                  <p className="text-[10px] font-bold uppercase tracking-wider text-state-error-700/80 dark:text-state-error-200/80 mb-1">
+                  <p className="text-xs font-semibold uppercase tracking-wide text-[var(--color-text-secondary)] mb-0.5">
                     Expirados
                   </p>
-                  <h3 className="text-3xl font-black text-state-error-900 dark:text-state-error-200 leading-none">
+                  <h3 className="text-2xl font-bold text-[var(--color-text-primary)] leading-none">
                     {stats.totalExpired}
                   </h3>
                 </div>
@@ -189,113 +229,131 @@ export function WaitlistManager({
             </CardContent>
           </Card>
         ) : (
-          filteredEntries.map((entry) => (
-            <Card
-              key={entry.id}
-              className="hover:border-[var(--color-action-primary)] transition-colors"
-            >
-              <CardContent className="pt-6">
-                <div className="flex items-start justify-between">
-                  <div className="flex-1">
-                    {/* Posición y Usuario */}
-                    <div className="flex items-center gap-3 mb-2">
-                      <div className="flex items-center justify-center w-10 h-10 rounded-full bg-[var(--color-state-info-bg)] text-[var(--color-state-info-text)] font-bold">
-                        #{entry.position}
-                      </div>
-                      <div>
-                        <div className="font-medium text-foreground">
-                          {entry.userName}
-                        </div>
-                        <div className="text-sm text-[var(--color-text-tertiary)]">
-                          {entry.userEmail}
-                        </div>
-                      </div>
-                    </div>
+          filteredEntries.map((entry) => {
+            const statusCfg = STATUS_CONFIG[entry.status] || STATUS_CONFIG.WAITING;
+            const priorityCfg = PRIORITY_CONFIG[entry.priority] || PRIORITY_CONFIG.NORMAL;
 
-                    {/* Recurso y Fecha */}
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-3 mt-3">
-                      <div>
-                        <div className="text-xs text-[var(--color-text-tertiary)]">
-                          Recurso
+            return (
+              <Card
+                key={entry.id}
+                className={`hover:shadow-md transition-all duration-200 border-l-4 ${statusCfg.accent}`}
+              >
+                <CardContent className="p-5">
+                  <div className="flex items-start justify-between gap-4">
+                    <div className="flex-1 min-w-0">
+                      {/* Posición y Usuario */}
+                      <div className="flex items-center gap-3 mb-3">
+                        <div className="flex items-center justify-center w-9 h-9 rounded-full bg-[var(--color-action-primary)] text-white text-sm font-bold flex-shrink-0">
+                          #{entry.position}
                         </div>
-                        <div className="text-sm text-foreground">
-                          {entry.resourceName}
-                        </div>
-                      </div>
-                      <div>
-                        <div className="text-xs text-[var(--color-text-tertiary)]">
-                          Fecha Deseada
-                        </div>
-                        <div className="text-sm text-foreground">
-                          {new Date(entry.desiredDate).toLocaleDateString(
-                            "es-ES",
+                        <div className="min-w-0">
+                          <div className="font-semibold text-[var(--color-text-primary)] truncate">
+                            {entry.userName}
+                          </div>
+                          {entry.userEmail && (
+                            <div className="text-sm text-[var(--color-text-secondary)] truncate">
+                              {entry.userEmail}
+                            </div>
                           )}
                         </div>
                       </div>
-                      <div>
-                        <div className="text-xs text-[var(--color-text-tertiary)]">
-                          Horario
+
+                      {/* Recurso y Fecha */}
+                      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mt-3 pl-12">
+                        <div>
+                          <div className="text-xs font-semibold uppercase tracking-wide text-[var(--color-text-secondary)] mb-1">
+                            Recurso
+                          </div>
+                          <div className="text-sm font-medium text-[var(--color-text-primary)]">
+                            {entry.resourceName}
+                          </div>
                         </div>
-                        <div className="text-sm text-foreground">
-                          {entry.startTime} - {entry.endTime}
+                        <div>
+                          <div className="text-xs font-semibold uppercase tracking-wide text-[var(--color-text-secondary)] mb-1">
+                            Fecha Deseada
+                          </div>
+                          <div className="text-sm font-medium text-[var(--color-text-primary)]">
+                            {new Date(entry.desiredDate).toLocaleDateString(
+                              "es-ES",
+                              { day: "2-digit", month: "short", year: "numeric" },
+                            )}
+                          </div>
                         </div>
+                        <div>
+                          <div className="text-xs font-semibold uppercase tracking-wide text-[var(--color-text-secondary)] mb-1">
+                            Horario
+                          </div>
+                          <div className="text-sm font-medium text-[var(--color-text-primary)]">
+                            {entry.startTime} - {entry.endTime}
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Razón */}
+                      {entry.reason && (
+                        <div className="mt-3 ml-12 px-3 py-2 bg-[var(--color-bg-muted)] rounded-md text-sm text-[var(--color-text-secondary)]">
+                          {entry.reason}
+                        </div>
+                      )}
+
+                      {/* Badges */}
+                      <div className="flex flex-wrap gap-2 mt-3 ml-12">
+                        <Badge className={`text-xs font-semibold px-2.5 py-0.5 rounded-full ${statusCfg.className}`}>
+                          {statusCfg.label}
+                        </Badge>
+                        <Badge className={`text-xs font-semibold px-2.5 py-0.5 rounded-full ${priorityCfg.className}`}>
+                          {priorityCfg.label}
+                        </Badge>
+                        {entry.notificationSent && (
+                          <Badge className="text-xs font-semibold px-2.5 py-0.5 rounded-full bg-blue-50 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300 border border-blue-200 dark:border-blue-800">
+                            <Bell className="w-3 h-3 mr-1 inline" />
+                            Notificado
+                          </Badge>
+                        )}
                       </div>
                     </div>
 
-                    {/* Razón */}
-                    {entry.reason && (
-                      <div className="mt-3 p-2 bg-muted rounded text-sm text-foreground">
-                        {entry.reason}
-                      </div>
-                    )}
-
-                    {/* Badges */}
-                    <div className="flex flex-wrap gap-2 mt-3">
-                      <Badge className={STATUS_COLORS[entry.status]}>
-                        {entry.status}
-                      </Badge>
-                      <Badge className={PRIORITY_COLORS[entry.priority]}>
-                        {entry.priority}
-                      </Badge>
-                      {entry.notificationSent && (
-                        <Badge className="bg-[var(--color-state-info-bg)] text-[var(--color-state-info-text)]">
-                          Notificado
-                        </Badge>
+                    {/* Acciones */}
+                    <div className="flex flex-col gap-2 flex-shrink-0">
+                      {entry.status === "WAITING" && (
+                        <>
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            className="gap-1.5"
+                            onClick={() => onNotify?.(entry.id)}
+                          >
+                            <Bell className="w-3.5 h-3.5" />
+                            Notificar
+                          </Button>
+                          <Button
+                            size="sm"
+                            className="gap-1.5"
+                            onClick={() => onAssign?.(entry.id)}
+                          >
+                            <CheckCircle className="w-3.5 h-3.5" />
+                            Asignar
+                          </Button>
+                        </>
+                      )}
+                      {(entry.status === "WAITING" ||
+                        entry.status === "NOTIFIED") && (
+                        <Button
+                          size="sm"
+                          variant="destructive"
+                          className="gap-1.5"
+                          onClick={() => onCancel?.(entry.id)}
+                        >
+                          <XCircle className="w-3.5 h-3.5" />
+                          Cancelar
+                        </Button>
                       )}
                     </div>
                   </div>
-
-                  {/* Acciones */}
-                  <div className="flex flex-col gap-2 ml-4">
-                    {entry.status === "WAITING" && (
-                      <>
-                        <Button
-                          size="sm"
-                          variant="outline"
-                          onClick={() => onNotify?.(entry.id)}
-                        >
-                          🔔 Notificar
-                        </Button>
-                        <Button size="sm" onClick={() => onAssign?.(entry.id)}>
-                          ✅ Asignar
-                        </Button>
-                      </>
-                    )}
-                    {(entry.status === "WAITING" ||
-                      entry.status === "NOTIFIED") && (
-                      <Button
-                        size="sm"
-                        variant="destructive"
-                        onClick={() => onCancel?.(entry.id)}
-                      >
-                        ❌ Cancelar
-                      </Button>
-                    )}
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          ))
+                </CardContent>
+              </Card>
+            );
+          })
         )}
       </div>
     </div>

@@ -5,11 +5,13 @@
  */
 
 import { CheckInClient } from "@/infrastructure/api/check-in-client";
+import { ReservationsClient } from "@/infrastructure/api/reservations-client";
 import type {
   CheckInDto,
   CheckInOut,
   CheckOutDto,
 } from "@/types/entities/checkInOut";
+import type { Reservation } from "@/types/entities/reservation";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 // ============================================
@@ -22,6 +24,7 @@ export const checkInKeys = {
   active: () => [...checkInKeys.all, "active"] as const,
   overdue: () => [...checkInKeys.all, "overdue"] as const,
   history: () => [...checkInKeys.all, "history"] as const,
+  upcoming: () => [...checkInKeys.all, "upcoming"] as const,
   details: () => [...checkInKeys.all, "detail"] as const,
   detail: (id: string) => [...checkInKeys.details(), id] as const,
   byReservation: (reservationId: string) =>
@@ -91,6 +94,31 @@ export function useCheckInByReservation(reservationId: string) {
   });
 }
 
+/**
+ * Hook para obtener reservas aprobadas/confirmadas del usuario (candidatas para check-in)
+ * Consulta el availability-service para obtener reservas con status CONFIRMED.
+ */
+export function useUpcomingReservations() {
+  return useQuery<Reservation[]>({
+    queryKey: checkInKeys.upcoming(),
+    queryFn: async () => {
+      const response = await ReservationsClient.search({
+        status: "CONFIRMED",
+        startDate: new Date().toISOString(),
+        limit: 20,
+      });
+      const data = response.data;
+      if (Array.isArray(data)) return data;
+      if (data && typeof data === "object" && "items" in data) {
+        return (data as { items: Reservation[] }).items || [];
+      }
+      return [];
+    },
+    retry: 1,
+    refetchInterval: 60000,
+  });
+}
+
 // ============================================
 // MUTATIONS
 // ============================================
@@ -112,6 +140,7 @@ export function useCheckIn() {
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: checkInKeys.active() });
       queryClient.invalidateQueries({ queryKey: checkInKeys.history() });
+      queryClient.invalidateQueries({ queryKey: checkInKeys.upcoming() });
       queryClient.invalidateQueries({
         queryKey: checkInKeys.byReservation(data.reservationId),
       });
@@ -136,6 +165,7 @@ export function useCheckOut() {
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: checkInKeys.active() });
       queryClient.invalidateQueries({ queryKey: checkInKeys.history() });
+      queryClient.invalidateQueries({ queryKey: checkInKeys.upcoming() });
       queryClient.invalidateQueries({
         queryKey: checkInKeys.byReservation(data.reservationId),
       });

@@ -597,6 +597,10 @@ export class MockService {
       return this.castResponse<T>(this.mockGetUserReportSummary(userId));
     }
 
+    if (endpoint.includes("/reservations/stats") && method === "GET") {
+      return this.castResponse<T>(this.mockGetReservationStats());
+    }
+
     if (endpoint.includes("/reservations") && method === "GET") {
       // Verificar si es un ID específico
       const idMatch = endpoint.match(/\/reservations\/([^/]+)$/);
@@ -3224,6 +3228,49 @@ export class MockService {
         },
       },
       message: "Reservations retrieved successfully",
+      timestamp: new Date().toISOString(),
+    };
+  }
+
+  private static mockGetReservationStats(): ApiResponse<unknown> {
+    const now = new Date();
+    const todayStart = new Date(now);
+    todayStart.setHours(0, 0, 0, 0);
+    const todayEnd = new Date(now);
+    todayEnd.setHours(23, 59, 59, 999);
+
+    const items = this.reservationsData;
+    const total = items.length;
+    const pending = items.filter((r) => r.status === "PENDING").length;
+    const confirmed = items.filter((r) => r.status === "CONFIRMED").length;
+    const inProgress = items.filter((r) => r.status === "ACTIVE" || r.status === "CHECKED_IN").length;
+    const completed = items.filter((r) => r.status === "COMPLETED").length;
+    const cancelled = items.filter((r) => r.status === "CANCELLED").length;
+    const active = pending + confirmed + inProgress;
+    const upcoming = items.filter((r) => {
+      const start = r.startDate ? new Date(r.startDate) : null;
+      return (
+        start &&
+        !Number.isNaN(start.getTime()) &&
+        start >= now &&
+        r.status !== "CANCELLED" &&
+        r.status !== "COMPLETED"
+      );
+    }).length;
+    const today = items.filter((r) => {
+      const start = r.startDate ? new Date(r.startDate) : null;
+      return (
+        start &&
+        !Number.isNaN(start.getTime()) &&
+        start >= todayStart &&
+        start <= todayEnd
+      );
+    }).length;
+
+    return {
+      success: true,
+      data: { total, pending, confirmed, inProgress, completed, cancelled, active, upcoming, today },
+      message: "Reservation stats retrieved successfully",
       timestamp: new Date().toISOString(),
     };
   }

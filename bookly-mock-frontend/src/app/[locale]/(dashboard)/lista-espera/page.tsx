@@ -23,8 +23,10 @@ import {
   useRemoveFromWaitlist,
 } from "@/hooks/mutations";
 import { useWaitlistEntries } from "@/hooks/useWaitlist";
+import { useResources } from "@/hooks/useResources";
 import { useDataMode } from "@/hooks/useDataMode";
 import type { WaitlistEntry, WaitlistStats } from "@/types/entities/waitlist";
+import type { Resource } from "@/types/entities/resource";
 import { useTranslations } from "next-intl";
 import * as React from "react";
 
@@ -124,11 +126,34 @@ export default function ListaEsperaPage() {
     ...(selectedResourceId !== "all" ? { resourceId: selectedResourceId } : {}),
   });
 
-  // Seleccionar fuente de datos según el modo
+  // Cargar recursos para enriquecer nombres (cross-reference)
+  const { data: resourcesData } = useResources();
+
+  // Mapa de resourceId → nombre para enriquecer entradas
+  const resourceNameMap = React.useMemo(() => {
+    const map = new Map<string, string>();
+    const rd = resourcesData as Record<string, unknown> | Resource[] | undefined;
+    const resources: Resource[] = Array.isArray(rd)
+      ? rd
+      : (rd as Record<string, unknown>)?.resources as Resource[] || (rd as Record<string, unknown>)?.data as Resource[] || [];
+    resources.forEach((r) => map.set(r.id, r.name));
+    return map;
+  }, [resourcesData]);
+
+  // Seleccionar fuente de datos según el modo y enriquecer con nombres
   const entries: WaitlistEntry[] = React.useMemo(() => {
     if (isMock) return MOCK_WAITLIST_ENTRIES;
-    return serverData?.entries || [];
-  }, [isMock, serverData?.entries]);
+    const raw = serverData?.entries || [];
+    // Enriquecer con nombres de recursos reales
+    return raw.map((entry) => ({
+      ...entry,
+      resourceName: resourceNameMap.get(entry.resourceId) || entry.resourceName,
+      // userName: si el backend no popula, mostrar un label legible
+      userName: entry.userName && !entry.userName.match(/^[0-9a-f]{24}$/i)
+        ? entry.userName
+        : `Usuario ${entry.position || ''}`.trim(),
+    }));
+  }, [isMock, serverData?.entries, resourceNameMap]);
 
   const stats: WaitlistStats = React.useMemo(() => {
     if (isMock) return MOCK_WAITLIST_STATS;
@@ -178,7 +203,7 @@ export default function ListaEsperaPage() {
         onSuccess: () => {
           // Success handled by React Query cache invalidation
         },
-        onError: (error: any) => {
+        onError: (error: unknown) => {
           console.error("Error al notificar:", error);
         },
       },
@@ -190,7 +215,7 @@ export default function ListaEsperaPage() {
       onSuccess: () => {
         // Success handled by React Query cache invalidation
       },
-      onError: (error: any) => {
+      onError: (error: unknown) => {
         console.error("Error al asignar:", error);
       },
     });
@@ -201,7 +226,7 @@ export default function ListaEsperaPage() {
       onSuccess: () => {
         // Success handled by React Query cache invalidation
       },
-      onError: (error: any) => {
+      onError: (error: unknown) => {
         console.error("Error al cancelar:", error);
       },
     });

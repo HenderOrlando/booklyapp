@@ -32,32 +32,16 @@ export function useCreateReservation() {
       }
       return response.data;
     },
-    onSuccess: (newReservation) => {
+    onSuccess: () => {
       showSuccess(
         t("success_create_title") || "Reserva Creada",
         t("success_create_message") || "La reserva se creó exitosamente"
       );
-      // Invalidar cache de reservas para refrescar lista
-      queryClient.invalidateQueries({
-        queryKey: reservationKeys.lists(),
-        refetchType: "active",
-      });
-      // Invalidar stats para que se actualicen los contadores
+      // Invalidar todas las queries de reservas (listas con cualquier filtro + stats)
+      // invalidateQueries usa prefix matching: ["reservations"] matchea
+      // ["reservations","list",{...}] y ["reservations","stats",...]
       queryClient.invalidateQueries({
         queryKey: reservationKeys.all,
-        predicate: (query) =>
-          query.queryKey[0] === "reservations" && query.queryKey[1] === "stats",
-      });
-      // Optimistic: agregar a cache de lista sin filtros
-      queryClient.setQueryData<any>(reservationKeys.lists(), (old: any) => {
-        if (!old?.items) return old;
-        return {
-          ...old,
-          items: [newReservation, ...old.items],
-          meta: old.meta
-            ? { ...old.meta, total: (old.meta.total || 0) + 1 }
-            : undefined,
-        };
       });
     },
     onError: (error: unknown) => {
