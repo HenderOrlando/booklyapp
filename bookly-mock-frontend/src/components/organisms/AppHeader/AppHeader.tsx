@@ -39,7 +39,7 @@ export function AppHeader({
           />
         </div>
         {showUser && user && (
-          <div className="hidden md:flex flex-col items-end leading-tight -space-y-0.5 text-right">
+          <div className="hidden md:flex flex-col items-start leading-tight -space-y-0.5 text-left">
             <span className="text-[13px] font-bold text-white">
               {/* Mostramos el primer rol del usuario, si existe. Si no, su nombre completo como fallback */}
               {user.roles && user.roles.length > 0 

@@ -32,6 +32,7 @@
   "no_results_title": "No se encontraron recursos",
   "no_results_desc": "No hay recursos que coincidan con los filtros aplicados. Intenta ajustar los criterios de búsqueda.",
   "empty_desc": "Aún no hay recursos registrados. Crea el primer recurso para comenzar.",
+  "page_description": "Gestiona todos los recursos institucionales: salas, auditorios, laboratorios y equipos",
   "view_table": "Vista Tabla",
   "view_list": "Vista Lista",
   "view_virtual": "Vista Virtual",

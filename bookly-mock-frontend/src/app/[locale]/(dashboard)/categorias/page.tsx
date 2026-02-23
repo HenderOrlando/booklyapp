@@ -19,6 +19,7 @@ import {
   FilterChips,
   type FilterChip,
 } from "@/components/molecules/FilterChips";
+import { DateRangePicker } from "@/components/molecules/DateRangePicker";
 import { SearchBar } from "@/components/molecules/SearchBar";
 import { CategoryModal } from "@/components/organisms/CategoryModal";
 import { ListLayout } from "@/components/templates/ListLayout";
@@ -96,6 +97,8 @@ export default function CategoriasPage() {
   const [showDeleteModal, setShowDeleteModal] = React.useState(false);
   const [categoryToDelete, setCategoryToDelete] =
     React.useState<Category | null>(null);
+  const [dateFrom, setDateFrom] = React.useState<Date | null>(null);
+  const [dateTo, setDateTo] = React.useState<Date | null>(null);
 
   const handleRefresh = () => {
     queryClient.invalidateQueries({ queryKey: categoryKeys.lists() });
@@ -115,6 +118,17 @@ export default function CategoriasPage() {
     // Filtro por estado
     if (statusFilter === "active" && !category.isActive) return false;
     if (statusFilter === "inactive" && category.isActive) return false;
+
+    // Filtro por fecha de creación
+    if (dateFrom || dateTo) {
+      const created = new Date(category.createdAt);
+      if (dateFrom && created < dateFrom) return false;
+      if (dateTo) {
+        const endOfDay = new Date(dateTo);
+        endOfDay.setHours(23, 59, 59, 999);
+        if (created > endOfDay) return false;
+      }
+    }
 
     return true;
   });
@@ -319,10 +333,11 @@ export default function CategoriasPage() {
   return (
     <ListLayout
       title={t("title")}
+      description={t("description")}
       badge={{ text: "Gestión de Categorías", variant: "secondary" }}
       onCreate={handleCreate}
       createLabel={t("create")}
-      actions={
+      headerActions={
         <Button
           variant="outline"
           size="sm"
@@ -462,18 +477,36 @@ export default function CategoriasPage() {
                 </Button>
               </div>
 
-              {(filter || statusFilter !== "all") && (
+              {(filter || statusFilter !== "all" || dateFrom || dateTo) && (
                 <Button
                   variant="outline"
                   size="sm"
                   onClick={() => {
                     setFilter("");
                     setStatusFilter("all");
+                    setDateFrom(null);
+                    setDateTo(null);
                   }}
                 >
                   {t("clear")}
                 </Button>
               )}
+            </div>
+
+            {/* Filtro por fecha */}
+            <div className="flex items-center gap-3">
+              <span className="text-xs font-semibold text-content-tertiary uppercase tracking-wider whitespace-nowrap">
+                {tCommon("filter_by_date")}
+              </span>
+              <DateRangePicker
+                startDate={dateFrom}
+                endDate={dateTo}
+                onRangeChange={(start, end) => {
+                  setDateFrom(start);
+                  setDateTo(end);
+                }}
+                className="flex-1"
+              />
             </div>
 
             {/* FilterChips - Mostrar filtros activos */}

@@ -31,6 +31,7 @@ import * as React from "react";
 interface ListLayoutProps {
   children: React.ReactNode;
   title: string;
+  description?: string;
   badge?: {
     text: string;
     variant?:
@@ -50,12 +51,14 @@ interface ListLayoutProps {
   onCreate?: () => void;
   createLabel?: string;
   actions?: React.ReactNode;
+  headerActions?: React.ReactNode;
   className?: string;
 }
 
 export function ListLayout({
   children,
   title,
+  description,
   badge,
   breadcrumbs,
   onSearch,
@@ -63,6 +66,7 @@ export function ListLayout({
   onCreate,
   createLabel = "Crear Nuevo",
   actions,
+  headerActions,
   className,
 }: ListLayoutProps) {
   const [searchValue, setSearchValue] = React.useState("");
@@ -100,36 +104,46 @@ export function ListLayout({
         </Breadcrumb>
       )}
 
-      {/* Título y Badge */}
+      {/* Título, Badge y Descripción */}
       <div className="flex items-center justify-between">
-        <div className="flex items-center gap-3">
-          <h1 className="text-3xl font-bold text-content-primary">
-            {title}
-          </h1>
-          {badge && (
-            <Badge variant={badge.variant || "default"}>{badge.text}</Badge>
+        <div>
+          <div className="flex items-center gap-3">
+            <h1 className="text-3xl font-bold text-content-primary">
+              {title}
+            </h1>
+            {badge && (
+              <Badge variant={badge.variant || "default"}>{badge.text}</Badge>
+            )}
+          </div>
+          {description && (
+            <p className="text-[var(--color-text-secondary)] mt-1">
+              {description}
+            </p>
           )}
         </div>
 
-        {/* Botón de crear */}
-        {onCreate && (
-          <Button onClick={onCreate}>
-            <svg
-              className="w-5 h-5"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M12 4v16m8-8H4"
-              />
-            </svg>
-            {createLabel}
-          </Button>
-        )}
+        {/* Botones de header: refresh + crear */}
+        <div className="flex items-center gap-3">
+          {headerActions}
+          {onCreate && (
+            <Button onClick={onCreate}>
+              <svg
+                className="w-5 h-5"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M12 4v16m8-8H4"
+                />
+              </svg>
+              {createLabel}
+            </Button>
+          )}
+        </div>
       </div>
 
       {/* Barra de acciones (Búsqueda y Filtros) */}

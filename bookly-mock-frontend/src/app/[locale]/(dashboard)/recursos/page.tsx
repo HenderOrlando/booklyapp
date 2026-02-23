@@ -441,19 +441,20 @@ export default function RecursosPage() {
   return (
     <ListLayout
       title={t("title")}
+      description={t("page_description")}
       badge={{ text: t("management"), variant: "secondary" }}
       onCreate={() => router.push("/recursos/nuevo")}
       createLabel={t("create")}
-      actions={
+      headerActions={
         <Button
           variant="outline"
           size="sm"
           onClick={handleRefresh}
           className="h-10 px-3 rounded-md border-line-subtle text-content-tertiary hover:text-action-primary hover:border-action-primary transition-all"
-          title="Refrescar datos"
+          title={tCommon("refresh")}
         >
           <RefreshCw size={16} className={cn(loading && "animate-spin", "mr-2")} />
-          Refrescar
+          {tCommon("refresh")}
         </Button>
       }
     >

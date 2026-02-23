@@ -17,6 +17,7 @@ import {
   FilterChips,
   type FilterChip,
 } from "@/components/molecules/FilterChips";
+import { DateRangePicker } from "@/components/molecules/DateRangePicker";
 import { SearchBar } from "@/components/molecules/SearchBar";
 import { CharacteristicModal } from "@/components/organisms/CharacteristicModal/CharacteristicModal";
 import { ListLayout } from "@/components/templates/ListLayout";
@@ -79,20 +80,34 @@ export default function CaracteristicasPage() {
   const [showDeleteModal, setShowDeleteModal] = React.useState(false);
   const [characteristicToDelete, setCharacteristicToDelete] =
     React.useState<Characteristic | null>(null);
+  const [dateFrom, setDateFrom] = React.useState<Date | null>(null);
+  const [dateTo, setDateTo] = React.useState<Date | null>(null);
 
-  const filteredCharacteristics = characteristics.filter((char) => {
-    if (filter !== "") {
-      const searchTerm = filter.toLowerCase();
-      const matchesText =
-        char.name.toLowerCase().includes(searchTerm) ||
-        char.code.toLowerCase().includes(searchTerm) ||
-        char.description?.toLowerCase().includes(searchTerm);
-      if (!matchesText) return false;
-    }
-    if (statusFilter === "active" && !char.isActive) return false;
-    if (statusFilter === "inactive" && char.isActive) return false;
-    return true;
-  });
+  const filteredCharacteristics = characteristics.filter(
+    (char: Characteristic) => {
+      if (filter) {
+        const s = filter.toLowerCase();
+        if (
+          !char.name.toLowerCase().includes(s) &&
+          !char.code.toLowerCase().includes(s)
+        )
+          return false;
+      }
+      if (statusFilter === "active" && !char.isActive) return false;
+      if (statusFilter === "inactive" && char.isActive) return false;
+      // Filtro por fecha de creación
+      if (dateFrom || dateTo) {
+        const created = new Date(char.createdAt);
+        if (dateFrom && created < dateFrom) return false;
+        if (dateTo) {
+          const endOfDay = new Date(dateTo);
+          endOfDay.setHours(23, 59, 59, 999);
+          if (created > endOfDay) return false;
+        }
+      }
+      return true;
+    },
+  );
 
   const handleCreate = () => {
     setModalMode("create");
@@ -219,10 +234,11 @@ export default function CaracteristicasPage() {
   return (
     <ListLayout
       title={t("title")}
+      description={t("subtitle")}
       badge={{ text: "Gestión de Características", variant: "secondary" }}
       onCreate={handleCreate}
       createLabel={t("create_button")}
-      actions={
+      headerActions={
         <Button
           variant="outline"
           size="sm"
@@ -352,7 +368,23 @@ export default function CaracteristicasPage() {
               </div>
             </div>
 
-            {(filter || statusFilter !== "all") && (
+            {/* Filtro por fecha */}
+            <div className="flex items-center gap-3">
+              <span className="text-xs font-semibold text-content-tertiary uppercase tracking-wider whitespace-nowrap">
+                {tCommon("filter_by_date")}
+              </span>
+              <DateRangePicker
+                startDate={dateFrom}
+                endDate={dateTo}
+                onRangeChange={(start, end) => {
+                  setDateFrom(start);
+                  setDateTo(end);
+                }}
+                className="flex-1"
+              />
+            </div>
+
+            {(filter || statusFilter !== "all" || dateFrom || dateTo) && (
               <FilterChips
                 filters={(() => {
                   const chips: FilterChip[] = [];
@@ -381,6 +413,8 @@ export default function CaracteristicasPage() {
                 onClearAll={() => {
                   setFilter("");
                   setStatusFilter("all");
+                  setDateFrom(null);
+                  setDateTo(null);
                 }}
               />
             )}

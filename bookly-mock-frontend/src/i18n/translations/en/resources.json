@@ -32,6 +32,7 @@
   "no_results_title": "No resources found",
   "no_results_desc": "No resources match the applied filters. Try adjusting search criteria.",
   "empty_desc": "No resources registered yet. Create the first resource to start.",
+  "page_description": "Manage all institutional resources: rooms, auditoriums, labs and equipment",
   "view_table": "Table View",
   "view_list": "List View",
   "view_virtual": "Virtual View",

@@ -14,6 +14,7 @@ import { Input } from "@/components/atoms/Input";
 import { StatusBadge } from "@/components/atoms/StatusBadge";
 import { Textarea } from "@/components/atoms/Textarea";
 import { DataTable } from "@/components/molecules/DataTable";
+import { DateRangePicker } from "@/components/molecules/DateRangePicker";
 import { SearchBar } from "@/components/molecules/SearchBar";
 import { ListLayout } from "@/components/templates/ListLayout";
 import { useCreateProgram, useUpdateProgram } from "@/hooks/mutations";
@@ -53,6 +54,8 @@ export default function ProgramasPage() {
   const handleRefresh = () => {
     queryClient.invalidateQueries({ queryKey: programKeys.lists() });
   };
+  const [dateFrom, setDateFrom] = React.useState<Date | null>(null);
+  const [dateTo, setDateTo] = React.useState<Date | null>(null);
   const [filter, setFilter] = React.useState("");
   const [statusFilter, setStatusFilter] = React.useState<
     "all" | "active" | "inactive"
@@ -86,6 +89,17 @@ export default function ProgramasPage() {
 
     if (statusFilter === "active" && !program.isActive) return false;
     if (statusFilter === "inactive" && program.isActive) return false;
+
+    // Filtro por fecha de creación
+    if (dateFrom || dateTo) {
+      const created = new Date(program.createdAt);
+      if (dateFrom && created < dateFrom) return false;
+      if (dateTo) {
+        const endOfDay = new Date(dateTo);
+        endOfDay.setHours(23, 59, 59, 999);
+        if (created > endOfDay) return false;
+      }
+    }
 
     return true;
   });
@@ -252,10 +266,11 @@ export default function ProgramasPage() {
   return (
     <ListLayout
       title={t("title")}
+      description={t("description")}
       badge={{ text: "Gestión de Programas", variant: "secondary" }}
       onCreate={handleCreate}
       createLabel={t("create")}
-      actions={
+      headerActions={
         <Button
           variant="outline"
           size="sm"
@@ -394,7 +409,38 @@ export default function ProgramasPage() {
                 >
                   {t("inactive")}
                 </Button>
+
+                {(filter || statusFilter !== "all" || dateFrom || dateTo) && (
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => {
+                      setFilter("");
+                      setStatusFilter("all");
+                      setDateFrom(null);
+                      setDateTo(null);
+                    }}
+                  >
+                    {tCommon("clear_filters")}
+                  </Button>
+                )}
               </div>
+            </div>
+
+            {/* Filtro por fecha */}
+            <div className="flex items-center gap-3">
+              <span className="text-xs font-semibold text-content-tertiary uppercase tracking-wider whitespace-nowrap">
+                {tCommon("filter_by_date")}
+              </span>
+              <DateRangePicker
+                startDate={dateFrom}
+                endDate={dateTo}
+                onRangeChange={(start, end) => {
+                  setDateFrom(start);
+                  setDateTo(end);
+                }}
+                className="flex-1"
+              />
             </div>
           </CardHeader>
           <CardContent>
