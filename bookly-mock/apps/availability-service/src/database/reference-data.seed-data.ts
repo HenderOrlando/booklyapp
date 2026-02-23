@@ -12,8 +12,11 @@ export const AVAILABILITY_REFERENCE_DATA: CreateReferenceDataDto[] = [
   { group: "reservation_status", code: "REJECTED", name: "Rechazado", color: "#F44336", icon: "thumbs-down", order: 3, createdBy: "system" },
   { group: "reservation_status", code: "CHECKED_IN", name: "Recibido", color: "#009688", icon: "log-in", order: 4, createdBy: "system" },
   { group: "reservation_status", code: "ACTIVE", name: "Activo", color: "#4CAF50", icon: "zap", order: 5, createdBy: "system" },
-  { group: "reservation_status", code: "COMPLETED", name: "Completado", color: "#607D8B", icon: "check", order: 6, createdBy: "system" },
-  { group: "reservation_status", code: "CANCELLED", name: "Cancelado", color: "#9E9E9E", icon: "x", order: 7, createdBy: "system" },
+  { group: "reservation_status", code: "IN_PROGRESS", name: "En Progreso", color: "#FF9800", icon: "play-circle", order: 6, createdBy: "system" },
+  { group: "reservation_status", code: "COMPLETED", name: "Completado", color: "#607D8B", icon: "check", order: 7, createdBy: "system" },
+  { group: "reservation_status", code: "CANCELLED", name: "Cancelado", color: "#9E9E9E", icon: "x", order: 8, createdBy: "system" },
+  { group: "reservation_status", code: "REJECTED", name: "Rechazado (Reserva)", color: "#E91E63", icon: "x-octagon", order: 9, createdBy: "system" },
+  { group: "reservation_status", code: "NO_SHOW", name: "No Asistió", color: "#795548", icon: "user-x", order: 10, createdBy: "system" },
 
   // ─── recurrence_type ───
   { group: "recurrence_type", code: "NONE", name: "Ninguno", order: 0, isDefault: true, createdBy: "system" },
