@@ -510,7 +510,7 @@ export function AppSidebar({
 
               const activeStyles = isActive
                 ? "bg-[var(--color-action-primary)] text-white"
-                : "text-slate-300 hover:text-white hover:bg-[var(--color-bg-elevated)]";
+                : "text-slate-300 hover:text-white hover:bg-white/10";
 
               const baseStyles = `flex items-center justify-between w-full px-4 py-2 rounded-md transition-colors ${activeStyles} ${isDisabled ? "cursor-default opacity-80" : ""}`;
 
@@ -540,7 +540,7 @@ export function AppSidebar({
                         const childStyles = `block px-4 py-2 rounded-md transition-colors text-sm ${
                           isChildActive
                             ? "text-[var(--color-action-primary)] font-medium"
-                            : "text-[var(--color-text-tertiary)] hover:text-[var(--color-text-inverse)] hover:bg-[var(--color-navigation-sidebar-hover,var(--color-bg-elevated))]"
+                            : "text-[var(--color-text-tertiary)] hover:text-[var(--color-text-inverse)] hover:bg-white/10"
                         } ${isDisabled ? "cursor-default" : ""}`;
 
                         return isDisabled ? (

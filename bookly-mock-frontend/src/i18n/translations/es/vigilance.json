@@ -72,5 +72,6 @@
   "empty_approvals_desc": "Todas las reservas aprobadas para hoy ya han realizado su ingreso al sitio.",
   "contacting_user": "Contactando al usuario...",
   "enter_resolution": "Ingresar resolución",
-  "filter": "Filtrar"
+  "filter": "Filtrar",
+  "unknown_user": "Usuario Desconocido"
 }

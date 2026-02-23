@@ -342,7 +342,7 @@ export const VigilancePanel = React.memo<VigilancePanelProps>(
                     </div>
                     <div>
                       <p className="text-sm font-semibold text-slate-800 dark:text-slate-200 truncate max-w-[120px]">
-                        {reservation.userName || t("unknown_user", { fallback: "Usuario Desconocido" })}
+                        {reservation.userName || t("unknown_user")}
                       </p>
                       <p className="text-[10px] text-slate-500 truncate max-w-[120px]">
                         {reservation.userEmail || "Sin email"}

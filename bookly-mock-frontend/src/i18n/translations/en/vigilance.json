@@ -72,5 +72,6 @@
   "empty_approvals_desc": "There are currently no requests waiting for your approval.",
   "contacting_user": "Contacting user...",
   "enter_resolution": "Enter resolution",
-  "filter": "Filter"
+  "filter": "Filter",
+  "unknown_user": "Unknown User"
 }
