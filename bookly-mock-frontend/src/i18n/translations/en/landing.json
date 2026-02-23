@@ -8,5 +8,104 @@
     "reservations_desc": "Availability and reservation system",
     "approvals_title": "Approvals",
     "approvals_desc": "Configurable approval flows"
+  },
+  "nav": {
+    "features": "Features",
+    "benefits": "Benefits",
+    "testimonials": "Testimonials",
+    "cta": "Get Started"
+  },
+  "hero": {
+    "badge": "Institutional Reservation Platform",
+    "title_line1": "Book university",
+    "title_highlight": "spaces",
+    "title_line2": "without the hassle",
+    "subtitle": "Bookly simplifies room, lab, and auditorium management at your university. Book in seconds, approve with a click, and get real-time reports.",
+    "cta_primary": "Sign In",
+    "cta_secondary": "Create Account",
+    "trusted_by": "Designed for the UFPS academic community"
+  },
+  "features": {
+    "title": "Everything you need to manage spaces",
+    "subtitle": "A complete platform connecting students, faculty, and staff with physical university resources.",
+    "resources": {
+      "title": "Resource Management",
+      "description": "Manage rooms, labs, auditoriums, and equipment with categories, custom attributes, and bulk import."
+    },
+    "reservations": {
+      "title": "Smart Reservations",
+      "description": "Book spaces in real-time with an interactive calendar, conflict detection, and automatic recurring reservations."
+    },
+    "approvals": {
+      "title": "Approval Workflows",
+      "description": "Set up differentiated validation flows by resource type with automatic notifications and full traceability."
+    },
+    "reports": {
+      "title": "Reports & Analytics",
+      "description": "Real-time dashboards with occupancy metrics, unmet demand insights, and CSV export for decision making."
+    },
+    "calendar": {
+      "title": "Integrated Calendar",
+      "description": "View availability of all resources in calendar format with daily, weekly, and monthly views."
+    },
+    "security": {
+      "title": "Security & Roles",
+      "description": "Secure authentication with granular roles: admin, coordinator, faculty, and student. Full action audit trail."
+    }
+  },
+  "benefits": {
+    "title": "Real impact on your institution",
+    "subtitle": "Bookly transforms how universities manage their physical spaces.",
+    "stat1_value": "90%",
+    "stat1_label": "Reduction in scheduling conflicts",
+    "stat2_value": "5 min",
+    "stat2_label": "Average time to book",
+    "stat3_value": "100%",
+    "stat3_label": "Approval traceability",
+    "stat4_value": "24/7",
+    "stat4_label": "System availability",
+    "card1_title": "For Students",
+    "card1_desc": "Book study rooms and labs from your phone, anytime, anywhere.",
+    "card2_title": "For Faculty",
+    "card2_desc": "Request auditoriums and specialized rooms with fast approval and automatic confirmation.",
+    "card3_title": "For Administrators",
+    "card3_desc": "Control resource usage with detailed reports, occupancy metrics, and complete audit trails."
+  },
+  "testimonials": {
+    "title": "The academic community trusts Bookly",
+    "subtitle": "Hear from people who use the platform every day.",
+    "t1_quote": "I used to spend half an hour looking for an available room. With Bookly, I book in under a minute.",
+    "t1_name": "María García",
+    "t1_role": "Systems Engineering Student",
+    "t2_quote": "The approval system lets me validate requests from anywhere. The traceability is excellent.",
+    "t2_name": "Carlos Rodríguez",
+    "t2_role": "Program Coordinator",
+    "t3_quote": "Occupancy reports helped us redistribute spaces and improve utilization by 40%.",
+    "t3_name": "Laura Martínez",
+    "t3_role": "Administrative Director"
+  },
+  "cta_section": {
+    "title": "Start managing your spaces today",
+    "subtitle": "Join the platform that is transforming university resource management.",
+    "button": "Create free account",
+    "login_text": "Already have an account?",
+    "login_link": "Sign in"
+  },
+  "footer": {
+    "brand_desc": "Institutional reservation system for Universidad Francisco de Paula Santander.",
+    "product": "Product",
+    "resources_link": "Resources",
+    "reservations_link": "Reservations",
+    "approvals_link": "Approvals",
+    "reports_link": "Reports",
+    "support": "Support",
+    "help_center": "Help Center",
+    "contact": "Contact",
+    "documentation": "Documentation",
+    "legal": "Legal",
+    "privacy": "Privacy",
+    "terms": "Terms of Service",
+    "copyright": "Bookly. All rights reserved.",
+    "university": "Universidad Francisco de Paula Santander"
   }
 }

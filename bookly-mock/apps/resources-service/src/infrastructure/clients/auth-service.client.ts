@@ -3,7 +3,7 @@ import { Injectable } from "@nestjs/common";
 import { ConfigService } from "@nestjs/config";
 import {
   IAuthServiceClient,
-} from "@resources/application/services/schedule-import.service";
+} from "../../application/services/schedule-import.service";
 
 /**
  * Auth Service HTTP Client
@@ -115,10 +115,8 @@ export class AuthServiceClient implements IAuthServiceClient {
 
       return { userId, created: true };
     } catch (error) {
-      const errMsg =
-        error instanceof Error ? error.message : String(error);
       this.logger.warn("Auth service communication failed, using fallback", {
-        error: errMsg,
+        error: error instanceof Error ? error : new Error(String(error)),
       });
 
       // Fallback resiliente: no bloquear importación si auth-service no responde

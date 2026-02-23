@@ -44,5 +44,6 @@
   "delete_title": "Confirmar Eliminación",
   "delete_confirm": "¿Estás seguro que deseas eliminar este mantenimiento?",
   "delete_button": "Eliminar",
-  "cancel_button": "Cancelar"
+  "cancel_button": "Cancelar",
+  "total_maintenances": "Total mantenimientos"
 }

@@ -721,7 +721,7 @@ export class ScheduleImportService {
       };
     } catch (error) {
       const errMsg = error instanceof Error ? error.message : String(error);
-      this.logger.error("Error resolving teacher", { fullName, error: errMsg });
+      this.logger.error("Error resolving teacher", error, { fullName });
       throw new Error(`Cannot resolve teacher "${fullName}": ${errMsg}`);
     }
   }
