@@ -329,32 +329,32 @@ export default function DashboardPage() {
         {/* Reservas y Recursos */}
         <div className="grid gap-6 md:grid-cols-2 mt-6">
           {/* Reservas Recientes */}
-          <Card className="border-[var(--color-border-subtle)] shadow-sm">
+          <Card className="border-line-subtle shadow-sm">
             <CardHeader>
-              <CardTitle className="text-lg text-[var(--color-text-primary)]">{t("recent_reservations")}</CardTitle>
-              <CardDescription className="text-sm text-[var(--color-text-secondary)]">{t("recent_reservations_desc")}</CardDescription>
+              <CardTitle className="text-lg text-content-primary">{t("recent_reservations")}</CardTitle>
+              <CardDescription className="text-sm text-content-secondary">{t("recent_reservations_desc")}</CardDescription>
             </CardHeader>
             <CardContent>
               <div className="space-y-4">
                 {isLoading ? (
-                  <p className="text-[var(--color-text-tertiary)]">
+                  <p className="text-content-tertiary">
                     {tCommon("loading")}
                   </p>
                 ) : recentReservations.length === 0 ? (
-                  <p className="text-[var(--color-text-tertiary)]">
+                  <p className="text-content-tertiary">
                     {t("no_recent_reservations")}
                   </p>
                 ) : (
                   recentReservations.slice(0, 5).map((reserva) => (
                     <div
                       key={reserva.id}
-                      className="flex items-center justify-between py-3 border-b last:border-0 border-[var(--color-border-subtle)]"
+                      className="flex items-center justify-between py-3 border-b last:border-0 border-line-subtle"
                     >
                       <div>
-                        <p className="font-medium text-[var(--color-text-primary)]">
+                        <p className="font-medium text-content-primary">
                           {reserva.resourceName || t("resource")}
                         </p>
-                        <p className="text-sm text-[var(--color-text-secondary)]">
+                        <p className="text-sm text-content-secondary">
                           {new Date(reserva.startAt).toLocaleDateString()} •{" "}
                           {`${new Date(reserva.startAt).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})} - ${new Date(reserva.endAt).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}`}
                         </p>
@@ -376,19 +376,19 @@ export default function DashboardPage() {
           </Card>
 
           {/* Recursos Más Usados */}
-          <Card className="border-[var(--color-border-subtle)] shadow-sm">
+          <Card className="border-line-subtle shadow-sm">
             <CardHeader>
-              <CardTitle className="text-lg text-[var(--color-text-primary)]">{t("most_used_resources")}</CardTitle>
-              <CardDescription className="text-sm text-[var(--color-text-secondary)]">{t("most_used_desc")}</CardDescription>
+              <CardTitle className="text-lg text-content-primary">{t("most_used_resources")}</CardTitle>
+              <CardDescription className="text-sm text-content-secondary">{t("most_used_desc")}</CardDescription>
             </CardHeader>
             <CardContent>
               <div className="space-y-5">
                 {isLoading ? (
-                  <p className="text-[var(--color-text-tertiary)]">
+                  <p className="text-content-tertiary">
                     {tCommon("loading")}
                   </p>
                 ) : (metrics?.mostUsedResources || []).length === 0 ? (
-                  <p className="text-[var(--color-text-tertiary)]">
+                  <p className="text-content-tertiary">
                     {t("no_data")}
                   </p>
                 ) : (
@@ -397,16 +397,16 @@ export default function DashboardPage() {
                     .map((recurso) => (
                       <div key={recurso.id}>
                         <div className="flex items-center justify-between mb-2">
-                          <span className="text-sm font-medium text-[var(--color-text-primary)]">
+                          <span className="text-sm font-medium text-content-primary">
                             {recurso.name}
                           </span>
-                          <span className="text-sm font-semibold text-[var(--color-text-secondary)]">
+                          <span className="text-sm font-semibold text-content-secondary">
                             {recurso.usageCount} {t("reservations_count")}
                           </span>
                         </div>
-                        <div className="w-full bg-[var(--color-bg-muted)] rounded-full h-2.5 dark:bg-[var(--color-bg-tertiary)] overflow-hidden">
+                        <div className="w-full bg-app rounded-full h-2.5 dark:bg-neutral-800 overflow-hidden">
                           <div
-                            className="bg-[var(--color-action-primary)] h-full rounded-full transition-all duration-500"
+                            className="bg-action-primary h-full rounded-full transition-all duration-500"
                             style={{
                               width: `${recurso.share > 0 ? recurso.share : Math.min(100, (recurso.usageCount / 30) * 100)}%`,
                             }}

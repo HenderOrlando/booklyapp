@@ -27,11 +27,10 @@ test.describe("Auth Smoke", () => {
 
     await loginPage.login(TEST_USERS.admin.email, TEST_USERS.admin.password);
 
-    // After login, AuthContext redirects via router.replace to the callback URL.
-    // Use 'commit' because the full load may take longer on protected routes.
+    // After login + reload, AuthContext restores user and redirects.
+    // Accept either the callback target or dashboard fallback.
     await page.waitForURL(/\/es\/(recursos|dashboard)/, {
-      timeout: 20000,
-      waitUntil: "commit",
+      timeout: 30000,
     });
   });
 

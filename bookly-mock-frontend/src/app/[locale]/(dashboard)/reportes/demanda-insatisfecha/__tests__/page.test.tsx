@@ -46,7 +46,7 @@ describe("DemandaInsatisfechaPage (RF-37)", () => {
   it("renders page title", async () => {
     render(<DemandaInsatisfechaPage />);
     await waitFor(() => {
-      expect(screen.getByText(/demanda insatisfecha/i)).toBeInTheDocument();
+      expect(screen.getByText("unsatisfied_demand_title")).toBeInTheDocument();
     });
   });
 

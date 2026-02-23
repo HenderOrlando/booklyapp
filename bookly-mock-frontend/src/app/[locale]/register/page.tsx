@@ -3,6 +3,13 @@
 import { Alert, AlertDescription } from "@/components/atoms/Alert";
 import { Button } from "@/components/atoms/Button";
 import { Input } from "@/components/atoms/Input";
+import { 
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/atoms/Select";
 import { AuthLayout } from "@/components/templates/AuthLayout";
 import { useLocale, useTranslations } from "next-intl";
 import * as React from "react";
@@ -132,14 +139,14 @@ export default function RegisterPage() {
 
         {/* Información Personal */}
         <div className="space-y-2">
-          <h3 className="text-sm font-semibold text-[var(--color-text-primary)]">
+          <h3 className="text-sm font-semibold text-content-primary">
             {t("personal_info")}
           </h3>
 
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <label className="block text-sm font-medium text-[var(--color-text-primary)] mb-1">
-                {t("first_name")} <span className="text-state-error-500">*</span>
+              <label className="block text-sm font-medium text-content-primary mb-1">
+                {t("first_name")} <span className="text-state-error-text">*</span>
               </label>
               <Input
                 type="text"
@@ -153,8 +160,8 @@ export default function RegisterPage() {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-[var(--color-text-primary)] mb-1">
-                {t("last_name")} <span className="text-state-error-500">*</span>
+              <label className="block text-sm font-medium text-content-primary mb-1">
+                {t("last_name")} <span className="text-state-error-text">*</span>
               </label>
               <Input
                 type="text"
@@ -171,13 +178,13 @@ export default function RegisterPage() {
 
         {/* Información de Cuenta */}
         <div className="space-y-2">
-          <h3 className="text-sm font-semibold text-[var(--color-text-primary)]">
+          <h3 className="text-sm font-semibold text-content-primary">
             {t("account_info")}
           </h3>
 
           <div>
-            <label className="block text-sm font-medium text-[var(--color-text-primary)] mb-1">
-              {t("email")} <span className="text-state-error-500">*</span>
+            <label className="block text-sm font-medium text-content-primary mb-1">
+              {t("email")} <span className="text-state-error-text">*</span>
             </label>
             <Input
               type="email"
@@ -191,8 +198,8 @@ export default function RegisterPage() {
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-[var(--color-text-primary)] mb-1">
-              {t("username")} <span className="text-state-error-500">*</span>
+            <label className="block text-sm font-medium text-content-primary mb-1">
+              {t("username")} <span className="text-state-error-text">*</span>
             </label>
             <Input
               type="text"
@@ -207,8 +214,8 @@ export default function RegisterPage() {
 
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <label className="block text-sm font-medium text-[var(--color-text-primary)] mb-1">
-                {t("password")} <span className="text-state-error-500">*</span>
+              <label className="block text-sm font-medium text-content-primary mb-1">
+                {t("password")} <span className="text-state-error-text">*</span>
               </label>
               <Input
                 type="password"
@@ -222,8 +229,8 @@ export default function RegisterPage() {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-[var(--color-text-primary)] mb-1">
-                {t("confirm_password")} <span className="text-state-error-500">*</span>
+              <label className="block text-sm font-medium text-content-primary mb-1">
+                {t("confirm_password")} <span className="text-state-error-text">*</span>
               </label>
               <Input
                 type="password"
@@ -240,12 +247,12 @@ export default function RegisterPage() {
 
         {/* Información Adicional (Opcional) */}
         <div className="space-y-2">
-          <h3 className="text-sm font-semibold text-[var(--color-text-primary)]">
+          <h3 className="text-sm font-semibold text-content-primary">
             {t("additional_info")}
           </h3>
 
           <div>
-            <label className="block text-sm font-medium text-[var(--color-text-primary)] mb-1">
+            <label className="block text-sm font-medium text-content-primary mb-1">
               {t("phone")}
             </label>
             <Input
@@ -260,25 +267,30 @@ export default function RegisterPage() {
 
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <label className="block text-sm font-medium text-[var(--color-text-primary)] mb-1">
+              <label className="block text-sm font-medium text-content-primary mb-1">
                 {t("doc_type")}
               </label>
-              <select
-                name="documentType"
+              <Select
                 value={formData.documentType}
-                onChange={handleChange}
+                onValueChange={(value) =>
+                  setFormData({ ...formData, documentType: value })
+                }
                 disabled={loading}
-                className="flex h-10 w-full rounded-md border border-[var(--color-border)] bg-[var(--color-bg-surface)] px-3 py-2 text-sm"
               >
-                <option value="CC">{t("document_types.cc")}</option>
-                <option value="TI">{t("document_types.ti")}</option>
-                <option value="CE">{t("document_types.ce")}</option>
-                <option value="PA">{t("document_types.pa")}</option>
-              </select>
+                <SelectTrigger>
+                  <SelectValue placeholder={t("doc_type")} />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="CC">{t("document_types.cc")}</SelectItem>
+                  <SelectItem value="TI">{t("document_types.ti")}</SelectItem>
+                  <SelectItem value="CE">{t("document_types.ce")}</SelectItem>
+                  <SelectItem value="PA">{t("document_types.pa")}</SelectItem>
+                </SelectContent>
+              </Select>
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-[var(--color-text-primary)] mb-1">
+              <label className="block text-sm font-medium text-content-primary mb-1">
                 {t("doc_number")}
               </label>
               <Input
@@ -297,11 +309,11 @@ export default function RegisterPage() {
           {loading ? t("registering") : t("create_account")}
         </Button>
 
-        <div className="text-center text-sm text-[var(--color-text-secondary)]">
+        <div className="text-center text-sm text-content-secondary">
           {t("already_have_account")}{" "}
           <a
             href="/login"
-            className="text-brand-primary-500 hover:underline font-medium"
+            className="text-action-primary hover:underline font-medium"
           >
             {t("login_link")}
           </a>
@@ -309,11 +321,11 @@ export default function RegisterPage() {
       </form>
 
       {/* Información de campos obligatorios */}
-      <div className="mt-6 p-3 bg-[var(--color-bg-muted)] rounded-md border border-[var(--color-border-subtle)]">
-        <p className="text-xs text-[var(--color-text-secondary)]">
-          <span className="text-state-error-500">*</span> {t("required_fields")}
+      <div className="mt-6 p-3 bg-app rounded-md border border-line-subtle">
+        <p className="text-xs text-content-secondary">
+          <span className="text-state-error-text">*</span> {t("required_fields")}
         </p>
-        <p className="text-xs text-[var(--color-text-secondary)] mt-1">
+        <p className="text-xs text-content-secondary mt-1">
           {t("password_requirement")}
         </p>
       </div>

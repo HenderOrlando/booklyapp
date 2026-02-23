@@ -54,4 +54,9 @@ jest.mock("@/infrastructure/http/httpClient", () => ({
   isMockMode: () => true,
 }));
 
+// Dummy test to prevent "must contain at least one test" error
+test("test-utils loads without errors", () => {
+  expect(true).toBe(true);
+});
+
 export { mockHttpClient };

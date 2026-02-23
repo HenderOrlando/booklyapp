@@ -21,19 +21,19 @@ const badgeVariants = cva(
     variants: {
       variant: {
         default:
-          "border-transparent bg-[var(--color-bg-secondary)] text-[var(--color-text-primary)]",
+          "border-transparent bg-app text-content-primary",
         success:
-          "border-[var(--color-state-success-border)] bg-[var(--color-state-success-bg)] text-[var(--color-state-success-text)]",
+          "border-state-success-border bg-state-success-bg text-state-success-text",
         warning:
-          "border-[var(--color-state-warning-border)] bg-[var(--color-state-warning-bg)] text-[var(--color-state-warning-text)]",
+          "border-state-warning-border bg-state-warning-bg text-state-warning-text",
         error:
-          "border-[var(--color-state-error-border)] bg-[var(--color-state-error-bg)] text-[var(--color-state-error-text)]",
+          "border-state-error-border bg-state-error-bg text-state-error-text",
         primary:
-          "border-transparent bg-[var(--color-action-primary)] text-[var(--color-text-inverse)]",
+          "border-transparent bg-action-primary text-content-inverse",
         secondary:
-          "border-transparent bg-[var(--color-action-secondary)] text-[var(--color-text-inverse)]",
+          "border-transparent bg-action-secondary text-content-inverse",
         outline:
-          "border-[var(--color-border-strong)] text-[var(--color-text-primary)]",
+          "border-line-strong text-content-primary",
       },
     },
     defaultVariants: {

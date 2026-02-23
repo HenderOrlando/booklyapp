@@ -37,14 +37,14 @@ const SelectTrigger = React.forwardRef<
       id={id}
       className={cn(
         "flex h-10 w-full items-center justify-between rounded-md border px-3 py-2 text-sm",
-        "ring-offset-background placeholder:text-[var(--color-text-secondary)]",
-        "bg-[var(--color-bg-surface)] border-[var(--color-border-subtle)]",
-        "text-[var(--color-text-primary)]",
-        "focus:outline-none focus:ring-2 focus:ring-[var(--color-border-focus)] focus:ring-offset-2",
+        "ring-offset-background placeholder:text-content-secondary",
+        "bg-surface border-line-subtle",
+        "text-content-primary",
+        "focus:outline-none focus:ring-2 focus:ring-line-focus focus:ring-offset-2",
         "disabled:cursor-not-allowed disabled:opacity-50",
         "[&>span]:line-clamp-1",
         error &&
-          "border-[var(--color-state-error-border)] focus:ring-[var(--color-state-error-border)]",
+          "border-state-error-border focus:ring-state-error-border",
         className,
       )}
       aria-invalid={error ? true : undefined}
@@ -140,8 +140,8 @@ const SelectContent = React.forwardRef<
       ref={ref}
       className={cn(
         "relative z-50 max-h-96 min-w-[8rem] overflow-hidden rounded-md border shadow-md",
-        "bg-[var(--color-bg-surface)] border-[var(--color-border-subtle)]",
-        "text-[var(--color-text-primary)]",
+        "bg-surface border-line-subtle",
+        "text-content-primary",
         "data-[state=open]:animate-in data-[state=closed]:animate-out",
         "data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0",
         "data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95",
@@ -190,7 +190,7 @@ const SelectItem = React.forwardRef<
     ref={ref}
     className={cn(
       "relative flex w-full cursor-default select-none items-center rounded-sm py-1.5 pl-8 pr-2 text-sm outline-none",
-      "focus:bg-[var(--color-bg-muted)] focus:text-[var(--color-text-primary)]",
+      "focus:bg-app focus:text-content-primary",
       "data-[disabled]:pointer-events-none data-[disabled]:opacity-50",
       className
     )}
@@ -225,7 +225,7 @@ const SelectSeparator = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <SelectPrimitive.Separator
     ref={ref}
-    className={cn("-mx-1 my-1 h-px bg-[var(--color-border-subtle)]", className)}
+    className={cn("-mx-1 my-1 h-px bg-line-subtle", className)}
     {...props}
   />
 ));

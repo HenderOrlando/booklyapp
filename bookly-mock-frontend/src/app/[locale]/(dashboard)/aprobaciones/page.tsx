@@ -3,6 +3,8 @@
 import { ApprovalCard } from "@/components/molecules/ApprovalCard";
 import { LoadingState } from "@/components/molecules/LoadingState";
 import { ApprovalModal } from "@/components/organisms/ApprovalModal";
+import { ListLayout } from "@/components/templates/ListLayout";
+import { Button } from "@/components/atoms/Button";
 import { useApprovalActions } from "@/hooks/useApprovalActions";
 import {
   useApprovalRequests,
@@ -19,7 +21,6 @@ import {
   CheckCircle,
   Clock,
   Filter,
-  Search,
   TrendingUp,
   XCircle,
 } from "lucide-react";
@@ -183,78 +184,78 @@ export default function AprobacionesPage() {
 
   return (
     <>
-      <div className="space-y-6">
-        {/* Header */}
-        <div>
-          <h1 className="text-3xl font-bold text-[var(--color-text-primary)] dark:text-[var(--color-text-primary)]">
-            {t("title")}
-          </h1>
-          <p className="mt-2 text-[var(--color-text-secondary)] dark:text-[var(--color-text-tertiary)]">
-            {t("description")}
-          </p>
-        </div>
-
+      <ListLayout
+        title={t("title")}
+        badge={{ text: t("management"), variant: "warning" }}
+        onSearch={setSearchQuery}
+        actions={
+          <Button variant="outline" className="flex items-center gap-2">
+            <Filter className="h-4 w-4" />
+            {t("filters")}
+          </Button>
+        }
+      >
         {/* Estadísticas */}
         {stats && (
           <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-            <div className="bg-[var(--color-bg-primary)] dark:bg-[var(--color-bg-secondary)] rounded-lg border border-[var(--color-border-primary)] dark:border-[var(--color-border-primary)] p-4">
+            <div className="bg-surface rounded-lg border border-line-subtle p-4">
               <div className="flex items-center gap-3">
-                <div className="p-2 bg-state-warning-100 dark:bg-state-warning-900/20 rounded-lg">
-                  <Clock className="h-5 w-5 text-state-warning-600 dark:text-state-warning-400" />
+                <div className="p-2 bg-state-warning-bg rounded-lg">
+                  <Clock className="h-5 w-5 text-state-warning-text" />
                 </div>
                 <div>
-                  <p className="text-sm text-[var(--color-text-secondary)] dark:text-[var(--color-text-tertiary)]">
+                  <p className="text-sm text-content-secondary">
                     {t("stats.pending")}
                   </p>
-                  <p className="text-2xl font-bold text-[var(--color-text-primary)] dark:text-[var(--color-text-primary)]">
+                  <p className="text-2xl font-bold text-content-primary">
                     {stats.totalPending || 0}
                   </p>
                 </div>
               </div>
             </div>
 
-            <div className="bg-[var(--color-bg-primary)] dark:bg-[var(--color-bg-secondary)] rounded-lg border border-[var(--color-border-primary)] dark:border-[var(--color-border-primary)] p-4">
+            <div className="bg-surface rounded-lg border border-line-subtle p-4">
               <div className="flex items-center gap-3">
-                <div className="p-2 bg-state-success-100 dark:bg-state-success-900/20 rounded-lg">
-                  <CheckCircle className="h-5 w-5 text-state-success-600 dark:text-state-success-400" />
+                <div className="p-2 bg-state-success-bg rounded-lg">
+                  <CheckCircle className="h-5 w-5 text-state-success-text" />
                 </div>
                 <div>
-                  <p className="text-sm text-[var(--color-text-secondary)] dark:text-[var(--color-text-tertiary)]">
+                  <p className="text-sm text-content-secondary">
                     {t("stats.approved")}
                   </p>
-                  <p className="text-2xl font-bold text-[var(--color-text-primary)] dark:text-[var(--color-text-primary)]">
+                  <p className="text-2xl font-bold text-content-primary">
                     {stats.totalApproved || 0}
                   </p>
                 </div>
               </div>
             </div>
 
-            <div className="bg-[var(--color-bg-primary)] dark:bg-[var(--color-bg-secondary)] rounded-lg border border-[var(--color-border-primary)] dark:border-[var(--color-border-primary)] p-4">
+            <div className="bg-surface rounded-lg border border-line-subtle p-4">
               <div className="flex items-center gap-3">
-                <div className="p-2 bg-state-error-100 dark:bg-state-error-900/20 rounded-lg">
-                  <XCircle className="h-5 w-5 text-state-error-600 dark:text-state-error-400" />
+                <div className="p-2 bg-state-error-bg rounded-lg">
+                  <XCircle className="h-5 w-5 text-state-error-text" />
                 </div>
                 <div>
-                  <p className="text-sm text-[var(--color-text-secondary)] dark:text-[var(--color-text-tertiary)]">
+                  <p className="text-sm text-content-secondary">
                     {t("stats.rejected")}
                   </p>
-                  <p className="text-2xl font-bold text-[var(--color-text-primary)] dark:text-[var(--color-text-primary)]">
+                  <p className="text-2xl font-bold text-content-primary">
                     {stats.totalRejected || 0}
                   </p>
                 </div>
               </div>
             </div>
 
-            <div className="bg-[var(--color-bg-primary)] dark:bg-[var(--color-bg-secondary)] rounded-lg border border-[var(--color-border-primary)] dark:border-[var(--color-border-primary)] p-4">
+            <div className="bg-surface rounded-lg border border-line-subtle p-4">
               <div className="flex items-center gap-3">
-                <div className="p-2 bg-brand-primary-100 dark:bg-brand-primary-900/20 rounded-lg">
-                  <TrendingUp className="h-5 w-5 text-brand-primary-600 dark:text-brand-primary-400" />
+                <div className="p-2 bg-action-primary/10 rounded-lg">
+                  <TrendingUp className="h-5 w-5 text-action-primary" />
                 </div>
                 <div>
-                  <p className="text-sm text-[var(--color-text-secondary)] dark:text-[var(--color-text-tertiary)]">
+                  <p className="text-sm text-content-secondary">
                     {t("stats.average_time")}
                   </p>
-                  <p className="text-2xl font-bold text-[var(--color-text-primary)] dark:text-[var(--color-text-primary)]">
+                  <p className="text-2xl font-bold text-content-primary">
                     {stats.averageApprovalTime
                       ? (stats.averageApprovalTime / 60).toFixed(1)
                       : "0"}
@@ -265,24 +266,6 @@ export default function AprobacionesPage() {
             </div>
           </div>
         )}
-
-        {/* Filtros y búsqueda */}
-        <div className="flex gap-4">
-          <div className="flex-1 relative">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-[var(--color-text-tertiary)]" />
-            <input
-              type="text"
-              placeholder={t("search_placeholder")}
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-10 pr-4 py-2 border border-[var(--color-border-primary)] dark:border-[var(--color-border-primary)] rounded-lg bg-[var(--color-bg-primary)] dark:bg-[var(--color-bg-secondary)] text-[var(--color-text-primary)] dark:text-[var(--color-text-primary)] placeholder:text-[var(--color-text-tertiary)]"
-            />
-          </div>
-          <button className="flex items-center gap-2 px-4 py-2 border border-[var(--color-border-primary)] dark:border-[var(--color-border-primary)] rounded-lg hover:bg-[var(--color-bg-secondary)] dark:hover:bg-[var(--color-bg-primary)]">
-            <Filter className="h-4 w-4" />
-            {t("filters")}
-          </button>
-        </div>
 
         {/* Lista de solicitudes */}
         {isLoading ? (
@@ -303,11 +286,11 @@ export default function AprobacionesPage() {
             ))}
           </div>
         ) : (
-          <div className="text-center py-12 text-[var(--color-text-tertiary)] dark:text-[var(--color-text-tertiary)]">
+          <div className="text-center py-12 text-content-tertiary">
             <p>{t("no_requests")}</p>
           </div>
         )}
-      </div>
+      </ListLayout>
 
       {/* Modal de detalle */}
       {selectedRequest && (

@@ -38,9 +38,7 @@ describe("Input", () => {
   it("applies error border style when error exists", () => {
     render(<Input error="Error" placeholder="Name" />);
     const input = screen.getByPlaceholderText("Name");
-    expect(input.className).toContain(
-      "border-[var(--color-state-error-border)]",
-    );
+    expect(input.className).toContain("border-state-error-border");
   });
 
   it("does not show error when error is undefined", () => {

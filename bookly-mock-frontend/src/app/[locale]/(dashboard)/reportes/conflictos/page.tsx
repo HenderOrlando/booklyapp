@@ -160,10 +160,10 @@ export default function ConflictosPage() {
       <div className="space-y-6 pb-6">
         <div className="flex items-center justify-between">
           <div>
-            <h2 className="text-3xl font-bold text-[var(--color-text-primary)]">
+            <h2 className="text-3xl font-bold text-content-primary">
               Conflictos de Disponibilidad
             </h2>
-            <p className="text-[var(--color-text-secondary)] mt-2">
+            <p className="text-content-secondary mt-2">
               Solapamientos y conflictos detectados en reservas
             </p>
           </div>
@@ -177,10 +177,10 @@ export default function ConflictosPage() {
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
           <Card>
             <CardContent className="pt-4">
-              <div className="text-2xl font-bold text-[var(--color-text-primary)]">
+              <div className="text-2xl font-bold text-content-primary">
                 {conflicts.length}
               </div>
-              <p className="text-xs text-[var(--color-text-secondary)]">
+              <p className="text-xs text-content-secondary">
                 Total conflictos
               </p>
             </CardContent>
@@ -190,7 +190,7 @@ export default function ConflictosPage() {
               <div className="text-2xl font-bold text-state-error-500">
                 {pendingCount}
               </div>
-              <p className="text-xs text-[var(--color-text-secondary)]">
+              <p className="text-xs text-content-secondary">
                 Pendientes
               </p>
             </CardContent>
@@ -200,7 +200,7 @@ export default function ConflictosPage() {
               <div className="text-2xl font-bold text-state-success-500">
                 {resolvedCount}
               </div>
-              <p className="text-xs text-[var(--color-text-secondary)]">
+              <p className="text-xs text-content-secondary">
                 Resueltos
               </p>
             </CardContent>
@@ -210,7 +210,7 @@ export default function ConflictosPage() {
               <div className="text-2xl font-bold text-state-warning-500">
                 {highSeverity}
               </div>
-              <p className="text-xs text-[var(--color-text-secondary)]">
+              <p className="text-xs text-content-secondary">
                 Alta severidad
               </p>
             </CardContent>
@@ -239,7 +239,7 @@ export default function ConflictosPage() {
                 <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-brand-primary-500" />
               </div>
             ) : filtered.length === 0 ? (
-              <p className="py-8 text-center text-[var(--color-text-tertiary)]">
+              <p className="py-8 text-center text-content-tertiary">
                 No se encontraron conflictos.
               </p>
             ) : (
@@ -247,7 +247,7 @@ export default function ConflictosPage() {
                 {filtered.map((conflict) => (
                   <div
                     key={conflict.id}
-                    className="rounded-lg border p-4 transition-colors hover:bg-[var(--color-bg-muted)]/50"
+                    className="rounded-lg border p-4 transition-colors hover:bg-app/50"
                   >
                     <div className="flex items-start justify-between gap-4">
                       <div className="flex items-start gap-3">
@@ -259,7 +259,7 @@ export default function ConflictosPage() {
                         />
                         <div>
                           <div className="flex items-center gap-2 flex-wrap">
-                            <span className="font-medium text-[var(--color-text-primary)]">
+                            <span className="font-medium text-content-primary">
                               {conflict.resourceName}
                             </span>
                             <Badge variant="default">
@@ -272,7 +272,7 @@ export default function ConflictosPage() {
                             </Badge>
                           </div>
 
-                          <div className="mt-1.5 flex items-center gap-4 text-xs text-[var(--color-text-tertiary)]">
+                          <div className="mt-1.5 flex items-center gap-4 text-xs text-content-tertiary">
                             <span className="flex items-center gap-1">
                               <Calendar className="h-3 w-3" />
                               {conflict.date}
@@ -283,7 +283,7 @@ export default function ConflictosPage() {
                             </span>
                           </div>
 
-                          <div className="mt-2 space-y-1 text-sm text-[var(--color-text-secondary)]">
+                          <div className="mt-2 space-y-1 text-sm text-content-secondary">
                             <p>
                               <span className="font-medium">
                                 {conflict.reservation1.userName}:

@@ -65,18 +65,18 @@ export function UserStatsCards({
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
       {/* Total usuarios */}
-      <Card className="bg-gradient-to-br from-blue-500/10 to-blue-600/10 border-blue-500/20">
+      <Card className="group hover:shadow-md transition-all duration-200 bg-gradient-to-br from-brand-primary-500/5 to-brand-primary-600/5 border-brand-primary-500/20">
         <CardContent className="p-6">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm font-medium text-[var(--color-text-tertiary)]">
+              <p className="text-[10px] font-bold uppercase tracking-wider text-brand-primary-600/80 mb-1">
                 {t("total_users")}
               </p>
-              <h3 className="text-3xl font-bold text-foreground mt-2">
+              <h3 className="text-3xl font-black text-brand-primary-800 dark:text-brand-primary-200 leading-none mt-2">
                 {users.length}
               </h3>
             </div>
-            <div className="w-12 h-12 bg-brand-primary-500/20 rounded-full flex items-center justify-center">
+            <div className="w-12 h-12 bg-brand-primary-500/10 text-brand-primary-600 rounded-2xl flex items-center justify-center group-hover:scale-110 transition-transform duration-200">
               <span className="text-2xl">👥</span>
             </div>
           </div>
@@ -84,22 +84,23 @@ export function UserStatsCards({
       </Card>
 
       {/* Usuarios activos */}
-      <Card className="bg-gradient-to-br from-green-500/10 to-green-600/10 border-green-500/20">
+      <Card className="group hover:shadow-md transition-all duration-200 bg-gradient-to-br from-state-success-500/5 to-state-success-700/5 border-state-success-500/20">
         <CardContent className="p-6">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm font-medium text-[var(--color-text-tertiary)]">
+              <p className="text-[10px] font-bold uppercase tracking-wider text-state-success-700/80 dark:text-state-success-200/80 mb-1">
                 {t("active_users")}
               </p>
-              <h3 className="text-3xl font-bold text-foreground mt-2">
+              <h3 className="text-3xl font-black text-state-success-900 dark:text-state-success-200 leading-none mt-2">
                 {activeUsers.length}
               </h3>
-              <p className="text-xs text-[var(--color-text-tertiary)] mt-1">
+              <p className="text-[11px] font-medium text-state-success-700/70 dark:text-state-success-200/70 mt-2 flex items-center gap-1">
+                <span className="w-1 h-1 rounded-full bg-state-success-500" />
                 {((activeUsers.length / users.length) * 100).toFixed(0)}%{" "}
                 {t("of_total")}
               </p>
             </div>
-            <div className="w-12 h-12 bg-state-success-500/20 rounded-full flex items-center justify-center">
+            <div className="w-12 h-12 bg-state-success-500/10 text-state-success-700 dark:text-state-success-200 rounded-2xl flex items-center justify-center group-hover:scale-110 transition-transform duration-200">
               <span className="text-2xl">✅</span>
             </div>
           </div>
@@ -107,24 +108,25 @@ export function UserStatsCards({
       </Card>
 
       {/* Usuarios inactivos */}
-      <Card className="bg-gradient-to-br from-orange-500/10 to-orange-600/10 border-orange-500/20">
+      <Card className="group hover:shadow-md transition-all duration-200 bg-gradient-to-br from-state-warning-500/5 to-state-warning-700/5 border-state-warning-500/20">
         <CardContent className="p-6">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm font-medium text-[var(--color-text-tertiary)]">
+              <p className="text-[10px] font-bold uppercase tracking-wider text-state-warning-700/80 dark:text-state-warning-200/80 mb-1">
                 {t("inactive_users")}
               </p>
-              <h3 className="text-3xl font-bold text-foreground mt-2">
+              <h3 className="text-3xl font-black text-state-warning-900 dark:text-state-warning-200 leading-none mt-2">
                 {inactiveUsers.length}
               </h3>
-              <p className="text-xs text-[var(--color-text-tertiary)] mt-1">
+              <p className="text-[11px] font-medium text-state-warning-700/70 dark:text-state-warning-200/70 mt-2 flex items-center gap-1">
+                <span className="w-1 h-1 rounded-full bg-state-warning-500" />
                 {users.length > 0
                   ? ((inactiveUsers.length / users.length) * 100).toFixed(0)
                   : 0}
                 % {t("of_total")}
               </p>
             </div>
-            <div className="w-12 h-12 bg-orange-500/20 rounded-full flex items-center justify-center">
+            <div className="w-12 h-12 bg-state-warning-500/10 text-state-warning-700 dark:text-state-warning-200 rounded-2xl flex items-center justify-center group-hover:scale-110 transition-transform duration-200">
               <span className="text-2xl">⚠️</span>
             </div>
           </div>
@@ -132,23 +134,24 @@ export function UserStatsCards({
       </Card>
 
       {/* Roles totales */}
-      <Card className="bg-gradient-to-br from-purple-500/10 to-purple-600/10 border-purple-500/20">
+      <Card className="group hover:shadow-md transition-all duration-200 bg-gradient-to-br from-purple-500/5 to-purple-600/5 border-purple-500/20">
         <CardContent className="p-6">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm font-medium text-[var(--color-text-tertiary)]">
+              <p className="text-[10px] font-bold uppercase tracking-wider text-purple-700/80 dark:text-purple-200/80 mb-1">
                 {t("total_roles")}
               </p>
-              <h3 className="text-3xl font-bold text-foreground mt-2">
+              <h3 className="text-3xl font-black text-purple-900 dark:text-purple-200 leading-none mt-2">
                 {roles.length}
               </h3>
               {mostCommonRole && (
-                <p className="text-xs text-[var(--color-text-tertiary)] mt-1">
+                <p className="text-[11px] font-medium text-purple-700/70 dark:text-purple-200/70 mt-2 flex items-center gap-1">
+                  <span className="w-1 h-1 rounded-full bg-purple-500" />
                   {t("most_common")}: {mostCommonRole[0]} ({mostCommonRole[1]})
                 </p>
               )}
             </div>
-            <div className="w-12 h-12 bg-purple-500/20 rounded-full flex items-center justify-center">
+            <div className="w-12 h-12 bg-purple-500/10 text-purple-700 dark:text-purple-200 rounded-2xl flex items-center justify-center group-hover:scale-110 transition-transform duration-200">
               <span className="text-2xl">🎭</span>
             </div>
           </div>

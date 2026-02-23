@@ -82,10 +82,10 @@ export default function DemandaInsatisfechaPage() {
         {/* Header */}
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-2xl font-bold text-[var(--color-text-primary)]">
+            <h1 className="text-2xl font-bold text-content-primary">
               {t("unsatisfied_demand_title")}
             </h1>
-            <p className="mt-1 text-sm text-[var(--color-text-secondary)]">
+            <p className="mt-1 text-sm text-content-secondary">
               {t("unsatisfied_demand_desc")}
             </p>
           </div>
@@ -103,10 +103,10 @@ export default function DemandaInsatisfechaPage() {
                 <TrendingDown className="h-5 w-5 text-state-error-600" />
               </div>
               <div>
-                <p className="text-2xl font-bold text-[var(--color-text-primary)]">
+                <p className="text-2xl font-bold text-content-primary">
                   {totalRejected}
                 </p>
-                <p className="text-xs text-[var(--color-text-secondary)]">
+                <p className="text-xs text-content-secondary">
                   {t("rejected_reservations")}
                 </p>
               </div>
@@ -118,10 +118,10 @@ export default function DemandaInsatisfechaPage() {
                 <AlertTriangle className="h-5 w-5 text-state-warning-600" />
               </div>
               <div>
-                <p className="text-2xl font-bold text-[var(--color-text-primary)]">
+                <p className="text-2xl font-bold text-content-primary">
                   {totalWaitlisted}
                 </p>
-                <p className="text-xs text-[var(--color-text-secondary)]">
+                <p className="text-xs text-content-secondary">
                   {t("in_waitlist")}
                 </p>
               </div>
@@ -133,10 +133,10 @@ export default function DemandaInsatisfechaPage() {
                 <BarChart3 className="h-5 w-5 text-brand-primary-600" />
               </div>
               <div>
-                <p className="text-2xl font-bold text-[var(--color-text-primary)]">
+                <p className="text-2xl font-bold text-content-primary">
                   {mockData.length}
                 </p>
-                <p className="text-xs text-[var(--color-text-secondary)]">
+                <p className="text-xs text-content-secondary">
                   {t("affected_resources")}
                 </p>
               </div>
@@ -149,20 +149,20 @@ export default function DemandaInsatisfechaPage() {
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead>
-                <tr className="border-b bg-[var(--color-bg-muted)]">
-                  <th className="px-4 py-3 text-left font-medium text-[var(--color-text-secondary)]">
+                <tr className="border-b bg-app">
+                  <th className="px-4 py-3 text-left font-medium text-content-secondary">
                     {t("resource")}
                   </th>
-                  <th className="px-4 py-3 text-center font-medium text-[var(--color-text-secondary)]">
+                  <th className="px-4 py-3 text-center font-medium text-content-secondary">
                     {t("rejected")}
                   </th>
-                  <th className="px-4 py-3 text-center font-medium text-[var(--color-text-secondary)]">
+                  <th className="px-4 py-3 text-center font-medium text-content-secondary">
                     {t("waiting")}
                   </th>
-                  <th className="px-4 py-3 text-left font-medium text-[var(--color-text-secondary)]">
+                  <th className="px-4 py-3 text-left font-medium text-content-secondary">
                     {t("peak_hours")}
                   </th>
-                  <th className="px-4 py-3 text-center font-medium text-[var(--color-text-secondary)]">
+                  <th className="px-4 py-3 text-center font-medium text-content-secondary">
                     {t("demand_score")}
                   </th>
                 </tr>
@@ -171,9 +171,9 @@ export default function DemandaInsatisfechaPage() {
                 {mockData.map((item) => (
                   <tr
                     key={item.resourceId}
-                    className="border-b last:border-0 hover:bg-[var(--color-bg-muted)]/50"
+                    className="border-b last:border-0 hover:bg-app/50"
                   >
-                    <td className="px-4 py-3 font-medium text-[var(--color-text-primary)]">
+                    <td className="px-4 py-3 font-medium text-content-primary">
                       {item.resourceName}
                     </td>
                     <td className="px-4 py-3 text-center">
@@ -187,7 +187,7 @@ export default function DemandaInsatisfechaPage() {
                         {item.peakHours.map((h) => (
                           <span
                             key={h}
-                            className="inline-flex items-center gap-1 rounded bg-[var(--color-bg-muted)] px-2 py-0.5 text-xs"
+                            className="inline-flex items-center gap-1 rounded bg-app px-2 py-0.5 text-xs"
                           >
                             <Calendar className="h-3 w-3" />
                             {h}
@@ -197,7 +197,7 @@ export default function DemandaInsatisfechaPage() {
                     </td>
                     <td className="px-4 py-3 text-center">
                       <div className="flex items-center justify-center gap-2">
-                        <div className="h-2 w-16 rounded-full bg-[var(--color-bg-muted)]">
+                        <div className="h-2 w-16 rounded-full bg-app">
                           <div
                             className={cn(
                               "h-full rounded-full",

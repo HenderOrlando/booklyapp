@@ -40,8 +40,7 @@ export function AuthLayout({
     <div
       className={cn(
         "min-h-screen flex items-center justify-center",
-        "bg-gradient-to-br from-brand-primary-50 to-brand-secondary-50",
-        "dark:from-slate-900 dark:to-slate-800",
+        "bg-app",
         "p-4",
         className,
       )}
@@ -74,10 +73,10 @@ export function AuthLayout({
                 </div>
               </div>
             </div>
-            <h1 className="text-3xl font-bold text-[var(--color-text-primary)] mb-2">
+            <h1 className="text-3xl font-bold text-content-primary mb-2">
               {publicConfig?.appName ?? "Bookly"}
             </h1>
-            <p className="text-[var(--color-text-secondary)]">
+            <p className="text-content-secondary">
               Sistema de Reservas Institucionales
             </p>
           </div>
@@ -86,8 +85,8 @@ export function AuthLayout({
         {/* Tarjeta de contenido */}
         <div
           className={cn(
-            "bg-[var(--color-bg-surface)] rounded-lg shadow-lg",
-            "border border-[var(--color-border-subtle)]",
+            "bg-surface rounded-lg shadow-lg",
+            "border border-line-subtle",
             "p-8",
           )}
         >
@@ -95,12 +94,12 @@ export function AuthLayout({
           {(title || description) && (
             <div className="mb-6">
               {title && (
-                <h2 className="text-2xl font-semibold text-[var(--color-text-primary)] mb-2">
+                <h2 className="text-2xl font-semibold text-content-primary mb-2">
                   {title}
                 </h2>
               )}
               {description && (
-                <p className="text-sm text-[var(--color-text-secondary)]">
+                <p className="text-sm text-content-secondary">
                   {description}
                 </p>
               )}
@@ -113,7 +112,7 @@ export function AuthLayout({
 
         {/* Footer */}
         <div className="text-center mt-6">
-          <p className="text-sm text-[var(--color-text-secondary)]">
+          <p className="text-sm text-content-secondary">
             © {new Date().getFullYear()} Universidad Francisco de Paula
             Santander
           </p>

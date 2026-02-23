@@ -19,27 +19,27 @@ import * as React from "react";
  */
 
 const buttonVariants = cva(
-  "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-border-focus)] focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50",
+  "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-line-focus focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50",
   {
     variants: {
       variant: {
         // Botón primario - Bookly Design System
         default:
-          "bg-[var(--color-action-primary)] text-[var(--color-text-inverse)] hover:bg-[var(--color-action-primary-hover)] active:brightness-95 disabled:bg-[var(--color-action-primary-disabled)]",
+          "bg-action-primary text-content-inverse hover:bg-action-primary-hover active:brightness-95 disabled:bg-action-primary-disabled disabled:text-content-inverse",
         // Botón secundario - Bookly Design System
         secondary:
-          "bg-[var(--color-action-secondary)] text-[var(--color-text-inverse)] hover:bg-[var(--color-action-secondary-hover)] active:brightness-95",
+          "bg-action-secondary text-content-inverse hover:bg-action-secondary-hover active:brightness-95",
         // Botón destructivo - Estados de error
         destructive:
-          "bg-[var(--color-state-error-text)] text-[var(--color-text-inverse)] hover:brightness-95 active:brightness-90",
+          "bg-state-error-text text-content-inverse hover:brightness-95 active:brightness-90",
         // Botón outline
         outline:
-          "border border-[var(--color-border-strong)] bg-transparent text-[var(--color-text-primary)] hover:bg-[var(--color-bg-muted)]",
+          "border border-line-strong bg-transparent text-content-primary hover:bg-app",
         // Botón ghost - Bookly Design System
         ghost:
-          "bg-transparent text-[var(--color-text-primary)] hover:bg-[var(--color-action-ghost-hover)]",
+          "bg-transparent text-content-primary hover:bg-action-ghost-hover",
         // Botón link
-        link: "text-[var(--color-text-link)] underline-offset-4 hover:underline",
+        link: "text-content-link underline-offset-4 hover:underline",
       },
       size: {
         default: "h-10 px-4 py-2",

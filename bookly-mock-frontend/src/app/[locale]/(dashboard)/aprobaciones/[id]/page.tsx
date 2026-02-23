@@ -54,7 +54,7 @@ const getPriorityColor = (priority?: string) => {
     case "URGENT":
       return "bg-state-error-100 text-state-error-800 dark:bg-state-error-900/20 dark:text-state-error-400";
     case "HIGH":
-      return "bg-orange-100 text-orange-800 dark:bg-orange-900/20 dark:text-orange-400";
+      return "bg-state-warning-100 text-state-warning-900 dark:bg-state-warning-900/20 dark:text-state-warning-200";
     case "NORMAL":
       return "bg-brand-primary-100 text-brand-primary-800 dark:bg-brand-primary-900/20 dark:text-brand-primary-400";
     case "LOW":
@@ -326,7 +326,7 @@ export default function ApprovalDetailPage() {
                 <Button
                   onClick={() => setShowApproveModal(true)}
                   disabled={isActionLoading}
-                  className="flex-1 bg-green-600 hover:bg-green-700"
+                  className="flex-1 bg-state-success-700 hover:bg-state-success-900 dark:bg-state-success-500 dark:hover:bg-state-success-700"
                 >
                   <CheckCircle className="h-5 w-5 mr-2" />
                   {t("approve")}
@@ -380,7 +380,7 @@ export default function ApprovalDetailPage() {
                   <Button
                     onClick={handleApprove}
                     disabled={isActionLoading}
-                    className="flex-1 bg-green-600 hover:bg-green-700"
+                    className="flex-1 bg-state-success-700 hover:bg-state-success-900 dark:bg-state-success-500 dark:hover:bg-state-success-700"
                   >
                     {t("confirm")}
                   </Button>

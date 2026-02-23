@@ -1,8 +1,9 @@
 /**
  * Base test fixture for Bookly E2E tests.
  *
- * Mocks the public config API to prevent hanging requests
- * during SSR and page transitions in E2E (no real backend).
+ * Mocks the public config API to prevent SSR-level hanging requests
+ * (no real backend in E2E mock mode).
+ *
  * All smoke specs should import { test, expect } from this file.
  */
 import { test as base } from "@playwright/test";

@@ -11,43 +11,37 @@ describe("Badge", () => {
   it("renders default variant", () => {
     render(<Badge>Default</Badge>);
     const badge = screen.getByText("Default");
-    expect(badge.className).toContain("bg-[var(--color-bg-secondary)]");
+    expect(badge.className).toContain("bg-app");
   });
 
   it("renders success variant with state tokens", () => {
     render(<Badge variant="success">Confirmed</Badge>);
     const badge = screen.getByText("Confirmed");
-    expect(badge.className).toContain(
-      "border-[var(--color-state-success-border)]",
-    );
+    expect(badge.className).toContain("border-state-success-border");
   });
 
   it("renders warning variant with state tokens", () => {
     render(<Badge variant="warning">Pending</Badge>);
     const badge = screen.getByText("Pending");
-    expect(badge.className).toContain(
-      "border-[var(--color-state-warning-border)]",
-    );
+    expect(badge.className).toContain("border-state-warning-border");
   });
 
   it("renders error variant with state tokens", () => {
     render(<Badge variant="error">Rejected</Badge>);
     const badge = screen.getByText("Rejected");
-    expect(badge.className).toContain(
-      "border-[var(--color-state-error-border)]",
-    );
+    expect(badge.className).toContain("border-state-error-border");
   });
 
   it("renders primary variant with brand colors", () => {
     render(<Badge variant="primary">Primary</Badge>);
     const badge = screen.getByText("Primary");
-    expect(badge.className).toContain("bg-[var(--color-action-primary)]");
+    expect(badge.className).toContain("bg-action-primary");
   });
 
   it("renders secondary variant with brand colors", () => {
     render(<Badge variant="secondary">Secondary</Badge>);
     const badge = screen.getByText("Secondary");
-    expect(badge.className).toContain("bg-[var(--color-action-secondary)]");
+    expect(badge.className).toContain("bg-action-secondary");
   });
 
   it("renders outline variant with border", () => {

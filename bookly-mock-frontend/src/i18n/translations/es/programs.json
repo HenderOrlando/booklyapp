@@ -61,5 +61,6 @@
   "capacity": "Capacidad",
   "type": "Tipo",
   "program-resources": "Recursos del Programa",
-  "program-users": "Usuarios del Programa"
+  "program-users": "Usuarios del Programa",
+  "total_programs": "Total Programas"
 }

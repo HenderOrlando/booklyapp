@@ -19,8 +19,10 @@ import {
   FilterChips,
   type FilterChip,
 } from "@/components/molecules/FilterChips";
+import { DateRangePicker } from "@/components/molecules/DateRangePicker";
 import { SearchBar } from "@/components/molecules/SearchBar";
 import { CategoryModal } from "@/components/organisms/CategoryModal";
+import { ListLayout } from "@/components/templates/ListLayout";
 import {
   categoryKeys,
   useCreateCategory,
@@ -30,8 +32,14 @@ import {
   type UpdateCategoryDto,
 } from "@/hooks/mutations";
 import { httpClient } from "@/infrastructure/http";
+import { cn } from "@/lib/utils";
 import { Category } from "@/types/entities/resource";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
+import {
+  List as ListIcon,
+  RefreshCw,
+  Table as TableIcon,
+} from "lucide-react";
 import { useTranslations } from "next-intl";
 import * as React from "react";
 
@@ -56,6 +64,8 @@ type CategoryMutationApiResponse = {
 export default function CategoriasPage() {
   const t = useTranslations("categories");
   const tCommon = useTranslations("common");
+  const queryClient = useQueryClient();
+  const [viewMode, setViewMode] = React.useState<"table" | "list">("table");
 
   // React Query para cargar categorías
   const { data: categories = [], isLoading: loading } = useQuery({
@@ -87,8 +97,12 @@ export default function CategoriasPage() {
   const [showDeleteModal, setShowDeleteModal] = React.useState(false);
   const [categoryToDelete, setCategoryToDelete] =
     React.useState<Category | null>(null);
+  const [dateFrom, setDateFrom] = React.useState<Date | null>(null);
+  const [dateTo, setDateTo] = React.useState<Date | null>(null);
 
-  // Ya no necesitamos useEffect - React Query maneja el fetch automáticamente
+  const handleRefresh = () => {
+    queryClient.invalidateQueries({ queryKey: categoryKeys.lists() });
+  };
 
   // Filtrar categorías
   const filteredCategories = categories.filter((category: Category) => {
@@ -104,6 +118,17 @@ export default function CategoriasPage() {
     // Filtro por estado
     if (statusFilter === "active" && !category.isActive) return false;
     if (statusFilter === "inactive" && category.isActive) return false;
+
+    // Filtro por fecha de creación
+    if (dateFrom || dateTo) {
+      const created = new Date(category.createdAt);
+      if (dateFrom && created < dateFrom) return false;
+      if (dateTo) {
+        const endOfDay = new Date(dateTo);
+        endOfDay.setHours(23, 59, 59, 999);
+        if (created > endOfDay) return false;
+      }
+    }
 
     return true;
   });
@@ -306,61 +331,70 @@ export default function CategoriasPage() {
   }
 
   return (
-    <>
+    <ListLayout
+      title={t("title")}
+      description={t("description")}
+      badge={{ text: "Gestión de Categorías", variant: "secondary" }}
+      onCreate={handleCreate}
+      createLabel={t("create")}
+      headerActions={
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={handleRefresh}
+          className="h-10 px-3 rounded-md border-line-subtle text-content-tertiary hover:text-action-primary hover:border-action-primary transition-all"
+          title={tCommon("refresh")}
+        >
+          <RefreshCw size={16} className={cn(loading && "animate-spin", "mr-2")} />
+          {tCommon("refresh")}
+        </Button>
+      }
+    >
       <div className="space-y-6 pb-6">
-        {/* Header */}
-        <div className="flex items-center justify-between">
-          <div>
-            <h2 className="text-3xl font-bold text-[var(--color-text-primary)]">
-              {t("title")}
-            </h2>
-            <p className="text-[var(--color-text-secondary)] mt-2">
-              {t("description")}
-            </p>
-          </div>
-          <Button onClick={handleCreate} data-testid="create-category-button">
-            {t("create")}
-          </Button>
-        </div>
-
         {/* Estadísticas */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-sm font-medium text-[var(--color-text-tertiary)]">
-                {t("total")}
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p className="text-3xl font-bold text-foreground">
-                {categories.length}
-              </p>
+          <Card className="group hover:shadow-md transition-all duration-200 bg-gradient-to-br from-brand-primary-500/5 to-brand-primary-600/5 border-brand-primary-500/20">
+            <CardContent className="p-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-[10px] font-bold uppercase tracking-wider text-brand-primary-600/80 mb-1">
+                    {t("total")}
+                  </p>
+                  <h3 className="text-3xl font-black text-brand-primary-800 dark:text-brand-primary-200 leading-none">
+                    {categories.length}
+                  </h3>
+                </div>
+              </div>
             </CardContent>
           </Card>
 
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-sm font-medium text-[var(--color-text-tertiary)]">
-                {t("active")}
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p className="text-3xl font-bold text-state-success-500">
-                {categories.filter((c: Category) => c.isActive).length}
-              </p>
+          <Card className="group hover:shadow-md transition-all duration-200 bg-gradient-to-br from-state-success-500/5 to-state-success-700/5 border-state-success-500/20">
+            <CardContent className="p-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-[10px] font-bold uppercase tracking-wider text-state-success-700/80 dark:text-state-success-200/80 mb-1">
+                    {t("active")}
+                  </p>
+                  <h3 className="text-3xl font-black text-state-success-900 dark:text-state-success-200 leading-none">
+                    {categories.filter((c: Category) => c.isActive).length}
+                  </h3>
+                </div>
+              </div>
             </CardContent>
           </Card>
 
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-sm font-medium text-[var(--color-text-tertiary)]">
-                {t("inactive")}
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p className="text-3xl font-bold text-[var(--color-text-tertiary)]">
-                {categories.filter((c: Category) => !c.isActive).length}
-              </p>
+          <Card className="group hover:shadow-md transition-all duration-200 bg-gradient-to-br from-state-warning-500/5 to-state-warning-700/5 border-state-warning-500/20">
+            <CardContent className="p-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-[10px] font-bold uppercase tracking-wider text-state-warning-700/80 dark:text-state-warning-200/80 mb-1">
+                    {t("inactive")}
+                  </p>
+                  <h3 className="text-3xl font-black text-state-warning-900 dark:text-state-warning-200 leading-none">
+                    {categories.filter((c: Category) => !c.isActive).length}
+                  </h3>
+                </div>
+              </div>
             </CardContent>
           </Card>
         </div>
@@ -374,6 +408,38 @@ export default function CategoriasPage() {
                 <CardDescription>
                   {t("showing_count", { count: filteredCategories.length, total: categories.length })}
                 </CardDescription>
+              </div>
+
+              {/* Toggle Vista Tabla / Vista Lista */}
+              <div className="flex items-center gap-1 bg-[var(--color-bg-muted)]/50 p-1 rounded-xl border border-[var(--color-border-subtle)]/50">
+                <Button
+                  variant={viewMode === "table" ? "default" : "ghost"}
+                  size="sm"
+                  onClick={() => setViewMode("table")}
+                  className={cn(
+                    "h-8 px-3 rounded-lg text-xs font-bold transition-all",
+                    viewMode === "table"
+                      ? "bg-white text-brand-primary-600 shadow-sm border-none hover:bg-white dark:bg-surface dark:text-brand-primary-400"
+                      : "text-[var(--color-text-tertiary)] hover:text-brand-primary-500",
+                  )}
+                >
+                  <TableIcon className="w-3.5 h-3.5 mr-1.5" />
+                  {tCommon("view_table")}
+                </Button>
+                <Button
+                  variant={viewMode === "list" ? "default" : "ghost"}
+                  size="sm"
+                  onClick={() => setViewMode("list")}
+                  className={cn(
+                    "h-8 px-3 rounded-lg text-xs font-bold transition-all",
+                    viewMode === "list"
+                      ? "bg-white text-brand-primary-600 shadow-sm border-none hover:bg-white dark:bg-surface dark:text-brand-primary-400"
+                      : "text-[var(--color-text-tertiary)] hover:text-brand-primary-500",
+                  )}
+                >
+                  <ListIcon className="w-3.5 h-3.5 mr-1.5" />
+                  {tCommon("view_list")}
+                </Button>
               </div>
             </div>
 
@@ -411,18 +477,36 @@ export default function CategoriasPage() {
                 </Button>
               </div>
 
-              {(filter || statusFilter !== "all") && (
+              {(filter || statusFilter !== "all" || dateFrom || dateTo) && (
                 <Button
                   variant="outline"
                   size="sm"
                   onClick={() => {
                     setFilter("");
                     setStatusFilter("all");
+                    setDateFrom(null);
+                    setDateTo(null);
                   }}
                 >
                   {t("clear")}
                 </Button>
               )}
+            </div>
+
+            {/* Filtro por fecha */}
+            <div className="flex items-center gap-3">
+              <span className="text-xs font-semibold text-content-tertiary uppercase tracking-wider whitespace-nowrap">
+                {tCommon("filter_by_date")}
+              </span>
+              <DateRangePicker
+                startDate={dateFrom}
+                endDate={dateTo}
+                onRangeChange={(start, end) => {
+                  setDateFrom(start);
+                  setDateTo(end);
+                }}
+                className="flex-1"
+              />
             </div>
 
             {/* FilterChips - Mostrar filtros activos */}
@@ -487,12 +571,82 @@ export default function CategoriasPage() {
                   )
                 }
               />
-            ) : (
+            ) : viewMode === "table" ? (
               <DataTable
                 data={filteredCategories}
                 columns={columns}
                 data-testid="categories-table"
               />
+            ) : (
+              <div className="space-y-3">
+                {filteredCategories.map((category) => (
+                  <div
+                    key={category.id}
+                    className="group bg-surface rounded-xl p-5 border border-line-subtle hover:border-brand-primary-500/50 hover:shadow-lg transition-all duration-200"
+                  >
+                    <div className="flex items-center justify-between gap-4">
+                      <div className="flex items-center gap-4 flex-1 min-w-0">
+                        <ColorSwatch color={category.color} size="md" />
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center gap-2 flex-wrap">
+                            <h3 className="text-base font-bold text-content-primary">
+                              {category.name}
+                            </h3>
+                            <StatusBadge
+                              type="category"
+                              status={category.isActive ? "ACTIVE" : "INACTIVE"}
+                            />
+                          </div>
+                          {category.description && (
+                            <p className="text-sm text-content-secondary mt-1 truncate">
+                              {category.description}
+                            </p>
+                          )}
+                          <div className="flex items-center gap-2 mt-2">
+                            <Badge
+                              style={{
+                                backgroundColor: category.color,
+                                color: "#fff",
+                              }}
+                            >
+                              {category.name}
+                            </Badge>
+                            <span className="text-xs text-content-tertiary font-mono">
+                              {category.color}
+                            </span>
+                          </div>
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-2 shrink-0">
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => handleEdit(category)}
+                        >
+                          {t("edit")}
+                        </Button>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => handleToggleStatus(category)}
+                        >
+                          {category.isActive ? t("deactivate") : t("activate")}
+                        </Button>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => {
+                            setCategoryToDelete(category);
+                            setShowDeleteModal(true);
+                          }}
+                        >
+                          {t("delete")}
+                        </Button>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
             )}
           </CardContent>
         </Card>
@@ -549,6 +703,6 @@ export default function CategoriasPage() {
           )}
         </ConfirmDialog>
       </div>
-    </>
+    </ListLayout>
   );
 }

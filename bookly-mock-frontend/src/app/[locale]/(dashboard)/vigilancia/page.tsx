@@ -151,7 +151,7 @@ export default function VigilanciaPage() {
               <p className="text-sm text-[var(--color-text-secondary)] dark:text-[var(--color-text-tertiary)]">
                 {t("delays_stat")}
               </p>
-              <p className="text-2xl font-bold text-orange-600 dark:text-orange-400">
+              <p className="text-2xl font-bold text-state-warning-700 dark:text-state-warning-200">
                 {data.stats.lateCheckIns}
               </p>
             </div>

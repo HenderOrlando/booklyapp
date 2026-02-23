@@ -1,5 +1,6 @@
 // Learn more: https://github.com/testing-library/jest-dom
 import "@testing-library/jest-dom";
+import "jest-canvas-mock";
 
 // Mock useCurrentUser (useLogout uses useQueryClient which needs QueryClientProvider)
 jest.mock("@/hooks/useCurrentUser", () => ({
@@ -32,6 +33,16 @@ jest.mock("next/navigation", () => ({
   notFound: jest.fn(),
 }));
 
+// Mock useToast (uses Redux dispatch which requires store provider)
+jest.mock("@/hooks/useToast", () => ({
+  useToast: () => ({
+    showSuccess: jest.fn(),
+    showError: jest.fn(),
+    showWarning: jest.fn(),
+    showInfo: jest.fn(),
+  }),
+}));
+
 // Mock window.matchMedia
 Object.defineProperty(window, "matchMedia", {
   writable: true,
@@ -46,6 +57,14 @@ Object.defineProperty(window, "matchMedia", {
     dispatchEvent: jest.fn(),
   })),
 });
+
+// Mock ResizeObserver (needed by Radix UI Tabs and other components)
+global.ResizeObserver = class ResizeObserver {
+  constructor() {}
+  disconnect() {}
+  observe() {}
+  unobserve() {}
+};
 
 // Mock IntersectionObserver
 global.IntersectionObserver = class IntersectionObserver {

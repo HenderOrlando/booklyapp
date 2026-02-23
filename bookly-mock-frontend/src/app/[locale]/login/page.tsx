@@ -63,6 +63,8 @@ export default function LoginPage() {
 
     try {
       await login(email, password, rememberMe);
+      // Force reload so the middleware sees the freshly set accessToken cookie
+      window.location.reload();
     } catch (error: unknown) {
       console.error("Login error:", error);
       setError(
@@ -75,7 +77,7 @@ export default function LoginPage() {
   return (
     <AuthLayout title={t("login")} description={t("description")}>
       <div className="mb-4 flex items-center justify-end gap-2">
-        <span className="text-xs font-medium text-[var(--color-text-secondary)]">
+        <span className="text-xs font-medium text-content-secondary">
           {t("theme_toggle_label")}
         </span>
         <ThemeToggle testId="login-theme-toggle" />
@@ -91,7 +93,7 @@ export default function LoginPage() {
         <div>
           <label
             htmlFor="login-email"
-            className="mb-2 block text-sm font-medium text-[var(--color-text-primary)]"
+            className="mb-2 block text-sm font-medium text-content-primary"
           >
             {t("institutional_email")}
           </label>
@@ -111,7 +113,7 @@ export default function LoginPage() {
         <div>
           <label
             htmlFor="login-password"
-            className="mb-2 block text-sm font-medium text-[var(--color-text-primary)]"
+            className="mb-2 block text-sm font-medium text-content-primary"
           >
             {t("password")}
           </label>
@@ -139,15 +141,15 @@ export default function LoginPage() {
               checked={rememberMe}
               onChange={(e) => setRememberMe(e.target.checked)}
               disabled={isLoading}
-              className="rounded border-[var(--color-border-subtle)] text-[var(--color-action-primary)] focus:ring-[var(--color-border-focus)] disabled:cursor-not-allowed disabled:opacity-50"
+              className="rounded border-line-subtle text-action-primary focus:ring-line-focus disabled:cursor-not-allowed disabled:opacity-50"
             />
-            <span className="ml-2 text-[var(--color-text-secondary)]">
+            <span className="ml-2 text-content-secondary">
               {t("remember")}
             </span>
           </label>
           <a
             href="/forgot-password"
-            className="text-[var(--color-text-link)] hover:underline"
+            className="text-content-link hover:underline"
           >
             {t("forgot_password")}
           </a>
@@ -162,11 +164,11 @@ export default function LoginPage() {
           {isLoading ? t("logging_in") : t("login")}
         </ButtonWithLoading>
 
-        <div className="text-center text-sm text-[var(--color-text-secondary)]">
+        <div className="text-center text-sm text-content-secondary">
           {t("no_account")}{" "}
           <a
             href="/register"
-            className="text-[var(--color-text-link)] hover:underline"
+            className="text-content-link hover:underline"
           >
             {t("register_link")}
           </a>
@@ -176,12 +178,12 @@ export default function LoginPage() {
       {isMock ? (
         <div
           data-testid="login-mock-credentials"
-          className="mt-6 rounded-md border border-[var(--color-border-subtle)] bg-[var(--color-bg-muted)] p-4"
+          className="mt-6 rounded-md border border-line-subtle bg-app p-4"
         >
-          <p className="mb-3 text-xs font-semibold text-[var(--color-text-primary)]">
+          <p className="mb-3 text-xs font-semibold text-content-primary">
             {t("test_credentials")}
           </p>
-          <div className="space-y-2 text-xs text-[var(--color-text-secondary)]">
+          <div className="space-y-2 text-xs text-content-secondary">
             <div>
               <strong>Admin:</strong> admin@ufps.edu.co / admin123
             </div>
@@ -195,14 +197,14 @@ export default function LoginPage() {
               <strong>Estudiante:</strong> estudiante@ufps.edu.co / est123
             </div>
           </div>
-          <p className="mt-3 text-[11px] text-[var(--color-text-tertiary)]">
+          <p className="mt-3 text-[11px] text-content-tertiary">
             {t("mock_mode_disclaimer")}
           </p>
         </div>
       ) : (
         <div
           data-testid="login-server-credentials-hint"
-          className="mt-6 rounded-md border border-[var(--color-border-subtle)] bg-[var(--color-bg-muted)] p-3 text-xs text-[var(--color-text-secondary)]"
+          className="mt-6 rounded-md border border-line-subtle bg-app p-3 text-xs text-content-secondary"
         >
           {t("server_credentials_hint")}
         </div>

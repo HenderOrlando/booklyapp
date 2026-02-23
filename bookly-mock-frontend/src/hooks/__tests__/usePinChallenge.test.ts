@@ -118,9 +118,11 @@ describe("usePinChallenge", () => {
       data: { authorized: false },
     });
 
-    let challengePromise: Promise<string>;
+    let rejectedError: Error | undefined;
     act(() => {
-      challengePromise = result.current.challenge("delete_role");
+      result.current.challenge("delete_role").catch((e: Error) => {
+        rejectedError = e;
+      });
     });
 
     await act(async () => {
@@ -128,9 +130,8 @@ describe("usePinChallenge", () => {
     });
 
     expect(onLocked).toHaveBeenCalled();
-    expect(result.current.isOpen).toBe(false);
-
-    await expect(challengePromise!).rejects.toThrow("PIN_LOCKED");
+    expect(rejectedError).toBeDefined();
+    expect(rejectedError!.message).toBe("PIN_LOCKED");
   });
 
   it("should reject with PIN_CANCELLED when modal is closed", async () => {

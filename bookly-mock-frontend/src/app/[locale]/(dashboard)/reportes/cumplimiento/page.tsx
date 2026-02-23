@@ -88,10 +88,10 @@ export default function CumplimientoPage() {
         {/* Header */}
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-2xl font-bold text-[var(--color-text-primary)]">
+            <h1 className="text-2xl font-bold text-content-primary">
               Cumplimiento de Reservas
             </h1>
-            <p className="mt-1 text-sm text-[var(--color-text-secondary)]">
+            <p className="mt-1 text-sm text-content-secondary">
               Tasa de asistencia y check-in de reservas confirmadas
             </p>
           </div>
@@ -109,10 +109,10 @@ export default function CumplimientoPage() {
                 <PieChart className="h-5 w-5 text-brand-primary-600" />
               </div>
               <div>
-                <p className="text-2xl font-bold text-[var(--color-text-primary)]">
+                <p className="text-2xl font-bold text-content-primary">
                   {avgCompliance}%
                 </p>
-                <p className="text-xs text-[var(--color-text-secondary)]">
+                <p className="text-xs text-content-secondary">
                   Tasa de cumplimiento
                 </p>
               </div>
@@ -124,10 +124,10 @@ export default function CumplimientoPage() {
                 <CheckCircle2 className="h-5 w-5 text-state-success-600" />
               </div>
               <div>
-                <p className="text-2xl font-bold text-[var(--color-text-primary)]">
+                <p className="text-2xl font-bold text-content-primary">
                   {totals.checkedIn}
                 </p>
-                <p className="text-xs text-[var(--color-text-secondary)]">
+                <p className="text-xs text-content-secondary">
                   Check-ins realizados
                 </p>
               </div>
@@ -139,10 +139,10 @@ export default function CumplimientoPage() {
                 <XCircle className="h-5 w-5 text-state-error-600" />
               </div>
               <div>
-                <p className="text-2xl font-bold text-[var(--color-text-primary)]">
+                <p className="text-2xl font-bold text-content-primary">
                   {totals.noShows}
                 </p>
-                <p className="text-xs text-[var(--color-text-secondary)]">
+                <p className="text-xs text-content-secondary">
                   No-shows
                 </p>
               </div>
@@ -154,10 +154,10 @@ export default function CumplimientoPage() {
                 <Clock className="h-5 w-5 text-state-warning-600" />
               </div>
               <div>
-                <p className="text-2xl font-bold text-[var(--color-text-primary)]">
+                <p className="text-2xl font-bold text-content-primary">
                   {totals.lateArrivals}
                 </p>
-                <p className="text-xs text-[var(--color-text-secondary)]">
+                <p className="text-xs text-content-secondary">
                   Llegadas tardías
                 </p>
               </div>
@@ -170,23 +170,23 @@ export default function CumplimientoPage() {
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead>
-                <tr className="border-b bg-[var(--color-bg-muted)]">
-                  <th className="px-4 py-3 text-left font-medium text-[var(--color-text-secondary)]">
+                <tr className="border-b bg-app">
+                  <th className="px-4 py-3 text-left font-medium text-content-secondary">
                     Período
                   </th>
-                  <th className="px-4 py-3 text-center font-medium text-[var(--color-text-secondary)]">
+                  <th className="px-4 py-3 text-center font-medium text-content-secondary">
                     Total reservas
                   </th>
-                  <th className="px-4 py-3 text-center font-medium text-[var(--color-text-secondary)]">
+                  <th className="px-4 py-3 text-center font-medium text-content-secondary">
                     Check-ins
                   </th>
-                  <th className="px-4 py-3 text-center font-medium text-[var(--color-text-secondary)]">
+                  <th className="px-4 py-3 text-center font-medium text-content-secondary">
                     No-shows
                   </th>
-                  <th className="px-4 py-3 text-center font-medium text-[var(--color-text-secondary)]">
+                  <th className="px-4 py-3 text-center font-medium text-content-secondary">
                     Tardías
                   </th>
-                  <th className="px-4 py-3 text-center font-medium text-[var(--color-text-secondary)]">
+                  <th className="px-4 py-3 text-center font-medium text-content-secondary">
                     Cumplimiento
                   </th>
                 </tr>
@@ -195,9 +195,9 @@ export default function CumplimientoPage() {
                 {mockData.map((row) => (
                   <tr
                     key={row.period}
-                    className="border-b last:border-0 hover:bg-[var(--color-bg-muted)]/50"
+                    className="border-b last:border-0 hover:bg-app/50"
                   >
-                    <td className="px-4 py-3 font-medium text-[var(--color-text-primary)]">
+                    <td className="px-4 py-3 font-medium text-content-primary">
                       {row.period}
                     </td>
                     <td className="px-4 py-3 text-center">

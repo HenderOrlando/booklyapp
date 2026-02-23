@@ -50,5 +50,7 @@
     "status_label": "Status"
   },
   "delete_confirm_button": "Delete",
-  "search_placeholder": "Search characteristics..."
+  "search_placeholder": "Search characteristics...",
+  "showing_count": "{count} of {total} characteristics",
+  "total": "Total Characteristics"
 }

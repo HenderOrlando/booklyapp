@@ -27,5 +27,14 @@
   "all": "Todos",
   "select_all": "Seleccionar todos",
   "deselect_all": "Deseleccionar todos",
-  "clear_search": "Limpiar Búsqueda"
+  "clear_search": "Limpiar Búsqueda",
+  "view_table": "Vista Tabla",
+  "view_list": "Vista Lista",
+  "refresh": "Refrescar",
+  "filter_by_date": "Filtrar por fecha",
+  "date_from": "Desde",
+  "date_to": "Hasta",
+  "clear_date_filter": "Limpiar fecha",
+  "filter_by_status": "Filtrar por estado",
+  "created_date": "Fecha de creación"
 }

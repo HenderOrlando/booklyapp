@@ -475,7 +475,7 @@ export function AppSidebar({
   }, [userRoles, t, isDesignSystem]);
 
   return (
-    <nav className={`space-y-6 ${className}`}>
+    <nav className={`space-y-6 dark:bg-[var(--color-bg-base)] dark:text-[var(--color-text-primary)] ${className}`}>
       {visibleSections.map((section, sectionIdx) => (
         <div key={section.title || sectionIdx} className="space-y-2">
           {section.title && (

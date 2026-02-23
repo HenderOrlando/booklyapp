@@ -38,8 +38,8 @@ export function MainLayout({
   return (
     <div
       className={cn(
-        "min-h-screen bg-[var(--color-bg-app)]",
-        "dark:bg-[var(--color-bg-app)]",
+        "min-h-screen bg-app",
+        "dark:bg-app",
         className,
       )}
     >
@@ -48,15 +48,15 @@ export function MainLayout({
         <header
           className={cn(
             "sticky top-0 z-50 w-full",
-            "border-b border-[var(--color-border-subtle)]",
-            "bg-[var(--color-navigation-header-bg,var(--color-action-primary))] text-[var(--color-text-inverse)]",
+            "border-b border-line-subtle",
+            "bg-action-primary text-content-inverse",
           )}
         >
           <div className="flex h-16 items-center px-4">
             {/* Botón toggle sidebar en mobile */}
             <button
               onClick={() => setSidebarOpen(!sidebarOpen)}
-              className="mr-4 lg:hidden p-2 rounded-md hover:bg-[var(--color-navigation-header-hover,var(--color-action-primary-hover))]"
+              className="mr-4 lg:hidden p-2 rounded-md hover:bg-action-primary-hover"
               aria-label="Toggle menu"
             >
               <svg
@@ -95,8 +95,8 @@ export function MainLayout({
               className={cn(
                 "fixed inset-y-0 left-0 z-50 w-64",
                 "flex flex-col",
-                "border-r border-[var(--color-border-subtle)]",
-                "bg-[var(--color-navigation-sidebar-bg,var(--color-bg-inverse))] text-[var(--color-text-inverse)]",
+                "border-r border-line-subtle",
+                "bg-inverse text-content-inverse",
                 "transition-transform duration-300",
                 "lg:sticky lg:top-16 lg:h-[calc(100vh-4rem)] lg:translate-x-0",
                 sidebarOpen ? "translate-x-0" : "-translate-x-full",
@@ -110,11 +110,11 @@ export function MainLayout({
         {/* Contenido principal */}
         <main
           className={cn(
-            "flex-1 min-h-[calc(100vh-4rem)]",
+            "flex-1 min-w-0 min-h-[calc(100vh-4rem)]",
             "transition-all duration-300",
           )}
         >
-          <div className="container mx-auto p-6 min-w-0 overflow-x-hidden">
+          <div className="w-full p-4 sm:p-6 lg:p-8">
             {children}
           </div>
         </main>

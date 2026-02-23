@@ -93,7 +93,7 @@ export default function ForgotPasswordPage() {
           </Alert>
 
           <div className="text-center space-y-4">
-            <p className="text-sm text-[var(--color-text-secondary)]">
+            <p className="text-sm text-content-secondary">
               {t("recovery_email_not_received")}
             </p>
 
@@ -124,7 +124,7 @@ export default function ForgotPasswordPage() {
           )}
 
           <div>
-            <label className="block text-sm font-medium text-[var(--color-text-primary)] mb-2">
+            <label className="block text-sm font-medium text-content-primary mb-2">
               {t("email_label")}
             </label>
             <Input
@@ -145,7 +145,7 @@ export default function ForgotPasswordPage() {
           <div className="text-center space-y-2">
             <Link
               href="/login"
-              className="text-sm text-brand-primary-500 hover:text-brand-primary-600 hover:underline"
+              className="text-sm text-action-primary hover:text-action-primary-hover hover:underline"
             >
               {t("back_to_login")}
             </Link>
@@ -154,11 +154,11 @@ export default function ForgotPasswordPage() {
       )}
 
       {/* Información adicional */}
-      <div className="mt-6 p-4 bg-[var(--color-surface-secondary)] rounded-md">
-        <h3 className="text-sm font-medium text-[var(--color-text-primary)] mb-2">
+      <div className="mt-6 p-4 bg-app rounded-md border border-line-subtle">
+        <h3 className="text-sm font-medium text-content-primary mb-2">
           {t("need_help")}
         </h3>
-        <ul className="text-xs text-[var(--color-text-secondary)] space-y-1">
+        <ul className="text-xs text-content-secondary space-y-1">
           <li>• {t("help_recovery_expiry")}</li>
           <li>• {t("help_recovery_limit")}</li>
           <li>• {t("help_contact_support")}</li>

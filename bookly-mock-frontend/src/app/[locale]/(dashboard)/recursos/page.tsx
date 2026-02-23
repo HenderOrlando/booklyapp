@@ -39,6 +39,7 @@ import {
   ResourceStatsCards,
   ResourcesTable,
 } from "./components";
+import { ListLayout } from "@/components/templates/ListLayout";
 
 export default function RecursosPage() {
   const router = useRouter();
@@ -404,95 +405,80 @@ export default function RecursosPage() {
 
   if (resourcesError) {
     return (
-      <>
-        <div className="flex flex-col items-center justify-center min-h-[60vh] space-y-4">
-          <div className="w-16 h-16 bg-red-100 text-red-600 rounded-full flex items-center justify-center">
-            <TableIcon size={32} />
-          </div>
-          <h2 className="text-2xl font-bold text-gray-900">
-            {t("error_loading")}
-          </h2>
-          <p className="text-[var(--color-text-tertiary)] max-w-md text-center">
-            {resourcesError instanceof Error
-              ? resourcesError.message
-              : String(resourcesError)}
-          </p>
-          <Button
-            onClick={() => window.location.reload()}
-            className="bg-brand-primary-600"
-          >
-            {tCommon("retry")}
-          </Button>
+      <div className="flex flex-col items-center justify-center min-h-[60vh] space-y-4">
+        <div className="w-16 h-16 bg-state-error-bg text-state-error-text rounded-full flex items-center justify-center">
+          <TableIcon size={32} />
         </div>
-      </>
+        <h2 className="text-2xl font-bold text-content-primary">
+          {t("error_loading")}
+        </h2>
+        <p className="text-content-tertiary max-w-md text-center">
+          {resourcesError instanceof Error
+            ? resourcesError.message
+            : String(resourcesError)}
+        </p>
+        <Button
+          onClick={() => window.location.reload()}
+          className="bg-action-primary"
+        >
+          {tCommon("retry")}
+        </Button>
+      </div>
     );
   }
 
   if (loading) {
     return (
-      <>
-        <div className="flex flex-col items-center justify-center min-h-[60vh]">
-          <LoadingSpinner size="lg" />
-          <p className="text-[var(--color-text-tertiary)] mt-4">
-            {t("loading")}
-          </p>
-        </div>
-      </>
+      <div className="flex flex-col items-center justify-center min-h-[60vh]">
+        <LoadingSpinner size="lg" />
+        <p className="text-content-tertiary mt-4">
+          {t("loading")}
+        </p>
+      </div>
     );
   }
 
   return (
-    <>
-      <div className="space-y-6 pb-6 px-4 md:px-6">
-        {/* Header */}
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-          <div>
-            <h2 className="text-3xl font-black tracking-tight text-[var(--color-text-primary)]">
-              {t("title")}
-            </h2>
-            <p className="text-[var(--color-text-secondary)] mt-1 font-medium">
-              {t("management")}
-            </p>
-          </div>
-          <div className="flex items-center gap-3">
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={handleRefresh}
-              className="h-9 w-9 p-0 rounded-xl border-[var(--color-border-subtle)] text-[var(--color-text-tertiary)] hover:text-brand-primary-600 hover:border-brand-primary-200 transition-all"
-              title="Refrescar datos"
-            >
-              <RefreshCw size={16} className={cn(loading && "animate-spin")} />
-            </Button>
-            <Button
-              onClick={() => router.push("/recursos/nuevo")}
-              className="bg-brand-primary-600 hover:bg-brand-primary-700 shadow-md hover:shadow-lg transition-all active:scale-95 rounded-xl px-6 font-bold"
-            >
-              {t("create")}
-            </Button>
-          </div>
-        </div>
-
+    <ListLayout
+      title={t("title")}
+      description={t("page_description")}
+      badge={{ text: t("management"), variant: "secondary" }}
+      onCreate={() => router.push("/recursos/nuevo")}
+      createLabel={t("create")}
+      headerActions={
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={handleRefresh}
+          className="h-10 px-3 rounded-md border-line-subtle text-content-tertiary hover:text-action-primary hover:border-action-primary transition-all"
+          title={tCommon("refresh")}
+        >
+          <RefreshCw size={16} className={cn(loading && "animate-spin", "mr-2")} />
+          {tCommon("refresh")}
+        </Button>
+      }
+    >
+      <div className="space-y-6">
         {/* Alerta de Conflicto de Puertos */}
         {portConflict && process.env.NODE_ENV === "development" && (
-          <div className="p-4 bg-orange-50 border border-orange-200 rounded-xl flex items-start gap-3">
+          <div className="p-4 bg-state-warning-50 border border-state-warning-200 rounded-xl flex items-start gap-3 dark:bg-state-warning-900 dark:border-state-warning-500">
             <AlertCircle
-              className="text-orange-600 shrink-0 mt-0.5"
+              className="text-state-warning-700 dark:text-state-warning-200 shrink-0 mt-0.5"
               size={18}
             />
             <div>
-              <h4 className="text-sm font-bold text-orange-800">
+              <h4 className="text-sm font-bold text-state-warning-900 dark:text-state-warning-200">
                 Posible Conflicto de Configuración
               </h4>
-              <p className="text-xs text-orange-700 mt-1">
+              <p className="text-xs text-state-warning-700 dark:text-state-warning-200 mt-1">
                 El Frontend y el API Gateway parecen estar usando el mismo
                 puerto (3000). Si no ves datos, verifica que el API Gateway esté
                 corriendo en un puerto diferente o usa
-                <code className="mx-1 px-1 bg-orange-100 rounded">
+                <code className="mx-1 px-1 bg-state-warning-100 dark:bg-state-warning-900 rounded">
                   NEXT_PUBLIC_USE_DIRECT_SERVICES=true
                 </code>
                 en tu archivo{" "}
-                <code className="px-1 bg-orange-100 rounded">.env.local</code>.
+                <code className="px-1 bg-state-warning-100 dark:bg-state-warning-900 rounded">.env.local</code>.
               </p>
             </div>
           </div>
@@ -516,7 +502,7 @@ export default function RecursosPage() {
               </p>
             </div>
 
-            <div className="flex items-center gap-2 bg-[var(--color-bg-muted)]/50 p-1 rounded-xl border border-[var(--color-border-subtle)]/50">
+            <div className="flex items-center gap-1 bg-[var(--color-bg-muted)]/50 p-1 rounded-xl border border-[var(--color-border-subtle)]/50">
               <Button
                 variant={!useVirtualScrolling ? "default" : "ghost"}
                 size="sm"
@@ -704,6 +690,6 @@ export default function RecursosPage() {
           variant="destructive"
         />
       </div>
-    </>
+    </ListLayout>
   );
 }

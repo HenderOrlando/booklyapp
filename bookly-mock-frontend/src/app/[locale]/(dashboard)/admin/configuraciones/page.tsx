@@ -771,7 +771,7 @@ function ThemeTab({
             <div className="flex gap-4 mt-2">
               {config.logoLightUrl && (
                 <div className="rounded-lg border border-[var(--color-border-subtle)] p-3 bg-white">
-                  <p className="text-[10px] text-gray-400 mb-1">Light</p>
+                  <p className="text-[10px] text-content-tertiary mb-1">Light</p>
                   <div className="relative h-8 w-32">
                     <Image
                       src={config.logoLightUrl}
@@ -784,8 +784,8 @@ function ThemeTab({
                 </div>
               )}
               {config.logoDarkUrl && (
-                <div className="rounded-lg border border-[var(--color-border-subtle)] p-3 bg-slate-800">
-                  <p className="text-[10px] text-slate-400 mb-1">Dark</p>
+                <div className="rounded-lg border border-[var(--color-border-subtle)] p-3 bg-inverse">
+                  <p className="text-[10px] text-content-tertiary mb-1">Dark</p>
                   <div className="relative h-8 w-32">
                     <Image
                       src={config.logoDarkUrl}
