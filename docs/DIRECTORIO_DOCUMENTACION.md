@@ -72,6 +72,17 @@ Documentación transversal, requisitos de negocio, alineación entre equipos y r
   * `WF-REV-01-windsurf-workflow.md` - Workflow de revisión.
   * `WF-RULES-REVIEW-workflow.md` / `WF-RULES-REVIEW.md` - Workflow de auditoría de reglas.
 
+* **Análisis para Tesis de Grado (`tesis/`):**
+  * [`00-RESUMEN-EJECUTIVO.md`](./tesis/00-RESUMEN-EJECUTIVO.md) - Resumen ejecutivo con cifras clave, top 10 aspectos impactantes y contribuciones académicas.
+  * [`01-DOMINIO-AUTENTICACION.md`](./tesis/01-DOMINIO-AUTENTICACION.md) - Análisis del dominio de identidad y control de accesos (auth-service).
+  * [`02-DOMINIO-RECURSOS.md`](./tesis/02-DOMINIO-RECURSOS.md) - Análisis del dominio de gestión de recursos físicos (resources-service).
+  * [`03-DOMINIO-DISPONIBILIDAD.md`](./tesis/03-DOMINIO-DISPONIBILIDAD.md) - Análisis del dominio de reservas y disponibilidad (availability-service).
+  * [`04-DOMINIO-APROBACIONES.md`](./tesis/04-DOMINIO-APROBACIONES.md) - Análisis del dominio de aprobaciones y validaciones (stockpile-service).
+  * [`05-DOMINIO-REPORTES.md`](./tesis/05-DOMINIO-REPORTES.md) - Análisis del dominio de reportes y análisis (reports-service).
+  * [`06-ARQUITECTURA-TRANSVERSAL.md`](./tesis/06-ARQUITECTURA-TRANSVERSAL.md) - Arquitectura transversal: API Gateway, Event Bus, observabilidad, estándares.
+  * [`07-FRONTEND-UX.md`](./tesis/07-FRONTEND-UX.md) - Frontend y experiencia de usuario: Next.js, Atomic Design, analytics, i18n.
+  * [`08-CALIDAD-TESTING-DEVOPS.md`](./tesis/08-CALIDAD-TESTING-DEVOPS.md) - Calidad, testing y DevOps: CI/CD, Docker, Kubernetes, Pulumi.
+
 * **Archivo Histórico (`archive/`):**
   * `rules-review/` - Logs de ejecución de auditorías de reglas.
   * `workflows-old/` - Guías de migración obsoletas.
