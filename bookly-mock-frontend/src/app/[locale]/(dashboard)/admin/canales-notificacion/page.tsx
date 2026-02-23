@@ -3,17 +3,18 @@
 import { Badge } from "@/components/atoms/Badge/Badge";
 import { Button } from "@/components/atoms/Button/Button";
 import { Card } from "@/components/atoms/Card/Card";
+import { Switch } from "@/components/atoms/Switch/Switch";
+import { DataTable } from "@/components/molecules/DataTable";
+import { Checkbox } from "@/components/atoms/Checkbox/Checkbox";
 import {
   useNotificationChannels,
   useNotificationPreferences,
 } from "@/hooks/useNotificationChannels";
 import { cn } from "@/lib/utils";
 import {
-  CheckCircle2,
   Mail,
   MessageCircle,
   Smartphone,
-  XCircle,
 } from "lucide-react";
 import { useTranslations } from "next-intl";
 import * as React from "react";
@@ -153,6 +154,72 @@ export default function CanalesNotificacionPage() {
     );
   };
 
+  const columns = [
+    {
+      key: "event_type",
+      header: t("notifications.event_type"),
+      cell: (pref: NotificationPreference) => (
+        <span className="font-medium text-[var(--color-text-primary)]">
+          {t(`notifications.events.${pref.eventType}` as any)}
+        </span>
+      ),
+    },
+    {
+      key: "email",
+      header: (
+        <div className="flex items-center justify-center gap-1">
+          <Mail className="h-4 w-4" /> {t("notifications.email")}
+        </div>
+      ),
+      className: "text-center",
+      cell: (pref: NotificationPreference) => (
+        <div className="flex justify-center">
+          <Checkbox
+            checked={pref.channels.email}
+            onCheckedChange={() => togglePreference(pref.eventType, "email")}
+            aria-label={`${t(`notifications.events.${pref.eventType}` as any)} por email`}
+          />
+        </div>
+      ),
+    },
+    {
+      key: "whatsapp",
+      header: (
+        <div className="flex items-center justify-center gap-1">
+          <MessageCircle className="h-4 w-4" /> {t("notifications.whatsapp")}
+        </div>
+      ),
+      className: "text-center",
+      cell: (pref: NotificationPreference) => (
+        <div className="flex justify-center">
+          <Checkbox
+            checked={pref.channels.whatsapp}
+            onCheckedChange={() => togglePreference(pref.eventType, "whatsapp")}
+            aria-label={`${t(`notifications.events.${pref.eventType}` as any)} por whatsapp`}
+          />
+        </div>
+      ),
+    },
+    {
+      key: "push",
+      header: (
+        <div className="flex items-center justify-center gap-1">
+          <Smartphone className="h-4 w-4" /> {t("notifications.push")}
+        </div>
+      ),
+      className: "text-center",
+      cell: (pref: NotificationPreference) => (
+        <div className="flex justify-center">
+          <Checkbox
+            checked={pref.channels.push}
+            onCheckedChange={() => togglePreference(pref.eventType, "push")}
+            aria-label={`${t(`notifications.events.${pref.eventType}` as any)} por push`}
+          />
+        </div>
+      ),
+    },
+  ];
+
   return (
     <>
       <div className="space-y-6">
@@ -212,26 +279,11 @@ export default function CanalesNotificacionPage() {
                         <Badge variant="warning">{t("notifications.not_configured")}</Badge>
                       )}
                     </div>
-                    <button
-                      type="button"
-                      role="switch"
-                      aria-checked={channel.enabled}
-                      onClick={() => toggleChannel(channel.id)}
+                    <Switch
+                      checked={channel.enabled}
+                      onCheckedChange={() => toggleChannel(channel.id)}
                       disabled={!channel.configured}
-                      className={cn(
-                        "relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors disabled:opacity-50 disabled:cursor-not-allowed",
-                        channel.enabled
-                          ? "bg-brand-primary-500"
-                          : "bg-[var(--color-bg-muted)]",
-                      )}
-                    >
-                      <span
-                        className={cn(
-                          "pointer-events-none inline-block h-5 w-5 transform rounded-full bg-[var(--color-bg-primary)] shadow transition-transform",
-                          channel.enabled ? "translate-x-5" : "translate-x-0",
-                        )}
-                      />
-                    </button>
+                    />
                   </div>
                 </Card>
               );
@@ -244,58 +296,12 @@ export default function CanalesNotificacionPage() {
           <h2 className="mb-3 text-lg font-semibold text-[var(--color-text-primary)]">
             {t("notifications.preferences_by_event")}
           </h2>
-          <Card className="overflow-hidden">
-            <div className="overflow-x-auto">
-              <table className="w-full text-sm">
-                <thead>
-                  <tr className="border-b bg-[var(--color-bg-muted)]">
-                    <th className="px-4 py-3 text-left font-medium text-[var(--color-text-secondary)]">
-                      {t("notifications.event_type")}
-                    </th>
-                    <th className="px-4 py-3 text-center font-medium text-[var(--color-text-secondary)]">
-                      <div className="flex items-center justify-center gap-1">
-                        <Mail className="h-4 w-4" /> {t("notifications.email")}
-                      </div>
-                    </th>
-                    <th className="px-4 py-3 text-center font-medium text-[var(--color-text-secondary)]">
-                      <div className="flex items-center justify-center gap-1">
-                        <MessageCircle className="h-4 w-4" /> {t("notifications.whatsapp")}
-                      </div>
-                    </th>
-                    <th className="px-4 py-3 text-center font-medium text-[var(--color-text-secondary)]">
-                      <div className="flex items-center justify-center gap-1">
-                        <Smartphone className="h-4 w-4" /> {t("notifications.push")}
-                      </div>
-                    </th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {preferences.map((pref) => (
-                    <tr key={pref.eventType} className="border-b last:border-0">
-                      <td className="px-4 py-3 font-medium text-[var(--color-text-primary)]">
-                        {t(`notifications.events.${pref.eventType}` as any)}
-                      </td>
-                      {(["email", "whatsapp", "push"] as const).map((ch) => (
-                        <td key={ch} className="px-4 py-3 text-center">
-                          <button
-                            onClick={() => togglePreference(pref.eventType, ch)}
-                            className="mx-auto"
-                            aria-label={`${t(`notifications.events.${pref.eventType}` as any)} por ${ch}: ${pref.channels[ch] ? "activado" : "desactivado"}`}
-                          >
-                            {pref.channels[ch] ? (
-                              <CheckCircle2 className="h-5 w-5 text-state-success-500" />
-                            ) : (
-                              <XCircle className="h-5 w-5 text-[var(--color-text-secondary)] hover:text-[var(--color-text-tertiary)]" />
-                            )}
-                          </button>
-                        </td>
-                      ))}
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          </Card>
+          <DataTable 
+            data={preferences}
+            columns={columns}
+            pageSize={preferences.length}
+            totalItems={preferences.length}
+          />
         </div>
 
         <div className="flex justify-end">
