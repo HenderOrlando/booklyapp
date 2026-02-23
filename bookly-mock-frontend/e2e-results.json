@@ -227,7 +227,7 @@
                       "workerIndex": 0,
                       "parallelIndex": 0,
                       "status": "failed",
-                      "duration": 20487,
+                      "duration": 21894,
                       "error": {
                         "message": "TimeoutError: page.waitForURL: Timeout 15000ms exceeded.\n=========================== logs ===========================\nwaiting for navigation until \"load\"\n============================================================",
                         "stack": "TimeoutError: page.waitForURL: Timeout 15000ms exceeded.\n=========================== logs ===========================\nwaiting for navigation until \"load\"\n============================================================\n    at C:\\Users\\USER\\Documents\\bookly\\booklyapp\\bookly-mock-frontend\\e2e\\smoke\\auth.smoke.spec.ts:47:16",
@@ -251,7 +251,7 @@
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2026-02-23T03:15:44.120Z",
+                      "startTime": "2026-02-23T03:18:20.385Z",
                       "annotations": [],
                       "attachments": [
                         {
@@ -296,7 +296,7 @@
                       "workerIndex": 1,
                       "parallelIndex": 1,
                       "status": "failed",
-                      "duration": 20429,
+                      "duration": 22151,
                       "error": {
                         "message": "TimeoutError: page.waitForURL: Timeout 15000ms exceeded.\n=========================== logs ===========================\nwaiting for navigation until \"load\"\n============================================================",
                         "stack": "TimeoutError: page.waitForURL: Timeout 15000ms exceeded.\n=========================== logs ===========================\nwaiting for navigation until \"load\"\n============================================================\n    at C:\\Users\\USER\\Documents\\bookly\\booklyapp\\bookly-mock-frontend\\e2e\\smoke\\auth.smoke.spec.ts:62:16",
@@ -320,7 +320,7 @@
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2026-02-23T03:15:44.153Z",
+                      "startTime": "2026-02-23T03:18:20.540Z",
                       "annotations": [],
                       "attachments": [
                         {
@@ -365,10 +365,10 @@
                       "workerIndex": 2,
                       "parallelIndex": 2,
                       "status": "failed",
-                      "duration": 20723,
+                      "duration": 20993,
                       "error": {
-                        "message": "TimeoutError: page.waitForURL: Timeout 15000ms exceeded.\n=========================== logs ===========================\nwaiting for navigation until \"load\"\n============================================================",
-                        "stack": "TimeoutError: page.waitForURL: Timeout 15000ms exceeded.\n=========================== logs ===========================\nwaiting for navigation until \"load\"\n============================================================\n    at LoginPage.expectDashboardRedirect (C:\\Users\\USER\\Documents\\bookly\\booklyapp\\bookly-mock-frontend\\e2e\\pages\\login.page.ts:51:21)\n    at C:\\Users\\USER\\Documents\\bookly\\booklyapp\\bookly-mock-frontend\\e2e\\smoke\\auth.smoke.spec.ts:73:21",
+                        "message": "TimeoutError: page.waitForURL: Timeout 15000ms exceeded.\n=========================== logs ===========================\nwaiting for navigation until \"load\"\n  navigated to \"http://localhost:4201/es/login\"\n  navigated to \"http://localhost:4201/es/login\"\n============================================================",
+                        "stack": "TimeoutError: page.waitForURL: Timeout 15000ms exceeded.\n=========================== logs ===========================\nwaiting for navigation until \"load\"\n  navigated to \"http://localhost:4201/es/login\"\n  navigated to \"http://localhost:4201/es/login\"\n============================================================\n    at LoginPage.expectDashboardRedirect (C:\\Users\\USER\\Documents\\bookly\\booklyapp\\bookly-mock-frontend\\e2e\\pages\\login.page.ts:51:21)\n    at C:\\Users\\USER\\Documents\\bookly\\booklyapp\\bookly-mock-frontend\\e2e\\smoke\\auth.smoke.spec.ts:73:21",
                         "location": {
                           "file": "C:\\Users\\USER\\Documents\\bookly\\booklyapp\\bookly-mock-frontend\\e2e\\pages\\login.page.ts",
                           "column": 21,
@@ -383,13 +383,13 @@
                             "column": 21,
                             "line": 51
                           },
-                          "message": "TimeoutError: page.waitForURL: Timeout 15000ms exceeded.\n=========================== logs ===========================\nwaiting for navigation until \"load\"\n============================================================\n\n\u001b[90m   at \u001b[39mpages\\login.page.ts:51\n\n\u001b[0m \u001b[90m 49 |\u001b[39m\n \u001b[90m 50 |\u001b[39m   \u001b[36masync\u001b[39m expectDashboardRedirect() {\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 51 |\u001b[39m     \u001b[36mawait\u001b[39m \u001b[36mthis\u001b[39m\u001b[33m.\u001b[39mpage\u001b[33m.\u001b[39mwaitForURL(\u001b[35m/dashboard/\u001b[39m\u001b[33m,\u001b[39m { timeout\u001b[33m:\u001b[39m \u001b[35m15000\u001b[39m })\u001b[33m;\u001b[39m\n \u001b[90m    |\u001b[39m                     \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 52 |\u001b[39m     \u001b[36mawait\u001b[39m expect(\u001b[36mthis\u001b[39m\u001b[33m.\u001b[39mpage)\u001b[33m.\u001b[39mtoHaveURL(\u001b[35m/dashboard/\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m 53 |\u001b[39m   }\n \u001b[90m 54 |\u001b[39m }\u001b[0m\n\u001b[2m    at LoginPage.expectDashboardRedirect (C:\\Users\\USER\\Documents\\bookly\\booklyapp\\bookly-mock-frontend\\e2e\\pages\\login.page.ts:51:21)\u001b[22m\n\u001b[2m    at C:\\Users\\USER\\Documents\\bookly\\booklyapp\\bookly-mock-frontend\\e2e\\smoke\\auth.smoke.spec.ts:73:21\u001b[22m"
+                          "message": "TimeoutError: page.waitForURL: Timeout 15000ms exceeded.\n=========================== logs ===========================\nwaiting for navigation until \"load\"\n  navigated to \"http://localhost:4201/es/login\"\n  navigated to \"http://localhost:4201/es/login\"\n============================================================\n\n\u001b[90m   at \u001b[39mpages\\login.page.ts:51\n\n\u001b[0m \u001b[90m 49 |\u001b[39m\n \u001b[90m 50 |\u001b[39m   \u001b[36masync\u001b[39m expectDashboardRedirect() {\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 51 |\u001b[39m     \u001b[36mawait\u001b[39m \u001b[36mthis\u001b[39m\u001b[33m.\u001b[39mpage\u001b[33m.\u001b[39mwaitForURL(\u001b[35m/dashboard/\u001b[39m\u001b[33m,\u001b[39m { timeout\u001b[33m:\u001b[39m \u001b[35m15000\u001b[39m })\u001b[33m;\u001b[39m\n \u001b[90m    |\u001b[39m                     \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 52 |\u001b[39m     \u001b[36mawait\u001b[39m expect(\u001b[36mthis\u001b[39m\u001b[33m.\u001b[39mpage)\u001b[33m.\u001b[39mtoHaveURL(\u001b[35m/dashboard/\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m 53 |\u001b[39m   }\n \u001b[90m 54 |\u001b[39m }\u001b[0m\n\u001b[2m    at LoginPage.expectDashboardRedirect (C:\\Users\\USER\\Documents\\bookly\\booklyapp\\bookly-mock-frontend\\e2e\\pages\\login.page.ts:51:21)\u001b[22m\n\u001b[2m    at C:\\Users\\USER\\Documents\\bookly\\booklyapp\\bookly-mock-frontend\\e2e\\smoke\\auth.smoke.spec.ts:73:21\u001b[22m"
                         }
                       ],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2026-02-23T03:15:44.106Z",
+                      "startTime": "2026-02-23T03:18:20.331Z",
                       "annotations": [],
                       "attachments": [
                         {
@@ -434,12 +434,12 @@
                       "workerIndex": 3,
                       "parallelIndex": 3,
                       "status": "passed",
-                      "duration": 5764,
+                      "duration": 6517,
                       "errors": [],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2026-02-23T03:15:44.242Z",
+                      "startTime": "2026-02-23T03:18:20.542Z",
                       "annotations": [],
                       "attachments": []
                     }
@@ -468,12 +468,12 @@
                       "workerIndex": 4,
                       "parallelIndex": 4,
                       "status": "passed",
-                      "duration": 5261,
+                      "duration": 6025,
                       "errors": [],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2026-02-23T03:15:44.291Z",
+                      "startTime": "2026-02-23T03:18:20.670Z",
                       "annotations": [],
                       "attachments": []
                     }
@@ -502,12 +502,12 @@
                       "workerIndex": 5,
                       "parallelIndex": 5,
                       "status": "passed",
-                      "duration": 4708,
+                      "duration": 5456,
                       "errors": [],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2026-02-23T03:15:44.287Z",
+                      "startTime": "2026-02-23T03:18:20.559Z",
                       "annotations": [],
                       "attachments": []
                     }
@@ -536,12 +536,12 @@
                       "workerIndex": 6,
                       "parallelIndex": 6,
                       "status": "passed",
-                      "duration": 4271,
+                      "duration": 5412,
                       "errors": [],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2026-02-23T03:15:44.268Z",
+                      "startTime": "2026-02-23T03:18:20.571Z",
                       "annotations": [],
                       "attachments": []
                     }
@@ -561,8 +561,8 @@
   ],
   "errors": [],
   "stats": {
-    "startTime": "2026-02-23T03:14:52.149Z",
-    "duration": 73853.04800000001,
+    "startTime": "2026-02-23T03:17:21.185Z",
+    "duration": 82985.453,
     "expected": 4,
     "skipped": 0,
     "unexpected": 3,

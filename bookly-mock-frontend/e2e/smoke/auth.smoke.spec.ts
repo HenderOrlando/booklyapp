@@ -12,6 +12,7 @@ import { LoginPage } from "../pages/login.page";
 
 test.describe("Auth Smoke", () => {
   test.beforeEach(async ({ page }) => {
+    // Mock the config API to avoid the ColorBootstrapSplash loader blocking the UI
     await page.route("**/api/v1/config/public", async (route) => {
       await route.fulfill({
         status: 200,
