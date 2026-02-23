@@ -18,7 +18,10 @@ import { PassportModule } from "@nestjs/passport";
 import { AuditDecoratorsModule } from "@reports/audit-decorators";
 import { I18nModule } from "@bookly/i18n";
 import { ResourceImportService } from "./application/services/resource-import.service";
+import { ScheduleImportService } from "./application/services/schedule-import.service";
 import { JwtStrategy } from "./infrastructure/strategies/jwt.strategy";
+import { AuthServiceClient } from "./infrastructure/clients/auth-service.client";
+import { AvailabilityServiceClient } from "./infrastructure/clients/availability-service.client";
 
 // Application Layer
 import * as EventHandlers from "./application/event-handlers";
@@ -50,6 +53,7 @@ import {
   MaintenanceRepository,
   ResourceRepository,
 } from "./infrastructure/repositories";
+import { ProgramRepository } from "./infrastructure/repositories/program.repository";
 import {
   Category,
   CategorySchema,
@@ -72,6 +76,7 @@ const RESOURCE_REPOSITORY = "IResourceRepository";
 const CATEGORY_REPOSITORY = "ICategoryRepository";
 const MAINTENANCE_REPOSITORY = "IMaintenanceRepository";
 const IMPORT_JOB_REPOSITORY = "IImportJobRepository";
+const PROGRAM_REPOSITORY = "IProgramRepository";
 
 /**
  * Resources Module
@@ -244,12 +249,48 @@ const IMPORT_JOB_REPOSITORY = "IImportJobRepository";
       provide: IMPORT_JOB_REPOSITORY,
       useClass: ImportJobRepository,
     },
+    {
+      provide: PROGRAM_REPOSITORY,
+      useClass: ProgramRepository,
+    },
+
+    // Schedule Import Service (with factory for interface injection)
+    {
+      provide: ScheduleImportService,
+      useFactory: (
+        resourceRepository: ResourceRepository,
+        categoryRepository: CategoryRepository,
+        programRepository: ProgramRepository,
+        authServiceClient: AuthServiceClient,
+        availabilityServiceClient: AvailabilityServiceClient,
+      ) => {
+        return new ScheduleImportService(
+          resourceRepository,
+          categoryRepository,
+          programRepository,
+          authServiceClient,
+          availabilityServiceClient,
+        );
+      },
+      inject: [
+        RESOURCE_REPOSITORY,
+        CATEGORY_REPOSITORY,
+        PROGRAM_REPOSITORY,
+        AuthServiceClient,
+        AvailabilityServiceClient,
+      ],
+    },
+
+    // Inter-service clients
+    AuthServiceClient,
+    AvailabilityServiceClient,
 
     // Direct Repository Injections (for handlers)
     ResourceRepository,
     CategoryRepository,
     MaintenanceRepository,
     ImportJobRepository,
+    ProgramRepository,
 
     // Inject Repositories into Services
     {

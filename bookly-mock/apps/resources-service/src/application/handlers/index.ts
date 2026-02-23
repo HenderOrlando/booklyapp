@@ -3,6 +3,7 @@ export * from "./create-category.handler";
 export * from "./create-resource.handler";
 export * from "./delete-resource.handler";
 export * from "./import-resources.handler";
+export * from "./import-schedule.handler";
 export * from "./restore-resource.handler";
 export * from "./rollback-import.handler";
 export * from "./schedule-maintenance.handler";
@@ -49,6 +50,7 @@ import {
   StartMaintenanceHandler,
 } from "./update-maintenance-status.handlers";
 import { UpdateResourceHandler } from "./update-resource.handler";
+import { ImportScheduleHandler } from "./import-schedule.handler";
 import { ValidateImportHandler } from "./validate-import.handler";
 
 export const CommandHandlers = [
@@ -66,6 +68,7 @@ export const CommandHandlers = [
   CancelMaintenanceHandler,
   CreateCategoryHandler,
   UpdateCategoryHandler,
+  ImportScheduleHandler,
 ];
 
 export const QueryHandlers = [
