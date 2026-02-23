@@ -370,9 +370,9 @@ export function AdvancedSearchModal({
                 </div>
               </div>
               <div className="flex flex-wrap gap-2">
-                {filteredCategories.map((category) => (
+                {filteredCategories.map((category, index) => (
                   <button
-                    key={category.id}
+                    key={category.id || `category-${index}`}
                     type="button"
                     onClick={() => handleCategoryToggle(category.id)}
                     className={`px-3 py-1.5 rounded-full border text-[10px] font-bold transition-all ${
@@ -454,9 +454,9 @@ export function AdvancedSearchModal({
               </div>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2 max-h-[150px] overflow-y-auto pr-2 custom-scrollbar">
-              {filteredCharacteristics.map((char) => (
+              {filteredCharacteristics.map((char, index) => (
                 <label
-                  key={char.id}
+                  key={char.id || `char-${index}`}
                   className={`flex items-center gap-3 p-2.5 rounded-xl border cursor-pointer transition-all ${
                     filters.characteristicIds?.includes(char.id)
                       ? "border-brand-primary-500 bg-brand-primary-50 text-brand-primary-700 shadow-sm"
@@ -514,9 +514,9 @@ export function AdvancedSearchModal({
               </div>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-2 max-h-[150px] overflow-y-auto pr-2 custom-scrollbar">
-              {filteredPrograms.map((program) => (
+              {filteredPrograms.map((program, index) => (
                 <label
-                  key={program.id}
+                  key={program.id || `program-${index}`}
                   className={`flex items-center gap-3 p-2.5 rounded-xl border cursor-pointer transition-all ${
                     filters.programIds?.includes(program.id)
                       ? "border-brand-primary-500 bg-brand-primary-50 text-brand-primary-700 shadow-sm"

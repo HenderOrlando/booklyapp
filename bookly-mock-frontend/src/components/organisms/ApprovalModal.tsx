@@ -12,8 +12,16 @@ import { ApprovalTimeline } from "@/components/molecules/ApprovalTimeline";
 import { ConflictAlert } from "@/components/molecules/ConflictAlert";
 import { DocumentPreview } from "@/components/molecules/DocumentPreview";
 import type { ApprovalRequest } from "@/types/entities/approval";
-import { format } from "date-fns";
+import { format, isValid } from "date-fns";
 import { es } from "date-fns/locale";
+
+// Helper para formateo seguro de fechas
+const safeFormat = (dateValue: string | Date | null | undefined, formatStr: string, options?: Parameters<typeof format>[2]): string => {
+  if (!dateValue) return "Fecha no disponible";
+  const date = new Date(dateValue);
+  if (!isValid(date)) return "Fecha inválida";
+  return format(date, formatStr, options);
+};
 import {
   AlertCircle,
   Calendar,
@@ -110,7 +118,6 @@ export const ApprovalModal = React.memo<ApprovalModalProps>(
 
     const startDate = new Date(request.startDate);
     const endDate = new Date(request.endDate);
-    const requestedDate = new Date(request.requestedAt);
     const isExpiring = request.expiresAt
       ? new Date(request.expiresAt).getTime() - Date.now() < 24 * 60 * 60 * 1000
       : false;
@@ -206,7 +213,7 @@ export const ApprovalModal = React.memo<ApprovalModalProps>(
                   <p className="text-xs mt-1">
                     Esta solicitud expirará el{" "}
                     {request.expiresAt &&
-                      format(new Date(request.expiresAt), "PPpp", {
+                      safeFormat(request.expiresAt, "PPpp", {
                         locale: es,
                       })}
                   </p>
@@ -288,7 +295,7 @@ export const ApprovalModal = React.memo<ApprovalModalProps>(
                       <div className="flex items-center gap-2 text-xs text-[var(--color-text-secondary)] dark:text-[var(--color-text-tertiary)]">
                         <Calendar className="h-3.5 w-3.5" />
                         Solicitado el{" "}
-                        {format(requestedDate, "PPpp", { locale: es })}
+                        {safeFormat(request.requestedAt, "PPpp", { locale: es })}
                       </div>
                     </div>
                   </div>
@@ -325,7 +332,7 @@ export const ApprovalModal = React.memo<ApprovalModalProps>(
                       <div className="flex items-center gap-2 text-sm">
                         <Calendar className="h-4 w-4 text-[var(--color-text-secondary)] dark:text-[var(--color-text-tertiary)]" />
                         <span className="text-[var(--color-text-primary)] dark:text-[var(--color-text-inverse)]">
-                          {format(startDate, "EEEE, d 'de' MMMM 'de' yyyy", {
+                          {format(startDate, "EEEE d 'de' MMMM 'de' yyyy", {
                             locale: es,
                           })}
                         </span>
@@ -333,14 +340,12 @@ export const ApprovalModal = React.memo<ApprovalModalProps>(
                       <div className="flex items-center gap-2 text-sm">
                         <Clock className="h-4 w-4 text-[var(--color-text-secondary)] dark:text-[var(--color-text-tertiary)]" />
                         <span className="text-[var(--color-text-primary)] dark:text-[var(--color-text-inverse)]">
-                          {format(startDate, "HH:mm")} -{" "}
-                          {format(endDate, "HH:mm")}
+                          {format(startDate, "HH:mm")} - {format(endDate, "HH:mm")}
                         </span>
                         <span className="text-xs text-[var(--color-text-secondary)] dark:text-[var(--color-text-tertiary)]">
-                          (
-                          {Math.round(
+                          ({Math.round(
                             (endDate.getTime() - startDate.getTime()) /
-                              (1000 * 60),
+                              (1000 * 60)
                           )}{" "}
                           minutos)
                         </span>
@@ -442,7 +447,7 @@ export const ApprovalModal = React.memo<ApprovalModalProps>(
                         )}
                         <div className="text-sm text-[var(--color-text-secondary)] dark:text-[var(--color-text-tertiary)]">
                           Fecha:{" "}
-                          {format(new Date(request.reviewedAt), "PPpp", {
+                          {safeFormat(request.reviewedAt, "PPpp", {
                             locale: es,
                           })}
                         </div>
