@@ -1073,7 +1073,7 @@ export default function CreateResourcePage() {
                             className={cn(
                               "inline-flex items-center gap-2 rounded-lg border px-3 py-1.5 text-xs font-medium transition-all animate-in fade-in zoom-in duration-200",
                               characteristic.isNew
-                                ? "border-blue-200 bg-blue-50 text-blue-700 shadow-sm"
+                                ? "border-brand-primary-200 bg-brand-primary-50 text-brand-primary-700 shadow-sm"
                                 : "border-[var(--color-border-subtle)] bg-[var(--color-bg-secondary)] text-[var(--color-text-primary)]",
                             )}
                           >
@@ -1084,7 +1084,7 @@ export default function CreateResourcePage() {
                             )}
                             <span>{characteristic.name}</span>
                             {characteristic.isNew && (
-                              <span className="flex h-1.5 w-1.5 rounded-full bg-blue-500 animate-pulse" />
+                              <span className="flex h-1.5 w-1.5 rounded-full bg-brand-primary-500 animate-pulse" />
                             )}
                             <button
                               type="button"
@@ -1154,9 +1154,9 @@ export default function CreateResourcePage() {
                           type="button"
                           data-testid="resource-characteristic-create-option"
                           onClick={handleCreateCharacteristic}
-                          className="flex items-center gap-3 w-full text-left px-3 py-3 rounded-lg border border-blue-200 bg-blue-50/50 hover:bg-blue-50 text-sm text-blue-700 transition-all font-medium group"
+                          className="flex items-center gap-3 w-full text-left px-3 py-3 rounded-lg border border-brand-primary-200 bg-brand-primary-50/50 hover:bg-brand-primary-50 text-sm text-brand-primary-700 transition-all font-medium group"
                         >
-                          <div className="flex h-6 w-6 items-center justify-center rounded-full bg-blue-100 group-hover:bg-blue-200 transition-colors">
+                          <div className="flex h-6 w-6 items-center justify-center rounded-full bg-brand-primary-100 group-hover:bg-brand-primary-200 transition-colors">
                             <Plus className="w-3.5 h-3.5" />
                           </div>
                           <span>
@@ -1248,9 +1248,9 @@ export default function CreateResourcePage() {
                     </div>
                   </div>
 
-                  <div className="flex items-start gap-3 p-3 bg-blue-500/10 border border-blue-500/20 rounded-lg">
-                    <AlertCircle className="w-4 h-4 text-blue-500 mt-0.5" />
-                    <p className="text-xs text-blue-700">
+                  <div className="flex items-start gap-3 p-3 bg-brand-primary-500/10 border border-brand-primary-500/20 rounded-lg">
+                    <AlertCircle className="w-4 h-4 text-brand-primary-500 mt-0.5" />
+                    <p className="text-xs text-brand-primary-700">
                       <strong>Nota:</strong> Si no seleccionas ningún programa,
                       el recurso estará disponible para todos los programas
                       académicos de la institución.
@@ -1308,12 +1308,12 @@ export default function CreateResourcePage() {
                               </div>
                               <div className="flex flex-wrap items-center gap-x-3 gap-y-1 mt-1">
                                 <span className="text-[10px] text-[var(--color-text-tertiary)] flex items-center gap-1">
-                                  <span className="w-1.5 h-1.5 rounded-full bg-blue-400"></span>
+                                  <span className="w-1.5 h-1.5 rounded-full bg-brand-primary-400"></span>
                                   {program.faculty}
                                 </span>
                                 {program.department && (
                                   <span className="text-[10px] text-[var(--color-text-tertiary)] flex items-center gap-1">
-                                    <span className="w-1.5 h-1.5 rounded-full bg-gray-400"></span>
+                                    <span className="w-1.5 h-1.5 rounded-full bg-content-tertiary"></span>
                                     {program.department}
                                   </span>
                                 )}
@@ -1501,7 +1501,7 @@ export default function CreateResourcePage() {
                   </div>
 
                   <div className="flex items-center gap-3 p-4 bg-[var(--color-bg-tertiary)]/30 rounded-xl border border-[var(--color-border-subtle)]">
-                    <div className="flex h-10 w-10 items-center justify-center rounded-full bg-blue-100 text-blue-600 shrink-0">
+                    <div className="flex h-10 w-10 items-center justify-center rounded-full bg-brand-primary-100 text-brand-primary-600 shrink-0">
                       <AlertCircle className="w-5 h-5" />
                     </div>
                     <div>

@@ -135,7 +135,7 @@ export function ResourcesTable({
               variant="ghost"
               size="sm"
               onClick={() => onRestore(resource)}
-              className="h-8 w-8 p-0 text-green-600 hover:bg-green-50"
+              className="h-8 w-8 p-0 text-state-success-700 hover:bg-state-success-50 dark:text-state-success-200 dark:hover:bg-state-success-900"
               title={t("restore")}
             >
               <RefreshCw size={16} />
@@ -145,7 +145,7 @@ export function ResourcesTable({
               variant="ghost"
               size="sm"
               onClick={() => onDelete(resource)}
-              className="h-8 w-8 p-0 text-red-500 hover:bg-red-50 hover:text-red-600"
+              className="h-8 w-8 p-0 text-state-error-500 hover:bg-state-error-50 hover:text-state-error-700 dark:text-state-error-400 dark:hover:bg-state-error-900"
               title={tCommon("delete")}
             >
               <Trash2 size={16} />
@@ -250,7 +250,7 @@ export function ResourcesTable({
               variant="default"
               size="sm"
               onClick={() => onRestore(resource)}
-              className="h-9 px-3 rounded-lg text-xs font-bold bg-green-600 hover:bg-green-700 text-white border-none shadow-sm flex items-center gap-2"
+              className="h-9 px-3 rounded-lg text-xs font-bold bg-state-success-700 hover:bg-state-success-900 text-content-inverse border-none shadow-sm flex items-center gap-2 dark:bg-state-success-500 dark:hover:bg-state-success-700"
             >
               <RefreshCw size={14} />
               {t("restore")}
@@ -260,7 +260,7 @@ export function ResourcesTable({
               variant="ghost"
               size="sm"
               onClick={() => onDelete(resource)}
-              className="h-9 w-9 p-0 rounded-lg text-red-500 hover:bg-red-50 hover:text-red-600"
+              className="h-9 w-9 p-0 rounded-lg text-state-error-500 hover:bg-state-error-50 hover:text-state-error-700 dark:text-state-error-400 dark:hover:bg-state-error-900"
               title={tCommon("delete")}
             >
               <Trash2 size={18} />

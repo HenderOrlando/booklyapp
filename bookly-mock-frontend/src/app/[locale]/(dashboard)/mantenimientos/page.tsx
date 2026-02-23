@@ -19,6 +19,7 @@ import {
 } from "@/components/molecules/FilterChips";
 import { SearchBar } from "@/components/molecules/SearchBar";
 import { MaintenanceModal } from "@/components/organisms/MaintenanceModal";
+import { ListLayout } from "@/components/templates/ListLayout";
 import {
   maintenanceKeys,
   useCancelMaintenance,
@@ -245,26 +246,62 @@ export default function MantenimientosPage() {
   ];
 
   if (loading) {
-    return (
-      <>
-        <LoadingSpinner fullScreen text={t("loading")} />
-      </>
-    );
+    return <LoadingSpinner fullScreen text={t("loading")} />;
   }
 
   return (
-    <>
+    <ListLayout
+      title={t("title")}
+      badge={{ text: "Gestión de Mantenimientos", variant: "secondary" }}
+      onCreate={handleCreate}
+      createLabel={t("program_maintenance")}
+    >
       <div className="space-y-6 pb-6">
-        <div className="flex items-center justify-between">
-          <div>
-            <h2 className="text-3xl font-bold text-[var(--color-text-primary)]">
-              {t("title")}
-            </h2>
-            <p className="text-[var(--color-text-secondary)] mt-2">
-              {t("description")}
-            </p>
-          </div>
-          <Button onClick={handleCreate}>{t("program_maintenance")}</Button>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <Card className="group hover:shadow-md transition-all duration-200 bg-gradient-to-br from-brand-primary-500/5 to-brand-primary-600/5 border-brand-primary-500/20">
+            <CardContent className="p-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-[10px] font-bold uppercase tracking-wider text-brand-primary-600/80 mb-1">
+                    {t("total_maintenances")}
+                  </p>
+                  <h3 className="text-3xl font-black text-brand-primary-800 dark:text-brand-primary-200 leading-none">
+                    {maintenances.length}
+                  </h3>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card className="group hover:shadow-md transition-all duration-200 bg-gradient-to-br from-state-warning-500/5 to-state-warning-700/5 border-state-warning-500/20">
+            <CardContent className="p-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-[10px] font-bold uppercase tracking-wider text-state-warning-700/80 dark:text-state-warning-200/80 mb-1">
+                    {t("scheduled_plural")}
+                  </p>
+                  <h3 className="text-3xl font-black text-state-warning-900 dark:text-state-warning-200 leading-none">
+                    {maintenances.filter((m: Maintenance) => m.status === "SCHEDULED").length}
+                  </h3>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card className="group hover:shadow-md transition-all duration-200 bg-gradient-to-br from-state-info-500/5 to-state-info-700/5 border-state-info-500/20">
+            <CardContent className="p-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-[10px] font-bold uppercase tracking-wider text-state-info-700/80 dark:text-state-info-200/80 mb-1">
+                    {t("in_progress_plural")}
+                  </p>
+                  <h3 className="text-3xl font-black text-state-info-900 dark:text-state-info-200 leading-none">
+                    {maintenances.filter((m: Maintenance) => m.status === "IN_PROGRESS").length}
+                  </h3>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
         </div>
 
         <Card>
@@ -428,6 +465,6 @@ export default function MantenimientosPage() {
           )}
         </ConfirmDialog>
       </div>
-    </>
+    </ListLayout>
   );
 }

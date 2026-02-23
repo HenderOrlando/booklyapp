@@ -1,7 +1,6 @@
 "use client";
 
 import { Badge } from "@/components/atoms/Badge";
-import { Button } from "@/components/atoms/Button";
 import {
   Card,
   CardContent,
@@ -23,6 +22,7 @@ import { useUsers } from "@/hooks/useUsers";
 import type { Permission, Role, User } from "@/types/entities/user";
 import { useTranslations } from "next-intl";
 import * as React from "react";
+import { ListLayout } from "@/components/templates/ListLayout";
 import { RoleDetailPanel, RoleFormModal, RoleStatsCards, RolesTable } from "./components";
 
 /**
@@ -325,32 +325,18 @@ export default function RolesAdminPage() {
   }
 
   return (
-    <>
+    <ListLayout
+      title={t("title")}
+      badge={{ text: "Administración", variant: "secondary" }}
+      onCreate={() => {
+        setSelectedRole(null);
+        setSelectedPermissions([]);
+        setSelectedUsers([]);
+        setShowRoleModal(true);
+      }}
+      createLabel={t("create_new")}
+    >
       <div className="space-y-8 pb-10">
-        {/* Header Seccion */}
-        <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
-          <div>
-            <h2 className="text-4xl font-black text-[var(--color-text-primary)] tracking-tight">
-              {t("title")}
-            </h2>
-            <p className="text-[var(--color-text-secondary)] mt-2 text-lg">
-              {t("subtitle")}
-            </p>
-          </div>
-          <Button
-            size="lg"
-            className="shadow-lg shadow-brand-primary-500/20"
-            onClick={() => {
-              setSelectedRole(null);
-              setSelectedPermissions([]);
-              setSelectedUsers([]);
-              setShowRoleModal(true);
-            }}
-          >
-            {t("create_new")}
-          </Button>
-        </div>
-
         {/* Estadísticas */}
         <RoleStatsCards
           roles={roles}
@@ -436,6 +422,6 @@ export default function RolesAdminPage() {
           onUserToggle={handleUserToggle}
         />
       </div>
-    </>
+    </ListLayout>
   );
 }

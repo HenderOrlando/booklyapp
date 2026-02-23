@@ -460,24 +460,24 @@ export default function RecursosPage() {
       <div className="space-y-6">
         {/* Alerta de Conflicto de Puertos */}
         {portConflict && process.env.NODE_ENV === "development" && (
-          <div className="p-4 bg-orange-50 border border-orange-200 rounded-xl flex items-start gap-3">
+          <div className="p-4 bg-state-warning-50 border border-state-warning-200 rounded-xl flex items-start gap-3 dark:bg-state-warning-900 dark:border-state-warning-500">
             <AlertCircle
-              className="text-orange-600 shrink-0 mt-0.5"
+              className="text-state-warning-700 dark:text-state-warning-200 shrink-0 mt-0.5"
               size={18}
             />
             <div>
-              <h4 className="text-sm font-bold text-orange-800">
+              <h4 className="text-sm font-bold text-state-warning-900 dark:text-state-warning-200">
                 Posible Conflicto de Configuración
               </h4>
-              <p className="text-xs text-orange-700 mt-1">
+              <p className="text-xs text-state-warning-700 dark:text-state-warning-200 mt-1">
                 El Frontend y el API Gateway parecen estar usando el mismo
                 puerto (3000). Si no ves datos, verifica que el API Gateway esté
                 corriendo en un puerto diferente o usa
-                <code className="mx-1 px-1 bg-orange-100 rounded">
+                <code className="mx-1 px-1 bg-state-warning-100 dark:bg-state-warning-900 rounded">
                   NEXT_PUBLIC_USE_DIRECT_SERVICES=true
                 </code>
                 en tu archivo{" "}
-                <code className="px-1 bg-orange-100 rounded">.env.local</code>.
+                <code className="px-1 bg-state-warning-100 dark:bg-state-warning-900 rounded">.env.local</code>.
               </p>
             </div>
           </div>

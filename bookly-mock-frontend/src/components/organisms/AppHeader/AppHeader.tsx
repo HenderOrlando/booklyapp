@@ -26,35 +26,36 @@ export function AppHeader({
   const t = useTranslations("auth");
 
   return (
-    <div className={`flex items-center justify-between flex-1 ${className}`}>
-      {/* Logo y Título (Organización y Bookly) */}
-      <div className="flex items-center gap-4">
-        <div className="flex items-center gap-3">
-          {/* DSI Logo White version */}
-          <div className="relative w-24 h-24 transition-all duration-300">
-            <Image
-              src="/images/logo_dsi_white.png"
-              alt="DSI UFPS"
-              fill
-              className="object-contain"
-              priority
-            />
-          </div>
-
-          <div className="flex flex-col">
-            <span className="text-[28px] font-black text-white leading-tight tracking-tight">
-              Bookly
-            </span>
-          </div>
+    <div className={`flex items-center flex-1 relative ${className}`}>
+      {/* Logo DSI - Izquierda */}
+      <div className="absolute left-0 top-1/2 -translate-y-1/2 flex items-center">
+        <div className="relative w-24 h-24 transition-all duration-300">
+          <Image
+            src="/images/logo_dsi_white.png"
+            alt="DSI UFPS"
+            fill
+            className="object-contain"
+            priority
+          />
         </div>
       </div>
 
-      {/* Sección de Usuario, Theme y Logout */}
-      <div className="flex items-center gap-6">
+      {/* Título Bookly - Centrado */}
+      <div className="flex-1 flex justify-center items-center">
+        <span className="text-[28px] font-black text-white leading-tight tracking-tight">
+          Bookly
+        </span>
+      </div>
+
+      {/* Sección Usuario, Theme y Logout - Derecha */}
+      <div className="absolute right-0 top-1/2 -translate-y-1/2 flex items-center gap-6">
         {showUser && user && (
-          <div className="hidden md:flex flex-col items-end leading-tight -space-y-0.5">
+          <div className="hidden md:flex flex-col items-end leading-tight -space-y-0.5 text-right">
             <span className="text-[13px] font-bold text-white">
-              {user.firstName} {user.lastName}
+              {/* Mostramos el primer rol del usuario, si existe. Si no, su nombre completo como fallback */}
+              {user.roles && user.roles.length > 0 
+                ? user.roles[0].displayName || user.roles[0].name 
+                : `${user.firstName} ${user.lastName}`}
             </span>
             <span className="text-[11px] text-white/70 font-medium">
               {user.email}
@@ -62,7 +63,7 @@ export function AppHeader({
           </div>
         )}
 
-        <div className="flex items-center gap-4 border-l border-white/20 pl-6">
+        <div className="flex items-center gap-4">
           <ThemeToggle />
           <LogoutButton
             variant="link"

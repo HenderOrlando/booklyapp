@@ -21,6 +21,7 @@ import {
 } from "@/components/molecules/FilterChips";
 import { SearchBar } from "@/components/molecules/SearchBar";
 import { CategoryModal } from "@/components/organisms/CategoryModal";
+import { ListLayout } from "@/components/templates/ListLayout";
 import {
   categoryKeys,
   useCreateCategory,
@@ -306,61 +307,57 @@ export default function CategoriasPage() {
   }
 
   return (
-    <>
+    <ListLayout
+      title={t("title")}
+      badge={{ text: "Gestión de Categorías", variant: "secondary" }}
+      onCreate={handleCreate}
+      createLabel={t("create")}
+    >
       <div className="space-y-6 pb-6">
-        {/* Header */}
-        <div className="flex items-center justify-between">
-          <div>
-            <h2 className="text-3xl font-bold text-[var(--color-text-primary)]">
-              {t("title")}
-            </h2>
-            <p className="text-[var(--color-text-secondary)] mt-2">
-              {t("description")}
-            </p>
-          </div>
-          <Button onClick={handleCreate} data-testid="create-category-button">
-            {t("create")}
-          </Button>
-        </div>
-
         {/* Estadísticas */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-sm font-medium text-[var(--color-text-tertiary)]">
-                {t("total")}
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p className="text-3xl font-bold text-foreground">
-                {categories.length}
-              </p>
+          <Card className="group hover:shadow-md transition-all duration-200 bg-gradient-to-br from-brand-primary-500/5 to-brand-primary-600/5 border-brand-primary-500/20">
+            <CardContent className="p-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-[10px] font-bold uppercase tracking-wider text-brand-primary-600/80 mb-1">
+                    {t("total")}
+                  </p>
+                  <h3 className="text-3xl font-black text-brand-primary-800 dark:text-brand-primary-200 leading-none">
+                    {categories.length}
+                  </h3>
+                </div>
+              </div>
             </CardContent>
           </Card>
 
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-sm font-medium text-[var(--color-text-tertiary)]">
-                {t("active")}
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p className="text-3xl font-bold text-state-success-500">
-                {categories.filter((c: Category) => c.isActive).length}
-              </p>
+          <Card className="group hover:shadow-md transition-all duration-200 bg-gradient-to-br from-state-success-500/5 to-state-success-700/5 border-state-success-500/20">
+            <CardContent className="p-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-[10px] font-bold uppercase tracking-wider text-state-success-700/80 dark:text-state-success-200/80 mb-1">
+                    {t("active")}
+                  </p>
+                  <h3 className="text-3xl font-black text-state-success-900 dark:text-state-success-200 leading-none">
+                    {categories.filter((c: Category) => c.isActive).length}
+                  </h3>
+                </div>
+              </div>
             </CardContent>
           </Card>
 
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-sm font-medium text-[var(--color-text-tertiary)]">
-                {t("inactive")}
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p className="text-3xl font-bold text-[var(--color-text-tertiary)]">
-                {categories.filter((c: Category) => !c.isActive).length}
-              </p>
+          <Card className="group hover:shadow-md transition-all duration-200 bg-gradient-to-br from-state-warning-500/5 to-state-warning-700/5 border-state-warning-500/20">
+            <CardContent className="p-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-[10px] font-bold uppercase tracking-wider text-state-warning-700/80 dark:text-state-warning-200/80 mb-1">
+                    {t("inactive")}
+                  </p>
+                  <h3 className="text-3xl font-black text-state-warning-900 dark:text-state-warning-200 leading-none">
+                    {categories.filter((c: Category) => !c.isActive).length}
+                  </h3>
+                </div>
+              </div>
             </CardContent>
           </Card>
         </div>
@@ -549,6 +546,6 @@ export default function CategoriasPage() {
           )}
         </ConfirmDialog>
       </div>
-    </>
+    </ListLayout>
   );
 }

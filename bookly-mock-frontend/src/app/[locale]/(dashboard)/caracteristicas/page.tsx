@@ -17,9 +17,8 @@ import {
   type FilterChip,
 } from "@/components/molecules/FilterChips";
 import { SearchBar } from "@/components/molecules/SearchBar";
-import { AppHeader } from "@/components/organisms/AppHeader";
-import { AppSidebar } from "@/components/organisms/AppSidebar";
 import { CharacteristicModal } from "@/components/organisms/CharacteristicModal/CharacteristicModal";
+import { ListLayout } from "@/components/templates/ListLayout";
 import {
   characteristicKeys,
   useCreateCharacteristic,
@@ -196,9 +195,6 @@ export default function CaracteristicasPage() {
     },
   ];
 
-  const _header = <AppHeader title={t("title")} />;
-  const _sidebar = <AppSidebar />;
-
   if (loading) {
     return (
       <>
@@ -208,23 +204,59 @@ export default function CaracteristicasPage() {
   }
 
   return (
-    <>
+    <ListLayout
+      title={t("title")}
+      badge={{ text: "Gestión de Características", variant: "secondary" }}
+      onCreate={handleCreate}
+      createLabel={t("create_button")}
+    >
       <div className="space-y-6 pb-6">
-        <div className="flex items-center justify-between">
-          <div>
-            <h2 className="text-3xl font-bold text-[var(--color-text-primary)]">
-              {t("title")}
-            </h2>
-            <p className="text-[var(--color-text-secondary)] mt-2">
-              {t("subtitle")}
-            </p>
-          </div>
-          <Button
-            onClick={handleCreate}
-            data-testid="create-characteristic-button"
-          >
-            {t("create_button")}
-          </Button>
+        {/* Estadísticas */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <Card className="group hover:shadow-md transition-all duration-200 bg-gradient-to-br from-brand-primary-500/5 to-brand-primary-600/5 border-brand-primary-500/20">
+            <CardContent className="p-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-[10px] font-bold uppercase tracking-wider text-brand-primary-600/80 mb-1">
+                    {t("total")}
+                  </p>
+                  <h3 className="text-3xl font-black text-brand-primary-800 dark:text-brand-primary-200 leading-none">
+                    {characteristics.length}
+                  </h3>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card className="group hover:shadow-md transition-all duration-200 bg-gradient-to-br from-state-success-500/5 to-state-success-700/5 border-state-success-500/20">
+            <CardContent className="p-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-[10px] font-bold uppercase tracking-wider text-state-success-700/80 dark:text-state-success-200/80 mb-1">
+                    {t("filter.active")}
+                  </p>
+                  <h3 className="text-3xl font-black text-state-success-900 dark:text-state-success-200 leading-none">
+                    {characteristics.filter((c: Characteristic) => c.isActive).length}
+                  </h3>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card className="group hover:shadow-md transition-all duration-200 bg-gradient-to-br from-state-warning-500/5 to-state-warning-700/5 border-state-warning-500/20">
+            <CardContent className="p-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-[10px] font-bold uppercase tracking-wider text-state-warning-700/80 dark:text-state-warning-200/80 mb-1">
+                    {t("filter.inactive")}
+                  </p>
+                  <h3 className="text-3xl font-black text-state-warning-900 dark:text-state-warning-200 leading-none">
+                    {characteristics.filter((c: Characteristic) => !c.isActive).length}
+                  </h3>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
         </div>
 
         <Card>
@@ -331,6 +363,6 @@ export default function CaracteristicasPage() {
           variant="destructive"
         />
       </div>
-    </>
+    </ListLayout>
   );
 }
