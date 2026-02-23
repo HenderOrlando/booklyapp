@@ -63,6 +63,8 @@ export default function LoginPage() {
 
     try {
       await login(email, password, rememberMe);
+      // Force reload so the middleware sees the freshly set accessToken cookie
+      window.location.reload();
     } catch (error: unknown) {
       console.error("Login error:", error);
       setError(
