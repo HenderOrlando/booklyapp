@@ -1,7 +1,15 @@
 "use client";
 
 import { Button } from "@/components/atoms/Button/Button";
-import { cn } from "@/lib/utils";
+import { Badge } from "@/components/atoms/Badge/Badge";
+import { Alert, AlertDescription, AlertTitle } from "@/components/atoms/Alert/Alert";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+} from "@/components/atoms/Dialog";
 import {
   AlertTriangle,
   Database,
@@ -10,7 +18,6 @@ import {
   Server,
   Wifi,
   WifiOff,
-  X,
   Zap,
 } from "lucide-react";
 import * as React from "react";
@@ -196,102 +203,63 @@ export function ModeChangeModal({
       : `Cambiar routing a ${newRouting === "gateway" ? "GATEWAY" : "DIRECTO"}`;
 
   const typeColors = {
-    info: "text-[var(--color-state-info-text)] bg-[var(--color-state-info-bg)] border-[var(--color-state-info-border)]",
-    warning:
-      "text-[var(--color-state-warning-text)] bg-[var(--color-state-warning-bg)] border-[var(--color-state-warning-border)]",
-    success:
-      "text-[var(--color-state-success-text)] bg-[var(--color-state-success-bg)] border-[var(--color-state-success-border)]",
-  };
+    info: "default",
+    warning: "warning",
+    success: "success",
+  } as const;
 
-  const modeBadgeClass = (value: string) =>
-    value === "mock"
-      ? "bg-[var(--color-state-warning-bg)] text-[var(--color-state-warning-text)]"
-      : "bg-[var(--color-state-success-bg)] text-[var(--color-state-success-text)]";
+  const modeBadgeVariant = (value: string) =>
+    value === "mock" ? "warning" : "success";
 
-  const routingBadgeClass = (value: string) =>
-    value === "gateway"
-      ? "bg-[var(--color-state-info-bg)] text-[var(--color-state-info-text)]"
-      : "bg-[var(--color-bg-muted)] text-[var(--color-text-secondary)]";
+  const routingBadgeVariant = (value: string) =>
+    value === "gateway" ? "primary" : "secondary";
 
   return (
-    <div className="fixed inset-0 z-[100] flex items-center justify-center bg-[var(--color-bg-overlay)]">
-      <div className="relative mx-4 w-full max-w-md rounded-xl border border-[var(--color-border-subtle)] bg-[var(--color-bg-primary)] p-6 shadow-2xl">
-        {/* Header */}
-        <div className="flex items-center justify-between mb-4">
-          <h2 className="text-lg font-bold text-[var(--color-text-primary)]">
-            {title}
-          </h2>
-          <button
-            onClick={onClose}
-            className="rounded-lg p-1 text-[var(--color-text-tertiary)] hover:bg-[var(--color-bg-muted)] transition-colors"
-          >
-            <X className="h-5 w-5" />
-          </button>
-        </div>
+    <Dialog open={open} onOpenChange={(isOpen) => !isOpen && onClose()}>
+      <DialogContent className="sm:max-w-md">
+        <DialogHeader>
+          <DialogTitle>{title}</DialogTitle>
+        </DialogHeader>
 
         {/* Summary badges */}
-        <div className="flex items-center gap-2 mb-4">
-          <span
-            className={cn(
-              "rounded-full px-3 py-1 text-xs font-semibold",
-              changeType === "data"
-                ? modeBadgeClass(currentMode)
-                : routingBadgeClass(currentRouting),
-            )}
-          >
+        <div className="flex items-center gap-2 mb-4 mt-2">
+          <Badge variant={changeType === "data" ? modeBadgeVariant(currentMode) : routingBadgeVariant(currentRouting)}>
             {changeType === "data"
               ? currentMode.toUpperCase()
               : currentRouting.toUpperCase()}
-          </span>
+          </Badge>
           <span className="text-[var(--color-text-tertiary)]">→</span>
-          <span
-            className={cn(
-              "rounded-full px-3 py-1 text-xs font-semibold",
-              changeType === "data"
-                ? modeBadgeClass(newMode)
-                : routingBadgeClass(newRouting),
-            )}
-          >
+          <Badge variant={changeType === "data" ? modeBadgeVariant(newMode) : routingBadgeVariant(newRouting)}>
             {changeType === "data"
               ? newMode.toUpperCase()
               : newRouting.toUpperCase()}
-          </span>
+          </Badge>
         </div>
 
         {/* Effects list */}
-        <div className="space-y-2 mb-6">
+        <div className="space-y-3 mb-6">
           <p className="text-xs font-medium text-[var(--color-text-secondary)] uppercase tracking-wider mb-2">
             Efectos del cambio
           </p>
           {effects.map((effect, i) => (
-            <div
-              key={i}
-              className={cn(
-                "flex items-start gap-3 rounded-lg border p-3",
-                typeColors[effect.type],
-              )}
-            >
-              <div className="mt-0.5 shrink-0">{effect.icon}</div>
-              <div>
-                <p className="text-sm font-medium">{effect.label}</p>
-                <p className="text-xs mt-0.5 opacity-80">
-                  {effect.description}
-                </p>
-              </div>
-            </div>
+            <Alert key={i} variant={typeColors[effect.type]}>
+              {effect.icon}
+              <AlertTitle>{effect.label}</AlertTitle>
+              <AlertDescription>{effect.description}</AlertDescription>
+            </Alert>
           ))}
         </div>
 
         {/* Actions */}
-        <div className="flex gap-3">
+        <DialogFooter className="gap-2 sm:gap-0">
           <Button variant="outline" className="flex-1" onClick={onClose}>
             Cancelar
           </Button>
           <Button className="flex-1" onClick={onConfirm}>
             Confirmar cambio
           </Button>
-        </div>
-      </div>
-    </div>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
   );
 }
