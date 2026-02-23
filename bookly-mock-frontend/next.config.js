@@ -32,7 +32,14 @@ const connectSrc = [
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   reactStrictMode: true,
-  output: "standalone", // Required for Docker deployment
+  output: process.env.STANDALONE === "true" ? "standalone" : undefined, // Required for Docker deployment
+  transpilePackages: [
+    "@tanstack/react-query",
+    "@tanstack/react-query-devtools",
+    "@tanstack/react-virtual",
+    "react-pdf",
+    "@react-pdf/renderer",
+  ],
   experimental: {
     serverActions: {
       bodySizeLimit: "2mb",
