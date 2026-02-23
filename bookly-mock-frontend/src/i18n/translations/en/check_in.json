@@ -41,5 +41,6 @@
   "success_check_out_desc": "You have successfully checked out",
   "error_check_out_title": "Check-out error",
   "error_check_out_desc": "Check-out could not be completed",
-  "error": "Error"
+  "error": "Error",
+  "error_loading": "Could not load check-in records. Check your connection and try again."
 }

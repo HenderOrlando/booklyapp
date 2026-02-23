@@ -10,6 +10,7 @@ import { RequestReassignmentCommand } from '@availability/application/commands/r
 import { RespondReassignmentCommand } from '@availability/application/commands/respond-reassignment.command';
 import { GetReassignmentHistoryQuery } from '@availability/application/queries/get-reassignment-history.query';
 import {
+  GetMyReassignmentHistoryDto,
   GetReassignmentHistoryDto,
   ReassignmentHistoryResponseDto,
   ReassignmentResponseDto,
@@ -106,7 +107,7 @@ export class ReassignmentController {
   @RequirePermissions("reservations:read")
   @ApiOperation({
     summary: "Obtener historial propio de reasignaciones",
-    description: "Consulta las reasignaciones del usuario autenticado",
+    description: "Consulta las reasignaciones del usuario autenticado, con filtros opcionales",
   })
   @ApiResponse({
     status: 200,
@@ -114,9 +115,16 @@ export class ReassignmentController {
     type: [ReassignmentHistoryResponseDto],
   })
   async getMyHistory(
-    @CurrentUser("sub") userId: string
+    @CurrentUser("sub") userId: string,
+    @Query() filters: GetMyReassignmentHistoryDto
   ): Promise<any> {
-    const query = new GetReassignmentHistoryQuery({ userId });
+    const queryFilters: GetReassignmentHistoryDto = {
+      userId,
+      ...(filters.accepted !== undefined && { accepted: filters.accepted }),
+      ...(filters.reason && { reason: filters.reason }),
+      ...(filters.pending !== undefined && { pending: filters.pending }),
+    };
+    const query = new GetReassignmentHistoryQuery(queryFilters);
     const history = await this.queryBus.execute(query);
     return ResponseUtil.success(history, 'Personal reassignment history retrieved successfully');
   }

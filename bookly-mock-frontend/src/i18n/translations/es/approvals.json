@@ -80,5 +80,8 @@
   "showing_records": "Mostrando {count} de {total} registros",
   "not_found": "Aprobación no encontrada",
   "a": "a",
-  "management": "Gestión de Aprobaciones"
+  "management": "Gestión de Aprobaciones",
+  "admin_view_all_approvals": "Vista de administrador: mostrando todas las aprobaciones del sistema.",
+  "user_view_own_approvals": "Mostrando solo tus aprobaciones pasadas.",
+  "error_loading_history": "Error al cargar el historial de aprobaciones"
 }

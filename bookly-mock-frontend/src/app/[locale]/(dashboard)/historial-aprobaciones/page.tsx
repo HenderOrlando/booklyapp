@@ -12,18 +12,26 @@ import {
 } from "@/components/atoms/Select";
 import { Input } from "@/components/atoms/Input";
 import { ApprovalTimeline } from "@/components/molecules/ApprovalTimeline";
-import type { ApprovalRequest } from "@/types/entities/approval";
-import { useQuery } from "@tanstack/react-query";
+import type { ApprovalStatus } from "@/types/entities/approval";
+import {
+  useApprovalHistory,
+  useCanViewAllApprovals,
+} from "@/hooks/useApprovalHistory";
 import { format } from "date-fns";
 import { es } from "date-fns/locale";
 import {
+  AlertTriangle,
   Calendar,
   ChevronDown,
+  ChevronLeft,
+  ChevronRight,
   ChevronUp,
   Clock,
   Download,
+  Eye,
   FileText,
   Search,
+  ShieldCheck,
 } from "lucide-react";
 import { useTranslations } from "next-intl";
 import * as React from "react";
@@ -33,123 +41,50 @@ import * as React from "react";
  *
  * Muestra el historial completo de aprobaciones con timeline expandible.
  * Implementa RF-25 (Registro y trazabilidad de aprobaciones).
+ *
+ * - Modo server: carga datos reales desde backend via useApprovalHistory.
+ * - Usuario normal: solo ve sus propias aprobaciones pasadas.
+ * - Admin/Coordinador: ve todas las aprobaciones del sistema.
  */
 
-// Mock data
-const getMockApprovalHistory = (): ApprovalRequest[] => [
-  {
-    id: "apr_001",
-    reservationId: "res_001",
-    userId: "user_001",
-    userName: "Carlos Rodríguez",
-    userEmail: "carlos@ufps.edu.co",
-    userRole: "Profesor",
-    resourceId: "res_001",
-    resourceName: "Auditorio Principal",
-    resourceType: "Auditorio",
-    categoryName: "Espacios Académicos",
-    startDate: new Date(Date.now() + 2 * 24 * 60 * 60 * 1000).toISOString(),
-    endDate: new Date(
-      Date.now() + 2 * 24 * 60 * 60 * 1000 + 2 * 60 * 60 * 1000,
-    ).toISOString(),
-    purpose: "Conferencia magistral sobre IA",
-    attendees: 150,
-    status: "APPROVED",
-    priority: "HIGH",
-    currentLevel: "SECOND_LEVEL",
-    maxLevel: "SECOND_LEVEL",
-    requestedAt: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000).toISOString(),
-    reviewedAt: new Date(Date.now() - 4 * 24 * 60 * 60 * 1000).toISOString(),
-    reviewerName: "Dr. López",
-    comments: "Aprobado por ser evento institucional importante",
-    createdAt: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000).toISOString(),
-    updatedAt: new Date(Date.now() - 4 * 24 * 60 * 60 * 1000).toISOString(),
-    history: [
-      {
-        id: "hist_001",
-        approvalRequestId: "apr_001",
-        action: "SUBMIT",
-        performedBy: "user_001",
-        performerName: "Carlos Rodríguez",
-        level: "FIRST_LEVEL",
-        timestamp: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000).toISOString(),
-      },
-      {
-        id: "hist_002",
-        approvalRequestId: "apr_001",
-        action: "APPROVE",
-        performedBy: "coordinator_001",
-        performerName: "Dr. López",
-        level: "SECOND_LEVEL",
-        comments: "Aprobado",
-        timestamp: new Date(Date.now() - 4 * 24 * 60 * 60 * 1000).toISOString(),
-      },
-    ],
-  },
-  {
-    id: "apr_002",
-    reservationId: "res_002",
-    userId: "user_002",
-    userName: "María González",
-    userEmail: "maria@ufps.edu.co",
-    userRole: "Estudiante",
-    resourceId: "res_002",
-    resourceName: "Sala de Reuniones B",
-    resourceType: "Sala",
-    categoryName: "Espacios Administrativos",
-    startDate: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000).toISOString(),
-    endDate: new Date(
-      Date.now() - 1 * 24 * 60 * 60 * 1000 + 1 * 60 * 60 * 1000,
-    ).toISOString(),
-    purpose: "Reunión de grupo",
-    attendees: 8,
-    status: "REJECTED",
-    priority: "NORMAL",
-    currentLevel: "FIRST_LEVEL",
-    maxLevel: "FIRST_LEVEL",
-    requestedAt: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000).toISOString(),
-    reviewedAt: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString(),
-    reviewerName: "Coordinadora Pérez",
-    rejectionReason: "Recurso no disponible en el horario solicitado",
-    createdAt: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000).toISOString(),
-    updatedAt: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString(),
-    history: [
-      {
-        id: "hist_003",
-        approvalRequestId: "apr_002",
-        action: "SUBMIT",
-        performedBy: "user_002",
-        performerName: "María González",
-        level: "FIRST_LEVEL",
-        timestamp: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000).toISOString(),
-      },
-      {
-        id: "hist_004",
-        approvalRequestId: "apr_002",
-        action: "REJECT",
-        performedBy: "coordinator_002",
-        performerName: "Coordinadora Pérez",
-        level: "FIRST_LEVEL",
-        reason: "Recurso no disponible",
-        timestamp: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString(),
-      },
-    ],
-  },
-];
+const PAGE_SIZE = 10;
+const SEARCH_DEBOUNCE_MS = 400;
 
 export default function HistorialAprobacionesPage() {
   const t = useTranslations("approvals");
+  const canViewAll = useCanViewAllApprovals();
+
   const [expandedItems, setExpandedItems] = React.useState<Set<string>>(
     new Set(),
   );
   const [filterStatus, setFilterStatus] = React.useState<string>("all");
-  const [searchQuery, setSearchQuery] = React.useState("");
+  const [searchInput, setSearchInput] = React.useState("");
+  const [debouncedSearch, setDebouncedSearch] = React.useState("");
+  const [currentPage, setCurrentPage] = React.useState(1);
 
-  const { data: history, isLoading } = useQuery({
-    queryKey: ["approval-history"],
-    queryFn: async () => getMockApprovalHistory(),
-    staleTime: 1000 * 60 * 5, // 5 minutos
+  React.useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedSearch(searchInput);
+      setCurrentPage(1);
+    }, SEARCH_DEBOUNCE_MS);
+    return () => clearTimeout(timer);
+  }, [searchInput]);
+
+  React.useEffect(() => {
+    setCurrentPage(1);
+  }, [filterStatus]);
+
+  const { data: paginatedData, isLoading, error } = useApprovalHistory({
+    status: filterStatus !== "all" ? (filterStatus as ApprovalStatus) : undefined,
+    search: debouncedSearch || undefined,
+    page: currentPage,
+    limit: PAGE_SIZE,
   });
+
+  const items = paginatedData?.items || [];
+  const meta = paginatedData?.meta;
+  const totalPages = meta?.totalPages || 1;
+  const totalItems = meta?.total || 0;
 
   const toggleExpanded = (id: string) => {
     setExpandedItems((prev) => {
@@ -163,29 +98,8 @@ export default function HistorialAprobacionesPage() {
     });
   };
 
-  const filteredHistory = React.useMemo(() => {
-    if (!history) return [];
-
-    return history.filter((item) => {
-      // Filtro de estado
-      if (filterStatus !== "all" && item.status !== filterStatus) return false;
-
-      // Filtro de búsqueda
-      if (searchQuery) {
-        const query = searchQuery.toLowerCase();
-        return (
-          item.userName.toLowerCase().includes(query) ||
-          item.resourceName.toLowerCase().includes(query) ||
-          item.purpose.toLowerCase().includes(query)
-        );
-      }
-
-      return true;
-    });
-  }, [history, filterStatus, searchQuery]);
-
   const handleExportCSV = () => {
-    if (!filteredHistory.length) return;
+    if (!items.length) return;
 
     const headers = [
       "ID",
@@ -201,7 +115,7 @@ export default function HistorialAprobacionesPage() {
       "Razón Rechazo",
     ];
 
-    const rows = filteredHistory.map((item) => [
+    const rows = items.map((item) => [
       item.id,
       item.userName,
       item.userEmail,
@@ -257,6 +171,24 @@ export default function HistorialAprobacionesPage() {
           </Button>
         </div>
 
+        {/* Indicador de alcance */}
+        {canViewAll && (
+          <div className="flex items-center gap-2 px-4 py-2.5 rounded-lg bg-[var(--color-state-info-bg)] border border-[var(--color-state-info-border)]">
+            <ShieldCheck className="h-4 w-4 text-[var(--color-state-info-text)]" />
+            <span className="text-sm text-[var(--color-state-info-text)]">
+              {t("admin_view_all_approvals")}
+            </span>
+          </div>
+        )}
+        {!canViewAll && (
+          <div className="flex items-center gap-2 px-4 py-2.5 rounded-lg bg-[var(--color-bg-muted)] border border-[var(--color-border-subtle)]">
+            <Eye className="h-4 w-4 text-[var(--color-text-secondary)]" />
+            <span className="text-sm text-[var(--color-text-secondary)]">
+              {t("user_view_own_approvals")}
+            </span>
+          </div>
+        )}
+
         {/* Filtros */}
         <div className="flex flex-col sm:flex-row gap-3">
           <div className="flex-1 relative">
@@ -264,8 +196,8 @@ export default function HistorialAprobacionesPage() {
             <Input
               type="text"
               placeholder={t("search_history_placeholder")}
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
+              value={searchInput}
+              onChange={(e) => setSearchInput(e.target.value)}
               className="pl-10"
             />
           </div>
@@ -290,9 +222,19 @@ export default function HistorialAprobacionesPage() {
           <div className="flex items-center justify-center py-12">
             <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[var(--color-action-primary)]" />
           </div>
-        ) : filteredHistory.length > 0 ? (
+        ) : error ? (
+          <div className="text-center py-12 bg-[var(--color-state-error-bg)] rounded-lg border border-[var(--color-state-error-border)]">
+            <AlertTriangle className="h-12 w-12 text-[var(--color-state-error-text)] mx-auto mb-3" />
+            <p className="text-[var(--color-state-error-text)] font-medium">
+              {t("error_loading_history")}
+            </p>
+            <p className="text-sm text-[var(--color-state-error-text)] mt-1 opacity-75">
+              {error instanceof Error ? error.message : String(error)}
+            </p>
+          </div>
+        ) : items.length > 0 ? (
           <div className="space-y-3">
-            {filteredHistory.map((item) => {
+            {items.map((item) => {
               const isExpanded = expandedItems.has(item.id);
 
               return (
@@ -462,12 +404,45 @@ export default function HistorialAprobacionesPage() {
           </div>
         )}
 
-        {/* Resumen */}
-        {filteredHistory.length > 0 && (
+        {/* Paginación */}
+        {totalPages > 1 && (
+          <div className="flex items-center justify-between">
+            <div className="text-sm text-[var(--color-text-secondary)] dark:text-[var(--color-text-tertiary)]">
+              {t("showing_records", {
+                count: items.length,
+                total: totalItems,
+              })}
+            </div>
+            <div className="flex items-center gap-2">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
+                disabled={currentPage <= 1}
+              >
+                <ChevronLeft className="h-4 w-4" />
+              </Button>
+              <span className="text-sm text-[var(--color-text-primary)] dark:text-[var(--color-text-primary)] px-2">
+                {currentPage} / {totalPages}
+              </span>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
+                disabled={currentPage >= totalPages}
+              >
+                <ChevronRight className="h-4 w-4" />
+              </Button>
+            </div>
+          </div>
+        )}
+
+        {/* Resumen (cuando hay una sola página) */}
+        {totalPages <= 1 && items.length > 0 && (
           <div className="text-center text-sm text-[var(--color-text-secondary)] dark:text-[var(--color-text-tertiary)]">
             {t("showing_records", {
-              count: filteredHistory.length,
-              total: history?.length || 0,
+              count: items.length,
+              total: totalItems,
             })}
           </div>
         )}

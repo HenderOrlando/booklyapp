@@ -29,18 +29,23 @@ import type { User as AuthUser, UserPreferences } from "@/types/entities/user";
 import {
   getApprovalHistory,
   getApprovalRequestById,
+  getFilteredReassignmentHistory,
   getMockLoginResponse,
   mockActiveReservations,
   mockApprovalRequests,
   mockApprovalStats,
   mockAuditLogs,
   mockCheckInOutStats,
+  mockCheckInOuts,
   mockCredentials,
   mockDelay,
+  mockPerformCheckIn,
+  mockPerformCheckOut,
   mockPermissions,
   mockRoles,
   mockUsers,
   mockVigilanceAlerts,
+  respondToMockReassignment,
 } from "./data";
 import { mockReservations } from "./data/reservations-service.mock";
 import type {
@@ -705,6 +710,81 @@ export class MockService {
 
     if (endpoint.includes("/monitoring/incident") && method === "POST") {
       return this.castResponse<T>(this.mockResolveIncident());
+    }
+
+    // ============================================
+    // CHECK-IN / CHECK-OUT ENDPOINTS (RF-26)
+    // ============================================
+
+    if (endpoint.includes("/check-in-out/user/me") && method === "GET") {
+      return this.castResponse<T>(this.mockGetMyCheckInHistory());
+    }
+
+    if (endpoint.includes("/check-in-out/active/all") && method === "GET") {
+      return this.castResponse<T>(this.mockGetActiveCheckIns());
+    }
+
+    if (endpoint.includes("/check-in-out/overdue/all") && method === "GET") {
+      return this.castResponse<T>(this.mockGetOverdueCheckIns());
+    }
+
+    if (endpoint.includes("/check-in-out/check-in") && method === "POST") {
+      const checkInPayload = payload as { reservationId: string; notes?: string; method?: string };
+      return this.castResponse<T>(
+        await this.mockPerformCheckInAction(checkInPayload.reservationId),
+      );
+    }
+
+    if (endpoint.includes("/check-in-out/check-out") && method === "POST") {
+      const checkOutPayload = payload as { checkInId: string; reservationId?: string; notes?: string };
+      return this.castResponse<T>(
+        await this.mockPerformCheckOutAction(checkOutPayload.checkInId),
+      );
+    }
+
+    if (endpoint.includes("/check-in-out/reservation/") && method === "GET") {
+      const reservationIdMatch = endpoint.match(/\/check-in-out\/reservation\/([^/?]+)/);
+      if (reservationIdMatch) {
+        return this.castResponse<T>(this.mockGetCheckInByReservation(reservationIdMatch[1]));
+      }
+    }
+
+    if (endpoint.includes("/check-in-out/") && method === "GET") {
+      const idMatch = endpoint.match(/\/check-in-out\/([^/?]+)$/);
+      if (idMatch && !["user", "active", "overdue", "check-in", "check-out", "reservation"].includes(idMatch[1])) {
+        return this.castResponse<T>(this.mockGetCheckInById(idMatch[1]));
+      }
+    }
+
+    // ============================================
+    // REASSIGNMENT ENDPOINTS (RF-15)
+    // ============================================
+
+    if (endpoint.includes("/reassignments/my-history") && method === "GET") {
+      const queryString = endpoint.split("?")[1] || "";
+      const params = new URLSearchParams(queryString);
+      const pendingParam = params.get("pending");
+      const pending = pendingParam === "true" ? true : pendingParam === "false" ? false : undefined;
+      return this.castResponse<T>(this.mockGetReassignmentHistory(pending));
+    }
+
+    if (endpoint.includes("/reassignments/history") && method === "GET") {
+      return this.castResponse<T>(this.mockGetReassignmentHistory());
+    }
+
+    if (endpoint.includes("/reassignments/request") && method === "POST") {
+      return this.castResponse<T>(this.mockRequestReassignment());
+    }
+
+    if (endpoint.includes("/reassignments/respond") && method === "POST") {
+      const respondPayload = payload as { reassignmentId: string; accepted: boolean; userFeedback?: string };
+      return this.castResponse<T>(
+        this.mockRespondToReassignment(
+          respondPayload.reassignmentId,
+          respondPayload.accepted,
+          respondPayload.userFeedback,
+        ),
+      );
     }
 
     // Endpoint no implementado en mock
@@ -3477,6 +3557,213 @@ export class MockService {
       success: true,
       data: { resolved: true },
       message: "Incidencia resuelta",
+      timestamp: new Date().toISOString(),
+    };
+  }
+
+  // ============================================
+  // CHECK-IN / CHECK-OUT ENDPOINTS (RF-26)
+  // ============================================
+
+  private static mockGetMyCheckInHistory(): ApiResponse<unknown> {
+    return {
+      success: true,
+      data: mockCheckInOuts,
+      message: "Historial de check-in obtenido",
+      timestamp: new Date().toISOString(),
+    };
+  }
+
+  private static mockGetActiveCheckIns(): ApiResponse<unknown> {
+    const active = mockCheckInOuts.filter(
+      (c) => c.checkInTime && !c.checkOutTime,
+    );
+    return {
+      success: true,
+      data: active,
+      message: "Check-ins activos obtenidos",
+      timestamp: new Date().toISOString(),
+    };
+  }
+
+  private static mockGetOverdueCheckIns(): ApiResponse<unknown> {
+    const now = new Date();
+    const overdue = mockCheckInOuts.filter((c) => {
+      if (!c.checkInTime || c.checkOutTime) return false;
+      const end = c.reservationEndTime
+        ? new Date(c.reservationEndTime)
+        : c.expectedReturnTime
+          ? new Date(c.expectedReturnTime)
+          : null;
+      return end && now > end;
+    });
+    return {
+      success: true,
+      data: overdue,
+      message: "Check-ins vencidos obtenidos",
+      timestamp: new Date().toISOString(),
+    };
+  }
+
+  private static async mockPerformCheckInAction(
+    reservationId: string,
+  ): Promise<ApiResponse<unknown>> {
+    const result = await mockPerformCheckIn(reservationId);
+    return {
+      success: true,
+      data: result,
+      message: "Check-in realizado exitosamente",
+      timestamp: new Date().toISOString(),
+    };
+  }
+
+  private static async mockPerformCheckOutAction(
+    checkInId: string,
+  ): Promise<ApiResponse<unknown>> {
+    const existing = mockCheckInOuts.find((c) => c.id === checkInId);
+    const reservationId = existing?.reservationId || checkInId;
+    const result = await mockPerformCheckOut(reservationId);
+    return {
+      success: true,
+      data: result,
+      message: "Check-out realizado exitosamente",
+      timestamp: new Date().toISOString(),
+    };
+  }
+
+  private static mockGetCheckInById(id: string): ApiResponse<unknown> {
+    const record = mockCheckInOuts.find((c) => c.id === id);
+    if (!record) {
+      throw {
+        response: {
+          status: 404,
+          data: {
+            success: false,
+            code: "STCK-0401",
+            message: "Registro de check-in no encontrado",
+            type: "error",
+            http_code: 404,
+          },
+        },
+      };
+    }
+    return {
+      success: true,
+      data: record,
+      message: "Registro de check-in obtenido",
+      timestamp: new Date().toISOString(),
+    };
+  }
+
+  private static mockGetCheckInByReservation(
+    reservationId: string,
+  ): ApiResponse<unknown> {
+    const record = mockCheckInOuts.find(
+      (c) => c.reservationId === reservationId,
+    );
+    if (!record) {
+      throw {
+        response: {
+          status: 404,
+          data: {
+            success: false,
+            code: "STCK-0402",
+            message: "Check-in no encontrado para esta reserva",
+            type: "error",
+            http_code: 404,
+          },
+        },
+      };
+    }
+    return {
+      success: true,
+      data: record,
+      message: "Check-in de reserva obtenido",
+      timestamp: new Date().toISOString(),
+    };
+  }
+
+  // ============================================
+  // REASSIGNMENT ENDPOINTS (RF-15)
+  // ============================================
+
+  private static mockGetReassignmentHistory(
+    pending?: boolean,
+  ): ApiResponse<unknown> {
+    const data = getFilteredReassignmentHistory(pending);
+    return {
+      success: true,
+      data,
+      message: pending
+        ? "Reasignaciones pendientes obtenidas"
+        : "Historial de reasignaciones obtenido",
+      timestamp: new Date().toISOString(),
+    };
+  }
+
+  private static mockRequestReassignment(): ApiResponse<unknown> {
+    return {
+      success: true,
+      data: {
+        originalReservationId: "rsv_002",
+        originalResourceId: "res_002",
+        originalResourceName: "Laboratorio de Sistemas 201",
+        alternatives: [
+          {
+            resourceId: "res_005",
+            resourceName: "Laboratorio de Sistemas 301",
+            resourceType: "LABORATORY",
+            similarityScore: 87,
+            scoreBreakdown: { capacity: 90, features: 85, location: 80, availability: 95 },
+            isAvailable: true,
+            capacity: 30,
+            location: "Edificio A, Piso 3",
+          },
+        ],
+        reason: "MAINTENANCE",
+        totalAlternatives: 1,
+        bestAlternative: {
+          resourceId: "res_005",
+          resourceName: "Laboratorio de Sistemas 301",
+          resourceType: "LABORATORY",
+          similarityScore: 87,
+          scoreBreakdown: { capacity: 90, features: 85, location: 80, availability: 95 },
+          isAvailable: true,
+          capacity: 30,
+          location: "Edificio A, Piso 3",
+        },
+      },
+      message: "Alternativas de reasignación encontradas",
+      timestamp: new Date().toISOString(),
+    };
+  }
+
+  private static mockRespondToReassignment(
+    reassignmentId: string,
+    accepted: boolean,
+    userFeedback?: string,
+  ): ApiResponse<unknown> {
+    const result = respondToMockReassignment(reassignmentId, accepted, userFeedback);
+
+    if (!result) {
+      throw {
+        response: {
+          status: 404,
+          data: {
+            success: false,
+            code: "AVAIL-0401",
+            message: "Reasignación no encontrada",
+            type: "error",
+            http_code: 404,
+          },
+        },
+      };
+    }
+
+    return {
+      success: true,
+      data: result,
+      message: accepted ? "Reasignación aceptada" : "Reasignación rechazada",
       timestamp: new Date().toISOString(),
     };
   }

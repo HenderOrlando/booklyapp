@@ -11,9 +11,6 @@ import {
 } from "@/components/atoms/Card/Card";
 import { useReassignment } from "@/hooks/useReassignment";
 import { useToast } from "@/hooks/useToast";
-import type { 
-  ReassignmentHistoryResponseDto, 
-} from "@/types/entities/reassignment";
 import { Skeleton } from "@/components/atoms/Skeleton/Skeleton";
 import {
   Tooltip,
@@ -38,8 +35,9 @@ export default function ReasignacionPage() {
 
   const t = useTranslations("reservations");
   const { showSuccess, showError } = useToast();
-  const { useHistory, respondToReassignment } = useReassignment();
-  const { data: history = [], isLoading: loadingHistory } = useHistory();
+  const { useHistory, usePending, respondToReassignment } = useReassignment();
+  const { data: pendingSuggestions = [], isLoading: loadingPending, error: pendingError } = usePending();
+  const { data: history = [], isLoading: loadingHistory, error: historyError } = useHistory();
 
   const handleRespond = async (
     reassignmentId: string,
@@ -65,11 +63,9 @@ export default function ReasignacionPage() {
     }
   };
 
-  const pendingSuggestions: ReassignmentHistoryResponseDto[] = history.filter(
-    (h) => !h.accepted && !h.respondedAt
-  );
+  const respondedHistory = history.filter((h) => h.respondedAt);
 
-  if (loadingHistory) {
+  if (loadingPending || loadingHistory) {
     return (
       <>
         <div className="space-y-6 pb-6">
@@ -91,6 +87,8 @@ export default function ReasignacionPage() {
     );
   }
 
+  const queryError = pendingError || historyError;
+
   return (
     <>
       <div className="space-y-6 pb-6">
@@ -102,6 +100,20 @@ export default function ReasignacionPage() {
             {t("reasignacion.descripcion")}
           </p>
         </div>
+
+        {queryError && (
+          <div className="p-4 rounded-lg bg-[var(--color-state-error-bg)] border border-[var(--color-state-error-border)] flex items-start gap-3">
+            <AlertCircle className="h-5 w-5 text-[var(--color-state-error-text)] mt-0.5 shrink-0" />
+            <div>
+              <p className="text-sm font-medium text-[var(--color-state-error-text)]">
+                {t("reasignacion.error_carga")}
+              </p>
+              <p className="text-xs text-[var(--color-state-error-text)] opacity-75 mt-1">
+                {queryError.message}
+              </p>
+            </div>
+          </div>
+        )}
 
         {/* Sugerencias Pendientes */}
         {pendingSuggestions.length > 0 && (
@@ -233,13 +245,13 @@ export default function ReasignacionPage() {
             <CardDescription>{t("reasignacion.historial_desc")}</CardDescription>
           </CardHeader>
           <CardContent>
-            {history.length === 0 ? (
+            {respondedHistory.length === 0 ? (
               <p className="py-8 text-center text-sm text-[var(--color-text-tertiary)] italic">
                 {t("reasignacion.sin_historial")}
               </p>
             ) : (
               <div className="divide-y divide-[var(--color-border-subtle)]">
-                {history.filter(h => h.respondedAt).map((entry) => (
+                {respondedHistory.map((entry) => (
                   <div key={entry.id} className="py-4 first:pt-0 last:pb-0">
                     <div className="flex items-center justify-between gap-4">
                       <div className="flex items-start gap-3">

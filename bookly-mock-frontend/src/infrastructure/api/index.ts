@@ -29,6 +29,7 @@ export * from "./notifications-client";
 export * from "./reports-client";
 export * from "./reservations-client";
 export * from "./resources-client";
+export * from "./waitlist-client";
 
 /**
  * Stack HTTP Completo Disponible:

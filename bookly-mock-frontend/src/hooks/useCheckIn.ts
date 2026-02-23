@@ -43,6 +43,7 @@ export function useActiveCheckIns() {
       return response.data || [];
     },
     refetchInterval: 30000, // Refrescar cada 30 seg
+    retry: 1,
   });
 }
 
@@ -57,6 +58,7 @@ export function useOverdueCheckIns() {
       return response.data || [];
     },
     refetchInterval: 60000,
+    retry: 1,
   });
 }
 
@@ -70,6 +72,7 @@ export function useMyCheckInHistory() {
       const response = await CheckInClient.getMyHistory();
       return response.data || [];
     },
+    retry: 1,
   });
 }
 

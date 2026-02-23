@@ -6,6 +6,7 @@
  */
 
 import { useToast } from "@/hooks/useToast";
+import { ReservationsClient } from "@/infrastructure/api";
 import { httpClient } from "@/infrastructure/http/httpClient";
 import type {
   CreateReservationDto,
@@ -25,19 +26,39 @@ export function useCreateReservation() {
 
   return useMutation({
     mutationFn: async (data: CreateReservationDto) => {
-      const response = await httpClient.post<Reservation>(
-        "/reservations",
-        data
-      );
-      return response;
+      const response = await ReservationsClient.create(data);
+      if (!response.success) {
+        throw new Error(response.message || "Error al crear reserva");
+      }
+      return response.data;
     },
-    onSuccess: () => {
+    onSuccess: (newReservation) => {
       showSuccess(
         t("success_create_title") || "Reserva Creada",
         t("success_create_message") || "La reserva se creó exitosamente"
       );
       // Invalidar cache de reservas para refrescar lista
-      queryClient.invalidateQueries({ queryKey: reservationKeys.lists() });
+      queryClient.invalidateQueries({
+        queryKey: reservationKeys.lists(),
+        refetchType: "active",
+      });
+      // Invalidar stats para que se actualicen los contadores
+      queryClient.invalidateQueries({
+        queryKey: reservationKeys.all,
+        predicate: (query) =>
+          query.queryKey[0] === "reservations" && query.queryKey[1] === "stats",
+      });
+      // Optimistic: agregar a cache de lista sin filtros
+      queryClient.setQueryData<any>(reservationKeys.lists(), (old: any) => {
+        if (!old?.items) return old;
+        return {
+          ...old,
+          items: [newReservation, ...old.items],
+          meta: old.meta
+            ? { ...old.meta, total: (old.meta.total || 0) + 1 }
+            : undefined,
+        };
+      });
     },
     onError: (error: unknown) => {
       const errorMessage =

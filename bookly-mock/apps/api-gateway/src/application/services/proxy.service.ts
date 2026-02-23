@@ -171,6 +171,19 @@ export class ProxyService {
       "/categories",
       "/resources",
       "/reference-data",
+      // Availability CRUD — UI needs the created/updated entity back immediately
+      "/reservations",
+      "/waiting-lists",
+      "/reassignments",
+      "/schedules",
+      "/availabilities",
+      // Stockpile CRUD — approval flows and check-in/out need synchronous confirmation
+      "/approval-requests",
+      "/approval-flows",
+      "/check-in-out",
+      // Reports — feedback and evaluations need synchronous persistence
+      "/feedback",
+      "/evaluations",
     ];
     // Build the full path to forward: /{service}{path}
     // e.g., service="approval-requests", path="/123" → fullForwardPath="/approval-requests/123"

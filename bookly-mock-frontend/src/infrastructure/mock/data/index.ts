@@ -66,6 +66,15 @@ export {
 } from "./stockpile-service.mock";
 
 // ============================================
+// AVAILABILITY - REASSIGNMENT SERVICE
+// ============================================
+export {
+  getFilteredReassignmentHistory,
+  mockReassignmentHistory,
+  respondToMockReassignment,
+} from "./availability-reassignment.mock";
+
+// ============================================
 // UTILIDADES COMUNES
 // ============================================
 

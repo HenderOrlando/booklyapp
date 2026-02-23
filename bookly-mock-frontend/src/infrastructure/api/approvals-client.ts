@@ -131,15 +131,37 @@ export class ApprovalsClient {
   /**
    * Obtiene solicitudes de aprobación con filtros
    *
+   * Mapea los filtros del frontend al contrato del backend:
+   * - userId → requesterId
+   * - resourceId, programId, priority, search, startDate, endDate → query params directos
+   * - level, categoryId → no soportados por backend (filtrado local en UI)
+   *
    * @param filters - Filtros de búsqueda
    * @returns Lista paginada de solicitudes
    */
   static async getApprovalRequests(
     filters?: ApprovalFilters
   ): Promise<ApiResponse<PaginatedResponse<ApprovalRequest>>> {
+    const params: Record<string, unknown> = {};
+
+    if (filters) {
+      if (filters.status) params.status = filters.status;
+      if (filters.requesterId) params.requesterId = filters.requesterId;
+      else if (filters.userId) params.requesterId = filters.userId;
+      if (filters.resourceId) params.resourceId = filters.resourceId;
+      if (filters.programId) params.programId = filters.programId;
+      if (filters.priority) params.priority = filters.priority;
+      if (filters.search) params.search = filters.search;
+      if (filters.startDate || filters.dateFrom) params.startDate = filters.startDate || filters.dateFrom;
+      if (filters.endDate || filters.dateTo) params.endDate = filters.endDate || filters.dateTo;
+      if (filters.reviewerId && !filters.requesterId && !filters.userId) params.requesterId = filters.reviewerId;
+      if (filters.page) params.page = filters.page;
+      if (filters.limit) params.limit = filters.limit;
+    }
+
     return httpClient.get<PaginatedResponse<ApprovalRequest>>(
       STOCKPILE_ENDPOINTS.APPROVAL_REQUESTS,
-      { params: filters }
+      { params }
     );
   }
 

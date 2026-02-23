@@ -13,6 +13,12 @@ export class GetApprovalRequestsQuery {
       approvalFlowId?: string;
       status?: ApprovalRequestStatus;
       reservationId?: string;
+      resourceId?: string;
+      programId?: string;
+      priority?: string;
+      search?: string;
+      startDate?: string;
+      endDate?: string;
     }
   ) {}
 }

@@ -30,7 +30,7 @@ export default function CheckInPage() {
   >(null);
 
   // Hooks de backend
-  const { data: checkInHistory, isLoading } = useMyCheckInHistory();
+  const { data: checkInHistory, isLoading, error: historyError } = useMyCheckInHistory();
   const checkInMutation = useCheckIn();
   const checkOutMutation = useCheckOut();
 
@@ -173,6 +173,21 @@ export default function CheckInPage() {
             </li>
           </ul>
         </div>
+
+        {/* Error de carga */}
+        {historyError && (
+          <div className="p-4 rounded-lg bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 flex items-start gap-3">
+            <AlertCircle className="h-5 w-5 text-red-600 dark:text-red-400 mt-0.5 shrink-0" />
+            <div>
+              <p className="text-sm font-medium text-red-800 dark:text-red-200">
+                {t("error_loading")}
+              </p>
+              <p className="text-xs text-red-600 dark:text-red-400 opacity-75 mt-1">
+                {historyError.message}
+              </p>
+            </div>
+          </div>
+        )}
 
         {/* Reserva activa (con check-in) */}
         {activeReservation && (

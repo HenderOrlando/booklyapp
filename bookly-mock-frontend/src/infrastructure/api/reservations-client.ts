@@ -154,9 +154,27 @@ export class ReservationsClient {
   static async create(
     data: CreateReservationDto,
   ): Promise<ApiResponse<Reservation>> {
+    // Build payload compatible with backend CreateReservationDto.
+    // The backend uses forbidNonWhitelisted: true, so extra UI-only fields
+    // (title, description, recurrenceType, recurrenceEndDate, attendees)
+    // must be stripped. Mock mode tolerates any shape via MockService.
+    const backendPayload: Record<string, unknown> = {
+      resourceId: data.resourceId,
+      userId: data.userId,
+      startDate: data.startDate,
+      endDate: data.endDate,
+      purpose: data.purpose || data.title || "",
+      ...(data.isRecurring != null && { isRecurring: data.isRecurring }),
+      ...(data.recurringPattern && { recurringPattern: data.recurringPattern }),
+      ...(data.participants && { participants: data.participants }),
+      ...(data.notes && { notes: data.notes }),
+      ...(data.externalCalendarId && { externalCalendarId: data.externalCalendarId }),
+      ...(data.externalCalendarEventId && { externalCalendarEventId: data.externalCalendarEventId }),
+    };
+
     return await httpClient.post<Reservation>(
       AVAILABILITY_ENDPOINTS.RESERVATIONS,
-      data,
+      backendPayload,
     );
   }
 

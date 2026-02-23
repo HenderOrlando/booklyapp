@@ -233,11 +233,13 @@ export const ReservationModal = React.memo(function ReservationModal({
 
     if (!validate()) return;
 
-    // Combinar fecha + hora
+    // Combinar fecha + hora y mapear campos al contrato del backend
     const reservationData: CreateReservationDto = {
       ...formData,
       startDate: `${formData.startDate}T${startTime}:00`,
       endDate: `${formData.endDate}T${endTime}:00`,
+      // Backend requiere 'purpose' (@IsNotEmpty); el formulario usa 'title' como campo principal
+      purpose: formData.title || formData.purpose || formData.description || "",
     };
 
     // Si es recurrente, mostrar preview
@@ -255,6 +257,8 @@ export const ReservationModal = React.memo(function ReservationModal({
       ...formData,
       startDate: `${formData.startDate}T${startTime}:00`,
       endDate: `${formData.endDate}T${endTime}:00`,
+      // Backend requiere 'purpose' (@IsNotEmpty); el formulario usa 'title' como campo principal
+      purpose: formData.title || formData.purpose || formData.description || "",
     };
 
     try {

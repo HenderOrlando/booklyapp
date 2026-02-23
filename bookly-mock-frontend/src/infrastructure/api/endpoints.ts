@@ -155,6 +155,10 @@ export const AVAILABILITY_ENDPOINTS = {
   WAITLIST_BY_ID: (id: string) => `${API_VERSION}/waiting-lists/${id}`,
   REASSIGNMENT: `${API_VERSION}/reassignments`,
   REASSIGNMENT_BY_ID: (id: string) => `${API_VERSION}/reassignments/${id}`,
+  REASSIGNMENT_REQUEST: `${API_VERSION}/reassignments/request`,
+  REASSIGNMENT_RESPOND: `${API_VERSION}/reassignments/respond`,
+  REASSIGNMENT_HISTORY: `${API_VERSION}/reassignments/history`,
+  REASSIGNMENT_MY_HISTORY: `${API_VERSION}/reassignments/my-history`,
 
   // Horarios
   SCHEDULES: `${API_VERSION}/schedules`,

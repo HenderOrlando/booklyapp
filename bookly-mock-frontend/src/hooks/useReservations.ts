@@ -16,7 +16,6 @@
 
 import { ReservationsClient, type ReservationSearchFilters } from "@/infrastructure/api";
 import type {
-  CreateReservationDto,
   Reservation,
   UpdateReservationDto,
 } from "@/types/entities/reservation";
@@ -58,7 +57,7 @@ export function useReservations(filters?: ReservationSearchFilters) {
       }
       return response.data;
     },
-    staleTime: 1000 * 60 * 5, // 5 minutos
+    staleTime: 1000 * 30, // 30 segundos para que invalidación post-create refresque rápido
   });
 }
 
@@ -113,47 +112,8 @@ export function useReservation(id: string, options?: { enabled?: boolean }) {
 // MUTATIONS (Escritura)
 // ============================================
 
-/**
- * Hook para crear una nueva reserva
- *
- * @returns Mutation con optimistic updates
- * @example
- * ```typescript
- * const createMutation = useCreateReservation();
- *
- * const handleSubmit = async (data) => {
- *   await createMutation.mutateAsync(data);
- *   router.push('/reservas');
- * };
- * ```
- */
-export function useCreateReservation() {
-  const queryClient = useQueryClient();
-
-  return useMutation({
-    mutationFn: async (data: CreateReservationDto) => {
-      const response = await ReservationsClient.create(data);
-      if (!response.success) {
-        throw new Error(response.message || "Error al crear reserva");
-      }
-      return response.data;
-    },
-    onSuccess: (newReservation) => {
-      // Invalidar lista para refetch
-      queryClient.invalidateQueries({ queryKey: reservationKeys.lists() });
-
-      // Optimistic: agregar a cache sin esperar refetch
-      queryClient.setQueryData<any>(reservationKeys.lists(), (old: any) => {
-        if (!old) return old;
-        return {
-          ...old,
-          items: [newReservation, ...old.items],
-          meta: { ...old.meta, total: old.meta.total + 1 },
-        };
-      });
-    },
-  });
-}
+// NOTA: useCreateReservation se exporta desde @/hooks/mutations/useReservationMutations.ts
+// para evitar duplicación. Usar: import { useCreateReservation } from "@/hooks/mutations";
 
 /**
  * Hook para actualizar una reserva existente
