@@ -2,20 +2,20 @@
   "cookies": [
     {
       "name": "accessToken",
-      "value": "mock-token-user_5-1771816949831",
+      "value": "mock-token-user_5-1771817596688",
       "domain": "localhost",
       "path": "/",
-      "expires": 1771903349.832004,
+      "expires": 1771903996.689616,
       "httpOnly": false,
       "secure": false,
       "sameSite": "Strict"
     },
     {
       "name": "refreshToken",
-      "value": "mock-refresh-user_5-1771816949831",
+      "value": "mock-refresh-user_5-1771817596688",
       "domain": "localhost",
       "path": "/",
-      "expires": 1772421749.832272,
+      "expires": 1772422396.689782,
       "httpOnly": false,
       "secure": false,
       "sameSite": "Strict"
@@ -25,7 +25,7 @@
       "value": "es",
       "domain": "localhost",
       "path": "/",
-      "expires": 1803352949.832406,
+      "expires": 1803353596.689882,
       "httpOnly": false,
       "secure": false,
       "sameSite": "Strict"
@@ -37,7 +37,7 @@
       "localStorage": [
         {
           "name": "accessToken",
-          "value": "mock-token-user_5-1771816949831"
+          "value": "mock-token-user_5-1771817596688"
         },
         {
           "name": "rememberMe",
@@ -45,11 +45,11 @@
         },
         {
           "name": "refreshToken",
-          "value": "mock-refresh-user_5-1771816949831"
+          "value": "mock-refresh-user_5-1771817596688"
         },
         {
           "name": "user",
-          "value": "{\"id\":\"user_5\",\"email\":\"vigilante@ufps.edu.co\",\"username\":\"vigilante\",\"firstName\":\"Pedro\",\"lastName\":\"López\",\"fullName\":\"Pedro López\",\"phoneNumber\":\"+57 304 567 8901\",\"phone\":\"+57 304 567 8901\",\"documentType\":\"CC\",\"documentNumber\":\"6677889900\",\"profilePicture\":\"https://api.dicebear.com/7.x/avataaars/svg?seed=pedro\",\"status\":\"ACTIVE\",\"isActive\":true,\"emailVerified\":true,\"isEmailVerified\":true,\"phoneVerified\":true,\"isPhoneVerified\":true,\"twoFactorEnabled\":false,\"roles\":[{\"id\":\"role_5\",\"code\":\"role_5\",\"name\":\"vigilancia\",\"displayName\":\"vigilancia\",\"description\":\"Personal de vigilancia y control de acceso\",\"permissions\":[{\"id\":\"perm_5\",\"code\":\"perm_5\",\"name\":\"perm_5\",\"resource\":\"resources\",\"action\":\"read\",\"description\":\"Ver recursos\",\"isSystem\":true},{\"id\":\"perm_9\",\"code\":\"perm_9\",\"name\":\"perm_9\",\"resource\":\"reservations\",\"action\":\"read\",\"description\":\"Ver reservas\",\"isSystem\":true}],\"isSystem\":true,\"createdAt\":\"2024-01-01T00:00:00.000Z\",\"updatedAt\":\"2024-01-01T00:00:00.000Z\"}],\"permissions\":[{\"id\":\"perm_5\",\"code\":\"perm_5\",\"name\":\"perm_5\",\"resource\":\"resources\",\"action\":\"read\",\"description\":\"Ver recursos\",\"isSystem\":true},{\"id\":\"perm_9\",\"code\":\"perm_9\",\"name\":\"perm_9\",\"resource\":\"reservations\",\"action\":\"read\",\"description\":\"Ver reservas\",\"isSystem\":true}],\"preferences\":{\"language\":\"es\",\"theme\":\"light\",\"notifications\":{\"email\":true,\"push\":true,\"sms\":false},\"timezone\":\"America/Bogota\"},\"lastLoginAt\":\"2026-02-22T15:22:28.814Z\",\"createdAt\":\"2024-04-01T00:00:00.000Z\",\"updatedAt\":\"2026-02-23T03:22:28.814Z\"}"
+          "value": "{\"id\":\"user_5\",\"email\":\"vigilante@ufps.edu.co\",\"username\":\"vigilante\",\"firstName\":\"Pedro\",\"lastName\":\"López\",\"fullName\":\"Pedro López\",\"phoneNumber\":\"+57 304 567 8901\",\"phone\":\"+57 304 567 8901\",\"documentType\":\"CC\",\"documentNumber\":\"6677889900\",\"profilePicture\":\"https://api.dicebear.com/7.x/avataaars/svg?seed=pedro\",\"status\":\"ACTIVE\",\"isActive\":true,\"emailVerified\":true,\"isEmailVerified\":true,\"phoneVerified\":true,\"isPhoneVerified\":true,\"twoFactorEnabled\":false,\"roles\":[{\"id\":\"role_5\",\"code\":\"role_5\",\"name\":\"vigilancia\",\"displayName\":\"vigilancia\",\"description\":\"Personal de vigilancia y control de acceso\",\"permissions\":[{\"id\":\"perm_5\",\"code\":\"perm_5\",\"name\":\"perm_5\",\"resource\":\"resources\",\"action\":\"read\",\"description\":\"Ver recursos\",\"isSystem\":true},{\"id\":\"perm_9\",\"code\":\"perm_9\",\"name\":\"perm_9\",\"resource\":\"reservations\",\"action\":\"read\",\"description\":\"Ver reservas\",\"isSystem\":true}],\"isSystem\":true,\"createdAt\":\"2024-01-01T00:00:00.000Z\",\"updatedAt\":\"2024-01-01T00:00:00.000Z\"}],\"permissions\":[{\"id\":\"perm_5\",\"code\":\"perm_5\",\"name\":\"perm_5\",\"resource\":\"resources\",\"action\":\"read\",\"description\":\"Ver recursos\",\"isSystem\":true},{\"id\":\"perm_9\",\"code\":\"perm_9\",\"name\":\"perm_9\",\"resource\":\"reservations\",\"action\":\"read\",\"description\":\"Ver reservas\",\"isSystem\":true}],\"preferences\":{\"language\":\"es\",\"theme\":\"light\",\"notifications\":{\"email\":true,\"push\":true,\"sms\":false},\"timezone\":\"America/Bogota\"},\"lastLoginAt\":\"2026-02-22T15:33:15.573Z\",\"createdAt\":\"2024-04-01T00:00:00.000Z\",\"updatedAt\":\"2026-02-23T03:33:15.573Z\"}"
         }
       ]
     }
