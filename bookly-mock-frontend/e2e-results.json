@@ -397,7 +397,7 @@
           "specs": [
             {
               "title": "restores protected route after login when callback is present",
-              "ok": false,
+              "ok": true,
               "tags": [],
               "tests": [
                 {
@@ -410,45 +410,17 @@
                     {
                       "workerIndex": 3,
                       "parallelIndex": 3,
-                      "status": "timedOut",
-                      "duration": 30403,
-                      "error": {
-                        "message": "\u001b[31mTest timeout of 30000ms exceeded.\u001b[39m",
-                        "stack": "\u001b[31mTest timeout of 30000ms exceeded.\u001b[39m"
-                      },
-                      "errors": [
-                        {
-                          "message": "\u001b[31mTest timeout of 30000ms exceeded.\u001b[39m"
-                        },
-                        {
-                          "location": {
-                            "file": "C:\\Users\\USER\\Documents\\bookly\\booklyapp\\bookly-mock-frontend\\e2e\\smoke\\auth.smoke.spec.ts",
-                            "column": 16,
-                            "line": 32
-                          },
-                          "message": "Error: page.waitForURL: Test timeout of 30000ms exceeded.\n=========================== logs ===========================\nwaiting for navigation until \"commit\"\n============================================================\n\n\u001b[0m \u001b[90m 30 |\u001b[39m     \u001b[90m// After login, AuthContext redirects via router.replace to the callback URL.\u001b[39m\n \u001b[90m 31 |\u001b[39m     \u001b[90m// Use 'commit' because the full load may take longer on protected routes.\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 32 |\u001b[39m     \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mwaitForURL(\u001b[35m/\\/es\\/(recursos|dashboard)/\u001b[39m\u001b[33m,\u001b[39m {\n \u001b[90m    |\u001b[39m                \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 33 |\u001b[39m       timeout\u001b[33m:\u001b[39m \u001b[35m20000\u001b[39m\u001b[33m,\u001b[39m\n \u001b[90m 34 |\u001b[39m       waitUntil\u001b[33m:\u001b[39m \u001b[32m\"commit\"\u001b[39m\u001b[33m,\u001b[39m\n \u001b[90m 35 |\u001b[39m     })\u001b[33m;\u001b[39m\u001b[0m\n\u001b[2m    at C:\\Users\\USER\\Documents\\bookly\\booklyapp\\bookly-mock-frontend\\e2e\\smoke\\auth.smoke.spec.ts:32:16\u001b[22m"
-                        }
-                      ],
+                      "status": "passed",
+                      "duration": 18432,
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
                       "startTime": "2026-02-23T04:24:39.068Z",
                       "annotations": [],
-                      "attachments": [
-                        {
-                          "name": "screenshot",
-                          "contentType": "image/png",
-                          "path": "C:\\Users\\USER\\Documents\\bookly\\booklyapp\\bookly-mock-frontend\\test-results\\auth.smoke-Auth-Smoke-rest-37b86-in-when-callback-is-present-smoke\\test-failed-1.png"
-                        },
-                        {
-                          "name": "error-context",
-                          "contentType": "text/markdown",
-                          "path": "C:\\Users\\USER\\Documents\\bookly\\booklyapp\\bookly-mock-frontend\\test-results\\auth.smoke-Auth-Smoke-rest-37b86-in-when-callback-is-present-smoke\\error-context.md"
-                        }
-                      ]
+                      "attachments": []
                     }
                   ],
-                  "status": "unexpected"
+                  "status": "expected"
                 }
               ],
               "id": "6d5c41464ee763695a58-6f913dd5086f6b04d8f6",
@@ -997,7 +969,7 @@
       "specs": [],
       "suites": [
         {
-          "title": "Navigation Smoke — Admin",
+          "title": "Navigation Smoke \u2014 Admin",
           "file": "smoke/navigation.smoke.spec.ts",
           "line": 12,
           "column": 6,
@@ -1108,7 +1080,7 @@
           ]
         },
         {
-          "title": "Navigation Smoke — Estudiante",
+          "title": "Navigation Smoke \u2014 Estudiante",
           "file": "smoke/navigation.smoke.spec.ts",
           "line": 37,
           "column": 6,
@@ -1144,7 +1116,7 @@
                             "column": 16,
                             "line": 42
                           },
-                          "message": "Error: page.goto: net::ERR_ABORTED; maybe frame was detached?\nCall log:\n\u001b[2m  - navigating to \"http://localhost:4201/es/dashboard\", waiting until \"load\"\u001b[22m\n\n\n\u001b[0m \u001b[90m 40 |\u001b[39m   \u001b[90m// E2E-NAV-003 | Student sidebar is restricted\u001b[39m\n \u001b[90m 41 |\u001b[39m   test(\u001b[32m\"student sidebar hides admin-only links\"\u001b[39m\u001b[33m,\u001b[39m \u001b[36masync\u001b[39m ({ page }) \u001b[33m=>\u001b[39m {\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 42 |\u001b[39m     \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mgoto(\u001b[32m\"/es/dashboard\"\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m    |\u001b[39m                \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 43 |\u001b[39m     \u001b[36mconst\u001b[39m sidebar \u001b[33m=\u001b[39m \u001b[36mnew\u001b[39m \u001b[33mSidebarPage\u001b[39m(page)\u001b[33m;\u001b[39m\n \u001b[90m 44 |\u001b[39m\n \u001b[90m 45 |\u001b[39m     \u001b[36mawait\u001b[39m sidebar\u001b[33m.\u001b[39mexpectLinkHidden(\u001b[32m\"Categorías\"\u001b[39m)\u001b[33m;\u001b[39m\u001b[0m\n\u001b[2m    at C:\\Users\\USER\\Documents\\bookly\\booklyapp\\bookly-mock-frontend\\e2e\\smoke\\navigation.smoke.spec.ts:42:16\u001b[22m"
+                          "message": "Error: page.goto: net::ERR_ABORTED; maybe frame was detached?\nCall log:\n\u001b[2m  - navigating to \"http://localhost:4201/es/dashboard\", waiting until \"load\"\u001b[22m\n\n\n\u001b[0m \u001b[90m 40 |\u001b[39m   \u001b[90m// E2E-NAV-003 | Student sidebar is restricted\u001b[39m\n \u001b[90m 41 |\u001b[39m   test(\u001b[32m\"student sidebar hides admin-only links\"\u001b[39m\u001b[33m,\u001b[39m \u001b[36masync\u001b[39m ({ page }) \u001b[33m=>\u001b[39m {\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 42 |\u001b[39m     \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mgoto(\u001b[32m\"/es/dashboard\"\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m    |\u001b[39m                \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 43 |\u001b[39m     \u001b[36mconst\u001b[39m sidebar \u001b[33m=\u001b[39m \u001b[36mnew\u001b[39m \u001b[33mSidebarPage\u001b[39m(page)\u001b[33m;\u001b[39m\n \u001b[90m 44 |\u001b[39m\n \u001b[90m 45 |\u001b[39m     \u001b[36mawait\u001b[39m sidebar\u001b[33m.\u001b[39mexpectLinkHidden(\u001b[32m\"Categor\u00edas\"\u001b[39m)\u001b[33m;\u001b[39m\u001b[0m\n\u001b[2m    at C:\\Users\\USER\\Documents\\bookly\\booklyapp\\bookly-mock-frontend\\e2e\\smoke\\navigation.smoke.spec.ts:42:16\u001b[22m"
                         }
                       ],
                       "stdout": [],
@@ -1812,7 +1784,7 @@
                             "column": 16,
                             "line": 9
                           },
-                          "message": "Error: page.goto: Test timeout of 30000ms exceeded.\nCall log:\n\u001b[2m  - navigating to \"http://localhost:4201/es/recursos\", waiting until \"load\"\u001b[22m\n\n\n\u001b[0m \u001b[90m  7 |\u001b[39m   test(\u001b[32m\"Allows user to join the waitlist when resource is unavailable\"\u001b[39m\u001b[33m,\u001b[39m \u001b[36masync\u001b[39m ({ page }) \u001b[33m=>\u001b[39m {\n \u001b[90m  8 |\u001b[39m     \u001b[90m// Ir a la página de recursos\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m  9 |\u001b[39m     \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mgoto(\u001b[32m\"/es/recursos\"\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m    |\u001b[39m                \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 10 |\u001b[39m     \u001b[90m// Seleccionar el primer recurso\u001b[39m\n \u001b[90m 11 |\u001b[39m     \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mgetByText(\u001b[32m\"Ver detalles\"\u001b[39m)\u001b[33m.\u001b[39mfirst()\u001b[33m.\u001b[39mclick()\u001b[33m;\u001b[39m\n \u001b[90m 12 |\u001b[39m\u001b[0m\n\u001b[2m    at C:\\Users\\USER\\Documents\\bookly\\booklyapp\\bookly-mock-frontend\\e2e\\smoke\\waitlist.smoke.spec.ts:9:16\u001b[22m"
+                          "message": "Error: page.goto: Test timeout of 30000ms exceeded.\nCall log:\n\u001b[2m  - navigating to \"http://localhost:4201/es/recursos\", waiting until \"load\"\u001b[22m\n\n\n\u001b[0m \u001b[90m  7 |\u001b[39m   test(\u001b[32m\"Allows user to join the waitlist when resource is unavailable\"\u001b[39m\u001b[33m,\u001b[39m \u001b[36masync\u001b[39m ({ page }) \u001b[33m=>\u001b[39m {\n \u001b[90m  8 |\u001b[39m     \u001b[90m// Ir a la p\u00e1gina de recursos\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m  9 |\u001b[39m     \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mgoto(\u001b[32m\"/es/recursos\"\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m    |\u001b[39m                \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 10 |\u001b[39m     \u001b[90m// Seleccionar el primer recurso\u001b[39m\n \u001b[90m 11 |\u001b[39m     \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mgetByText(\u001b[32m\"Ver detalles\"\u001b[39m)\u001b[33m.\u001b[39mfirst()\u001b[33m.\u001b[39mclick()\u001b[33m;\u001b[39m\n \u001b[90m 12 |\u001b[39m\u001b[0m\n\u001b[2m    at C:\\Users\\USER\\Documents\\bookly\\booklyapp\\bookly-mock-frontend\\e2e\\smoke\\waitlist.smoke.spec.ts:9:16\u001b[22m"
                         }
                       ],
                       "stdout": [],
@@ -1862,7 +1834,7 @@
                             "column": 16,
                             "line": 40
                           },
-                          "message": "Error: page.goto: Test timeout of 30000ms exceeded.\nCall log:\n\u001b[2m  - navigating to \"http://localhost:4201/es/admin/lista-espera\", waiting until \"load\"\u001b[22m\n\n\n\u001b[0m \u001b[90m 38 |\u001b[39m   test(\u001b[32m\"Admin can view waitlist manager and notify users\"\u001b[39m\u001b[33m,\u001b[39m \u001b[36masync\u001b[39m ({ page }) \u001b[33m=>\u001b[39m {\n \u001b[90m 39 |\u001b[39m     \u001b[90m// Ir directamente al administrador de lista de espera\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 40 |\u001b[39m     \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mgoto(\u001b[32m\"/es/admin/lista-espera\"\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m    |\u001b[39m                \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 41 |\u001b[39m     \n \u001b[90m 42 |\u001b[39m     \u001b[90m// Verificar que la página cargó\u001b[39m\n \u001b[90m 43 |\u001b[39m     \u001b[36mawait\u001b[39m expect(page\u001b[33m.\u001b[39mgetByRole(\u001b[32m\"heading\"\u001b[39m\u001b[33m,\u001b[39m { name\u001b[33m:\u001b[39m \u001b[35m/Lista de Espera/i\u001b[39m }))\u001b[33m.\u001b[39mtoBeVisible()\u001b[33m;\u001b[39m\u001b[0m\n\u001b[2m    at C:\\Users\\USER\\Documents\\bookly\\booklyapp\\bookly-mock-frontend\\e2e\\smoke\\waitlist.smoke.spec.ts:40:16\u001b[22m"
+                          "message": "Error: page.goto: Test timeout of 30000ms exceeded.\nCall log:\n\u001b[2m  - navigating to \"http://localhost:4201/es/admin/lista-espera\", waiting until \"load\"\u001b[22m\n\n\n\u001b[0m \u001b[90m 38 |\u001b[39m   test(\u001b[32m\"Admin can view waitlist manager and notify users\"\u001b[39m\u001b[33m,\u001b[39m \u001b[36masync\u001b[39m ({ page }) \u001b[33m=>\u001b[39m {\n \u001b[90m 39 |\u001b[39m     \u001b[90m// Ir directamente al administrador de lista de espera\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 40 |\u001b[39m     \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mgoto(\u001b[32m\"/es/admin/lista-espera\"\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m    |\u001b[39m                \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 41 |\u001b[39m     \n \u001b[90m 42 |\u001b[39m     \u001b[90m// Verificar que la p\u00e1gina carg\u00f3\u001b[39m\n \u001b[90m 43 |\u001b[39m     \u001b[36mawait\u001b[39m expect(page\u001b[33m.\u001b[39mgetByRole(\u001b[32m\"heading\"\u001b[39m\u001b[33m,\u001b[39m { name\u001b[33m:\u001b[39m \u001b[35m/Lista de Espera/i\u001b[39m }))\u001b[33m.\u001b[39mtoBeVisible()\u001b[33m;\u001b[39m\u001b[0m\n\u001b[2m    at C:\\Users\\USER\\Documents\\bookly\\booklyapp\\bookly-mock-frontend\\e2e\\smoke\\waitlist.smoke.spec.ts:40:16\u001b[22m"
                         }
                       ],
                       "stdout": [],
