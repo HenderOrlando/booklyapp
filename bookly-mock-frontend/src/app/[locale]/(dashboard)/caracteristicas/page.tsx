@@ -4,6 +4,7 @@ import { Button } from "@/components/atoms/Button";
 import {
   Card,
   CardContent,
+  CardDescription,
   CardHeader,
   CardTitle,
 } from "@/components/atoms/Card";
@@ -29,7 +30,13 @@ import {
   CharacteristicsClient,
   type Characteristic,
 } from "@/infrastructure/api/characteristics-client";
-import { useQuery } from "@tanstack/react-query";
+import { cn } from "@/lib/utils";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
+import {
+  List as ListIcon,
+  RefreshCw,
+  Table as TableIcon,
+} from "lucide-react";
 import { useTranslations } from "next-intl";
 import * as React from "react";
 /**
@@ -53,6 +60,12 @@ export default function CaracteristicasPage() {
   const deleteCharacteristic = useDeleteCharacteristic();
   const t = useTranslations("characteristics");
   const tCommon = useTranslations("common");
+  const queryClient = useQueryClient();
+  const [viewMode, setViewMode] = React.useState<"table" | "list">("table");
+
+  const handleRefresh = () => {
+    queryClient.invalidateQueries({ queryKey: characteristicKeys.lists() });
+  };
 
   const [filter, setFilter] = React.useState("");
   const [statusFilter, setStatusFilter] = React.useState<
@@ -209,6 +222,18 @@ export default function CaracteristicasPage() {
       badge={{ text: "Gestión de Características", variant: "secondary" }}
       onCreate={handleCreate}
       createLabel={t("create_button")}
+      actions={
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={handleRefresh}
+          className="h-10 px-3 rounded-md border-line-subtle text-content-tertiary hover:text-action-primary hover:border-action-primary transition-all"
+          title={tCommon("refresh")}
+        >
+          <RefreshCw size={16} className={cn(loading && "animate-spin", "mr-2")} />
+          {tCommon("refresh")}
+        </Button>
+      }
     >
       <div className="space-y-6 pb-6">
         {/* Estadísticas */}
@@ -264,6 +289,41 @@ export default function CaracteristicasPage() {
             <div className="flex items-center justify-between mb-4">
               <div>
                 <CardTitle>{t("list_title")}</CardTitle>
+                <CardDescription>
+                  {t("showing_count", { count: filteredCharacteristics.length, total: characteristics.length })}
+                </CardDescription>
+              </div>
+
+              {/* Toggle Vista Tabla / Vista Lista */}
+              <div className="flex items-center gap-1 bg-[var(--color-bg-muted)]/50 p-1 rounded-xl border border-[var(--color-border-subtle)]/50">
+                <Button
+                  variant={viewMode === "table" ? "default" : "ghost"}
+                  size="sm"
+                  onClick={() => setViewMode("table")}
+                  className={cn(
+                    "h-8 px-3 rounded-lg text-xs font-bold transition-all",
+                    viewMode === "table"
+                      ? "bg-white text-brand-primary-600 shadow-sm border-none hover:bg-white dark:bg-surface dark:text-brand-primary-400"
+                      : "text-[var(--color-text-tertiary)] hover:text-brand-primary-500",
+                  )}
+                >
+                  <TableIcon className="w-3.5 h-3.5 mr-1.5" />
+                  {tCommon("view_table")}
+                </Button>
+                <Button
+                  variant={viewMode === "list" ? "default" : "ghost"}
+                  size="sm"
+                  onClick={() => setViewMode("list")}
+                  className={cn(
+                    "h-8 px-3 rounded-lg text-xs font-bold transition-all",
+                    viewMode === "list"
+                      ? "bg-white text-brand-primary-600 shadow-sm border-none hover:bg-white dark:bg-surface dark:text-brand-primary-400"
+                      : "text-[var(--color-text-tertiary)] hover:text-brand-primary-500",
+                  )}
+                >
+                  <ListIcon className="w-3.5 h-3.5 mr-1.5" />
+                  {tCommon("view_list")}
+                </Button>
               </div>
             </div>
             <div className="flex items-center gap-3">
@@ -334,8 +394,62 @@ export default function CaracteristicasPage() {
                   <Button onClick={handleCreate}>{t("create_button")}</Button>
                 }
               />
-            ) : (
+            ) : viewMode === "table" ? (
               <DataTable data={filteredCharacteristics} columns={columns} />
+            ) : (
+              <div className="space-y-3">
+                {filteredCharacteristics.map((char) => (
+                  <div
+                    key={char.id}
+                    className="group bg-surface rounded-xl p-5 border border-line-subtle hover:border-brand-primary-500/50 hover:shadow-lg transition-all duration-200"
+                  >
+                    <div className="flex items-center justify-between gap-4">
+                      <div className="flex items-center gap-4 flex-1 min-w-0">
+                        {char.color && (
+                          <div
+                            className="w-4 h-4 rounded-full shrink-0"
+                            style={{ backgroundColor: char.color }}
+                          />
+                        )}
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center gap-2 flex-wrap">
+                            <h3 className="text-base font-bold text-content-primary">
+                              {char.name}
+                            </h3>
+                            <span className="text-xs text-content-tertiary font-mono">
+                              {char.code}
+                            </span>
+                            <StatusBadge
+                              type="category"
+                              status={char.isActive ? "ACTIVE" : "INACTIVE"}
+                            />
+                          </div>
+                          {char.description && (
+                            <p className="text-sm text-content-secondary mt-1 truncate">
+                              {char.description}
+                            </p>
+                          )}
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-2 shrink-0">
+                        <Button variant="outline" size="sm" onClick={() => handleEdit(char)}>
+                          {tCommon("edit")}
+                        </Button>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => {
+                            setCharacteristicToDelete(char);
+                            setShowDeleteModal(true);
+                          }}
+                        >
+                          {tCommon("delete")}
+                        </Button>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
             )}
           </CardContent>
         </Card>

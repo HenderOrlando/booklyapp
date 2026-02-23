@@ -27,5 +27,8 @@
   "all": "All",
   "select_all": "Select all",
   "deselect_all": "Deselect all",
-  "clear_search": "Clear Search"
+  "clear_search": "Clear Search",
+  "view_table": "Table View",
+  "view_list": "List View",
+  "refresh": "Refresh"
 }

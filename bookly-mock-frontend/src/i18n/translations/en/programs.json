@@ -61,5 +61,6 @@
   "add_user_error": "Error adding user to program",
   "remove_user_error": "Error removing user from program",
   "program-resources": "Program Resources",
-  "program-users": "Program Users"
+  "program-users": "Program Users",
+  "total_programs": "Total Programs"
 }

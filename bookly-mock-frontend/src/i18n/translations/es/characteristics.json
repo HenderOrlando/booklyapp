@@ -50,5 +50,7 @@
     "status_label": "Estado"
   },
   "delete_confirm_button": "Eliminar",
-  "search_placeholder": "Buscar características..."
+  "search_placeholder": "Buscar características...",
+  "showing_count": "{count} de {total} características",
+  "total": "Total Características"
 }

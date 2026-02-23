@@ -31,8 +31,14 @@ import {
   type UpdateCategoryDto,
 } from "@/hooks/mutations";
 import { httpClient } from "@/infrastructure/http";
+import { cn } from "@/lib/utils";
 import { Category } from "@/types/entities/resource";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
+import {
+  List as ListIcon,
+  RefreshCw,
+  Table as TableIcon,
+} from "lucide-react";
 import { useTranslations } from "next-intl";
 import * as React from "react";
 
@@ -57,6 +63,8 @@ type CategoryMutationApiResponse = {
 export default function CategoriasPage() {
   const t = useTranslations("categories");
   const tCommon = useTranslations("common");
+  const queryClient = useQueryClient();
+  const [viewMode, setViewMode] = React.useState<"table" | "list">("table");
 
   // React Query para cargar categorías
   const { data: categories = [], isLoading: loading } = useQuery({
@@ -89,7 +97,9 @@ export default function CategoriasPage() {
   const [categoryToDelete, setCategoryToDelete] =
     React.useState<Category | null>(null);
 
-  // Ya no necesitamos useEffect - React Query maneja el fetch automáticamente
+  const handleRefresh = () => {
+    queryClient.invalidateQueries({ queryKey: categoryKeys.lists() });
+  };
 
   // Filtrar categorías
   const filteredCategories = categories.filter((category: Category) => {
@@ -312,6 +322,18 @@ export default function CategoriasPage() {
       badge={{ text: "Gestión de Categorías", variant: "secondary" }}
       onCreate={handleCreate}
       createLabel={t("create")}
+      actions={
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={handleRefresh}
+          className="h-10 px-3 rounded-md border-line-subtle text-content-tertiary hover:text-action-primary hover:border-action-primary transition-all"
+          title={tCommon("refresh")}
+        >
+          <RefreshCw size={16} className={cn(loading && "animate-spin", "mr-2")} />
+          {tCommon("refresh")}
+        </Button>
+      }
     >
       <div className="space-y-6 pb-6">
         {/* Estadísticas */}
@@ -371,6 +393,38 @@ export default function CategoriasPage() {
                 <CardDescription>
                   {t("showing_count", { count: filteredCategories.length, total: categories.length })}
                 </CardDescription>
+              </div>
+
+              {/* Toggle Vista Tabla / Vista Lista */}
+              <div className="flex items-center gap-1 bg-[var(--color-bg-muted)]/50 p-1 rounded-xl border border-[var(--color-border-subtle)]/50">
+                <Button
+                  variant={viewMode === "table" ? "default" : "ghost"}
+                  size="sm"
+                  onClick={() => setViewMode("table")}
+                  className={cn(
+                    "h-8 px-3 rounded-lg text-xs font-bold transition-all",
+                    viewMode === "table"
+                      ? "bg-white text-brand-primary-600 shadow-sm border-none hover:bg-white dark:bg-surface dark:text-brand-primary-400"
+                      : "text-[var(--color-text-tertiary)] hover:text-brand-primary-500",
+                  )}
+                >
+                  <TableIcon className="w-3.5 h-3.5 mr-1.5" />
+                  {tCommon("view_table")}
+                </Button>
+                <Button
+                  variant={viewMode === "list" ? "default" : "ghost"}
+                  size="sm"
+                  onClick={() => setViewMode("list")}
+                  className={cn(
+                    "h-8 px-3 rounded-lg text-xs font-bold transition-all",
+                    viewMode === "list"
+                      ? "bg-white text-brand-primary-600 shadow-sm border-none hover:bg-white dark:bg-surface dark:text-brand-primary-400"
+                      : "text-[var(--color-text-tertiary)] hover:text-brand-primary-500",
+                  )}
+                >
+                  <ListIcon className="w-3.5 h-3.5 mr-1.5" />
+                  {tCommon("view_list")}
+                </Button>
               </div>
             </div>
 
@@ -484,12 +538,82 @@ export default function CategoriasPage() {
                   )
                 }
               />
-            ) : (
+            ) : viewMode === "table" ? (
               <DataTable
                 data={filteredCategories}
                 columns={columns}
                 data-testid="categories-table"
               />
+            ) : (
+              <div className="space-y-3">
+                {filteredCategories.map((category) => (
+                  <div
+                    key={category.id}
+                    className="group bg-surface rounded-xl p-5 border border-line-subtle hover:border-brand-primary-500/50 hover:shadow-lg transition-all duration-200"
+                  >
+                    <div className="flex items-center justify-between gap-4">
+                      <div className="flex items-center gap-4 flex-1 min-w-0">
+                        <ColorSwatch color={category.color} size="md" />
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center gap-2 flex-wrap">
+                            <h3 className="text-base font-bold text-content-primary">
+                              {category.name}
+                            </h3>
+                            <StatusBadge
+                              type="category"
+                              status={category.isActive ? "ACTIVE" : "INACTIVE"}
+                            />
+                          </div>
+                          {category.description && (
+                            <p className="text-sm text-content-secondary mt-1 truncate">
+                              {category.description}
+                            </p>
+                          )}
+                          <div className="flex items-center gap-2 mt-2">
+                            <Badge
+                              style={{
+                                backgroundColor: category.color,
+                                color: "#fff",
+                              }}
+                            >
+                              {category.name}
+                            </Badge>
+                            <span className="text-xs text-content-tertiary font-mono">
+                              {category.color}
+                            </span>
+                          </div>
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-2 shrink-0">
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => handleEdit(category)}
+                        >
+                          {t("edit")}
+                        </Button>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => handleToggleStatus(category)}
+                        >
+                          {category.isActive ? t("deactivate") : t("activate")}
+                        </Button>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => {
+                            setCategoryToDelete(category);
+                            setShowDeleteModal(true);
+                          }}
+                        >
+                          {t("delete")}
+                        </Button>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
             )}
           </CardContent>
         </Card>

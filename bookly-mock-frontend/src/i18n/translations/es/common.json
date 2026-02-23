@@ -27,5 +27,8 @@
   "all": "Todos",
   "select_all": "Seleccionar todos",
   "deselect_all": "Deseleccionar todos",
-  "clear_search": "Limpiar Búsqueda"
+  "clear_search": "Limpiar Búsqueda",
+  "view_table": "Vista Tabla",
+  "view_list": "Vista Lista",
+  "refresh": "Refrescar"
 }

@@ -11,12 +11,21 @@ import {
 } from "@/components/atoms/Card";
 import { Checkbox } from "@/components/atoms/Checkbox";
 import { Input } from "@/components/atoms/Input";
+import { StatusBadge } from "@/components/atoms/StatusBadge";
 import { Textarea } from "@/components/atoms/Textarea";
 import { DataTable } from "@/components/molecules/DataTable";
+import { SearchBar } from "@/components/molecules/SearchBar";
 import { ListLayout } from "@/components/templates/ListLayout";
 import { useCreateProgram, useUpdateProgram } from "@/hooks/mutations";
-import { usePrograms } from "@/hooks/usePrograms";
+import { programKeys, usePrograms } from "@/hooks/usePrograms";
+import { cn } from "@/lib/utils";
 import { AcademicProgram } from "@/types/entities/resource";
+import { useQueryClient } from "@tanstack/react-query";
+import {
+  List as ListIcon,
+  RefreshCw,
+  Table as TableIcon,
+} from "lucide-react";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
 import * as React from "react";
@@ -29,7 +38,10 @@ import * as React from "react";
 
 export default function ProgramasPage() {
   const t = useTranslations("programs");
+  const tCommon = useTranslations("common");
   const router = useRouter();
+  const queryClient = useQueryClient();
+  const [viewMode, setViewMode] = React.useState<"table" | "list">("table");
 
   // ✅ MEJORES PRÁCTICAS: Usar hook personalizado
   const { data: programs = [], isLoading: loading } = usePrograms();
@@ -37,6 +49,10 @@ export default function ProgramasPage() {
   // Mutations
   const createProgram = useCreateProgram();
   const updateProgram = useUpdateProgram();
+
+  const handleRefresh = () => {
+    queryClient.invalidateQueries({ queryKey: programKeys.lists() });
+  };
   const [filter, setFilter] = React.useState("");
   const [statusFilter, setStatusFilter] = React.useState<
     "all" | "active" | "inactive"
@@ -239,6 +255,18 @@ export default function ProgramasPage() {
       badge={{ text: "Gestión de Programas", variant: "secondary" }}
       onCreate={handleCreate}
       createLabel={t("create")}
+      actions={
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={handleRefresh}
+          className="h-10 px-3 rounded-md border-line-subtle text-content-tertiary hover:text-action-primary hover:border-action-primary transition-all"
+          title={tCommon("refresh")}
+        >
+          <RefreshCw size={16} className={cn(loading && "animate-spin", "mr-2")} />
+          {tCommon("refresh")}
+        </Button>
+      }
     >
       <div className="space-y-6 pb-6">
         {/* Estadísticas */}
@@ -301,13 +329,46 @@ export default function ProgramasPage() {
                   })}
                 </CardDescription>
               </div>
+
+              {/* Toggle Vista Tabla / Vista Lista */}
+              <div className="flex items-center gap-1 bg-[var(--color-bg-muted)]/50 p-1 rounded-xl border border-[var(--color-border-subtle)]/50">
+                <Button
+                  variant={viewMode === "table" ? "default" : "ghost"}
+                  size="sm"
+                  onClick={() => setViewMode("table")}
+                  className={cn(
+                    "h-8 px-3 rounded-lg text-xs font-bold transition-all",
+                    viewMode === "table"
+                      ? "bg-white text-brand-primary-600 shadow-sm border-none hover:bg-white dark:bg-surface dark:text-brand-primary-400"
+                      : "text-[var(--color-text-tertiary)] hover:text-brand-primary-500",
+                  )}
+                >
+                  <TableIcon className="w-3.5 h-3.5 mr-1.5" />
+                  {tCommon("view_table")}
+                </Button>
+                <Button
+                  variant={viewMode === "list" ? "default" : "ghost"}
+                  size="sm"
+                  onClick={() => setViewMode("list")}
+                  className={cn(
+                    "h-8 px-3 rounded-lg text-xs font-bold transition-all",
+                    viewMode === "list"
+                      ? "bg-white text-brand-primary-600 shadow-sm border-none hover:bg-white dark:bg-surface dark:text-brand-primary-400"
+                      : "text-[var(--color-text-tertiary)] hover:text-brand-primary-500",
+                  )}
+                >
+                  <ListIcon className="w-3.5 h-3.5 mr-1.5" />
+                  {tCommon("view_list")}
+                </Button>
+              </div>
             </div>
 
             <div className="flex items-center gap-3">
-              <Input
+              <SearchBar
                 placeholder={t("search_placeholder")}
                 value={filter}
-                onChange={(e) => setFilter(e.target.value)}
+                onChange={setFilter}
+                onClear={() => setFilter("")}
                 className="max-w-md flex-1"
               />
 
@@ -337,7 +398,72 @@ export default function ProgramasPage() {
             </div>
           </CardHeader>
           <CardContent>
-            <DataTable data={filteredPrograms} columns={columns} />
+            {filteredPrograms.length === 0 ? (
+              <div className="text-center py-12">
+                <p className="text-content-tertiary">{tCommon("no_data")}</p>
+              </div>
+            ) : viewMode === "table" ? (
+              <DataTable data={filteredPrograms} columns={columns} />
+            ) : (
+              <div className="space-y-3">
+                {filteredPrograms.map((program) => (
+                  <div
+                    key={program.id}
+                    className="group bg-surface rounded-xl p-5 border border-line-subtle hover:border-brand-primary-500/50 hover:shadow-lg transition-all duration-200"
+                  >
+                    <div className="flex items-center justify-between gap-4">
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-2 flex-wrap">
+                          <span className="font-mono text-xs text-content-tertiary bg-app px-2 py-0.5 rounded">
+                            {program.code}
+                          </span>
+                          <h3 className="text-base font-bold text-content-primary">
+                            {program.name}
+                          </h3>
+                          <StatusBadge
+                            type="category"
+                            status={program.isActive ? "ACTIVE" : "INACTIVE"}
+                          />
+                        </div>
+                        {program.description && (
+                          <p className="text-sm text-content-secondary mt-1 truncate">
+                            {program.description}
+                          </p>
+                        )}
+                        <div className="flex items-center gap-4 mt-2 text-sm text-content-tertiary">
+                          <span>{program.faculty}</span>
+                          {program.department && (
+                            <span>· {program.department}</span>
+                          )}
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-2 shrink-0">
+                        <Button
+                          size="sm"
+                          onClick={() => router.push(`/programas/${program.id}`)}
+                        >
+                          {t("view_detail")}
+                        </Button>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => handleEdit(program)}
+                        >
+                          {t("edit")}
+                        </Button>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => handleToggleStatus(program)}
+                        >
+                          {program.isActive ? t("deactivate") : t("activate")}
+                        </Button>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
           </CardContent>
         </Card>
 

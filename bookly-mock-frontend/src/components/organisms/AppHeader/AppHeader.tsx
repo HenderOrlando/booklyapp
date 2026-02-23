@@ -38,17 +38,6 @@ export function AppHeader({
             priority
           />
         </div>
-      </div>
-
-      {/* Título Bookly - Centrado */}
-      <div className="flex-1 flex justify-center items-center">
-        <span className="text-[28px] font-black text-white leading-tight tracking-tight">
-          Bookly
-        </span>
-      </div>
-
-      {/* Sección Usuario, Theme y Logout - Derecha */}
-      <div className="absolute right-0 top-1/2 -translate-y-1/2 flex items-center gap-6">
         {showUser && user && (
           <div className="hidden md:flex flex-col items-end leading-tight -space-y-0.5 text-right">
             <span className="text-[13px] font-bold text-white">
@@ -62,7 +51,17 @@ export function AppHeader({
             </span>
           </div>
         )}
+      </div>
 
+      {/* Título Bookly - Centrado */}
+      <div className="flex-1 flex justify-center items-center">
+        <span className="text-[28px] font-black text-white leading-tight tracking-tight">
+          Bookly
+        </span>
+      </div>
+
+      {/* Sección Usuario, Theme y Logout - Derecha */}
+      <div className="absolute right-0 top-1/2 -translate-y-1/2 flex items-center gap-6">
         <div className="flex items-center gap-4">
           <ThemeToggle />
           <LogoutButton
