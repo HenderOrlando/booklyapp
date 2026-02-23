@@ -20,6 +20,26 @@ import { STOCKPILE_REFERENCE_DATA } from "./reference-data.seed-data";
 const logger = createLogger("StockpileSeed");
 
 /**
+ * Helper: upsert con _id fijo.
+ * MongoDB no permite modificar _id en updates, así que usamos $setOnInsert para _id.
+ */
+async function upsertWithFixedId(
+  model: Model<any>,
+  filter: Record<string, any>,
+  data: Record<string, any>,
+): Promise<any> {
+  const { _id, ...rest } = data;
+  if (!_id) {
+    return model.findOneAndUpdate(filter, rest, { upsert: true, new: true });
+  }
+  return model.findOneAndUpdate(
+    filter,
+    { $set: rest, $setOnInsert: { _id } } as any,
+    { upsert: true, new: true },
+  );
+}
+
+/**
  * Seed data para Stockpile Service
  * Crea flujos de aprobación, solicitudes, documentos y notificaciones
  */
@@ -414,10 +434,10 @@ async function seed() {
     const insertedRequests: any[] = [];
 
     for (const request of approvalRequests) {
-      const doc = await approvalRequestModel.findOneAndUpdate(
+      const doc = await upsertWithFixedId(
+        approvalRequestModel,
         { reservationId: request.reservationId },
         request,
-        { upsert: true, new: true },
       );
       insertedRequests.push(doc);
     }

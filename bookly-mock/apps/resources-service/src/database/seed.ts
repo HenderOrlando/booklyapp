@@ -24,6 +24,24 @@ import { RESOURCES_REFERENCE_DATA } from "./reference-data.seed-data";
 const logger = createLogger("ResourcesSeed");
 
 /**
+ * Helper: upsert con _id fijo.
+ * MongoDB no permite modificar _id en updates, así que usamos $setOnInsert para _id
+ * y $set para el resto de los campos.
+ */
+async function upsertWithFixedId<T>(
+  model: Model<T>,
+  filter: Record<string, any>,
+  data: Record<string, any>,
+): Promise<any> {
+  const { _id, ...rest } = data;
+  return model.findOneAndUpdate(
+    filter,
+    { $set: rest, $setOnInsert: { _id } } as any,
+    { upsert: true, new: true },
+  );
+}
+
+/**
  * Seed data para Resources Service
  * Crea recursos y categorías de prueba
  */
@@ -107,10 +125,7 @@ async function seed() {
 
     logger.info(`Procesando ${faculties.length} facultades...`);
     for (const fac of faculties) {
-      await facultyModel.findOneAndUpdate({ code: fac.code }, fac, {
-        upsert: true,
-        new: true,
-      });
+      await upsertWithFixedId(facultyModel, { code: fac.code }, fac);
     }
     logger.info(`✅ ${faculties.length} facultades procesadas (upsert)`);
 
@@ -159,10 +174,7 @@ async function seed() {
 
     logger.info(`Procesando ${departments.length} departamentos...`);
     for (const dep of departments) {
-      await departmentModel.findOneAndUpdate({ code: dep.code }, dep, {
-        upsert: true,
-        new: true,
-      });
+      await upsertWithFixedId(departmentModel, { code: dep.code }, dep);
     }
     logger.info(`✅ ${departments.length} departamentos procesados (upsert)`);
 
@@ -231,11 +243,7 @@ async function seed() {
     const insertedPrograms: (Document & Program)[] = [];
 
     for (const prog of programs) {
-      const doc = await programModel.findOneAndUpdate(
-        { code: prog.code },
-        prog,
-        { upsert: true, new: true },
-      );
+      const doc = await upsertWithFixedId(programModel, { code: prog.code }, prog);
       insertedPrograms.push(doc as Document & Program);
     }
 
@@ -303,11 +311,7 @@ async function seed() {
     const insertedCategories: (Document & Category)[] = [];
 
     for (const cat of categories) {
-      const doc = await categoryModel.findOneAndUpdate(
-        { code: cat.code },
-        cat,
-        { upsert: true, new: true },
-      );
+      const doc = await upsertWithFixedId(categoryModel, { code: cat.code }, cat);
       insertedCategories.push(doc as Document & Category);
     }
 
@@ -559,11 +563,7 @@ async function seed() {
     const insertedResources: (Document & Resource)[] = [];
 
     for (const res of resources) {
-      const doc = await resourceModel.findOneAndUpdate(
-        { code: res.code },
-        res,
-        { upsert: true, new: true },
-      );
+      const doc = await upsertWithFixedId(resourceModel, { code: res.code }, res);
       insertedResources.push(doc as Document & Resource);
     }
 
