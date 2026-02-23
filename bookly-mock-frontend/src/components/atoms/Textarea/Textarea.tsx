@@ -28,7 +28,7 @@ const Textarea = React.forwardRef<HTMLTextAreaElement, TextareaProps>(
         {error && (
           <p
             id={errorId}
-            className="mt-1 text-sm text-[var(--color-state-error-text)]"
+            className="mt-1 text-sm text-state-error-text"
           >
             {error}
           </p>

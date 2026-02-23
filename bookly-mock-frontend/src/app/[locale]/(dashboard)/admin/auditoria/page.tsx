@@ -433,14 +433,35 @@ export default function AuditoriaPage() {
                 <CardTitle>{t("logs_title")}</CardTitle>
                 <CardDescription>{t("logs_list_desc")}</CardDescription>
               </div>
-              <div className="flex gap-2">
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => setUseVirtualScrolling(!useVirtualScrolling)}
-                >
-                  {useVirtualScrolling ? t("view_table") : t("view_virtual")}
-                </Button>
+              <div className="flex items-center gap-4">
+                <div className="flex items-center gap-1 bg-[var(--color-bg-muted)]/50 p-1 rounded-xl border border-[var(--color-border-subtle)]/50">
+                  <Button
+                    variant={!useVirtualScrolling ? "default" : "ghost"}
+                    size="sm"
+                    onClick={() => setUseVirtualScrolling(false)}
+                    className={
+                      !useVirtualScrolling
+                        ? "h-8 px-3 rounded-lg text-xs font-bold bg-white text-brand-primary-600 shadow-sm border-none hover:bg-white transition-all"
+                        : "h-8 px-3 rounded-lg text-xs font-bold text-[var(--color-text-tertiary)] hover:text-brand-primary-500 transition-all"
+                    }
+                  >
+                    <svg className="w-3.5 h-3.5 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 10h18M3 14h18m-9-4v8m-7 0h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" /></svg>
+                    {t("view_table")}
+                  </Button>
+                  <Button
+                    variant={useVirtualScrolling ? "default" : "ghost"}
+                    size="sm"
+                    onClick={() => setUseVirtualScrolling(true)}
+                    className={
+                      useVirtualScrolling
+                        ? "h-8 px-3 rounded-lg text-xs font-bold bg-white text-brand-primary-600 shadow-sm border-none hover:bg-white transition-all"
+                        : "h-8 px-3 rounded-lg text-xs font-bold text-[var(--color-text-tertiary)] hover:text-brand-primary-500 transition-all"
+                    }
+                  >
+                    <svg className="w-3.5 h-3.5 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 10h16M4 14h16M4 18h16" /></svg>
+                    {t("view_virtual")}
+                  </Button>
+                </div>
                 <Button
                   variant="outline"
                   onClick={handleExportCsv}

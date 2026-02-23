@@ -140,7 +140,7 @@ export default function ResetPasswordPage() {
           )}
 
           <div>
-            <label className="block text-sm font-medium text-[var(--color-text-primary)] mb-2">
+            <label className="block text-sm font-medium text-content-primary mb-2">
               {t("new_password_label")}
             </label>
             <Input
@@ -152,13 +152,13 @@ export default function ResetPasswordPage() {
               disabled={loading || !token}
               className="w-full"
             />
-            <p className="text-xs text-[var(--color-text-secondary)] mt-1">
+            <p className="text-xs text-content-secondary mt-1">
               {t("new_password_hint")}
             </p>
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-[var(--color-text-primary)] mb-2">
+            <label className="block text-sm font-medium text-content-primary mb-2">
               {t("confirm_password_label")}
             </label>
             <Input
@@ -179,13 +179,13 @@ export default function ResetPasswordPage() {
           <div className="text-center space-y-2">
             <Link
               href="/forgot-password"
-              className="text-sm text-brand-primary-500 hover:text-brand-primary-600 hover:underline block"
+              className="text-sm text-action-primary hover:text-action-primary-hover hover:underline block"
             >
               {t("request_new_link")}
             </Link>
             <Link
               href="/login"
-              className="text-sm text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] hover:underline block"
+              className="text-sm text-content-secondary hover:text-content-primary hover:underline block"
             >
               {t("back_to_login")}
             </Link>
@@ -194,11 +194,11 @@ export default function ResetPasswordPage() {
       )}
 
       {/* Información de seguridad */}
-      <div className="mt-6 p-4 bg-[var(--color-surface-secondary)] rounded-md">
-        <h3 className="text-sm font-medium text-[var(--color-text-primary)] mb-2">
+      <div className="mt-6 p-4 bg-app rounded-md border border-line-subtle">
+        <h3 className="text-sm font-medium text-content-primary mb-2">
           {t("security_tips_title")}
         </h3>
-        <ul className="text-xs text-[var(--color-text-secondary)] space-y-1">
+        <ul className="text-xs text-content-secondary space-y-1">
           <li>• {t("security_tip_unique")}</li>
           <li>• {t("security_tip_mix")}</li>
           <li>• {t("security_tip_share")}</li>

@@ -72,6 +72,42 @@ const config: Config = {
             900: "#7F1D1D",
           },
         },
+        
+        // Semantic Tokens from globals.css
+        app: "var(--color-bg-app)",
+        surface: "var(--color-bg-surface)",
+        inverse: "var(--color-bg-inverse)",
+        elevated: "var(--color-bg-elevated)",
+
+        content: {
+          primary: "var(--color-text-primary)",
+          secondary: "var(--color-text-secondary)",
+          tertiary: "var(--color-text-tertiary)",
+          inverse: "var(--color-text-inverse)",
+          danger: "var(--color-text-danger)",
+        },
+
+        action: {
+          primary: {
+            DEFAULT: "var(--color-action-primary)",
+            hover: "var(--color-action-primary-hover)",
+            disabled: "var(--color-action-primary-disabled)",
+          },
+          secondary: {
+            DEFAULT: "var(--color-action-secondary)",
+            hover: "var(--color-action-secondary-hover)",
+          },
+          ghost: {
+            hover: "var(--color-action-ghost-hover)",
+          }
+        },
+
+        line: {
+          subtle: "var(--color-border-subtle)",
+          strong: "var(--color-border-strong)",
+          focus: "var(--color-border-focus)",
+        },
+
         // Shadcn/ui compatibility (mapped to Bookly tokens)
         border: "hsl(var(--border))",
         input: "hsl(var(--input))",

@@ -73,7 +73,7 @@ export function ListLayout({
   };
 
   return (
-    <div className={cn("space-y-6", className)}>
+    <div className={cn("w-full space-y-6", className)}>
       {/* Breadcrumbs */}
       {breadcrumbs && breadcrumbs.length > 0 && (
         <Breadcrumb>
@@ -103,7 +103,7 @@ export function ListLayout({
       {/* Título y Badge */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-3">
-          <h1 className="text-3xl font-bold text-[var(--color-text-primary)]">
+          <h1 className="text-3xl font-bold text-content-primary">
             {title}
           </h1>
           {badge && (

@@ -32,6 +32,8 @@ import { useState } from "react";
 import { useDebounce } from "@/hooks/use-debounce";
 import { ReservationFiltersSection, ReservationStatsCards } from "./components";
 
+import { ListLayout } from "@/components/templates/ListLayout";
+
 /**
  * Página de Reservas
  *
@@ -138,45 +140,55 @@ export default function ReservasPage() {
 
   if (loading) {
     return (
-      <>
-        <div className="flex flex-col items-center justify-center min-h-[60vh]">
-          <LoadingSpinner size="lg" />
-          <p className="mt-4 text-[var(--color-text-tertiary)]">
-            {tCommon("loading")}
-          </p>
-        </div>
-      </>
+      <div className="flex flex-col items-center justify-center min-h-[60vh]">
+        <LoadingSpinner size="lg" />
+        <p className="mt-4 text-content-tertiary">
+          {tCommon("loading")}
+        </p>
+      </div>
     );
   }
 
   return (
     <>
-      {/* Header de página */}
-      <div className="space-y-6">
-        <div className="flex items-center justify-between">
-          <div>
-            <h2 className="text-3xl font-bold text-[var(--color-text-primary)]">
-              {t("title")}
-            </h2>
-            <p className="text-[var(--color-text-secondary)] mt-1">
-              {t("management")}
-            </p>
-          </div>
-          <div className="flex gap-2">
+      <ListLayout
+        title={t("title")}
+        badge={{ text: t("management"), variant: "secondary" }}
+        onCreate={() => setShowCreateModal(true)}
+        createLabel={t("create")}
+        actions={
+          <div className="flex items-center gap-1 bg-[var(--color-bg-muted)]/50 p-1 rounded-xl border border-[var(--color-border-subtle)]/50">
             <Button
-              variant="outline"
+              variant={!useVirtualScrolling ? "default" : "ghost"}
               size="sm"
-              onClick={() => setUseVirtualScrolling(!useVirtualScrolling)}
+              onClick={() => setUseVirtualScrolling(false)}
+              className={
+                !useVirtualScrolling
+                  ? "h-8 px-3 rounded-lg text-xs font-bold bg-white text-brand-primary-600 shadow-sm border-none hover:bg-white transition-all"
+                  : "h-8 px-3 rounded-lg text-xs font-bold text-[var(--color-text-tertiary)] hover:text-brand-primary-500 transition-all"
+              }
             >
-              {useVirtualScrolling ? t("view_grid") : t("view_virtual")}
+              <svg className="w-3.5 h-3.5 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" /></svg>
+              {t("view_grid")}
             </Button>
-            <Button onClick={() => setShowCreateModal(true)}>
-              {t("create")}
+            <Button
+              variant={useVirtualScrolling ? "default" : "ghost"}
+              size="sm"
+              onClick={() => setUseVirtualScrolling(true)}
+              className={
+                useVirtualScrolling
+                  ? "h-8 px-3 rounded-lg text-xs font-bold bg-white text-brand-primary-600 shadow-sm border-none hover:bg-white transition-all"
+                  : "h-8 px-3 rounded-lg text-xs font-bold text-[var(--color-text-tertiary)] hover:text-brand-primary-500 transition-all"
+              }
+            >
+              <svg className="w-3.5 h-3.5 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 10h16M4 14h16M4 18h16" /></svg>
+              {t("view_virtual")}
             </Button>
           </div>
-        </div>
-
-        {/* Stats Cards */}
+        }
+      >
+        <div className="space-y-6">
+          {/* Stats Cards */}
         <ReservationStatsCards stats={statsData} />
 
         {/* Card con contenido */}
@@ -257,6 +269,7 @@ export default function ReservasPage() {
           </CardContent>
         </Card>
       </div>
+      </ListLayout>
 
       {/* Modal de Edición */}
       {editingReservation && (

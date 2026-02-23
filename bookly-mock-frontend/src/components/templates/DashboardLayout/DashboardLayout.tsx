@@ -63,19 +63,19 @@ export function KPICard({
   return (
     <Card className={className}>
       <CardHeader className="flex flex-row items-center justify-between pb-2">
-        <CardTitle className="text-sm font-medium text-[var(--color-text-secondary)]">
+        <CardTitle className="text-sm font-medium text-content-secondary">
           {title}
         </CardTitle>
         {icon && (
-          <div className="text-[var(--color-text-secondary)]">{icon}</div>
+          <div className="text-content-secondary">{icon}</div>
         )}
       </CardHeader>
       <CardContent>
-        <div className="text-2xl font-bold text-[var(--color-text-primary)]">
+        <div className="text-2xl font-bold text-content-primary">
           {value}
         </div>
         {description && (
-          <p className="text-xs text-[var(--color-text-secondary)] mt-1">
+          <p className="text-xs text-content-secondary mt-1">
             {description}
           </p>
         )}
@@ -124,7 +124,7 @@ export function DashboardLayout({
   className,
 }: DashboardLayoutProps) {
   return (
-    <div className={cn("space-y-6", className)}>
+    <div className={cn("w-full space-y-6", className)}>
       {/* KPIs Grid */}
       {kpis && (
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">{kpis}</div>
