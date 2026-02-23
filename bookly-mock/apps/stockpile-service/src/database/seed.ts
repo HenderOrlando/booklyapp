@@ -725,6 +725,46 @@ async function seed() {
           damageReported: false,
         },
       },
+      // Upcoming reservation para Admin General (PENDING)
+      {
+        reservationId: new Types.ObjectId(SEED_IDS.RESERVA_APROBADA_ID),
+        resourceId: resourceAuditorioId,
+        userId: ADMIN_GENERAL_ID,
+        status: CheckInOutStatus.PENDING,
+        expectedReturnTime: new Date(new Date(today).setHours(16, 0, 0)),
+        metadata: {
+          qrCode: "ADMIN-UPCOMING-QR-1234",
+          location: "Auditorio Principal"
+        },
+        reservationStartTime: new Date(new Date(today).setHours(14, 0, 0)),
+        reservationEndTime: new Date(new Date(today).setHours(16, 0, 0)),
+        resourceName: "Auditorio Principal",
+        resourceType: "AUDITORIUM",
+      },
+      // Active check-in para Admin General (CHECKED_IN)
+      {
+        reservationId: new Types.ObjectId(SEED_IDS.RESERVA_CONFIRMADA_ID),
+        resourceId: new Types.ObjectId(SEED_IDS.RECURSO_SALA_CONF_A_ID),
+        userId: ADMIN_GENERAL_ID,
+        status: CheckInOutStatus.CHECKED_IN,
+        checkInTime: new Date(new Date(today).setHours(8, 0, 0)),
+        checkInBy: STAFF_VIGILANTE_ID,
+        checkInType: CheckInOutType.MANUAL,
+        checkInNotes: "Check-in temprano",
+        expectedReturnTime: new Date(new Date(today).setHours(10, 0, 0)),
+        resourceCondition: {
+          beforeCheckIn: "Buen estado",
+          damageReported: false,
+        },
+        metadata: {
+          qrCode: "ADMIN-ACTIVE-QR-5678",
+          location: "Sala de Conferencias A"
+        },
+        reservationStartTime: new Date(new Date(today).setHours(8, 0, 0)),
+        reservationEndTime: new Date(new Date(today).setHours(10, 0, 0)),
+        resourceName: "Sala de Conferencias A",
+        resourceType: "MEETING_ROOM",
+      },
     ];
 
     logger.info(`Procesando ${checkInOuts.length} registros de check-in/out...`);
