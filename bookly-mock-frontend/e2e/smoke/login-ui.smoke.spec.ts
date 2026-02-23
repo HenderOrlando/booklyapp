@@ -73,6 +73,21 @@ test.describe("Login UI smoke", () => {
   });
 
   test("mock credentials are hidden in SERVER mode", async ({ page }) => {
+    await page.route("**/api/v1/config/public", async (route) => {
+      await route.fulfill({
+        status: 200,
+        contentType: "application/json",
+        body: JSON.stringify({
+          success: true,
+          data: {
+            themeMode: "light",
+            primaryColor: "#000000",
+            secondaryColor: "#ffffff",
+          },
+        }),
+      });
+    });
+
     await page.addInitScript(() => {
       window.localStorage.setItem("bookly_data_mode_override", "serve");
       window.localStorage.setItem("bookly_use_direct_services", "false");
