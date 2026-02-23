@@ -63,8 +63,6 @@ export default function LoginPage() {
 
     try {
       await login(email, password, rememberMe);
-      // Force reload to ensure redirect logic in AuthProvider/AuthContext kicks in fresh
-      window.location.reload();
     } catch (error: unknown) {
       console.error("Login error:", error);
       setError(
