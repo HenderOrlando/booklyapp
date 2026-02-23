@@ -1,4 +1,4 @@
-import EditResourcePage from "@/app/[locale]/recursos/[id]/editar/page";
+import EditResourcePage from "@/app/[locale]/(dashboard)/recursos/[id]/editar/page";
 import { httpClient } from "@/infrastructure/http";
 import "@testing-library/jest-dom";
 import { render, screen, waitFor } from "@testing-library/react";
