@@ -479,7 +479,7 @@ export function AppSidebar({
       {visibleSections.map((section, sectionIdx) => (
         <div key={section.title || sectionIdx} className="space-y-2">
           {section.title && (
-            <h3 className="px-4 text-[10px] font-bold text-slate-500 uppercase tracking-widest mt-4 mb-2">
+            <h3 className="px-4 text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-4 mb-2">
               {section.title}
             </h3>
           )}
