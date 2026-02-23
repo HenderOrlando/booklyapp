@@ -62,16 +62,22 @@ export class DeadLetterQueueService implements OnModuleInit {
   }
 
   async onModuleInit() {
-    // Verificar conexión a MongoDB antes de iniciar auto-retry
+    // Iniciar con retraso el auto-retry para dar tiempo a MongoDB a conectarse
+    setTimeout(() => {
+      this.checkAndStartAutoRetry();
+    }, 5000);
+  }
+
+  private async checkAndStartAutoRetry() {
     try {
-      if (this.dlqModel?.db?.db) {
+      if (this.dlqModel?.db?.readyState === 1) { // 1 = connected
         // Hacer un query real para verificar autenticación
         await this.dlqModel.countDocuments().limit(1).exec();
         this.startAutoRetry();
         logger.info("DLQ Service initialized with auto-retry enabled");
       } else {
         logger.warn(
-          "DLQ Service initialized without auto-retry (MongoDB connection not ready)",
+          `DLQ Service initialized without auto-retry (MongoDB connection state: ${this.dlqModel?.db?.readyState})`,
         );
       }
     } catch (error) {

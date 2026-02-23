@@ -49,17 +49,17 @@ export class AuthServiceClient implements IAuthServiceClient {
       });
 
       if (searchResponse.ok) {
-        const searchData = await searchResponse.json();
-        const users = searchData?.data?.data || searchData?.data || [];
+        const searchData: any = await searchResponse.json();
+        const users: any = searchData?.data?.data || searchData?.data || [];
 
         if (Array.isArray(users) && users.length > 0) {
-          const existingUser = users[0];
+          const existingUser: any = users[0];
           this.logger.info("Teacher found", {
-            userId: existingUser._id || existingUser.id,
+            userId: existingUser?._id || existingUser?.id,
             email: params.email,
           });
           return {
-            userId: existingUser._id || existingUser.id,
+            userId: existingUser?._id || existingUser?.id,
             created: false,
           };
         }
