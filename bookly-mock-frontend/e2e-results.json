@@ -227,12 +227,12 @@
                       "workerIndex": 0,
                       "parallelIndex": 0,
                       "status": "passed",
-                      "duration": 19967,
+                      "duration": 25026,
                       "errors": [],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2026-02-23T05:11:36.340Z",
+                      "startTime": "2026-02-23T05:18:25.646Z",
                       "annotations": [],
                       "attachments": []
                     }
@@ -261,12 +261,12 @@
                       "workerIndex": 1,
                       "parallelIndex": 1,
                       "status": "passed",
-                      "duration": 20114,
+                      "duration": 24735,
                       "errors": [],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2026-02-23T05:11:36.276Z",
+                      "startTime": "2026-02-23T05:18:25.760Z",
                       "annotations": [],
                       "attachments": []
                     }
@@ -295,12 +295,12 @@
                       "workerIndex": 2,
                       "parallelIndex": 2,
                       "status": "passed",
-                      "duration": 20228,
+                      "duration": 21896,
                       "errors": [],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2026-02-23T05:11:36.386Z",
+                      "startTime": "2026-02-23T05:18:25.762Z",
                       "annotations": [],
                       "attachments": []
                     }
@@ -332,7 +332,7 @@
           "specs": [
             {
               "title": "restores protected route after login when callback is present",
-              "ok": false,
+              "ok": true,
               "tags": [],
               "tests": [
                 {
@@ -345,53 +345,18 @@
                     {
                       "workerIndex": 3,
                       "parallelIndex": 3,
-                      "status": "failed",
-                      "duration": 29619,
-                      "error": {
-                        "message": "TimeoutError: page.waitForURL: Timeout 20000ms exceeded.\n=========================== logs ===========================\nwaiting for navigation until \"commit\"\n  navigated to \"http://localhost:4201/es/login?callback=%2Fes%2Frecursos%3Ffrom%3Dauth-redirect&callbackUrl=%2Fes%2Frecursos%3Ffrom%3Dauth-redirect\"\n  navigated to \"http://localhost:4201/es/login?callback=%2Fes%2Frecursos%3Ffrom%3Dauth-redirect&callbackUrl=%2Fes%2Frecursos%3Ffrom%3Dauth-redirect\"\n============================================================",
-                        "stack": "TimeoutError: page.waitForURL: Timeout 20000ms exceeded.\n=========================== logs ===========================\nwaiting for navigation until \"commit\"\n  navigated to \"http://localhost:4201/es/login?callback=%2Fes%2Frecursos%3Ffrom%3Dauth-redirect&callbackUrl=%2Fes%2Frecursos%3Ffrom%3Dauth-redirect\"\n  navigated to \"http://localhost:4201/es/login?callback=%2Fes%2Frecursos%3Ffrom%3Dauth-redirect&callbackUrl=%2Fes%2Frecursos%3Ffrom%3Dauth-redirect\"\n============================================================\n    at C:\\Users\\USER\\Documents\\bookly\\booklyapp\\bookly-mock-frontend\\e2e\\smoke\\auth.smoke.spec.ts:32:16",
-                        "location": {
-                          "file": "C:\\Users\\USER\\Documents\\bookly\\booklyapp\\bookly-mock-frontend\\e2e\\smoke\\auth.smoke.spec.ts",
-                          "column": 16,
-                          "line": 32
-                        },
-                        "snippet": "\u001b[0m \u001b[90m 30 |\u001b[39m     \u001b[90m// After login, AuthContext redirects via router.replace to the callback URL.\u001b[39m\n \u001b[90m 31 |\u001b[39m     \u001b[90m// Use 'commit' because the full load may take longer on protected routes.\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 32 |\u001b[39m     \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mwaitForURL(\u001b[35m/\\/es\\/(recursos|dashboard)/\u001b[39m\u001b[33m,\u001b[39m {\n \u001b[90m    |\u001b[39m                \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 33 |\u001b[39m       timeout\u001b[33m:\u001b[39m \u001b[35m20000\u001b[39m\u001b[33m,\u001b[39m\n \u001b[90m 34 |\u001b[39m       waitUntil\u001b[33m:\u001b[39m \u001b[32m\"commit\"\u001b[39m\u001b[33m,\u001b[39m\n \u001b[90m 35 |\u001b[39m     })\u001b[33m;\u001b[39m\u001b[0m"
-                      },
-                      "errors": [
-                        {
-                          "location": {
-                            "file": "C:\\Users\\USER\\Documents\\bookly\\booklyapp\\bookly-mock-frontend\\e2e\\smoke\\auth.smoke.spec.ts",
-                            "column": 16,
-                            "line": 32
-                          },
-                          "message": "TimeoutError: page.waitForURL: Timeout 20000ms exceeded.\n=========================== logs ===========================\nwaiting for navigation until \"commit\"\n  navigated to \"http://localhost:4201/es/login?callback=%2Fes%2Frecursos%3Ffrom%3Dauth-redirect&callbackUrl=%2Fes%2Frecursos%3Ffrom%3Dauth-redirect\"\n  navigated to \"http://localhost:4201/es/login?callback=%2Fes%2Frecursos%3Ffrom%3Dauth-redirect&callbackUrl=%2Fes%2Frecursos%3Ffrom%3Dauth-redirect\"\n============================================================\n\n\u001b[0m \u001b[90m 30 |\u001b[39m     \u001b[90m// After login, AuthContext redirects via router.replace to the callback URL.\u001b[39m\n \u001b[90m 31 |\u001b[39m     \u001b[90m// Use 'commit' because the full load may take longer on protected routes.\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 32 |\u001b[39m     \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mwaitForURL(\u001b[35m/\\/es\\/(recursos|dashboard)/\u001b[39m\u001b[33m,\u001b[39m {\n \u001b[90m    |\u001b[39m                \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 33 |\u001b[39m       timeout\u001b[33m:\u001b[39m \u001b[35m20000\u001b[39m\u001b[33m,\u001b[39m\n \u001b[90m 34 |\u001b[39m       waitUntil\u001b[33m:\u001b[39m \u001b[32m\"commit\"\u001b[39m\u001b[33m,\u001b[39m\n \u001b[90m 35 |\u001b[39m     })\u001b[33m;\u001b[39m\u001b[0m\n\u001b[2m    at C:\\Users\\USER\\Documents\\bookly\\booklyapp\\bookly-mock-frontend\\e2e\\smoke\\auth.smoke.spec.ts:32:16\u001b[22m"
-                        }
-                      ],
+                      "status": "passed",
+                      "duration": 22370,
+                      "errors": [],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2026-02-23T05:11:36.479Z",
+                      "startTime": "2026-02-23T05:18:25.726Z",
                       "annotations": [],
-                      "attachments": [
-                        {
-                          "name": "screenshot",
-                          "contentType": "image/png",
-                          "path": "C:\\Users\\USER\\Documents\\bookly\\booklyapp\\bookly-mock-frontend\\test-results\\auth.smoke-Auth-Smoke-rest-37b86-in-when-callback-is-present-smoke\\test-failed-1.png"
-                        },
-                        {
-                          "name": "error-context",
-                          "contentType": "text/markdown",
-                          "path": "C:\\Users\\USER\\Documents\\bookly\\booklyapp\\bookly-mock-frontend\\test-results\\auth.smoke-Auth-Smoke-rest-37b86-in-when-callback-is-present-smoke\\error-context.md"
-                        }
-                      ],
-                      "errorLocation": {
-                        "file": "C:\\Users\\USER\\Documents\\bookly\\booklyapp\\bookly-mock-frontend\\e2e\\smoke\\auth.smoke.spec.ts",
-                        "column": 16,
-                        "line": 32
-                      }
+                      "attachments": []
                     }
                   ],
-                  "status": "unexpected"
+                  "status": "expected"
                 }
               ],
               "id": "6d5c41464ee763695a58-6f913dd5086f6b04d8f6",
@@ -412,15 +377,15 @@
                   "projectName": "smoke",
                   "results": [
                     {
-                      "workerIndex": 0,
-                      "parallelIndex": 0,
+                      "workerIndex": 2,
+                      "parallelIndex": 2,
                       "status": "passed",
-                      "duration": 12160,
+                      "duration": 9303,
                       "errors": [],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2026-02-23T05:11:56.576Z",
+                      "startTime": "2026-02-23T05:18:48.121Z",
                       "annotations": [],
                       "attachments": []
                     }
@@ -430,7 +395,7 @@
               ],
               "id": "6d5c41464ee763695a58-fd26e0533fd8267e183a",
               "file": "smoke/auth.smoke.spec.ts",
-              "line": 39,
+              "line": 38,
               "column": 7
             },
             {
@@ -446,15 +411,15 @@
                   "projectName": "smoke",
                   "results": [
                     {
-                      "workerIndex": 1,
-                      "parallelIndex": 1,
+                      "workerIndex": 3,
+                      "parallelIndex": 3,
                       "status": "passed",
-                      "duration": 12020,
+                      "duration": 9083,
                       "errors": [],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2026-02-23T05:11:56.624Z",
+                      "startTime": "2026-02-23T05:18:48.414Z",
                       "annotations": [],
                       "attachments": []
                     }
@@ -464,7 +429,7 @@
               ],
               "id": "6d5c41464ee763695a58-9b1f7ce6660f17a0dd71",
               "file": "smoke/auth.smoke.spec.ts",
-              "line": 52,
+              "line": 51,
               "column": 7
             },
             {
@@ -480,15 +445,15 @@
                   "projectName": "smoke",
                   "results": [
                     {
-                      "workerIndex": 2,
-                      "parallelIndex": 2,
+                      "workerIndex": 1,
+                      "parallelIndex": 1,
                       "status": "passed",
-                      "duration": 8237,
+                      "duration": 5405,
                       "errors": [],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2026-02-23T05:11:56.897Z",
+                      "startTime": "2026-02-23T05:18:50.978Z",
                       "annotations": [],
                       "attachments": []
                     }
@@ -498,7 +463,7 @@
               ],
               "id": "6d5c41464ee763695a58-4c6b061f4c0b41486f75",
               "file": "smoke/auth.smoke.spec.ts",
-              "line": 62,
+              "line": 61,
               "column": 7
             },
             {
@@ -514,15 +479,15 @@
                   "projectName": "smoke",
                   "results": [
                     {
-                      "workerIndex": 2,
-                      "parallelIndex": 2,
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
                       "status": "passed",
-                      "duration": 3215,
+                      "duration": 4767,
                       "errors": [],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2026-02-23T05:12:05.234Z",
+                      "startTime": "2026-02-23T05:18:51.017Z",
                       "annotations": [],
                       "attachments": []
                     }
@@ -532,7 +497,7 @@
               ],
               "id": "6d5c41464ee763695a58-0c1e4bd734ec737c5fa9",
               "file": "smoke/auth.smoke.spec.ts",
-              "line": 71,
+              "line": 70,
               "column": 7
             },
             {
@@ -548,15 +513,15 @@
                   "projectName": "smoke",
                   "results": [
                     {
-                      "workerIndex": 4,
-                      "parallelIndex": 3,
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
                       "status": "passed",
-                      "duration": 7708,
+                      "duration": 3024,
                       "errors": [],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2026-02-23T05:12:13.266Z",
+                      "startTime": "2026-02-23T05:18:55.876Z",
                       "annotations": [],
                       "attachments": []
                     }
@@ -566,7 +531,7 @@
               ],
               "id": "6d5c41464ee763695a58-14b04abf9b57a02003b3",
               "file": "smoke/auth.smoke.spec.ts",
-              "line": 86,
+              "line": 85,
               "column": 7
             },
             {
@@ -582,15 +547,15 @@
                   "projectName": "smoke",
                   "results": [
                     {
-                      "workerIndex": 2,
-                      "parallelIndex": 2,
+                      "workerIndex": 1,
+                      "parallelIndex": 1,
                       "status": "passed",
-                      "duration": 16723,
+                      "duration": 17016,
                       "errors": [],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2026-02-23T05:12:08.502Z",
+                      "startTime": "2026-02-23T05:18:56.494Z",
                       "annotations": [],
                       "attachments": []
                     }
@@ -600,7 +565,7 @@
               ],
               "id": "6d5c41464ee763695a58-bf27e710c94ac34c74a8",
               "file": "smoke/auth.smoke.spec.ts",
-              "line": 93,
+              "line": 92,
               "column": 7
             }
           ]
@@ -633,15 +598,15 @@
                   "projectName": "smoke",
                   "results": [
                     {
-                      "workerIndex": 1,
-                      "parallelIndex": 1,
+                      "workerIndex": 2,
+                      "parallelIndex": 2,
                       "status": "passed",
-                      "duration": 5812,
+                      "duration": 6279,
                       "errors": [],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2026-02-23T05:12:08.729Z",
+                      "startTime": "2026-02-23T05:18:57.529Z",
                       "annotations": [],
                       "attachments": []
                     }
@@ -684,15 +649,15 @@
                   "projectName": "smoke",
                   "results": [
                     {
-                      "workerIndex": 0,
-                      "parallelIndex": 0,
+                      "workerIndex": 3,
+                      "parallelIndex": 3,
                       "status": "passed",
-                      "duration": 3484,
+                      "duration": 2825,
                       "errors": [],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2026-02-23T05:12:08.822Z",
+                      "startTime": "2026-02-23T05:18:57.569Z",
                       "annotations": [],
                       "attachments": []
                     }
@@ -721,12 +686,12 @@
                       "workerIndex": 0,
                       "parallelIndex": 0,
                       "status": "passed",
-                      "duration": 14877,
+                      "duration": 15491,
                       "errors": [],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2026-02-23T05:12:12.359Z",
+                      "startTime": "2026-02-23T05:18:58.964Z",
                       "annotations": [],
                       "attachments": []
                     }
@@ -752,15 +717,15 @@
                   "projectName": "smoke",
                   "results": [
                     {
-                      "workerIndex": 1,
-                      "parallelIndex": 1,
+                      "workerIndex": 3,
+                      "parallelIndex": 3,
                       "status": "passed",
-                      "duration": 6535,
+                      "duration": 8989,
                       "errors": [],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2026-02-23T05:12:14.590Z",
+                      "startTime": "2026-02-23T05:19:00.437Z",
                       "annotations": [],
                       "attachments": []
                     }
@@ -786,15 +751,15 @@
                   "projectName": "smoke",
                   "results": [
                     {
-                      "workerIndex": 1,
-                      "parallelIndex": 1,
+                      "workerIndex": 2,
+                      "parallelIndex": 2,
                       "status": "passed",
-                      "duration": 2882,
+                      "duration": 5811,
                       "errors": [],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2026-02-23T05:12:21.189Z",
+                      "startTime": "2026-02-23T05:19:03.861Z",
                       "annotations": [],
                       "attachments": []
                     }
@@ -826,7 +791,7 @@
           "specs": [
             {
               "title": "dashboard page loads with content",
-              "ok": false,
+              "ok": true,
               "tags": [],
               "tests": [
                 {
@@ -837,55 +802,20 @@
                   "projectName": "smoke",
                   "results": [
                     {
-                      "workerIndex": 4,
+                      "workerIndex": 3,
                       "parallelIndex": 3,
-                      "status": "failed",
-                      "duration": 13447,
-                      "error": {
-                        "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m(\u001b[22m\u001b[2m)\u001b[22m failed\n\nLocator: locator('h1, h2').filter({ hasText: /dashboard|panel|inicio/i })\nExpected: visible\nTimeout: 10000ms\nError: element(s) not found\n\nCall log:\n\u001b[2m  - Expect \"toBeVisible\" with timeout 10000ms\u001b[22m\n\u001b[2m  - waiting for locator('h1, h2').filter({ hasText: /dashboard|panel|inicio/i })\u001b[22m\n",
-                        "stack": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m(\u001b[22m\u001b[2m)\u001b[22m failed\n\nLocator: locator('h1, h2').filter({ hasText: /dashboard|panel|inicio/i })\nExpected: visible\nTimeout: 10000ms\nError: element(s) not found\n\nCall log:\n\u001b[2m  - Expect \"toBeVisible\" with timeout 10000ms\u001b[22m\n\u001b[2m  - waiting for locator('h1, h2').filter({ hasText: /dashboard|panel|inicio/i })\u001b[22m\n\n    at C:\\Users\\USER\\Documents\\bookly\\booklyapp\\bookly-mock-frontend\\e2e\\smoke\\navigation.smoke.spec.ts:21:7",
-                        "location": {
-                          "file": "C:\\Users\\USER\\Documents\\bookly\\booklyapp\\bookly-mock-frontend\\e2e\\smoke\\navigation.smoke.spec.ts",
-                          "column": 7,
-                          "line": 21
-                        },
-                        "snippet": "\u001b[0m \u001b[90m 19 |\u001b[39m     \u001b[36mawait\u001b[39m expect(\n \u001b[90m 20 |\u001b[39m       page\u001b[33m.\u001b[39mlocator(\u001b[32m\"h1, h2\"\u001b[39m)\u001b[33m.\u001b[39mfilter({ hasText\u001b[33m:\u001b[39m \u001b[35m/dashboard|panel|inicio/i\u001b[39m })\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 21 |\u001b[39m     )\u001b[33m.\u001b[39mtoBeVisible({ timeout\u001b[33m:\u001b[39m \u001b[35m10000\u001b[39m })\u001b[33m;\u001b[39m\n \u001b[90m    |\u001b[39m       \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 22 |\u001b[39m   })\u001b[33m;\u001b[39m\n \u001b[90m 23 |\u001b[39m\n \u001b[90m 24 |\u001b[39m   \u001b[90m// E2E-NAV-002 | Admin sidebar shows all main links\u001b[39m\u001b[0m"
-                      },
-                      "errors": [
-                        {
-                          "location": {
-                            "file": "C:\\Users\\USER\\Documents\\bookly\\booklyapp\\bookly-mock-frontend\\e2e\\smoke\\navigation.smoke.spec.ts",
-                            "column": 7,
-                            "line": 21
-                          },
-                          "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m(\u001b[22m\u001b[2m)\u001b[22m failed\n\nLocator: locator('h1, h2').filter({ hasText: /dashboard|panel|inicio/i })\nExpected: visible\nTimeout: 10000ms\nError: element(s) not found\n\nCall log:\n\u001b[2m  - Expect \"toBeVisible\" with timeout 10000ms\u001b[22m\n\u001b[2m  - waiting for locator('h1, h2').filter({ hasText: /dashboard|panel|inicio/i })\u001b[22m\n\n\n\u001b[0m \u001b[90m 19 |\u001b[39m     \u001b[36mawait\u001b[39m expect(\n \u001b[90m 20 |\u001b[39m       page\u001b[33m.\u001b[39mlocator(\u001b[32m\"h1, h2\"\u001b[39m)\u001b[33m.\u001b[39mfilter({ hasText\u001b[33m:\u001b[39m \u001b[35m/dashboard|panel|inicio/i\u001b[39m })\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 21 |\u001b[39m     )\u001b[33m.\u001b[39mtoBeVisible({ timeout\u001b[33m:\u001b[39m \u001b[35m10000\u001b[39m })\u001b[33m;\u001b[39m\n \u001b[90m    |\u001b[39m       \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 22 |\u001b[39m   })\u001b[33m;\u001b[39m\n \u001b[90m 23 |\u001b[39m\n \u001b[90m 24 |\u001b[39m   \u001b[90m// E2E-NAV-002 | Admin sidebar shows all main links\u001b[39m\u001b[0m\n\u001b[2m    at C:\\Users\\USER\\Documents\\bookly\\booklyapp\\bookly-mock-frontend\\e2e\\smoke\\navigation.smoke.spec.ts:21:7\u001b[22m"
-                        }
-                      ],
+                      "status": "passed",
+                      "duration": 3746,
+                      "errors": [],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2026-02-23T05:12:21.368Z",
+                      "startTime": "2026-02-23T05:19:09.530Z",
                       "annotations": [],
-                      "attachments": [
-                        {
-                          "name": "screenshot",
-                          "contentType": "image/png",
-                          "path": "C:\\Users\\USER\\Documents\\bookly\\booklyapp\\bookly-mock-frontend\\test-results\\navigation.smoke-Navigatio-aeb1c-ard-page-loads-with-content-smoke\\test-failed-1.png"
-                        },
-                        {
-                          "name": "error-context",
-                          "contentType": "text/markdown",
-                          "path": "C:\\Users\\USER\\Documents\\bookly\\booklyapp\\bookly-mock-frontend\\test-results\\navigation.smoke-Navigatio-aeb1c-ard-page-loads-with-content-smoke\\error-context.md"
-                        }
-                      ],
-                      "errorLocation": {
-                        "file": "C:\\Users\\USER\\Documents\\bookly\\booklyapp\\bookly-mock-frontend\\e2e\\smoke\\navigation.smoke.spec.ts",
-                        "column": 7,
-                        "line": 21
-                      }
+                      "attachments": []
                     }
                   ],
-                  "status": "unexpected"
+                  "status": "expected"
                 }
               ],
               "id": "3d08fbc9975ce57ce3bb-282ab30351d58ea80750",
@@ -906,15 +836,15 @@
                   "projectName": "smoke",
                   "results": [
                     {
-                      "workerIndex": 1,
-                      "parallelIndex": 1,
+                      "workerIndex": 2,
+                      "parallelIndex": 2,
                       "status": "passed",
-                      "duration": 3407,
+                      "duration": 3832,
                       "errors": [],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2026-02-23T05:12:24.183Z",
+                      "startTime": "2026-02-23T05:19:09.757Z",
                       "annotations": [],
                       "attachments": []
                     }
@@ -924,7 +854,7 @@
               ],
               "id": "3d08fbc9975ce57ce3bb-85287cf8c41299b5fff2",
               "file": "smoke/navigation.smoke.spec.ts",
-              "line": 25,
+              "line": 27,
               "column": 7
             }
           ]
@@ -932,7 +862,7 @@
         {
           "title": "Navigation Smoke — Estudiante",
           "file": "smoke/navigation.smoke.spec.ts",
-          "line": 37,
+          "line": 39,
           "column": 6,
           "specs": [
             {
@@ -948,15 +878,15 @@
                   "projectName": "smoke",
                   "results": [
                     {
-                      "workerIndex": 2,
-                      "parallelIndex": 2,
+                      "workerIndex": 3,
+                      "parallelIndex": 3,
                       "status": "passed",
-                      "duration": 2565,
+                      "duration": 5480,
                       "errors": [],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2026-02-23T05:12:25.304Z",
+                      "startTime": "2026-02-23T05:19:13.346Z",
                       "annotations": [],
                       "attachments": []
                     }
@@ -966,7 +896,7 @@
               ],
               "id": "3d08fbc9975ce57ce3bb-639df2f0697d314ec23c",
               "file": "smoke/navigation.smoke.spec.ts",
-              "line": 41,
+              "line": 43,
               "column": 7
             }
           ]
@@ -999,15 +929,15 @@
                   "projectName": "smoke",
                   "results": [
                     {
-                      "workerIndex": 0,
-                      "parallelIndex": 0,
+                      "workerIndex": 1,
+                      "parallelIndex": 1,
                       "status": "passed",
-                      "duration": 26341,
+                      "duration": 29872,
                       "errors": [],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2026-02-23T05:12:27.281Z",
+                      "startTime": "2026-02-23T05:19:13.595Z",
                       "annotations": [],
                       "attachments": []
                     }
@@ -1033,15 +963,15 @@
                   "projectName": "smoke",
                   "results": [
                     {
-                      "workerIndex": 1,
-                      "parallelIndex": 1,
+                      "workerIndex": 2,
+                      "parallelIndex": 2,
                       "status": "passed",
-                      "duration": 25937,
+                      "duration": 29785,
                       "errors": [],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2026-02-23T05:12:27.646Z",
+                      "startTime": "2026-02-23T05:19:13.648Z",
                       "annotations": [],
                       "attachments": []
                     }
@@ -1067,15 +997,15 @@
                   "projectName": "smoke",
                   "results": [
                     {
-                      "workerIndex": 2,
-                      "parallelIndex": 2,
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
                       "status": "passed",
-                      "duration": 31140,
+                      "duration": 30616,
                       "errors": [],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2026-02-23T05:12:27.937Z",
+                      "startTime": "2026-02-23T05:19:14.521Z",
                       "annotations": [],
                       "attachments": []
                     }
@@ -1118,15 +1048,15 @@
                   "projectName": "smoke",
                   "results": [
                     {
-                      "workerIndex": 5,
+                      "workerIndex": 3,
                       "parallelIndex": 3,
                       "status": "passed",
-                      "duration": 30421,
+                      "duration": 29087,
                       "errors": [],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2026-02-23T05:12:39.398Z",
+                      "startTime": "2026-02-23T05:19:18.875Z",
                       "annotations": [],
                       "attachments": []
                     }
@@ -1152,15 +1082,15 @@
                   "projectName": "smoke",
                   "results": [
                     {
-                      "workerIndex": 1,
-                      "parallelIndex": 1,
+                      "workerIndex": 2,
+                      "parallelIndex": 2,
                       "status": "passed",
-                      "duration": 48595,
+                      "duration": 22500,
                       "errors": [],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2026-02-23T05:12:53.638Z",
+                      "startTime": "2026-02-23T05:19:43.491Z",
                       "annotations": [],
                       "attachments": []
                     }
@@ -1186,15 +1116,15 @@
                   "projectName": "smoke",
                   "results": [
                     {
-                      "workerIndex": 0,
-                      "parallelIndex": 0,
+                      "workerIndex": 1,
+                      "parallelIndex": 1,
                       "status": "passed",
-                      "duration": 48715,
+                      "duration": 23973,
                       "errors": [],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2026-02-23T05:12:53.694Z",
+                      "startTime": "2026-02-23T05:19:43.560Z",
                       "annotations": [],
                       "attachments": []
                     }
@@ -1220,15 +1150,15 @@
                   "projectName": "smoke",
                   "results": [
                     {
-                      "workerIndex": 2,
-                      "parallelIndex": 2,
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
                       "status": "passed",
-                      "duration": 42704,
+                      "duration": 20430,
                       "errors": [],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2026-02-23T05:12:59.166Z",
+                      "startTime": "2026-02-23T05:19:45.180Z",
                       "annotations": [],
                       "attachments": []
                     }
@@ -1271,15 +1201,15 @@
                   "projectName": "smoke",
                   "results": [
                     {
-                      "workerIndex": 5,
+                      "workerIndex": 3,
                       "parallelIndex": 3,
                       "status": "passed",
-                      "duration": 20317,
+                      "duration": 13695,
                       "errors": [],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2026-02-23T05:13:10.115Z",
+                      "startTime": "2026-02-23T05:19:48.006Z",
                       "annotations": [],
                       "attachments": []
                     }
@@ -1305,15 +1235,15 @@
                   "projectName": "smoke",
                   "results": [
                     {
-                      "workerIndex": 5,
+                      "workerIndex": 3,
                       "parallelIndex": 3,
                       "status": "passed",
-                      "duration": 29358,
+                      "duration": 36893,
                       "errors": [],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2026-02-23T05:13:30.479Z",
+                      "startTime": "2026-02-23T05:20:01.749Z",
                       "annotations": [],
                       "attachments": []
                     }
@@ -1339,15 +1269,15 @@
                   "projectName": "smoke",
                   "results": [
                     {
-                      "workerIndex": 2,
-                      "parallelIndex": 2,
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
                       "status": "passed",
-                      "duration": 17928,
+                      "duration": 29728,
                       "errors": [],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2026-02-23T05:13:41.913Z",
+                      "startTime": "2026-02-23T05:20:05.653Z",
                       "annotations": [],
                       "attachments": []
                     }
@@ -1373,15 +1303,15 @@
                   "projectName": "smoke",
                   "results": [
                     {
-                      "workerIndex": 1,
-                      "parallelIndex": 1,
+                      "workerIndex": 2,
+                      "parallelIndex": 2,
                       "status": "passed",
-                      "duration": 32462,
+                      "duration": 32039,
                       "errors": [],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2026-02-23T05:13:42.298Z",
+                      "startTime": "2026-02-23T05:20:06.055Z",
                       "annotations": [],
                       "attachments": []
                     }
@@ -1424,15 +1354,15 @@
                   "projectName": "smoke",
                   "results": [
                     {
-                      "workerIndex": 0,
-                      "parallelIndex": 0,
+                      "workerIndex": 1,
+                      "parallelIndex": 1,
                       "status": "passed",
-                      "duration": 32271,
+                      "duration": 30503,
                       "errors": [],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2026-02-23T05:13:42.485Z",
+                      "startTime": "2026-02-23T05:20:07.615Z",
                       "annotations": [],
                       "attachments": []
                     }
@@ -1458,15 +1388,15 @@
                   "projectName": "smoke",
                   "results": [
                     {
-                      "workerIndex": 2,
-                      "parallelIndex": 2,
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
                       "status": "passed",
-                      "duration": 15366,
+                      "duration": 3579,
                       "errors": [],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2026-02-23T05:13:59.887Z",
+                      "startTime": "2026-02-23T05:20:35.435Z",
                       "annotations": [],
                       "attachments": []
                     }
@@ -1486,11 +1416,11 @@
   ],
   "errors": [],
   "stats": {
-    "startTime": "2026-02-23T05:10:40.845Z",
-    "duration": 215195.344,
-    "expected": 29,
+    "startTime": "2026-02-23T05:17:21.622Z",
+    "duration": 198238.76200000002,
+    "expected": 31,
     "skipped": 0,
-    "unexpected": 2,
+    "unexpected": 0,
     "flaky": 0
   }
 }
