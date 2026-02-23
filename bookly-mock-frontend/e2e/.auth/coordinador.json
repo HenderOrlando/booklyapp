@@ -2,20 +2,20 @@
   "cookies": [
     {
       "name": "accessToken",
-      "value": "mock-token-user_2-1771820374444",
+      "value": "mock-token-user_2-1771820666882",
       "domain": "localhost",
       "path": "/",
-      "expires": 1771906774.446427,
+      "expires": 1771907066.883657,
       "httpOnly": false,
       "secure": false,
       "sameSite": "Strict"
     },
     {
       "name": "refreshToken",
-      "value": "mock-refresh-user_2-1771820374444",
+      "value": "mock-refresh-user_2-1771820666882",
       "domain": "localhost",
       "path": "/",
-      "expires": 1772425174.446608,
+      "expires": 1772425466.884086,
       "httpOnly": false,
       "secure": false,
       "sameSite": "Strict"
@@ -25,7 +25,7 @@
       "value": "es",
       "domain": "localhost",
       "path": "/",
-      "expires": 1803356374.446872,
+      "expires": 1803356666.884259,
       "httpOnly": false,
       "secure": false,
       "sameSite": "Strict"
@@ -37,7 +37,7 @@
       "localStorage": [
         {
           "name": "accessToken",
-          "value": "mock-token-user_2-1771820374444"
+          "value": "mock-token-user_2-1771820666882"
         },
         {
           "name": "rememberMe",
@@ -45,11 +45,11 @@
         },
         {
           "name": "refreshToken",
-          "value": "mock-refresh-user_2-1771820374444"
+          "value": "mock-refresh-user_2-1771820666882"
         },
         {
           "name": "user",
-          "value": "{\"id\":\"user_2\",\"email\":\"coordinador@ufps.edu.co\",\"username\":\"coordinador\",\"firstName\":\"María\",\"lastName\":\"González\",\"fullName\":\"María González\",\"phoneNumber\":\"+57 301 234 5678\",\"phone\":\"+57 301 234 5678\",\"documentType\":\"CC\",\"documentNumber\":\"0987654321\",\"profilePicture\":\"https://api.dicebear.com/7.x/avataaars/svg?seed=maria\",\"status\":\"ACTIVE\",\"isActive\":true,\"emailVerified\":true,\"isEmailVerified\":true,\"phoneVerified\":true,\"isPhoneVerified\":true,\"twoFactorEnabled\":false,\"roles\":[{\"id\":\"role_2\",\"code\":\"role_2\",\"name\":\"coordinador\",\"displayName\":\"coordinador\",\"description\":\"Coordinador de programa académico\",\"permissions\":[{\"id\":\"perm_5\",\"code\":\"perm_5\",\"name\":\"perm_5\",\"resource\":\"resources\",\"action\":\"read\",\"description\":\"Ver recursos\",\"isSystem\":true},{\"id\":\"perm_6\",\"code\":\"perm_6\",\"name\":\"perm_6\",\"resource\":\"resources\",\"action\":\"create\",\"description\":\"Crear recursos\",\"isSystem\":true},{\"id\":\"perm_7\",\"code\":\"perm_7\",\"name\":\"perm_7\",\"resource\":\"resources\",\"action\":\"update\",\"description\":\"Actualizar recursos\",\"isSystem\":true},{\"id\":\"perm_8\",\"code\":\"perm_8\",\"name\":\"perm_8\",\"resource\":\"resources\",\"action\":\"delete\",\"description\":\"Eliminar recursos\",\"isSystem\":true},{\"id\":\"perm_9\",\"code\":\"perm_9\",\"name\":\"perm_9\",\"resource\":\"reservations\",\"action\":\"read\",\"description\":\"Ver reservas\",\"isSystem\":true},{\"id\":\"perm_10\",\"code\":\"perm_10\",\"name\":\"perm_10\",\"resource\":\"reservations\",\"action\":\"create\",\"description\":\"Crear reservas\",\"isSystem\":true},{\"id\":\"perm_11\",\"code\":\"perm_11\",\"name\":\"perm_11\",\"resource\":\"reservations\",\"action\":\"update\",\"description\":\"Actualizar reservas\",\"isSystem\":true},{\"id\":\"perm_12\",\"code\":\"perm_12\",\"name\":\"perm_12\",\"resource\":\"reservations\",\"action\":\"delete\",\"description\":\"Eliminar reservas\",\"isSystem\":true},{\"id\":\"perm_13\",\"code\":\"perm_13\",\"name\":\"perm_13\",\"resource\":\"approvals\",\"action\":\"manage\",\"description\":\"Gestionar aprobaciones\",\"isSystem\":true},{\"id\":\"perm_14\",\"code\":\"perm_14\",\"name\":\"perm_14\",\"resource\":\"reports\",\"action\":\"read\",\"description\":\"Ver reportes\",\"isSystem\":true},{\"id\":\"perm_15\",\"code\":\"perm_15\",\"name\":\"perm_15\",\"resource\":\"reports\",\"action\":\"export\",\"description\":\"Exportar reportes\",\"isSystem\":true}],\"isSystem\":true,\"createdAt\":\"2024-01-01T00:00:00.000Z\",\"updatedAt\":\"2024-01-01T00:00:00.000Z\"}],\"permissions\":[{\"id\":\"perm_5\",\"code\":\"perm_5\",\"name\":\"perm_5\",\"resource\":\"resources\",\"action\":\"read\",\"description\":\"Ver recursos\",\"isSystem\":true},{\"id\":\"perm_6\",\"code\":\"perm_6\",\"name\":\"perm_6\",\"resource\":\"resources\",\"action\":\"create\",\"description\":\"Crear recursos\",\"isSystem\":true},{\"id\":\"perm_7\",\"code\":\"perm_7\",\"name\":\"perm_7\",\"resource\":\"resources\",\"action\":\"update\",\"description\":\"Actualizar recursos\",\"isSystem\":true},{\"id\":\"perm_8\",\"code\":\"perm_8\",\"name\":\"perm_8\",\"resource\":\"resources\",\"action\":\"delete\",\"description\":\"Eliminar recursos\",\"isSystem\":true},{\"id\":\"perm_9\",\"code\":\"perm_9\",\"name\":\"perm_9\",\"resource\":\"reservations\",\"action\":\"read\",\"description\":\"Ver reservas\",\"isSystem\":true},{\"id\":\"perm_10\",\"code\":\"perm_10\",\"name\":\"perm_10\",\"resource\":\"reservations\",\"action\":\"create\",\"description\":\"Crear reservas\",\"isSystem\":true},{\"id\":\"perm_11\",\"code\":\"perm_11\",\"name\":\"perm_11\",\"resource\":\"reservations\",\"action\":\"update\",\"description\":\"Actualizar reservas\",\"isSystem\":true},{\"id\":\"perm_12\",\"code\":\"perm_12\",\"name\":\"perm_12\",\"resource\":\"reservations\",\"action\":\"delete\",\"description\":\"Eliminar reservas\",\"isSystem\":true},{\"id\":\"perm_13\",\"code\":\"perm_13\",\"name\":\"perm_13\",\"resource\":\"approvals\",\"action\":\"manage\",\"description\":\"Gestionar aprobaciones\",\"isSystem\":true},{\"id\":\"perm_14\",\"code\":\"perm_14\",\"name\":\"perm_14\",\"resource\":\"reports\",\"action\":\"read\",\"description\":\"Ver reportes\",\"isSystem\":true},{\"id\":\"perm_15\",\"code\":\"perm_15\",\"name\":\"perm_15\",\"resource\":\"reports\",\"action\":\"export\",\"description\":\"Exportar reportes\",\"isSystem\":true}],\"preferences\":{\"language\":\"es\",\"theme\":\"system\",\"notifications\":{\"email\":true,\"push\":true,\"sms\":true},\"timezone\":\"America/Bogota\"},\"lastLoginAt\":\"2026-02-23T03:19:33.575Z\",\"createdAt\":\"2024-01-15T00:00:00.000Z\",\"updatedAt\":\"2026-02-23T04:19:33.575Z\"}"
+          "value": "{\"id\":\"user_2\",\"email\":\"coordinador@ufps.edu.co\",\"username\":\"coordinador\",\"firstName\":\"María\",\"lastName\":\"González\",\"fullName\":\"María González\",\"phoneNumber\":\"+57 301 234 5678\",\"phone\":\"+57 301 234 5678\",\"documentType\":\"CC\",\"documentNumber\":\"0987654321\",\"profilePicture\":\"https://api.dicebear.com/7.x/avataaars/svg?seed=maria\",\"status\":\"ACTIVE\",\"isActive\":true,\"emailVerified\":true,\"isEmailVerified\":true,\"phoneVerified\":true,\"isPhoneVerified\":true,\"twoFactorEnabled\":false,\"roles\":[{\"id\":\"role_2\",\"code\":\"role_2\",\"name\":\"coordinador\",\"displayName\":\"coordinador\",\"description\":\"Coordinador de programa académico\",\"permissions\":[{\"id\":\"perm_5\",\"code\":\"perm_5\",\"name\":\"perm_5\",\"resource\":\"resources\",\"action\":\"read\",\"description\":\"Ver recursos\",\"isSystem\":true},{\"id\":\"perm_6\",\"code\":\"perm_6\",\"name\":\"perm_6\",\"resource\":\"resources\",\"action\":\"create\",\"description\":\"Crear recursos\",\"isSystem\":true},{\"id\":\"perm_7\",\"code\":\"perm_7\",\"name\":\"perm_7\",\"resource\":\"resources\",\"action\":\"update\",\"description\":\"Actualizar recursos\",\"isSystem\":true},{\"id\":\"perm_8\",\"code\":\"perm_8\",\"name\":\"perm_8\",\"resource\":\"resources\",\"action\":\"delete\",\"description\":\"Eliminar recursos\",\"isSystem\":true},{\"id\":\"perm_9\",\"code\":\"perm_9\",\"name\":\"perm_9\",\"resource\":\"reservations\",\"action\":\"read\",\"description\":\"Ver reservas\",\"isSystem\":true},{\"id\":\"perm_10\",\"code\":\"perm_10\",\"name\":\"perm_10\",\"resource\":\"reservations\",\"action\":\"create\",\"description\":\"Crear reservas\",\"isSystem\":true},{\"id\":\"perm_11\",\"code\":\"perm_11\",\"name\":\"perm_11\",\"resource\":\"reservations\",\"action\":\"update\",\"description\":\"Actualizar reservas\",\"isSystem\":true},{\"id\":\"perm_12\",\"code\":\"perm_12\",\"name\":\"perm_12\",\"resource\":\"reservations\",\"action\":\"delete\",\"description\":\"Eliminar reservas\",\"isSystem\":true},{\"id\":\"perm_13\",\"code\":\"perm_13\",\"name\":\"perm_13\",\"resource\":\"approvals\",\"action\":\"manage\",\"description\":\"Gestionar aprobaciones\",\"isSystem\":true},{\"id\":\"perm_14\",\"code\":\"perm_14\",\"name\":\"perm_14\",\"resource\":\"reports\",\"action\":\"read\",\"description\":\"Ver reportes\",\"isSystem\":true},{\"id\":\"perm_15\",\"code\":\"perm_15\",\"name\":\"perm_15\",\"resource\":\"reports\",\"action\":\"export\",\"description\":\"Exportar reportes\",\"isSystem\":true}],\"isSystem\":true,\"createdAt\":\"2024-01-01T00:00:00.000Z\",\"updatedAt\":\"2024-01-01T00:00:00.000Z\"}],\"permissions\":[{\"id\":\"perm_5\",\"code\":\"perm_5\",\"name\":\"perm_5\",\"resource\":\"resources\",\"action\":\"read\",\"description\":\"Ver recursos\",\"isSystem\":true},{\"id\":\"perm_6\",\"code\":\"perm_6\",\"name\":\"perm_6\",\"resource\":\"resources\",\"action\":\"create\",\"description\":\"Crear recursos\",\"isSystem\":true},{\"id\":\"perm_7\",\"code\":\"perm_7\",\"name\":\"perm_7\",\"resource\":\"resources\",\"action\":\"update\",\"description\":\"Actualizar recursos\",\"isSystem\":true},{\"id\":\"perm_8\",\"code\":\"perm_8\",\"name\":\"perm_8\",\"resource\":\"resources\",\"action\":\"delete\",\"description\":\"Eliminar recursos\",\"isSystem\":true},{\"id\":\"perm_9\",\"code\":\"perm_9\",\"name\":\"perm_9\",\"resource\":\"reservations\",\"action\":\"read\",\"description\":\"Ver reservas\",\"isSystem\":true},{\"id\":\"perm_10\",\"code\":\"perm_10\",\"name\":\"perm_10\",\"resource\":\"reservations\",\"action\":\"create\",\"description\":\"Crear reservas\",\"isSystem\":true},{\"id\":\"perm_11\",\"code\":\"perm_11\",\"name\":\"perm_11\",\"resource\":\"reservations\",\"action\":\"update\",\"description\":\"Actualizar reservas\",\"isSystem\":true},{\"id\":\"perm_12\",\"code\":\"perm_12\",\"name\":\"perm_12\",\"resource\":\"reservations\",\"action\":\"delete\",\"description\":\"Eliminar reservas\",\"isSystem\":true},{\"id\":\"perm_13\",\"code\":\"perm_13\",\"name\":\"perm_13\",\"resource\":\"approvals\",\"action\":\"manage\",\"description\":\"Gestionar aprobaciones\",\"isSystem\":true},{\"id\":\"perm_14\",\"code\":\"perm_14\",\"name\":\"perm_14\",\"resource\":\"reports\",\"action\":\"read\",\"description\":\"Ver reportes\",\"isSystem\":true},{\"id\":\"perm_15\",\"code\":\"perm_15\",\"name\":\"perm_15\",\"resource\":\"reports\",\"action\":\"export\",\"description\":\"Exportar reportes\",\"isSystem\":true}],\"preferences\":{\"language\":\"es\",\"theme\":\"system\",\"notifications\":{\"email\":true,\"push\":true,\"sms\":true},\"timezone\":\"America/Bogota\"},\"lastLoginAt\":\"2026-02-23T03:24:25.977Z\",\"createdAt\":\"2024-01-15T00:00:00.000Z\",\"updatedAt\":\"2026-02-23T04:24:25.977Z\"}"
         }
       ]
     }

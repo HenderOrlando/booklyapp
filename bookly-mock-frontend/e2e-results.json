@@ -199,6 +199,190 @@
   },
   "suites": [
     {
+      "title": "smoke\\approvals.smoke.spec.ts",
+      "file": "smoke/approvals.smoke.spec.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [],
+      "suites": [
+        {
+          "title": "Approvals Smoke",
+          "file": "smoke/approvals.smoke.spec.ts",
+          "line": 12,
+          "column": 6,
+          "specs": [
+            {
+              "title": "displays approvals list page",
+              "ok": false,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "smoke",
+                  "projectName": "smoke",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "timedOut",
+                      "duration": 31000,
+                      "error": {
+                        "message": "\u001b[31mTest timeout of 30000ms exceeded.\u001b[39m",
+                        "stack": "\u001b[31mTest timeout of 30000ms exceeded.\u001b[39m"
+                      },
+                      "errors": [
+                        {
+                          "message": "\u001b[31mTest timeout of 30000ms exceeded.\u001b[39m"
+                        }
+                      ],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-02-23T04:24:38.774Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "screenshot",
+                          "contentType": "image/png",
+                          "path": "C:\\Users\\USER\\Documents\\bookly\\booklyapp\\bookly-mock-frontend\\test-results\\approvals.smoke-Approvals-Smoke-displays-approvals-list-page-smoke\\test-failed-1.png"
+                        },
+                        {
+                          "name": "error-context",
+                          "contentType": "text/markdown",
+                          "path": "C:\\Users\\USER\\Documents\\bookly\\booklyapp\\bookly-mock-frontend\\test-results\\approvals.smoke-Approvals-Smoke-displays-approvals-list-page-smoke\\error-context.md"
+                        }
+                      ]
+                    }
+                  ],
+                  "status": "unexpected"
+                }
+              ],
+              "id": "095bd68ffa796db60c39-f3e1b1c7a14524ceb3c5",
+              "file": "smoke/approvals.smoke.spec.ts",
+              "line": 16,
+              "column": 7
+            },
+            {
+              "title": "navigates to approval detail",
+              "ok": false,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "smoke",
+                  "projectName": "smoke",
+                  "results": [
+                    {
+                      "workerIndex": 1,
+                      "parallelIndex": 1,
+                      "status": "timedOut",
+                      "duration": 30631,
+                      "error": {
+                        "message": "\u001b[31mTest timeout of 30000ms exceeded.\u001b[39m",
+                        "stack": "\u001b[31mTest timeout of 30000ms exceeded.\u001b[39m"
+                      },
+                      "errors": [
+                        {
+                          "message": "\u001b[31mTest timeout of 30000ms exceeded.\u001b[39m"
+                        }
+                      ],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-02-23T04:24:38.926Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "screenshot",
+                          "contentType": "image/png",
+                          "path": "C:\\Users\\USER\\Documents\\bookly\\booklyapp\\bookly-mock-frontend\\test-results\\approvals.smoke-Approvals-Smoke-navigates-to-approval-detail-smoke\\test-failed-1.png"
+                        },
+                        {
+                          "name": "error-context",
+                          "contentType": "text/markdown",
+                          "path": "C:\\Users\\USER\\Documents\\bookly\\booklyapp\\bookly-mock-frontend\\test-results\\approvals.smoke-Approvals-Smoke-navigates-to-approval-detail-smoke\\error-context.md"
+                        }
+                      ]
+                    }
+                  ],
+                  "status": "unexpected"
+                }
+              ],
+              "id": "095bd68ffa796db60c39-9277357377a43c5efdb2",
+              "file": "smoke/approvals.smoke.spec.ts",
+              "line": 27,
+              "column": 7
+            },
+            {
+              "title": "approval detail shows action buttons",
+              "ok": false,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "smoke",
+                  "projectName": "smoke",
+                  "results": [
+                    {
+                      "workerIndex": 2,
+                      "parallelIndex": 2,
+                      "status": "timedOut",
+                      "duration": 30738,
+                      "error": {
+                        "message": "\u001b[31mTest timeout of 30000ms exceeded.\u001b[39m",
+                        "stack": "\u001b[31mTest timeout of 30000ms exceeded.\u001b[39m"
+                      },
+                      "errors": [
+                        {
+                          "message": "\u001b[31mTest timeout of 30000ms exceeded.\u001b[39m"
+                        },
+                        {
+                          "location": {
+                            "file": "C:\\Users\\USER\\Documents\\bookly\\booklyapp\\bookly-mock-frontend\\e2e\\smoke\\approvals.smoke.spec.ts",
+                            "column": 45,
+                            "line": 52
+                          },
+                          "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBe\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m) // Object.is equality\u001b[22m\n\nExpected: \u001b[32mtrue\u001b[39m\nReceived: \u001b[31mfalse\u001b[39m\n\n\u001b[0m \u001b[90m 50 |\u001b[39m     \u001b[36mconst\u001b[39m rejectVisible \u001b[33m=\u001b[39m \u001b[36mawait\u001b[39m rejectBtn\u001b[33m.\u001b[39misVisible()\u001b[33m.\u001b[39m\u001b[36mcatch\u001b[39m(() \u001b[33m=>\u001b[39m \u001b[36mfalse\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m 51 |\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 52 |\u001b[39m     expect(approveVisible \u001b[33m||\u001b[39m rejectVisible)\u001b[33m.\u001b[39mtoBe(\u001b[36mtrue\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m    |\u001b[39m                                             \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 53 |\u001b[39m   })\u001b[33m;\u001b[39m\n \u001b[90m 54 |\u001b[39m })\u001b[33m;\u001b[39m\n \u001b[90m 55 |\u001b[39m\u001b[0m\n\u001b[2m    at C:\\Users\\USER\\Documents\\bookly\\booklyapp\\bookly-mock-frontend\\e2e\\smoke\\approvals.smoke.spec.ts:52:45\u001b[22m"
+                        }
+                      ],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-02-23T04:24:38.891Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "screenshot",
+                          "contentType": "image/png",
+                          "path": "C:\\Users\\USER\\Documents\\bookly\\booklyapp\\bookly-mock-frontend\\test-results\\approvals.smoke-Approvals--60306-detail-shows-action-buttons-smoke\\test-failed-1.png"
+                        },
+                        {
+                          "name": "error-context",
+                          "contentType": "text/markdown",
+                          "path": "C:\\Users\\USER\\Documents\\bookly\\booklyapp\\bookly-mock-frontend\\test-results\\approvals.smoke-Approvals--60306-detail-shows-action-buttons-smoke\\error-context.md"
+                        }
+                      ]
+                    }
+                  ],
+                  "status": "unexpected"
+                }
+              ],
+              "id": "095bd68ffa796db60c39-ae3f86dbf6bc0607598a",
+              "file": "smoke/approvals.smoke.spec.ts",
+              "line": 39,
+              "column": 7
+            }
+          ]
+        }
+      ]
+    },
+    {
       "title": "smoke\\auth.smoke.spec.ts",
       "file": "smoke/auth.smoke.spec.ts",
       "column": 0,
@@ -224,34 +408,31 @@
                   "projectName": "smoke",
                   "results": [
                     {
-                      "workerIndex": 0,
-                      "parallelIndex": 0,
-                      "status": "failed",
-                      "duration": 19324,
+                      "workerIndex": 3,
+                      "parallelIndex": 3,
+                      "status": "timedOut",
+                      "duration": 30403,
                       "error": {
-                        "message": "TimeoutError: page.waitForURL: Timeout 15000ms exceeded.\n=========================== logs ===========================\nwaiting for navigation until \"load\"\n============================================================",
-                        "stack": "TimeoutError: page.waitForURL: Timeout 15000ms exceeded.\n=========================== logs ===========================\nwaiting for navigation until \"load\"\n============================================================\n    at C:\\Users\\USER\\Documents\\bookly\\booklyapp\\bookly-mock-frontend\\e2e\\smoke\\auth.smoke.spec.ts:30:16",
-                        "location": {
-                          "file": "C:\\Users\\USER\\Documents\\bookly\\booklyapp\\bookly-mock-frontend\\e2e\\smoke\\auth.smoke.spec.ts",
-                          "column": 16,
-                          "line": 30
-                        },
-                        "snippet": "\u001b[0m \u001b[90m 28 |\u001b[39m     \u001b[36mawait\u001b[39m loginPage\u001b[33m.\u001b[39mlogin(\u001b[33mTEST_USERS\u001b[39m\u001b[33m.\u001b[39madmin\u001b[33m.\u001b[39memail\u001b[33m,\u001b[39m \u001b[33mTEST_USERS\u001b[39m\u001b[33m.\u001b[39madmin\u001b[33m.\u001b[39mpassword)\u001b[33m;\u001b[39m\n \u001b[90m 29 |\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 30 |\u001b[39m     \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mwaitForURL(\u001b[35m/\\/es\\/recursos\\?from=auth-redirect/\u001b[39m\u001b[33m,\u001b[39m {\n \u001b[90m    |\u001b[39m                \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 31 |\u001b[39m       timeout\u001b[33m:\u001b[39m \u001b[35m15000\u001b[39m\u001b[33m,\u001b[39m\n \u001b[90m 32 |\u001b[39m     })\u001b[33m;\u001b[39m\n \u001b[90m 33 |\u001b[39m     \u001b[36mawait\u001b[39m expect(page)\u001b[33m.\u001b[39mtoHaveURL(\u001b[35m/\\/es\\/recursos\\?from=auth-redirect/\u001b[39m)\u001b[33m;\u001b[39m\u001b[0m"
+                        "message": "\u001b[31mTest timeout of 30000ms exceeded.\u001b[39m",
+                        "stack": "\u001b[31mTest timeout of 30000ms exceeded.\u001b[39m"
                       },
                       "errors": [
+                        {
+                          "message": "\u001b[31mTest timeout of 30000ms exceeded.\u001b[39m"
+                        },
                         {
                           "location": {
                             "file": "C:\\Users\\USER\\Documents\\bookly\\booklyapp\\bookly-mock-frontend\\e2e\\smoke\\auth.smoke.spec.ts",
                             "column": 16,
-                            "line": 30
+                            "line": 32
                           },
-                          "message": "TimeoutError: page.waitForURL: Timeout 15000ms exceeded.\n=========================== logs ===========================\nwaiting for navigation until \"load\"\n============================================================\n\n\u001b[0m \u001b[90m 28 |\u001b[39m     \u001b[36mawait\u001b[39m loginPage\u001b[33m.\u001b[39mlogin(\u001b[33mTEST_USERS\u001b[39m\u001b[33m.\u001b[39madmin\u001b[33m.\u001b[39memail\u001b[33m,\u001b[39m \u001b[33mTEST_USERS\u001b[39m\u001b[33m.\u001b[39madmin\u001b[33m.\u001b[39mpassword)\u001b[33m;\u001b[39m\n \u001b[90m 29 |\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 30 |\u001b[39m     \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mwaitForURL(\u001b[35m/\\/es\\/recursos\\?from=auth-redirect/\u001b[39m\u001b[33m,\u001b[39m {\n \u001b[90m    |\u001b[39m                \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 31 |\u001b[39m       timeout\u001b[33m:\u001b[39m \u001b[35m15000\u001b[39m\u001b[33m,\u001b[39m\n \u001b[90m 32 |\u001b[39m     })\u001b[33m;\u001b[39m\n \u001b[90m 33 |\u001b[39m     \u001b[36mawait\u001b[39m expect(page)\u001b[33m.\u001b[39mtoHaveURL(\u001b[35m/\\/es\\/recursos\\?from=auth-redirect/\u001b[39m)\u001b[33m;\u001b[39m\u001b[0m\n\u001b[2m    at C:\\Users\\USER\\Documents\\bookly\\booklyapp\\bookly-mock-frontend\\e2e\\smoke\\auth.smoke.spec.ts:30:16\u001b[22m"
+                          "message": "Error: page.waitForURL: Test timeout of 30000ms exceeded.\n=========================== logs ===========================\nwaiting for navigation until \"commit\"\n============================================================\n\n\u001b[0m \u001b[90m 30 |\u001b[39m     \u001b[90m// After login, AuthContext redirects via router.replace to the callback URL.\u001b[39m\n \u001b[90m 31 |\u001b[39m     \u001b[90m// Use 'commit' because the full load may take longer on protected routes.\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 32 |\u001b[39m     \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mwaitForURL(\u001b[35m/\\/es\\/(recursos|dashboard)/\u001b[39m\u001b[33m,\u001b[39m {\n \u001b[90m    |\u001b[39m                \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 33 |\u001b[39m       timeout\u001b[33m:\u001b[39m \u001b[35m20000\u001b[39m\u001b[33m,\u001b[39m\n \u001b[90m 34 |\u001b[39m       waitUntil\u001b[33m:\u001b[39m \u001b[32m\"commit\"\u001b[39m\u001b[33m,\u001b[39m\n \u001b[90m 35 |\u001b[39m     })\u001b[33m;\u001b[39m\u001b[0m\n\u001b[2m    at C:\\Users\\USER\\Documents\\bookly\\booklyapp\\bookly-mock-frontend\\e2e\\smoke\\auth.smoke.spec.ts:32:16\u001b[22m"
                         }
                       ],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2026-02-23T04:19:45.615Z",
+                      "startTime": "2026-02-23T04:24:39.068Z",
                       "annotations": [],
                       "attachments": [
                         {
@@ -264,12 +445,7 @@
                           "contentType": "text/markdown",
                           "path": "C:\\Users\\USER\\Documents\\bookly\\booklyapp\\bookly-mock-frontend\\test-results\\auth.smoke-Auth-Smoke-rest-37b86-in-when-callback-is-present-smoke\\error-context.md"
                         }
-                      ],
-                      "errorLocation": {
-                        "file": "C:\\Users\\USER\\Documents\\bookly\\booklyapp\\bookly-mock-frontend\\e2e\\smoke\\auth.smoke.spec.ts",
-                        "column": 16,
-                        "line": 30
-                      }
+                      ]
                     }
                   ],
                   "status": "unexpected"
@@ -282,7 +458,7 @@
             },
             {
               "title": "redirects to dashboard after direct login without callback",
-              "ok": true,
+              "ok": false,
               "tags": [],
               "tests": [
                 {
@@ -293,25 +469,60 @@
                   "projectName": "smoke",
                   "results": [
                     {
-                      "workerIndex": 1,
-                      "parallelIndex": 1,
-                      "status": "passed",
-                      "duration": 18915,
-                      "errors": [],
+                      "workerIndex": 4,
+                      "parallelIndex": 4,
+                      "status": "failed",
+                      "duration": 29406,
+                      "error": {
+                        "message": "TimeoutError: page.waitForURL: Timeout 15000ms exceeded.\n=========================== logs ===========================\nwaiting for navigation until \"load\"\n============================================================",
+                        "stack": "TimeoutError: page.waitForURL: Timeout 15000ms exceeded.\n=========================== logs ===========================\nwaiting for navigation until \"load\"\n============================================================\n    at C:\\Users\\USER\\Documents\\bookly\\booklyapp\\bookly-mock-frontend\\e2e\\smoke\\auth.smoke.spec.ts:47:16",
+                        "location": {
+                          "file": "C:\\Users\\USER\\Documents\\bookly\\booklyapp\\bookly-mock-frontend\\e2e\\smoke\\auth.smoke.spec.ts",
+                          "column": 16,
+                          "line": 47
+                        },
+                        "snippet": "\u001b[0m \u001b[90m 45 |\u001b[39m     \u001b[36mawait\u001b[39m loginPage\u001b[33m.\u001b[39mlogin(\u001b[33mTEST_USERS\u001b[39m\u001b[33m.\u001b[39madmin\u001b[33m.\u001b[39memail\u001b[33m,\u001b[39m \u001b[33mTEST_USERS\u001b[39m\u001b[33m.\u001b[39madmin\u001b[33m.\u001b[39mpassword)\u001b[33m;\u001b[39m\n \u001b[90m 46 |\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 47 |\u001b[39m     \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mwaitForURL(\u001b[35m/\\/es\\/dashboard/\u001b[39m\u001b[33m,\u001b[39m { timeout\u001b[33m:\u001b[39m \u001b[35m15000\u001b[39m })\u001b[33m;\u001b[39m\n \u001b[90m    |\u001b[39m                \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 48 |\u001b[39m     \u001b[36mawait\u001b[39m expect(page)\u001b[33m.\u001b[39mtoHaveURL(\u001b[35m/\\/es\\/dashboard/\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m 49 |\u001b[39m   })\u001b[33m;\u001b[39m\n \u001b[90m 50 |\u001b[39m\u001b[0m"
+                      },
+                      "errors": [
+                        {
+                          "location": {
+                            "file": "C:\\Users\\USER\\Documents\\bookly\\booklyapp\\bookly-mock-frontend\\e2e\\smoke\\auth.smoke.spec.ts",
+                            "column": 16,
+                            "line": 47
+                          },
+                          "message": "TimeoutError: page.waitForURL: Timeout 15000ms exceeded.\n=========================== logs ===========================\nwaiting for navigation until \"load\"\n============================================================\n\n\u001b[0m \u001b[90m 45 |\u001b[39m     \u001b[36mawait\u001b[39m loginPage\u001b[33m.\u001b[39mlogin(\u001b[33mTEST_USERS\u001b[39m\u001b[33m.\u001b[39madmin\u001b[33m.\u001b[39memail\u001b[33m,\u001b[39m \u001b[33mTEST_USERS\u001b[39m\u001b[33m.\u001b[39madmin\u001b[33m.\u001b[39mpassword)\u001b[33m;\u001b[39m\n \u001b[90m 46 |\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 47 |\u001b[39m     \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mwaitForURL(\u001b[35m/\\/es\\/dashboard/\u001b[39m\u001b[33m,\u001b[39m { timeout\u001b[33m:\u001b[39m \u001b[35m15000\u001b[39m })\u001b[33m;\u001b[39m\n \u001b[90m    |\u001b[39m                \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 48 |\u001b[39m     \u001b[36mawait\u001b[39m expect(page)\u001b[33m.\u001b[39mtoHaveURL(\u001b[35m/\\/es\\/dashboard/\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m 49 |\u001b[39m   })\u001b[33m;\u001b[39m\n \u001b[90m 50 |\u001b[39m\u001b[0m\n\u001b[2m    at C:\\Users\\USER\\Documents\\bookly\\booklyapp\\bookly-mock-frontend\\e2e\\smoke\\auth.smoke.spec.ts:47:16\u001b[22m"
+                        }
+                      ],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2026-02-23T04:19:45.315Z",
+                      "startTime": "2026-02-23T04:24:39.103Z",
                       "annotations": [],
-                      "attachments": []
+                      "attachments": [
+                        {
+                          "name": "screenshot",
+                          "contentType": "image/png",
+                          "path": "C:\\Users\\USER\\Documents\\bookly\\booklyapp\\bookly-mock-frontend\\test-results\\auth.smoke-Auth-Smoke-redi-df07a-rect-login-without-callback-smoke\\test-failed-1.png"
+                        },
+                        {
+                          "name": "error-context",
+                          "contentType": "text/markdown",
+                          "path": "C:\\Users\\USER\\Documents\\bookly\\booklyapp\\bookly-mock-frontend\\test-results\\auth.smoke-Auth-Smoke-redi-df07a-rect-login-without-callback-smoke\\error-context.md"
+                        }
+                      ],
+                      "errorLocation": {
+                        "file": "C:\\Users\\USER\\Documents\\bookly\\booklyapp\\bookly-mock-frontend\\e2e\\smoke\\auth.smoke.spec.ts",
+                        "column": 16,
+                        "line": 47
+                      }
                     }
                   ],
-                  "status": "expected"
+                  "status": "unexpected"
                 }
               ],
               "id": "6d5c41464ee763695a58-fd26e0533fd8267e183a",
               "file": "smoke/auth.smoke.spec.ts",
-              "line": 37,
+              "line": 39,
               "column": 7
             },
             {
@@ -327,15 +538,15 @@
                   "projectName": "smoke",
                   "results": [
                     {
-                      "workerIndex": 2,
-                      "parallelIndex": 2,
+                      "workerIndex": 5,
+                      "parallelIndex": 5,
                       "status": "passed",
-                      "duration": 18933,
+                      "duration": 13326,
                       "errors": [],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2026-02-23T04:19:45.357Z",
+                      "startTime": "2026-02-23T04:24:38.879Z",
                       "annotations": [],
                       "attachments": []
                     }
@@ -345,7 +556,7 @@
               ],
               "id": "6d5c41464ee763695a58-9b1f7ce6660f17a0dd71",
               "file": "smoke/auth.smoke.spec.ts",
-              "line": 50,
+              "line": 52,
               "column": 7
             },
             {
@@ -361,15 +572,15 @@
                   "projectName": "smoke",
                   "results": [
                     {
-                      "workerIndex": 3,
-                      "parallelIndex": 3,
+                      "workerIndex": 6,
+                      "parallelIndex": 6,
                       "status": "passed",
-                      "duration": 5018,
+                      "duration": 5093,
                       "errors": [],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2026-02-23T04:19:45.706Z",
+                      "startTime": "2026-02-23T04:24:38.930Z",
                       "annotations": [],
                       "attachments": []
                     }
@@ -379,7 +590,7 @@
               ],
               "id": "6d5c41464ee763695a58-4c6b061f4c0b41486f75",
               "file": "smoke/auth.smoke.spec.ts",
-              "line": 60,
+              "line": 62,
               "column": 7
             },
             {
@@ -395,15 +606,15 @@
                   "projectName": "smoke",
                   "results": [
                     {
-                      "workerIndex": 4,
-                      "parallelIndex": 4,
+                      "workerIndex": 7,
+                      "parallelIndex": 7,
                       "status": "passed",
-                      "duration": 4744,
+                      "duration": 14304,
                       "errors": [],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2026-02-23T04:19:45.437Z",
+                      "startTime": "2026-02-23T04:24:39.079Z",
                       "annotations": [],
                       "attachments": []
                     }
@@ -413,7 +624,7 @@
               ],
               "id": "6d5c41464ee763695a58-0c1e4bd734ec737c5fa9",
               "file": "smoke/auth.smoke.spec.ts",
-              "line": 69,
+              "line": 71,
               "column": 7
             },
             {
@@ -429,15 +640,15 @@
                   "projectName": "smoke",
                   "results": [
                     {
-                      "workerIndex": 5,
-                      "parallelIndex": 5,
+                      "workerIndex": 6,
+                      "parallelIndex": 6,
                       "status": "passed",
-                      "duration": 3988,
+                      "duration": 8981,
                       "errors": [],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2026-02-23T04:19:45.576Z",
+                      "startTime": "2026-02-23T04:24:44.451Z",
                       "annotations": [],
                       "attachments": []
                     }
@@ -447,12 +658,79 @@
               ],
               "id": "6d5c41464ee763695a58-14b04abf9b57a02003b3",
               "file": "smoke/auth.smoke.spec.ts",
-              "line": 84,
+              "line": 86,
               "column": 7
             },
             {
               "title": "can navigate to register page from login",
-              "ok": true,
+              "ok": false,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "smoke",
+                  "projectName": "smoke",
+                  "results": [
+                    {
+                      "workerIndex": 5,
+                      "parallelIndex": 5,
+                      "status": "timedOut",
+                      "duration": 40118,
+                      "error": {
+                        "message": "\u001b[31mTest timeout of 30000ms exceeded.\u001b[39m",
+                        "stack": "\u001b[31mTest timeout of 30000ms exceeded.\u001b[39m"
+                      },
+                      "errors": [
+                        {
+                          "message": "\u001b[31mTest timeout of 30000ms exceeded.\u001b[39m"
+                        },
+                        {
+                          "location": {
+                            "file": "C:\\Users\\USER\\Documents\\bookly\\booklyapp\\bookly-mock-frontend\\e2e\\smoke\\auth.smoke.spec.ts",
+                            "column": 26,
+                            "line": 99
+                          },
+                          "message": "Error: expect.toHaveURL: Target page, context or browser has been closed\n\n\u001b[0m \u001b[90m  97 |\u001b[39m     \u001b[36mif\u001b[39m (\u001b[36mawait\u001b[39m loginPage\u001b[33m.\u001b[39mregisterLink\u001b[33m.\u001b[39misVisible()) {\n \u001b[90m  98 |\u001b[39m       \u001b[36mawait\u001b[39m loginPage\u001b[33m.\u001b[39mregisterLink\u001b[33m.\u001b[39mclick()\u001b[33m;\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m  99 |\u001b[39m       \u001b[36mawait\u001b[39m expect(page)\u001b[33m.\u001b[39mtoHaveURL(\u001b[35m/register/\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m     |\u001b[39m                          \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 100 |\u001b[39m     }\n \u001b[90m 101 |\u001b[39m   })\u001b[33m;\u001b[39m\n \u001b[90m 102 |\u001b[39m })\u001b[33m;\u001b[39m\u001b[0m\n\u001b[2m    at C:\\Users\\USER\\Documents\\bookly\\booklyapp\\bookly-mock-frontend\\e2e\\smoke\\auth.smoke.spec.ts:99:26\u001b[22m"
+                        }
+                      ],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-02-23T04:24:52.595Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "unexpected"
+                }
+              ],
+              "id": "6d5c41464ee763695a58-bf27e710c94ac34c74a8",
+              "file": "smoke/auth.smoke.spec.ts",
+              "line": 93,
+              "column": 7
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "title": "smoke\\data-config.smoke.spec.ts",
+      "file": "smoke/data-config.smoke.spec.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [],
+      "suites": [
+        {
+          "title": "Data configuration smoke",
+          "file": "smoke/data-config.smoke.spec.ts",
+          "line": 9,
+          "column": 6,
+          "specs": [
+            {
+              "title": "validates MOCK / SERVER+GATEWAY / SERVER+DIRECTO matrix",
+              "ok": false,
               "tags": [],
               "tests": [
                 {
@@ -465,23 +743,50 @@
                     {
                       "workerIndex": 6,
                       "parallelIndex": 6,
-                      "status": "passed",
-                      "duration": 20881,
-                      "errors": [],
+                      "status": "timedOut",
+                      "duration": 31880,
+                      "error": {
+                        "message": "\u001b[31mTest timeout of 30000ms exceeded.\u001b[39m",
+                        "stack": "\u001b[31mTest timeout of 30000ms exceeded.\u001b[39m"
+                      },
+                      "errors": [
+                        {
+                          "message": "\u001b[31mTest timeout of 30000ms exceeded.\u001b[39m"
+                        },
+                        {
+                          "location": {
+                            "file": "C:\\Users\\USER\\Documents\\bookly\\booklyapp\\bookly-mock-frontend\\e2e\\smoke\\data-config.smoke.spec.ts",
+                            "column": 16,
+                            "line": 15
+                          },
+                          "message": "Error: page.goto: Test timeout of 30000ms exceeded.\nCall log:\n\u001b[2m  - navigating to \"http://localhost:4201/es/dashboard\", waiting until \"load\"\u001b[22m\n\n\n\u001b[0m \u001b[90m 13 |\u001b[39m     page\u001b[33m,\u001b[39m\n \u001b[90m 14 |\u001b[39m   }) \u001b[33m=>\u001b[39m {\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 15 |\u001b[39m     \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mgoto(\u001b[32m\"/es/dashboard\"\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m    |\u001b[39m                \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 16 |\u001b[39m\n \u001b[90m 17 |\u001b[39m     \u001b[36mawait\u001b[39m openDataConfigPanel(page)\u001b[33m;\u001b[39m\n \u001b[90m 18 |\u001b[39m     \u001b[36mawait\u001b[39m expect(page\u001b[33m.\u001b[39mgetByTestId(\u001b[32m\"data-config-mode-btn\"\u001b[39m))\u001b[33m.\u001b[39mtoContainText(\u001b[0m\n\u001b[2m    at C:\\Users\\USER\\Documents\\bookly\\booklyapp\\bookly-mock-frontend\\e2e\\smoke\\data-config.smoke.spec.ts:15:16\u001b[22m"
+                        }
+                      ],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2026-02-23T04:19:45.453Z",
+                      "startTime": "2026-02-23T04:24:53.506Z",
                       "annotations": [],
-                      "attachments": []
+                      "attachments": [
+                        {
+                          "name": "screenshot",
+                          "contentType": "image/png",
+                          "path": "C:\\Users\\USER\\Documents\\bookly\\booklyapp\\bookly-mock-frontend\\test-results\\data-config.smoke-Data-con-8c79e-TEWAY-SERVER-DIRECTO-matrix-smoke\\test-failed-1.png"
+                        },
+                        {
+                          "name": "error-context",
+                          "contentType": "text/markdown",
+                          "path": "C:\\Users\\USER\\Documents\\bookly\\booklyapp\\bookly-mock-frontend\\test-results\\data-config.smoke-Data-con-8c79e-TEWAY-SERVER-DIRECTO-matrix-smoke\\error-context.md"
+                        }
+                      ]
                     }
                   ],
-                  "status": "expected"
+                  "status": "unexpected"
                 }
               ],
-              "id": "6d5c41464ee763695a58-bf27e710c94ac34c74a8",
-              "file": "smoke/auth.smoke.spec.ts",
-              "line": 91,
+              "id": "b8fd179802c1ab759efe-ceef46c07fb83253a132",
+              "file": "smoke/data-config.smoke.spec.ts",
+              "line": 12,
               "column": 7
             }
           ]
@@ -503,7 +808,7 @@
           "specs": [
             {
               "title": "login submit button is visible and clickable in light mode",
-              "ok": true,
+              "ok": false,
               "tags": [],
               "tests": [
                 {
@@ -516,18 +821,45 @@
                     {
                       "workerIndex": 7,
                       "parallelIndex": 7,
-                      "status": "passed",
-                      "duration": 4117,
-                      "errors": [],
+                      "status": "timedOut",
+                      "duration": 31019,
+                      "error": {
+                        "message": "\u001b[31mTest timeout of 30000ms exceeded.\u001b[39m",
+                        "stack": "\u001b[31mTest timeout of 30000ms exceeded.\u001b[39m"
+                      },
+                      "errors": [
+                        {
+                          "message": "\u001b[31mTest timeout of 30000ms exceeded.\u001b[39m"
+                        },
+                        {
+                          "location": {
+                            "file": "C:\\Users\\USER\\Documents\\bookly\\booklyapp\\bookly-mock-frontend\\e2e\\smoke\\login-ui.smoke.spec.ts",
+                            "column": 16,
+                            "line": 13
+                          },
+                          "message": "Error: page.goto: Test timeout of 30000ms exceeded.\nCall log:\n\u001b[2m  - navigating to \"http://localhost:4201/es/login\", waiting until \"load\"\u001b[22m\n\n\n\u001b[0m \u001b[90m 11 |\u001b[39m     })\u001b[33m;\u001b[39m\n \u001b[90m 12 |\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 13 |\u001b[39m     \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mgoto(\u001b[32m\"/es/login\"\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m    |\u001b[39m                \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 14 |\u001b[39m\n \u001b[90m 15 |\u001b[39m     \u001b[36mconst\u001b[39m submitButton \u001b[33m=\u001b[39m page\u001b[33m.\u001b[39mgetByTestId(\u001b[32m\"login-submit-btn\"\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m 16 |\u001b[39m     \u001b[36mawait\u001b[39m expect(submitButton)\u001b[33m.\u001b[39mtoBeVisible()\u001b[33m;\u001b[39m\u001b[0m\n\u001b[2m    at C:\\Users\\USER\\Documents\\bookly\\booklyapp\\bookly-mock-frontend\\e2e\\smoke\\login-ui.smoke.spec.ts:13:16\u001b[22m"
+                        }
+                      ],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2026-02-23T04:19:45.665Z",
+                      "startTime": "2026-02-23T04:24:54.144Z",
                       "annotations": [],
-                      "attachments": []
+                      "attachments": [
+                        {
+                          "name": "screenshot",
+                          "contentType": "image/png",
+                          "path": "C:\\Users\\USER\\Documents\\bookly\\booklyapp\\bookly-mock-frontend\\test-results\\login-ui.smoke-Login-UI-sm-f4036-and-clickable-in-light-mode-smoke\\test-failed-1.png"
+                        },
+                        {
+                          "name": "error-context",
+                          "contentType": "text/markdown",
+                          "path": "C:\\Users\\USER\\Documents\\bookly\\booklyapp\\bookly-mock-frontend\\test-results\\login-ui.smoke-Login-UI-sm-f4036-and-clickable-in-light-mode-smoke\\error-context.md"
+                        }
+                      ]
                     }
                   ],
-                  "status": "expected"
+                  "status": "unexpected"
                 }
               ],
               "id": "f2c03d0284eb1f1aa23a-f9762c90f05c07a7cad7",
@@ -537,7 +869,7 @@
             },
             {
               "title": "theme toggle switches light -> dark -> light on login",
-              "ok": true,
+              "ok": false,
               "tags": [],
               "tests": [
                 {
@@ -548,20 +880,36 @@
                   "projectName": "smoke",
                   "results": [
                     {
-                      "workerIndex": 5,
-                      "parallelIndex": 5,
-                      "status": "passed",
-                      "duration": 19825,
-                      "errors": [],
+                      "workerIndex": 8,
+                      "parallelIndex": 4,
+                      "status": "timedOut",
+                      "duration": 40137,
+                      "error": {
+                        "message": "\u001b[31mTest timeout of 30000ms exceeded.\u001b[39m",
+                        "stack": "\u001b[31mTest timeout of 30000ms exceeded.\u001b[39m"
+                      },
+                      "errors": [
+                        {
+                          "message": "\u001b[31mTest timeout of 30000ms exceeded.\u001b[39m"
+                        },
+                        {
+                          "location": {
+                            "file": "C:\\Users\\USER\\Documents\\bookly\\booklyapp\\bookly-mock-frontend\\e2e\\smoke\\login-ui.smoke.spec.ts",
+                            "column": 16,
+                            "line": 46
+                          },
+                          "message": "Error: page.reload: net::ERR_ABORTED; maybe frame was detached?\nCall log:\n\u001b[2m  - waiting for navigation until \"load\"\u001b[22m\n\n\n\u001b[0m \u001b[90m 44 |\u001b[39m       \u001b[33m.\u001b[39mtoBe(\u001b[32m\"dark\"\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m 45 |\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 46 |\u001b[39m     \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mreload()\u001b[33m;\u001b[39m\n \u001b[90m    |\u001b[39m                \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 47 |\u001b[39m     \u001b[36mawait\u001b[39m expect(page\u001b[33m.\u001b[39mlocator(\u001b[32m\"html\"\u001b[39m))\u001b[33m.\u001b[39mtoHaveClass(\u001b[35m/dark/\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m 48 |\u001b[39m\n \u001b[90m 49 |\u001b[39m     \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mgetByTestId(\u001b[32m\"login-theme-toggle\"\u001b[39m)\u001b[33m.\u001b[39mclick()\u001b[33m;\u001b[39m\u001b[0m\n\u001b[2m    at C:\\Users\\USER\\Documents\\bookly\\booklyapp\\bookly-mock-frontend\\e2e\\smoke\\login-ui.smoke.spec.ts:46:16\u001b[22m"
+                        }
+                      ],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2026-02-23T04:19:50.126Z",
+                      "startTime": "2026-02-23T04:25:16.860Z",
                       "annotations": [],
                       "attachments": []
                     }
                   ],
-                  "status": "expected"
+                  "status": "unexpected"
                 }
               ],
               "id": "f2c03d0284eb1f1aa23a-feed70a2323ae5eb3a84",
@@ -582,15 +930,15 @@
                   "projectName": "smoke",
                   "results": [
                     {
-                      "workerIndex": 7,
-                      "parallelIndex": 7,
+                      "workerIndex": 9,
+                      "parallelIndex": 3,
                       "status": "passed",
-                      "duration": 15021,
+                      "duration": 11551,
                       "errors": [],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2026-02-23T04:19:50.352Z",
+                      "startTime": "2026-02-23T04:25:16.965Z",
                       "annotations": [],
                       "attachments": []
                     }
@@ -616,15 +964,15 @@
                   "projectName": "smoke",
                   "results": [
                     {
-                      "workerIndex": 4,
-                      "parallelIndex": 4,
+                      "workerIndex": 10,
+                      "parallelIndex": 0,
                       "status": "passed",
-                      "duration": 15165,
+                      "duration": 11564,
                       "errors": [],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2026-02-23T04:19:50.538Z",
+                      "startTime": "2026-02-23T04:25:17.035Z",
                       "annotations": [],
                       "attachments": []
                     }
@@ -640,15 +988,922 @@
           ]
         }
       ]
+    },
+    {
+      "title": "smoke\\navigation.smoke.spec.ts",
+      "file": "smoke/navigation.smoke.spec.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [],
+      "suites": [
+        {
+          "title": "Navigation Smoke — Admin",
+          "file": "smoke/navigation.smoke.spec.ts",
+          "line": 12,
+          "column": 6,
+          "specs": [
+            {
+              "title": "dashboard page loads with content",
+              "ok": false,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "smoke",
+                  "projectName": "smoke",
+                  "results": [
+                    {
+                      "workerIndex": 11,
+                      "parallelIndex": 1,
+                      "status": "failed",
+                      "duration": 21481,
+                      "error": {
+                        "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m(\u001b[22m\u001b[2m)\u001b[22m failed\n\nLocator: locator('h1, h2').filter({ hasText: /dashboard|panel|inicio/i })\nExpected: visible\nTimeout: 10000ms\nError: element(s) not found\n\nCall log:\n\u001b[2m  - Expect \"toBeVisible\" with timeout 10000ms\u001b[22m\n\u001b[2m  - waiting for locator('h1, h2').filter({ hasText: /dashboard|panel|inicio/i })\u001b[22m\n",
+                        "stack": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m(\u001b[22m\u001b[2m)\u001b[22m failed\n\nLocator: locator('h1, h2').filter({ hasText: /dashboard|panel|inicio/i })\nExpected: visible\nTimeout: 10000ms\nError: element(s) not found\n\nCall log:\n\u001b[2m  - Expect \"toBeVisible\" with timeout 10000ms\u001b[22m\n\u001b[2m  - waiting for locator('h1, h2').filter({ hasText: /dashboard|panel|inicio/i })\u001b[22m\n\n    at C:\\Users\\USER\\Documents\\bookly\\booklyapp\\bookly-mock-frontend\\e2e\\smoke\\navigation.smoke.spec.ts:21:7",
+                        "location": {
+                          "file": "C:\\Users\\USER\\Documents\\bookly\\booklyapp\\bookly-mock-frontend\\e2e\\smoke\\navigation.smoke.spec.ts",
+                          "column": 7,
+                          "line": 21
+                        },
+                        "snippet": "\u001b[0m \u001b[90m 19 |\u001b[39m     \u001b[36mawait\u001b[39m expect(\n \u001b[90m 20 |\u001b[39m       page\u001b[33m.\u001b[39mlocator(\u001b[32m\"h1, h2\"\u001b[39m)\u001b[33m.\u001b[39mfilter({ hasText\u001b[33m:\u001b[39m \u001b[35m/dashboard|panel|inicio/i\u001b[39m })\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 21 |\u001b[39m     )\u001b[33m.\u001b[39mtoBeVisible({ timeout\u001b[33m:\u001b[39m \u001b[35m10000\u001b[39m })\u001b[33m;\u001b[39m\n \u001b[90m    |\u001b[39m       \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 22 |\u001b[39m   })\u001b[33m;\u001b[39m\n \u001b[90m 23 |\u001b[39m\n \u001b[90m 24 |\u001b[39m   \u001b[90m// E2E-NAV-002 | Admin sidebar shows all main links\u001b[39m\u001b[0m"
+                      },
+                      "errors": [
+                        {
+                          "location": {
+                            "file": "C:\\Users\\USER\\Documents\\bookly\\booklyapp\\bookly-mock-frontend\\e2e\\smoke\\navigation.smoke.spec.ts",
+                            "column": 7,
+                            "line": 21
+                          },
+                          "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m(\u001b[22m\u001b[2m)\u001b[22m failed\n\nLocator: locator('h1, h2').filter({ hasText: /dashboard|panel|inicio/i })\nExpected: visible\nTimeout: 10000ms\nError: element(s) not found\n\nCall log:\n\u001b[2m  - Expect \"toBeVisible\" with timeout 10000ms\u001b[22m\n\u001b[2m  - waiting for locator('h1, h2').filter({ hasText: /dashboard|panel|inicio/i })\u001b[22m\n\n\n\u001b[0m \u001b[90m 19 |\u001b[39m     \u001b[36mawait\u001b[39m expect(\n \u001b[90m 20 |\u001b[39m       page\u001b[33m.\u001b[39mlocator(\u001b[32m\"h1, h2\"\u001b[39m)\u001b[33m.\u001b[39mfilter({ hasText\u001b[33m:\u001b[39m \u001b[35m/dashboard|panel|inicio/i\u001b[39m })\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 21 |\u001b[39m     )\u001b[33m.\u001b[39mtoBeVisible({ timeout\u001b[33m:\u001b[39m \u001b[35m10000\u001b[39m })\u001b[33m;\u001b[39m\n \u001b[90m    |\u001b[39m       \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 22 |\u001b[39m   })\u001b[33m;\u001b[39m\n \u001b[90m 23 |\u001b[39m\n \u001b[90m 24 |\u001b[39m   \u001b[90m// E2E-NAV-002 | Admin sidebar shows all main links\u001b[39m\u001b[0m\n\u001b[2m    at C:\\Users\\USER\\Documents\\bookly\\booklyapp\\bookly-mock-frontend\\e2e\\smoke\\navigation.smoke.spec.ts:21:7\u001b[22m"
+                        }
+                      ],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-02-23T04:25:17.135Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "screenshot",
+                          "contentType": "image/png",
+                          "path": "C:\\Users\\USER\\Documents\\bookly\\booklyapp\\bookly-mock-frontend\\test-results\\navigation.smoke-Navigatio-aeb1c-ard-page-loads-with-content-smoke\\test-failed-1.png"
+                        },
+                        {
+                          "name": "error-context",
+                          "contentType": "text/markdown",
+                          "path": "C:\\Users\\USER\\Documents\\bookly\\booklyapp\\bookly-mock-frontend\\test-results\\navigation.smoke-Navigatio-aeb1c-ard-page-loads-with-content-smoke\\error-context.md"
+                        }
+                      ],
+                      "errorLocation": {
+                        "file": "C:\\Users\\USER\\Documents\\bookly\\booklyapp\\bookly-mock-frontend\\e2e\\smoke\\navigation.smoke.spec.ts",
+                        "column": 7,
+                        "line": 21
+                      }
+                    }
+                  ],
+                  "status": "unexpected"
+                }
+              ],
+              "id": "3d08fbc9975ce57ce3bb-282ab30351d58ea80750",
+              "file": "smoke/navigation.smoke.spec.ts",
+              "line": 16,
+              "column": 7
+            },
+            {
+              "title": "admin sidebar shows all navigation links",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "smoke",
+                  "projectName": "smoke",
+                  "results": [
+                    {
+                      "workerIndex": 12,
+                      "parallelIndex": 2,
+                      "status": "passed",
+                      "duration": 11479,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-02-23T04:25:17.163Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "3d08fbc9975ce57ce3bb-85287cf8c41299b5fff2",
+              "file": "smoke/navigation.smoke.spec.ts",
+              "line": 25,
+              "column": 7
+            }
+          ]
+        },
+        {
+          "title": "Navigation Smoke — Estudiante",
+          "file": "smoke/navigation.smoke.spec.ts",
+          "line": 37,
+          "column": 6,
+          "specs": [
+            {
+              "title": "student sidebar hides admin-only links",
+              "ok": false,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "smoke",
+                  "projectName": "smoke",
+                  "results": [
+                    {
+                      "workerIndex": 13,
+                      "parallelIndex": 7,
+                      "status": "timedOut",
+                      "duration": 40110,
+                      "error": {
+                        "message": "\u001b[31mTest timeout of 30000ms exceeded.\u001b[39m",
+                        "stack": "\u001b[31mTest timeout of 30000ms exceeded.\u001b[39m"
+                      },
+                      "errors": [
+                        {
+                          "message": "\u001b[31mTest timeout of 30000ms exceeded.\u001b[39m"
+                        },
+                        {
+                          "location": {
+                            "file": "C:\\Users\\USER\\Documents\\bookly\\booklyapp\\bookly-mock-frontend\\e2e\\smoke\\navigation.smoke.spec.ts",
+                            "column": 16,
+                            "line": 42
+                          },
+                          "message": "Error: page.goto: net::ERR_ABORTED; maybe frame was detached?\nCall log:\n\u001b[2m  - navigating to \"http://localhost:4201/es/dashboard\", waiting until \"load\"\u001b[22m\n\n\n\u001b[0m \u001b[90m 40 |\u001b[39m   \u001b[90m// E2E-NAV-003 | Student sidebar is restricted\u001b[39m\n \u001b[90m 41 |\u001b[39m   test(\u001b[32m\"student sidebar hides admin-only links\"\u001b[39m\u001b[33m,\u001b[39m \u001b[36masync\u001b[39m ({ page }) \u001b[33m=>\u001b[39m {\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 42 |\u001b[39m     \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mgoto(\u001b[32m\"/es/dashboard\"\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m    |\u001b[39m                \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 43 |\u001b[39m     \u001b[36mconst\u001b[39m sidebar \u001b[33m=\u001b[39m \u001b[36mnew\u001b[39m \u001b[33mSidebarPage\u001b[39m(page)\u001b[33m;\u001b[39m\n \u001b[90m 44 |\u001b[39m\n \u001b[90m 45 |\u001b[39m     \u001b[36mawait\u001b[39m sidebar\u001b[33m.\u001b[39mexpectLinkHidden(\u001b[32m\"Categorías\"\u001b[39m)\u001b[33m;\u001b[39m\u001b[0m\n\u001b[2m    at C:\\Users\\USER\\Documents\\bookly\\booklyapp\\bookly-mock-frontend\\e2e\\smoke\\navigation.smoke.spec.ts:42:16\u001b[22m"
+                        }
+                      ],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-02-23T04:25:34.920Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "unexpected"
+                }
+              ],
+              "id": "3d08fbc9975ce57ce3bb-639df2f0697d314ec23c",
+              "file": "smoke/navigation.smoke.spec.ts",
+              "line": 41,
+              "column": 7
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "title": "smoke\\reports.smoke.spec.ts",
+      "file": "smoke/reports.smoke.spec.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [],
+      "suites": [
+        {
+          "title": "Reports Smoke",
+          "file": "smoke/reports.smoke.spec.ts",
+          "line": 12,
+          "column": 6,
+          "specs": [
+            {
+              "title": "displays reports dashboard page",
+              "ok": false,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "smoke",
+                  "projectName": "smoke",
+                  "results": [
+                    {
+                      "workerIndex": 14,
+                      "parallelIndex": 6,
+                      "status": "timedOut",
+                      "duration": 40137,
+                      "error": {
+                        "message": "\u001b[31mTest timeout of 30000ms exceeded.\u001b[39m",
+                        "stack": "\u001b[31mTest timeout of 30000ms exceeded.\u001b[39m"
+                      },
+                      "errors": [
+                        {
+                          "message": "\u001b[31mTest timeout of 30000ms exceeded.\u001b[39m"
+                        },
+                        {
+                          "location": {
+                            "file": "C:\\Users\\USER\\Documents\\bookly\\booklyapp\\bookly-mock-frontend\\e2e\\smoke\\reports.smoke.spec.ts",
+                            "column": 16,
+                            "line": 17
+                          },
+                          "message": "Error: page.goto: net::ERR_ABORTED; maybe frame was detached?\nCall log:\n\u001b[2m  - navigating to \"http://localhost:4201/es/reportes\", waiting until \"load\"\u001b[22m\n\n\n\u001b[0m \u001b[90m 15 |\u001b[39m   \u001b[90m// E2E-RPT-001 | Reports dashboard loads\u001b[39m\n \u001b[90m 16 |\u001b[39m   test(\u001b[32m\"displays reports dashboard page\"\u001b[39m\u001b[33m,\u001b[39m \u001b[36masync\u001b[39m ({ page }) \u001b[33m=>\u001b[39m {\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 17 |\u001b[39m     \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mgoto(\u001b[32m\"/es/reportes\"\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m    |\u001b[39m                \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 18 |\u001b[39m     \u001b[36mawait\u001b[39m expect(\n \u001b[90m 19 |\u001b[39m       page\u001b[33m.\u001b[39mlocator(\u001b[32m\"h1, h2\"\u001b[39m)\u001b[33m.\u001b[39mfilter({ hasText\u001b[33m:\u001b[39m \u001b[35m/reportes/i\u001b[39m })\n \u001b[90m 20 |\u001b[39m     )\u001b[33m.\u001b[39mtoBeVisible({ timeout\u001b[33m:\u001b[39m \u001b[35m10000\u001b[39m })\u001b[33m;\u001b[39m\u001b[0m\n\u001b[2m    at C:\\Users\\USER\\Documents\\bookly\\booklyapp\\bookly-mock-frontend\\e2e\\smoke\\reports.smoke.spec.ts:17:16\u001b[22m"
+                        }
+                      ],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-02-23T04:25:34.732Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "unexpected"
+                }
+              ],
+              "id": "5c2b8b4602c693f2cd58-2c4080586a66efc13ab6",
+              "file": "smoke/reports.smoke.spec.ts",
+              "line": 16,
+              "column": 7
+            },
+            {
+              "title": "navigates to resources report",
+              "ok": false,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "smoke",
+                  "projectName": "smoke",
+                  "results": [
+                    {
+                      "workerIndex": 9,
+                      "parallelIndex": 3,
+                      "status": "timedOut",
+                      "duration": 40103,
+                      "error": {
+                        "message": "\u001b[31mTest timeout of 30000ms exceeded.\u001b[39m",
+                        "stack": "\u001b[31mTest timeout of 30000ms exceeded.\u001b[39m"
+                      },
+                      "errors": [
+                        {
+                          "message": "\u001b[31mTest timeout of 30000ms exceeded.\u001b[39m"
+                        },
+                        {
+                          "location": {
+                            "file": "C:\\Users\\USER\\Documents\\bookly\\booklyapp\\bookly-mock-frontend\\e2e\\smoke\\reports.smoke.spec.ts",
+                            "column": 16,
+                            "line": 25
+                          },
+                          "message": "Error: page.goto: net::ERR_ABORTED; maybe frame was detached?\nCall log:\n\u001b[2m  - navigating to \"http://localhost:4201/es/reportes/recursos\", waiting until \"load\"\u001b[22m\n\n\n\u001b[0m \u001b[90m 23 |\u001b[39m   \u001b[90m// E2E-RPT-002 | Navigate to resource reports\u001b[39m\n \u001b[90m 24 |\u001b[39m   test(\u001b[32m\"navigates to resources report\"\u001b[39m\u001b[33m,\u001b[39m \u001b[36masync\u001b[39m ({ page }) \u001b[33m=>\u001b[39m {\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 25 |\u001b[39m     \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mgoto(\u001b[32m\"/es/reportes/recursos\"\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m    |\u001b[39m                \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 26 |\u001b[39m     \u001b[36mawait\u001b[39m expect(page)\u001b[33m.\u001b[39mtoHaveURL(\u001b[35m/reportes\\/recursos/\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m 27 |\u001b[39m   })\u001b[33m;\u001b[39m\n \u001b[90m 28 |\u001b[39m\u001b[0m\n\u001b[2m    at C:\\Users\\USER\\Documents\\bookly\\booklyapp\\bookly-mock-frontend\\e2e\\smoke\\reports.smoke.spec.ts:25:16\u001b[22m"
+                        }
+                      ],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-02-23T04:25:29.059Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "unexpected"
+                }
+              ],
+              "id": "5c2b8b4602c693f2cd58-21a8c58eb9505f1390f9",
+              "file": "smoke/reports.smoke.spec.ts",
+              "line": 24,
+              "column": 7
+            },
+            {
+              "title": "has export functionality available",
+              "ok": false,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "smoke",
+                  "projectName": "smoke",
+                  "results": [
+                    {
+                      "workerIndex": 10,
+                      "parallelIndex": 0,
+                      "status": "timedOut",
+                      "duration": 40118,
+                      "error": {
+                        "message": "\u001b[31mTest timeout of 30000ms exceeded.\u001b[39m",
+                        "stack": "\u001b[31mTest timeout of 30000ms exceeded.\u001b[39m"
+                      },
+                      "errors": [
+                        {
+                          "message": "\u001b[31mTest timeout of 30000ms exceeded.\u001b[39m"
+                        },
+                        {
+                          "location": {
+                            "file": "C:\\Users\\USER\\Documents\\bookly\\booklyapp\\bookly-mock-frontend\\e2e\\smoke\\reports.smoke.spec.ts",
+                            "column": 16,
+                            "line": 31
+                          },
+                          "message": "Error: page.goto: net::ERR_ABORTED; maybe frame was detached?\nCall log:\n\u001b[2m  - navigating to \"http://localhost:4201/es/reportes\", waiting until \"load\"\u001b[22m\n\n\n\u001b[0m \u001b[90m 29 |\u001b[39m   \u001b[90m// E2E-RPT-007 | Export CSV button present\u001b[39m\n \u001b[90m 30 |\u001b[39m   test(\u001b[32m\"has export functionality available\"\u001b[39m\u001b[33m,\u001b[39m \u001b[36masync\u001b[39m ({ page }) \u001b[33m=>\u001b[39m {\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 31 |\u001b[39m     \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mgoto(\u001b[32m\"/es/reportes\"\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m    |\u001b[39m                \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 32 |\u001b[39m     \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mwaitForLoadState(\u001b[32m\"networkidle\"\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m 33 |\u001b[39m\n \u001b[90m 34 |\u001b[39m     \u001b[36mconst\u001b[39m exportBtn \u001b[33m=\u001b[39m page\u001b[33m.\u001b[39mlocator(\u001b[32m\"button, a\"\u001b[39m)\u001b[33m.\u001b[39mfilter({ hasText\u001b[33m:\u001b[39m \u001b[35m/exportar|csv|descargar/i\u001b[39m })\u001b[33m.\u001b[39mfirst()\u001b[33m;\u001b[39m\u001b[0m\n\u001b[2m    at C:\\Users\\USER\\Documents\\bookly\\booklyapp\\bookly-mock-frontend\\e2e\\smoke\\reports.smoke.spec.ts:31:16\u001b[22m"
+                        }
+                      ],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-02-23T04:25:29.104Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "unexpected"
+                }
+              ],
+              "id": "5c2b8b4602c693f2cd58-b22d7cc43ef23a16fcef",
+              "file": "smoke/reports.smoke.spec.ts",
+              "line": 30,
+              "column": 7
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "title": "smoke\\reservations.smoke.spec.ts",
+      "file": "smoke/reservations.smoke.spec.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [],
+      "suites": [
+        {
+          "title": "Reservations Smoke",
+          "file": "smoke/reservations.smoke.spec.ts",
+          "line": 12,
+          "column": 6,
+          "specs": [
+            {
+              "title": "displays reservations list page",
+              "ok": false,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "smoke",
+                  "projectName": "smoke",
+                  "results": [
+                    {
+                      "workerIndex": 12,
+                      "parallelIndex": 2,
+                      "status": "timedOut",
+                      "duration": 40075,
+                      "error": {
+                        "message": "\u001b[31mTest timeout of 30000ms exceeded.\u001b[39m",
+                        "stack": "\u001b[31mTest timeout of 30000ms exceeded.\u001b[39m"
+                      },
+                      "errors": [
+                        {
+                          "message": "\u001b[31mTest timeout of 30000ms exceeded.\u001b[39m"
+                        },
+                        {
+                          "location": {
+                            "file": "C:\\Users\\USER\\Documents\\bookly\\booklyapp\\bookly-mock-frontend\\e2e\\smoke\\reservations.smoke.spec.ts",
+                            "column": 16,
+                            "line": 17
+                          },
+                          "message": "Error: page.goto: net::ERR_ABORTED; maybe frame was detached?\nCall log:\n\u001b[2m  - navigating to \"http://localhost:4201/es/reservas\", waiting until \"load\"\u001b[22m\n\n\n\u001b[0m \u001b[90m 15 |\u001b[39m   \u001b[90m// E2E-AVL-001 | List reservations visible\u001b[39m\n \u001b[90m 16 |\u001b[39m   test(\u001b[32m\"displays reservations list page\"\u001b[39m\u001b[33m,\u001b[39m \u001b[36masync\u001b[39m ({ page }) \u001b[33m=>\u001b[39m {\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 17 |\u001b[39m     \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mgoto(\u001b[32m\"/es/reservas\"\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m    |\u001b[39m                \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 18 |\u001b[39m     \u001b[36mawait\u001b[39m expect(\n \u001b[90m 19 |\u001b[39m       page\u001b[33m.\u001b[39mlocator(\u001b[32m\"h1, h2\"\u001b[39m)\u001b[33m.\u001b[39mfilter({ hasText\u001b[33m:\u001b[39m \u001b[35m/reservas/i\u001b[39m })\u001b[33m,\u001b[39m\n \u001b[90m 20 |\u001b[39m     )\u001b[33m.\u001b[39mtoBeVisible({ timeout\u001b[33m:\u001b[39m \u001b[35m10000\u001b[39m })\u001b[33m;\u001b[39m\u001b[0m\n\u001b[2m    at C:\\Users\\USER\\Documents\\bookly\\booklyapp\\bookly-mock-frontend\\e2e\\smoke\\reservations.smoke.spec.ts:17:16\u001b[22m"
+                        }
+                      ],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-02-23T04:25:29.326Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "unexpected"
+                }
+              ],
+              "id": "950379e8af53ae7c1058-24f376043bd9196f2ce4",
+              "file": "smoke/reservations.smoke.spec.ts",
+              "line": 16,
+              "column": 7
+            },
+            {
+              "title": "navigates to new reservation form",
+              "ok": false,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "smoke",
+                  "projectName": "smoke",
+                  "results": [
+                    {
+                      "workerIndex": 15,
+                      "parallelIndex": 5,
+                      "status": "timedOut",
+                      "duration": 40120,
+                      "error": {
+                        "message": "\u001b[31mTest timeout of 30000ms exceeded.\u001b[39m",
+                        "stack": "\u001b[31mTest timeout of 30000ms exceeded.\u001b[39m"
+                      },
+                      "errors": [
+                        {
+                          "message": "\u001b[31mTest timeout of 30000ms exceeded.\u001b[39m"
+                        },
+                        {
+                          "location": {
+                            "file": "C:\\Users\\USER\\Documents\\bookly\\booklyapp\\bookly-mock-frontend\\e2e\\smoke\\reservations.smoke.spec.ts",
+                            "column": 16,
+                            "line": 25
+                          },
+                          "message": "Error: page.goto: net::ERR_ABORTED; maybe frame was detached?\nCall log:\n\u001b[2m  - navigating to \"http://localhost:4201/es/reservas/nueva\", waiting until \"load\"\u001b[22m\n\n\n\u001b[0m \u001b[90m 23 |\u001b[39m   \u001b[90m// E2E-AVL-002 | Navigate to create reservation\u001b[39m\n \u001b[90m 24 |\u001b[39m   test(\u001b[32m\"navigates to new reservation form\"\u001b[39m\u001b[33m,\u001b[39m \u001b[36masync\u001b[39m ({ page }) \u001b[33m=>\u001b[39m {\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 25 |\u001b[39m     \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mgoto(\u001b[32m\"/es/reservas/nueva\"\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m    |\u001b[39m                \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 26 |\u001b[39m     \u001b[36mawait\u001b[39m expect(page)\u001b[33m.\u001b[39mtoHaveURL(\u001b[35m/reservas\\/nueva/\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m 27 |\u001b[39m   })\u001b[33m;\u001b[39m\n \u001b[90m 28 |\u001b[39m\u001b[0m\n\u001b[2m    at C:\\Users\\USER\\Documents\\bookly\\booklyapp\\bookly-mock-frontend\\e2e\\smoke\\reservations.smoke.spec.ts:25:16\u001b[22m"
+                        }
+                      ],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-02-23T04:25:39.540Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "unexpected"
+                }
+              ],
+              "id": "950379e8af53ae7c1058-d97ff8d41be90757a28e",
+              "file": "smoke/reservations.smoke.spec.ts",
+              "line": 24,
+              "column": 7
+            },
+            {
+              "title": "navigates to reservation detail",
+              "ok": false,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "smoke",
+                  "projectName": "smoke",
+                  "results": [
+                    {
+                      "workerIndex": 16,
+                      "parallelIndex": 1,
+                      "status": "timedOut",
+                      "duration": 40166,
+                      "error": {
+                        "message": "\u001b[31mTest timeout of 30000ms exceeded.\u001b[39m",
+                        "stack": "\u001b[31mTest timeout of 30000ms exceeded.\u001b[39m"
+                      },
+                      "errors": [
+                        {
+                          "message": "\u001b[31mTest timeout of 30000ms exceeded.\u001b[39m"
+                        },
+                        {
+                          "location": {
+                            "file": "C:\\Users\\USER\\Documents\\bookly\\booklyapp\\bookly-mock-frontend\\e2e\\smoke\\reservations.smoke.spec.ts",
+                            "column": 16,
+                            "line": 32
+                          },
+                          "message": "Error: page.goto: net::ERR_ABORTED; maybe frame was detached?\nCall log:\n\u001b[2m  - navigating to \"http://localhost:4201/es/reservas/rsv_001\", waiting until \"load\"\u001b[22m\n\n\n\u001b[0m \u001b[90m 30 |\u001b[39m   test(\u001b[32m\"navigates to reservation detail\"\u001b[39m\u001b[33m,\u001b[39m \u001b[36masync\u001b[39m ({ page }) \u001b[33m=>\u001b[39m {\n \u001b[90m 31 |\u001b[39m     \u001b[90m// Navigate directly to a known mock reservation (click-through tested in regression)\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 32 |\u001b[39m     \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mgoto(\u001b[32m\"/es/reservas/rsv_001\"\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m    |\u001b[39m                \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 33 |\u001b[39m     \u001b[36mawait\u001b[39m expect(page)\u001b[33m.\u001b[39mtoHaveURL(\u001b[35m/reservas\\/rsv_001/\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m 34 |\u001b[39m     \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mwaitForLoadState(\u001b[32m\"networkidle\"\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m 35 |\u001b[39m\u001b[0m\n\u001b[2m    at C:\\Users\\USER\\Documents\\bookly\\booklyapp\\bookly-mock-frontend\\e2e\\smoke\\reservations.smoke.spec.ts:32:16\u001b[22m"
+                        }
+                      ],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-02-23T04:25:45.330Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "unexpected"
+                }
+              ],
+              "id": "950379e8af53ae7c1058-8c4a135dbd091f0eac42",
+              "file": "smoke/reservations.smoke.spec.ts",
+              "line": 30,
+              "column": 7
+            },
+            {
+              "title": "displays calendar page",
+              "ok": false,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "smoke",
+                  "projectName": "smoke",
+                  "results": [
+                    {
+                      "workerIndex": 17,
+                      "parallelIndex": 4,
+                      "status": "timedOut",
+                      "duration": 40165,
+                      "error": {
+                        "message": "\u001b[31mTest timeout of 30000ms exceeded.\u001b[39m",
+                        "stack": "\u001b[31mTest timeout of 30000ms exceeded.\u001b[39m"
+                      },
+                      "errors": [
+                        {
+                          "message": "\u001b[31mTest timeout of 30000ms exceeded.\u001b[39m"
+                        },
+                        {
+                          "location": {
+                            "file": "C:\\Users\\USER\\Documents\\bookly\\booklyapp\\bookly-mock-frontend\\e2e\\smoke\\reservations.smoke.spec.ts",
+                            "column": 16,
+                            "line": 47
+                          },
+                          "message": "Error: page.goto: net::ERR_ABORTED; maybe frame was detached?\nCall log:\n\u001b[2m  - navigating to \"http://localhost:4201/es/calendario\", waiting until \"load\"\u001b[22m\n\n\n\u001b[0m \u001b[90m 45 |\u001b[39m   \u001b[90m// E2E-AVL-007 | Calendar view loads\u001b[39m\n \u001b[90m 46 |\u001b[39m   test(\u001b[32m\"displays calendar page\"\u001b[39m\u001b[33m,\u001b[39m \u001b[36masync\u001b[39m ({ page }) \u001b[33m=>\u001b[39m {\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 47 |\u001b[39m     \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mgoto(\u001b[32m\"/es/calendario\"\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m    |\u001b[39m                \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 48 |\u001b[39m     \u001b[36mawait\u001b[39m expect(page)\u001b[33m.\u001b[39mtoHaveURL(\u001b[35m/calendario/\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m 49 |\u001b[39m     \u001b[36mawait\u001b[39m expect(\n \u001b[90m 50 |\u001b[39m       page\u001b[0m\n\u001b[2m    at C:\\Users\\USER\\Documents\\bookly\\booklyapp\\bookly-mock-frontend\\e2e\\smoke\\reservations.smoke.spec.ts:47:16\u001b[22m"
+                        }
+                      ],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-02-23T04:26:03.267Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "unexpected"
+                }
+              ],
+              "id": "950379e8af53ae7c1058-7b47851803195d56dd35",
+              "file": "smoke/reservations.smoke.spec.ts",
+              "line": 46,
+              "column": 7
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "title": "smoke\\resources.smoke.spec.ts",
+      "file": "smoke/resources.smoke.spec.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [],
+      "suites": [
+        {
+          "title": "Resources Smoke",
+          "file": "smoke/resources.smoke.spec.ts",
+          "line": 12,
+          "column": 6,
+          "specs": [
+            {
+              "title": "displays resources list page",
+              "ok": false,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "smoke",
+                  "projectName": "smoke",
+                  "results": [
+                    {
+                      "workerIndex": 18,
+                      "parallelIndex": 3,
+                      "status": "timedOut",
+                      "duration": 40130,
+                      "error": {
+                        "message": "\u001b[31mTest timeout of 30000ms exceeded.\u001b[39m",
+                        "stack": "\u001b[31mTest timeout of 30000ms exceeded.\u001b[39m"
+                      },
+                      "errors": [
+                        {
+                          "message": "\u001b[31mTest timeout of 30000ms exceeded.\u001b[39m"
+                        },
+                        {
+                          "location": {
+                            "file": "C:\\Users\\USER\\Documents\\bookly\\booklyapp\\bookly-mock-frontend\\e2e\\smoke\\resources.smoke.spec.ts",
+                            "column": 16,
+                            "line": 17
+                          },
+                          "message": "Error: page.goto: net::ERR_ABORTED; maybe frame was detached?\nCall log:\n\u001b[2m  - navigating to \"http://localhost:4201/es/recursos\", waiting until \"load\"\u001b[22m\n\n\n\u001b[0m \u001b[90m 15 |\u001b[39m   \u001b[90m// E2E-RES-001 | List resources visible\u001b[39m\n \u001b[90m 16 |\u001b[39m   test(\u001b[32m\"displays resources list page\"\u001b[39m\u001b[33m,\u001b[39m \u001b[36masync\u001b[39m ({ page }) \u001b[33m=>\u001b[39m {\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 17 |\u001b[39m     \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mgoto(\u001b[32m\"/es/recursos\"\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m    |\u001b[39m                \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 18 |\u001b[39m     \u001b[36mawait\u001b[39m expect(\n \u001b[90m 19 |\u001b[39m       page\u001b[33m.\u001b[39mlocator(\u001b[32m\"h1, h2\"\u001b[39m)\u001b[33m.\u001b[39mfilter({ hasText\u001b[33m:\u001b[39m \u001b[35m/recursos/i\u001b[39m })\u001b[33m,\u001b[39m\n \u001b[90m 20 |\u001b[39m     )\u001b[33m.\u001b[39mtoBeVisible({ timeout\u001b[33m:\u001b[39m \u001b[35m10000\u001b[39m })\u001b[33m;\u001b[39m\u001b[0m\n\u001b[2m    at C:\\Users\\USER\\Documents\\bookly\\booklyapp\\bookly-mock-frontend\\e2e\\smoke\\resources.smoke.spec.ts:17:16\u001b[22m"
+                        }
+                      ],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-02-23T04:26:15.528Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "unexpected"
+                }
+              ],
+              "id": "50d039000a1a4c9095c3-c96361facb59d5cb9ef8",
+              "file": "smoke/resources.smoke.spec.ts",
+              "line": 16,
+              "column": 7
+            },
+            {
+              "title": "navigates to create resource form",
+              "ok": false,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "smoke",
+                  "projectName": "smoke",
+                  "results": [
+                    {
+                      "workerIndex": 19,
+                      "parallelIndex": 0,
+                      "status": "timedOut",
+                      "duration": 40105,
+                      "error": {
+                        "message": "\u001b[31mTest timeout of 30000ms exceeded.\u001b[39m",
+                        "stack": "\u001b[31mTest timeout of 30000ms exceeded.\u001b[39m"
+                      },
+                      "errors": [
+                        {
+                          "message": "\u001b[31mTest timeout of 30000ms exceeded.\u001b[39m"
+                        },
+                        {
+                          "location": {
+                            "file": "C:\\Users\\USER\\Documents\\bookly\\booklyapp\\bookly-mock-frontend\\e2e\\smoke\\resources.smoke.spec.ts",
+                            "column": 16,
+                            "line": 25
+                          },
+                          "message": "Error: page.goto: net::ERR_ABORTED; maybe frame was detached?\nCall log:\n\u001b[2m  - navigating to \"http://localhost:4201/es/recursos/nuevo\", waiting until \"load\"\u001b[22m\n\n\n\u001b[0m \u001b[90m 23 |\u001b[39m   \u001b[90m// E2E-RES-002 | Navigate to create resource\u001b[39m\n \u001b[90m 24 |\u001b[39m   test(\u001b[32m\"navigates to create resource form\"\u001b[39m\u001b[33m,\u001b[39m \u001b[36masync\u001b[39m ({ page }) \u001b[33m=>\u001b[39m {\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 25 |\u001b[39m     \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mgoto(\u001b[32m\"/es/recursos/nuevo\"\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m    |\u001b[39m                \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 26 |\u001b[39m     \u001b[36mawait\u001b[39m expect(page)\u001b[33m.\u001b[39mtoHaveURL(\u001b[35m/recursos\\/nuevo/\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m 27 |\u001b[39m     \u001b[36mawait\u001b[39m expect(\n \u001b[90m 28 |\u001b[39m       page\u001b[0m\n\u001b[2m    at C:\\Users\\USER\\Documents\\bookly\\booklyapp\\bookly-mock-frontend\\e2e\\smoke\\resources.smoke.spec.ts:25:16\u001b[22m"
+                        }
+                      ],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-02-23T04:26:15.536Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "unexpected"
+                }
+              ],
+              "id": "50d039000a1a4c9095c3-1a8fd68fe112c31f628c",
+              "file": "smoke/resources.smoke.spec.ts",
+              "line": 24,
+              "column": 7
+            },
+            {
+              "title": "navigates to resource detail",
+              "ok": false,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "smoke",
+                  "projectName": "smoke",
+                  "results": [
+                    {
+                      "workerIndex": 20,
+                      "parallelIndex": 2,
+                      "status": "timedOut",
+                      "duration": 40123,
+                      "error": {
+                        "message": "\u001b[31mTest timeout of 30000ms exceeded.\u001b[39m",
+                        "stack": "\u001b[31mTest timeout of 30000ms exceeded.\u001b[39m"
+                      },
+                      "errors": [
+                        {
+                          "message": "\u001b[31mTest timeout of 30000ms exceeded.\u001b[39m"
+                        },
+                        {
+                          "location": {
+                            "file": "C:\\Users\\USER\\Documents\\bookly\\booklyapp\\bookly-mock-frontend\\e2e\\smoke\\resources.smoke.spec.ts",
+                            "column": 16,
+                            "line": 37
+                          },
+                          "message": "Error: page.goto: net::ERR_ABORTED; maybe frame was detached?\nCall log:\n\u001b[2m  - navigating to \"http://localhost:4201/es/recursos\", waiting until \"load\"\u001b[22m\n\n\n\u001b[0m \u001b[90m 35 |\u001b[39m   \u001b[90m// E2E-RES-003 | View resource detail\u001b[39m\n \u001b[90m 36 |\u001b[39m   test(\u001b[32m\"navigates to resource detail\"\u001b[39m\u001b[33m,\u001b[39m \u001b[36masync\u001b[39m ({ page }) \u001b[33m=>\u001b[39m {\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 37 |\u001b[39m     \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mgoto(\u001b[32m\"/es/recursos\"\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m    |\u001b[39m                \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 38 |\u001b[39m     \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mwaitForLoadState(\u001b[32m\"networkidle\"\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m 39 |\u001b[39m\n \u001b[90m 40 |\u001b[39m     \u001b[36mconst\u001b[39m resourceLink \u001b[33m=\u001b[39m page\u001b[33m.\u001b[39mlocator(\u001b[32m\"a[href*='/recursos/']\"\u001b[39m)\u001b[33m.\u001b[39mfirst()\u001b[33m;\u001b[39m\u001b[0m\n\u001b[2m    at C:\\Users\\USER\\Documents\\bookly\\booklyapp\\bookly-mock-frontend\\e2e\\smoke\\resources.smoke.spec.ts:37:16\u001b[22m"
+                        }
+                      ],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-02-23T04:26:15.690Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "unexpected"
+                }
+              ],
+              "id": "50d039000a1a4c9095c3-20c27bb8a65d5f149ce1",
+              "file": "smoke/resources.smoke.spec.ts",
+              "line": 36,
+              "column": 7
+            },
+            {
+              "title": "navigates to edit resource page",
+              "ok": false,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "smoke",
+                  "projectName": "smoke",
+                  "results": [
+                    {
+                      "workerIndex": 21,
+                      "parallelIndex": 6,
+                      "status": "timedOut",
+                      "duration": 40276,
+                      "error": {
+                        "message": "\u001b[31mTest timeout of 30000ms exceeded.\u001b[39m",
+                        "stack": "\u001b[31mTest timeout of 30000ms exceeded.\u001b[39m"
+                      },
+                      "errors": [
+                        {
+                          "message": "\u001b[31mTest timeout of 30000ms exceeded.\u001b[39m"
+                        },
+                        {
+                          "location": {
+                            "file": "C:\\Users\\USER\\Documents\\bookly\\booklyapp\\bookly-mock-frontend\\e2e\\smoke\\resources.smoke.spec.ts",
+                            "column": 16,
+                            "line": 49
+                          },
+                          "message": "Error: page.goto: net::ERR_ABORTED; maybe frame was detached?\nCall log:\n\u001b[2m  - navigating to \"http://localhost:4201/es/recursos/res_001\", waiting until \"load\"\u001b[22m\n\n\n\u001b[0m \u001b[90m 47 |\u001b[39m   \u001b[90m// E2E-RES-004 | Navigate to edit resource\u001b[39m\n \u001b[90m 48 |\u001b[39m   test(\u001b[32m\"navigates to edit resource page\"\u001b[39m\u001b[33m,\u001b[39m \u001b[36masync\u001b[39m ({ page }) \u001b[33m=>\u001b[39m {\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 49 |\u001b[39m     \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mgoto(\u001b[32m\"/es/recursos/res_001\"\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m    |\u001b[39m                \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 50 |\u001b[39m     \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mwaitForLoadState(\u001b[32m\"networkidle\"\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m 51 |\u001b[39m\n \u001b[90m 52 |\u001b[39m     \u001b[36mconst\u001b[39m editLink \u001b[33m=\u001b[39m page\u001b[0m\n\u001b[2m    at C:\\Users\\USER\\Documents\\bookly\\booklyapp\\bookly-mock-frontend\\e2e\\smoke\\resources.smoke.spec.ts:49:16\u001b[22m"
+                        }
+                      ],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-02-23T04:26:22.295Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "unexpected"
+                }
+              ],
+              "id": "50d039000a1a4c9095c3-7c68a45ed537f9897ea6",
+              "file": "smoke/resources.smoke.spec.ts",
+              "line": 48,
+              "column": 7
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "title": "smoke\\waitlist.smoke.spec.ts",
+      "file": "smoke/waitlist.smoke.spec.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [],
+      "suites": [
+        {
+          "title": "Waitlist E2E Flow",
+          "file": "smoke/waitlist.smoke.spec.ts",
+          "line": 4,
+          "column": 6,
+          "specs": [
+            {
+              "title": "Allows user to join the waitlist when resource is unavailable",
+              "ok": false,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "smoke",
+                  "projectName": "smoke",
+                  "results": [
+                    {
+                      "workerIndex": 22,
+                      "parallelIndex": 7,
+                      "status": "timedOut",
+                      "duration": 40262,
+                      "error": {
+                        "message": "\u001b[31mTest timeout of 30000ms exceeded.\u001b[39m",
+                        "stack": "\u001b[31mTest timeout of 30000ms exceeded.\u001b[39m"
+                      },
+                      "errors": [
+                        {
+                          "message": "\u001b[31mTest timeout of 30000ms exceeded.\u001b[39m"
+                        },
+                        {
+                          "location": {
+                            "file": "C:\\Users\\USER\\Documents\\bookly\\booklyapp\\bookly-mock-frontend\\e2e\\smoke\\waitlist.smoke.spec.ts",
+                            "column": 16,
+                            "line": 9
+                          },
+                          "message": "Error: page.goto: Test timeout of 30000ms exceeded.\nCall log:\n\u001b[2m  - navigating to \"http://localhost:4201/es/recursos\", waiting until \"load\"\u001b[22m\n\n\n\u001b[0m \u001b[90m  7 |\u001b[39m   test(\u001b[32m\"Allows user to join the waitlist when resource is unavailable\"\u001b[39m\u001b[33m,\u001b[39m \u001b[36masync\u001b[39m ({ page }) \u001b[33m=>\u001b[39m {\n \u001b[90m  8 |\u001b[39m     \u001b[90m// Ir a la página de recursos\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m  9 |\u001b[39m     \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mgoto(\u001b[32m\"/es/recursos\"\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m    |\u001b[39m                \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 10 |\u001b[39m     \u001b[90m// Seleccionar el primer recurso\u001b[39m\n \u001b[90m 11 |\u001b[39m     \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mgetByText(\u001b[32m\"Ver detalles\"\u001b[39m)\u001b[33m.\u001b[39mfirst()\u001b[33m.\u001b[39mclick()\u001b[33m;\u001b[39m\n \u001b[90m 12 |\u001b[39m\u001b[0m\n\u001b[2m    at C:\\Users\\USER\\Documents\\bookly\\booklyapp\\bookly-mock-frontend\\e2e\\smoke\\waitlist.smoke.spec.ts:9:16\u001b[22m"
+                        }
+                      ],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-02-23T04:26:22.295Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "unexpected"
+                }
+              ],
+              "id": "50aa29b8053db5f42a2d-b07195fb5be36dce8b19",
+              "file": "smoke/waitlist.smoke.spec.ts",
+              "line": 7,
+              "column": 7
+            },
+            {
+              "title": "Admin can view waitlist manager and notify users",
+              "ok": false,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "smoke",
+                  "projectName": "smoke",
+                  "results": [
+                    {
+                      "workerIndex": 23,
+                      "parallelIndex": 5,
+                      "status": "timedOut",
+                      "duration": 33500,
+                      "error": {
+                        "message": "\u001b[31mTest timeout of 30000ms exceeded.\u001b[39m",
+                        "stack": "\u001b[31mTest timeout of 30000ms exceeded.\u001b[39m"
+                      },
+                      "errors": [
+                        {
+                          "message": "\u001b[31mTest timeout of 30000ms exceeded.\u001b[39m"
+                        },
+                        {
+                          "location": {
+                            "file": "C:\\Users\\USER\\Documents\\bookly\\booklyapp\\bookly-mock-frontend\\e2e\\smoke\\waitlist.smoke.spec.ts",
+                            "column": 16,
+                            "line": 40
+                          },
+                          "message": "Error: page.goto: Test timeout of 30000ms exceeded.\nCall log:\n\u001b[2m  - navigating to \"http://localhost:4201/es/admin/lista-espera\", waiting until \"load\"\u001b[22m\n\n\n\u001b[0m \u001b[90m 38 |\u001b[39m   test(\u001b[32m\"Admin can view waitlist manager and notify users\"\u001b[39m\u001b[33m,\u001b[39m \u001b[36masync\u001b[39m ({ page }) \u001b[33m=>\u001b[39m {\n \u001b[90m 39 |\u001b[39m     \u001b[90m// Ir directamente al administrador de lista de espera\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 40 |\u001b[39m     \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mgoto(\u001b[32m\"/es/admin/lista-espera\"\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m    |\u001b[39m                \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 41 |\u001b[39m     \n \u001b[90m 42 |\u001b[39m     \u001b[90m// Verificar que la página cargó\u001b[39m\n \u001b[90m 43 |\u001b[39m     \u001b[36mawait\u001b[39m expect(page\u001b[33m.\u001b[39mgetByRole(\u001b[32m\"heading\"\u001b[39m\u001b[33m,\u001b[39m { name\u001b[33m:\u001b[39m \u001b[35m/Lista de Espera/i\u001b[39m }))\u001b[33m.\u001b[39mtoBeVisible()\u001b[33m;\u001b[39m\u001b[0m\n\u001b[2m    at C:\\Users\\USER\\Documents\\bookly\\booklyapp\\bookly-mock-frontend\\e2e\\smoke\\waitlist.smoke.spec.ts:40:16\u001b[22m"
+                        }
+                      ],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-02-23T04:26:25.501Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "screenshot",
+                          "contentType": "image/png",
+                          "path": "C:\\Users\\USER\\Documents\\bookly\\booklyapp\\bookly-mock-frontend\\test-results\\waitlist.smoke-Waitlist-E2-67dd0-st-manager-and-notify-users-smoke\\test-failed-1.png"
+                        },
+                        {
+                          "name": "error-context",
+                          "contentType": "text/markdown",
+                          "path": "C:\\Users\\USER\\Documents\\bookly\\booklyapp\\bookly-mock-frontend\\test-results\\waitlist.smoke-Waitlist-E2-67dd0-st-manager-and-notify-users-smoke\\error-context.md"
+                        }
+                      ]
+                    }
+                  ],
+                  "status": "unexpected"
+                }
+              ],
+              "id": "50aa29b8053db5f42a2d-f4363ff51ab4113b046e",
+              "file": "smoke/waitlist.smoke.spec.ts",
+              "line": 38,
+              "column": 7
+            }
+          ]
+        }
+      ]
     }
   ],
   "errors": [],
   "stats": {
-    "startTime": "2026-02-23T04:18:56.233Z",
-    "duration": 74516.44600000001,
-    "expected": 10,
+    "startTime": "2026-02-23T04:23:49.376Z",
+    "duration": 194897.369,
+    "expected": 7,
     "skipped": 0,
-    "unexpected": 1,
+    "unexpected": 24,
     "flaky": 0
   }
 }
