@@ -3,7 +3,7 @@ import { Injectable } from "@nestjs/common";
 import { ConfigService } from "@nestjs/config";
 import {
   IAuthServiceClient,
-} from "../../application/services/schedule-import.service";
+} from "@resources/application/services/schedule-import.service";
 
 /**
  * Auth Service HTTP Client
@@ -104,9 +104,9 @@ export class AuthServiceClient implements IAuthServiceClient {
         };
       }
 
-      const createData = await createResponse.json();
-      const newUser = createData?.data?.data || createData?.data || createData;
-      const userId = newUser._id || newUser.id;
+      const createData: any = await createResponse.json();
+      const newUser: any = createData?.data?.data || createData?.data || createData;
+      const userId = newUser?._id || newUser?.id;
 
       this.logger.info("Teacher created", {
         userId,
