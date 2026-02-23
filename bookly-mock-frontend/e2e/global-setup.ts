@@ -15,9 +15,8 @@ import { AUTH_STATE_DIR, TEST_USERS } from "./fixtures/test-users";
  *
  * Runs once before all tests.
  * 1. Creates a browser context
- * 2. Mocks the config API to prevent ColorBootstrapSplash from blocking the UI
- * 3. Logs in with each test user role (admin, coordinador, profesor, etc.)
- * 4. Saves the storage state (cookies, localStorage) for each role into files
+ * 2. Logs in with each test user role (admin, coordinador, profesor, etc.)
+ * 3. Saves the storage state (cookies, localStorage) for each role into files
  *
  * These state files are then used by individual tests to start already logged in.
  */
@@ -34,22 +33,6 @@ async function globalSetup(config: FullConfig) {
   for (const [role, creds] of Object.entries(TEST_USERS)) {
     const context = await browser.newContext();
     const page = await context.newPage();
-
-    // Mock config API in global setup so it's cached in the state if needed
-    await page.route("**/api/v1/config/public", async (route) => {
-      await route.fulfill({
-        status: 200,
-        contentType: "application/json",
-        body: JSON.stringify({
-          success: true,
-          data: {
-            themeMode: "light",
-            primaryColor: "#000000",
-            secondaryColor: "#ffffff",
-          },
-        }),
-      });
-    });
 
     try {
       // Login flow

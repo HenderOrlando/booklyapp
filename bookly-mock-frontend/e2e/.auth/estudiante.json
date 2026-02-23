@@ -2,20 +2,20 @@
   "cookies": [
     {
       "name": "accessToken",
-      "value": "mock-token-user_4-1771819186775",
+      "value": "mock-token-user_4-1771819845398",
       "domain": "localhost",
       "path": "/",
-      "expires": 1771905586.776171,
+      "expires": 1771906245.399322,
       "httpOnly": false,
       "secure": false,
       "sameSite": "Strict"
     },
     {
       "name": "refreshToken",
-      "value": "mock-refresh-user_4-1771819186775",
+      "value": "mock-refresh-user_4-1771819845398",
       "domain": "localhost",
       "path": "/",
-      "expires": 1772423986.776436,
+      "expires": 1772424645.399617,
       "httpOnly": false,
       "secure": false,
       "sameSite": "Strict"
@@ -25,7 +25,7 @@
       "value": "es",
       "domain": "localhost",
       "path": "/",
-      "expires": 1803355186.776598,
+      "expires": 1803355845.399881,
       "httpOnly": false,
       "secure": false,
       "sameSite": "Strict"
@@ -37,7 +37,7 @@
       "localStorage": [
         {
           "name": "accessToken",
-          "value": "mock-token-user_4-1771819186775"
+          "value": "mock-token-user_4-1771819845398"
         },
         {
           "name": "rememberMe",
@@ -45,11 +45,11 @@
         },
         {
           "name": "refreshToken",
-          "value": "mock-refresh-user_4-1771819186775"
+          "value": "mock-refresh-user_4-1771819845398"
         },
         {
           "name": "user",
-          "value": "{\"id\":\"user_4\",\"email\":\"estudiante@ufps.edu.co\",\"username\":\"estudiante\",\"firstName\":\"Ana\",\"lastName\":\"Martínez\",\"fullName\":\"Ana Martínez\",\"phoneNumber\":\"+57 303 456 7890\",\"phone\":\"+57 303 456 7890\",\"documentType\":\"TI\",\"documentNumber\":\"5566778899\",\"profilePicture\":\"https://api.dicebear.com/7.x/avataaars/svg?seed=ana\",\"status\":\"ACTIVE\",\"isActive\":true,\"emailVerified\":true,\"isEmailVerified\":true,\"phoneVerified\":false,\"isPhoneVerified\":false,\"twoFactorEnabled\":false,\"roles\":[{\"id\":\"role_4\",\"code\":\"role_4\",\"name\":\"estudiante\",\"displayName\":\"estudiante\",\"description\":\"Estudiante de la universidad\",\"permissions\":[{\"id\":\"perm_5\",\"code\":\"perm_5\",\"name\":\"perm_5\",\"resource\":\"resources\",\"action\":\"read\",\"description\":\"Ver recursos\",\"isSystem\":true},{\"id\":\"perm_6\",\"code\":\"perm_6\",\"name\":\"perm_6\",\"resource\":\"resources\",\"action\":\"create\",\"description\":\"Crear recursos\",\"isSystem\":true},{\"id\":\"perm_9\",\"code\":\"perm_9\",\"name\":\"perm_9\",\"resource\":\"reservations\",\"action\":\"read\",\"description\":\"Ver reservas\",\"isSystem\":true},{\"id\":\"perm_10\",\"code\":\"perm_10\",\"name\":\"perm_10\",\"resource\":\"reservations\",\"action\":\"create\",\"description\":\"Crear reservas\",\"isSystem\":true}],\"isSystem\":true,\"createdAt\":\"2024-01-01T00:00:00.000Z\",\"updatedAt\":\"2024-01-01T00:00:00.000Z\"}],\"permissions\":[{\"id\":\"perm_5\",\"code\":\"perm_5\",\"name\":\"perm_5\",\"resource\":\"resources\",\"action\":\"read\",\"description\":\"Ver recursos\",\"isSystem\":true},{\"id\":\"perm_6\",\"code\":\"perm_6\",\"name\":\"perm_6\",\"resource\":\"resources\",\"action\":\"create\",\"description\":\"Crear recursos\",\"isSystem\":true},{\"id\":\"perm_9\",\"code\":\"perm_9\",\"name\":\"perm_9\",\"resource\":\"reservations\",\"action\":\"read\",\"description\":\"Ver reservas\",\"isSystem\":true},{\"id\":\"perm_10\",\"code\":\"perm_10\",\"name\":\"perm_10\",\"resource\":\"reservations\",\"action\":\"create\",\"description\":\"Crear reservas\",\"isSystem\":true}],\"preferences\":{\"language\":\"es\",\"theme\":\"light\",\"notifications\":{\"email\":true,\"push\":true,\"sms\":false},\"timezone\":\"America/Bogota\"},\"lastLoginAt\":\"2026-02-22T03:59:45.751Z\",\"createdAt\":\"2024-03-01T00:00:00.000Z\",\"updatedAt\":\"2026-02-23T03:59:45.751Z\"}"
+          "value": "{\"id\":\"user_4\",\"email\":\"estudiante@ufps.edu.co\",\"username\":\"estudiante\",\"firstName\":\"Ana\",\"lastName\":\"Martínez\",\"fullName\":\"Ana Martínez\",\"phoneNumber\":\"+57 303 456 7890\",\"phone\":\"+57 303 456 7890\",\"documentType\":\"TI\",\"documentNumber\":\"5566778899\",\"profilePicture\":\"https://api.dicebear.com/7.x/avataaars/svg?seed=ana\",\"status\":\"ACTIVE\",\"isActive\":true,\"emailVerified\":true,\"isEmailVerified\":true,\"phoneVerified\":false,\"isPhoneVerified\":false,\"twoFactorEnabled\":false,\"roles\":[{\"id\":\"role_4\",\"code\":\"role_4\",\"name\":\"estudiante\",\"displayName\":\"estudiante\",\"description\":\"Estudiante de la universidad\",\"permissions\":[{\"id\":\"perm_5\",\"code\":\"perm_5\",\"name\":\"perm_5\",\"resource\":\"resources\",\"action\":\"read\",\"description\":\"Ver recursos\",\"isSystem\":true},{\"id\":\"perm_6\",\"code\":\"perm_6\",\"name\":\"perm_6\",\"resource\":\"resources\",\"action\":\"create\",\"description\":\"Crear recursos\",\"isSystem\":true},{\"id\":\"perm_9\",\"code\":\"perm_9\",\"name\":\"perm_9\",\"resource\":\"reservations\",\"action\":\"read\",\"description\":\"Ver reservas\",\"isSystem\":true},{\"id\":\"perm_10\",\"code\":\"perm_10\",\"name\":\"perm_10\",\"resource\":\"reservations\",\"action\":\"create\",\"description\":\"Crear reservas\",\"isSystem\":true}],\"isSystem\":true,\"createdAt\":\"2024-01-01T00:00:00.000Z\",\"updatedAt\":\"2024-01-01T00:00:00.000Z\"}],\"permissions\":[{\"id\":\"perm_5\",\"code\":\"perm_5\",\"name\":\"perm_5\",\"resource\":\"resources\",\"action\":\"read\",\"description\":\"Ver recursos\",\"isSystem\":true},{\"id\":\"perm_6\",\"code\":\"perm_6\",\"name\":\"perm_6\",\"resource\":\"resources\",\"action\":\"create\",\"description\":\"Crear recursos\",\"isSystem\":true},{\"id\":\"perm_9\",\"code\":\"perm_9\",\"name\":\"perm_9\",\"resource\":\"reservations\",\"action\":\"read\",\"description\":\"Ver reservas\",\"isSystem\":true},{\"id\":\"perm_10\",\"code\":\"perm_10\",\"name\":\"perm_10\",\"resource\":\"reservations\",\"action\":\"create\",\"description\":\"Crear reservas\",\"isSystem\":true}],\"preferences\":{\"language\":\"es\",\"theme\":\"light\",\"notifications\":{\"email\":true,\"push\":true,\"sms\":false},\"timezone\":\"America/Bogota\"},\"lastLoginAt\":\"2026-02-22T04:10:44.511Z\",\"createdAt\":\"2024-03-01T00:00:00.000Z\",\"updatedAt\":\"2026-02-23T04:10:44.511Z\"}"
         }
       ]
     }
