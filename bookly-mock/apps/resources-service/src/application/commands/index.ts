@@ -4,6 +4,7 @@ export * from "./create-category.command";
 export * from "./create-resource.command";
 export * from "./delete-resource.command";
 export * from "./import-resources.command";
+export * from "./import-schedule.command";
 export * from "./restore-resource.command";
 export * from "./rollback-import.command";
 export * from "./schedule-maintenance.command";

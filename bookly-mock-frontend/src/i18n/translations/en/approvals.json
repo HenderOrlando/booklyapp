@@ -79,5 +79,6 @@
   "no_records_found": "No se encontraron registros",
   "showing_records": "Mostrando {count} de {total} registros",
   "not_found": "Approval not found",
-  "a": "to"
+  "a": "to",
+  "management": "Approval Management"
 }

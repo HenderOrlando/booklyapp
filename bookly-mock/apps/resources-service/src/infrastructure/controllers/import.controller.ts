@@ -27,6 +27,7 @@ import {
   StartAsyncImportCommand,
   ValidateImportCommand,
 } from '@resources/application/commands';
+import { ImportScheduleCommand } from '@resources/application/commands/import-schedule.command';
 import {
   GenerateImportTemplateQuery,
   GetImportJobQuery,
@@ -42,6 +43,10 @@ import {
   ValidateImportDto,
   ValidationResultDto,
 } from "../dto";
+import {
+  ImportScheduleFromCSVDto,
+  ImportScheduleResponseDto,
+} from "../dto/import-schedule.dto";
 
 /**
  * Import Controller
@@ -273,6 +278,47 @@ export class ImportController {
     >(templateQuery);
 
     return ResponseUtil.success(csvContent, "Template generated");
+  }
+
+  /**
+   * Importa horarios institucionales desde CSV
+   * Crea recursos, reservas recurrentes y usuarios docentes automáticamente
+   */
+  @Post("schedule")
+  @ApiOperation({
+    summary: "Importar horarios institucionales desde CSV",
+    description:
+      "Importa recursos, crea reservas recurrentes (día+hora) o únicas (fecha), y resuelve/crea docentes. " +
+      "Requiere especificar tipo de recurso y rango de fechas para la recurrencia.",
+  })
+  async importSchedule(
+    @Body() importDto: ImportScheduleFromCSVDto,
+    @CurrentUser("sub") userId: string
+  ) {
+    const command = new ImportScheduleCommand(
+      importDto.csvContent,
+      importDto.resourceType,
+      importDto.recurrenceStartDate,
+      importDto.recurrenceEndDate,
+      userId,
+      importDto.mode,
+      importDto.skipErrors,
+      importDto.defaultCategoryCodes,
+      importDto.defaultTeacherRole,
+      importDto.institutionalEmailDomain
+    );
+
+    const result = await this.commandBus.execute<
+      ImportScheduleCommand,
+      ImportScheduleResponseDto
+    >(command);
+
+    return ResponseUtil.success(
+      result,
+      `Schedule import completed: ${result.resourcesCreated} resources created, ` +
+        `${result.resourcesUpdated} updated, ${result.reservationsCreated} reservations, ` +
+        `${result.teachersCreated} teachers created, ${result.errorCount} errors`
+    );
   }
 
   /**

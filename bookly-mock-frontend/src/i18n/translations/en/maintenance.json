@@ -44,5 +44,6 @@
   "delete_title": "Confirm Deletion",
   "delete_confirm": "Are you sure you want to delete this maintenance?",
   "delete_button": "Delete",
-  "cancel_button": "Cancel"
+  "cancel_button": "Cancel",
+  "total_maintenances": "Total maintenance records"
 }

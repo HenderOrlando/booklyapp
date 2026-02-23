@@ -8,5 +8,104 @@
     "reservations_desc": "Sistema de disponibilidad y reservas",
     "approvals_title": "Aprobaciones",
     "approvals_desc": "Flujos de aprobación configurables"
+  },
+  "nav": {
+    "features": "Funcionalidades",
+    "benefits": "Beneficios",
+    "testimonials": "Testimonios",
+    "cta": "Comenzar ahora"
+  },
+  "hero": {
+    "badge": "Plataforma Institucional de Reservas",
+    "title_line1": "Reserva espacios",
+    "title_highlight": "universitarios",
+    "title_line2": "sin complicaciones",
+    "subtitle": "Bookly simplifica la gestión de salas, laboratorios y auditorios de tu universidad. Reserva en segundos, aprueba con un clic y obtén reportes en tiempo real.",
+    "cta_primary": "Iniciar Sesión",
+    "cta_secondary": "Crear Cuenta",
+    "trusted_by": "Diseñado para la comunidad académica de la UFPS"
+  },
+  "features": {
+    "title": "Todo lo que necesitas para gestionar espacios",
+    "subtitle": "Una plataforma completa que conecta a estudiantes, docentes y administrativos con los recursos físicos de la universidad.",
+    "resources": {
+      "title": "Gestión de Recursos",
+      "description": "Administra salas, laboratorios, auditorios y equipos con categorías, atributos personalizados e importación masiva."
+    },
+    "reservations": {
+      "title": "Reservas Inteligentes",
+      "description": "Reserva espacios en tiempo real con calendario interactivo, detección de conflictos y reservas periódicas automáticas."
+    },
+    "approvals": {
+      "title": "Flujos de Aprobación",
+      "description": "Configura flujos de validación diferenciados por tipo de recurso, con notificaciones automáticas y trazabilidad completa."
+    },
+    "reports": {
+      "title": "Reportes y Análisis",
+      "description": "Dashboards en tiempo real con métricas de ocupación, demanda insatisfecha y exportación a CSV para toma de decisiones."
+    },
+    "calendar": {
+      "title": "Calendario Integrado",
+      "description": "Visualiza la disponibilidad de todos los recursos en formato calendario con vista diaria, semanal y mensual."
+    },
+    "security": {
+      "title": "Seguridad y Roles",
+      "description": "Autenticación segura con roles granulares: administrador, coordinador, docente y estudiante. Auditoría de cada acción."
+    }
+  },
+  "benefits": {
+    "title": "Impacto real en tu institución",
+    "subtitle": "Bookly transforma la forma en que las universidades gestionan sus espacios físicos.",
+    "stat1_value": "90%",
+    "stat1_label": "Reducción de conflictos de horario",
+    "stat2_value": "5 min",
+    "stat2_label": "Tiempo promedio para reservar",
+    "stat3_value": "100%",
+    "stat3_label": "Trazabilidad de aprobaciones",
+    "stat4_value": "24/7",
+    "stat4_label": "Disponibilidad del sistema",
+    "card1_title": "Para Estudiantes",
+    "card1_desc": "Reserva espacios de estudio y laboratorios desde tu celular, en cualquier momento y lugar.",
+    "card2_title": "Para Docentes",
+    "card2_desc": "Solicita auditorios y salas especializadas con aprobación rápida y confirmación automática.",
+    "card3_title": "Para Administrativos",
+    "card3_desc": "Controla el uso de recursos con reportes detallados, métricas de ocupación y auditoría completa."
+  },
+  "testimonials": {
+    "title": "La comunidad académica confía en Bookly",
+    "subtitle": "Opiniones de quienes ya usan la plataforma todos los días.",
+    "t1_quote": "Antes perdía media hora buscando un salón disponible. Con Bookly reservo en menos de un minuto.",
+    "t1_name": "María García",
+    "t1_role": "Estudiante de Ingeniería de Sistemas",
+    "t2_quote": "El sistema de aprobaciones me permite validar solicitudes desde cualquier lugar. La trazabilidad es excelente.",
+    "t2_name": "Carlos Rodríguez",
+    "t2_role": "Coordinador de Programa",
+    "t3_quote": "Los reportes de ocupación nos ayudaron a redistribuir espacios y mejorar el aprovechamiento en un 40%.",
+    "t3_name": "Laura Martínez",
+    "t3_role": "Directora Administrativa"
+  },
+  "cta_section": {
+    "title": "Empieza a gestionar tus espacios hoy",
+    "subtitle": "Únete a la plataforma que está transformando la gestión de recursos universitarios.",
+    "button": "Crear cuenta gratuita",
+    "login_text": "¿Ya tienes cuenta?",
+    "login_link": "Inicia sesión"
+  },
+  "footer": {
+    "brand_desc": "Sistema de reservas institucionales para la Universidad Francisco de Paula Santander.",
+    "product": "Producto",
+    "resources_link": "Recursos",
+    "reservations_link": "Reservas",
+    "approvals_link": "Aprobaciones",
+    "reports_link": "Reportes",
+    "support": "Soporte",
+    "help_center": "Centro de Ayuda",
+    "contact": "Contacto",
+    "documentation": "Documentación",
+    "legal": "Legal",
+    "privacy": "Privacidad",
+    "terms": "Términos de Uso",
+    "copyright": "Bookly. Todos los derechos reservados.",
+    "university": "Universidad Francisco de Paula Santander"
   }
 }
