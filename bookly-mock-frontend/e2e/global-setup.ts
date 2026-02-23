@@ -42,7 +42,7 @@ async function globalSetup(config: FullConfig) {
       await page.fill('[data-testid="login-password-input"]', creds.password);
       await page.click('[data-testid="login-submit-btn"]');
 
-      // Esperar redirecciÃ³n exitosa
+      // Esperar redirección exitosa
       await page.waitForURL(/dashboard/, { timeout: 15000 });
 
       const statePath = path.resolve(`${AUTH_STATE_DIR}/${role}.json`);
