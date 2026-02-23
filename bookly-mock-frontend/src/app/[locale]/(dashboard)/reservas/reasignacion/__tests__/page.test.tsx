@@ -9,10 +9,10 @@ jest.mock("@/contexts/AuthContext", () => ({ useAuth: () => ({ user: { id: "u1",
 jest.mock("@/infrastructure/http/httpClient", () => ({ httpClient: { get: jest.fn().mockResolvedValue({ success: true, data: [] }), post: jest.fn(), put: jest.fn(), patch: jest.fn(), delete: jest.fn() }, isMockMode: () => true }));
 jest.mock("@/hooks/useReassignment", () => ({
   useReassignment: () => ({
-    useHistory: () => ({ data: [], isLoading: false }),
-    respondToReassignment: { mutate: jest.fn(), isPending: false },
-    reassign: { mutate: jest.fn(), isPending: false },
-    cancelReassignment: { mutate: jest.fn(), isPending: false },
+    useHistory: () => ({ data: [], isLoading: false, error: null }),
+    usePending: () => ({ data: [], isLoading: false, error: null }),
+    respondToReassignment: { mutate: jest.fn(), mutateAsync: jest.fn(), isPending: false },
+    requestReassignment: { mutate: jest.fn(), isPending: false },
   }),
 }));
 

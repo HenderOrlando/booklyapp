@@ -12,6 +12,7 @@ export * from "./get-reservation-stats.query";
 export * from "./get-reservations.query";
 export * from "./get-user-activity.query";
 export * from "./get-user-recurring-reservations.query";
+export * from "./get-all-waiting-lists.query";
 export * from "./get-waiting-list.query";
 export * from "./preview-recurring-series.query";
 export * from "./search-availability.query";

@@ -111,6 +111,12 @@ export class ApprovalRequestsController {
         approvalFlowId: query.approvalFlowId,
         status: query.status,
         reservationId: query.reservationId,
+        resourceId: query.resourceId,
+        programId: query.programId,
+        priority: query.priority,
+        search: query.search,
+        startDate: query.startDate,
+        endDate: query.endDate,
       },
     );
 

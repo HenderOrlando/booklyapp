@@ -214,6 +214,12 @@ export class GetReassignmentHistoryDto {
   @IsString()
   @IsOptional()
   reason?: string;
+
+  @ApiPropertyOptional({ description: "Filtrar solo pendientes (sin respuesta del usuario)" })
+  @IsBoolean()
+  @IsOptional()
+  @Type(() => Boolean)
+  pending?: boolean;
 }
 
 /**
@@ -276,6 +282,28 @@ export class ReassignmentHistoryResponseDto {
 
   @ApiProperty({ description: "Fecha de creación" })
   createdAt: Date;
+}
+
+/**
+ * DTO para obtener historial propio de reasignaciones
+ */
+export class GetMyReassignmentHistoryDto {
+  @ApiPropertyOptional({ description: "Filtrar solo pendientes (sin respuesta)" })
+  @IsBoolean()
+  @IsOptional()
+  @Type(() => Boolean)
+  pending?: boolean;
+
+  @ApiPropertyOptional({ description: "Filtrar por aceptadas/rechazadas" })
+  @IsBoolean()
+  @IsOptional()
+  @Type(() => Boolean)
+  accepted?: boolean;
+
+  @ApiPropertyOptional({ description: "Razón de reasignación" })
+  @IsString()
+  @IsOptional()
+  reason?: string;
 }
 
 /**

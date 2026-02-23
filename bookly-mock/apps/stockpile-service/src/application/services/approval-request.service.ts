@@ -341,11 +341,86 @@ export class ApprovalRequestService {
       approvalFlowId?: string;
       status?: ApprovalRequestStatus;
       reservationId?: string;
+      resourceId?: string;
+      programId?: string;
+      priority?: string;
+      search?: string;
+      startDate?: string;
+      endDate?: string;
     }
   ): Promise<{ requests: ApprovalRequestEntity[]; meta: PaginationMeta }> {
     logger.info("Getting approval requests", { filters });
 
-    return await this.approvalRequestRepository.findMany(pagination, filters);
+    // Separate base filters (DB-level) from metadata filters (post-query)
+    const { resourceId, programId, priority, search, startDate, endDate, ...baseFilters } = filters || {};
+
+    const result = await this.approvalRequestRepository.findMany(pagination, baseFilters);
+
+    // Apply metadata-based filters post-query
+    let filteredRequests = result.requests;
+
+    if (resourceId) {
+      filteredRequests = filteredRequests.filter(
+        (r) => r.metadata?.resourceId === resourceId,
+      );
+    }
+
+    if (programId) {
+      filteredRequests = filteredRequests.filter(
+        (r) => r.metadata?.programId === programId,
+      );
+    }
+
+    if (priority) {
+      filteredRequests = filteredRequests.filter(
+        (r) => r.metadata?.priority === priority,
+      );
+    }
+
+    if (startDate) {
+      const start = new Date(startDate);
+      filteredRequests = filteredRequests.filter((r) => {
+        const reservationStart = r.metadata?.reservationStartDate
+          ? new Date(r.metadata.reservationStartDate)
+          : r.createdAt;
+        return reservationStart && reservationStart >= start;
+      });
+    }
+
+    if (endDate) {
+      const end = new Date(endDate);
+      filteredRequests = filteredRequests.filter((r) => {
+        const reservationEnd = r.metadata?.reservationEndDate
+          ? new Date(r.metadata.reservationEndDate)
+          : r.createdAt;
+        return reservationEnd && reservationEnd <= end;
+      });
+    }
+
+    if (search) {
+      const query = search.toLowerCase();
+      filteredRequests = filteredRequests.filter((r) => {
+        const userName = (r.metadata?.userName || "").toLowerCase();
+        const resourceName = (r.metadata?.resourceName || "").toLowerCase();
+        const purpose = (r.metadata?.purpose || "").toLowerCase();
+        const userEmail = (r.metadata?.userEmail || "").toLowerCase();
+        return (
+          userName.includes(query) ||
+          resourceName.includes(query) ||
+          purpose.includes(query) ||
+          userEmail.includes(query)
+        );
+      });
+    }
+
+    return {
+      requests: filteredRequests,
+      meta: {
+        ...result.meta,
+        total: filteredRequests.length,
+        totalPages: Math.ceil(filteredRequests.length / (pagination.limit || 10)),
+      },
+    };
   }
 
   /**

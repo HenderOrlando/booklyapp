@@ -5,7 +5,7 @@ import {
   UpdateWaitingListPriorityCommand,
   AcceptWaitingListOfferCommand,
 } from "@availability/application/commands";
-import { GetWaitingListQuery } from "@availability/application/queries";
+import { GetWaitingListQuery, GetAllWaitingListsQuery } from "@availability/application/queries";
 import { ResponseUtil } from "@libs/common";
 import { CurrentUser } from "@libs/decorators";
 import { JwtAuthGuard } from "@libs/guards";
@@ -77,6 +77,46 @@ export class WaitingListsController {
       waitingListEntry,
       "Added to waiting list successfully",
     );
+  }
+
+  @Get()
+  @ApiOperation({ summary: "Obtener todas las entradas de lista de espera" })
+  @ApiResponse({
+    status: 200,
+    description: "Lista de espera obtenida exitosamente",
+  })
+  async findAll(
+    @Query("page") page?: number,
+    @Query("limit") limit?: number,
+    @Query("resourceId") resourceId?: string,
+    @Query("userId") userId?: string,
+    @Query("isActive") isActive?: string,
+  ): Promise<any> {
+    const filters: { resourceId?: string; userId?: string; isActive?: boolean } = {};
+    if (resourceId) filters.resourceId = resourceId;
+    if (userId) filters.userId = userId;
+    if (isActive !== undefined && isActive !== "") {
+      filters.isActive = isActive === "true";
+    }
+
+    const query = new GetAllWaitingListsQuery(
+      { page: page || 1, limit: limit || 20 },
+      Object.keys(filters).length > 0 ? filters : undefined,
+    );
+
+    const result = await this.queryBus.execute(query);
+
+    if (result.waitingLists && result.meta) {
+      return ResponseUtil.paginated(
+        result.waitingLists,
+        result.meta.total,
+        page || 1,
+        limit || 20,
+        "Waiting lists retrieved successfully",
+      );
+    }
+
+    return ResponseUtil.success(result, "Waiting lists retrieved successfully");
   }
 
   @Get("resource/:resourceId")

@@ -167,6 +167,7 @@ export interface ApprovalFilters {
   level?: ApprovalLevel;
   priority?: ApprovalPriority;
   userId?: string;
+  requesterId?: string;
   resourceId?: string;
   startDate?: string;
   endDate?: string;
@@ -176,6 +177,8 @@ export interface ApprovalFilters {
   dateFrom?: string;
   dateTo?: string;
   search?: string; // Búsqueda por texto
+  page?: number;
+  limit?: number;
 }
 
 /**

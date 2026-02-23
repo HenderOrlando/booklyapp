@@ -77,6 +77,7 @@ const config: Config = {
         app: "var(--color-bg-app)",
         surface: "var(--color-bg-surface)",
         inverse: "var(--color-bg-inverse)",
+        sidebar: "var(--color-bg-sidebar)",
         elevated: "var(--color-bg-elevated)",
 
         content: {

@@ -1,4 +1,6 @@
 import { AddToWaitingListHandler } from "./add-to-waiting-list.handler";
+import { GetAllWaitingListsHandler } from "./get-all-waiting-lists.handler";
+import { GetWaitingListHandler } from "./get-waiting-list.handler";
 import { CancelMaintenanceBlockHandler } from "./cancel-maintenance-block.handler";
 import { CancelRecurringInstanceHandler } from "./cancel-recurring-instance.handler";
 import { CancelRecurringSeriesHandler } from "./cancel-recurring-series.handler";
@@ -75,9 +77,13 @@ export const AllHandlers = [
   GetAvailabilityExceptionsHandler,
   GetMaintenanceBlocksHandler,
   GetReassignmentHistoryHandler,
+  GetAllWaitingListsHandler,
+  GetWaitingListHandler,
 ];
 
 export * from "./add-to-waiting-list.handler";
+export * from "./get-all-waiting-lists.handler";
+export * from "./get-waiting-list.handler";
 export * from "./cancel-waiting-list.handler";
 export * from "./notify-waiting-list.handler";
 export * from "./update-waiting-list-priority.handler";

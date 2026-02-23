@@ -80,5 +80,8 @@
   "showing_records": "Mostrando {count} de {total} registros",
   "not_found": "Approval not found",
   "a": "to",
-  "management": "Approval Management"
+  "management": "Approval Management",
+  "admin_view_all_approvals": "Admin view: showing all system approvals.",
+  "user_view_own_approvals": "Showing only your past approvals.",
+  "error_loading_history": "Error loading approval history"
 }

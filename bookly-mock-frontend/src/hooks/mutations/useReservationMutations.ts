@@ -6,6 +6,7 @@
  */
 
 import { useToast } from "@/hooks/useToast";
+import { ReservationsClient } from "@/infrastructure/api";
 import { httpClient } from "@/infrastructure/http/httpClient";
 import type {
   CreateReservationDto,
@@ -25,19 +26,23 @@ export function useCreateReservation() {
 
   return useMutation({
     mutationFn: async (data: CreateReservationDto) => {
-      const response = await httpClient.post<Reservation>(
-        "/reservations",
-        data
-      );
-      return response;
+      const response = await ReservationsClient.create(data);
+      if (!response.success) {
+        throw new Error(response.message || "Error al crear reserva");
+      }
+      return response.data;
     },
     onSuccess: () => {
       showSuccess(
         t("success_create_title") || "Reserva Creada",
         t("success_create_message") || "La reserva se creó exitosamente"
       );
-      // Invalidar cache de reservas para refrescar lista
-      queryClient.invalidateQueries({ queryKey: reservationKeys.lists() });
+      // Invalidar todas las queries de reservas (listas con cualquier filtro + stats)
+      // invalidateQueries usa prefix matching: ["reservations"] matchea
+      // ["reservations","list",{...}] y ["reservations","stats",...]
+      queryClient.invalidateQueries({
+        queryKey: reservationKeys.all,
+      });
     },
     onError: (error: unknown) => {
       const errorMessage =

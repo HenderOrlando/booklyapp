@@ -96,7 +96,7 @@ export function MainLayout({
                 "fixed inset-y-0 left-0 z-50 w-64",
                 "flex flex-col",
                 "border-r border-line-subtle",
-                "bg-inverse text-content-inverse",
+                "bg-sidebar text-content-inverse",
                 "transition-transform duration-300",
                 "lg:sticky lg:top-16 lg:h-[calc(100vh-4rem)] lg:translate-x-0",
                 sidebarOpen ? "translate-x-0" : "-translate-x-full",

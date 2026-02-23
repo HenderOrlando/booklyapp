@@ -15,15 +15,18 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/atoms/Select";
+import { LoadingSpinner } from "@/components/atoms/LoadingSpinner";
 import { WaitlistManager } from "@/components/organisms/WaitlistManager";
 import {
   useAcceptWaitlistOffer,
   useNotifyWaitlist,
   useRemoveFromWaitlist,
-  waitlistKeys,
 } from "@/hooks/mutations";
+import { useWaitlistEntries } from "@/hooks/useWaitlist";
+import { useResources } from "@/hooks/useResources";
+import { useDataMode } from "@/hooks/useDataMode";
 import type { WaitlistEntry, WaitlistStats } from "@/types/entities/waitlist";
-import { useQuery } from "@tanstack/react-query";
+import type { Resource } from "@/types/entities/resource";
 import { useTranslations } from "next-intl";
 import * as React from "react";
 
@@ -36,114 +39,157 @@ import * as React from "react";
  * - Acciones de notificación y asignación
  */
 
-// Mock data temporales (luego vendrán del backend)
-const getMockWaitlistData = () => ({
-  entries: [
-    {
-      id: "wait_1",
-      userId: "user_1",
-      userName: "Carlos García",
-      userEmail: "carlos.garcia@ufps.edu.co",
-      resourceId: "res_1",
-      resourceName: "Aula 101",
-      desiredDate: "2025-11-25",
-      startTime: "14:00",
-      endTime: "16:00",
-      priority: "HIGH",
-      status: "WAITING",
-      position: 1,
-      reason: "Clase de Cálculo Diferencial - Grupo 01",
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
-    },
-    {
-      id: "wait_2",
-      userId: "user_2",
-      userName: "Ana Martínez",
-      userEmail: "ana.martinez@ufps.edu.co",
-      resourceId: "res_1",
-      resourceName: "Aula 101",
-      desiredDate: "2025-11-25",
-      startTime: "14:00",
-      endTime: "16:00",
-      priority: "NORMAL",
-      status: "WAITING",
-      position: 2,
-      reason: "Tutoría de programación",
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
-    },
-    {
-      id: "wait_3",
-      userId: "user_3",
-      userName: "Luis Rodríguez",
-      userEmail: "luis.rodriguez@ufps.edu.co",
-      resourceId: "res_2",
-      resourceName: "Laboratorio 3",
-      desiredDate: "2025-11-26",
-      startTime: "09:00",
-      endTime: "11:00",
-      priority: "URGENT",
-      status: "NOTIFIED",
-      position: 1,
-      reason: "Práctica de laboratorio - Electrónica",
-      notificationSent: true,
-      notificationSentAt: new Date().toISOString(),
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
-    },
-  ] as WaitlistEntry[],
-  stats: {
-    totalWaiting: 8,
-    totalNotified: 3,
-    totalAssigned: 12,
-    totalExpired: 2,
-    averageWaitTime: 2.5,
-    byPriority: {
-      low: 2,
-      normal: 4,
-      high: 2,
-      urgent: 0,
-    },
-  } as WaitlistStats,
-});
+// Mock data (fallback cuando dataMode es MOCK)
+const MOCK_WAITLIST_ENTRIES: WaitlistEntry[] = [
+  {
+    id: "wait_1",
+    userId: "user_1",
+    userName: "Carlos García",
+    userEmail: "carlos.garcia@ufps.edu.co",
+    resourceId: "res_1",
+    resourceName: "Aula 101",
+    desiredDate: "2025-11-25",
+    startTime: "14:00",
+    endTime: "16:00",
+    priority: "HIGH",
+    status: "WAITING",
+    position: 1,
+    reason: "Clase de Cálculo Diferencial - Grupo 01",
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
+  },
+  {
+    id: "wait_2",
+    userId: "user_2",
+    userName: "Ana Martínez",
+    userEmail: "ana.martinez@ufps.edu.co",
+    resourceId: "res_1",
+    resourceName: "Aula 101",
+    desiredDate: "2025-11-25",
+    startTime: "14:00",
+    endTime: "16:00",
+    priority: "NORMAL",
+    status: "WAITING",
+    position: 2,
+    reason: "Tutoría de programación",
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
+  },
+  {
+    id: "wait_3",
+    userId: "user_3",
+    userName: "Luis Rodríguez",
+    userEmail: "luis.rodriguez@ufps.edu.co",
+    resourceId: "res_2",
+    resourceName: "Laboratorio 3",
+    desiredDate: "2025-11-26",
+    startTime: "09:00",
+    endTime: "11:00",
+    priority: "URGENT",
+    status: "NOTIFIED",
+    position: 1,
+    reason: "Práctica de laboratorio - Electrónica",
+    notificationSent: true,
+    notificationSentAt: new Date().toISOString(),
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
+  },
+];
+
+const MOCK_WAITLIST_STATS: WaitlistStats = {
+  totalWaiting: 8,
+  totalNotified: 3,
+  totalAssigned: 12,
+  totalExpired: 2,
+  averageWaitTime: 2.5,
+  byPriority: {
+    low: 2,
+    normal: 4,
+    high: 2,
+    urgent: 0,
+  },
+};
 
 export default function ListaEsperaPage() {
   const t = useTranslations("waitlist");
+  const { isMock, isServe } = useDataMode();
   const [selectedResourceId, setSelectedResourceId] =
     React.useState<string>("all");
 
-  // React Query para cargar datos de waitlist
-  const { data: waitlistData } = useQuery({
-    queryKey: waitlistKeys.lists(),
-    queryFn: async () => getMockWaitlistData(),
-    staleTime: 1000 * 60 * 2, // 2 minutos
+  // React Query para cargar datos de waitlist desde backend (modo SERVER)
+  const {
+    data: serverData,
+    isLoading,
+    error: serverError,
+    refetch,
+  } = useWaitlistEntries({
+    ...(selectedResourceId !== "all" ? { resourceId: selectedResourceId } : {}),
   });
 
-  const mockEntries = waitlistData?.entries || [];
-  const mockStats = waitlistData?.stats || {
-    totalWaiting: 0,
-    totalNotified: 0,
-    totalAssigned: 0,
-    totalExpired: 0,
-    averageWaitTime: 0,
-    byPriority: { low: 0, normal: 0, high: 0, urgent: 0 },
-  };
+  // Cargar recursos para enriquecer nombres (cross-reference)
+  const { data: resourcesData } = useResources();
+
+  // Mapa de resourceId → nombre para enriquecer entradas
+  const resourceNameMap = React.useMemo(() => {
+    const map = new Map<string, string>();
+    const rd = resourcesData as Record<string, unknown> | Resource[] | undefined;
+    const resources: Resource[] = Array.isArray(rd)
+      ? rd
+      : (rd as Record<string, unknown>)?.resources as Resource[] || (rd as Record<string, unknown>)?.data as Resource[] || [];
+    resources.forEach((r) => map.set(r.id, r.name));
+    return map;
+  }, [resourcesData]);
+
+  // Seleccionar fuente de datos según el modo y enriquecer con nombres
+  const entries: WaitlistEntry[] = React.useMemo(() => {
+    if (isMock) return MOCK_WAITLIST_ENTRIES;
+    const raw = serverData?.entries || [];
+    // Enriquecer con nombres de recursos reales
+    return raw.map((entry) => ({
+      ...entry,
+      resourceName: resourceNameMap.get(entry.resourceId) || entry.resourceName,
+      // userName: si el backend no popula, mostrar un label legible
+      userName: entry.userName && !entry.userName.match(/^[0-9a-f]{24}$/i)
+        ? entry.userName
+        : `Usuario ${entry.position || ''}`.trim(),
+    }));
+  }, [isMock, serverData?.entries, resourceNameMap]);
+
+  const stats: WaitlistStats = React.useMemo(() => {
+    if (isMock) return MOCK_WAITLIST_STATS;
+    return serverData?.stats || {
+      totalWaiting: 0,
+      totalNotified: 0,
+      totalAssigned: 0,
+      totalExpired: 0,
+      averageWaitTime: 0,
+      byPriority: { low: 0, normal: 0, high: 0, urgent: 0 },
+    };
+  }, [isMock, serverData?.stats]);
 
   // Mutations
   const notifyEntry = useNotifyWaitlist();
   const assignEntry = useAcceptWaitlistOffer();
   const removeEntry = useRemoveFromWaitlist();
 
-  // Filtrar por recurso
-  const filteredEntries =
-    selectedResourceId === "all"
-      ? mockEntries
-      : mockEntries.filter((e) => e.resourceId === selectedResourceId);
+  // Extraer recursos únicos para el dropdown de filtro
+  const uniqueResources = React.useMemo(() => {
+    const map = new Map<string, string>();
+    entries.forEach((e) => map.set(e.resourceId, e.resourceName));
+    return Array.from(map.entries()).map(([id, name]) => ({ id, name }));
+  }, [entries]);
+
+  // Filtrar por recurso (en modo mock se filtra client-side, en server ya viene filtrado)
+  const filteredEntries = React.useMemo(() => {
+    if (isServe) return entries; // Ya filtrado por query param
+    return selectedResourceId === "all"
+      ? entries
+      : entries.filter((e) => e.resourceId === selectedResourceId);
+  }, [isServe, entries, selectedResourceId]);
 
   const handleNotify = (entryId: string) => {
     // Obtener entrada para extraer datos del recurso
-    const entry = mockEntries.find((e) => e.id === entryId);
+    const entry = entries.find((e) => e.id === entryId);
     if (!entry) return;
 
     notifyEntry.mutate(
@@ -157,7 +203,7 @@ export default function ListaEsperaPage() {
         onSuccess: () => {
           // Success handled by React Query cache invalidation
         },
-        onError: (error: any) => {
+        onError: (error: unknown) => {
           console.error("Error al notificar:", error);
         },
       },
@@ -169,7 +215,7 @@ export default function ListaEsperaPage() {
       onSuccess: () => {
         // Success handled by React Query cache invalidation
       },
-      onError: (error: any) => {
+      onError: (error: unknown) => {
         console.error("Error al asignar:", error);
       },
     });
@@ -180,7 +226,7 @@ export default function ListaEsperaPage() {
       onSuccess: () => {
         // Success handled by React Query cache invalidation
       },
-      onError: (error: any) => {
+      onError: (error: unknown) => {
         console.error("Error al cancelar:", error);
       },
     });
@@ -216,6 +262,33 @@ export default function ListaEsperaPage() {
           </div>
         </div>
 
+        {/* Estado de carga (solo en modo SERVER) */}
+        {isServe && isLoading && (
+          <div className="flex items-center justify-center py-12">
+            <LoadingSpinner size="lg" />
+            <span className="ml-3 text-[var(--color-text-secondary)]">
+              Cargando lista de espera...
+            </span>
+          </div>
+        )}
+
+        {/* Error de carga (solo en modo SERVER) */}
+        {isServe && serverError && (
+          <Card>
+            <CardContent className="py-8 text-center">
+              <div className="text-[var(--color-state-error-text)] mb-2">
+                Error al cargar lista de espera
+              </div>
+              <p className="text-sm text-[var(--color-text-tertiary)] mb-4">
+                {serverError instanceof Error ? serverError.message : String(serverError)}
+              </p>
+              <Button variant="outline" onClick={() => refetch()}>
+                Reintentar
+              </Button>
+            </CardContent>
+          </Card>
+        )}
+
         {/* Filtro por recurso */}
         <Card>
           <CardHeader>
@@ -239,9 +312,11 @@ export default function ListaEsperaPage() {
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="all">{t("all_resources")}</SelectItem>
-                    <SelectItem value="res_1">Aula 101</SelectItem>
-                    <SelectItem value="res_2">Laboratorio 3</SelectItem>
-                    <SelectItem value="res_3">Auditorio Principal</SelectItem>
+                    {uniqueResources.map((res) => (
+                      <SelectItem key={res.id} value={res.id}>
+                        {res.name}
+                      </SelectItem>
+                    ))}
                   </SelectContent>
                 </Select>
               </div>
@@ -258,7 +333,7 @@ export default function ListaEsperaPage() {
         {/* WaitlistManager Organism */}
         <WaitlistManager
           entries={filteredEntries}
-          stats={mockStats}
+          stats={stats}
           onNotify={handleNotify}
           onAssign={handleAssign}
           onCancel={handleCancel}

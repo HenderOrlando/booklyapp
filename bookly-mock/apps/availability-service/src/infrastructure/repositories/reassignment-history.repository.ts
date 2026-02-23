@@ -45,6 +45,7 @@ export class ReassignmentHistoryRepository {
     startDate?: Date;
     endDate?: Date;
     reason?: string;
+    pending?: boolean;
   }): Promise<ReassignmentHistory[]> {
     const query: any = {};
 
@@ -72,6 +73,13 @@ export class ReassignmentHistoryRepository {
 
     if (filters.reason) {
       query.reason = filters.reason;
+    }
+
+    // Filtrar pendientes: sin respuesta del usuario (respondedAt no existe)
+    if (filters.pending === true) {
+      query.respondedAt = { $exists: false };
+    } else if (filters.pending === false) {
+      query.respondedAt = { $exists: true };
     }
 
     if (filters.startDate || filters.endDate) {

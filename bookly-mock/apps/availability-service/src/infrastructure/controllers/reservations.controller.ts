@@ -108,7 +108,12 @@ export class ReservationsController {
     );
 
     const reservation = await this.commandBus.execute(command);
-    return ResponseUtil.success(reservation, 'Reservation created successfully');
+    // Convertir entidad a objeto plano (incluye title, resourceName, userName)
+    // para mantener consistencia con el formato de GET /reservations
+    const data = typeof reservation.toObject === 'function'
+      ? reservation.toObject()
+      : reservation;
+    return ResponseUtil.success(data, 'Reservation created successfully');
   }
 
   @Get()
@@ -252,7 +257,10 @@ export class ReservationsController {
     );
 
     const reservation = await this.commandBus.execute(command);
-    return ResponseUtil.success(reservation, 'Reservation updated successfully');
+    const data = typeof reservation?.toObject === 'function'
+      ? reservation.toObject()
+      : reservation;
+    return ResponseUtil.success(data, 'Reservation updated successfully');
   }
 
   @Post(":id/cancel")
@@ -277,7 +285,10 @@ export class ReservationsController {
     );
 
     const result = await this.commandBus.execute(command);
-    return ResponseUtil.success(result, 'Reservation cancelled successfully');
+    const data = typeof result?.toObject === 'function'
+      ? result.toObject()
+      : result;
+    return ResponseUtil.success(data, 'Reservation cancelled successfully');
   }
 
   @Post(":id/check-in")
@@ -296,7 +307,10 @@ export class ReservationsController {
   ): Promise<any> {
     const command = new CheckInReservationCommand(id, user.sub);
     const result = await this.commandBus.execute(command);
-    return ResponseUtil.success(result, 'Check-in completed successfully');
+    const data = typeof result?.toObject === 'function'
+      ? result.toObject()
+      : result;
+    return ResponseUtil.success(data, 'Check-in completed successfully');
   }
 
   @Post(":id/check-out")
@@ -315,7 +329,10 @@ export class ReservationsController {
   ): Promise<any> {
     const command = new CheckOutReservationCommand(id, user.sub);
     const result = await this.commandBus.execute(command);
-    return ResponseUtil.success(result, 'Check-out completed successfully');
+    const data = typeof result?.toObject === 'function'
+      ? result.toObject()
+      : result;
+    return ResponseUtil.success(data, 'Check-out completed successfully');
   }
 
   @Delete(":id")

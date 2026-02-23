@@ -18,7 +18,7 @@ import {
   useCreateReservation,
   useUpdateReservation,
 } from "@/hooks/mutations";
-import { useReservations, useReservationStats } from "@/hooks/useReservations";
+import { useReservations } from "@/hooks/useReservations";
 import { useRouter } from "@/i18n/navigation";
 import { mockResourcesForReservations } from "@/infrastructure/mock/data/reservations-service.mock";
 import type { Resource } from "@/types/entities/resource";
@@ -71,10 +71,7 @@ export default function ReservasPage() {
     useReservations(apiFilters);
   const reservations: Reservation[] = reservationsData?.items || [];
 
-  // React Query para estadísticas
-  const { data: statsData, isLoading: loadingStats } = useReservationStats();
-
-  const loading = loadingReservations || loadingStats;
+  const loading = loadingReservations;
 
   // Mutations
   const createReservation = useCreateReservation();
@@ -189,7 +186,7 @@ export default function ReservasPage() {
       >
         <div className="space-y-6">
           {/* Stats Cards */}
-        <ReservationStatsCards stats={statsData} />
+        <ReservationStatsCards reservations={reservations} />
 
         {/* Card con contenido */}
         <Card>

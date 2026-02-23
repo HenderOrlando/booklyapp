@@ -80,6 +80,22 @@ export class WaitingListService {
   }
 
   /**
+   * Obtiene todas las entradas de lista de espera con filtros opcionales
+   */
+  async findAll(
+    query: PaginationQuery,
+    filters?: {
+      resourceId?: string;
+      userId?: string;
+      isActive?: boolean;
+    }
+  ): Promise<{ waitingLists: WaitingListEntity[]; meta: PaginationMeta }> {
+    logger.info("Finding all waiting lists", { filters });
+
+    return await this.waitingListRepository.findMany(query, filters);
+  }
+
+  /**
    * Obtiene la lista de espera de un recurso
    */
   async getWaitingList(
