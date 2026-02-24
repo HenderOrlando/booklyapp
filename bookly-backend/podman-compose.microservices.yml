@@ -7,7 +7,7 @@ services:
   api-gateway:
     build:
       context: .
-      dockerfile: ../ci-cd/bookly-mock/dockerfiles/Dockerfile.gateway
+      dockerfile: ../ci-cd/bookly-backend/dockerfiles/Dockerfile.gateway
     image: bookly-api-gateway:latest
     container_name: bookly-api-gateway
     ports:
@@ -24,7 +24,7 @@ services:
   auth-service:
     build:
       context: .
-      dockerfile: ../ci-cd/bookly-mock/dockerfiles/Dockerfile.auth
+      dockerfile: ../ci-cd/bookly-backend/dockerfiles/Dockerfile.auth
     image: bookly-auth-service:latest
     container_name: bookly-auth-service
     ports:
@@ -41,7 +41,7 @@ services:
   resources-service:
     build:
       context: .
-      dockerfile: ../ci-cd/bookly-mock/dockerfiles/Dockerfile.resources
+      dockerfile: ../ci-cd/bookly-backend/dockerfiles/Dockerfile.resources
     image: bookly-resources-service:latest
     container_name: bookly-resources-service
     ports:
@@ -58,7 +58,7 @@ services:
   availability-service:
     build:
       context: .
-      dockerfile: ../ci-cd/bookly-mock/dockerfiles/Dockerfile.availability
+      dockerfile: ../ci-cd/bookly-backend/dockerfiles/Dockerfile.availability
     image: bookly-availability-service:latest
     container_name: bookly-availability-service
     ports:
@@ -75,7 +75,7 @@ services:
   stockpile-service:
     build:
       context: .
-      dockerfile: ../ci-cd/bookly-mock/dockerfiles/Dockerfile.stockpile
+      dockerfile: ../ci-cd/bookly-backend/dockerfiles/Dockerfile.stockpile
     image: bookly-stockpile-service:latest
     container_name: bookly-stockpile-service
     ports:
@@ -92,7 +92,7 @@ services:
   reports-service:
     build:
       context: .
-      dockerfile: ../ci-cd/bookly-mock/dockerfiles/Dockerfile.reports
+      dockerfile: ../ci-cd/bookly-backend/dockerfiles/Dockerfile.reports
     image: bookly-reports-service:latest
     container_name: bookly-reports-service
     ports:
@@ -108,14 +108,14 @@ services:
   # ===============================================
   bookly-web:
     build:
-      context: ../bookly-mock-frontend
-      dockerfile: ../ci-cd/bookly-mock/dockerfiles/Dockerfile.web
+      context: ../bookly-frontend
+      dockerfile: ../ci-cd/bookly-backend/dockerfiles/Dockerfile.web
     image: bookly-frontend:latest
     container_name: bookly-frontend
     ports:
       - "${PORT_6}:4200"
     env_file:
-      - ../bookly-mock-frontend/.env.podman
+      - ../bookly-frontend/.env.podman
     networks:
       - bookly-network
     restart: unless-stopped

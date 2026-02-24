@@ -33,7 +33,7 @@ export class KafkaService implements OnModuleInit, OnModuleDestroy {
 
       const clientId =
         this.options.clientId ||
-        this.configService.get<string>("KAFKA_CLIENT_ID", "bookly-mock");
+        this.configService.get<string>("KAFKA_CLIENT_ID", "bookly-backend");
 
       this.kafka = new Kafka({
         clientId,

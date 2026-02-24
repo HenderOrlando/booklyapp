@@ -6,14 +6,14 @@ services:
   # ===============================================
   zookeeper:
     image: confluentinc/cp-zookeeper:7.5.0
-    container_name: bookly-mock-zookeeper
+    container_name: bookly-backend-zookeeper
     ports:
       - "${PORT_9}:2181"
     environment:
       ZOOKEEPER_CLIENT_PORT: 2181
       ZOOKEEPER_TICK_TIME: 2000
     networks:
-      - bookly-mock-network
+      - bookly-backend-network
     volumes:
       - zookeeper-data:/var/lib/zookeeper/data
       - zookeeper-logs:/var/lib/zookeeper/log
@@ -23,7 +23,7 @@ services:
   # ===============================================
   kafka:
     image: confluentinc/cp-kafka:7.5.0
-    container_name: bookly-mock-kafka
+    container_name: bookly-backend-kafka
     ports:
       - "${PORT_8}:9092"
       - "${PORT_7}:9093"
@@ -38,7 +38,7 @@ services:
     depends_on:
       - zookeeper
     networks:
-      - bookly-mock-network
+      - bookly-backend-network
     volumes:
       - kafka-data:/var/lib/kafka/data
 
@@ -47,12 +47,12 @@ services:
   # ===============================================
   redis:
     image: redis:7.2-alpine
-    container_name: bookly-mock-redis
+    container_name: bookly-backend-redis
     ports:
       - "${PORT_6}:6379"
     command: redis-server --appendonly yes
     networks:
-      - bookly-mock-network
+      - bookly-backend-network
     volumes:
       - redis-data:/data
     healthcheck:
@@ -66,15 +66,15 @@ services:
   # ===============================================
   mongodb-auth:
     image: mongo:7.0
-    container_name: bookly-mock-mongodb-auth
+    container_name: bookly-backend-mongodb-auth
     ports:
       - "${PORT_5}:27017"
     environment:
       MONGO_INITDB_ROOT_USERNAME: bookly
       MONGO_INITDB_ROOT_PASSWORD: bookly123
-      MONGO_INITDB_DATABASE: bookly-mock-auth
+      MONGO_INITDB_DATABASE: bookly-backend-auth
     networks:
-      - bookly-mock-network
+      - bookly-backend-network
     volumes:
       - mongodb-auth-data:/data/db
       # - ./apps/auth-service/src/database/init-mongo.js:/docker-entrypoint-initdb.d/init-mongo.js:ro
@@ -89,15 +89,15 @@ services:
   # ===============================================
   mongodb-resources:
     image: mongo:7.0
-    container_name: bookly-mock-mongodb-resources
+    container_name: bookly-backend-mongodb-resources
     ports:
       - "${PORT_4}:27017"
     environment:
       MONGO_INITDB_ROOT_USERNAME: bookly
       MONGO_INITDB_ROOT_PASSWORD: bookly123
-      MONGO_INITDB_DATABASE: bookly-mock-resources
+      MONGO_INITDB_DATABASE: bookly-backend-resources
     networks:
-      - bookly-mock-network
+      - bookly-backend-network
     volumes:
       - mongodb-resources-data:/data/db
       # - ./apps/resources-service/src/database/init-mongo.js:/docker-entrypoint-initdb.d/init-mongo.js:ro
@@ -112,15 +112,15 @@ services:
   # ===============================================
   mongodb-availability:
     image: mongo:7.0
-    container_name: bookly-mock-mongodb-availability
+    container_name: bookly-backend-mongodb-availability
     ports:
       - "${PORT_3}:27017"
     environment:
       MONGO_INITDB_ROOT_USERNAME: bookly
       MONGO_INITDB_ROOT_PASSWORD: bookly123
-      MONGO_INITDB_DATABASE: bookly-mock-availability
+      MONGO_INITDB_DATABASE: bookly-backend-availability
     networks:
-      - bookly-mock-network
+      - bookly-backend-network
     volumes:
       - mongodb-availability-data:/data/db
       # - ./apps/availability-service/src/database/init-mongo.js:/docker-entrypoint-initdb.d/init-mongo.js:ro
@@ -135,15 +135,15 @@ services:
   # ===============================================
   mongodb-stockpile:
     image: mongo:7.0
-    container_name: bookly-mock-mongodb-stockpile
+    container_name: bookly-backend-mongodb-stockpile
     ports:
       - "${PORT_2}:27017"
     environment:
       MONGO_INITDB_ROOT_USERNAME: bookly
       MONGO_INITDB_ROOT_PASSWORD: bookly123
-      MONGO_INITDB_DATABASE: bookly-mock-stockpile
+      MONGO_INITDB_DATABASE: bookly-backend-stockpile
     networks:
-      - bookly-mock-network
+      - bookly-backend-network
     volumes:
       - mongodb-stockpile-data:/data/db
       # - ./apps/stockpile-service/src/database/init-mongo.js:/docker-entrypoint-initdb.d/init-mongo.js:ro
@@ -158,15 +158,15 @@ services:
   # ===============================================
   mongodb-reports:
     image: mongo:7.0
-    container_name: bookly-mock-mongodb-reports
+    container_name: bookly-backend-mongodb-reports
     ports:
       - "${PORT_1}:27017"
     environment:
       MONGO_INITDB_ROOT_USERNAME: bookly
       MONGO_INITDB_ROOT_PASSWORD: bookly123
-      MONGO_INITDB_DATABASE: bookly-mock-reports
+      MONGO_INITDB_DATABASE: bookly-backend-reports
     networks:
-      - bookly-mock-network
+      - bookly-backend-network
     volumes:
       - mongodb-reports-data:/data/db
       # - ./apps/reports-service/src/database/init-mongo.js:/docker-entrypoint-initdb.d/init-mongo.js:ro
@@ -181,15 +181,15 @@ services:
   # ===============================================
   mongodb-gateway:
     image: mongo:7.0
-    container_name: bookly-mock-mongodb-gateway
+    container_name: bookly-backend-mongodb-gateway
     ports:
       - "${PORT_0}:27017"
     environment:
       MONGO_INITDB_ROOT_USERNAME: bookly
       MONGO_INITDB_ROOT_PASSWORD: bookly123
-      MONGO_INITDB_DATABASE: bookly-mock-gateway
+      MONGO_INITDB_DATABASE: bookly-backend-gateway
     networks:
-      - bookly-mock-network
+      - bookly-backend-network
     volumes:
       - mongodb-gateway-data:/data/db
     healthcheck:
@@ -204,9 +204,9 @@ services:
   api-gateway:
     build:
       context: .
-      dockerfile: ../ci-cd/bookly-mock/dockerfiles/Dockerfile.gateway
-    image: bookly-mock-api-gateway:latest
-    container_name: bookly-mock-api-gateway
+      dockerfile: ../ci-cd/bookly-backend/dockerfiles/Dockerfile.gateway
+    image: bookly-backend-api-gateway:latest
+    container_name: bookly-backend-api-gateway
     ports:
       - "${PORT_10}:3000"
     environment:
@@ -224,7 +224,7 @@ services:
       # Reports Service
       REPORTS_SERVICE_URL: http://reports-service:3005
       # MongoDB Gateway
-      MONGO_URI: mongodb://bookly:bookly123@mongodb-gateway:27017/bookly-mock-gateway?authSource=admin
+      MONGO_URI: mongodb://bookly:bookly123@mongodb-gateway:27017/bookly-backend-gateway?authSource=admin
       # Redis
       REDIS_HOST: redis
       REDIS_PORT: 6379
@@ -238,7 +238,7 @@ services:
       kafka:
         condition: service_started
     networks:
-      - bookly-mock-network
+      - bookly-backend-network
     restart: unless-stopped
 
   # ===============================================
@@ -247,16 +247,16 @@ services:
   auth-service:
     build:
       context: .
-      dockerfile: ../ci-cd/bookly-mock/dockerfiles/Dockerfile.auth
-    image: bookly-mock-auth-service:latest
-    container_name: bookly-mock-auth-service
+      dockerfile: ../ci-cd/bookly-backend/dockerfiles/Dockerfile.auth
+    image: bookly-backend-auth-service:latest
+    container_name: bookly-backend-auth-service
     ports:
       - "${PORT_11}:3001"
     environment:
       NODE_ENV: production
       PORT: 3001
       # MongoDB Auth
-      MONGO_URI: mongodb://bookly:bookly123@mongodb-auth:27017/bookly-mock-auth?authSource=admin
+      MONGO_URI: mongodb://bookly:bookly123@mongodb-auth:27017/bookly-backend-auth?authSource=admin
       # Redis
       REDIS_HOST: redis
       REDIS_PORT: 6379
@@ -273,7 +273,7 @@ services:
       kafka:
         condition: service_started
     networks:
-      - bookly-mock-network
+      - bookly-backend-network
     restart: unless-stopped
 
   # ===============================================
@@ -282,16 +282,16 @@ services:
   resources-service:
     build:
       context: .
-      dockerfile: ../ci-cd/bookly-mock/dockerfiles/Dockerfile.resources
-    image: bookly-mock-resources-service:latest
-    container_name: bookly-mock-resources-service
+      dockerfile: ../ci-cd/bookly-backend/dockerfiles/Dockerfile.resources
+    image: bookly-backend-resources-service:latest
+    container_name: bookly-backend-resources-service
     ports:
       - "${PORT_12}:3002"
     environment:
       NODE_ENV: production
       PORT: 3002
       # MongoDB Resources
-      MONGO_URI: mongodb://bookly:bookly123@mongodb-resources:27017/bookly-mock-resources?authSource=admin
+      MONGO_URI: mongodb://bookly:bookly123@mongodb-resources:27017/bookly-backend-resources?authSource=admin
       # Redis
       REDIS_HOST: redis
       REDIS_PORT: 6379
@@ -305,7 +305,7 @@ services:
       kafka:
         condition: service_started
     networks:
-      - bookly-mock-network
+      - bookly-backend-network
     restart: unless-stopped
 
   # ===============================================
@@ -314,16 +314,16 @@ services:
   availability-service:
     build:
       context: .
-      dockerfile: ../ci-cd/bookly-mock/dockerfiles/Dockerfile.availability
-    image: bookly-mock-availability-service:latest
-    container_name: bookly-mock-availability-service
+      dockerfile: ../ci-cd/bookly-backend/dockerfiles/Dockerfile.availability
+    image: bookly-backend-availability-service:latest
+    container_name: bookly-backend-availability-service
     ports:
       - "${PORT_13}:3003"
     environment:
       NODE_ENV: production
       PORT: 3003
       # MongoDB Availability
-      MONGO_URI: mongodb://bookly:bookly123@mongodb-availability:27017/bookly-mock-availability?authSource=admin
+      MONGO_URI: mongodb://bookly:bookly123@mongodb-availability:27017/bookly-backend-availability?authSource=admin
       # Redis
       REDIS_HOST: redis
       REDIS_PORT: 6379
@@ -337,7 +337,7 @@ services:
       kafka:
         condition: service_started
     networks:
-      - bookly-mock-network
+      - bookly-backend-network
     restart: unless-stopped
 
   # ===============================================
@@ -346,16 +346,16 @@ services:
   stockpile-service:
     build:
       context: .
-      dockerfile: ../ci-cd/bookly-mock/dockerfiles/Dockerfile.stockpile
-    image: bookly-mock-stockpile-service:latest
-    container_name: bookly-mock-stockpile-service
+      dockerfile: ../ci-cd/bookly-backend/dockerfiles/Dockerfile.stockpile
+    image: bookly-backend-stockpile-service:latest
+    container_name: bookly-backend-stockpile-service
     ports:
       - "${PORT_14}:3004"
     environment:
       NODE_ENV: production
       PORT: 3004
       # MongoDB Stockpile
-      MONGO_URI: mongodb://bookly:bookly123@mongodb-stockpile:27017/bookly-mock-stockpile?authSource=admin
+      MONGO_URI: mongodb://bookly:bookly123@mongodb-stockpile:27017/bookly-backend-stockpile?authSource=admin
       # Redis
       REDIS_HOST: redis
       REDIS_PORT: 6379
@@ -369,7 +369,7 @@ services:
       kafka:
         condition: service_started
     networks:
-      - bookly-mock-network
+      - bookly-backend-network
     restart: unless-stopped
 
   # ===============================================
@@ -378,16 +378,16 @@ services:
   reports-service:
     build:
       context: .
-      dockerfile: ../ci-cd/bookly-mock/dockerfiles/Dockerfile.reports
-    image: bookly-mock-reports-service:latest
-    container_name: bookly-mock-reports-service
+      dockerfile: ../ci-cd/bookly-backend/dockerfiles/Dockerfile.reports
+    image: bookly-backend-reports-service:latest
+    container_name: bookly-backend-reports-service
     ports:
       - "${PORT_15}:3005"
     environment:
       NODE_ENV: production
       PORT: 3005
       # MongoDB Reports
-      MONGO_URI: mongodb://bookly:bookly123@mongodb-reports:27017/bookly-mock-reports?authSource=admin
+      MONGO_URI: mongodb://bookly:bookly123@mongodb-reports:27017/bookly-backend-reports?authSource=admin
       # Redis
       REDIS_HOST: redis
       REDIS_PORT: 6379
@@ -401,7 +401,7 @@ services:
       kafka:
         condition: service_started
     networks:
-      - bookly-mock-network
+      - bookly-backend-network
     restart: unless-stopped
 
   # ===============================================
@@ -409,7 +409,7 @@ services:
   # ===============================================
   bookly-web:
     build:
-      context: ../bookly-mock-frontend
+      context: ../bookly-frontend
       dockerfile_inline: |
         FROM node:20-alpine AS deps
         RUN apk add --no-cache libc6-compat
@@ -434,8 +434,8 @@ services:
         EXPOSE 4200
         ENV PORT 4200
         CMD ["node", "server.js"]
-    image: bookly-mock-frontend:latest
-    container_name: bookly-mock-frontend
+    image: bookly-frontend:latest
+    container_name: bookly-frontend
     ports:
       - "${PORT_16}:4200"
     environment:
@@ -445,11 +445,11 @@ services:
     depends_on:
       - api-gateway
     networks:
-      - bookly-mock-network
+      - bookly-backend-network
     restart: unless-stopped
 
 networks:
-  bookly-mock-network:
+  bookly-backend-network:
     driver: bridge
 
 volumes:
