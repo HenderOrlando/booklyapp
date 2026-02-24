@@ -40,11 +40,11 @@ jobs:
           node-version: "20"
 
       - name: Install FE dependencies
-        working-directory: bookly-mock-frontend
+        working-directory: bookly-frontend
         run: npm ci --ignore-scripts
 
       - name: npm audit (FE)
-        working-directory: bookly-mock-frontend
+        working-directory: bookly-frontend
         run: npm audit --audit-level=high || true
 
   dependency-audit-backend:
@@ -60,9 +60,9 @@ jobs:
           node-version: "20"
 
       - name: Install BE dependencies
-        working-directory: bookly-mock
+        working-directory: bookly-backend
         run: npm ci --ignore-scripts
 
       - name: npm audit (BE)
-        working-directory: bookly-mock
+        working-directory: bookly-backend
         run: npm audit --audit-level=high || true

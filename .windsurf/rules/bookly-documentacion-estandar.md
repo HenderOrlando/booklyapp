@@ -1,8 +1,8 @@
 ---
 description: Reglas y estándares para la creación, actualización y mantenimiento de la documentación en Bookly (Frontend, Backend y Global)
   - "docs/**/*.md"
-  - "bookly-mock/docs/**/*.md"
-  - "bookly-mock-frontend/docs/**/*.md"
+  - "bookly-backend/docs/**/*.md"
+  - "bookly-frontend/docs/**/*.md"
 trigger: always_on
 ---
 
@@ -23,7 +23,7 @@ Lineamientos obligatorios para crear, modificar y organizar documentación en Bo
 - `workflows-guide/` - Guías rápidas y definiciones de workflows de Windsurf.
 - `archive/` - Documentación obsoleta (rules-review, workflows-old, fixes anteriores).
 
-### `bookly-mock/docs/` (Backend)
+### `bookly-backend/docs/` (Backend)
 
 - `adr/` - Architecture Decision Records (ADR-001 a ADR-003).
 - `api/` - Estándar de respuestas, Swagger, AsyncAPI, ejemplos de uso.
@@ -36,7 +36,7 @@ Lineamientos obligatorios para crear, modificar y organizar documentación en Bo
 - `testing/` - Estado de testing y auditoría de dashboard.
 - `archive/` - Planes completados, migraciones, refactorings, verificaciones, rules-review.
 
-### `bookly-mock-frontend/docs/` (Frontend)
+### `bookly-frontend/docs/` (Frontend)
 
 - `architecture-and-standards/` - ARCHITECTURE, BEST_PRACTICES, PERFORMANCE, TESTING.
 - `api-integration/` - Guías de integración UI-API por servicio (01-06), configuración backend, estructura de respuesta.
@@ -66,8 +66,8 @@ Lineamientos obligatorios para crear, modificar y organizar documentación en Bo
 Cualquier adición, movimiento o eliminación de un archivo de documentación obliga a actualizar:
 
 - `docs/` → `docs/DIRECTORIO_DOCUMENTACION.md`
-- `bookly-mock/docs/` → `bookly-mock/docs/INDEX.md`
-- `bookly-mock-frontend/docs/` → `bookly-mock-frontend/docs/INDEX.md`
+- `bookly-backend/docs/` → `bookly-backend/docs/INDEX.md`
+- `bookly-frontend/docs/` → `bookly-frontend/docs/INDEX.md`
 
 ## 4. Archivo de Documentación Obsoleta (Archive)
 
@@ -84,7 +84,7 @@ Cualquier adición, movimiento o eliminación de un archivo de documentación ob
 
 - **Features frontend:** Estructura `Feature: [Nombre]` → Requerimientos → Implementación → Tests.
 - **Fixes frontend:** Estructura `Fix: [Nombre]` → Problema → Causa Raíz → Solución → Prevención.
-- **Backend:** Usar plantillas de `bookly-mock/docs/templates/` (REQUIREMENT, ENDPOINTS, SEEDS, ARCHITECTURE, DATABASE, EVENT_BUS).
+- **Backend:** Usar plantillas de `bookly-backend/docs/templates/` (REQUIREMENT, ENDPOINTS, SEEDS, ARCHITECTURE, DATABASE, EVENT_BUS).
 
 ## 6. Lenguaje y Tono
 

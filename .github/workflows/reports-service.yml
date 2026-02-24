@@ -6,9 +6,9 @@ on:
       - main
       - develop
     paths:
-      - 'bookly-mock/apps/reports-service/**'
-      - 'bookly-mock/libs/**'
-      - 'ci-cd/bookly-mock/dockerfiles/Dockerfile.reports'
+      - 'bookly-backend/apps/reports-service/**'
+      - 'bookly-backend/libs/**'
+      - 'ci-cd/bookly-backend/dockerfiles/Dockerfile.reports'
       - '.github/workflows/reports-service.yml'
   workflow_dispatch:
 
@@ -24,8 +24,8 @@ jobs:
     uses: ./.github/workflows/build-and-push-image.yml
     with:
       service-name: reports-service
-      dockerfile-path: ci-cd/bookly-mock/dockerfiles/Dockerfile.reports
-      context-path: bookly-mock
+      dockerfile-path: ci-cd/bookly-backend/dockerfiles/Dockerfile.reports
+      context-path: bookly-backend
       image-name: bookly-reports-service
 
   deploy:

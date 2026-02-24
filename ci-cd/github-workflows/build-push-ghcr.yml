@@ -28,9 +28,9 @@ on:
       - main
       - develop
     paths:
-      - 'bookly-mock/**'
-      - 'ci-cd/bookly-mock/dockerfiles/**'
-      - 'bookly-mock-frontend/**'
+      - 'bookly-backend/**'
+      - 'ci-cd/bookly-backend/dockerfiles/**'
+      - 'bookly-frontend/**'
 
 env:
   REGISTRY: ghcr.io
@@ -112,12 +112,12 @@ jobs:
           
           case $SERVICE in
             web)
-              echo "dockerfile=ci-cd/bookly-mock/dockerfiles/Dockerfile.web" >> $GITHUB_OUTPUT
-              echo "context=bookly-mock-frontend" >> $GITHUB_OUTPUT
+              echo "dockerfile=ci-cd/bookly-backend/dockerfiles/Dockerfile.web" >> $GITHUB_OUTPUT
+              echo "context=bookly-frontend" >> $GITHUB_OUTPUT
               ;;
             *)
-              echo "dockerfile=ci-cd/bookly-mock/dockerfiles/Dockerfile.$SERVICE" >> $GITHUB_OUTPUT
-              echo "context=bookly-mock" >> $GITHUB_OUTPUT
+              echo "dockerfile=ci-cd/bookly-backend/dockerfiles/Dockerfile.$SERVICE" >> $GITHUB_OUTPUT
+              echo "context=bookly-backend" >> $GITHUB_OUTPUT
               ;;
           esac
 

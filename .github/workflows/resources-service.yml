@@ -6,9 +6,9 @@ on:
       - main
       - develop
     paths:
-      - 'bookly-mock/apps/resources-service/**'
-      - 'bookly-mock/libs/**'
-      - 'ci-cd/bookly-mock/dockerfiles/Dockerfile.resources'
+      - 'bookly-backend/apps/resources-service/**'
+      - 'bookly-backend/libs/**'
+      - 'ci-cd/bookly-backend/dockerfiles/Dockerfile.resources'
       - '.github/workflows/resources-service.yml'
   workflow_dispatch:
 
@@ -24,8 +24,8 @@ jobs:
     uses: ./.github/workflows/build-and-push-image.yml
     with:
       service-name: resources-service
-      dockerfile-path: ci-cd/bookly-mock/dockerfiles/Dockerfile.resources
-      context-path: bookly-mock
+      dockerfile-path: ci-cd/bookly-backend/dockerfiles/Dockerfile.resources
+      context-path: bookly-backend
       image-name: bookly-resources-service
 
   deploy:

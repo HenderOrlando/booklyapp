@@ -6,9 +6,9 @@ on:
       - main
       - develop
     paths:
-      - 'bookly-mock/apps/stockpile-service/**'
-      - 'bookly-mock/libs/**'
-      - 'ci-cd/bookly-mock/dockerfiles/Dockerfile.stockpile'
+      - 'bookly-backend/apps/stockpile-service/**'
+      - 'bookly-backend/libs/**'
+      - 'ci-cd/bookly-backend/dockerfiles/Dockerfile.stockpile'
       - '.github/workflows/stockpile-service.yml'
   workflow_dispatch:
 
@@ -24,8 +24,8 @@ jobs:
     uses: ./.github/workflows/build-and-push-image.yml
     with:
       service-name: stockpile-service
-      dockerfile-path: ci-cd/bookly-mock/dockerfiles/Dockerfile.stockpile
-      context-path: bookly-mock
+      dockerfile-path: ci-cd/bookly-backend/dockerfiles/Dockerfile.stockpile
+      context-path: bookly-backend
       image-name: bookly-stockpile-service
 
   deploy:

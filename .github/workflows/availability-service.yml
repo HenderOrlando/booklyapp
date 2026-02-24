@@ -6,9 +6,9 @@ on:
       - main
       - develop
     paths:
-      - 'bookly-mock/apps/availability-service/**'
-      - 'bookly-mock/libs/**'
-      - 'ci-cd/bookly-mock/dockerfiles/Dockerfile.availability'
+      - 'bookly-backend/apps/availability-service/**'
+      - 'bookly-backend/libs/**'
+      - 'ci-cd/bookly-backend/dockerfiles/Dockerfile.availability'
       - '.github/workflows/availability-service.yml'
   workflow_dispatch:
 
@@ -24,8 +24,8 @@ jobs:
     uses: ./.github/workflows/build-and-push-image.yml
     with:
       service-name: availability-service
-      dockerfile-path: ci-cd/bookly-mock/dockerfiles/Dockerfile.availability
-      context-path: bookly-mock
+      dockerfile-path: ci-cd/bookly-backend/dockerfiles/Dockerfile.availability
+      context-path: bookly-backend
       image-name: bookly-availability-service
 
   deploy:

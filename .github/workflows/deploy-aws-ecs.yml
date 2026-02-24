@@ -25,38 +25,38 @@ jobs:
       matrix:
         service:
           - name: api-gateway
-            dockerfile: ci-cd/bookly-mock/dockerfiles/Dockerfile.gateway
-            context: bookly-mock
+            dockerfile: ci-cd/bookly-backend/dockerfiles/Dockerfile.gateway
+            context: bookly-backend
             ecs_service: bookly-api-gateway-service
             ecs_cluster: bookly-cluster
           - name: auth-service
-            dockerfile: ci-cd/bookly-mock/dockerfiles/Dockerfile.auth
-            context: bookly-mock
+            dockerfile: ci-cd/bookly-backend/dockerfiles/Dockerfile.auth
+            context: bookly-backend
             ecs_service: bookly-auth-service
             ecs_cluster: bookly-cluster
           - name: availability-service
-            dockerfile: ci-cd/bookly-mock/dockerfiles/Dockerfile.availability
-            context: bookly-mock
+            dockerfile: ci-cd/bookly-backend/dockerfiles/Dockerfile.availability
+            context: bookly-backend
             ecs_service: bookly-availability-service
             ecs_cluster: bookly-cluster
           - name: resources-service
-            dockerfile: ci-cd/bookly-mock/dockerfiles/Dockerfile.resources
-            context: bookly-mock
+            dockerfile: ci-cd/bookly-backend/dockerfiles/Dockerfile.resources
+            context: bookly-backend
             ecs_service: bookly-resources-service
             ecs_cluster: bookly-cluster
           - name: reports-service
-            dockerfile: ci-cd/bookly-mock/dockerfiles/Dockerfile.reports
-            context: bookly-mock
+            dockerfile: ci-cd/bookly-backend/dockerfiles/Dockerfile.reports
+            context: bookly-backend
             ecs_service: bookly-reports-service
             ecs_cluster: bookly-cluster
           - name: stockpile-service
-            dockerfile: ci-cd/bookly-mock/dockerfiles/Dockerfile.stockpile
-            context: bookly-mock
+            dockerfile: ci-cd/bookly-backend/dockerfiles/Dockerfile.stockpile
+            context: bookly-backend
             ecs_service: bookly-stockpile-service
             ecs_cluster: bookly-cluster
           - name: bookly-web
-            dockerfile: ci-cd/bookly-mock/dockerfiles/Dockerfile.web
-            context: bookly-mock-frontend
+            dockerfile: ci-cd/bookly-backend/dockerfiles/Dockerfile.web
+            context: bookly-frontend
             ecs_service: bookly-web-service
             ecs_cluster: bookly-cluster
 

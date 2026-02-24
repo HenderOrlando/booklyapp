@@ -6,9 +6,9 @@ on:
       - main
       - develop
     paths:
-      - 'bookly-mock/apps/api-gateway/**'
-      - 'bookly-mock/libs/**'
-      - 'ci-cd/bookly-mock/dockerfiles/Dockerfile.gateway'
+      - 'bookly-backend/apps/api-gateway/**'
+      - 'bookly-backend/libs/**'
+      - 'ci-cd/bookly-backend/dockerfiles/Dockerfile.gateway'
       - '.github/workflows/api-gateway.yml'
   workflow_dispatch:
 
@@ -24,8 +24,8 @@ jobs:
     uses: ./.github/workflows/build-and-push-image.yml
     with:
       service-name: api-gateway
-      dockerfile-path: ci-cd/bookly-mock/dockerfiles/Dockerfile.gateway
-      context-path: bookly-mock
+      dockerfile-path: ci-cd/bookly-backend/dockerfiles/Dockerfile.gateway
+      context-path: bookly-backend
       image-name: bookly-api-gateway
 
   deploy:

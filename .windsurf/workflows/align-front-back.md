@@ -4,7 +4,7 @@ description: Workflow de verificación y alineación entre el frontend y backend
 
 # WF-38 — Verificación de alineación Frontend/Backend (Windsurf) + Release Gate a Producción
 
-> **Skills** desde `.windsurf/skills/*` · **Rules** desde `.windsurf/rules/*` · **Contratos** en `backend-mock/` **frontend** en `bookly-mock-frontend/` **backend** en `bookly-mock/`
+> **Skills** desde `.windsurf/skills/*` · **Rules** desde `.windsurf/rules/*` · **Contratos** en `bookly-backend/` **frontend** en `bookly-frontend/` **backend** en `bookly-backend/`
 
 ## Catálogo de skills (referencia rápida)
 

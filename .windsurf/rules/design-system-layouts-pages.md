@@ -1,6 +1,6 @@
 ---
 trigger: model_decision
-description: when work in bookly-mock-frontend folder
+description: when work in bookly-frontend folder
 ---
 
 # 🧱 Layouts y Patrones de Página – Bookly

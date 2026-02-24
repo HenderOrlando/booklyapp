@@ -6,8 +6,8 @@ on:
       - main
       - develop
     paths:
-      - 'bookly-mock-frontend/**'
-      - 'ci-cd/bookly-mock/dockerfiles/Dockerfile.web'
+      - 'bookly-frontend/**'
+      - 'ci-cd/bookly-backend/dockerfiles/Dockerfile.web'
       - '.github/workflows/frontend.yml'
   workflow_dispatch:
 
@@ -23,8 +23,8 @@ jobs:
     uses: ./.github/workflows/build-and-push-image.yml
     with:
       service-name: bookly-web
-      dockerfile-path: ci-cd/bookly-mock/dockerfiles/Dockerfile.web
-      context-path: bookly-mock-frontend
+      dockerfile-path: ci-cd/bookly-backend/dockerfiles/Dockerfile.web
+      context-path: bookly-frontend
       image-name: bookly-frontend
 
   deploy:
