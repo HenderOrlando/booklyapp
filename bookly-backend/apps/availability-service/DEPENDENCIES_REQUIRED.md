@@ -5,7 +5,7 @@
 ### Instalación
 
 ```bash
-cd /Users/henderorlando/Documents/GitHub/bookly-monorepo/bookly-mock/apps/availability-service
+cd /Users/henderorlando/Documents/GitHub/bookly-monorepo/bookly-backend/apps/availability-service
 
 # Calendarios OAuth y APIs
 npm install googleapis@^126.0.0

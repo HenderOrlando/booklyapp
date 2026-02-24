@@ -10,7 +10,7 @@ echo "🔍 Verificando integración del Event Bus Unificado..."
 echo ""
 
 # Directorio base
-BASE_DIR="/Users/henderorlando/Documents/GitHub/bookly-monorepo/bookly-mock"
+BASE_DIR="/Users/henderorlando/Documents/GitHub/bookly-monorepo/bookly-backend"
 cd "$BASE_DIR"
 
 # Colores

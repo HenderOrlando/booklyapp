@@ -23,7 +23,7 @@ check_mongodb() {
     echo -n "Verificando MongoDB en puerto $port ($service)... "
     if docker ps | grep -q "27017->27017.*bookly-mongodb-$service" || \
        docker ps | grep -q "$port:27017.*bookly-mongodb-$service" || \
-       docker ps | grep -q "bookly-mock-mongodb-$service"; then
+       docker ps | grep -q "bookly-backend-mongodb-$service"; then
         echo -e "${GREEN}✓ Corriendo${NC}"
         return 0
     else

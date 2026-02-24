@@ -5,7 +5,7 @@ Garantizar que todos los microservicios sigan los principios arquitectónicos de
 
 ---
 
-## ✅ Estado Actual en bookly-mock
+## ✅ Estado Actual en bookly-backend
 
 ### ✓ Implementado Correctamente
 

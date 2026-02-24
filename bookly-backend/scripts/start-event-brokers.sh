@@ -10,7 +10,7 @@ echo "🚀 Iniciando Event Brokers para pruebas de Event Bus..."
 echo ""
 
 # Directorio base
-BASE_DIR="/Users/henderorlando/Documents/GitHub/bookly-monorepo/bookly-mock"
+BASE_DIR="/Users/henderorlando/Documents/GitHub/bookly-monorepo/bookly-backend"
 cd "$BASE_DIR"
 
 # Colores
@@ -22,11 +22,11 @@ NC='\033[0m' # No Color
 
 # Verificar si Kafka está corriendo
 echo "📡 Verificando Kafka..."
-if docker ps | grep -q "bookly-mock-kafka"; then
+if docker ps | grep -q "bookly-backend-kafka"; then
     echo -e "${GREEN}✅ Kafka ya está corriendo${NC}"
 else
     echo -e "${YELLOW}⚠️  Kafka no está corriendo. Iniciando...${NC}"
-    docker start bookly-mock-kafka bookly-mock-zookeeper 2>/dev/null || {
+    docker start bookly-backend-kafka bookly-backend-zookeeper 2>/dev/null || {
         echo -e "${RED}❌ Error: No se pudo iniciar Kafka${NC}"
         echo "   Ejecuta: docker-compose up -d kafka zookeeper"
         exit 1
@@ -55,12 +55,12 @@ fi
 echo ""
 echo "🔍 Verificando salud de Kafka..."
 sleep 2
-if docker exec bookly-mock-kafka kafka-topics.sh --list --bootstrap-server localhost:9092 >/dev/null 2>&1; then
+if docker exec bookly-backend-kafka kafka-topics.sh --list --bootstrap-server localhost:9092 >/dev/null 2>&1; then
     echo -e "${GREEN}✅ Kafka está funcionando correctamente${NC}"
     echo "   Puerto: 9092"
 else
     echo -e "${RED}❌ Kafka no responde correctamente${NC}"
-    echo "   Verifica los logs: docker logs bookly-mock-kafka"
+    echo "   Verifica los logs: docker logs bookly-backend-kafka"
 fi
 
 # Verificar salud de RabbitMQ

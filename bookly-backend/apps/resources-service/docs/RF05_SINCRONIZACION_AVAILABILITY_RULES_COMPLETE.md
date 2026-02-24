@@ -324,7 +324,7 @@ Cuando no se pueden obtener reglas del recurso, se aplican las siguientes por de
 PORT=3002
 
 # MongoDB
-MONGODB_URI_AVAILABILITY=mongodb://bookly:bookly123@localhost:27019/bookly-mock-availability?authSource=admin
+MONGODB_URI_AVAILABILITY=mongodb://bookly:bookly123@localhost:27019/bookly-backend-availability?authSource=admin
 
 # Redis para cache
 REDIS_HOST=localhost
@@ -343,7 +343,7 @@ KAFKA_BROKER=localhost:9092
 PORT=3003
 
 # MongoDB
-MONGODB_URI_RESOURCES=mongodb://bookly:bookly123@localhost:27017/bookly-mock-resources?authSource=admin
+MONGODB_URI_RESOURCES=mongodb://bookly:bookly123@localhost:27017/bookly-backend-resources?authSource=admin
 
 # Kafka para eventos
 KAFKA_BROKER=localhost:9092

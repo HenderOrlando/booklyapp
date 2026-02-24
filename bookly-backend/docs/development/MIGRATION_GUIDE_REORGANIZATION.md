@@ -7,7 +7,7 @@
 
 ## 📌 ¿Qué cambió?
 
-Se reorganizó completamente la estructura de documentación y scripts de bookly-mock para mejorar la navegabilidad y eliminar redundancias.
+Se reorganizó completamente la estructura de documentación y scripts de bookly-backend para mejorar la navegabilidad y eliminar redundancias.
 
 ---
 
@@ -190,9 +190,9 @@ grep -r "idempotencia" docs/
 
 ```bash
 # Alias útiles para .bashrc o .zshrc
-alias bdocs='cd /path/to/bookly-mock/docs'
-alias bscripts='cd /path/to/bookly-mock/scripts'
-alias bindex='cat /path/to/bookly-mock/docs/INDEX.md'
+alias bdocs='cd /path/to/bookly-backend/docs'
+alias bscripts='cd /path/to/bookly-backend/scripts'
+alias bindex='cat /path/to/bookly-backend/docs/INDEX.md'
 ```
 
 ---

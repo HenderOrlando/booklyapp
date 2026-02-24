@@ -8,7 +8,7 @@
 
 ## 🎯 Objetivo
 
-Auditar el cumplimiento de estándares arquitectónicos, de código y testing en el proyecto **bookly-mock** según las especificaciones definidas en las memories de Bookly.
+Auditar el cumplimiento de estándares arquitectónicos, de código y testing en el proyecto **bookly-backend** según las especificaciones definidas en las memories de Bookly.
 
 ---
 
@@ -355,7 +355,7 @@ Todas las auditorías están en la carpeta: `resumen/auditorias/`
 
 ## 📊 Conclusión
 
-El proyecto **bookly-mock** tiene una base arquitectónica sólida (69% de cumplimiento en arquitectura) pero presenta **deficiencias críticas en testing (3% de cobertura)** y **problemas significativos en estandarización de respuestas API (63% de cumplimiento)**.
+El proyecto **bookly-backend** tiene una base arquitectónica sólida (69% de cumplimiento en arquitectura) pero presenta **deficiencias críticas en testing (3% de cobertura)** y **problemas significativos en estandarización de respuestas API (63% de cumplimiento)**.
 
 ### Estado Actual: ❌ NO LISTO PARA PRODUCCIÓN
 

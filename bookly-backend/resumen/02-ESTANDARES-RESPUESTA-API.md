@@ -5,7 +5,7 @@ Garantizar que todas las respuestas de API sigan el estándar `ApiResponseBookly
 
 ---
 
-## ✅ Estado Actual en bookly-mock
+## ✅ Estado Actual en bookly-backend
 
 ### ✓ Implementado Correctamente
 

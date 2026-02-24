@@ -258,7 +258,7 @@ Para cada servicio, crear al menos:
 
 ```bash
 # 1. Copiar configuración Jest a todos los servicios
-cd /Users/henderorlando/Documents/GitHub/bookly-monorepo/bookly-mock
+cd /Users/henderorlando/Documents/GitHub/bookly-monorepo/bookly-backend
 
 for service in resources-service availability-service stockpile-service reports-service api-gateway; do
   echo "Configurando $service..."

@@ -6,7 +6,7 @@ Garantizar cobertura de pruebas >80%, implementar BDD con Jasmine, y mantener ca
 
 ---
 
-## ✅ Estado Actual en bookly-mock
+## ✅ Estado Actual en bookly-backend
 
 ### ✓ Implementado Correctamente
 
@@ -361,7 +361,7 @@ jobs:
 
 ```properties
 # sonar-project.properties
-sonar.projectKey=bookly-mock
+sonar.projectKey=bookly-backend
 sonar.projectName=Bookly Mock
 sonar.projectVersion=1.0
 

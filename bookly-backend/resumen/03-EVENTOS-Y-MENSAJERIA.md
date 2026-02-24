@@ -6,7 +6,7 @@ Garantizar que todos los microservicios publiquen y consuman eventos de manera c
 
 ---
 
-## ✅ Estado Actual en bookly-mock
+## ✅ Estado Actual en bookly-backend
 
 ### ✓ Implementado Correctamente
 

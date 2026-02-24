@@ -37,7 +37,7 @@ npm run seed:reports
 npm run seed:reports -- --clean
 
 # Desde cualquier ubicación del monorepo
-cd bookly-mock
+cd bookly-backend
 npm run seed:reports
 ```
 

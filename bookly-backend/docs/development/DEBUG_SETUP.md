@@ -169,7 +169,7 @@ pkill -f node
 
 3. ✅ Path correcto en `launch.json`:
    ```json
-   "outFiles": ["${workspaceFolder}/bookly-mock/dist/**/*.js"]
+   "outFiles": ["${workspaceFolder}/bookly-backend/dist/**/*.js"]
    ```
 
 ### ❌ "Cannot find module '@libs/...'"
@@ -181,7 +181,7 @@ pkill -f node
 ```bash
 # Verificar tsconfig.json paths
 # Reinstalar dependencias
-cd bookly-mock
+cd bookly-backend
 npm install
 
 # Limpiar y reconstruir
@@ -208,7 +208,7 @@ pkill -f "auth-service"
 
 ### Estructura del launch.json
 
-Ubicación: `bookly-mock/.vscode/launch.json`
+Ubicación: `bookly-backend/.vscode/launch.json`
 
 ```json
 {
@@ -220,12 +220,12 @@ Ubicación: `bookly-mock/.vscode/launch.json`
       "request": "launch",
       "runtimeExecutable": "npm",
       "runtimeArgs": ["run", "start:<service>:debug"],
-      "cwd": "${workspaceFolder}/bookly-mock",
+      "cwd": "${workspaceFolder}/bookly-backend",
       "console": "integratedTerminal",
       "restart": true,
       "skipFiles": ["<node_internals>/**"],
       "sourceMaps": true,
-      "outFiles": ["${workspaceFolder}/bookly-mock/dist/**/*.js"]
+      "outFiles": ["${workspaceFolder}/bookly-backend/dist/**/*.js"]
     }
   ]
 }
@@ -377,10 +377,10 @@ Agrega variables para monitorear continuamente:
 Ejecuta este checklist para verificar que todo funciona:
 
 - [ ] **VS Code abierto** en carpeta raíz del monorepo
-- [ ] **Dependencias instaladas**: `cd bookly-mock && npm install`
+- [ ] **Dependencias instaladas**: `cd bookly-backend && npm install`
 - [ ] **Build exitoso**: `npm run build`
 - [ ] **Docker corriendo**: MongoDB, Redis, RabbitMQ
-- [ ] **Variables .env** configuradas en `bookly-mock/.env`
+- [ ] **Variables .env** configuradas en `bookly-backend/.env`
 - [ ] **Puertos libres**: 3000-3005 y 9229-9234
 - [ ] **Panel de Debug** abierto (`Cmd+Shift+D`)
 - [ ] **Configuración seleccionada** en dropdown

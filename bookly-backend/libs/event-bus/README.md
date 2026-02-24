@@ -180,7 +180,7 @@ libs/event-bus/
 ### 1. Compilar
 
 ```bash
-cd /Users/henderorlando/Documents/GitHub/bookly-monorepo/bookly-mock
+cd /Users/henderorlando/Documents/GitHub/bookly-monorepo/bookly-backend
 npm run build
 ```
 

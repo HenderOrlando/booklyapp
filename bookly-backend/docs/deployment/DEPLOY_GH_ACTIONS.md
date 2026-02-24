@@ -1,6 +1,6 @@
 # 🔄 DEPLOYMENT GITHUB ACTIONS - CI/CD Automation
 
-Guía completa para configurar CI/CD automatizado con GitHub Actions para Bookly-Mock.
+Guía completa para configurar CI/CD automatizado con GitHub Actions para bookly-backend.
 
 ## 📋 Prerrequisitos
 
@@ -289,8 +289,8 @@ jobs:
       - name: Build and push Docker image
         uses: docker/build-push-action@v5
         with:
-          context: ./bookly-mock
-          file: ./bookly-mock/apps/${{ matrix.service }}/Dockerfile
+          context: ./bookly-backend
+          file: ./bookly-backend/apps/${{ matrix.service }}/Dockerfile
           push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
@@ -614,7 +614,7 @@ jobs:
 
       - name: Build Docker image
         run: |
-          docker build -f bookly-mock/apps/${{ matrix.service }}/Dockerfile -t test-image ./bookly-mock
+          docker build -f bookly-backend/apps/${{ matrix.service }}/Dockerfile -t test-image ./bookly-backend
 
       - name: Run Trivy vulnerability scanner
         uses: aquasecurity/trivy-action@master
@@ -756,8 +756,8 @@ jobs:
       - name: Build and push
         uses: docker/build-push-action@v5
         with:
-          context: ./bookly-mock
-          file: ./bookly-mock/apps/${{ inputs.service }}/Dockerfile
+          context: ./bookly-backend
+          file: ./bookly-backend/apps/${{ inputs.service }}/Dockerfile
           push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}

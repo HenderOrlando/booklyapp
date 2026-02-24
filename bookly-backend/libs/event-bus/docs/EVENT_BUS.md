@@ -462,7 +462,7 @@ npm run start:dev
 **MongoDB Event Store**:
 
 ```bash
-docker exec -it bookly-mock-mongodb-gateway mongosh \
+docker exec -it bookly-backend-mongodb-gateway mongosh \
   -u bookly -p bookly123 --authenticationDatabase admin
 
 use bookly-events
@@ -483,8 +483,8 @@ docker restart bookly-rabbitmq
 ### Kafka no responde
 
 ```bash
-docker logs bookly-mock-kafka
-docker logs bookly-mock-zookeeper
+docker logs bookly-backend-kafka
+docker logs bookly-backend-zookeeper
 ```
 
 ### Eventos no se almacenan
@@ -492,7 +492,7 @@ docker logs bookly-mock-zookeeper
 Verificar `ENABLE_EVENT_STORE=true` y conexión a MongoDB:
 
 ```bash
-docker logs bookly-mock-mongodb-gateway
+docker logs bookly-backend-mongodb-gateway
 ```
 
 ---

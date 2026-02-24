@@ -11,11 +11,11 @@ Aunque los archivos `.env` existían correctamente, **NestJS no los estaba carga
 
 ```typescript
 ConfigModule.forRoot({
-  envFilePath: ".env", // ❌ Busca en el directorio raíz (bookly-mock/)
+  envFilePath: ".env", // ❌ Busca en el directorio raíz (bookly-backend/)
 });
 ```
 
-Los debuggers ejecutan desde el **directorio raíz** del monorepo (`bookly-mock/`), pero los archivos `.env` están en `apps/[service]/.env`.
+Los debuggers ejecutan desde el **directorio raíz** del monorepo (`bookly-backend/`), pero los archivos `.env` están en `apps/[service]/.env`.
 
 ---
 
@@ -151,7 +151,7 @@ curl http://localhost:3005/api/v1/health
 ### Antes (❌ Fallaba)
 
 ```typescript
-// Buscaba .env en bookly-mock/ (no existe)
+// Buscaba .env en bookly-backend/ (no existe)
 ConfigModule.forRoot({
   envFilePath: ".env",
 });

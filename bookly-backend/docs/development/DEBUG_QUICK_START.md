@@ -55,7 +55,7 @@ Antes de debuggear, asegúrate de tener:
 
 ```bash
 # 1. Dependencias instaladas
-cd bookly-mock
+cd bookly-backend
 npm install
 
 # 2. Build completado

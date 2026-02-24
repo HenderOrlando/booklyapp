@@ -38,7 +38,7 @@ npm run seed:availability
 npm run seed:availability -- --clean
 
 # Desde cualquier ubicación del monorepo
-cd bookly-mock
+cd bookly-backend
 npm run seed:availability
 ```
 

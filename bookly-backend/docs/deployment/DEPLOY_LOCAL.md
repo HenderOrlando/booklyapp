@@ -1,6 +1,6 @@
 # 🚀 DEPLOYMENT LOCAL - Node.js
 
-Guía completa para desplegar Bookly-Mock en entorno local usando Node.js.
+Guía completa para desplegar bookly-backend en entorno local usando Node.js.
 
 ## 📋 Prerrequisitos
 
@@ -46,7 +46,7 @@ git --version   # >= 2.0.0
 ```bash
 # Clonar repositorio
 git clone <repository-url>
-cd bookly-monorepo/bookly-mock
+cd bookly-monorepo/bookly-backend
 
 # Instalar dependencias
 npm install

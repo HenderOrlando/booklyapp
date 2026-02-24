@@ -28,12 +28,12 @@ Cada servicio tiene su **propia instancia MongoDB** en **puertos diferentes**:
 
 | Servicio         | Puerto | Contenedor Docker                  | URI Correcta                                                                      |
 | ---------------- | ------ | ---------------------------------- | --------------------------------------------------------------------------------- |
-| **Auth**         | 27017  | `bookly-mock-mongodb-auth`         | `mongodb://bookly:bookly123@localhost:27017/bookly-auth?authSource=admin`         |
-| **Resources**    | 27018  | `bookly-mock-mongodb-resources`    | `mongodb://bookly:bookly123@localhost:27018/bookly-resources?authSource=admin`    |
-| **Availability** | 27019  | `bookly-mock-mongodb-availability` | `mongodb://bookly:bookly123@localhost:27019/bookly-availability?authSource=admin` |
-| **Stockpile**    | 27020  | `bookly-mock-mongodb-stockpile`    | `mongodb://bookly:bookly123@localhost:27020/bookly-stockpile?authSource=admin`    |
-| **Reports**      | 27021  | `bookly-mock-mongodb-reports`      | `mongodb://bookly:bookly123@localhost:27021/bookly-reports?authSource=admin`      |
-| **API Gateway**  | 27022  | `bookly-mock-mongodb-gateway`      | `mongodb://bookly:bookly123@localhost:27022/bookly-gateway?authSource=admin`      |
+| **Auth**         | 27017  | `bookly-backend-mongodb-auth`         | `mongodb://bookly:bookly123@localhost:27017/bookly-auth?authSource=admin`         |
+| **Resources**    | 27018  | `bookly-backend-mongodb-resources`    | `mongodb://bookly:bookly123@localhost:27018/bookly-resources?authSource=admin`    |
+| **Availability** | 27019  | `bookly-backend-mongodb-availability` | `mongodb://bookly:bookly123@localhost:27019/bookly-availability?authSource=admin` |
+| **Stockpile**    | 27020  | `bookly-backend-mongodb-stockpile`    | `mongodb://bookly:bookly123@localhost:27020/bookly-stockpile?authSource=admin`    |
+| **Reports**      | 27021  | `bookly-backend-mongodb-reports`      | `mongodb://bookly:bookly123@localhost:27021/bookly-reports?authSource=admin`      |
+| **API Gateway**  | 27022  | `bookly-backend-mongodb-gateway`      | `mongodb://bookly:bookly123@localhost:27022/bookly-gateway?authSource=admin`      |
 
 ### Cambios Realizados
 
@@ -66,7 +66,7 @@ Los debuggers actuales todavía tienen las URIs antiguas en memoria.
 
 ```bash
 # Ir al directorio del monorepo
-cd /Users/henderorlando/Documents/GitHub/bookly-monorepo/bookly-mock
+cd /Users/henderorlando/Documents/GitHub/bookly-monorepo/bookly-backend
 
 # Detener todos los procesos
 pkill -9 -f "node.*start:.*:debug"
@@ -118,21 +118,21 @@ docker ps --filter "name=mongo"
 
 Deberías ver 6 contenedores:
 
-- ✅ bookly-mock-mongodb-auth (27017)
-- ✅ bookly-mock-mongodb-resources (27018)
-- ✅ bookly-mock-mongodb-availability (27019)
-- ✅ bookly-mock-mongodb-stockpile (27020)
-- ✅ bookly-mock-mongodb-reports (27021)
-- ✅ bookly-mock-mongodb-gateway (27022)
+- ✅ bookly-backend-mongodb-auth (27017)
+- ✅ bookly-backend-mongodb-resources (27018)
+- ✅ bookly-backend-mongodb-availability (27019)
+- ✅ bookly-backend-mongodb-stockpile (27020)
+- ✅ bookly-backend-mongodb-reports (27021)
+- ✅ bookly-backend-mongodb-gateway (27022)
 
 ### 2. Probar conexión directa
 
 ```bash
 # Auth Service (puerto 27017)
-docker exec bookly-mock-mongodb-auth mongosh -u bookly -p bookly123 --authenticationDatabase admin --eval "db.version()"
+docker exec bookly-backend-mongodb-auth mongosh -u bookly -p bookly123 --authenticationDatabase admin --eval "db.version()"
 
 # Resources Service (puerto 27018)
-docker exec bookly-mock-mongodb-resources mongosh -u bookly -p bookly123 --authenticationDatabase admin --eval "db.version()"
+docker exec bookly-backend-mongodb-resources mongosh -u bookly -p bookly123 --authenticationDatabase admin --eval "db.version()"
 ```
 
 ### 3. Health Checks una vez corriendo
@@ -199,20 +199,20 @@ DATABASE_URI=mongodb://bookly:bookly123@localhost:[PORT]/bookly-[service]?authSo
 ### 1. Verificar contenedor específico está corriendo
 
 ```bash
-docker ps --filter "name=bookly-mock-mongodb-[service]" --format "{{.Names}}: {{.Status}}"
+docker ps --filter "name=bookly-backend-mongodb-[service]" --format "{{.Names}}: {{.Status}}"
 ```
 
 ### 2. Ver logs del contenedor
 
 ```bash
-docker logs bookly-mock-mongodb-[service] --tail 50
+docker logs bookly-backend-mongodb-[service] --tail 50
 ```
 
 ### 3. Reiniciar contenedor específico
 
 ```bash
-docker restart bookly-mock-mongodb-[service]
-docker logs -f bookly-mock-mongodb-[service]
+docker restart bookly-backend-mongodb-[service]
+docker logs -f bookly-backend-mongodb-[service]
 ```
 
 ### 4. Verificar puerto está escuchando

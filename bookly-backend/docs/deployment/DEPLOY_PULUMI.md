@@ -1,6 +1,6 @@
 # ☁️ DEPLOYMENT PULUMI - Google Cloud Platform
 
-Guía completa para desplegar Bookly-Mock en Google Cloud Platform usando Pulumi como Infrastructure as Code.
+Guía completa para desplegar bookly-backend en Google Cloud Platform usando Pulumi como Infrastructure as Code.
 
 ## 📋 Prerrequisitos
 
@@ -116,7 +116,7 @@ infrastructure/
 ### 2. Pulumi.yaml
 
 ```yaml
-name: bookly-mock-infrastructure
+name: bookly-backend-infrastructure
 runtime: nodejs
 description: Bookly Mock Infrastructure on GCP
 main: index.ts
@@ -155,7 +155,7 @@ config:
 
 ```json
 {
-  "name": "bookly-mock-infrastructure",
+  "name": "bookly-backend-infrastructure",
   "version": "1.0.0",
   "dependencies": {
     "@pulumi/pulumi": "^3.0.0",
@@ -503,11 +503,11 @@ export function buildAndPushImages(project: string) {
   // Build API Gateway image
   const apiGatewayImage = new docker.Image("api-gateway-image", {
     imageName: docker.buildImage({
-      context: "../bookly-mock",
+      context: "../bookly-backend",
       dockerfile: "apps/api-gateway/Dockerfile",
     }),
     build: {
-      context: "../bookly-mock",
+      context: "../bookly-backend",
       dockerfile: "apps/api-gateway/Dockerfile",
     },
     imageName: `gcr.io/${project}/api-gateway:latest`,

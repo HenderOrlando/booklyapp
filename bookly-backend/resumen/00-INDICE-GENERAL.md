@@ -2,7 +2,7 @@
 
 ## 🎯 Propósito
 
-Este conjunto de documentos sirve como guía completa para garantizar que **bookly-mock** cumpla a cabalidad con todas las reglas y estándares definidos en las memories de Bookly.
+Este conjunto de documentos sirve como guía completa para garantizar que **bookly-backend** cumpla a cabalidad con todas las reglas y estándares definidos en las memories de Bookly.
 
 ---
 
@@ -324,8 +324,8 @@ Este conjunto de documentos sirve como guía completa para garantizar que **book
 Para dudas o sugerencias sobre estas guías:
 
 - **Equipo**: Bookly Development Team
-- **Proyecto**: bookly-mock
-- **Ubicación**: `bookly-mock/resumen/`
+- **Proyecto**: bookly-backend
+- **Ubicación**: `bookly-backend/resumen/`
 
 ---
 

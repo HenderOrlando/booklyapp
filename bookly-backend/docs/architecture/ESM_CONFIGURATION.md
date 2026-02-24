@@ -131,7 +131,7 @@ const core_1 = require("@nestjs/core");
 ## 📊 Estructura de Compilación
 
 ```
-bookly-mock/
+bookly-backend/
 ├── apps/                           # Código fuente (TypeScript + ESM)
 │   ├── auth-service/
 │   │   └── src/

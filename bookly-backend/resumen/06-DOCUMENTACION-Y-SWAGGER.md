@@ -6,7 +6,7 @@ Garantizar documentación completa de APIs REST (Swagger) y eventos (AsyncAPI) e
 
 ---
 
-## ✅ Estado Actual en bookly-mock
+## ✅ Estado Actual en bookly-backend
 
 ### ✓ Implementado Correctamente
 

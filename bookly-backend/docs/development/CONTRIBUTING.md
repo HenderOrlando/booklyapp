@@ -122,7 +122,7 @@ Solo para documentación transversal:
 
 # Clonar tu fork
 git clone https://github.com/[tu-usuario]/bookly-monorepo.git
-cd bookly-monorepo/bookly-mock
+cd bookly-monorepo/bookly-backend
 
 # Agregar upstream
 git remote add upstream https://github.com/bookly/bookly-monorepo.git

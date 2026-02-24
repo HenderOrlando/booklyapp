@@ -32,7 +32,7 @@ docker exec bookly-rabbitmq rabbitmqctl list_queues | grep -E "(bookly|availabil
 # Verificar Redis
 echo ""
 echo "3️⃣  Verificando Redis..."
-if docker exec bookly-mock-redis redis-cli ping | grep -q "PONG"; then
+if docker exec bookly-backend-redis redis-cli ping | grep -q "PONG"; then
     echo -e "${GREEN}✅ Redis está funcionando${NC}"
 else
     echo -e "${RED}❌ Redis no responde${NC}"

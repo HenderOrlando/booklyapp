@@ -1,6 +1,6 @@
 # 📚 Guías de Cumplimiento - Bookly Mock
 
-Esta carpeta contiene documentos guía para garantizar que **bookly-mock** cumpla completamente con las reglas y estándares definidos en las memories de Bookly.
+Esta carpeta contiene documentos guía para garantizar que **bookly-backend** cumpla completamente con las reglas y estándares definidos en las memories de Bookly.
 
 ## 📖 Documentos Disponibles
 
@@ -123,8 +123,8 @@ Swagger/OpenAPI, AsyncAPI, decoradores, DTOs y documentación técnica.
 
 Para dudas sobre estas guías:
 - **Equipo**: Bookly Development Team
-- **Proyecto**: bookly-mock
-- **Ubicación**: `bookly-mock/resumen/`
+- **Proyecto**: bookly-backend
+- **Ubicación**: `bookly-backend/resumen/`
 
 ---
 

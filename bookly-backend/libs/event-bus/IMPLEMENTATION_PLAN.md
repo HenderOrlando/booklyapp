@@ -581,7 +581,7 @@ export class UserService {
 ## 📦 Instalación de Dependencias
 
 ```bash
-cd /Users/henderorlando/Documents/GitHub/bookly-monorepo/bookly-mock
+cd /Users/henderorlando/Documents/GitHub/bookly-monorepo/bookly-backend
 npm install kafkajs amqplib uuid
 npm install --save-dev @types/amqplib
 ```

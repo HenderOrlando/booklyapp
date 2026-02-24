@@ -37,7 +37,7 @@ Todos los servicios ahora usan credenciales de autenticación por defecto:
 1. **Iniciar MongoDB**:
 
 ```bash
-cd bookly-mock
+cd bookly-backend
 docker-compose up -d mongodb-auth mongodb-resources mongodb-availability mongodb-stockpile mongodb-reports mongodb-gateway
 ```
 

@@ -10,7 +10,7 @@ Se han creado configuraciones de debug para **todos los microservicios** de Book
 
 ### 1. `.vscode/launch.json` ⚙️
 
-**Ubicación**: `bookly-mock/.vscode/launch.json`
+**Ubicación**: `bookly-backend/.vscode/launch.json`
 
 Contiene:
 
@@ -22,7 +22,7 @@ Contiene:
 
 ### 2. `docs/DEBUG_SETUP.md` 📚
 
-**Ubicación**: `bookly-mock/docs/DEBUG_SETUP.md`
+**Ubicación**: `bookly-backend/docs/DEBUG_SETUP.md`
 
 Documentación completa con:
 
@@ -35,7 +35,7 @@ Documentación completa con:
 
 ### 3. `docs/DEBUG_QUICK_START.md` ⚡
 
-**Ubicación**: `bookly-mock/docs/DEBUG_QUICK_START.md`
+**Ubicación**: `bookly-backend/docs/DEBUG_QUICK_START.md`
 
 Guía rápida con:
 
@@ -128,7 +128,7 @@ Los warnings que muestra VS Code sobre `protocol` y `port` son **benignos**:
 Antes de debuggear:
 
 ```bash
-cd bookly-mock
+cd bookly-backend
 npm install       # Instalar dependencias
 npm run build     # Build inicial
 docker-compose up -d  # Servicios base (MongoDB, Redis, RabbitMQ)

@@ -186,7 +186,7 @@ docs/
 - **AsyncAPI**: `geolocation-dashboard.asyncapi.yaml`
 - **Health Check**: `http://localhost:3004/api/v1/health`
 - **Metrics**: `http://localhost:3004/api/v1/metrics/cache`
-- **Repositorio**: [bookly-monorepo/bookly-mock](../../)
+- **Repositorio**: [bookly-monorepo/bookly-backend](../../)
 
 ---
 

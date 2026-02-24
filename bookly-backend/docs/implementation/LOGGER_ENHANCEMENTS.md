@@ -282,7 +282,7 @@ logger.logQuery("SELECT * FROM reservations WHERE user_id = $1 AND date > $2", {
 
 ```bash
 # Ejecutar cualquier script con logger
-cd bookly-mock
+cd bookly-backend
 npm run start:auth
 
 # Deberías ver logs con colores e iconos

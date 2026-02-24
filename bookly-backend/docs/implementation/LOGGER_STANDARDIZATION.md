@@ -1,8 +1,8 @@
-# Estandarización del Logger en Bookly-Mock
+# Estandarización del Logger en bookly-backend
 
 ## 📋 Resumen
 
-Se ha completado la estandarización del sistema de logging en todo el proyecto `bookly-mock` para usar exclusivamente el Logger centralizado ubicado en `libs/common/src/utils/logger.util.ts`.
+Se ha completado la estandarización del sistema de logging en todo el proyecto `bookly-backend` para usar exclusivamente el Logger centralizado ubicado en `libs/common/src/utils/logger.util.ts`.
 
 ## ✅ Cambios Realizados
 

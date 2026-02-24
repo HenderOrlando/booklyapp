@@ -1,6 +1,6 @@
 # 🐳 DEPLOYMENT DOCKER - Docker Local
 
-Guía completa para desplegar Bookly-Mock usando Docker local con contenedores.
+Guía completa para desplegar bookly-backend usando Docker local con contenedores.
 
 ## 📋 Prerrequisitos
 
@@ -65,7 +65,7 @@ Despliega toda la infraestructura y microservicios juntos.
 ```bash
 # Clonar repositorio
 git clone <repository-url>
-cd bookly-monorepo/bookly-mock
+cd bookly-monorepo/bookly-backend
 
 # Configurar entorno
 cp .env.docker.example .env.docker
@@ -109,7 +109,7 @@ docker-compose -f docker-compose.microservices.yml up -d --build
 NODE_ENV=production
 
 # Red Docker
-DOCKER_NETWORK=bookly-mock-network
+DOCKER_NETWORK=bookly-backend-network
 
 # Base de Datos (contenedores Docker)
 MONGODB_URI=mongodb://mongodb-auth:27017/bookly_auth
@@ -149,7 +149,7 @@ services:
   # MongoDB instances
   mongodb-auth:
     image: mongo:7.0
-    container_name: bookly-mock-mongodb-auth
+    container_name: bookly-backend-mongodb-auth
     ports:
       - "27017:27017"
     environment:
@@ -159,33 +159,33 @@ services:
     volumes:
       - mongodb-auth-data:/data/db
     networks:
-      - bookly-mock-network
+      - bookly-backend-network
 
   # Redis
   redis:
     image: redis:7.2-alpine
-    container_name: bookly-mock-redis
+    container_name: bookly-backend-redis
     ports:
       - "6379:6379"
     volumes:
       - redis-data:/data
     networks:
-      - bookly-mock-network
+      - bookly-backend-network
 
   # Kafka + Zookeeper
   zookeeper:
     image: confluentinc/cp-zookeeper:7.5.0
-    container_name: bookly-mock-zookeeper
+    container_name: bookly-backend-zookeeper
     ports:
       - "2181:2181"
     environment:
       ZOOKEEPER_CLIENT_PORT: 2181
     networks:
-      - bookly-mock-network
+      - bookly-backend-network
 
   kafka:
     image: confluentinc/cp-kafka:7.5.0
-    container_name: bookly-mock-kafka
+    container_name: bookly-backend-kafka
     ports:
       - "9092:9092"
     environment:
@@ -195,7 +195,7 @@ services:
     depends_on:
       - zookeeper
     networks:
-      - bookly-mock-network
+      - bookly-backend-network
 
 volumes:
   mongodb-auth-data:
@@ -205,7 +205,7 @@ volumes:
   zookeeper-data:
 
 networks:
-  bookly-mock-network:
+  bookly-backend-network:
     driver: bridge
 ```
 
@@ -219,7 +219,7 @@ services:
     build:
       context: .
       dockerfile: apps/api-gateway/Dockerfile
-    container_name: bookly-mock-api-gateway
+    container_name: bookly-backend-api-gateway
     ports:
       - "3000:3000"
     environment:
@@ -232,14 +232,14 @@ services:
       - redis
       - kafka
     networks:
-      - bookly-mock-network
+      - bookly-backend-network
     restart: unless-stopped
 
   auth-service:
     build:
       context: .
       dockerfile: apps/auth-service/Dockerfile
-    container_name: bookly-mock-auth-service
+    container_name: bookly-backend-auth-service
     ports:
       - "3001:3001"
     environment:
@@ -252,13 +252,13 @@ services:
       - redis
       - kafka
     networks:
-      - bookly-mock-network
+      - bookly-backend-network
     restart: unless-stopped
 
   # ... otros servicios similares
 
 networks:
-  bookly-mock-network:
+  bookly-backend-network:
     external: true
 ```
 
@@ -313,7 +313,7 @@ docker system prune -f
 docker stats
 
 # Backup de volúmenes
-docker run --rm -v bookly-mock-mongodb-auth-data:/data -v $(pwd):/backup ubuntu tar cvf /backup/mongodb-auth-backup.tar /data
+docker run --rm -v bookly-backend-mongodb-auth-data:/data -v $(pwd):/backup ubuntu tar cvf /backup/mongodb-auth-backup.tar /data
 ```
 
 ## 🔍 Verificación del Deployment
@@ -546,10 +546,10 @@ docker-compose up -d
 
 ```bash
 # Backup todos los volúmenes
-docker run --rm -v bookly-mock-mongodb-auth-data:/data -v $(pwd):/backup ubuntu tar cvf /backup/mongodb-auth-$(date +%Y%m%d).tar /data
+docker run --rm -v bookly-backend-mongodb-auth-data:/data -v $(pwd):/backup ubuntu tar cvf /backup/mongodb-auth-$(date +%Y%m%d).tar /data
 
 # Restore
-docker run --rm -v bookly-mock-mongodb-auth-data:/data -v $(pwd):/backup ubuntu tar xvf /backup/mongodb-auth-20240101.tar -C /
+docker run --rm -v bookly-backend-mongodb-auth-data:/data -v $(pwd):/backup ubuntu tar xvf /backup/mongodb-auth-20240101.tar -C /
 ```
 
 ### Escalado Rápido

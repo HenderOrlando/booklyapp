@@ -268,7 +268,7 @@ curl http://localhost:3000/events/metrics | jq
 
 ```bash
 # Desde el directorio raíz del proyecto
-cd bookly-mock
+cd bookly-backend
 
 # Iniciar todos los microservicios
 npm run start:all

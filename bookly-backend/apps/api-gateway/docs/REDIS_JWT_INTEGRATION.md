@@ -617,7 +617,7 @@ const redis = new Redis({
 1. **Instalar ioredis**:
 
    ```bash
-   cd /Users/henderorlando/Documents/GitHub/bookly-monorepo/bookly-mock
+   cd /Users/henderorlando/Documents/GitHub/bookly-monorepo/bookly-backend
    npm install ioredis @types/ioredis
    ```
 

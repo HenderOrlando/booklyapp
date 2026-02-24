@@ -57,7 +57,7 @@ Toda la documentación está organizada y disponible en el índice maestro:
 
 ```bash
 # Clone and navigate
-cd bookly-mock
+cd bookly-backend
 
 # Install dependencies
 npm install
@@ -176,7 +176,7 @@ npm test -- apps/auth-service
 ## 📦 Project Structure
 
 ```
-bookly-mock/
+bookly-backend/
 ├── apps/                         # Microservices
 │   ├── api-gateway/              # Central gateway
 │   ├── auth-service/             # Authentication & Authorization
@@ -273,7 +273,7 @@ MIT License - See main Bookly project for details.
 
 - Wait for MongoDB containers to be healthy
 - Check credentials in `.env`
-- Verify network connectivity: `docker network inspect bookly-mock-network`
+- Verify network connectivity: `docker network inspect bookly-frontend-network`
 
 ### Kafka not receiving events
 

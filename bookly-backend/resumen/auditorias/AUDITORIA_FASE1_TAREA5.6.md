@@ -141,7 +141,7 @@ jobs:
 **Falta crear**:
 
 ```properties
-sonar.projectKey=bookly-mock
+sonar.projectKey=bookly-backend
 sonar.projectName=Bookly Mock
 sonar.projectVersion=1.0
 
