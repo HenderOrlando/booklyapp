@@ -1,6 +1,6 @@
 /**
  * Tipos de respuesta estándar del API Gateway
- * Basados en el backend bookly-mock
+ * Basados en el backend bookly-backend
  */
 
 export interface ApiResponse<T = unknown> {

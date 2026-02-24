@@ -1,6 +1,6 @@
 /**
  * Datos Mock para Reasignaciones (RF-15)
- * Alineados con bookly-mock/apps/availability-service
+ * Alineados con bookly-backend/apps/availability-service
  */
 
 import type { ReassignmentHistoryResponseDto } from "@/types/entities/reassignment";

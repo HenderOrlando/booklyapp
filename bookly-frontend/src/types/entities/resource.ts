@@ -1,6 +1,6 @@
 /**
  * Types para Resources Service
- * Alineados con bookly-mock/apps/resources-service
+ * Alineados con bookly-backend/apps/resources-service
  */
 
 // Enums

@@ -1,6 +1,6 @@
 /**
  * Datos Mock para Availability/Reservations Service
- * Alineados con bookly-mock/apps/availability-service
+ * Alineados con bookly-backend/apps/availability-service
  */
 
 import type { Reservation } from "@/types/entities/reservation";

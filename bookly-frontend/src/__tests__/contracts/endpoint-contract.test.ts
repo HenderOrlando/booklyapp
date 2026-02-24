@@ -20,7 +20,7 @@ const API_V1 = "/api/v1";
 
 /**
  * BE controller prefixes extracted from @Controller() decorators
- * Source: bookly-mock/apps/{service}/src/infrastructure/controllers/{name}.ts
+ * Source: bookly-backend/apps/{service}/src/infrastructure/controllers/{name}.ts
  */
 const BE_CONTROLLERS = {
   auth: ["auth", "users", "roles", "permissions", "audit"],
