@@ -116,7 +116,7 @@ El `httpClient` detecta automáticamente qué servicio usar según el endpoint:
 ## 🚀 Iniciar el Frontend
 
 ```bash
-cd bookly-mock-frontend
+cd bookly-frontend
 
 # Instalar dependencias (solo primera vez)
 npm install
@@ -292,7 +292,7 @@ cd bookly-backend/infrastructure
 docker-compose up
 
 # Terminal 2: Configurar y levantar frontend
-cd bookly-mock-frontend
+cd bookly-frontend
 cat > .env.local << EOF
 NEXT_PUBLIC_DATA_MODE=serve
 NEXT_PUBLIC_API_GATEWAY_URL=http://localhost:3000

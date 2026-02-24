@@ -188,7 +188,7 @@ else
     echo ""
     echo -e "${YELLOW}Acciones recomendadas:${NC}"
     echo "  1. Verifica que Docker esté corriendo"
-    echo "  2. Inicia los servicios: cd bookly-mock && npm run dev:all"
+    echo "  2. Inicia los servicios: cd bookly-backend && npm run dev:all"
     echo "  3. Revisa los logs de los servicios fallidos"
     echo ""
     exit 1

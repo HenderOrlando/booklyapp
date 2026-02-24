@@ -1,6 +1,6 @@
 #!/bin/bash
 # Setup script for Storybook + a11y tooling
-# Run from bookly-mock-frontend directory:
+# Run from bookly-backend-frontend directory:
 #   bash scripts/setup-storybook-a11y.sh
 
 set -e

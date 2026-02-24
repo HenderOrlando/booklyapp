@@ -102,7 +102,7 @@ Ver [ARCHITECTURE.md](./docs/ARCHITECTURE.md) para detalles completos.
 ## 📁 Estructura del Proyecto
 
 ```
-bookly-mock-frontend/
+bookly-frontend/
 ├── src/
 │   ├── app/[locale]/              # Next.js App Router
 │   │   ├── dashboard/             # Dashboard principal
@@ -167,7 +167,7 @@ Ver [ARCHITECTURE.md](./docs/ARCHITECTURE.md) para estructura completa.
 
 ```bash
 # Navegar al proyecto
-cd bookly-monorepo/bookly-mock-frontend
+cd bookly-monorepo/bookly-frontend
 
 # Instalar dependencias
 npm install

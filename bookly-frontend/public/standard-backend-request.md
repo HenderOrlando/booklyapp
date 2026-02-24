@@ -1,4 +1,4 @@
-# PROMPT — Estandarizar **Requests** del Backend (`bookly-mock`)
+# PROMPT — Estandarizar **Requests** del Backend (`bookly-backend`)
 
 > **Objetivo**: Unificar y normalizar **la forma en que el backend recibe solicitudes** (requests) para:
 >
@@ -13,7 +13,7 @@
 ## 🧠 Contexto del repo
 
 - Monorepo **Nx**.
-- Backend: **`bookly-mock`** (NestJS).
+- Backend: **`bookly-backend`** (NestJS).
 - Debe respetar los modos existentes (p.ej. `MOCK/SERVER`), pero **este trabajo solo aplica a backend**.
 - La estandarización debe reflejar los procesos/casos de uso y reglas del proyecto en la documentación proporcionada.
 
@@ -88,7 +88,7 @@ Al finalizar, el backend debe exponer **requests estandarizados** (contratos de 
    - Convenciones de query params
    - Esquemas de body para: command/entity, list/search, dashboard query, report run/export
    - Ejemplos por dominio (resources, availability, reports)
-2. **Implementación en `bookly-mock`**
+2. **Implementación en `bookly-backend`**
    - DTOs compartidos
    - Pipes/Interceptors/Middlewares
    - Swagger/OpenAPI actualizado

@@ -6,7 +6,7 @@ Actúa como **Senior Backend Engineer + QA**.
 
 ## Objetivo
 
-Estandarizar **todas** las respuestas del backend **bookly-mock** para:
+Estandarizar **todas** las respuestas del backend **bookly-backend** para:
 
 1. **Entidad** (GET/POST/PUT/PATCH/DELETE que devuelven un recurso).
 2. **Lista de entidades** (listados con filtros + paginación).
@@ -22,7 +22,7 @@ Debe basarse en la documentación entregada (especialmente el catálogo/estructu
 
 ### Incluye
 
-- Cambios en **backend** (bookly-mock): contrato de respuestas, interceptores/filtros globales, DTOs, controladores/handlers, documentación técnica, pruebas.
+- Cambios en **backend** (bookly-backend): contrato de respuestas, interceptores/filtros globales, DTOs, controladores/handlers, documentación técnica, pruebas.
 
 ### NO incluye
 

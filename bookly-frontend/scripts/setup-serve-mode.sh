@@ -102,7 +102,7 @@ if command -v curl &> /dev/null; then
     else
         echo -e "${RED}✗ API Gateway no responde${NC}"
         echo -e "${YELLOW}  Asegúrate de iniciar el backend primero:${NC}"
-        echo -e "  ${BLUE}cd ../bookly-mock && npm run dev:all${NC}"
+        echo -e "  ${BLUE}cd ../bookly-backend && npm run dev:all${NC}"
     fi
 else
     echo -e "${YELLOW}⚠️  curl no instalado, no se puede verificar backend${NC}"

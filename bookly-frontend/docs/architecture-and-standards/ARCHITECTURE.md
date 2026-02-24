@@ -70,7 +70,7 @@
 ## 🏗️ Estructura del Proyecto
 
 ```
-bookly-mock-frontend/
+bookly-frontend/
 ├── src/
 │   ├── app/                          # Next.js App Router
 │   │   └── [locale]/                 # Rutas internacionalizadas
