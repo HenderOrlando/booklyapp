@@ -26,9 +26,9 @@
 
 | Component | Container                | Port       | Status     |
 | --------- | ------------------------ | ---------- | ---------- |
-| MongoDB   | bookly-mock-mongodb-auth | 27017      | ✅ Healthy |
-| Redis     | bookly-mock-redis        | 6379       | ✅ Healthy |
-| RabbitMQ  | bookly-mock-rabbitmq     | 5672/15672 | ✅ Healthy |
+| MongoDB   | bookly-backend-mongodb-auth | 27017      | ✅ Healthy |
+| Redis     | bookly-backend-redis        | 6379       | ✅ Healthy |
+| RabbitMQ  | bookly-backend-rabbitmq     | 5672/15672 | ✅ Healthy |
 
 ---
 

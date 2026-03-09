@@ -21,7 +21,7 @@ param(
 
 # Configuration - Use $PSScriptRoot to calculate paths relative to script location
 $SCRIPT_DIR = $PSScriptRoot
-$BOOKLY_MOCK_PATH = (Resolve-Path (Join-Path $SCRIPT_DIR "..\..\..\..\bookly-mock")).Path
+$BOOKLY_MOCK_PATH = (Resolve-Path (Join-Path $SCRIPT_DIR "..\..\..\..\bookly-backend")).Path
 $DOCKER_COMPOSE_FULL = "docker-compose.yml"
 $DOCKER_COMPOSE_PARTIAL = "docker-compose.microservices.yml"
 $DEPLOY_MODE_FILE = ".deploy-mode"
@@ -72,7 +72,7 @@ if ($LASTEXITCODE -ne 0) {
 Write-Host "Docker is running!" -ForegroundColor Green
 Write-Host ""
 
-# Change to bookly-mock directory
+# Change to bookly-backend directory
 Push-Location $BOOKLY_MOCK_PATH
 
 # Determine which docker-compose file to use
@@ -203,7 +203,7 @@ try {
             "apps/availability-service/.env",
             "apps/stockpile-service/.env",
             "apps/reports-service/.env",
-            "../bookly-mock-frontend/.env"
+            "../bookly-frontend/.env"
         )
         
         $missingFiles = @()

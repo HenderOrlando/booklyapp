@@ -1,6 +1,6 @@
 # Plan E2E — Bookly Mock Frontend
 
-> Estrategia integral de pruebas end-to-end con Playwright para `bookly-mock-frontend`, cubriendo 45 RFs, 5 módulos, 5 roles, con ejecución local y CI.
+> Estrategia integral de pruebas end-to-end con Playwright para `bookly-frontend`, cubriendo 45 RFs, 5 módulos, 5 roles, con ejecución local y CI.
 
 **Última actualización:** 2026-02-17  
 **Versión:** 1.0.0  
@@ -160,7 +160,7 @@ test("estudiante cannot access /admin/roles", async ({ page }) => {
 ### 5.1 Estructura de carpetas
 
 ```text
-bookly-mock-frontend/
+bookly-frontend/
   e2e/
     .auth/                              # storageState (gitignored)
       .gitignore
@@ -412,7 +412,7 @@ export default defineConfig({
 
 **Triggers:**
 
-- `pull_request` (paths: `bookly-mock-frontend/**`) → smoke
+- `pull_request` (paths: `bookly-frontend/**`) → smoke
 - `schedule: cron '0 3 * * *'` → regression nightly
 - `workflow_dispatch` → manual (smoke / regression / visual / all)
 

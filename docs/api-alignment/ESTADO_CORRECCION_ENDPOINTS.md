@@ -61,7 +61,7 @@ Si encuentras errores 404 en llamadas a API:
 
 1. Verifica `endpoints.ts`.
 2. Asegúrate de usar los **Clientes** (`AuthClient`, `ResourcesClient`, etc.) y no `httpClient` directo.
-3. Revisa que el backend (bookly-mock) esté corriendo en los puertos correctos.
+3. Revisa que el backend (bookly-backend) esté corriendo en los puertos correctos.
 
 ```bash
 # Verificar endpoints

@@ -4,7 +4,7 @@
 
 ### 1️⃣ Desplegar Todo
 ```powershell
-cd bookly-mock
+cd bookly-backend
 .\docker-deploy.ps1
 ```
 

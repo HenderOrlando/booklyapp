@@ -1,6 +1,6 @@
-# Rules Index — bookly-mock
+# Rules Index — bookly-backend
 
-**Run ID:** `2026-02-21-bookly-mock-01`  
+**Run ID:** `2026-02-21-bookly-backend-01`  
 **Generated:** 2026-02-21
 
 ## Resumen

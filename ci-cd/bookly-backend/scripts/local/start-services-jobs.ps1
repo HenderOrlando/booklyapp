@@ -9,17 +9,17 @@ Write-Host ""
 
 # Verificar que la infraestructura esté corriendo
 Write-Host "Verificando infraestructura Docker..." -ForegroundColor Yellow
-$containers = docker ps --filter "name=bookly-mock" --format "{{.Names}}"
+$containers = docker ps --filter "name=bookly-backend" --format "{{.Names}}"
 $requiredContainers = @(
-    "bookly-mock-mongodb-auth",
-    "bookly-mock-mongodb-resources",
-    "bookly-mock-mongodb-availability",
-    "bookly-mock-mongodb-stockpile",
-    "bookly-mock-mongodb-reports",
-    "bookly-mock-mongodb-gateway",
-    "bookly-mock-redis",
-    "bookly-mock-kafka",
-    "bookly-mock-zookeeper"
+    "bookly-backend-mongodb-auth",
+    "bookly-backend-mongodb-resources",
+    "bookly-backend-mongodb-availability",
+    "bookly-backend-mongodb-stockpile",
+    "bookly-backend-mongodb-reports",
+    "bookly-backend-mongodb-gateway",
+    "bookly-backend-redis",
+    "bookly-backend-kafka",
+    "bookly-backend-zookeeper"
 )
 
 $missingContainers = @()

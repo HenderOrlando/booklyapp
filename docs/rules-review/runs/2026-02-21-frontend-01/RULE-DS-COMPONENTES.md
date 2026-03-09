@@ -1,6 +1,6 @@
 # RULE-DS-COMPONENTES — Sistema de Componentes y Estados
 
-> **Score: 3/5 — Funcional** | Domain: design-system | Scope: bookly-mock-frontend
+> **Score: 3/5 — Funcional** | Domain: design-system | Scope: bookly-frontend
 
 ## Resumen
 

@@ -11,24 +11,24 @@ Todos los servicios de infraestructura están corriendo correctamente en Docker:
 
 | Servicio | Puerto | Estado | Contenedor |
 |----------|--------|--------|------------|
-| **MongoDB Auth** | 27017 | ✅ Healthy | bookly-mock-mongodb-auth |
-| **MongoDB Resources** | 27018 | ✅ Healthy | bookly-mock-mongodb-resources |
-| **MongoDB Availability** | 27019 | ✅ Healthy | bookly-mock-mongodb-availability |
-| **MongoDB Stockpile** | 27020 | ✅ Healthy | bookly-mock-mongodb-stockpile |
-| **MongoDB Reports** | 27021 | ✅ Healthy | bookly-mock-mongodb-reports |
-| **MongoDB Gateway** | 27022 | ✅ Healthy | bookly-mock-mongodb-gateway |
-| **Redis** | 6379 | ✅ Healthy | bookly-mock-redis |
-| **Kafka** | 9092-9093 | ✅ Running | bookly-mock-kafka |
-| **Zookeeper** | 2181 | ✅ Running | bookly-mock-zookeeper |
+| **MongoDB Auth** | 27017 | ✅ Healthy | bookly-backend-mongodb-auth |
+| **MongoDB Resources** | 27018 | ✅ Healthy | bookly-backend-mongodb-resources |
+| **MongoDB Availability** | 27019 | ✅ Healthy | bookly-backend-mongodb-availability |
+| **MongoDB Stockpile** | 27020 | ✅ Healthy | bookly-backend-mongodb-stockpile |
+| **MongoDB Reports** | 27021 | ✅ Healthy | bookly-backend-mongodb-reports |
+| **MongoDB Gateway** | 27022 | ✅ Healthy | bookly-backend-mongodb-gateway |
+| **Redis** | 6379 | ✅ Healthy | bookly-backend-redis |
+| **Kafka** | 9092-9093 | ✅ Running | bookly-backend-kafka |
+| **Zookeeper** | 2181 | ✅ Running | bookly-backend-zookeeper |
 
 **Comando para verificar**:
 ```powershell
-docker ps --filter "name=bookly-mock"
+docker ps --filter "name=bookly-backend"
 ```
 
 **Comando para detener**:
 ```powershell
-cd bookly-mock
+cd bookly-backend
 docker-compose down
 ```
 
@@ -39,8 +39,8 @@ docker-compose down
 | Archivo | Ubicación | Descripción |
 |---------|-----------|-------------|
 | `START_ALL_LOCAL.ps1` | Raíz del proyecto | Script maestro que levanta la infraestructura Docker |
-| `start-backend-local.ps1` | `bookly-mock/` | Inicia todos los microservicios localmente |
-| `start-frontend-local.ps1` | `bookly-mock-frontend/` | Inicia el frontend Next.js |
+| `start-backend-local.ps1` | `bookly-backend/` | Inicia todos los microservicios localmente |
+| `start-frontend-local.ps1` | `bookly-frontend/` | Inicia el frontend Next.js |
 
 #### Documentación
 
@@ -74,7 +74,7 @@ Los microservicios tienen algunos problemas de configuración que requieren revi
 
 1. **Verificar dependencias**:
    ```powershell
-   cd bookly-mock
+   cd bookly-backend
    npm install --legacy-peer-deps
    ```
 
@@ -86,7 +86,7 @@ Los microservicios tienen algunos problemas de configuración que requieren revi
    ```
 
 3. **Revisar variables de entorno**:
-   - Verificar que exista `.env` en `bookly-mock/`
+   - Verificar que exista `.env` en `bookly-backend/`
    - Copiar desde `.env.docker.example` si es necesario
 
 ### Frontend
@@ -94,7 +94,7 @@ Los microservicios tienen algunos problemas de configuración que requieren revi
 No se ha probado aún. Scripts listos para ejecutar:
 
 ```powershell
-cd bookly-mock-frontend
+cd bookly-frontend
 .\start-frontend-local.ps1
 ```
 
@@ -104,11 +104,11 @@ cd bookly-mock-frontend
 
 ```powershell
 # Iniciar
-cd bookly-mock
+cd bookly-backend
 docker-compose up -d zookeeper kafka redis mongodb-auth mongodb-resources mongodb-availability mongodb-stockpile mongodb-reports mongodb-gateway
 
 # Verificar
-docker ps --filter "name=bookly-mock"
+docker ps --filter "name=bookly-backend"
 
 # Ver logs
 docker-compose logs -f
@@ -120,7 +120,7 @@ docker-compose down
 ### Backend (Local) ⚠️
 
 ```powershell
-cd bookly-mock
+cd bookly-backend
 
 # Opción 1: Todos los servicios (usando concurrently)
 npm run start:all
@@ -140,7 +140,7 @@ npm run start:reports      # Puerto 3005
 ### Frontend (Pendiente) 📋
 
 ```powershell
-cd bookly-mock-frontend
+cd bookly-frontend
 npm run dev  # Puerto 4200
 ```
 
@@ -151,7 +151,7 @@ npm run dev  # Puerto 4200
 1. Verificar que Docker Desktop esté corriendo
 2. Eliminar contenedores previos:
    ```powershell
-   docker rm -f $(docker ps -aq --filter "name=bookly-mock")
+   docker rm -f $(docker ps -aq --filter "name=bookly-backend")
    ```
 3. Volver a levantar
 
@@ -159,7 +159,7 @@ npm run dev  # Puerto 4200
 
 1. Reinstalar dependencias:
    ```powershell
-   cd bookly-mock
+   cd bookly-backend
    rm -rf node_modules
    npm install --legacy-peer-deps
    ```
@@ -176,7 +176,7 @@ booklyapp/
 ├── INICIO_RAPIDO.md             # Guía rápida
 ├── ESTADO_DESPLIEGUE.md         # Este archivo
 │
-├── bookly-mock/
+├── bookly-backend/
 │   ├── docker-compose.yml       # Infraestructura Docker
 │   ├── start-backend-local.ps1  # Inicio de microservicios
 │   ├── Dockerfile.gateway       # Dockerfile del API Gateway
@@ -186,7 +186,7 @@ booklyapp/
 │   ├── Dockerfile.stockpile     # Dockerfile Stockpile Service
 │   └── Dockerfile.reports       # Dockerfile Reports Service
 │
-└── bookly-mock-frontend/
+└── bookly-frontend/
     └── start-frontend-local.ps1 # Inicio del frontend
 ```
 

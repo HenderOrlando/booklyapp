@@ -7,7 +7,7 @@
 
 ## 📋 Resumen Ejecutivo
 
-Este documento mapea los endpoints disponibles en el backend (bookly-mock) con su implementación en el frontend (bookly-mock-frontend), identificando inconsistencias y endpoints faltantes.
+Este documento mapea los endpoints disponibles en el backend (bookly-backend) con su implementación en el frontend (bookly-frontend), identificando inconsistencias y endpoints faltantes.
 
 ### 🎯 Objetivos
 
@@ -237,29 +237,28 @@ Este documento mapea los endpoints disponibles en el backend (bookly-mock) con s
 
 ## 📈 Análisis y Recomendaciones
 
-### ✅ Endpoints Implementados Correctamente
+### ✅ Endpoints Implementados Correctamente (Verificado 2026-02-24)
 
-- **Auth Service**: Login, logout, registro, 2FA ✅
-- **Resources Service**: CRUD completo de recursos y categorías ✅
-- **Availability Service**: CRUD de reservas básicas ✅
-- **Reports Service**: Dashboard y KPIs ✅
+- **Auth Service** (9 controllers): Login, logout, registro, 2FA, usuarios, roles, permisos, auditoría, OAuth, config ✅
+- **Resources Service** (9 controllers): CRUD recursos, categorías, mantenimientos, programas, facultades, departamentos, importación ✅
+- **Availability Service** (11 controllers): Reservas, disponibilidad, excepciones, calendario, historial, bloques mantenimiento, waitlist, reasignación ✅
+- **Stockpile Service** (12 controllers): Aprobaciones, flujos, check-in/out, documentos, monitoreo, location analytics, notificaciones ✅
+- **Reports Service** (12 controllers): Dashboard, uso, usuarios, demanda, exportación, feedback, evaluaciones, auditoría ✅
 
-### ⚠️ Endpoints Pendientes de Implementación Backend
+### ✅ Cobertura Frontend
 
-1. **Reports Service — 31 endpoints STUB** (87% del servicio)
-   - Scheduled Reports (6 endpoints)
-   - Custom Reports (5 endpoints)
-   - Report Templates (5 endpoints)
-   - Alert Management (6 endpoints)
-   - Performance Monitoring (4 endpoints)
-   - Data Processing (5 endpoints)
+- **15 clientes HTTP** cubriendo los 38 controllers de negocio
+- **210+ hooks React Query** (queries + mutations)
+- **15 controllers operacionales** (health, metrics, reference-data) no requieren frontend
 
-2. **Endpoints avanzados menores**
-   - `POST /availabilities` — Configurar disponibilidad
-   - `GET /availabilities/calendar` — Vista calendario
-   - `POST /approval-requests/:id/notification` — Enviar notificación
-   - `GET /check-in-out/location/:locationId` — Check-ins por ubicación
-   - `GET /reports/user/:userId/history` — Historial de reportes
+### ⚪ Controladores Operacionales (no requieren frontend)
+
+- `health.controller.ts` (x5 servicios) — Health checks internos
+- `metrics.controller.ts` (x2 servicios) — Métricas de cache/Prometheus
+- `reference-data.controller.ts` (x4 servicios) — Datos de referencia admin
+- `notification-metrics.controller.ts` — Métricas de notificaciones
+- `proximity-notification.controller.ts` — Notificaciones de proximidad (IoT/mobile)
+- `tenant-notification-config.controller.ts` — Config multi-tenant
 
 ### 🔧 Inconsistencias Detectadas
 
@@ -292,15 +291,17 @@ Este documento mapea los endpoints disponibles en el backend (bookly-mock) con s
 - [x] Hooks de auditoría (logs + stats + export)
 - [x] Hooks de reservas recurrentes
 - [x] Hooks de dashboard y KPIs
+- [x] Cliente `availability-client.ts` (disponibilidad, excepciones, calendario, historial, bloques mantenimiento)
+- [x] Hooks `useAvailability`, `useCalendarView`, `useHistory`
+- [x] Métodos location-analytics + monitoring extendido en `monitoring-client.ts`
+- [x] Endpoints constants actualizados en `endpoints.ts`
 
-### Pendiente
+### Pendiente (Solo pruebas)
 
-- [ ] Implementar 31 endpoints STUB de Reports Service en backend
-- [ ] Crear clientes + hooks para endpoints STUB tras implementación
-- [ ] Agregar tests de integración
-- [ ] Implementar endpoints avanzados menores (5 endpoints)
+- [ ] Agregar tests de integración para nuevos clientes
+- [ ] Tests E2E para flujos completos
 
 ---
 
-**Última actualización**: 2026-02-22  
-**Próxima revisión**: Después de implementar feedback y tests de integración
+**Última actualización**: 2026-02-24  
+**Estado**: ✅ Alineación completa — 53 controllers backend / 15 clientes + 210 hooks frontend

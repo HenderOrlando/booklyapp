@@ -1,6 +1,6 @@
 # RULE-AUTH-RF44 — Registro de accesos y actividades para auditoría
 
-> **Score: 2/5 — Parcial** | Domain: auth | Scope: bookly-mock-frontend
+> **Score: 2/5 — Parcial** | Domain: auth | Scope: bookly-frontend
 
 ## Resumen
 

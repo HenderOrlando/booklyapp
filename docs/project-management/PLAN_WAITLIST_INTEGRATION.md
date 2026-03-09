@@ -14,7 +14,7 @@ Este documento detalla el plan para asegurar que la funcionalidad de "lista de e
   - El API Gateway registra `waiting-lists` pero los endpoints en el controlador `proxy.service.ts` no parecen estar mapeados correctamente en algunos casos (hay discrepancias entre `/waitlist` y `/waiting-lists`).
   - Faltan endpoints para notificar (`/waitlist/notify`), actualizar prioridad (`/waitlist/:id/priority`) y aceptar oferta (`/waitlist/:id/accept`) que el frontend espera usar.
 
-### Frontend (`bookly-mock-frontend`)
+### Frontend (`bookly-frontend`)
 
 - **Implementado**:
   - UI: `WaitlistManager` (Componente para ver y gestionar la lista).
@@ -61,7 +61,7 @@ Este documento detalla el plan para asegurar que la funcionalidad de "lista de e
 1. **Pruebas Unitarias/Integración (Backend):**
    - Escribir tests para los nuevos handlers y controladores de actualización de prioridad, notificación y aceptación.
 2. **Pruebas E2E (Frontend/Playwright):**
-   - Crear un escenario de prueba en `bookly-mock-frontend/e2e/` (ej: `waitlist.spec.ts`) que cubra:
+   - Crear un escenario de prueba en `bookly-frontend/e2e/` (ej: `waitlist.spec.ts`) que cubra:
      - Intentar reservar un recurso ocupado.
      - Seleccionar la opción de unirse a la lista de espera.
      - Verificar que el usuario aparece en el `WaitlistManager` (como Admin).

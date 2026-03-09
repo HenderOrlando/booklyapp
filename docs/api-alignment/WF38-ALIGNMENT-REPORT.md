@@ -12,8 +12,8 @@
 | ---------------- | ------------------------------------------------------------------------------------ |
 | Skills resueltas | 6 activadas                                                                          |
 | Rules indexadas  | 91 en `.windsurf/rules/`                                                             |
-| FE path          | `bookly-mock-frontend/` (Next.js 14)                                                 |
-| BE path          | `bookly-mock/` (NestJS monorepo, 6 servicios)                                        |
+| FE path          | `bookly-frontend/` (Next.js 14)                                                 |
+| BE path          | `bookly-backend/` (NestJS monorepo, 6 servicios)                                        |
 | Endpoint map FE  | `src/infrastructure/api/endpoints.ts` (318 líneas, 6 secciones)                      |
 | API clients FE   | `src/infrastructure/api/*.ts` (7 clientes) + `src/services/*.ts` (6 clientes legacy) |
 
@@ -439,26 +439,26 @@
 ```
 
 Modified (12):
-bookly-mock-frontend/next.config.js
-bookly-mock-frontend/src/hooks/useReportData.ts
-bookly-mock-frontend/src/hooks/useUsers.ts
-bookly-mock-frontend/src/infrastructure/api/endpoints.ts
-bookly-mock-frontend/src/infrastructure/api/index.ts
-bookly-mock-frontend/src/infrastructure/http/httpClient.ts
-bookly-mock-frontend/src/services/approvalsClient.ts
-bookly-mock-frontend/src/services/checkInOutClient.ts
-bookly-mock-frontend/src/services/documentsClient.ts
-bookly-mock-frontend/src/services/reportsClient.ts
-bookly-mock-frontend/src/services/templatesClient.ts
-bookly-mock-frontend/src/types/api/response.ts
+bookly-frontend/next.config.js
+bookly-frontend/src/hooks/useReportData.ts
+bookly-frontend/src/hooks/useUsers.ts
+bookly-frontend/src/infrastructure/api/endpoints.ts
+bookly-frontend/src/infrastructure/api/index.ts
+bookly-frontend/src/infrastructure/http/httpClient.ts
+bookly-frontend/src/services/approvalsClient.ts
+bookly-frontend/src/services/checkInOutClient.ts
+bookly-frontend/src/services/documentsClient.ts
+bookly-frontend/src/services/reportsClient.ts
+bookly-frontend/src/services/templatesClient.ts
+bookly-frontend/src/types/api/response.ts
 
 Created (3):
-bookly-mock-frontend/src/infrastructure/http/errorMapper.ts
-bookly-mock-frontend/src/**tests**/contracts/endpoint-contract.test.ts
+bookly-frontend/src/infrastructure/http/errorMapper.ts
+bookly-frontend/src/**tests**/contracts/endpoint-contract.test.ts
 .github/workflows/security-scan.yml
 
 Backend (1):
-bookly-mock/apps/api-gateway/src/application/services/proxy.service.ts
+bookly-backend/apps/api-gateway/src/application/services/proxy.service.ts
 
 ```
 

@@ -57,7 +57,7 @@ Gate rápido de PR. Valida que los flujos críticos de cada módulo funcionan de
 npx playwright test --project=smoke
 
 # CI (automático en PR)
-# Trigger: pull_request en paths bookly-mock-frontend/**
+# Trigger: pull_request en paths bookly-frontend/**
 ```
 
 ---
@@ -259,20 +259,20 @@ e2e-smoke:
       uses: actions/cache@v4
       with:
         path: ~/.npm
-        key: npm-${{ hashFiles('bookly-mock-frontend/package-lock.json') }}
+        key: npm-${{ hashFiles('bookly-frontend/package-lock.json') }}
     - run: npm ci
-      working-directory: bookly-mock-frontend
+      working-directory: bookly-frontend
     - run: npx playwright install --with-deps chromium
-      working-directory: bookly-mock-frontend
+      working-directory: bookly-frontend
     - run: npx playwright test --project=smoke
-      working-directory: bookly-mock-frontend
+      working-directory: bookly-frontend
       env:
         NEXT_PUBLIC_DATA_MODE: mock
     - uses: actions/upload-artifact@v4
       if: always()
       with:
         name: e2e-smoke-report
-        path: bookly-mock-frontend/playwright-report/
+        path: bookly-frontend/playwright-report/
         retention-days: 7
 ```
 
@@ -289,11 +289,11 @@ e2e-nightly:
       with:
         node-version: 20
     - run: npm ci
-      working-directory: bookly-mock-frontend
+      working-directory: bookly-frontend
     - run: npx playwright install --with-deps chromium
-      working-directory: bookly-mock-frontend
+      working-directory: bookly-frontend
     - run: npx playwright test --project=regression --project=visual
-      working-directory: bookly-mock-frontend
+      working-directory: bookly-frontend
       env:
         NEXT_PUBLIC_DATA_MODE: mock
     - uses: actions/upload-artifact@v4
@@ -301,8 +301,8 @@ e2e-nightly:
       with:
         name: e2e-nightly-report
         path: |
-          bookly-mock-frontend/playwright-report/
-          bookly-mock-frontend/test-results/
+          bookly-frontend/playwright-report/
+          bookly-frontend/test-results/
         retention-days: 30
 ```
 

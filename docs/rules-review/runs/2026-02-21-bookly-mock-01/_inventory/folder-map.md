@@ -1,7 +1,7 @@
-# Folder Map — bookly-mock
+# Folder Map — bookly-backend
 
-**Run ID:** `2026-02-21-bookly-mock-01`  
-**SCOPE_ROOT:** `bookly-mock`  
+**Run ID:** `2026-02-21-bookly-backend-01`  
+**SCOPE_ROOT:** `bookly-backend`  
 **Generated:** 2026-02-21
 
 ---

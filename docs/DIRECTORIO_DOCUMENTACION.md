@@ -4,11 +4,11 @@
 
 ---
 
-## 🏗️ Backend (`bookly-mock/docs/`)
+## 🏗️ Backend (`bookly-backend/docs/`)
 
 Documentación técnica, arquitectura y estándares del backend (microservicios NestJS, API Gateway, MongoDB).
 
-* **Índice:** [`INDEX.md`](../bookly-mock/docs/INDEX.md)
+* **Índice:** [`INDEX.md`](../bookly-backend/docs/INDEX.md)
 
 * **Directorios Activos:**
   * `adr/` - Architecture Decision Records.
@@ -24,11 +24,11 @@ Documentación técnica, arquitectura y estándares del backend (microservicios 
 
 ---
 
-## 🎨 Frontend (`bookly-mock-frontend/docs/`)
+## 🎨 Frontend (`bookly-frontend/docs/`)
 
 Documentación del frontend Next.js: arquitectura, estándares, integración con APIs y backlog técnico.
 
-* **Índice:** [`INDEX.md`](../bookly-mock-frontend/docs/INDEX.md)
+* **Índice:** [`INDEX.md`](../bookly-frontend/docs/INDEX.md)
 
 * **Directorios Activos:**
   * `architecture-and-standards/` - Arquitectura, buenas prácticas, performance y testing.
@@ -92,6 +92,6 @@ Documentación transversal, requisitos de negocio, alineación entre equipos y r
 
 > 💡 **Navegación Rápida:**
 
-* **Modificar API o BD** → `bookly-mock/docs/architecture/` y `adr/`
-* **Nueva pantalla o componente** → `bookly-mock-frontend/docs/architecture-and-standards/BEST_PRACTICES.md`
+* **Modificar API o BD** → `bookly-backend/docs/architecture/` y `adr/`
+* **Nueva pantalla o componente** → `bookly-frontend/docs/architecture-and-standards/BEST_PRACTICES.md`
 * **Conexión frontend ↔ backend** → `docs/api-alignment/FRONTEND_BACKEND_ENDPOINT_MAPPING.md`

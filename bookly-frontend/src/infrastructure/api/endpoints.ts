@@ -140,6 +140,39 @@ export const AVAILABILITY_ENDPOINTS = {
 
   // Disponibilidad
   AVAILABILITIES: `${API_VERSION}/availabilities`,
+  AVAILABILITIES_BY_RESOURCE: (resourceId: string) =>
+    `${API_VERSION}/availabilities/resource/${resourceId}`,
+  AVAILABILITIES_SEARCH: `${API_VERSION}/availabilities/search`,
+
+  // Excepciones de Disponibilidad
+  AVAILABILITY_EXCEPTIONS: `${API_VERSION}/availability/exceptions`,
+  AVAILABILITY_EXCEPTIONS_BY_RESOURCE: (resourceId: string) =>
+    `${API_VERSION}/availability/exceptions/resource/${resourceId}`,
+  AVAILABILITY_EXCEPTION_BY_ID: (id: string) =>
+    `${API_VERSION}/availability/exceptions/${id}`,
+
+  // Vista de Calendario (Calendar View Controller)
+  CALENDAR_VIEW: `${API_VERSION}/calendar/view`,
+  CALENDAR_MONTH: `${API_VERSION}/calendar/month`,
+  CALENDAR_WEEK: `${API_VERSION}/calendar/week`,
+  CALENDAR_DAY: `${API_VERSION}/calendar/day`,
+
+  // Historial
+  HISTORY_BY_RESERVATION: (id: string) =>
+    `${API_VERSION}/history/reservation/${id}`,
+  HISTORY_BY_USER: (userId: string) =>
+    `${API_VERSION}/history/user/${userId}`,
+  HISTORY_SEARCH: `${API_VERSION}/history/search`,
+  HISTORY_EXPORT: `${API_VERSION}/history/export`,
+  HISTORY_MY_ACTIVITY: `${API_VERSION}/history/my-activity`,
+
+  // Bloques de Mantenimiento (Availability Service)
+  MAINTENANCE_BLOCKS: `${API_VERSION}/availability/maintenance`,
+  MAINTENANCE_BLOCKS_BY_RESOURCE: (resourceId: string) =>
+    `${API_VERSION}/availability/maintenance/resource/${resourceId}`,
+  MAINTENANCE_BLOCKS_ACTIVE: `${API_VERSION}/availability/maintenance/active`,
+  MAINTENANCE_BLOCK_BY_ID: (id: string) =>
+    `${API_VERSION}/availability/maintenance/${id}`,
 
   // Conflictos y Validación
   CHECK_CONFLICTS: `${API_VERSION}/availabilities/conflicts`,
@@ -225,7 +258,18 @@ export const STOCKPILE_ENDPOINTS = {
   MONITORING_OVERDUE: `${API_VERSION}/monitoring/overdue`,
   MONITORING_STATS: `${API_VERSION}/monitoring/statistics`,
   MONITORING_ALERTS: `${API_VERSION}/monitoring/alerts`,
+  MONITORING_HISTORY: (resourceId: string) =>
+    `${API_VERSION}/monitoring/history/${resourceId}`,
+  MONITORING_INCIDENT: `${API_VERSION}/monitoring/incident`,
+  MONITORING_INCIDENTS_PENDING: `${API_VERSION}/monitoring/incidents/pending`,
   RESOLVE_INCIDENT: (id: string) => `${API_VERSION}/monitoring/incident/${id}/resolve`,
+
+  // Location Analytics
+  LOCATION_ANALYTICS_USAGE: `${API_VERSION}/location-analytics/usage`,
+  LOCATION_ANALYTICS_HEATMAP: `${API_VERSION}/location-analytics/heatmap`,
+  LOCATION_ANALYTICS_STATS: `${API_VERSION}/location-analytics/statistics`,
+  LOCATION_ANALYTICS_RESOURCE: (resourceId: string) =>
+    `${API_VERSION}/location-analytics/resource/${resourceId}`,
 } as const;
 
 /**

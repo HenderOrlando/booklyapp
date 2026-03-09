@@ -1,6 +1,6 @@
 # 📝 Changelog - CI/CD Bookly Mock
 
-Registro de cambios en la configuración de CI/CD de **bookly-mock** (backend).
+Registro de cambios en la configuración de CI/CD de **bookly-backend** (backend).
 
 ---
 
@@ -11,27 +11,27 @@ Registro de cambios en la configuración de CI/CD de **bookly-mock** (backend).
 #### ✨ Añadido
 
 **Estructura de Carpetas**:
-- ✅ `ci-cd/` - Carpeta principal para todo el CI/CD de bookly-mock
+- ✅ `ci-cd/` - Carpeta principal para todo el CI/CD de bookly-backend
 - ✅ `ci-cd/scripts/local/` - Scripts de ejecución local
 - ✅ `ci-cd/scripts/docker/` - Scripts de Docker completo
 - ✅ `ci-cd/dockerfiles/` - Dockerfiles de microservicios
 - ✅ `ci-cd/docs/` - Documentación de despliegue
 
 **Documentación Nueva**:
-- ✅ `ci-cd/README.md` - Guía completa de CI/CD de bookly-mock
+- ✅ `ci-cd/README.md` - Guía completa de CI/CD de bookly-backend
 - ✅ `ci-cd/INDEX.md` - Índice detallado de todos los archivos
 - ✅ `ci-cd/CHANGELOG.md` - Este archivo
 
 **Scripts Reorganizados**:
 - ✅ `ci-cd/scripts/local/start-all.ps1` - Inicia infraestructura Docker
-- ✅ `ci-cd/scripts/local/start-backend.ps1` - Inicia microservicios de bookly-mock
-- ✅ `ci-cd/scripts/local/start-frontend.ps1` - Inicia bookly-mock-frontend
+- ✅ `ci-cd/scripts/local/start-backend.ps1` - Inicia microservicios de bookly-backend
+- ✅ `ci-cd/scripts/local/start-frontend.ps1` - Inicia bookly-frontend
 - ✅ `ci-cd/scripts/local/start-services-jobs.ps1` - Versión con PowerShell Jobs
 - ✅ `ci-cd/scripts/docker/deploy.ps1` - Despliegue completo en Docker
 - ✅ `ci-cd/scripts/docker/verify.ps1` - Verificación de servicios
 
 **Dockerfiles Reorganizados**:
-- ✅ `ci-cd/dockerfiles/Dockerfile.gateway` - API Gateway de bookly-mock
+- ✅ `ci-cd/dockerfiles/Dockerfile.gateway` - API Gateway de bookly-backend
 - ✅ `ci-cd/dockerfiles/Dockerfile.auth` - Auth Service
 - ✅ `ci-cd/dockerfiles/Dockerfile.resources` - Resources Service
 - ✅ `ci-cd/dockerfiles/Dockerfile.availability` - Availability Service
@@ -50,8 +50,8 @@ Registro de cambios en la configuración de CI/CD de **bookly-mock** (backend).
 #### 🔄 Modificado
 
 **Archivos Actualizados**:
-- ✅ `bookly-mock/docker-compose.yml` - Rutas de Dockerfiles actualizadas a `../ci-cd/dockerfiles/`
-- ✅ `README.md` (raíz) - Sección de CI/CD agregada con referencia a bookly-mock
+- ✅ `bookly-backend/docker-compose.yml` - Rutas de Dockerfiles actualizadas a `../ci-cd/dockerfiles/`
+- ✅ `README.md` (raíz) - Sección de CI/CD agregada con referencia a bookly-backend
 - ✅ Scripts con rutas relativas corregidas usando `$PSScriptRoot`
 
 #### 🗑️ Removido
@@ -62,23 +62,23 @@ Registro de cambios en la configuración de CI/CD de **bookly-mock** (backend).
 - ❌ `ESTADO_DESPLIEGUE.md` → Movido a `ci-cd/docs/ESTADO_DESPLIEGUE.md`
 - ❌ `DEPLOYMENT_SUMMARY.md` → Movido a `ci-cd/docs/DEPLOYMENT_SUMMARY.md`
 
-**Archivos Movidos desde bookly-mock/**:
-- ❌ `bookly-mock/start-backend-local.ps1` → `ci-cd/scripts/local/start-backend.ps1`
-- ❌ `bookly-mock/start-local.ps1` → `ci-cd/scripts/local/start-services-jobs.ps1`
-- ❌ `bookly-mock/docker-deploy.ps1` → `ci-cd/scripts/docker/deploy.ps1`
-- ❌ `bookly-mock/docker-verify.ps1` → `ci-cd/scripts/docker/verify.ps1`
-- ❌ `bookly-mock/Dockerfile.*` → `ci-cd/dockerfiles/Dockerfile.*`
-- ❌ `bookly-mock/DOCKER_DEPLOYMENT.md` → `ci-cd/docs/DOCKER_DEPLOYMENT.md`
-- ❌ `bookly-mock/README_QUICK_START.md` → `ci-cd/docs/QUICK_START.md`
+**Archivos Movidos desde bookly-backend/**:
+- ❌ `bookly-backend/start-backend-local.ps1` → `ci-cd/scripts/local/start-backend.ps1`
+- ❌ `bookly-backend/start-local.ps1` → `ci-cd/scripts/local/start-services-jobs.ps1`
+- ❌ `bookly-backend/docker-deploy.ps1` → `ci-cd/scripts/docker/deploy.ps1`
+- ❌ `bookly-backend/docker-verify.ps1` → `ci-cd/scripts/docker/verify.ps1`
+- ❌ `bookly-backend/Dockerfile.*` → `ci-cd/dockerfiles/Dockerfile.*`
+- ❌ `bookly-backend/DOCKER_DEPLOYMENT.md` → `ci-cd/docs/DOCKER_DEPLOYMENT.md`
+- ❌ `bookly-backend/README_QUICK_START.md` → `ci-cd/docs/QUICK_START.md`
 
-**Archivos Movidos desde bookly-mock-frontend/**:
-- ❌ `bookly-mock-frontend/start-frontend-local.ps1` → `ci-cd/scripts/local/start-frontend.ps1`
+**Archivos Movidos desde bookly-frontend/**:
+- ❌ `bookly-frontend/start-frontend-local.ps1` → `ci-cd/scripts/local/start-frontend.ps1`
 
 #### 🎯 Alcance y Enfoque
 
 **Clarificación Importante**:
-- 📌 Todo el contenido de `ci-cd/` es **específico para bookly-mock** (backend)
-- 📌 Referencias claras en toda la documentación sobre el alcance de bookly-mock
+- 📌 Todo el contenido de `ci-cd/` es **específico para bookly-backend** (backend)
+- 📌 Referencias claras en toda la documentación sobre el alcance de bookly-backend
 - 📌 Nota agregada indicando que otros componentes de Bookly tienen sus propios directorios
 
 ### 📊 Métricas
@@ -90,11 +90,11 @@ Registro de cambios en la configuración de CI/CD de **bookly-mock** (backend).
 
 ### ✅ Beneficios
 
-1. **Organización Mejorada**: Todo CI/CD de bookly-mock centralizado
-2. **Claridad de Alcance**: Referencias explícitas a bookly-mock en todos los archivos
-3. **Separación Clara**: Scripts separados del código fuente de bookly-mock
-4. **Mantenibilidad**: Más fácil encontrar archivos relacionados con bookly-mock
-5. **Escalabilidad**: Preparado para futuras configuraciones de bookly-mock
+1. **Organización Mejorada**: Todo CI/CD de bookly-backend centralizado
+2. **Claridad de Alcance**: Referencias explícitas a bookly-backend en todos los archivos
+3. **Separación Clara**: Scripts separados del código fuente de bookly-backend
+4. **Mantenibilidad**: Más fácil encontrar archivos relacionados con bookly-backend
+5. **Escalabilidad**: Preparado para futuras configuraciones de bookly-backend
 
 ---
 

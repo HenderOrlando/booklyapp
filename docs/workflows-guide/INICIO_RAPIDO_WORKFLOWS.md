@@ -84,7 +84,7 @@ Esta guía te ayudará a empezar a usar los workflows de GitHub Actions en menos
 
 1. Haz un pequeño cambio en cualquier servicio:
    ```bash
-   cd bookly-mock/apps/api-gateway/src
+   cd bookly-backend/apps/api-gateway/src
    # Edita cualquier archivo, por ejemplo, agrega un comentario
    echo "// Test workflow" >> main.ts
    ```
@@ -131,13 +131,13 @@ Esta guía te ayudará a empezar a usar los workflows de GitHub Actions en menos
 
 | Servicio | Workflow | Se activa cuando cambias |
 |----------|----------|--------------------------|
-| API Gateway | `api-gateway.yml` | `bookly-mock/apps/api-gateway/**` |
-| Auth Service | `auth-service.yml` | `bookly-mock/apps/auth-service/**` |
-| Resources | `resources-service.yml` | `bookly-mock/apps/resources-service/**` |
-| Availability | `availability-service.yml` | `bookly-mock/apps/availability-service/**` |
-| Stockpile | `stockpile-service.yml` | `bookly-mock/apps/stockpile-service/**` |
-| Reports | `reports-service.yml` | `bookly-mock/apps/reports-service/**` |
-| Frontend | `frontend.yml` | `bookly-mock-frontend/**` |
+| API Gateway | `api-gateway.yml` | `bookly-backend/apps/api-gateway/**` |
+| Auth Service | `auth-service.yml` | `bookly-backend/apps/auth-service/**` |
+| Resources | `resources-service.yml` | `bookly-backend/apps/resources-service/**` |
+| Availability | `availability-service.yml` | `bookly-backend/apps/availability-service/**` |
+| Stockpile | `stockpile-service.yml` | `bookly-backend/apps/stockpile-service/**` |
+| Reports | `reports-service.yml` | `bookly-backend/apps/reports-service/**` |
+| Frontend | `frontend.yml` | `bookly-frontend/**` |
 
 ---
 
@@ -232,7 +232,7 @@ on:
 **Problema:** Ruta incorrecta al Dockerfile
 
 **Solución:**
-- Verifica que el Dockerfile existe en: `ci-cd/bookly-mock/dockerfiles/`
+- Verifica que el Dockerfile existe en: `ci-cd/bookly-backend/dockerfiles/`
 - No muevas los Dockerfiles de su ubicación
 
 ### Workflow no se ejecuta
@@ -241,7 +241,7 @@ on:
 
 **Solución:**
 1. Verifica que modificaste archivos en la ruta correcta
-2. Ejemplo: cambios en `bookly-mock/apps/api-gateway/` activan `api-gateway.yml`
+2. Ejemplo: cambios en `bookly-backend/apps/api-gateway/` activan `api-gateway.yml`
 3. Verifica que hiciste push a `main` o `develop`
 
 ### Build falla con error de dependencias

@@ -1,7 +1,7 @@
-# Rules Review — bookly-mock
+# Rules Review — bookly-backend
 
-**Run ID:** `2026-02-21-bookly-mock-01`  
-**SCOPE_ROOT:** `bookly-mock`  
+**Run ID:** `2026-02-21-bookly-backend-01`  
+**SCOPE_ROOT:** `bookly-backend`  
 **Generated:** 2026-02-21  
 **Rules audited:** 47 (42 RF + 5 Flow)  
 **Meta rules (context only):** 5
@@ -10,7 +10,7 @@
 
 ## Resumen Ejecutivo
 
-El backend `bookly-mock` presenta una implementación **sólida a nivel funcional** en los dominios core (auth, resources, availability), con arquitectura hexagonal, CQRS y EDA bien estructurados. El dominio de **reports** tiene buena cobertura de controllers y servicios. El dominio de **stockpile** tiene implementación funcional con controllers para aprobaciones, check-in/out y documentos.
+El backend `bookly-backend` presenta una implementación **sólida a nivel funcional** en los dominios core (auth, resources, availability), con arquitectura hexagonal, CQRS y EDA bien estructurados. El dominio de **reports** tiene buena cobertura de controllers y servicios. El dominio de **stockpile** tiene implementación funcional con controllers para aprobaciones, check-in/out y documentos.
 
 ### KPIs Globales
 

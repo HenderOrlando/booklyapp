@@ -1,13 +1,13 @@
-# Rules Review — bookly-mock-frontend
+# Rules Review — bookly-frontend
 
 > **Run ID:** `2026-02-21-frontend-01`
-> **Scope:** `bookly-mock-frontend`
+> **Scope:** `bookly-frontend`
 > **Date:** 2026-02-21
 > **Total Rules:** 41 | **Applicable:** 41
 
 ## Resumen Ejecutivo
 
-El frontend de Bookly (`bookly-mock-frontend`) es una aplicación Next.js con Atomic Design, i18n (en/es), Redux Toolkit, React Query, Tailwind CSS y Playwright para E2E. Cubre **todos los dominios funcionales** del sistema con 24 rutas, 122+ componentes, 44 hooks, 15 API clients y 14 tipos de entidad.
+El frontend de Bookly (`bookly-frontend`) es una aplicación Next.js con Atomic Design, i18n (en/es), Redux Toolkit, React Query, Tailwind CSS y Playwright para E2E. Cubre **todos los dominios funcionales** del sistema con 24 rutas, 122+ componentes, 44 hooks, 15 API clients y 14 tipos de entidad.
 
 ### KPIs de Cobertura
 

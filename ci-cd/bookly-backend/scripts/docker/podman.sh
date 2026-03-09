@@ -92,7 +92,7 @@ fi
 
 # Configuration - Use script location to calculate paths
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-BOOKLY_MOCK_PATH="$(cd "$SCRIPT_DIR/../../../../bookly-mock" && pwd)"
+BOOKLY_MOCK_PATH="$(cd "$SCRIPT_DIR/../../../../bookly-backend" && pwd)"
 DOCKER_COMPOSE_FULL="podman-compose.yml"
 DOCKER_COMPOSE_PARTIAL="podman-compose.microservices.yml"
 DEPLOY_MODE_FILE=".deploy-mode"
@@ -212,7 +212,7 @@ parallel_build() {
     echo -e "${GREEN}Build complete!${NC}"
 }
 
-# Change to bookly-mock directory
+# Change to bookly-backend directory
 cd "$BOOKLY_MOCK_PATH" || exit 1
 
 # Determine which podman-compose file to use
@@ -317,13 +317,13 @@ if [[ "$MODE" == "full" ]]; then
     else
         echo -e "${YELLOW}Waiting for infrastructure (active polling, max 30s)...${NC}"
         wait_for_containers \
-            "bookly-mock-redis" \
-            "bookly-mock-mongodb-auth" \
-            "bookly-mock-mongodb-resources" \
-            "bookly-mock-mongodb-availability" \
-            "bookly-mock-mongodb-stockpile" \
-            "bookly-mock-mongodb-reports" \
-            "bookly-mock-mongodb-gateway"
+            "bookly-backend-redis" \
+            "bookly-backend-mongodb-auth" \
+            "bookly-backend-mongodb-resources" \
+            "bookly-backend-mongodb-availability" \
+            "bookly-backend-mongodb-stockpile" \
+            "bookly-backend-mongodb-reports" \
+            "bookly-backend-mongodb-gateway"
         echo -e "${GREEN}Infrastructure ready!${NC}"
     fi
     echo ""
@@ -338,13 +338,13 @@ if [[ "$MODE" == "full" ]]; then
     if [[ "$FAST_MODE" != "true" ]]; then
         echo -e "${YELLOW}Waiting for services to be ready (active polling)...${NC}"
         wait_for_containers \
-            "bookly-mock-api-gateway" \
-            "bookly-mock-auth-service" \
-            "bookly-mock-resources-service" \
-            "bookly-mock-availability-service" \
-            "bookly-mock-stockpile-service" \
-            "bookly-mock-reports-service" \
-            "bookly-mock-frontend"
+            "bookly-backend-api-gateway" \
+            "bookly-backend-auth-service" \
+            "bookly-backend-resources-service" \
+            "bookly-backend-availability-service" \
+            "bookly-backend-stockpile-service" \
+            "bookly-backend-reports-service" \
+            "bookly-frontend"
         echo -e "${GREEN}All services ready!${NC}"
     fi
     echo ""
@@ -383,7 +383,7 @@ else
         "apps/availability-service/.env"
         "apps/stockpile-service/.env"
         "apps/reports-service/.env"
-        "../bookly-mock-frontend/.env"
+        "../bookly-frontend/.env"
     )
     
     missing_files=()

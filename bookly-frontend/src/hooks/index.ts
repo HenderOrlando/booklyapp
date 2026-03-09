@@ -11,5 +11,10 @@ export * from "./useResources";
 // Waitlist hooks
 export * from "./useWaitlist";
 
+// Availability hooks
+export * from "./useAvailability";
+export * from "./useCalendarView";
+export * from "./useHistory";
+
 // Auth hooks (existentes)
 export * from "./useAuth";

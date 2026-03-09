@@ -44,7 +44,7 @@ Write-Host "  Infrastructure Services" -ForegroundColor Cyan
 Write-Host "=====================================" -ForegroundColor Cyan
 
 Write-Host "Checking Redis..." -NoNewline
-$redisStatus = docker exec bookly-mock-redis redis-cli ping 2>&1
+$redisStatus = docker exec bookly-backend-redis redis-cli ping 2>&1
 if ($redisStatus -eq "PONG") {
     Write-Host " [OK]" -ForegroundColor Green
 } else {
@@ -52,7 +52,7 @@ if ($redisStatus -eq "PONG") {
 }
 
 Write-Host "Checking MongoDB Auth..." -NoNewline
-$mongoAuthStatus = docker exec bookly-mock-mongodb-auth mongosh --eval "db.adminCommand('ping')" --quiet 2>&1
+$mongoAuthStatus = docker exec bookly-backend-mongodb-auth mongosh --eval "db.adminCommand('ping')" --quiet 2>&1
 if ($mongoAuthStatus -like "*ok*") {
     Write-Host " [OK]" -ForegroundColor Green
 } else {
@@ -60,7 +60,7 @@ if ($mongoAuthStatus -like "*ok*") {
 }
 
 Write-Host "Checking Kafka..." -NoNewline
-$kafkaStatus = docker exec bookly-mock-kafka kafka-broker-api-versions --bootstrap-server localhost:9092 2>&1
+$kafkaStatus = docker exec bookly-backend-kafka kafka-broker-api-versions --bootstrap-server localhost:9092 2>&1
 if ($LASTEXITCODE -eq 0) {
     Write-Host " [OK]" -ForegroundColor Green
 } else {

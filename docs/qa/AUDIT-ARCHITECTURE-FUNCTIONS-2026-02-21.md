@@ -1,7 +1,7 @@
 # Auditoría de Arquitectura y Funciones - Bookly
 
 **Fecha:** 2026-02-21
-**Alcance:** Backend (`bookly-mock`) y Frontend (`bookly-mock-frontend`)
+**Alcance:** Backend (`bookly-backend`) y Frontend (`bookly-frontend`)
 
 ---
 

@@ -1,6 +1,6 @@
 # RULE-AUTH-RF42 — Restricción de modificaciones a administradores
 
-> **Score: 3/5 — Funcional** | Domain: auth | Scope: bookly-mock-frontend
+> **Score: 3/5 — Funcional** | Domain: auth | Scope: bookly-frontend
 
 ## Resumen
 

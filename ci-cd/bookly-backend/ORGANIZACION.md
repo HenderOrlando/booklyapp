@@ -4,9 +4,9 @@ Este documento describe la organización del CI/CD para **Bookly Mock** (Fronten
 
 ## 🎯 Alcance
 
-Esta carpeta `ci-cd/bookly-mock/` contiene **todo lo necesario** para el despliegue de:
+Esta carpeta `ci-cd/bookly-backend/` contiene **todo lo necesario** para el despliegue de:
 
-### Backend (bookly-mock)
+### Backend (bookly-backend)
 - ✅ API Gateway (puerto 3000)
 - ✅ Auth Service (puerto 3001)
 - ✅ Resources Service (puerto 3002)
@@ -14,7 +14,7 @@ Esta carpeta `ci-cd/bookly-mock/` contiene **todo lo necesario** para el desplie
 - ✅ Stockpile Service (puerto 3004)
 - ✅ Reports Service (puerto 3005)
 
-### Frontend (bookly-mock-frontend)
+### Frontend (bookly-frontend)
 - ✅ Next.js App (puerto 4200)
 
 ### Infraestructura
@@ -26,7 +26,7 @@ Esta carpeta `ci-cd/bookly-mock/` contiene **todo lo necesario** para el desplie
 ## 📁 Estructura Completa
 
 ```
-ci-cd/bookly-mock/
+ci-cd/bookly-backend/
 │
 ├── scripts/                    # Scripts de despliegue
 │   ├── local/                  # Ejecución local
@@ -69,14 +69,14 @@ ci-cd/bookly-mock/
 ```
 [1] Infraestructura Docker
     ↓
-    .\ci-cd\bookly-mock\scripts\local\start-all.ps1
+    .\ci-cd\bookly-backend\scripts\local\start-all.ps1
     ↓
     ├─ MongoDB (6 instancias)
     ├─ Redis
     ├─ Kafka
     └─ Zookeeper
 
-[2] Backend Local (bookly-mock/)
+[2] Backend Local (bookly-backend/)
     ↓
     npm run start:all
     ↓
@@ -87,7 +87,7 @@ ci-cd/bookly-mock/
     ├─ Stockpile Service :3004
     └─ Reports Service :3005
 
-[3] Frontend Local (bookly-mock-frontend/)
+[3] Frontend Local (bookly-frontend/)
     ↓
     npm run dev
     ↓
@@ -99,7 +99,7 @@ ci-cd/bookly-mock/
 ```
 [1] Deploy Todo
     ↓
-    .\ci-cd\bookly-mock\scripts\docker\deploy.ps1
+    .\ci-cd\bookly-backend\scripts\docker\deploy.ps1
     ↓
     ├─ Infraestructura (Docker)
     ├─ Backend (Docker)
@@ -107,7 +107,7 @@ ci-cd/bookly-mock/
 
 [2] Verificar
     ↓
-    .\ci-cd\bookly-mock\scripts\docker\verify.ps1
+    .\ci-cd\bookly-backend\scripts\docker\verify.ps1
 ```
 
 ## 📍 Referencias de Rutas
@@ -116,45 +116,45 @@ ci-cd/bookly-mock/
 
 ```powershell
 # Scripts
-.\ci-cd\bookly-mock\scripts\local\start-all.ps1
-.\ci-cd\bookly-mock\scripts\docker\deploy.ps1
+.\ci-cd\bookly-backend\scripts\local\start-all.ps1
+.\ci-cd\bookly-backend\scripts\docker\deploy.ps1
 
 # Documentación
-.\ci-cd\bookly-mock\README.md
-.\ci-cd\bookly-mock\docs\INICIO_RAPIDO.md
+.\ci-cd\bookly-backend\README.md
+.\ci-cd\bookly-backend\docs\INICIO_RAPIDO.md
 ```
 
-### Desde bookly-mock/
+### Desde bookly-backend/
 
 ```powershell
 # Scripts
-..\ci-cd\bookly-mock\scripts\docker\deploy.ps1
-..\ci-cd\bookly-mock\scripts\docker\verify.ps1
+..\ci-cd\bookly-backend\scripts\docker\deploy.ps1
+..\ci-cd\bookly-backend\scripts\docker\verify.ps1
 
 # Dockerfiles (en docker-compose.yml)
-dockerfile: ../ci-cd/bookly-mock/dockerfiles/Dockerfile.gateway
-dockerfile: ../ci-cd/bookly-mock/dockerfiles/Dockerfile.auth
+dockerfile: ../ci-cd/bookly-backend/dockerfiles/Dockerfile.gateway
+dockerfile: ../ci-cd/bookly-backend/dockerfiles/Dockerfile.auth
 # ... etc
 ```
 
-### Desde bookly-mock-frontend/
+### Desde bookly-frontend/
 
 ```powershell
 # Scripts
-..\ci-cd\bookly-mock\scripts\local\start-frontend.ps1
+..\ci-cd\bookly-backend\scripts\local\start-frontend.ps1
 ```
 
 ## 🎨 Ventajas de esta Organización
 
 ### 1. **Claridad Total**
-- ✅ Queda claro que `ci-cd/bookly-mock/` contiene TODO de bookly-mock
+- ✅ Queda claro que `ci-cd/bookly-backend/` contiene TODO de bookly-backend
 - ✅ Frontend y backend juntos en el mismo lugar
 - ✅ Fácil de encontrar archivos relacionados
 
 ### 2. **Escalabilidad**
 ```
 ci-cd/
-├── bookly-mock/           # ✅ Implementado
+├── bookly-backend/           # ✅ Implementado
 ├── bookly-production/     # 📋 Futuro
 ├── bookly-analytics/      # 📋 Futuro
 └── ...
@@ -187,4 +187,4 @@ ci-cd/
 ---
 
 **Última actualización**: 6 de diciembre de 2025  
-**Versión**: 2.0.0 (Reorganización con carpeta bookly-mock)
+**Versión**: 2.0.0 (Reorganización con carpeta bookly-backend)

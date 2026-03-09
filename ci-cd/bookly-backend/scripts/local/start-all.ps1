@@ -37,7 +37,7 @@ Write-Host ""
 Write-Host "📋 Paso 2/3: Levantando infraestructura en Docker..." -ForegroundColor Yellow
 Write-Host "   (MongoDB, Redis, Kafka, Zookeeper)" -ForegroundColor Gray
 
-Push-Location "$PSScriptRoot\..\..\..\..\bookly-mock"
+Push-Location "$PSScriptRoot\..\..\..\..\bookly-backend"
 try {
     $output = docker-compose up -d zookeeper kafka redis mongodb-auth mongodb-resources mongodb-availability mongodb-stockpile mongodb-reports mongodb-gateway 2>&1
     
@@ -84,11 +84,11 @@ Write-Host ""
 Write-Host "Abre 2 terminales nuevas:" -ForegroundColor White
 Write-Host ""
 Write-Host "Terminal 1 - Backend (Microservicios):" -ForegroundColor Green
-Write-Host "  cd bookly-mock" -ForegroundColor White
+Write-Host "  cd bookly-backend" -ForegroundColor White
 Write-Host "  .\start-backend-local.ps1" -ForegroundColor Cyan
 Write-Host ""
 Write-Host "Terminal 2 - Frontend (Next.js):" -ForegroundColor Green
-Write-Host "  cd bookly-mock-frontend" -ForegroundColor White
+Write-Host "  cd bookly-frontend" -ForegroundColor White
 Write-Host "  .\start-frontend-local.ps1" -ForegroundColor Cyan
 Write-Host ""
 Write-Host "════════════════════════════════════════" -ForegroundColor Gray
@@ -99,6 +99,6 @@ Write-Host "  📡 API Gateway: http://localhost:3000" -ForegroundColor Green
 Write-Host "  📚 Swagger:     http://localhost:3000/api/docs" -ForegroundColor Green
 Write-Host ""
 Write-Host "Para detener la infraestructura Docker:" -ForegroundColor Yellow
-Write-Host "  cd bookly-mock" -ForegroundColor White
+Write-Host "  cd bookly-backend" -ForegroundColor White
 Write-Host "  docker-compose down" -ForegroundColor Cyan
 Write-Host ""

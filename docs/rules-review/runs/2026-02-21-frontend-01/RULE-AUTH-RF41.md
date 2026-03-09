@@ -1,6 +1,6 @@
 # RULE-AUTH-RF41 — Gestión de roles y permisos
 
-> **Score: 3/5 — Funcional** | Domain: auth | Scope: bookly-mock-frontend
+> **Score: 3/5 — Funcional** | Domain: auth | Scope: bookly-frontend
 
 ## Resumen
 

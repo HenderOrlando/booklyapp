@@ -154,13 +154,13 @@ Todos los scripts de despliegue y documentación están organizados en la carpet
 
 ```
 ci-cd/
-├── bookly-mock/            # CI/CD de Bookly Mock (Frontend + Backend)
+├── bookly-backend/            # CI/CD de Bookly Mock (Frontend + Backend)
 │   ├── scripts/
 │   │   ├── local/          # Scripts para ejecución local
 │   │   └── docker/         # Scripts para Docker completo
 │   ├── dockerfiles/        # Dockerfiles de microservicios
 │   ├── docs/               # Documentación de despliegue
-│   ├── README.md           # Guía completa de bookly-mock
+│   ├── README.md           # Guía completa de bookly-backend
 │   └── INDEX.md            # Índice de archivos
 │
 └── README.md              # Guía general de CI/CD
@@ -172,21 +172,21 @@ ci-cd/
 
 ```powershell
 # 1. Levantar infraestructura Docker
-.\ci-cd\bookly-mock\scripts\local\start-all.ps1
+.\ci-cd\bookly-backend\scripts\local\start-all.ps1
 
 # 2. En otra terminal - Backend
-cd bookly-mock
+cd bookly-backend
 npm run start:all
 
 # 3. En otra terminal - Frontend
-cd bookly-mock-frontend
+cd bookly-frontend
 npm run dev
 ```
 
 ### 📚 Documentación Completa
 
-Ver **[ci-cd/bookly-mock/README.md](ci-cd/bookly-mock/README.md)** para:
-- Guías de despliegue paso a paso de bookly-mock
+Ver **[ci-cd/bookly-backend/README.md](ci-cd/bookly-backend/README.md)** para:
+- Guías de despliegue paso a paso de bookly-backend
 - Configuración de Docker
 - Troubleshooting
 - Comandos útiles

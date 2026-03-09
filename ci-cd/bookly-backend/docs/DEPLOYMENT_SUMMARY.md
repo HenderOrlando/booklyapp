@@ -2,7 +2,7 @@
 
 ## ✅ Archivos Creados
 
-### 1. Dockerfiles para Microservicios (bookly-mock/)
+### 1. Dockerfiles para Microservicios (bookly-backend/)
 
 He creado Dockerfiles individuales para cada microservicio usando multi-stage builds optimizados:
 
@@ -21,7 +21,7 @@ Características de los Dockerfiles:
 - ✅ Optimización de capas
 - ✅ dumb-init para manejo de señales
 
-### 2. Docker Compose Completo (bookly-mock/docker-compose.yml)
+### 2. Docker Compose Completo (bookly-backend/docker-compose.yml)
 
 Actualicé el `docker-compose.yml` para incluir:
 
@@ -85,7 +85,7 @@ Actualicé el `docker-compose.yml` para incluir:
 
 ### 6. Configuración de Next.js
 
-Actualicé `bookly-mock-frontend/next.config.js` para agregar:
+Actualicé `bookly-frontend/next.config.js` para agregar:
 ```javascript
 output: 'standalone'  // Necesario para Docker
 ```
@@ -176,7 +176,7 @@ docker stats
 ### Opción 3: Ejecutar verificación completa (después del despliegue)
 
 ```powershell
-cd bookly-mock
+cd bookly-backend
 .\docker-verify.ps1
 ```
 
@@ -224,15 +224,15 @@ El despliegue completo requiere:
 
 Los datos se guardan en volúmenes Docker:
 ```
-bookly-mock_mongodb-auth-data
-bookly-mock_mongodb-resources-data
-bookly-mock_mongodb-availability-data
-bookly-mock_mongodb-stockpile-data
-bookly-mock_mongodb-reports-data
-bookly-mock_mongodb-gateway-data
-bookly-mock_redis-data
-bookly-mock_kafka-data
-bookly-mock_zookeeper-data
+bookly-backend_mongodb-auth-data
+bookly-backend_mongodb-resources-data
+bookly-backend_mongodb-availability-data
+bookly-backend_mongodb-stockpile-data
+bookly-backend_mongodb-reports-data
+bookly-backend_mongodb-gateway-data
+bookly-backend_redis-data
+bookly-backend_kafka-data
+bookly-backend_zookeeper-data
 ```
 
 Para limpiar todo (⚠️ BORRA DATOS):

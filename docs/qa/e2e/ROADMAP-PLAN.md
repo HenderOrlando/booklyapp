@@ -298,7 +298,7 @@ Tests (E2E-RPT-001, E2E-RPT-002, E2E-RPT-007):
 
 #### F1-T14: Crear workflow CI `.github/workflows/e2e-frontend.yml`
 
-- Trigger: `pull_request` en paths `bookly-mock-frontend/**`
+- Trigger: `pull_request` en paths `bookly-frontend/**`
 - Job: checkout → setup node → npm ci → install playwright → run smoke → upload artifact
 - Cache: `~/.npm` + Playwright browsers
 

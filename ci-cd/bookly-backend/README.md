@@ -5,73 +5,73 @@ Esta carpeta contiene todos los scripts, configuraciones y documentación relaci
 ## 📁 Estructura
 
 ```
-ci-cd/                      # CI/CD específico para bookly-mock (backend)
+ci-cd/                      # CI/CD específico para bookly-backend (backend)
 ├── scripts/
-│   ├── local/              # Scripts para ejecución local de bookly-mock
-│   │   ├── start-all.ps1              # Inicia infraestructura Docker para bookly-mock
-│   │   ├── start-backend.ps1          # Inicia microservicios de bookly-mock
-│   │   ├── start-frontend.ps1         # Inicia bookly-mock-frontend
+│   ├── local/              # Scripts para ejecución local de bookly-backend
+│   │   ├── start-all.ps1              # Inicia infraestructura Docker para bookly-backend
+│   │   ├── start-backend.ps1          # Inicia microservicios de bookly-backend
+│   │   ├── start-frontend.ps1         # Inicia bookly-frontend
 │   │   └── start-services-jobs.ps1    # Versión alternativa con PowerShell Jobs
 │   │
-│   └── docker/             # Scripts para despliegue Docker de bookly-mock
-│       ├── deploy.ps1                 # Despliega bookly-mock en Docker
-│       └── verify.ps1                 # Verifica servicios de bookly-mock
+│   └── docker/             # Scripts para despliegue Docker de bookly-backend
+│       ├── deploy.ps1                 # Despliega bookly-backend en Docker
+│       └── verify.ps1                 # Verifica servicios de bookly-backend
 │
-├── dockerfiles/            # Dockerfiles de microservicios de bookly-mock
-│   ├── Dockerfile.gateway             # API Gateway (bookly-mock)
-│   ├── Dockerfile.auth                # Auth Service (bookly-mock)
-│   ├── Dockerfile.resources           # Resources Service (bookly-mock)
-│   ├── Dockerfile.availability        # Availability Service (bookly-mock)
-│   ├── Dockerfile.stockpile           # Stockpile Service (bookly-mock)
-│   ├── Dockerfile.reports             # Reports Service (bookly-mock)
+├── dockerfiles/            # Dockerfiles de microservicios de bookly-backend
+│   ├── Dockerfile.gateway             # API Gateway (bookly-backend)
+│   ├── Dockerfile.auth                # Auth Service (bookly-backend)
+│   ├── Dockerfile.resources           # Resources Service (bookly-backend)
+│   ├── Dockerfile.availability        # Availability Service (bookly-backend)
+│   ├── Dockerfile.stockpile           # Stockpile Service (bookly-backend)
+│   ├── Dockerfile.reports             # Reports Service (bookly-backend)
 │   └── Dockerfile.base                # Dockerfile base compartido
 │
-├── docs/                   # Documentación de despliegue de bookly-mock
-│   ├── INICIO_RAPIDO.md              # Guía rápida de bookly-mock
-│   ├── ESTADO_DESPLIEGUE.md          # Estado del despliegue de bookly-mock
-│   ├── DOCKER_DEPLOYMENT.md          # Guía Docker de bookly-mock
-│   ├── QUICK_START.md                # Quick start de bookly-mock
-│   └── DEPLOYMENT_SUMMARY.md         # Resumen técnico de bookly-mock
+├── docs/                   # Documentación de despliegue de bookly-backend
+│   ├── INICIO_RAPIDO.md              # Guía rápida de bookly-backend
+│   ├── ESTADO_DESPLIEGUE.md          # Estado del despliegue de bookly-backend
+│   ├── DOCKER_DEPLOYMENT.md          # Guía Docker de bookly-backend
+│   ├── QUICK_START.md                # Quick start de bookly-backend
+│   └── DEPLOYMENT_SUMMARY.md         # Resumen técnico de bookly-backend
 │
 └── README.md              # Este archivo
 ```
 
-> **Nota**: Este directorio CI/CD contiene configuraciones específicas para **bookly-mock** (backend NestJS con microservicios). Para otros componentes del proyecto Bookly, consultar sus respectivos directorios.
+> **Nota**: Este directorio CI/CD contiene configuraciones específicas para **bookly-backend** (backend NestJS con microservicios). Para otros componentes del proyecto Bookly, consultar sus respectivos directorios.
 
 ## 🚀 Inicio Rápido (Bookly Mock)
 
 ### Modo Híbrido (Recomendado para Desarrollo)
 
-**Infraestructura en Docker + Microservicios de bookly-mock Locales**
+**Infraestructura en Docker + Microservicios de bookly-backend Locales**
 
 ```powershell
 # 1. Desde la raíz del proyecto
 .\ci-cd\scripts\local\start-all.ps1
 
 # 2. En una nueva terminal - Backend
-cd bookly-mock
+cd bookly-backend
 npm run start:all
 
 # 3. En otra terminal - Frontend
-cd bookly-mock-frontend
+cd bookly-frontend
 npm run dev
 ```
 
 ### Modo Docker Completo (Bookly Mock)
 
-**Todo bookly-mock en Docker (para producción o testing)**
+**Todo bookly-backend en Docker (para producción o testing)**
 
 ```powershell
-# Desde bookly-mock/
-cd bookly-mock
+# Desde bookly-backend/
+cd bookly-backend
 
 # Opción 1: Usar script automatizado
 ..\ci-cd\scripts\docker\deploy.ps1
 
-# Opción 2: Manual con docker-compose de bookly-mock
+# Opción 2: Manual con docker-compose de bookly-backend
 docker-compose up -d
 
-# Verificar estado de bookly-mock
+# Verificar estado de bookly-backend
 ..\ci-cd\scripts\docker\verify.ps1
 ```
 
@@ -96,11 +96,11 @@ Inicia todos los microservicios localmente usando `npm run start:all`
 
 **Requisitos**:
 - Infraestructura Docker corriendo
-- Ejecutar desde `bookly-mock/`
+- Ejecutar desde `bookly-backend/`
 
 **Uso**:
 ```powershell
-cd bookly-mock
+cd bookly-backend
 ..\ci-cd\scripts\local\start-backend.ps1
 ```
 
@@ -109,7 +109,7 @@ Inicia el frontend Next.js en modo desarrollo
 
 **Uso**:
 ```powershell
-cd bookly-mock-frontend
+cd bookly-frontend
 ..\ci-cd\scripts\local\start-frontend.ps1
 ```
 
@@ -128,7 +128,7 @@ Script automatizado que:
 
 **Uso**:
 ```powershell
-cd bookly-mock
+cd bookly-backend
 ..\ci-cd\scripts\docker\deploy.ps1
 ```
 
@@ -141,13 +141,13 @@ Verifica el estado de todos los servicios Docker:
 
 **Uso**:
 ```powershell
-cd bookly-mock
+cd bookly-backend
 ..\ci-cd\scripts\docker\verify.ps1
 ```
 
 ## 🐳 Dockerfiles
 
-Todos los Dockerfiles están en `dockerfiles/` y deben ser referenciados desde `bookly-mock/docker-compose.yml`
+Todos los Dockerfiles están en `dockerfiles/` y deben ser referenciados desde `bookly-backend/docker-compose.yml`
 
 **Características**:
 - ✅ Single-stage builds (optimizados para Windows)
@@ -202,10 +202,10 @@ Resumen técnico de la configuración de despliegue.
 ### Docker
 ```powershell
 # Ver contenedores activos
-docker ps --filter "name=bookly-mock"
+docker ps --filter "name=bookly-backend"
 
 # Ver logs
-cd bookly-mock
+cd bookly-backend
 docker-compose logs -f
 
 # Detener todo
@@ -217,7 +217,7 @@ docker-compose down -v
 
 ### NPM (Modo Local)
 ```powershell
-cd bookly-mock
+cd bookly-backend
 
 # Todos los servicios
 npm run start:all

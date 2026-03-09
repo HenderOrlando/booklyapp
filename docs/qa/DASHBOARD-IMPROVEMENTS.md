@@ -2,7 +2,7 @@
 
 ## T0: Profiles
 
-### Backend Profile (@bookly-mock)
+### Backend Profile (@bookly-backend)
 - **Stack**: NestJS
 - **Arquitectura**: Clean Architecture, CQRS, Event-Driven
 - **Auth**: JWT, Guards por roles/permisos
@@ -10,7 +10,7 @@
 - **Base de Datos**: Mongoose / MongoDB (usado como read model en `reports-service`)
 - **Dashboard Data Source**: `DashboardService` agrega métricas usando MongoDB (`usageReportModel`, `resourceCacheModel`, `userFeedbackModel`) y EventStore (`eventStoreService`).
 
-### Web Profile (@bookly-mock-frontend)
+### Web Profile (@bookly-frontend)
 - **Stack**: Next.js (App Router)
 - **Renderizado**: Client-side (uso de `"use client"` en `DashboardGrid`)
 - **Estado**: React Query (`@tanstack/react-query`) para server state (hooks en `useDashboard.ts`).

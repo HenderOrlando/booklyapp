@@ -2,7 +2,7 @@
 
 ## 1. Objetivo
 
-Garantizar que **todas las páginas y componentes del frontend (`bookly-mock-frontend`)** apliquen de manera estricta y consistente los componentes, tokens de color y layouts definidos en el sistema de diseño de Bookly, logrando una interfaz visualmente uniforme, usable y accesible en todos los dominios.
+Garantizar que **todas las páginas y componentes del frontend (`bookly-frontend`)** apliquen de manera estricta y consistente los componentes, tokens de color y layouts definidos en el sistema de diseño de Bookly, logrando una interfaz visualmente uniforme, usable y accesible en todos los dominios.
 
 ## 2. Reglas Afectadas (Rules)
 

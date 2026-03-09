@@ -1,4 +1,4 @@
-# Rules Index — bookly-mock-frontend
+# Rules Index — bookly-frontend
 
 > Run: `2026-02-21-frontend-01` | Total Rules: 41 | All applicable to frontend scope
 

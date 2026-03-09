@@ -89,7 +89,7 @@ jobs:
     uses: ./.github/workflows/build-and-push-image.yml
     with:
       service-name: auth-service
-      dockerfile-path: ./ci-cd/bookly-mock/dockerfiles/Dockerfile.auth
+      dockerfile-path: ./ci-cd/bookly-backend/dockerfiles/Dockerfile.auth
     secrets:
       DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
       DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}

@@ -1,6 +1,6 @@
-# Folder Map — bookly-mock-frontend
+# Folder Map — bookly-frontend
 
-> Run: `2026-02-21-frontend-01` | Scope: `bookly-mock-frontend`
+> Run: `2026-02-21-frontend-01` | Scope: `bookly-frontend`
 
 ## Project Type
 

@@ -1,6 +1,6 @@
 # RULE-AUTH-RF45 — Verificación 2FA en solicitudes críticas
 
-> **Score: 1/5 — Esqueleto** | Domain: auth | Scope: bookly-mock-frontend
+> **Score: 1/5 — Esqueleto** | Domain: auth | Scope: bookly-frontend
 
 ## Resumen
 

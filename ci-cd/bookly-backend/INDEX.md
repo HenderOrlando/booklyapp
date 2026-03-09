@@ -1,13 +1,13 @@
 # 📑 Índice de Archivos CI/CD - Bookly Mock (Backend)
 
-Este archivo proporciona un índice completo de todos los archivos relacionados con CI/CD y despliegue de **bookly-mock** (backend con microservicios NestJS).
+Este archivo proporciona un índice completo de todos los archivos relacionados con CI/CD y despliegue de **bookly-backend** (backend con microservicios NestJS).
 
 ## 📊 Resumen de Reorganización
 
 **Fecha**: 6 de diciembre de 2025  
 **Alcance**: Bookly Mock (Backend)
 
-Todos los archivos de despliegue de **bookly-mock** han sido reorganizados desde la raíz del proyecto y la carpeta `bookly-mock/` hacia la carpeta `ci-cd/` para mejor organización y mantenibilidad.
+Todos los archivos de despliegue de **bookly-backend** han sido reorganizados desde la raíz del proyecto y la carpeta `bookly-backend/` hacia la carpeta `ci-cd/` para mejor organización y mantenibilidad.
 
 ## 📁 Archivos Movidos
 
@@ -16,29 +16,29 @@ Todos los archivos de despliegue de **bookly-mock** han sido reorganizados desde
 | Archivo Original | Nueva Ubicación | Descripción |
 |-----------------|-----------------|-------------|
 | `START_ALL_LOCAL.ps1` | `ci-cd/scripts/local/start-all.ps1` | Script maestro - Inicia infraestructura |
-| `bookly-mock/start-backend-local.ps1` | `ci-cd/scripts/local/start-backend.ps1` | Inicia microservicios localmente |
-| `bookly-mock/start-local.ps1` | `ci-cd/scripts/local/start-services-jobs.ps1` | Versión con PowerShell Jobs |
-| `bookly-mock-frontend/start-frontend-local.ps1` | `ci-cd/scripts/local/start-frontend.ps1` | Inicia frontend Next.js |
+| `bookly-backend/start-backend-local.ps1` | `ci-cd/scripts/local/start-backend.ps1` | Inicia microservicios localmente |
+| `bookly-backend/start-local.ps1` | `ci-cd/scripts/local/start-services-jobs.ps1` | Versión con PowerShell Jobs |
+| `bookly-frontend/start-frontend-local.ps1` | `ci-cd/scripts/local/start-frontend.ps1` | Inicia frontend Next.js |
 
 ### Scripts Docker
 
 | Archivo Original | Nueva Ubicación | Descripción |
 |-----------------|-----------------|-------------|
-| `bookly-mock/docker-deploy.ps1` | `ci-cd/scripts/docker/deploy.ps1` | Despliega todo en Docker |
-| `bookly-mock/docker-verify.ps1` | `ci-cd/scripts/docker/verify.ps1` | Verifica servicios Docker |
+| `bookly-backend/docker-deploy.ps1` | `ci-cd/scripts/docker/deploy.ps1` | Despliega todo en Docker |
+| `bookly-backend/docker-verify.ps1` | `ci-cd/scripts/docker/verify.ps1` | Verifica servicios Docker |
 
 ### Dockerfiles
 
 | Archivo Original | Nueva Ubicación | Descripción |
 |-----------------|-----------------|-------------|
-| `bookly-mock/Dockerfile.gateway` | `ci-cd/dockerfiles/Dockerfile.gateway` | API Gateway |
-| `bookly-mock/Dockerfile.auth` | `ci-cd/dockerfiles/Dockerfile.auth` | Auth Service |
-| `bookly-mock/Dockerfile.resources` | `ci-cd/dockerfiles/Dockerfile.resources` | Resources Service |
-| `bookly-mock/Dockerfile.availability` | `ci-cd/dockerfiles/Dockerfile.availability` | Availability Service |
-| `bookly-mock/Dockerfile.stockpile` | `ci-cd/dockerfiles/Dockerfile.stockpile` | Stockpile Service |
-| `bookly-mock/Dockerfile.reports` | `ci-cd/dockerfiles/Dockerfile.reports` | Reports Service |
-| `bookly-mock/Dockerfile.base` | `ci-cd/dockerfiles/Dockerfile.base` | Dockerfile base compartido |
-| `bookly-mock/Dockerfile.simple-gateway` | `ci-cd/dockerfiles/Dockerfile.simple-gateway` | Versión simplificada del gateway |
+| `bookly-backend/Dockerfile.gateway` | `ci-cd/dockerfiles/Dockerfile.gateway` | API Gateway |
+| `bookly-backend/Dockerfile.auth` | `ci-cd/dockerfiles/Dockerfile.auth` | Auth Service |
+| `bookly-backend/Dockerfile.resources` | `ci-cd/dockerfiles/Dockerfile.resources` | Resources Service |
+| `bookly-backend/Dockerfile.availability` | `ci-cd/dockerfiles/Dockerfile.availability` | Availability Service |
+| `bookly-backend/Dockerfile.stockpile` | `ci-cd/dockerfiles/Dockerfile.stockpile` | Stockpile Service |
+| `bookly-backend/Dockerfile.reports` | `ci-cd/dockerfiles/Dockerfile.reports` | Reports Service |
+| `bookly-backend/Dockerfile.base` | `ci-cd/dockerfiles/Dockerfile.base` | Dockerfile base compartido |
+| `bookly-backend/Dockerfile.simple-gateway` | `ci-cd/dockerfiles/Dockerfile.simple-gateway` | Versión simplificada del gateway |
 
 ### Documentación
 
@@ -46,8 +46,8 @@ Todos los archivos de despliegue de **bookly-mock** han sido reorganizados desde
 |-----------------|-----------------|-------------|
 | `INICIO_RAPIDO.md` | `ci-cd/docs/INICIO_RAPIDO.md` | Guía de inicio rápido |
 | `ESTADO_DESPLIEGUE.md` | `ci-cd/docs/ESTADO_DESPLIEGUE.md` | Estado actual del despliegue |
-| `bookly-mock/DOCKER_DEPLOYMENT.md` | `ci-cd/docs/DOCKER_DEPLOYMENT.md` | Guía completa de Docker |
-| `bookly-mock/README_QUICK_START.md` | `ci-cd/docs/QUICK_START.md` | Quick start original |
+| `bookly-backend/DOCKER_DEPLOYMENT.md` | `ci-cd/docs/DOCKER_DEPLOYMENT.md` | Guía completa de Docker |
+| `bookly-backend/README_QUICK_START.md` | `ci-cd/docs/QUICK_START.md` | Quick start original |
 | `DEPLOYMENT_SUMMARY.md` | `ci-cd/docs/DEPLOYMENT_SUMMARY.md` | Resumen técnico del despliegue |
 
 ## 📝 Archivos Nuevos Creados
@@ -61,9 +61,9 @@ Todos los archivos de despliegue de **bookly-mock** han sido reorganizados desde
 
 ```
 booklyapp/
-├── ci-cd/                          # Carpeta CI/CD de bookly-mock (backend)
-│   ├── README.md                   # Guía principal de bookly-mock
-│   ├── INDEX.md                    # Este archivo - Índice de bookly-mock
+├── ci-cd/                          # Carpeta CI/CD de bookly-backend (backend)
+│   ├── README.md                   # Guía principal de bookly-backend
+│   ├── INDEX.md                    # Este archivo - Índice de bookly-backend
 │   │
 │   ├── scripts/                    # Scripts de despliegue
 │   │   ├── local/                  # Ejecución local
@@ -93,12 +93,12 @@ booklyapp/
 │       ├── QUICK_START.md
 │       └── DEPLOYMENT_SUMMARY.md
 │
-├── bookly-mock/                    # Backend (sin scripts de despliegue)
+├── bookly-backend/                    # Backend (sin scripts de despliegue)
 │   ├── docker-compose.yml          # Permanece aquí
 │   ├── .env.docker.example         # Permanece aquí
 │   └── ...
 │
-├── bookly-mock-frontend/           # Frontend (sin scripts de despliegue)
+├── bookly-frontend/           # Frontend (sin scripts de despliegue)
 │   └── ...
 │
 └── README.md                       # README principal (actualizado con sección CI/CD)
@@ -108,7 +108,7 @@ booklyapp/
 
 ### En docker-compose.yml
 
-Si `bookly-mock/docker-compose.yml` hace referencia a los Dockerfiles, actualizar las rutas:
+Si `bookly-backend/docker-compose.yml` hace referencia a los Dockerfiles, actualizar las rutas:
 
 ```yaml
 services:
@@ -131,18 +131,18 @@ Los scripts en `ci-cd/scripts/local/` ya han sido actualizados con rutas relativ
 .\ci-cd\scripts\local\start-all.ps1
 
 # Backend (en otra terminal)
-cd bookly-mock
+cd bookly-backend
 npm run start:all
 
 # Frontend (en otra terminal)
-cd bookly-mock-frontend
+cd bookly-frontend
 npm run dev
 ```
 
 ### Despliegue Docker Completo
 
 ```powershell
-cd bookly-mock
+cd bookly-backend
 ..\ci-cd\scripts\docker\deploy.ps1
 ```
 
@@ -154,18 +154,18 @@ cd bookly-mock
 
 ## ✅ Beneficios de la Reorganización
 
-1. **Mejor Organización**: Todos los archivos de CI/CD de bookly-mock en un solo lugar
-2. **Separación de Responsabilidades**: Scripts de bookly-mock separados de código fuente
-3. **Fácil Navegación**: Estructura clara y lógica para bookly-mock
-4. **Mantenibilidad**: Más fácil encontrar y actualizar archivos de bookly-mock
-5. **Escalabilidad**: Preparado para agregar más scripts y configuraciones de bookly-mock
+1. **Mejor Organización**: Todos los archivos de CI/CD de bookly-backend en un solo lugar
+2. **Separación de Responsabilidades**: Scripts de bookly-backend separados de código fuente
+3. **Fácil Navegación**: Estructura clara y lógica para bookly-backend
+4. **Mantenibilidad**: Más fácil encontrar y actualizar archivos de bookly-backend
+5. **Escalabilidad**: Preparado para agregar más scripts y configuraciones de bookly-backend
 
 ## 🎯 Alcance
 
-> **Importante**: Este directorio `ci-cd/` contiene **únicamente** las configuraciones de despliegue para **bookly-mock** (backend con microservicios NestJS).
+> **Importante**: Este directorio `ci-cd/` contiene **únicamente** las configuraciones de despliegue para **bookly-backend** (backend con microservicios NestJS).
 >
 > Para otros componentes del proyecto Bookly:
-> - **bookly-mock-frontend**: Ver carpeta `bookly-mock-frontend/` (scripts específicos si existen)
+> - **bookly-frontend**: Ver carpeta `bookly-frontend/` (scripts específicos si existen)
 > - **Otros servicios**: Consultar sus respectivos directorios
 
 ---

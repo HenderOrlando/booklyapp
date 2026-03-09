@@ -27,32 +27,32 @@ jobs:
       matrix:
         service: 
           - name: api-gateway
-            dockerfile: ci-cd/bookly-mock/dockerfiles/Dockerfile.gateway
-            context: bookly-mock
+            dockerfile: ci-cd/bookly-backend/dockerfiles/Dockerfile.gateway
+            context: bookly-backend
             port: 3000
           - name: auth-service
-            dockerfile: ci-cd/bookly-mock/dockerfiles/Dockerfile.auth
-            context: bookly-mock
+            dockerfile: ci-cd/bookly-backend/dockerfiles/Dockerfile.auth
+            context: bookly-backend
             port: 3001
           - name: availability-service
-            dockerfile: ci-cd/bookly-mock/dockerfiles/Dockerfile.availability
-            context: bookly-mock
+            dockerfile: ci-cd/bookly-backend/dockerfiles/Dockerfile.availability
+            context: bookly-backend
             port: 3002
           - name: resources-service
-            dockerfile: ci-cd/bookly-mock/dockerfiles/Dockerfile.resources
-            context: bookly-mock
+            dockerfile: ci-cd/bookly-backend/dockerfiles/Dockerfile.resources
+            context: bookly-backend
             port: 3003
           - name: reports-service
-            dockerfile: ci-cd/bookly-mock/dockerfiles/Dockerfile.reports
-            context: bookly-mock
+            dockerfile: ci-cd/bookly-backend/dockerfiles/Dockerfile.reports
+            context: bookly-backend
             port: 3004
           - name: stockpile-service
-            dockerfile: ci-cd/bookly-mock/dockerfiles/Dockerfile.stockpile
-            context: bookly-mock
+            dockerfile: ci-cd/bookly-backend/dockerfiles/Dockerfile.stockpile
+            context: bookly-backend
             port: 3005
           - name: bookly-web
-            dockerfile: ci-cd/bookly-mock/dockerfiles/Dockerfile.web
-            context: bookly-mock-frontend
+            dockerfile: ci-cd/bookly-backend/dockerfiles/Dockerfile.web
+            context: bookly-frontend
             port: 3006
 
     permissions:

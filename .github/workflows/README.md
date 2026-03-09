@@ -70,9 +70,9 @@ Cada servicio tiene su propio workflow que se activa automáticamente cuando:
 
 1. **Push a ramas principales** (`main` o `develop`)
 2. **Cambios en archivos específicos**:
-   - Código del servicio específico (`bookly-mock/apps/{servicio}/**`)
-   - Librerías compartidas (`bookly-mock/libs/**`)
-   - Dockerfile del servicio (`ci-cd/bookly-mock/dockerfiles/Dockerfile.{servicio}`)
+   - Código del servicio específico (`bookly-backend/apps/{servicio}/**`)
+   - Librerías compartidas (`bookly-backend/libs/**`)
+   - Dockerfile del servicio (`ci-cd/bookly-backend/dockerfiles/Dockerfile.{servicio}`)
    - El propio workflow (`.github/workflows/{servicio}.yml`)
 
 ### Triggers Manuales
@@ -138,7 +138,7 @@ services:
   api-gateway:
     build:
       context: .
-      dockerfile: ../ci-cd/bookly-mock/dockerfiles/Dockerfile.gateway
+      dockerfile: ../ci-cd/bookly-backend/dockerfiles/Dockerfile.gateway
     # ...
 ```
 

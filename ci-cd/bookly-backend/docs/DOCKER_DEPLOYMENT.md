@@ -42,7 +42,7 @@ El despliegue incluye los siguientes componentes:
 
 ```powershell
 # En Windows PowerShell
-cd bookly-mock
+cd bookly-backend
 .\docker-deploy.ps1
 ```
 
@@ -136,7 +136,7 @@ Una vez desplegado, puedes acceder a:
 
 ### Variables de Entorno
 
-Puedes crear un archivo `.env` en el directorio `bookly-mock` basado en `.env.docker.example`:
+Puedes crear un archivo `.env` en el directorio `bookly-backend` basado en `.env.docker.example`:
 
 ```bash
 cp .env.docker.example .env
@@ -189,13 +189,13 @@ docker-compose up -d --scale reports-service=3
 
 ```bash
 # Entrar a un contenedor
-docker exec -it bookly-mock-api-gateway sh
+docker exec -it bookly-backend-api-gateway sh
 
 # Ver estadísticas de recursos
 docker stats
 
 # Inspeccionar red
-docker network inspect bookly-mock_bookly-mock-network
+docker network inspect bookly-backend_bookly-backend-network
 
 # Ver volúmenes
 docker volume ls
@@ -236,7 +236,7 @@ docker-compose restart mongodb-auth redis kafka
 
 ```bash
 # Verificar health de MongoDB
-docker exec bookly-mock-mongodb-auth mongosh --eval "db.adminCommand('ping')"
+docker exec bookly-backend-mongodb-auth mongosh --eval "db.adminCommand('ping')"
 ```
 
 ### Problema: Frontend no carga
@@ -319,7 +319,7 @@ done
 
 ```bash
 # Escanear imagen
-docker scan bookly-mock-api-gateway
+docker scan bookly-backend-api-gateway
 ```
 
 ## 📝 Notas Adicionales
@@ -343,7 +343,7 @@ Los datos se almacenan en volúmenes Docker:
 docker volume ls | grep bookly
 
 # Backup de un volumen
-docker run --rm -v bookly-mock_mongodb-auth-data:/data -v $(pwd):/backup alpine tar czf /backup/mongodb-auth-backup.tar.gz /data
+docker run --rm -v bookly-backend_mongodb-auth-data:/data -v $(pwd):/backup alpine tar czf /backup/mongodb-auth-backup.tar.gz /data
 ```
 
 ### Actualización de Servicios

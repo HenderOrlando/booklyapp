@@ -24,7 +24,7 @@ Este script:
 ### Paso 2: Iniciar Backend (Nueva terminal)
 
 ```powershell
-cd bookly-mock
+cd bookly-backend
 .\start-backend-local.ps1
 ```
 
@@ -39,7 +39,7 @@ Esto inicia los 6 microservicios:
 ### Paso 3: Iniciar Frontend (Nueva terminal)
 
 ```powershell
-cd bookly-mock-frontend
+cd bookly-frontend
 .\start-frontend-local.ps1
 ```
 
@@ -65,7 +65,7 @@ cd bookly-mock-frontend
 
 ### Detener Infraestructura Docker
 ```powershell
-cd bookly-mock
+cd bookly-backend
 docker-compose down
 ```
 
@@ -73,20 +73,20 @@ docker-compose down
 
 ### Ver contenedores Docker
 ```powershell
-docker ps --filter "name=bookly-mock"
+docker ps --filter "name=bookly-backend"
 ```
 
 ### Ver logs de infraestructura
 ```powershell
-cd bookly-mock
+cd bookly-backend
 docker-compose logs -f
 ```
 
 ## ⚙️ Configuración
 
 Las variables de entorno están en:
-- Backend: `bookly-mock/.env` (se crea automáticamente)
-- Frontend: `bookly-mock-frontend/.env.local`
+- Backend: `bookly-backend/.env` (se crea automáticamente)
+- Frontend: `bookly-frontend/.env.local`
 
 ## 🐛 Troubleshooting
 
@@ -95,7 +95,7 @@ Las variables de entorno están en:
 
 ### Error: "Infraestructura Docker no está corriendo"
 ```powershell
-cd bookly-mock
+cd bookly-backend
 docker-compose up -d zookeeper kafka redis mongodb-auth mongodb-resources mongodb-availability mongodb-stockpile mongodb-reports mongodb-gateway
 ```
 
@@ -117,6 +117,6 @@ docker-compose up -d zookeeper kafka redis mongodb-auth mongodb-resources mongod
 
 ## 📚 Más Información
 
-- **Documentación completa**: Ver `bookly-mock/DOCKER_DEPLOYMENT.md`
+- **Documentación completa**: Ver `bookly-backend/DOCKER_DEPLOYMENT.md`
 - **Arquitectura**: Ver `docs/`
 - **Testing**: Ver `test-endpoints-api-gateway/`

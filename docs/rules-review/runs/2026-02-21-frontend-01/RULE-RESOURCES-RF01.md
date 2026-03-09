@@ -1,6 +1,6 @@
 # RULE-RESOURCES-RF01 — CRUD de recursos
 
-> **Score: 3/5 — Funcional** | Domain: resources | Scope: bookly-mock-frontend
+> **Score: 3/5 — Funcional** | Domain: resources | Scope: bookly-frontend
 
 ## Resumen
 
